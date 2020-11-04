@@ -67,7 +67,8 @@ public class CaseAssignedUserRolesController {
     @Autowired
     public CaseAssignedUserRolesController(ApplicationParams applicationParams,
                                            UIDService caseReferenceService,
-                                           @Qualifier("authorised") CaseAssignedUserRolesOperation caseAssignedUserRolesOperation,
+                                           @Qualifier("authorised") CaseAssignedUserRolesOperation
+                                                   caseAssignedUserRolesOperation,
                                            SecurityUtils securityUtils) {
         this.applicationParams = applicationParams;
         this.caseReferenceService = caseReferenceService;
@@ -99,12 +100,12 @@ public class CaseAssignedUserRolesController {
         ),
         @ApiResponse(
             code = 401,
-            message = "Authentication failure due to invalid / expired tokens (IDAM / S2S)."
+            message = V2.Error.AUTHENTICATION_TOKEN_INVALID
         ),
         @ApiResponse(
             code = 403,
             message = "One of the following reasons:\n"
-                + "1. Unauthorised S2S service \n"
+                + "1. " + V2.Error.UNAUTHORISED_S2S_SERVICE + "\n"
                 + "2. " + V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION + "."
         ),
         @ApiResponse(
@@ -114,9 +115,12 @@ public class CaseAssignedUserRolesController {
     })
     @LogAudit(
         operationType = ADD_CASE_ASSIGNED_USER_ROLES,
-        caseId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildCaseIds(#caseAssignedUserRolesRequest)",
-        targetIdamId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildUserIds(#caseAssignedUserRolesRequest)",
-        targetCaseRoles = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildCaseRoles(#caseAssignedUserRolesRequest)"
+        caseId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController)"
+            + ".buildCaseIds(#caseAssignedUserRolesRequest)",
+        targetIdamId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController)"
+            + ".buildUserIds(#caseAssignedUserRolesRequest)",
+        targetCaseRoles = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController)"
+            + ".buildCaseRoles(#caseAssignedUserRolesRequest)"
     )
     public ResponseEntity<CaseAssignedUserRolesResponse> addCaseUserRoles(
         @ApiParam(value = "Valid Service-to-Service JWT token for an approved micro-service", required = true)
@@ -148,7 +152,8 @@ public class CaseAssignedUserRolesController {
                             + "1. " + V2.Error.EMPTY_CASE_USER_ROLE_LIST + ", \n"
                             + "2. " + V2.Error.CASE_ID_INVALID + ": has to be a valid 16-digit Luhn number, \n"
                             + "3. " + V2.Error.USER_ID_INVALID + ": has to be a string of length > 0, \n"
-                            + "4. " + V2.Error.CASE_ROLE_FORMAT_INVALID + ": has to be a none-empty string in square brackets, \n"
+                            + "4. " + V2.Error.CASE_ROLE_FORMAT_INVALID + ": has to be a none-empty string in square "
+                                + "brackets, \n"
                             + "5. " + V2.Error.ORGANISATION_ID_INVALID + ": has to be a non-empty string, when present."
             ),
             @ApiResponse(
@@ -168,9 +173,12 @@ public class CaseAssignedUserRolesController {
     })
     @LogAudit(
             operationType = REMOVE_CASE_ASSIGNED_USER_ROLES,
-            caseId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildCaseIds(#caseAssignedUserRolesRequest)",
-            targetIdamId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildUserIds(#caseAssignedUserRolesRequest)",
-            targetCaseRoles = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildCaseRoles(#caseAssignedUserRolesRequest)"
+            caseId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController)"
+                + ".buildCaseIds(#caseAssignedUserRolesRequest)",
+            targetIdamId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController)"
+                + ".buildUserIds(#caseAssignedUserRolesRequest)",
+            targetCaseRoles = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController)"
+                + ".buildCaseRoles(#caseAssignedUserRolesRequest)"
     )
     public ResponseEntity<CaseAssignedUserRolesResponse> removeCaseUserRoles(
             @ApiParam(value = "Valid Service-to-Service JWT token for an approved micro-service", required = true)
@@ -179,7 +187,8 @@ public class CaseAssignedUserRolesController {
             @RequestBody CaseAssignedUserRolesRequest caseAssignedUserRolesRequest
     ) {
         validateRequest(clientS2SToken, caseAssignedUserRolesRequest);
-        this.caseAssignedUserRolesOperation.removeCaseUserRoles(caseAssignedUserRolesRequest.getCaseAssignedUserRoles());
+        this.caseAssignedUserRolesOperation.removeCaseUserRoles(caseAssignedUserRolesRequest
+            .getCaseAssignedUserRoles());
         return ResponseEntity.status(HttpStatus.OK).body(new CaseAssignedUserRolesResponse(REMOVE_SUCCESS_MESSAGE));
     }
 
@@ -214,11 +223,15 @@ public class CaseAssignedUserRolesController {
     })
     @LogAudit(
         operationType = GET_CASE_ASSIGNED_USER_ROLES,
-        caseId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildOptionalIds(#caseIds)",
-        targetIdamId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController).buildOptionalIds(#optionalUserIds)"
+        caseId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController)"
+            + ".buildOptionalIds(#caseIds)",
+        targetIdamId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController)"
+            + ".buildOptionalIds(#optionalUserIds)"
     )
-    public ResponseEntity<CaseAssignedUserRolesResource> getCaseUserRoles(@RequestParam("case_ids") List<String> caseIds,
-                                                                          @RequestParam(value = "user_ids", required = false)
+    public ResponseEntity<CaseAssignedUserRolesResource> getCaseUserRoles(@RequestParam("case_ids")
+                                                                                  List<String> caseIds,
+                                                                          @RequestParam(value = "user_ids",
+                                                                              required = false)
                                                                               Optional<List<String>> optionalUserIds) {
         List<String> userIds = optionalUserIds.orElseGet(Lists::newArrayList);
         validateRequestParams(caseIds, userIds);
@@ -230,7 +243,8 @@ public class CaseAssignedUserRolesController {
     }
 
     private void validateRequestParams(List<String> caseIds, List<String> userIds) {
-        List<String> errorMessages = Lists.newArrayList("Invalid data provided for the following inputs to the request:");
+        List<String> errorMessages =
+            Lists.newArrayList("Invalid data provided for the following inputs to the request:");
         if (caseIds == null || caseIds.isEmpty()) {
             errorMessages.add(V2.Error.EMPTY_CASE_ID_LIST);
         } else {
@@ -255,7 +269,8 @@ public class CaseAssignedUserRolesController {
 
     private void validateRequestParams(CaseAssignedUserRolesRequest addCaseAssignedUserRolesRequest) {
 
-        List<String> errorMessages = Lists.newArrayList("Invalid data provided for the following inputs to the request:");
+        List<String> errorMessages =
+            Lists.newArrayList("Invalid data provided for the following inputs to the request:");
 
         List<CaseAssignedUserRoleWithOrganisation> caseUserRoles =
             caseAssignedUserRolesToStream(addCaseAssignedUserRolesRequest).collect(Collectors.toList());
@@ -273,7 +288,8 @@ public class CaseAssignedUserRolesController {
         }
     }
 
-    private void validateCaseAssignedUserRoleRequest(CaseAssignedUserRoleWithOrganisation caseRole, List<String> errorMessages) {
+    private void validateCaseAssignedUserRoleRequest(CaseAssignedUserRoleWithOrganisation caseRole,
+                                                     List<String> errorMessages) {
         // case_id: has to be a valid 16-digit Luhn number
         if (!caseReferenceService.validateUID(caseRole.getCaseDataId())) {
             errorMessages.add(V2.Error.CASE_ID_INVALID);
@@ -319,7 +335,8 @@ public class CaseAssignedUserRolesController {
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 
-    private static Stream<CaseAssignedUserRoleWithOrganisation> caseAssignedUserRolesToStream(CaseAssignedUserRolesRequest addCaseAssignedUserRolesRequest) {
+    private static Stream<CaseAssignedUserRoleWithOrganisation> caseAssignedUserRolesToStream(
+        CaseAssignedUserRolesRequest addCaseAssignedUserRolesRequest) {
         return addCaseAssignedUserRolesRequest != null
             ? Optional.ofNullable(addCaseAssignedUserRolesRequest.getCaseAssignedUserRoles())
                 .map(Collection::stream)

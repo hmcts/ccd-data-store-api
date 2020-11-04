@@ -1,0 +1,50 @@
+{
+  "_guid_": "F-114_Case_Data_Create_Token_Creation",
+  "_extends_": "Standard_Token_Creation_Data_For_Case_Creation",
+  "specs": [
+    "to create a token for case creation"
+  ],
+  "users": {
+    "invokingUser": {
+      "username": "master.caseworker@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
+  },
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_ComplexOrganisation",
+      "etid": "createOrganisation"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "case_details" : {
+        "id" : null,
+        "jurisdiction" : "BEFTA_MASTER",
+        "state" : null,
+        "version" : null,
+        "case_type_id" : "FT_ComplexOrganisation",
+        "created_date" : null,
+        "last_modified" : null,
+        "last_state_modified_date" : null,
+        "security_classification" : null,
+        "case_data" : {
+          "OrganisationPolicyField" : {
+            "OrgPolicyCaseAssignedRole" : "[Claimant]"
+          }
+        },
+        "data_classification" : { },
+        "supplementary_data" : null,
+        "after_submit_callback_response" : null,
+        "callback_response_status_code" : null,
+        "callback_response_status" : null,
+        "delete_draft_response_status_code" : null,
+        "delete_draft_response_status" : null,
+        "security_classifications" : { }
+      },
+      "event_id": "createOrganisation"
+    }
+  }
+}

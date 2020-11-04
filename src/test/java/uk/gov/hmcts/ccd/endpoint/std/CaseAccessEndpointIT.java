@@ -56,11 +56,13 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn200WhenFindIdsCalled() throws Exception {
 
-        final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/ids?userId=" + USER_ID;
+        final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/ids?userId=" + USER_ID;
 
         grantAccess();
 
-        final String aUrl = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_ID + "/users";
+        final String aUrl = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/" + CASE_ID + "/users";
 
         mockMvc.perform(post(aUrl)
             .contentType(MediaType.APPLICATION_JSON)
@@ -82,7 +84,8 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturnEmptyListWhenFindIdsCalledAndNoGrantsExist() throws Exception {
-        final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/ids?userId=12312312312321";
+        final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
+            + "/cases/ids?userId=12312312312321";
 
         final MvcResult mvcResult = mockMvc.perform(get(url))
             .andExpect(status().isOk())
@@ -112,10 +115,11 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
-        MatcherAssert.assertThat(captor.getValue().getOperationType(), is(AuditOperationType.GRANT_CASE_ACCESS.getLabel()));
+        MatcherAssert.assertThat(captor.getValue().getOperationType(),
+            is(AuditOperationType.GRANT_CASE_ACCESS.getLabel()));
         MatcherAssert.assertThat(captor.getValue().getCaseId(), is(CASE_ID));
         MatcherAssert.assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
-        MatcherAssert.assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        MatcherAssert.assertThat(captor.getValue().getIdamId(), is(USER_ID));
         MatcherAssert.assertThat(captor.getValue().getInvokingService(), is("ccd_gw"));
         MatcherAssert.assertThat(captor.getValue().getHttpStatus(), is(201));
         MatcherAssert.assertThat(captor.getValue().getTargetIdamId(), is(USER_ID));
@@ -146,10 +150,11 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
         verify(auditRepository, times(2)).save(captor.capture());
         List<AuditEntry> auditEntry = captor.getAllValues();
 
-        MatcherAssert.assertThat(auditEntry.get(1).getOperationType(), is(AuditOperationType.REVOKE_CASE_ACCESS.getLabel()));
+        MatcherAssert.assertThat(auditEntry.get(1).getOperationType(),
+            is(AuditOperationType.REVOKE_CASE_ACCESS.getLabel()));
         MatcherAssert.assertThat(auditEntry.get(1).getCaseId(), is(CASE_ID));
         MatcherAssert.assertThat(auditEntry.get(1).getJurisdiction(), is(JURISDICTION));
-        MatcherAssert.assertThat(auditEntry.get(1).getIdamId(), is("Cloud.Strife@test.com"));
+        MatcherAssert.assertThat(auditEntry.get(1).getIdamId(), is(USER_ID));
         MatcherAssert.assertThat(auditEntry.get(1).getInvokingService(), is("ccd_gw"));
         MatcherAssert.assertThat(auditEntry.get(1).getHttpStatus(), is(204));
         MatcherAssert.assertThat(auditEntry.get(1).getTargetIdamId(), is(USER_ID));
@@ -170,7 +175,8 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
     }
 
     private void revokeAccess() throws Exception {
-        final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/" + CASE_ID + "/users/" + USER_ID;
+        final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/"
+            + CASE_ID + "/users/" + USER_ID;
 
         mockMvc.perform(delete(url))
             .andExpect(status().isNoContent())

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.search;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import java.util.ArrayList;
@@ -14,12 +15,16 @@ public class CaseSearchResult {
     private Long total;
     private List<CaseDetails> cases;
 
+    @JsonProperty("case_types_results")
+    private List<CaseTypeResults> caseTypesResults;
+
     public CaseSearchResult() {
     }
 
     public CaseSearchResult(Long total, List<CaseDetails> cases, List<CaseTypeResults> caseTypesResults) {
         this.cases = cases;
         this.total = total;
+        this.caseTypesResults = caseTypesResults;
     }
 
     public CaseSearchResult(Long total, List<CaseDetails> cases) {
@@ -37,6 +42,11 @@ public class CaseSearchResult {
     public List<String> getCaseReferences(String caseTypeId) {
         return cases == null
             ? emptyList()
-            : cases.stream().filter(c -> c.getCaseTypeId().equals(caseTypeId)).map(CaseDetails::getReferenceAsString).collect(toList());
+            : cases.stream().filter(c ->
+            c.getCaseTypeId().equals(caseTypeId)).map(CaseDetails::getReferenceAsString).collect(toList());
+    }
+
+    public List<CaseTypeResults> getCaseTypesResults() {
+        return caseTypesResults;
     }
 }

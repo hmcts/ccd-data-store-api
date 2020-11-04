@@ -36,7 +36,8 @@ import java.util.Optional;
 @Named
 @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
 @Singleton
-@SuppressWarnings("checkstyle:SummaryJavadoc") // partial javadoc attributes added prior to checkstyle implementation in module
+@SuppressWarnings("checkstyle:SummaryJavadoc")
+// partial javadoc attributes added prior to checkstyle implementation in module
 public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCaseDetailsRepository.class);
@@ -146,14 +147,16 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-    public List<CaseDetails> findByMetaDataAndFieldData(final MetaData metadata, final Map<String, String> dataSearchParams) {
+    public List<CaseDetails> findByMetaDataAndFieldData(final MetaData metadata,
+                                                        final Map<String, String> dataSearchParams) {
         final Query query = getQuery(metadata, dataSearchParams, false);
         paginate(query, metadata.getPage());
         return caseDetailsMapper.entityToModel(query.getResultList());
     }
 
     @Override
-    public PaginatedSearchMetadata getPaginatedSearchMetadata(MetaData metaData, Map<String, String> dataSearchParams) {
+    public PaginatedSearchMetadata getPaginatedSearchMetadata(MetaData metaData,
+                                                              Map<String, String> dataSearchParams) {
         final Query query = getQuery(metaData, dataSearchParams, true);
         Integer totalResults = ((Number) query.getSingleResult()).intValue();
         int pageSize = applicationParams.getPaginationPageSize();
@@ -177,7 +180,8 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     /**
      * Finds a case using a query builder that doesn't secure the query.
-     * Required in some corner cases but {@link CaseDetailsRepository#findByReference(String, Long)} should be used most of the times
+     * Required in some corner cases but {@link CaseDetailsRepository#findByReference(String, Long)}
+     * should be used most of the times
      */
     @Override
     public Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference) {
@@ -186,7 +190,9 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         return qb.getSingleResult().map(this.caseDetailsMapper::entityToModel);
     }
 
-    private Optional<CaseDetailsEntity> getCaseDetailsEntity(Long id, String reference, CaseDetailsQueryBuilder<CaseDetailsEntity> qb) {
+    private Optional<CaseDetailsEntity> getCaseDetailsEntity(Long id,
+                                                             String reference,
+                                                             CaseDetailsQueryBuilder<CaseDetailsEntity> qb) {
         if (null != reference) {
             qb.whereReference(reference);
         } else {

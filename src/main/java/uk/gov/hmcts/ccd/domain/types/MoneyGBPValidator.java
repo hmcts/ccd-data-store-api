@@ -53,7 +53,8 @@ public class MoneyGBPValidator implements BaseTypeValidator {
                 );
             }
         } catch (NumberFormatException e) {
-            return Collections.singletonList(new ValidationResult(value + " is not a valid value.  Money GBP needs to be expressed in pence", dataFieldId));
+            return Collections.singletonList(new ValidationResult(value + " is not a valid value.  "
+                + "Money GBP needs to be expressed in pence", dataFieldId));
         }
 
         return Collections.emptyList();

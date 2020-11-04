@@ -106,7 +106,8 @@ public abstract class AbstractDefaultGetCaseViewOperation {
             .collect(Collectors.toList());
     }
 
-    protected void hydrateHistoryField(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition, List<CaseViewEvent> events) {
+    protected void hydrateHistoryField(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition,
+                                       List<CaseViewEvent> events) {
         for (CaseFieldDefinition caseFieldDefinition : caseTypeDefinition.getCaseFieldDefinitions()) {
             if (caseFieldDefinition.getFieldTypeDefinition().getType().equals(CASE_HISTORY_VIEWER)) {
                 JsonNode eventsNode = objectMapperService.convertObjectToJsonNode(events);

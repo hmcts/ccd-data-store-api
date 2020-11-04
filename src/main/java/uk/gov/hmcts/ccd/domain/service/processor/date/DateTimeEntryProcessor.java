@@ -56,7 +56,8 @@ public class DateTimeEntryProcessor extends CaseDataFieldProcessor {
                                          String fieldPath,
                                          WizardPageComplexFieldOverride override,
                                          CommonField topLevelField) {
-        final BaseType collectionFieldType = BaseType.get(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getType());
+        final BaseType collectionFieldType =
+            BaseType.get(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getType());
 
         if (shouldExecuteCollection(collectionNode, caseViewField,
             DATETIMEENTRY, collectionFieldType, SUPPORTED_TYPES)) {

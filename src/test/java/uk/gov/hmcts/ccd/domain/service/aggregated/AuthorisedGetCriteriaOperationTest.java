@@ -86,7 +86,8 @@ class AuthorisedGetCriteriaOperationTest {
 
         doReturn(testCaseTypeOpt).when(getCaseTypeOperation).execute(CASE_TYPE_ONE, CAN_READ);
 
-        classUnderTest = new AuthorisedGetCriteriaOperation(getCriteriaOperation, getCaseTypeOperation, userRepository);
+        classUnderTest =
+            new AuthorisedGetCriteriaOperation(getCriteriaOperation, getCaseTypeOperation, userRepository);
     }
 
     @Test
@@ -94,7 +95,8 @@ class AuthorisedGetCriteriaOperationTest {
     void shouldFailWhenWhenNoReadAccess() {
         doReturn(Optional.empty()).when(getCaseTypeOperation).execute(CASE_TYPE_ONE, CAN_READ);
 
-        assertThrows(ResourceNotFoundException.class, () -> classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET));
+        assertThrows(ResourceNotFoundException.class, () ->
+            classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET));
     }
 
     @Test
@@ -102,7 +104,8 @@ class AuthorisedGetCriteriaOperationTest {
     void shouldReturnOnlyAuthorisedSearchInputs() {
         doReturn(testSearchInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
 
-        final List<SearchInput> searchInputs = (List<SearchInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
+        final List<SearchInput> searchInputs =
+            (List<SearchInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(3)),
@@ -118,7 +121,8 @@ class AuthorisedGetCriteriaOperationTest {
         doReturn(testSearchInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
         doReturn(Sets.newHashSet(ROLE1)).when(userRepository).getUserRoles();
 
-        final List<SearchInput> searchInputs = (List<SearchInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
+        final List<SearchInput> searchInputs =
+            (List<SearchInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(4)),
@@ -135,7 +139,8 @@ class AuthorisedGetCriteriaOperationTest {
         doReturn(testSearchInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
         doReturn(Sets.newHashSet(ROLE1, ROLE2)).when(userRepository).getUserRoles();
 
-        final List<SearchInput> searchInputs = (List<SearchInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
+        final List<SearchInput> searchInputs =
+            (List<SearchInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(4)),
@@ -151,7 +156,8 @@ class AuthorisedGetCriteriaOperationTest {
     void shouldReturnEmptySearchInputWhenNoFieldIsAuthorised() {
         doReturn(new ArrayList<>()).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
 
-        final List<SearchInput> searchInputs = (List<SearchInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
+        final List<SearchInput> searchInputs =
+            (List<SearchInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(0))
@@ -163,7 +169,8 @@ class AuthorisedGetCriteriaOperationTest {
     void shouldReturnOnlyAuthorisedWorkbasketInputs() {
         doReturn(testWorkbasketInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
 
-        final List<WorkbasketInput> workbasketInputs = (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+        final List<WorkbasketInput> workbasketInputs =
+            (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(3)),
@@ -179,7 +186,8 @@ class AuthorisedGetCriteriaOperationTest {
         doReturn(testWorkbasketInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
         doReturn(Sets.newHashSet(ROLE1)).when(userRepository).getUserRoles();
 
-        final List<WorkbasketInput> workbasketInputs = (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+        final List<WorkbasketInput> workbasketInputs =
+            (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(4)),
@@ -196,7 +204,8 @@ class AuthorisedGetCriteriaOperationTest {
         doReturn(testWorkbasketInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
         doReturn(Sets.newHashSet(ROLE1, ROLE2)).when(userRepository).getUserRoles();
 
-        final List<WorkbasketInput> workbasketInputs = (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+        final List<WorkbasketInput> workbasketInputs =
+            (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(4)),
@@ -212,7 +221,8 @@ class AuthorisedGetCriteriaOperationTest {
     void shouldReturnEmptyWorkbasketInputWhenNoFieldIsAuthorised() {
         doReturn(new ArrayList<>()).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
 
-        final List<WorkbasketInput> workbasketInputs = (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+        final List<WorkbasketInput> workbasketInputs =
+            (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(0))
@@ -230,7 +240,8 @@ class AuthorisedGetCriteriaOperationTest {
 
         doReturn(testWorkbasketInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
 
-        final List<WorkbasketInput> workbasketInputs = (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+        final List<WorkbasketInput> workbasketInputs =
+            (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(3)),
@@ -252,7 +263,8 @@ class AuthorisedGetCriteriaOperationTest {
         doReturn(testWorkbasketInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
         doReturn(Sets.newHashSet(ROLE1)).when(userRepository).getUserRoles();
 
-        final List<WorkbasketInput> workbasketInputs = (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+        final List<WorkbasketInput> workbasketInputs =
+            (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(2)),
@@ -272,7 +284,8 @@ class AuthorisedGetCriteriaOperationTest {
 
         doReturn(testSearchInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
 
-        final List<SearchInput> searchInputs = (List<SearchInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+        final List<SearchInput> searchInputs =
+            (List<SearchInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(3)),
@@ -294,7 +307,8 @@ class AuthorisedGetCriteriaOperationTest {
         doReturn(testSearchInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
         doReturn(Sets.newHashSet(ROLE1)).when(userRepository).getUserRoles();
 
-        final List<SearchInput> searchInputs = (List<SearchInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+        final List<SearchInput> searchInputs =
+            (List<SearchInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
 
         assertAll(
             () -> assertThat(searchInputs.size(), is(2)),

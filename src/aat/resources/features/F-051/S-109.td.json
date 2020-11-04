@@ -82,7 +82,7 @@
 									"pre_states": [
 										"*"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -124,7 +124,7 @@
 									"pre_states": [
 										"*"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -166,7 +166,7 @@
 									"pre_states": [
 										"IN_PROGRESS"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -208,7 +208,7 @@
 									"pre_states": [
 										"IN_PROGRESS"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -250,7 +250,7 @@
 									"pre_states": [
 										"TODO"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -290,7 +290,7 @@
 									"order": null,
 									"case_fields": [],
 									"pre_states": [],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -451,7 +451,7 @@
 									"pre_states": [
 										"*"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -482,7 +482,7 @@
 									"pre_states": [
 										"*"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -513,7 +513,7 @@
 									"pre_states": [
 										"IN_PROGRESS"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -544,7 +544,7 @@
 									"pre_states": [
 										"IN_PROGRESS"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -575,7 +575,7 @@
 									"pre_states": [
 										"TODO"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -604,7 +604,7 @@
 									"order": null,
 									"case_fields": [],
 									"pre_states": [],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,

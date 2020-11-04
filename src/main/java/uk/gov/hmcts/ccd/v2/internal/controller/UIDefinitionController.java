@@ -7,18 +7,33 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.Banner;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
-import uk.gov.hmcts.ccd.domain.service.aggregated.*;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCriteriaOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetUserProfileOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetBannerOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetJurisdictionUiConfigOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetBannerOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetCriteriaOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetJurisdictionUiConfigOperation;
+import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.internal.resource.*;
+import uk.gov.hmcts.ccd.v2.internal.resource.BannerViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.JurisdictionConfigViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.JurisdictionViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.SearchInputsViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.WorkbasketInputsViewResource;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +42,9 @@ import java.util.function.Predicate;
 
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.SEARCH;
 import static uk.gov.hmcts.ccd.domain.model.search.CriteriaType.WORKBASKET;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
 @RestController
 @RequestMapping(path = "/internal")
@@ -44,9 +61,11 @@ public class UIDefinitionController {
     private final HashMap<String, Predicate<AccessControlList>> accessMap = new HashMap<>();
 
     @Autowired
-    public UIDefinitionController(@Qualifier(AuthorisedGetCriteriaOperation.QUALIFIER) GetCriteriaOperation getCriteriaOperation,
+    public UIDefinitionController(@Qualifier(AuthorisedGetCriteriaOperation.QUALIFIER)
+                                          GetCriteriaOperation getCriteriaOperation,
                                   @Qualifier(DefaultGetBannerOperation.QUALIFIER) GetBannerOperation getBannerOperation,
-                                  @Qualifier(AuthorisedGetUserProfileOperation.QUALIFIER) final GetUserProfileOperation getUserProfileOperation,
+                                  @Qualifier(AuthorisedGetUserProfileOperation.QUALIFIER)
+                                      final GetUserProfileOperation getUserProfileOperation,
                                   @Qualifier(DefaultGetJurisdictionUiConfigOperation.QUALIFIER)
                                           GetJurisdictionUiConfigOperation getJurisdictionUiConfigOperation) {
         this.getCriteriaOperation = getCriteriaOperation;
@@ -82,9 +101,11 @@ public class UIDefinitionController {
             message = "Case type not found"
         )
     })
-    public ResponseEntity<WorkbasketInputsViewResource> getWorkbasketInputsDetails(@PathVariable("caseTypeId") String caseTypeId) {
+    public ResponseEntity<WorkbasketInputsViewResource> getWorkbasketInputsDetails(@PathVariable("caseTypeId")
+                                                                                           String caseTypeId) {
 
-        WorkbasketInput[] workbasketInputs = getCriteriaOperation.execute(caseTypeId, CAN_READ, WORKBASKET).toArray(new WorkbasketInput[0]);
+        WorkbasketInput[] workbasketInputs =
+            getCriteriaOperation.execute(caseTypeId, CAN_READ, WORKBASKET).toArray(new WorkbasketInput[0]);
 
         return ResponseEntity.ok(new WorkbasketInputsViewResource(workbasketInputs, caseTypeId));
     }
@@ -113,9 +134,11 @@ public class UIDefinitionController {
             message = "Case type not found"
         )
     })
-    public ResponseEntity<SearchInputsViewResource> getSearchInputsDetails(@PathVariable("caseTypeId") String caseTypeId) {
+    public ResponseEntity<SearchInputsViewResource> getSearchInputsDetails(@PathVariable("caseTypeId")
+                                                                                   String caseTypeId) {
 
-        SearchInput[] searchInputs = getCriteriaOperation.execute(caseTypeId, CAN_READ, SEARCH).toArray(new SearchInput[0]);
+        SearchInput[] searchInputs =
+            getCriteriaOperation.execute(caseTypeId, CAN_READ, SEARCH).toArray(new SearchInput[0]);
 
         return ResponseEntity.ok(new SearchInputsViewResource(searchInputs, caseTypeId));
     }
@@ -167,7 +190,8 @@ public class UIDefinitionController {
             response = JurisdictionConfigViewResource.class
         )
     })
-    public ResponseEntity<JurisdictionConfigViewResource> getJurisdictionUiConfigs(@RequestParam("ids") Optional<List<String>> idsOptional) {
+    public ResponseEntity<JurisdictionConfigViewResource> getJurisdictionUiConfigs(@RequestParam("ids")
+                                                                                   Optional<List<String>> idsOptional) {
         List<JurisdictionUiConfigDefinition> listOfConfigs = idsOptional.isPresent()
             ? getJurisdictionUiConfigOperation.execute(idsOptional.get())
             : Lists.newArrayList();
@@ -206,7 +230,8 @@ public class UIDefinitionController {
         if (accessMap.get(access) == null) {
             throw new BadRequestException("Access can only be 'create', 'read' or 'update'");
         }
-        JurisdictionDisplayProperties[] jurisdictions = getUserProfileOperation.execute(accessMap.get(access)).getJurisdictions();
+        JurisdictionDisplayProperties[] jurisdictions =
+            getUserProfileOperation.execute(accessMap.get(access)).getJurisdictions();
         if (jurisdictions == null || jurisdictions.length == 0) {
             throw new ResourceNotFoundException("No jurisdictions found");
         }

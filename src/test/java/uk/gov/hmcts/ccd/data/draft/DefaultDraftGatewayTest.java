@@ -30,6 +30,7 @@ import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
@@ -71,7 +72,7 @@ class DefaultDraftGatewayTest {
     private static final String JID = "TEST";
     private static final String CTID = "TestAddressBookCase";
     private static final String ETID = "createCase";
-    private static final String DID = "5";
+    private static final String DID = "4444333322221111";
     public static final String TYPE = "caseDataContent";
     public static final ZonedDateTime NOW = ZonedDateTime.now();
     public static final ZonedDateTime NOW_PLUS_5_MIN = ZonedDateTime.now().plus(5, ChronoUnit.MINUTES);
@@ -93,6 +94,9 @@ class DefaultDraftGatewayTest {
 
     @Mock
     private DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
+
+    @Mock
+    private UIDService uidService;
 
     private DraftGateway draftGateway;
 
@@ -118,6 +122,7 @@ class DefaultDraftGatewayTest {
         when(applicationParams.draftBaseURL()).thenReturn(draftBaseURL);
         when(applicationParams.draftURL(DID)).thenReturn(draftURL5);
         when(applicationParams.getDraftMaxTTLDays()).thenReturn(7);
+        when(uidService.validateUID(DID)).thenReturn(true);
 
         data.put(KEY, VALUE);
         dataClassification.put(KEY_CLASS, VALUE_CLASS);
@@ -154,19 +159,22 @@ class DefaultDraftGatewayTest {
             .withType(CASE_DATA_CONTENT)
             .build();
         draftGateway = new DefaultDraftGateway(createDraftRestTemplate, restTemplate, securityUtils, applicationParams,
-            draftResponseToCaseDetailsBuilder);
+            draftResponseToCaseDetailsBuilder,uidService);
     }
 
     @Test
     void shouldSuccessfullyCreateDraft() throws URISyntaxException {
         ResponseEntity<HttpEntity> response = ResponseEntity.created(new URI("http://localhost:8800/drafts/4")).build();
-        doReturn(response).when(createDraftRestTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class));
+        doReturn(response).when(createDraftRestTemplate).exchange(anyString(), eq(HttpMethod.POST),
+            any(HttpEntity.class), eq(HttpEntity.class));
 
         Long result = draftGateway.create(createCaseDraftRequest);
 
         assertAll(
-            () -> verify(createDraftRestTemplate).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class)),
-            () -> verify(restTemplate, never()).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class)),
+            () -> verify(createDraftRestTemplate).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(HttpEntity.class),
+                eq(HttpEntity.class)),
+            () -> verify(restTemplate, never()).exchange(eq(draftBaseURL), eq(HttpMethod.POST), any(HttpEntity.class),
+                eq(HttpEntity.class)),
             () -> assertThat(result, is(4L))
         );
     }
@@ -174,22 +182,28 @@ class DefaultDraftGatewayTest {
     @Test
     void shouldFailToCreateDraftWhenConnectivityIssue() {
         Exception exception = new RestClientException("connectivity issue");
-        doThrow(exception).when(createDraftRestTemplate).exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(HttpEntity.class));
+        doThrow(exception).when(createDraftRestTemplate).exchange(anyString(), eq(HttpMethod.POST),
+            any(HttpEntity.class), eq(HttpEntity.class));
 
-        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.create(createCaseDraftRequest));
-        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
+        final ServiceException actualException =
+            assertThrows(ServiceException.class, () -> draftGateway.create(createCaseDraftRequest));
+        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser"
+            + " or try again later"));
         assertThat(actualException.getCause(), is(exception));
     }
 
     @Test
     void shouldSuccessfullyUpdateToDraft() throws URISyntaxException {
-        doReturn(ResponseEntity.status(204).build()).when(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(HttpEntity.class));
+        doReturn(ResponseEntity.status(204).build()).when(restTemplate).exchange(anyString(), eq(HttpMethod.PUT),
+            any(HttpEntity.class), eq(HttpEntity.class));
 
         DraftResponse result = draftGateway.update(updateCaseDraftRequest, DID);
 
         assertAll(
-            () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.PUT), any(HttpEntity.class), eq(HttpEntity.class)),
-            () -> verify(createDraftRestTemplate, never()).exchange(eq(draftURL5), eq(HttpMethod.PUT), any(RequestEntity.class), eq(HttpEntity.class)),
+            () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.PUT), any(HttpEntity.class),
+                eq(HttpEntity.class)),
+            () -> verify(createDraftRestTemplate, never()).exchange(eq(draftURL5), eq(HttpMethod.PUT),
+                any(RequestEntity.class), eq(HttpEntity.class)),
             () -> assertThat(result, hasProperty("id", is(DID)))
         );
     }
@@ -197,20 +211,26 @@ class DefaultDraftGatewayTest {
     @Test
     void shouldFailToUpdateToDraftWhenConnectivityIssue() {
         Exception exception = new RestClientException("connectivity issue");
-        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(HttpEntity.class));
+        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class),
+            eq(HttpEntity.class));
 
-        final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.update(updateCaseDraftRequest, DID));
-        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
+        final ServiceException actualException =
+            assertThrows(ServiceException.class, () -> draftGateway.update(updateCaseDraftRequest, DID));
+        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser"
+            + " or try again later"));
         assertThat(actualException.getCause(), is(exception));
     }
 
     @Test
     void shouldFailToUpdateToDraftWhenOtherClientError() {
         Exception exception = new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
-        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(HttpEntity.class));
+        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class),
+            eq(HttpEntity.class));
 
-        final ApiException actualException = assertThrows(ApiException.class, () -> draftGateway.update(updateCaseDraftRequest, DID));
-        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
+        final ApiException actualException =
+            assertThrows(ApiException.class, () -> draftGateway.update(updateCaseDraftRequest, DID));
+        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser"
+            + " or try again later"));
         assertThat(actualException.getCause(), is(instanceOf(HttpClientErrorException.class)));
         assertThat(actualException.getCause(), is(exception));
     }
@@ -218,41 +238,55 @@ class DefaultDraftGatewayTest {
     @Test
     void shouldFailToUpdateToDraftWhenNotFound() {
         Exception exception = new HttpClientErrorException(HttpStatus.NOT_FOUND);
-        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(HttpEntity.class));
+        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class),
+            eq(HttpEntity.class));
 
-        final ResourceNotFoundException actualException = assertThrows(ResourceNotFoundException.class, () -> draftGateway.update(updateCaseDraftRequest, DID));
-        assertThat(actualException.getMessage(), is("No draft found ( draft reference = '5' )"));
+        final ResourceNotFoundException actualException =
+            assertThrows(ResourceNotFoundException.class, () -> draftGateway.update(updateCaseDraftRequest, DID));
+        assertThat(actualException.getMessage(), is("No draft found ( draft reference = '4444333322221111' )"));
     }
 
     @Test
     void shouldSuccessfullyRetrieveDraft() throws URISyntaxException {
-        doReturn(ResponseEntity.ok(draft)).when(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.GET), any(HttpEntity.class), eq(Draft.class));
+        doReturn(ResponseEntity.ok(draft)).when(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.GET),
+            any(HttpEntity.class), eq(Draft.class));
 
         DraftResponse result = draftGateway.get(DID);
 
         assertAll(
-            () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.GET), any(HttpEntity.class), eq(Draft.class)),
-            () -> verify(createDraftRestTemplate, never()).exchange(eq(draftURL5), eq(HttpMethod.GET), any(RequestEntity.class), eq(Draft.class)),
+            () -> verify(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.GET), any(HttpEntity.class),
+                eq(Draft.class)),
+            () -> verify(createDraftRestTemplate, never()).exchange(eq(draftURL5), eq(HttpMethod.GET),
+                any(RequestEntity.class), eq(Draft.class)),
             () -> assertThat(result, hasProperty("id", is(DID))),
             () -> assertThat(result, hasProperty("type", is(TYPE))),
-            () -> assertThat(result, hasProperty("document", hasProperty("userId", is(caseDraft.getUserId())))),
-            () -> assertThat(result, hasProperty("document", hasProperty("jurisdictionId", is(caseDraft.getJurisdictionId())))),
-            () -> assertThat(result, hasProperty("document", hasProperty("caseTypeId", is(caseDraft.getCaseTypeId())))),
-            () -> assertThat(result, hasProperty("document", hasProperty("eventId", is(caseDraft.getEventId())))),
-            () -> assertThat(result, hasProperty("document", hasProperty("caseDataContent", hasProperty("data", is(caseDataContent.getData()))))),
+            () -> assertThat(result, hasProperty("document", hasProperty("userId",
+                is(caseDraft.getUserId())))),
+            () -> assertThat(result, hasProperty("document", hasProperty("jurisdictionId",
+                is(caseDraft.getJurisdictionId())))),
+            () -> assertThat(result, hasProperty("document", hasProperty("caseTypeId",
+                is(caseDraft.getCaseTypeId())))),
+            () -> assertThat(result, hasProperty("document", hasProperty("eventId",
+                is(caseDraft.getEventId())))),
+            () -> assertThat(result, hasProperty("document", hasProperty("caseDataContent",
+                hasProperty("data", is(caseDataContent.getData()))))),
             () -> assertThat(result,
                 hasProperty("document",
                     hasProperty("caseDataContent",
-                        hasProperty("securityClassification", is(caseDataContent.getSecurityClassification()))))),
+                        hasProperty("securityClassification", is(caseDataContent
+                            .getSecurityClassification()))))),
             () -> assertThat(result,
                 hasProperty("document",
                     hasProperty("caseDataContent",
                         hasProperty("dataClassification", is(caseDataContent.getDataClassification()))))),
-            () -> assertThat(result, hasProperty("document", hasProperty("caseDataContent", hasProperty("token", is(caseDataContent.getToken()))))),
+            () -> assertThat(result, hasProperty("document", hasProperty("caseDataContent",
+                hasProperty("token", is(caseDataContent.getToken()))))),
             () -> assertThat(result,
-                hasProperty("document", hasProperty("caseDataContent", hasProperty("ignoreWarning", is(caseDataContent.getIgnoreWarning()))))),
+                hasProperty("document", hasProperty("caseDataContent",
+                    hasProperty("ignoreWarning", is(caseDataContent.getIgnoreWarning()))))),
             () -> assertThat(result,
-                hasProperty("document", hasProperty("caseDataContent", hasProperty("event", samePropertyValuesAs(caseDataContent.getEvent()))))),
+                hasProperty("document", hasProperty("caseDataContent",
+                    hasProperty("event", samePropertyValuesAs(caseDataContent.getEvent()))))),
             () -> assertThat(result, hasProperty("created", is(NOW.toLocalDateTime()))),
             () -> assertThat(result, hasProperty("updated", is(NOW_PLUS_5_MIN.toLocalDateTime())))
         );
@@ -261,20 +295,24 @@ class DefaultDraftGatewayTest {
     @Test
     void shouldFailToGetFromDraftWhenConnectivityIssue() {
         Exception exception = new RestClientException("connectivity issue");
-        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(Draft.class));
+        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class),
+            eq(Draft.class));
 
         final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.get(DID));
-        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
+        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser"
+            + " or try again later"));
         assertThat(actualException.getCause(), is(exception));
     }
 
     @Test
     void shouldFailToGetFromDraftWhenOtherClientError() {
         Exception exception = new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
-        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(Draft.class));
+        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class),
+            eq(Draft.class));
 
         final ApiException actualException = assertThrows(ApiException.class, () -> draftGateway.get(DID));
-        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
+        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser "
+            + "or try again later"));
         assertThat(actualException.getCause(), is(instanceOf(HttpClientErrorException.class)));
         assertThat(actualException.getCause(), is(exception));
     }
@@ -282,15 +320,18 @@ class DefaultDraftGatewayTest {
     @Test
     void shouldFailToGetFromDraftWhenNotFound() {
         Exception exception = new HttpClientErrorException(HttpStatus.NOT_FOUND);
-        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(Draft.class));
+        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class),
+            eq(Draft.class));
 
-        final ResourceNotFoundException actualException = assertThrows(ResourceNotFoundException.class, () -> draftGateway.get(DID));
-        assertThat(actualException.getMessage(), is("No draft found ( draft reference = '5' )"));
+        final ResourceNotFoundException actualException = assertThrows(ResourceNotFoundException.class, () ->
+            draftGateway.get(DID));
+        assertThat(actualException.getMessage(), is("No draft found ( draft reference = '4444333322221111' )"));
     }
 
     @Test
     void shouldSuccessfullyDeleteDraft() throws URISyntaxException {
-        doReturn(ResponseEntity.ok(draft)).when(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Draft.class));
+        doReturn(ResponseEntity.ok(draft)).when(restTemplate).exchange(eq(draftURL5), eq(HttpMethod.DELETE),
+            any(HttpEntity.class), eq(Draft.class));
 
         draftGateway.delete(DID);
 
@@ -300,20 +341,24 @@ class DefaultDraftGatewayTest {
     @Test
     void shouldFailToDeleteFromDraftWhenConnectivityIssue() {
         Exception exception = new RestClientException("connectivity issue");
-        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Draft.class));
+        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class),
+            eq(Draft.class));
 
         final ServiceException actualException = assertThrows(ServiceException.class, () -> draftGateway.delete(DID));
-        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
+        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser "
+            + "or try again later"));
         assertThat(actualException.getCause(), is(exception));
     }
 
     @Test
     void shouldFailToDeleteFromDraftWhenOtherClientError() {
         Exception exception = new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
-        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Draft.class));
+        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class),
+            eq(Draft.class));
 
         final ApiException actualException = assertThrows(ApiException.class, () -> draftGateway.delete(DID));
-        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser or try again later"));
+        assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser "
+            + "or try again later"));
         assertThat(actualException.getCause(), is(instanceOf(HttpClientErrorException.class)));
         assertThat(actualException.getCause(), is(exception));
     }
@@ -321,10 +366,12 @@ class DefaultDraftGatewayTest {
     @Test
     void shouldFailToDeleteFromDraftWhenNotFound() {
         Exception exception = new HttpClientErrorException(HttpStatus.NOT_FOUND);
-        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class), eq(Draft.class));
+        doThrow(exception).when(restTemplate).exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class),
+            eq(Draft.class));
 
-        final ResourceNotFoundException actualException = assertThrows(ResourceNotFoundException.class, () -> draftGateway.delete(DID));
-        assertThat(actualException.getMessage(), is("No draft found ( draft reference = '5' )"));
+        final ResourceNotFoundException actualException = assertThrows(ResourceNotFoundException.class, () ->
+            draftGateway.delete(DID));
+        assertThat(actualException.getMessage(), is("No draft found ( draft reference = '4444333322221111' )"));
     }
 
 }

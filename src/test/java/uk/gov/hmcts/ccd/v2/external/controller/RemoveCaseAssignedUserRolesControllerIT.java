@@ -36,7 +36,8 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         "classpath:sql/insert_cases_with_valid_case_ids.sql",
     })
     @DisplayName(
-        "AC-1: must successfully remove a user and case role for a specific case by a user calling through/from an authorised application"
+        "AC-1: must successfully remove a user and case role for a specific case by a user calling through/from an "
+            + "authorised application"
     )
     void shouldRemoveCaseUserRoleForAuthorisedApp() throws Exception {
         // ARRANGE
@@ -179,7 +180,8 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
 
         // override s2s token in HTTP headers
         HttpHeaders httpHeaders = createHttpHeaders();
-        httpHeaders.set(SecurityUtils.SERVICE_AUTHORIZATION, "Bearer " + MockUtils.generateDummyS2SToken(UNAUTHORISED_ADD_SERVICE));
+        httpHeaders.set(SecurityUtils.SERVICE_AUTHORIZATION, "Bearer " + MockUtils.generateDummyS2SToken(
+            UNAUTHORISED_ADD_SERVICE));
 
         List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
             new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_1)
@@ -330,7 +332,8 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
 
         // override s2s token in HTTP headers to check it also supports S2S token without bearer
         HttpHeaders httpHeaders = createHttpHeaders();
-        httpHeaders.set(SecurityUtils.SERVICE_AUTHORIZATION, MockUtils.generateDummyS2SToken(AUTHORISED_ADD_SERVICE_2));
+        httpHeaders.set(SecurityUtils.SERVICE_AUTHORIZATION,
+            MockUtils.generateDummyS2SToken(AUTHORISED_ADD_SERVICE_2));
 
         List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
             new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_1),
@@ -393,7 +396,8 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         mockMvc.perform(delete(caseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(
-                    List.of(new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId1, CASE_ROLE_1, ORGANISATION_ID_1)))))
+                    List.of(new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId1, CASE_ROLE_1,
+                        ORGANISATION_ID_1)))))
             .headers(createHttpHeaders()))
             .andExpect(status().isOk())
             .andReturn();
@@ -408,7 +412,8 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         mockMvc.perform(delete(caseAssignedUserRoles)
                 .contentType(JSON_CONTENT_TYPE)
                 .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(
-                        List.of(new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId1, CASE_ROLE_1, ORGANISATION_ID_1)))))
+                        List.of(new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId1, CASE_ROLE_1,
+                            ORGANISATION_ID_1)))))
                 .headers(createHttpHeaders()))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -420,7 +425,8 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         mockMvc.perform(delete(caseAssignedUserRoles)
                 .contentType(JSON_CONTENT_TYPE)
                 .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(
-                        List.of(new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId2, CASE_ROLE_1, ORGANISATION_ID_1)))))
+                        List.of(new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId2, CASE_ROLE_1,
+                            ORGANISATION_ID_1)))))
                 .headers(createHttpHeaders()))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -465,7 +471,8 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         mockMvc.perform(delete(caseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(
-                    List.of(new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_2, ORGANISATION_ID_1))
+                    List.of(new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_2,
+                        ORGANISATION_ID_1))
             )))
             .headers(createHttpHeaders()))
             .andExpect(status().isOk())
@@ -495,9 +502,11 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         String userId = "8842-003"; // don't need the users to exist in the repository but want unique for each AC
 
         // set a default count for any organisation
-        supplementaryDataRepository.setSupplementaryData(CASE_ID_EXTRA, getOrgUserCountSupDataKey(ORGANISATION_ID_2), 0L);
+        supplementaryDataRepository.setSupplementaryData(CASE_ID_EXTRA, getOrgUserCountSupDataKey(ORGANISATION_ID_2),
+            0L);
 
-        addCaseUserRoles(List.of(new CaseAssignedUserRoleWithOrganisation(CASE_ID_EXTRA, userId, CASE_ROLE_1, ORGANISATION_ID_2)));
+        addCaseUserRoles(List.of(new CaseAssignedUserRoleWithOrganisation(CASE_ID_EXTRA, userId, CASE_ROLE_1,
+            ORGANISATION_ID_2)));
 
         // initial user counters
         final Object orgUserCountersBefore = supplementaryDataRepository.findSupplementaryData(CASE_ID_EXTRA, null)
@@ -537,9 +546,11 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         String userId = "8442-004"; // don't need the users to exist in the repository but want unique for each AC
 
         // set a default count for any organisation
-        supplementaryDataRepository.setSupplementaryData(CASE_ID_EXTRA, getOrgUserCountSupDataKey(ORGANISATION_ID_2), 0L);
+        supplementaryDataRepository.setSupplementaryData(CASE_ID_EXTRA, getOrgUserCountSupDataKey(ORGANISATION_ID_2),
+            0L);
 
-        addCaseUserRoles(List.of(new CaseAssignedUserRoleWithOrganisation(CASE_ID_EXTRA, userId, CASE_ROLE_1, ORGANISATION_ID_2)));
+        addCaseUserRoles(List.of(new CaseAssignedUserRoleWithOrganisation(CASE_ID_EXTRA, userId, CASE_ROLE_1,
+            ORGANISATION_ID_2)));
 
         // initial user counters
         final Object orgUserCountersBefore = supplementaryDataRepository.findSupplementaryData(CASE_ID_EXTRA, null)
@@ -549,7 +560,8 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         Exception exception = mockMvc.perform(delete(caseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(
-                    List.of(new CaseAssignedUserRoleWithOrganisation(CASE_ID_EXTRA, userId, CASE_ROLE_1, INVALID_ORGANISATION_ID))
+                    List.of(new CaseAssignedUserRoleWithOrganisation(CASE_ID_EXTRA, userId, CASE_ROLE_1,
+                        INVALID_ORGANISATION_ID))
             )))
             .headers(createHttpHeaders()))
             .andExpect(status().isBadRequest())

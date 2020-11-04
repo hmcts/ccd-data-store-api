@@ -16,7 +16,8 @@ public class TestIdamConfiguration extends ContextCleanupListener {
     private String issuerUri;
 
     @Bean
-    // Overriding as OAuth2ClientRegistrationRepositoryConfiguration loading before wire-mock mappings for /o/.well-known/openid-configuration
+    // Overriding as OAuth2ClientRegistrationRepositoryConfiguration loading before wire-mock mappings
+    // for /o/.well-known/openid-configuration
     public ClientRegistrationRepository clientRegistrationRepository() {
         return new InMemoryClientRegistrationRepository(clientRegistration());
     }

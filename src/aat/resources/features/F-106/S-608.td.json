@@ -142,6 +142,7 @@
               "classification": "[[ANY_STRING_NOT_NULLABLE]]"
             }
           },
+          "supplementary_data": null,
           "after_submit_callback_response": "[[ANY_NULLABLE]]",
           "callback_response_status_code": "[[ANY_NULLABLE]]",
           "callback_response_status": "[[ANY_NULLABLE]]",

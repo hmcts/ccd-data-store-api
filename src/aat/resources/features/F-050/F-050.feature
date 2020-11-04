@@ -7,7 +7,7 @@ Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-301
+@S-301 @Smoke
 Scenario: must validate when all fields are valid
 
     Given a user with [an active profile in CCD],

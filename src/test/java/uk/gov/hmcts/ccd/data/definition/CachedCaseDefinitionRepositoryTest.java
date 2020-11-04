@@ -51,33 +51,39 @@ class CachedCaseDefinitionRepositoryTest {
         @Test
         @DisplayName("should initially retrieve case types from decorated repository")
         void shouldRetrieveCaseTypesFromDecorated() {
-            final List<CaseTypeDefinition> expectedCaseTypes = Lists.newArrayList(new CaseTypeDefinition(), new CaseTypeDefinition());
+            final List<CaseTypeDefinition> expectedCaseTypes =
+                Lists.newArrayList(new CaseTypeDefinition(), new CaseTypeDefinition());
             doReturn(expectedCaseTypes).when(caseDefinitionRepository).getCaseTypesForJurisdiction(JURISDICTION_ID);
 
-            final List<CaseTypeDefinition> caseTypes = cachedCaseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID);
+            final List<CaseTypeDefinition> caseTypes =
+                cachedCaseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID);
 
             assertAll(
                 () -> assertThat(caseTypes, is(expectedCaseTypes)),
-                () -> verify(caseDefinitionRepository, times(1)).getCaseTypesForJurisdiction(JURISDICTION_ID)
+                () -> verify(caseDefinitionRepository, times(1)).getCaseTypesForJurisdiction(
+                    JURISDICTION_ID)
             );
         }
 
         @Test
         @DisplayName("should cache case types for subsequent calls")
         void shouldCacheCaseTypesForSubsequentCalls() {
-            final List<CaseTypeDefinition> expectedCaseTypes = Lists.newArrayList(new CaseTypeDefinition(), new CaseTypeDefinition());
+            final List<CaseTypeDefinition> expectedCaseTypes =
+                Lists.newArrayList(new CaseTypeDefinition(), new CaseTypeDefinition());
             doReturn(expectedCaseTypes).when(caseDefinitionRepository).getCaseTypesForJurisdiction(JURISDICTION_ID);
 
             cachedCaseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID);
 
-            verify(caseDefinitionRepository, times(1)).getCaseTypesForJurisdiction(JURISDICTION_ID);
+            verify(caseDefinitionRepository, times(1)).getCaseTypesForJurisdiction(
+                JURISDICTION_ID);
 
             doReturn(newArrayList(new CaseTypeDefinition(),
                 new CaseTypeDefinition()))
                 .when(caseDefinitionRepository)
                 .getCaseTypesForJurisdiction(JURISDICTION_ID);
 
-            final List<CaseTypeDefinition> caseTypes = cachedCaseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID);
+            final List<CaseTypeDefinition> caseTypes =
+                cachedCaseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID);
 
             assertAll(
                 () -> assertThat(caseTypes, is(expectedCaseTypes)),
@@ -93,7 +99,8 @@ class CachedCaseDefinitionRepositoryTest {
         @Test
         @DisplayName("should initially retrieve base types from decorated repository")
         void shouldRetrieveBaseTypesFromDecorated() {
-            final List<FieldTypeDefinition> expectedBaseTypes = newArrayList(new FieldTypeDefinition(), new FieldTypeDefinition());
+            final List<FieldTypeDefinition> expectedBaseTypes =
+                newArrayList(new FieldTypeDefinition(), new FieldTypeDefinition());
             doReturn(expectedBaseTypes).when(caseDefinitionRepository).getBaseTypes();
 
             final List<FieldTypeDefinition> baseTypes = cachedCaseDefinitionRepository.getBaseTypes();
@@ -107,14 +114,16 @@ class CachedCaseDefinitionRepositoryTest {
         @Test
         @DisplayName("should cache base types for subsequent calls")
         void shouldCacheBaseTypesForSubsequentCalls() {
-            final List<FieldTypeDefinition> expectedBaseTypes = newArrayList(new FieldTypeDefinition(), new FieldTypeDefinition());
+            final List<FieldTypeDefinition> expectedBaseTypes =
+                newArrayList(new FieldTypeDefinition(), new FieldTypeDefinition());
             doReturn(expectedBaseTypes).when(caseDefinitionRepository).getBaseTypes();
 
             cachedCaseDefinitionRepository.getBaseTypes();
 
             verify(caseDefinitionRepository, times(1)).getBaseTypes();
 
-            doReturn(newArrayList(new FieldTypeDefinition(), new FieldTypeDefinition())).when(caseDefinitionRepository).getBaseTypes();
+            doReturn(newArrayList(new FieldTypeDefinition(), new FieldTypeDefinition())).when(caseDefinitionRepository)
+                .getBaseTypes();
 
             final List<FieldTypeDefinition> baseTypes = cachedCaseDefinitionRepository.getBaseTypes();
 
@@ -154,7 +163,8 @@ class CachedCaseDefinitionRepositoryTest {
             final List<String> jurisdictions = newArrayList("jurisdiction1", "jurisdiction2");
             doReturn(expectedBaseTypes).when(caseDefinitionRepository).getCaseTypesIDsByJurisdictions(jurisdictions);
 
-            final List<String> caseTypesIDs = cachedCaseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictions);
+            final List<String> caseTypesIDs =
+                cachedCaseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictions);
 
             assertAll(
                 () -> assertThat(caseTypesIDs, is(expectedBaseTypes))
@@ -176,7 +186,8 @@ class CachedCaseDefinitionRepositoryTest {
 
             assertAll(
                 () -> assertThat(userRole, is(expectedUserRole)),
-                () -> verify(caseDefinitionRepository, times(1)).getUserRoleClassifications(USER_ROLE_1)
+                () -> verify(caseDefinitionRepository, times(1)).getUserRoleClassifications(
+                    USER_ROLE_1)
             );
         }
 
@@ -224,7 +235,8 @@ class CachedCaseDefinitionRepositoryTest {
 
             assertAll(
                 () -> assertThat(userRolesList, is(expectedUserRolesList)),
-                () -> verify(caseDefinitionRepository, times(2)).getUserRoleClassifications(anyString())
+                () -> verify(caseDefinitionRepository, times(2)).getUserRoleClassifications(
+                    anyString())
             );
         }
 
@@ -237,10 +249,13 @@ class CachedCaseDefinitionRepositoryTest {
 
             verify(caseDefinitionRepository, times(2)).getUserRoleClassifications(anyString());
 
-            final List<UserRole> someOtherUserRolesList = Arrays.asList(aUserRole().withRole(USER_ROLE_3).build(), aUserRole().withRole(USER_ROLE_4).build());
-            when(caseDefinitionRepository.getClassificationsForUserRoleList(userRoles)).thenReturn(someOtherUserRolesList);
+            final List<UserRole> someOtherUserRolesList =
+                Arrays.asList(aUserRole().withRole(USER_ROLE_3).build(), aUserRole().withRole(USER_ROLE_4).build());
+            when(caseDefinitionRepository.getClassificationsForUserRoleList(userRoles))
+                .thenReturn(someOtherUserRolesList);
 
-            final List<UserRole> userRolesList = cachedCaseDefinitionRepository.getClassificationsForUserRoleList(userRoles);
+            final List<UserRole> userRolesList = cachedCaseDefinitionRepository.getClassificationsForUserRoleList(
+                userRoles);
 
             assertAll(
                 () -> assertThat(userRolesList, is(Arrays.asList(userRole2, userRole1))),

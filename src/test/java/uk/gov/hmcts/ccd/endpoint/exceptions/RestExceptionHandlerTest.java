@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.gov.hmcts.ccd.AppInsights;
+import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.domain.model.common.HttpError;
 import uk.gov.hmcts.ccd.domain.model.std.CaseFieldValidationError;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
@@ -104,7 +104,8 @@ public class RestExceptionHandlerTest {
         // ARRANGE
         String myUniqueExceptionMessage = "My unique generic runtime exception message 1";
         // any runtime exception (that is not an ApiException)
-        ArrayIndexOutOfBoundsException expectedException = new ArrayIndexOutOfBoundsException(myUniqueExceptionMessage);
+        ArrayIndexOutOfBoundsException expectedException =
+            new ArrayIndexOutOfBoundsException(myUniqueExceptionMessage);
 
         setupMockServiceToThrowException(expectedException);
 
@@ -121,7 +122,8 @@ public class RestExceptionHandlerTest {
         // ARRANGE
         String myUniqueExceptionMessage = "My unique generic runtime exception message 2";
         // any runtime exception (that is not an ApiException)
-        ArrayIndexOutOfBoundsException expectedException = new ArrayIndexOutOfBoundsException(myUniqueExceptionMessage);
+        ArrayIndexOutOfBoundsException expectedException =
+            new ArrayIndexOutOfBoundsException(myUniqueExceptionMessage);
 
         setupMockServiceToThrowException(expectedException);
 
@@ -311,6 +313,7 @@ public class RestExceptionHandlerTest {
     }
 
     @Test
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break long method name
     public void handleCaseValidationException_shouldReturnHttpErrorResponse_withFieldErrors_returnsWithDetails_includeFieldNamesAndMessages() throws Exception {
 
         // ARRANGE
@@ -333,6 +336,7 @@ public class RestExceptionHandlerTest {
     }
 
     @Test
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break long method name
     public void handleCaseValidationException_shouldLogExceptionAsWarning_withFieldErrors_includeFieldNamesButNotMessages() throws Exception {
 
         // ARRANGE
@@ -358,8 +362,8 @@ public class RestExceptionHandlerTest {
     }
 
     @Test
-    public void handleCaseValidationException_shouldTrackExceptionToAppInsightsAsWarning_withFieldErrors_includeFieldNamesButNotMessages()
-        throws Exception {
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break long method name
+    public void handleCaseValidationException_shouldTrackExceptionToAppInsightsAsWarning_withFieldErrors_includeFieldNamesButNotMessages() throws Exception {
 
         // ARRANGE
         List<CaseFieldValidationError> fieldErrors = createFieldErrors();
@@ -371,7 +375,8 @@ public class RestExceptionHandlerTest {
         mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
 
         // ASSERT
-        verify(appInsights, times(1)).trackException(eq(expectedException), customPropertiesCaptor.capture(), eq(SeverityLevel.Warning));
+        verify(appInsights, times(1)).trackException(eq(expectedException), customPropertiesCaptor.capture(),
+            eq(SeverityLevel.Warning));
         // check logging field names
         Map<String, String> trackedCustomProperties = customPropertiesCaptor.getValue();
         String trackedFieldInfo = trackedCustomProperties.get("CaseValidationError field IDs");
@@ -386,7 +391,8 @@ public class RestExceptionHandlerTest {
     private void assertHttpErrorResponse(ResultActions result, Exception expectedException) throws Exception {
 
         // NB: as we cannot mock HttpError generate an equivalent and compare to response
-        final HttpError<Serializable> expectedError = new HttpError<>(expectedException, mock(HttpServletRequest.class));
+        final HttpError<Serializable> expectedError =
+            new HttpError<>(expectedException, mock(HttpServletRequest.class));
 
         // check the very basics
         result.andExpect(status().is(expectedError.getStatus()));
@@ -396,7 +402,8 @@ public class RestExceptionHandlerTest {
         result.andExpect(jsonPath("$.message").value(expectedException.getMessage()));
     }
 
-    private void assertExtraApiExceptionResponseProperties(ResultActions result, ApiException expectedException) throws Exception {
+    private void assertExtraApiExceptionResponseProperties(ResultActions result, ApiException expectedException)
+                                                                                                    throws Exception {
 
         // load extra properties
         Serializable exceptionDetails = expectedException.getDetails();
@@ -419,7 +426,8 @@ public class RestExceptionHandlerTest {
             result.andExpect(jsonPath("$.callbackErrors").doesNotExist());
         } else {
             for (int i = 0; i < exceptionCallbackErrors.size(); i++) {
-                result.andExpect(jsonPath(String.format("$.callbackErrors[%s]", i)).value(exceptionCallbackErrors.get(i)));
+                result.andExpect(jsonPath(String.format("$.callbackErrors[%s]", i)).value(exceptionCallbackErrors
+                    .get(i)));
             }
         }
 
@@ -428,7 +436,8 @@ public class RestExceptionHandlerTest {
             result.andExpect(jsonPath("$.callbackWarnings").doesNotExist());
         } else {
             for (int i = 0; i < exceptionCallbackWarnings.size(); i++) {
-                result.andExpect(jsonPath(String.format("$.callbackWarnings[%s]", i)).value(exceptionCallbackWarnings.get(i)));
+                result.andExpect(jsonPath(String.format("$.callbackWarnings[%s]", i)).value(exceptionCallbackWarnings
+                    .get(i)));
             }
         }
     }

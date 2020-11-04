@@ -31,20 +31,23 @@ public class TextValidator implements BaseTypeValidator {
 
         if (!dataValue.isTextual()) {
             final String nodeType = dataValue.getNodeType().toString().toLowerCase();
-            return Collections.singletonList(new ValidationResult(nodeType + " is not a string", dataFieldId));
+            return Collections.singletonList(new ValidationResult(nodeType + " is not a string",
+                dataFieldId));
         }
 
         final String value = dataValue.textValue();
 
         if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), value)) {
             return Collections.singletonList(
-                new ValidationResult(value + " exceed maximum length " + caseFieldDefinition.getFieldTypeDefinition().getMax(), dataFieldId)
+                new ValidationResult(value + " exceed maximum length " + caseFieldDefinition
+                    .getFieldTypeDefinition().getMax(), dataFieldId)
             );
         }
 
         if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), value)) {
             return Collections.singletonList(
-                new ValidationResult(value + " require minimum length " + caseFieldDefinition.getFieldTypeDefinition().getMin(), dataFieldId)
+                new ValidationResult(value + " require minimum length " + caseFieldDefinition
+                    .getFieldTypeDefinition().getMin(), dataFieldId)
             );
         }
 
