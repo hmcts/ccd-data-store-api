@@ -5,7 +5,8 @@ package uk.gov.hmcts.ccd.domain.types;
  */
 public enum PredefinedFields {
 
-    CASE_LINK_TEXT_CASE_REFERENCE("TextCaseReference");
+    CASE_LINK_TEXT_CASE_REFERENCE("TextCaseReference"),
+    ORG_POLICY_CASE_ASSIGNED_ROLE("OrgPolicyCaseAssignedRole");
 
     private String fieldID;
 

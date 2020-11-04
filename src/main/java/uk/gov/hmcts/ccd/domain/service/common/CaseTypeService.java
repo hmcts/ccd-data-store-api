@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseFieldValidationError;
 import uk.gov.hmcts.ccd.domain.types.CaseDataValidator;
+import uk.gov.hmcts.ccd.domain.types.ValidationContext;
 import uk.gov.hmcts.ccd.domain.types.ValidationResult;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -57,9 +58,10 @@ public class CaseTypeService {
     }
 
     public void validateData(final Map<String, JsonNode> data,
-                             final CaseTypeDefinition caseTypeDefinition) {
+                             final CaseTypeDefinition caseTypeDefinition,
+                             final ValidationContext validationContext) {
         final List<ValidationResult> dataValidationResults =
-            caseDataValidator.validate(data, caseTypeDefinition.getCaseFieldDefinitions());
+            caseDataValidator.validate(data, caseTypeDefinition.getCaseFieldDefinitions(),validationContext);
         if (!dataValidationResults.isEmpty()) {
             final List<CaseFieldValidationError> fieldErrors = dataValidationResults.stream()
                 .map(validationResult ->
@@ -67,6 +69,10 @@ public class CaseTypeService {
                 .collect(Collectors.toList());
             throw new CaseValidationException(fieldErrors);
         }
+    }
+
+    public void validateData(final Map<String, JsonNode> data,final CaseTypeDefinition caseTypeDefinition){
+        validateData(data,caseTypeDefinition, new ValidationContext(null,null));
     }
 
     public CaseTypeDefinition getCaseTypeForJurisdiction(final String caseTypeId,

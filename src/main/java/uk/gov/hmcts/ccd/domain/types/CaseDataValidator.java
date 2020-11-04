@@ -26,6 +26,7 @@ public class CaseDataValidator {
     private static final String FIELD_SEPARATOR = ".";
 
     private List<FieldValidator> validators;
+    private ValidationContext validationContext;
 
     @Inject
     public CaseDataValidator(final List<FieldValidator> validators) {
@@ -33,7 +34,9 @@ public class CaseDataValidator {
     }
 
     public List<ValidationResult> validate(final Map<String, JsonNode> data,
-                                           final List<CaseFieldDefinition> caseFieldDefinitions) {
+                                           final List<CaseFieldDefinition> caseFieldDefinitions,
+                                           final ValidationContext validationContext) {
+        this.validationContext = validationContext;
         return validate(data, caseFieldDefinitions, CaseDataValidator.EMPTY_STRING);
     }
 
@@ -102,6 +105,10 @@ public class CaseDataValidator {
                                                        final CaseFieldDefinition caseFieldDefinition,
                                                        final String fieldIdPrefix,
                                                        final BaseType fieldType) {
+        validationContext.setPath(fieldIdPrefix);
+        Optional<FieldValidator> dataFieldIdValidator = validators.stream().filter(
+            validator -> isDataFieldIdValidator(validator, dataFieldId)
+        ).findAny();
 
         Optional<FieldValidator> predefinedFieldValidator = validators.stream().filter(
             validator -> isPredefinedTypeFieldValidator(validator, caseFieldDefinition.getFieldTypeDefinition().getId())
@@ -111,9 +118,8 @@ public class CaseDataValidator {
             isBaseTypeValidator(validator, fieldType)
         ).findAny();
 
-        //if a PredefinedTypeFieldValidator is configured, the field type BaseTypeValidator is not executed.
-        // The PredefinedTypeFieldValidator can execute it if needed
-        Optional<FieldValidator> validatorToExecute = predefinedFieldValidator.or(() -> baseTypeValidator);
+        // TODO PROPER JAVA DOC
+        Optional<FieldValidator> validatorToExecute = dataFieldIdValidator.or(() -> predefinedFieldValidator).or(()->baseTypeValidator);
 
         return validatorToExecute.map(validator -> validator.validate(dataFieldId, dataValue, caseFieldDefinition)
                 .stream()
@@ -127,6 +133,15 @@ public class CaseDataValidator {
     private boolean isPredefinedTypeFieldValidator(FieldValidator validator, String fieldID) {
         if (validator instanceof PredefinedTypeFieldValidator) {
             String predefinedId = ((PredefinedTypeFieldValidator) validator).getPredefinedFieldId();
+            return predefinedId.equals(fieldID);
+        }
+        return false;
+    }
+
+    private boolean isDataFieldIdValidator(FieldValidator validator, String fieldID) {
+        if (validator instanceof DataFieldIdValidator) {
+            ((DataFieldIdValidator) validator).setValidationContext(validationContext);
+            String predefinedId = ((DataFieldIdValidator) validator).getPredefinedFieldId();
             return predefinedId.equals(fieldID);
         }
         return false;
