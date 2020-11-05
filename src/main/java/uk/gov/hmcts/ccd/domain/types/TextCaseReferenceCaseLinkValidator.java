@@ -17,7 +17,7 @@ import java.util.List;
 
 import static uk.gov.hmcts.ccd.domain.model.common.CaseReferenceUtils.formatCaseReference;
 
-@Named("TextCaseReferenceCaseLinkValidator")
+@Named
 @Singleton
 public class TextCaseReferenceCaseLinkValidator implements CustomTypeValidator {
 
