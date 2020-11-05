@@ -220,7 +220,8 @@
             "type": "text"
           },
           "PhoneUKField": {
-            "analyzer": "phone_number_analyzer",
+            "analyzer": "standard",
+            "search_analyzer": "phone_number_analyzer",
             "type": "text"
           },
           "TextAreaField": {
