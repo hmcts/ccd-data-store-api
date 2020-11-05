@@ -31,72 +31,38 @@
 		"body": {
 			"columns": [
 				{
-					"label": "Last State Modified Date",
-					"order": 1,
-					"metadata": true,
-					"case_field_id": "[LAST_STATE_MODIFIED_DATE]",
-					"case_field_type": {
-						"id": "DateTime",
-						"type": "DateTime",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
-				},
+          "_extends_": "F-026_response_data",
+          "metadata": true
+        },
 				{
+          "_extends_": "F-026_response_data",
 					"label": "`Text` field",
 					"order": 2,
-					"metadata": false,
 					"case_field_id": "TextField",
 					"case_field_type": {
 						"id": "Text",
-						"type": "Text",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+						"type": "Text"
+					}
 				},
 				{
+          "_extends_": "F-026_response_data",
 					"label": "`Number` field",
 					"order": 3,
-					"metadata": false,
 					"case_field_id": "NumberField",
 					"case_field_type": {
 						"id": "Number",
-						"type": "Number",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+						"type": "Number"
+					}
 				},
 				{
+          "_extends_": "F-026_response_data",
 					"label": "`YesOrNo` field",
 					"order": 4,
-					"metadata": false,
 					"case_field_id": "YesOrNoField",
 					"case_field_type": {
 						"id": "YesOrNo",
-						"type": "YesOrNo",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+						"type": "YesOrNo"
+					}
 				}
 			],
 			"results": "[[ANYTHING_PRESENT]]",
