@@ -1,0 +1,32 @@
+{
+  "_guid_": "F-027_ResponseData",
+
+  "id": "[LAST_STATE_MODIFIED_DATE]",
+  "label": "Last State Modified Date",
+  "hidden": false,
+  "value": "[[ANY_DATE_NOT_NULLABLE]]",
+  "metadata": true,
+  "hint_text": null,
+  "field_type": {
+    "id": "DateTime",
+    "type": "DateTime",
+    "min": null,
+    "max": null,
+    "regular_expression": null,
+    "fixed_list_items": [],
+    "complex_fields": [],
+    "collection_field_type": null
+  },
+  "validation_expr": null,
+  "security_label": "PUBLIC",
+  "order": null,
+  "formatted_value": null,
+  "display_context": null,
+  "display_context_parameter": null,
+  "show_condition": null,
+  "show_summary_change_option": null,
+  "show_summary_content_option": null,
+  "retain_hidden_value": null,
+  "acls": [],
+  "default_value": null
+}
