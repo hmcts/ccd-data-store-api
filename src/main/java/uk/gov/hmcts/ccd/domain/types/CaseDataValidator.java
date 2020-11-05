@@ -27,10 +27,8 @@ public class CaseDataValidator {
         this.validators = validators;
     }
 
-    public List<ValidationResult> validate(final Map<String, JsonNode> data,
-                                           final List<CaseFieldDefinition> caseFieldDefinitions,
-                                           final ValidationContext validationContext) {
-        return validate(data, caseFieldDefinitions, CaseDataValidator.EMPTY_STRING,validationContext);
+    public List<ValidationResult> validate(final ValidationContext validationContext) {
+        return validate(validationContext.getData(), validationContext.getCaseTypeDefinition().getCaseFieldDefinitions(), CaseDataValidator.EMPTY_STRING, validationContext);
     }
 
     public List<ValidationResult> validate(final Map<String, JsonNode> data,
