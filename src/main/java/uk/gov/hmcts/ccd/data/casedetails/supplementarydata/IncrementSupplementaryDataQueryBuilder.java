@@ -20,8 +20,7 @@ public class IncrementSupplementaryDataQueryBuilder implements SupplementaryData
             + "        WHEN jsonb_extract_path_text(COALESCE(supplementary_data, '{}'), :node_path) IS NOT NULL"
             + "        THEN jsonb_set(COALESCE(supplementary_data, '{}'), :leaf_node_key,"
             + "             (jsonb_extract_path_text(supplementary_data, :node_path)\\:\\:INT + :value) \\:\\:TEXT\\:\\:jsonb, false)"
-            + "    END), "
-            + "supplementary_data_last_modified = :current_time "
+            + "    END) "
             + "WHERE reference = :reference";
 
     @Override
