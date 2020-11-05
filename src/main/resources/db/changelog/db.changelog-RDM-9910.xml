@@ -1,0 +1,30 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet id="rdm-9910" runInTransaction="false" author="daniel.lysiak1@hmcts.net">
+        <sql dbms="postgresql"
+            endDelimiter="\nGO"
+            splitStatements="true"
+            stripComments="true">
+            ALTER TABLE case_data ADD db_last_modified timestamp;
+
+            CREATE INDEX idx_db_last_modified ON case_data (db_last_modified);
+
+            UPDATE case_data SET db_last_modified = last_modified;
+
+            CREATE OR REPLACE FUNCTION set_case_data_db_last_modified()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                NEW.db_last_modified := now();
+                RETURN NEW;
+            END
+            $$ LANGUAGE plpgsql;
+
+            CREATE TRIGGER trg_case_data_updated
+            BEFORE INSERT OR UPDATE ON case_data
+            FOR EACH ROW EXECUTE PROCEDURE set_case_data_db_last_modified();
+
+            ALTER TABLE case_data DROP COLUMN supplementary_data_last_modified;
+        </sql>
+    </changeSet>
+</databaseChangeLog>
