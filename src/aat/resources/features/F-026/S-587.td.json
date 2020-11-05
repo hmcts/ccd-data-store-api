@@ -31,11 +31,11 @@
 		"body": {
 			"columns": [
 				{
-          "_extends_": "F-026_response_data",
+          "_extends_": "F-026_ResponseData",
           "metadata": true
         },
 				{
-          "_extends_": "F-026_response_data",
+          "_extends_": "F-026_ResponseData",
 					"label": "`Text` field",
 					"order": 2,
 					"case_field_id": "TextField",
@@ -45,7 +45,7 @@
 					}
 				},
 				{
-          "_extends_": "F-026_response_data",
+          "_extends_": "F-026_ResponseData",
 					"label": "`Number` field",
 					"order": 3,
 					"case_field_id": "NumberField",
@@ -55,7 +55,7 @@
 					}
 				},
 				{
-          "_extends_": "F-026_response_data",
+          "_extends_": "F-026_ResponseData",
 					"label": "`YesOrNo` field",
 					"order": 4,
 					"case_field_id": "YesOrNoField",
