@@ -5,8 +5,7 @@ package uk.gov.hmcts.ccd.domain.types;
  */
 public enum CustomTypes {
 
-    CASE_LINK_TEXT_CASE_REFERENCE("TextCaseReference"),
-    ORG_POLICY_CASE_ASSIGNED_ROLE("OrgPolicyCaseAssignedRole");
+    CASE_LINK_TEXT_CASE_REFERENCE("TextCaseReference");
 
     private String id;
 

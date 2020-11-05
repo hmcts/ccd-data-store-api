@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-@Named("OrgPolicyCaseAssignedRole")
+@Named
 @Singleton
 public class OrgPolicyCaseAssignedRoleValidator implements FieldIdBasedValidator {
 
@@ -35,7 +35,7 @@ public class OrgPolicyCaseAssignedRoleValidator implements FieldIdBasedValidator
 
     @Override
     public String getFieldId() {
-        return CustomTypes.ORG_POLICY_CASE_ASSIGNED_ROLE.getId();
+        return PredefinedFieldsIDs.ORG_POLICY_CASE_ASSIGNED_ROLE.getId();
     }
 
     @Override
@@ -71,9 +71,5 @@ public class OrgPolicyCaseAssignedRoleValidator implements FieldIdBasedValidator
 
     private boolean caseRolesContainsCaseInsensitive(Set<String> caseRoles, JsonNode orgPolicyRoleNode) {
         return caseRoles.stream().anyMatch(e -> e.equalsIgnoreCase(orgPolicyRoleNode.textValue()));
-    }
-
-    private String getOrganisationFieldName(String fieldPath){
-        return "";
     }
 }
