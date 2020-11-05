@@ -18,7 +18,7 @@ import java.util.Set;
 
 @Named("OrgPolicyCaseAssignedRole")
 @Singleton
-public class OrgPolicyCaseAssignedRoleValidator implements DataFieldIdValidator {
+public class OrgPolicyCaseAssignedRoleValidator implements FieldIdBasedValidator {
 
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseRoleRepository caseRoleRepository;
@@ -34,8 +34,8 @@ public class OrgPolicyCaseAssignedRoleValidator implements DataFieldIdValidator 
     }
 
     @Override
-    public String getPredefinedFieldId() {
-        return PredefinedFields.ORG_POLICY_CASE_ASSIGNED_ROLE.getFieldID();
+    public String getFieldId() {
+        return CustomTypes.ORG_POLICY_CASE_ASSIGNED_ROLE.getId();
     }
 
     @Override

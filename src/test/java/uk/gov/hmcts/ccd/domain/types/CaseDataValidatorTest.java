@@ -376,7 +376,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
         fieldValidators.add(textCaseReferenceCaseLinkValidator);
         CaseDataValidator caseDataValidator = new CaseDataValidator(fieldValidators);
 
-        when(textCaseReferenceCaseLinkValidator.getPredefinedFieldId()).thenReturn("TextCaseReference");
+        when(textCaseReferenceCaseLinkValidator.getCustomTypeId()).thenReturn("TextCaseReference");
 
         final String DATA = "{\n" +
             "        \"CaseReference\": \"1596104840593131\"\n" +
@@ -397,7 +397,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
         fieldValidators.add(new CollectionValidator());
         CaseDataValidator caseDataValidator = new CaseDataValidator(fieldValidators);
 
-        when(textCaseReferenceCaseLinkValidator.getPredefinedFieldId()).thenReturn("TextCaseReference");
+        when(textCaseReferenceCaseLinkValidator.getCustomTypeId()).thenReturn("TextCaseReference");
 
         final String DATA =
             "{\n" +

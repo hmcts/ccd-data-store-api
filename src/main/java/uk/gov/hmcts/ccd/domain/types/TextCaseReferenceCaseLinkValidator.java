@@ -19,7 +19,7 @@ import static uk.gov.hmcts.ccd.domain.model.common.CaseReferenceUtils.formatCase
 
 @Named("TextCaseReferenceCaseLinkValidator")
 @Singleton
-public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeFieldValidator {
+public class TextCaseReferenceCaseLinkValidator implements CustomTypeValidator {
 
     private static final Logger LOG = LoggerFactory.getLogger(TextCaseReferenceCaseLinkValidator.class);
     private CaseService caseService;
@@ -63,7 +63,7 @@ public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeFieldVa
     }
 
     @Override
-    public String getPredefinedFieldId() {
-        return PredefinedFields.CASE_LINK_TEXT_CASE_REFERENCE.getFieldID();
+    public String getCustomTypeId() {
+        return CustomTypes.CASE_LINK_TEXT_CASE_REFERENCE.getId();
     }
 }

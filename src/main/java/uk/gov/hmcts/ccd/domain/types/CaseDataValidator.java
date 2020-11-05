@@ -100,28 +100,27 @@ public class CaseDataValidator {
         }
     }
 
-    private List<ValidationResult> validateSimpleField(final String dataFieldId,
+    private List<ValidationResult> validateSimpleField(final String fieldId,
                                                        final JsonNode dataValue,
                                                        final CaseFieldDefinition caseFieldDefinition,
                                                        final String fieldIdPrefix,
                                                        final BaseType fieldType) {
         validationContext.setPath(fieldIdPrefix);
-        Optional<FieldValidator> dataFieldIdValidator = validators.stream().filter(
-            validator -> isDataFieldIdValidator(validator, dataFieldId)
+        Optional<FieldValidator> fieldIdBasedValidator = validators.stream().filter(
+            validator -> isFieldIdBasedValidator(validator, fieldId)
         ).findAny();
 
-        Optional<FieldValidator> predefinedFieldValidator = validators.stream().filter(
-            validator -> isPredefinedTypeFieldValidator(validator, caseFieldDefinition.getFieldTypeDefinition().getId())
+        Optional<FieldValidator> customTypeValidator = validators.stream().filter(
+            validator -> isCustomTypeValidator(validator, caseFieldDefinition.getFieldTypeDefinition().getId())
         ).findAny();
 
         Optional<FieldValidator> baseTypeValidator = validators.stream().filter(validator ->
             isBaseTypeValidator(validator, fieldType)
         ).findAny();
 
-        // TODO PROPER JAVA DOC
-        Optional<FieldValidator> validatorToExecute = dataFieldIdValidator.or(() -> predefinedFieldValidator).or(()->baseTypeValidator);
+        Optional<FieldValidator> validatorToExecute = fieldIdBasedValidator.or(() -> customTypeValidator).or(()->baseTypeValidator);
 
-        return validatorToExecute.map(validator -> validator.validate(dataFieldId, dataValue, caseFieldDefinition)
+        return validatorToExecute.map(validator -> validator.validate(fieldId, dataValue, caseFieldDefinition)
                 .stream()
                 .map(result ->
                     new ValidationResult(result.getErrorMessage(), fieldIdPrefix + result.getFieldId()))
@@ -130,19 +129,19 @@ public class CaseDataValidator {
                     new RuntimeException("System error: No validator found for " + fieldType.getType()));
     }
 
-    private boolean isPredefinedTypeFieldValidator(FieldValidator validator, String fieldID) {
-        if (validator instanceof PredefinedTypeFieldValidator) {
-            String predefinedId = ((PredefinedTypeFieldValidator) validator).getPredefinedFieldId();
-            return predefinedId.equals(fieldID);
+    private boolean isCustomTypeValidator(FieldValidator validator, String fieldTypeId) {
+        if (validator instanceof CustomTypeValidator) {
+            String customTypeId = ((CustomTypeValidator) validator).getCustomTypeId();
+            return customTypeId.equals(fieldTypeId);
         }
         return false;
     }
 
-    private boolean isDataFieldIdValidator(FieldValidator validator, String fieldID) {
-        if (validator instanceof DataFieldIdValidator) {
-            ((DataFieldIdValidator) validator).setValidationContext(validationContext);
-            String predefinedId = ((DataFieldIdValidator) validator).getPredefinedFieldId();
-            return predefinedId.equals(fieldID);
+    private boolean isFieldIdBasedValidator(FieldValidator validator, String fieldId) {
+        if (validator instanceof FieldIdBasedValidator) {
+            ((FieldIdBasedValidator) validator).setValidationContext(validationContext);
+            String validatorFieldId = ((FieldIdBasedValidator) validator).getFieldId();
+            return validatorFieldId.equals(fieldId);
         }
         return false;
     }
