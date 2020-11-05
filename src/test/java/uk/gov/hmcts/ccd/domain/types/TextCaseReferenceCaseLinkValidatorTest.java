@@ -59,7 +59,7 @@ class TextCaseReferenceCaseLinkValidatorTest {
 
     @Test
     void getType() {
-        assertThat(validator.getPredefinedFieldId(), is("TextCaseReference"));
+        assertThat(validator.getCustomTypeId(), is("TextCaseReference"));
     }
 
     @Test
