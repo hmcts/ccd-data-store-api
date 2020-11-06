@@ -101,8 +101,11 @@ public class CaseDataValidator {
                                                        final BaseType fieldType,
                                                        final ValidationContext validationContext) {
         validationContext.setPath(fieldIdPrefix);
+        validationContext.setDataValue(dataValue);
+        validationContext.setCaseFieldDefinition(caseFieldDefinition);
+        validationContext.setFieldId(fieldId);
         Optional<FieldValidator> fieldIdBasedValidator = validators.stream().filter(
-            validator -> isFieldIdBasedValidator(validator, fieldId, validationContext)
+            validator -> isFieldIdBasedValidator(validator, fieldId)
         ).findAny();
 
         Optional<FieldValidator> customTypeValidator = validators.stream().filter(
@@ -115,7 +118,7 @@ public class CaseDataValidator {
 
         Optional<FieldValidator> validatorToExecute = fieldIdBasedValidator.or(() -> customTypeValidator).or(()->baseTypeValidator);
 
-        return validatorToExecute.map(validator -> validator.validate(fieldId, dataValue, caseFieldDefinition)
+        return validatorToExecute.map(validator -> validator.validate(validationContext)
                 .stream()
                 .map(result ->
                     new ValidationResult(result.getErrorMessage(), fieldIdPrefix + result.getFieldId()))
@@ -132,9 +135,8 @@ public class CaseDataValidator {
         return false;
     }
 
-    private boolean isFieldIdBasedValidator(FieldValidator validator, String fieldId, ValidationContext validationContext) {
+    private boolean isFieldIdBasedValidator(FieldValidator validator, String fieldId) {
         if (validator instanceof FieldIdBasedValidator) {
-            ((FieldIdBasedValidator) validator).setValidationContext(validationContext);
             String validatorFieldId = ((FieldIdBasedValidator) validator).getFieldId();
             return validatorFieldId.equals(fieldId);
         }

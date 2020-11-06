@@ -9,8 +9,6 @@ package uk.gov.hmcts.ccd.domain.types;
  */
 public interface FieldIdBasedValidator extends FieldValidator {
 
-    void setValidationContext(ValidationContext validationContext);
-
     /**
      * @return the field id to which the validator is associated
      */

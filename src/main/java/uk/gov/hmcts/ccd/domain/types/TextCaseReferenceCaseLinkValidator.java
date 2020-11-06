@@ -33,11 +33,13 @@ public class TextCaseReferenceCaseLinkValidator implements CustomTypeValidator {
     }
 
     @Override
-    public List<ValidationResult> validate(final String dataFieldId,
-                                           final JsonNode dataValue,
-                                           final CaseFieldDefinition caseFieldDefinition) {
+    public List<ValidationResult> validate(ValidationContext validationContext) {
 
-        List<ValidationResult> validationResults = textValidator.validate(dataFieldId, dataValue, caseFieldDefinition);
+        final String dataFieldId = validationContext.getFieldId();
+        final JsonNode dataValue = validationContext.getDataValue();
+        final CaseFieldDefinition caseFieldDefinition = validationContext.getCaseFieldDefinition();
+        final List<ValidationResult> validationResults = textValidator.validate(dataFieldId, dataValue, caseFieldDefinition);
+
         if (validationResults.isEmpty() && !textValidator.isNullOrEmpty(dataValue)) {
             final String value = dataValue.textValue();
             return isAnExistingCase(value, dataFieldId);
