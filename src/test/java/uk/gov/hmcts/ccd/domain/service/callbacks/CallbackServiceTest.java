@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,6 +8,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -33,9 +39,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isA;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -71,7 +77,8 @@ class CallbackServiceTest {
     private CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
     private CaseDetails caseDetails = new CaseDetails();
     private CallbackResponse callbackResponse = new CallbackResponse();
-
+    private Logger logger;
+    private ListAppender<ILoggingEvent> listAppender;
 
     @BeforeEach
     void setUp() {
@@ -91,8 +98,18 @@ class CallbackServiceTest {
         when(restTemplate
             .exchange(eq(URL), eq(HttpMethod.POST), isA(HttpEntity.class), eq(CallbackResponse.class)))
             .thenReturn(responseEntity);
+
+        logger = (Logger) LoggerFactory.getLogger(CallbackService.class);
+        listAppender = new ListAppender<>();
+        listAppender.start();
+        logger.addAppender(listAppender);
+
     }
 
+    @AfterEach
+    void cleanUp() {
+        logger.detachAndStopAllAppenders();
+    }
     @Test
     @DisplayName("Should set ignore warning flag in callback request if set by client")
     public void shouldSetIgnoreWarningsFlagInCallbackRequestIfSetByClient() throws Exception {
@@ -151,19 +168,37 @@ class CallbackServiceTest {
         ccdCallbackLogControl.add("*");
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
-
-        verify(appinsights).trackCallbackEvent(eq(CALLBACK_TYPE), eq(URL), eq("200"), any(Duration.class));
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals("Invoking callback {} of type {} with request: {}", logsList.get(0)
+            .getMessage());
     }
 
     @Test
-    @DisplayName("Should Log callback event")
+    @DisplayName("Should Log callback test multiple event")
+    public void shouldLogCallbackEventMultiple() throws Exception {
+        List<String> ccdCallbackLogControl = new ArrayList<String>();
+        ccdCallbackLogControl.add("abc-callback");
+        ccdCallbackLogControl.add("xyz-callback");
+        ccdCallbackLogControl.add("test-callback");
+        doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
+        callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals("The callback {} response received: {}", logsList.get(1)
+            .getMessage());
+    }
+
+    @Test
+    @DisplayName("Should Log callback test event")
     public void shouldLogCallbackEvent() throws Exception {
         List<String> ccdCallbackLogControl = new ArrayList<String>();
         ccdCallbackLogControl.add("test-callback");
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
-
-        verify(appinsights).trackCallbackEvent(eq(CALLBACK_TYPE), eq(URL), eq("200"), any(Duration.class));
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals("Invoking callback {} of type {} with request: {}", logsList.get(0)
+            .getMessage());
+        assertEquals("The callback {} response received: {}", logsList.get(1)
+            .getMessage());
     }
 
     @Test
@@ -173,8 +208,8 @@ class CallbackServiceTest {
         ccdCallbackLogControl.add("Notest-callback");
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
-
-        verify(appinsights).trackCallbackEvent(eq(CALLBACK_TYPE), eq(URL), eq("200"), any(Duration.class));
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0,logsList.size());
     }
 
     @Test
@@ -183,8 +218,8 @@ class CallbackServiceTest {
         List<String> ccdCallbackLogControl = new ArrayList<String>();
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
-
-        verify(appinsights).trackCallbackEvent(eq(CALLBACK_TYPE), eq(URL), eq("200"), any(Duration.class));
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals(0,logsList.size());
     }
 
     private void initSecurityContext() {

@@ -39,6 +39,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @Service
 public class CallbackService {
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
+    private static final String STAR_STR = "*";
 
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
@@ -123,13 +124,6 @@ public class CallbackService {
         HttpHeaders securityHeaders = securityUtils.authorizationHeaders();
 
         CallbackTelemetryThreadContext.setTelemetryContext(new CallbackTelemetryContext(callbackType));
-        List<String> ccdCallbackLogControl = applicationParams.getCcdCallbackLogControl();
-        boolean match = false;
-        String starStr = "*";//to match any call back
-        if (ccdCallbackLogControl.size() > 0 && (starStr.equals(ccdCallbackLogControl.get(0))
-            || ccdCallbackLogControl.stream().anyMatch(url::contains))) {
-            match = true;
-        }
         int httpStatus = 0;
         Instant startTime = Instant.now();
 
@@ -140,13 +134,12 @@ public class CallbackService {
                 securityHeaders.forEach((key, values) -> httpHeaders.put(key, values));
             }
             final HttpEntity requestEntity = new HttpEntity(callbackRequest, httpHeaders);
-            if (match) {
-                LOG.info("Invoking callback {} of CallbackType {} at {} with Request {}",
-                    url, callbackType, startTime, requestEntity);
+            if (logCallbackDetails(url)) {
+                LOG.info("Invoking callback {} of type {} with request: {}", url, callbackType, requestEntity);
             }
             ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz);
-            if (match) {
-                LOG.info(" Received callback Response {}", responseEntity);
+            if (logCallbackDetails(url)) {
+                LOG.info("The callback {} response received: {}", url, responseEntity);
             }
             httpStatus = responseEntity.getStatusCodeValue();
             return Optional.of(responseEntity);
@@ -172,5 +165,15 @@ public class CallbackService {
                 .withErrors(callbackResponse.getErrors())
                 .withWarnings(callbackResponse.getWarnings());
         }
+    }
+
+    private boolean logCallbackDetails(final String url) {
+        boolean logCallBack = false;
+        List<String> ccdCallbackLogControl = applicationParams.getCcdCallbackLogControl();
+        if (ccdCallbackLogControl.size() > 0 && (STAR_STR.equals(ccdCallbackLogControl.get(0))
+            || ccdCallbackLogControl.stream().anyMatch(url::contains))) {
+            logCallBack = true;
+        }
+        return logCallBack;
     }
 }
