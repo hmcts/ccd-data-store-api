@@ -167,10 +167,20 @@ class CallbackServiceTest {
     }
 
     @Test
-    @DisplayName("Should Log callback event")
+    @DisplayName("Should Not Log callback event")
     public void shouldNotLogCallbackEvent() throws Exception {
         List<String> ccdCallbackLogControl = new ArrayList<String>();
         ccdCallbackLogControl.add("Notest-callback");
+        doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
+        callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
+
+        verify(appinsights).trackCallbackEvent(eq(CALLBACK_TYPE), eq(URL), eq("200"), any(Duration.class));
+    }
+
+    @Test
+    @DisplayName("Should Not Log callback event when empty")
+    public void shouldNotLogCallbackEventEmpty() throws Exception {
+        List<String> ccdCallbackLogControl = new ArrayList<String>();
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
 
