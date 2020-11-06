@@ -9,7 +9,6 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.LoggerFactory;
-import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
@@ -40,8 +39,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -103,13 +103,13 @@ class CallbackServiceTest {
         listAppender = new ListAppender<>();
         listAppender.start();
         logger.addAppender(listAppender);
-
     }
 
     @AfterEach
     void cleanUp() {
         logger.detachAndStopAllAppenders();
     }
+
     @Test
     @DisplayName("Should set ignore warning flag in callback request if set by client")
     public void shouldSetIgnoreWarningsFlagInCallbackRequestIfSetByClient() throws Exception {
