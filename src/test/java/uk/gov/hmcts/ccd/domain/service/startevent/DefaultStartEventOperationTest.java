@@ -1,28 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
-import java.util.Map;
-import java.util.Optional;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.core.StringStartsWith.startsWith;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +16,7 @@ import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplexDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
@@ -53,6 +32,32 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.StringStartsWith.startsWith;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDraftBuilder.newCaseDraft;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventFieldDefinitionBuilder.newCaseEventField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
+
 public class DefaultStartEventOperationTest {
 
     private static final String UID = "1";
@@ -64,9 +69,91 @@ public class DefaultStartEventOperationTest {
     private static final String TEST_DRAFT_ID = "1";
     private static final String TEST_CASE_REFERENCE = "123456789012345";
     private static final String TEST_CASE_STATE = "TestState";
-    public static final String PRIVATE = SecurityClassification.PRIVATE.name();
-    private static final Map<String, JsonNode> DATA = Maps.newHashMap();
+    private static final String PRIVATE = SecurityClassification.PRIVATE.name();
     private static final Map<String, JsonNode> DATA_CLASSIFICATION = Maps.newHashMap();
+    private static final Map<String, JsonNode> DEFAULT_VALUE_DATA = expectedDefaultValue();
+
+    static Map<String, JsonNode> expectedDefaultValue() {
+        Map<String, JsonNode> data = new HashMap<>();
+        try {
+            JsonNode changeOrgDefaultValue = MAPPER.readTree(""
+                                                                 + "{"
+                                                                 + "  \"Reason\": \"Good reason\","
+                                                                 + "  \"OrganisationToAdd\": {"
+                                                                 + "    \"OrganisationID\": \"Sol Firm 1\""
+                                                                 + "  }"
+                                                                 + "}");
+
+            data.put("ChangeOrganisationRequestField", changeOrgDefaultValue);
+
+            JsonNode orgPolicyDefaultValue = MAPPER.readTree("{"
+                                                                 + "  \"Organisation\": {"
+                                                                 + "    \"OrganisationID\": \"Sol Firm 2\""
+                                                                 + "  },"
+                                                                 + "  \"OrgPolicyCaseAssignedRole\": \"[Claimant]\""
+                                                                 + "}");
+            data.put("OrganisationPolicyField", orgPolicyDefaultValue);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
+
+    static Map<String, JsonNode> existingCaseData() {
+        Map<String, JsonNode> data = new HashMap<>();
+        try {
+            JsonNode changeOrg = MAPPER.readTree(""
+                                                     + "{"
+                                                     + "  \"Reason\": \"Old reason\","
+                                                     + "  \"NotesReason\": null,"
+                                                     + "  \"OrganisationToAdd\": {"
+                                                     + "    \"OrganisationID\": null"
+                                                     + "  }"
+                                                     + "}");
+            data.put("ChangeOrganisationRequestField", changeOrg);
+
+            JsonNode orgPolicy = MAPPER.readTree("{"
+                                                     + "  \"Organisation\": {"
+                                                     + "    \"OrganisationID\": null"
+                                                     + "  },"
+                                                     + "  \"OrgPolicyReference\": null,"
+                                                     + "  \"OrgPolicyCaseAssignedRole\": null"
+                                                     + "}");
+            data.put("OrganisationPolicyField", orgPolicy);
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
+
+    static Map<String, JsonNode> expectedAfterMergeWithDefaultValue() {
+        Map<String, JsonNode> data = new HashMap<>();
+        try {
+            JsonNode changeOrg = MAPPER.readTree(""
+                                                     + "{"
+                                                     + "  \"Reason\": \"Good reason\","
+                                                     + "  \"NotesReason\": null,"
+                                                     + "  \"OrganisationToAdd\": {"
+                                                     + "    \"OrganisationID\": \"Sol Firm 1\""
+                                                     + "  }"
+                                                     + "}");
+            data.put("ChangeOrganisationRequestField", changeOrg);
+
+            JsonNode orgPolicy = MAPPER.readTree("{"
+                                                     + "  \"Organisation\": {"
+                                                     + "    \"OrganisationID\": \"Sol Firm 2\""
+                                                     + "  },"
+                                                     + "  \"OrgPolicyReference\": null,"
+                                                     + "  \"OrgPolicyCaseAssignedRole\": \"[Claimant]\""
+                                                     + "}");
+            data.put("OrganisationPolicyField", orgPolicy);
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
 
     @Mock
     private EventTriggerService eventTriggerService;
@@ -97,13 +184,45 @@ public class DefaultStartEventOperationTest {
 
     private DefaultStartEventOperation defaultStartEventOperation;
 
-    private final CaseDetails caseDetails = newCaseDetails().build();
+    private final CaseDetails caseDetails = newCaseDetails().withData(null).build();
     private final CaseTypeDefinition caseTypeDefinition = newCaseType().withCaseTypeId(TEST_CASE_TYPE_ID)
         .withJurisdiction(newJurisdiction().withJurisdictionId(TEST_JURISDICTION_ID).build()).build();
-    private final CaseEventDefinition caseEventDefinition = newCaseEvent().build();
+    private final CaseEventDefinition caseEventDefinition = newCaseEvent().withCaseFields(
+        Arrays.asList(newCaseEventField()
+                          .withCaseFieldId("ChangeOrganisationRequestField")
+                          .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                                                                   .reference("Reason")
+                                                                   .defaultValue("Good reason")
+                                                                   .build())
+                          .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                                                                   .reference("NotesReason")
+                                                                   .defaultValue(null)
+                                                                   .build())
+                          .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                                                                   .reference("OrganisationToAdd.OrganisationID")
+                                                                   .defaultValue("Sol Firm 1")
+                                                                   .build())
+                          .build(),
+                      newCaseEventField()
+                          .withCaseFieldId("OrganisationPolicyField")
+                          .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                                                                   .reference("Organisation.OrganisationID")
+                                                                   .defaultValue("Sol Firm 2")
+                                                                   .build())
+                          .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                                                                   .reference("OrgPolicyReference")
+                                                                   .defaultValue(null)
+                                                                   .build())
+                          .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                                                                   .reference("OrgPolicyCaseAssignedRole")
+                                                                   .defaultValue("[Claimant]")
+                                                                   .build())
+                          .build()
+        )
+    ).build();
     private final CaseDataContent caseDataContent = newCaseDataContent()
         .withSecurityClassification(PRIVATE)
-        .withData(DATA)
+        .withData(existingCaseData())
         .withDataClassification(DATA_CLASSIFICATION)
         .build();
     private final CaseDraft caseDraft = newCaseDraft()
@@ -117,12 +236,11 @@ public class DefaultStartEventOperationTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-
+        doReturn(DEFAULT_VALUE_DATA).when(caseService)
+            .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
         doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(TEST_CASE_TYPE_ID);
         doReturn(caseEventDefinition).when(eventTriggerService).findCaseEvent(caseTypeDefinition,
             TEST_EVENT_TRIGGER_ID);
-        doNothing().when(callbackInvoker).invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition,
-            caseDetails, IGNORE_WARNING);
 
         defaultStartEventOperation = new DefaultStartEventOperation(eventTokenService,
                                                                     caseDefinitionRepository,
@@ -141,8 +259,8 @@ public class DefaultStartEventOperationTest {
 
         @BeforeEach
         void setUp() {
-            doReturn(caseDetails).when(caseService).createNewCaseDetails(eq(TEST_CASE_TYPE_ID),
-                eq(TEST_JURISDICTION_ID), eq(Maps.newHashMap()));
+            doReturn(newCaseDetails().withData(Maps.newHashMap()).build()).when(caseService)
+                .createNewCaseDetails(eq(TEST_CASE_TYPE_ID), eq(TEST_JURISDICTION_ID), eq(Maps.newHashMap()));
             doReturn(true).when(eventTriggerService).isPreStateEmpty(caseEventDefinition);
             doReturn(UID).when(userAuthorisation).getUserId();
             doReturn(TEST_EVENT_TOKEN).when(eventTokenService).generateToken(
@@ -165,8 +283,8 @@ public class DefaultStartEventOperationTest {
                 () -> verify(eventTokenService).generateToken(UID, caseEventDefinition, caseTypeDefinition
                     .getJurisdictionDefinition(), caseTypeDefinition),
                 () -> verify(callbackInvoker).invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition,
-                    caseDetails, IGNORE_WARNING),
-                () -> assertThat(actual.getCaseDetails(), is(equalTo(caseDetails))),
+                                                                         actual.getCaseDetails(), IGNORE_WARNING),
+                () -> assertThat(actual.getCaseDetails().getData(), is(equalTo(DEFAULT_VALUE_DATA))),
                 () -> assertThat(actual.getToken(), is(equalTo(TEST_EVENT_TOKEN))),
                 () -> assertThat(actual.getEventId(), is(equalTo(TEST_EVENT_TRIGGER_ID)))
             );
@@ -227,7 +345,7 @@ public class DefaultStartEventOperationTest {
             doReturn(draftResponse).when(draftGateway).get(TEST_DRAFT_ID);
             caseDetails.setCaseTypeId(TEST_CASE_TYPE_ID);
             caseDetails.setJurisdiction(TEST_JURISDICTION_ID);
-            caseDetails.setData(DATA);
+            caseDetails.setData(existingCaseData());
             caseDetails.setDataClassification(DATA_CLASSIFICATION);
             caseDetails.setSecurityClassification(SecurityClassification.PRIVATE);
             doReturn(UID).when(userAuthorisation).getUserId();
@@ -250,7 +368,8 @@ public class DefaultStartEventOperationTest {
                     eq(caseTypeDefinition), any(CaseDetails.class), eq(IGNORE_WARNING)),
                 () -> assertThat(actual.getCaseDetails(), hasProperty("securityClassification",
                     is(SecurityClassification.PRIVATE))),
-                () -> assertThat(actual.getCaseDetails(), hasProperty("data", is(DATA))),
+                () -> assertThat(actual.getCaseDetails(), hasProperty("data",
+                                                                      is(expectedAfterMergeWithDefaultValue()))),
                 () -> assertThat(actual.getCaseDetails(), hasProperty("dataClassification",
                     is(DATA_CLASSIFICATION))),
                 () -> assertThat(actual.getCaseDetails(), hasProperty("caseTypeId",
@@ -307,11 +426,10 @@ public class DefaultStartEventOperationTest {
 
         @BeforeEach
         void setUp() {
+            caseDetails.setData(existingCaseData());
             caseDetails.setState(TEST_CASE_STATE);
             caseDetails.setCaseTypeId(TEST_CASE_TYPE_ID);
             doReturn(true).when(uidService).validateUID(TEST_CASE_REFERENCE);
-            doReturn(caseDetails).when(caseDetailsRepository).findUniqueCase(TEST_JURISDICTION_ID, TEST_CASE_TYPE_ID,
-                TEST_CASE_REFERENCE);
             doReturn(true).when(eventTriggerService).isPreStateValid(TEST_CASE_STATE, caseEventDefinition);
             doReturn(TEST_EVENT_TOKEN).when(eventTokenService).generateToken(
                 UID, caseDetails, caseEventDefinition,
@@ -338,8 +456,9 @@ public class DefaultStartEventOperationTest {
                 () -> verify(eventTokenService).generateToken(UID, caseDetails,
                     caseEventDefinition, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition),
                 () -> verify(callbackInvoker).invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition,
-                    caseDetails, IGNORE_WARNING),
+                                                                         actual.getCaseDetails(), IGNORE_WARNING),
                 () -> assertThat(actual.getCaseDetails(), is(equalTo(caseDetails))),
+                () -> assertThat(actual.getCaseDetails().getData(), is(equalTo(expectedAfterMergeWithDefaultValue()))),
                 () -> assertThat(actual.getToken(), is(equalTo(TEST_EVENT_TOKEN))),
                 () -> assertThat(actual.getEventId(), is(equalTo(TEST_EVENT_TRIGGER_ID)))
             );

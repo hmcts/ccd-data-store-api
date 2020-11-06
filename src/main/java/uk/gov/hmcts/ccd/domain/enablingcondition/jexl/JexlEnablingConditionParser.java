@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.casestate.jexl;
+package uk.gov.hmcts.ccd.domain.enablingcondition.jexl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -20,8 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.domain.casestate.EnablingConditionFormatter;
-import uk.gov.hmcts.ccd.domain.casestate.EnablingConditionParser;
+import uk.gov.hmcts.ccd.domain.enablingcondition.EnablingConditionConverter;
+import uk.gov.hmcts.ccd.domain.enablingcondition.EnablingConditionParser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 @Component
@@ -34,16 +34,16 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
 
     private final ObjectMapper objectMapper;
 
-    private EnablingConditionFormatter enablingConditionFormatter;
+    private EnablingConditionConverter enablingConditionConverter;
 
     @Inject
-    public JexlEnablingConditionParser(EnablingConditionFormatter enablingConditionFormatter) {
-        this(enablingConditionFormatter, new ObjectMapper());
+    public JexlEnablingConditionParser(EnablingConditionConverter enablingConditionConverter) {
+        this(enablingConditionConverter, new ObjectMapper());
     }
 
-    protected JexlEnablingConditionParser(EnablingConditionFormatter enablingConditionFormatter,
+    protected JexlEnablingConditionParser(EnablingConditionConverter enablingConditionConverter,
                                           ObjectMapper objectMapper) {
-        this.enablingConditionFormatter = enablingConditionFormatter;
+        this.enablingConditionConverter = enablingConditionConverter;
         this.engine = new JexlBuilder().create();
         this.objectMapper = objectMapper;
     }
@@ -51,7 +51,7 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
     @Override
     public Boolean evaluate(String enablingCondition, Map<String, JsonNode> caseEventData) {
         try {
-            String expression = this.enablingConditionFormatter.format(enablingCondition);
+            String expression = this.enablingConditionConverter.convert(enablingCondition);
             if (expression != null) {
                 JexlScript expressionScript = engine.createScript(expression);
                 Map<String, Object> data = retrieveContextData(caseEventData, expressionScript.getVariables());

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.casestate.jexl;
+package uk.gov.hmcts.ccd.domain.enablingcondition.jexl;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -9,11 +9,19 @@ import java.util.stream.Collectors;
 import org.apache.commons.jexl3.JexlOperator;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.domain.casestate.EnablingConditionFormatter;
+import uk.gov.hmcts.ccd.domain.enablingcondition.EnablingConditionConverter;
 
+/**
+ * This class converts the post state enabling condition to Jexl condition.
+ * For now we are handling AND -> and
+ * OR -> or
+ * = -> ==
+ * FieldA="*" -> FieldA=~".*" (content checking)
+ * FieldA!="*" -> FieldA!~".*" (content checking)
+ */
 @Component
 @Qualifier("jexl")
-public class JexlEnablingConditionFormatter implements EnablingConditionFormatter {
+public class JexlEnablingConditionConverter implements EnablingConditionConverter {
 
     private static final String AND_CONDITION_REGEX = "\\sAND\\s(?=(([^\"]*\"){2})*[^\"]*$)";
 
@@ -40,7 +48,7 @@ public class JexlEnablingConditionFormatter implements EnablingConditionFormatte
     private static final String NOT_CONTAINS_OPERATOR = "!~";
 
     @Override
-    public String format(String enablingCondition) {
+    public String convert(String enablingCondition) {
         Optional<String> parsedCondition = parseEnablingCondition(enablingCondition);
         return parsedCondition.orElse(enablingCondition);
     }

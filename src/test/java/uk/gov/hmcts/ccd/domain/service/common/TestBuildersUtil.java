@@ -28,6 +28,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.Banner;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplexDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -790,6 +792,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseEventBuilder withCaseFields(List<CaseEventFieldDefinition> caseEventFieldDefinitions) {
+            caseEventDefinition.setCaseFields(caseEventFieldDefinitions);
+            return this;
+        }
+
         public CaseEventBuilder withId(String id) {
             caseEventDefinition.setId(id);
             return this;
@@ -823,6 +830,35 @@ public class TestBuildersUtil {
         public CaseEventBuilder withShowEventNotes(Boolean showEventNotes) {
             caseEventDefinition.setShowEventNotes(showEventNotes);
             return this;
+        }
+    }
+
+    public static class CaseEventFieldDefinitionBuilder {
+        private final CaseEventFieldDefinition caseField;
+        private final List<CaseEventFieldComplexDefinition> complexFieldDefinitions = new ArrayList<>();
+
+        private CaseEventFieldDefinitionBuilder() {
+            this.caseField = new CaseEventFieldDefinition();
+        }
+
+        public static CaseEventFieldDefinitionBuilder newCaseEventField() {
+            return new CaseEventFieldDefinitionBuilder();
+        }
+
+        public CaseEventFieldDefinitionBuilder withCaseFieldId(String caseFieldId) {
+            caseField.setCaseFieldId(caseFieldId);
+            return this;
+        }
+
+        public CaseEventFieldDefinitionBuilder addCaseEventFieldComplexDefinitions(
+            CaseEventFieldComplexDefinition complexFieldDefinition) {
+            complexFieldDefinitions.add(complexFieldDefinition);
+            return this;
+        }
+
+        public CaseEventFieldDefinition build() {
+            caseField.setCaseEventFieldComplexDefinitions(complexFieldDefinitions);
+            return caseField;
         }
     }
 

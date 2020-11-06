@@ -35,7 +35,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseStateUpdateService;
+import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
@@ -104,7 +104,7 @@ class CreateCaseEventDefinitionServiceTest {
     @Mock
     private Clock clock;
     @Mock
-    private CaseStateUpdateService caseStateUpdateService;
+    private CasePostStateService casePostStateService;
 
     private Clock fixedClock = Clock.fixed(Instant.parse("2018-08-19T16:02:42.00Z"), ZoneOffset.UTC);
 
@@ -185,8 +185,8 @@ class CreateCaseEventDefinitionServiceTest {
             any(),
             any(),
             any())).willReturn(aboutToSubmitCallbackResponse);
-        doReturn(Optional.of(POST_STATE)).when(this.caseStateUpdateService)
-            .retrieveCaseState(any(CaseEventDefinition.class), any(CaseDetails.class));
+        doReturn(POST_STATE).when(this.casePostStateService)
+            .evaluateCaseState(any(CaseEventDefinition.class), any(CaseDetails.class));
     }
 
     private List<EventPostStateDefinition> getEventPostStates(String... postStateReferences) {
@@ -228,8 +228,8 @@ class CreateCaseEventDefinitionServiceTest {
         caseDetailsBefore.setLastStateModifiedDate(LAST_MODIFIED);
         caseDetailsBefore.setState(PRE_STATE_ID);
         caseEventDefinition = new CaseEventDefinition();
-        doReturn(Optional.of(PRE_STATE_ID)).when(this.caseStateUpdateService)
-            .retrieveCaseState(any(CaseEventDefinition.class), any(CaseDetails.class));
+        doReturn(PRE_STATE_ID).when(this.casePostStateService)
+            .evaluateCaseState(any(CaseEventDefinition.class), any(CaseDetails.class));
 
         CaseStateDefinition state = new CaseStateDefinition();
         state.setId(PRE_STATE_ID);
