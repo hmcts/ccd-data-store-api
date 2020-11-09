@@ -29,414 +29,110 @@
           "__ordering__": "unordered"
         },
         {
-          "id": "TextField",
-          "label": "A `Text` field",
-          "hidden": false,
-          "value": "Some Text",
-          "metadata": false,
-          "hint_text": "Some generic textual data.",
-          "field_type": {
-            "id": "Text",
-            "type": "Text",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
-            "fixed_list_items": [],
-            "complex_fields": [],
-            "collection_field_type": null
-          },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value": "Some Text",
-          "display_context": "OPTIONAL",
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": true,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": [
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "_extends_": "F-028_ResponseData_2",
+          "value": "Some Text"
         },
         {
+          "_extends_": "F-028_ResponseData_2",
           "id": "NumberField",
           "label": "A `Number` field",
-          "hidden": false,
-          "value": "[[ANYTHING_PRESENT]]",
-          "metadata": false,
           "hint_text": "A numeric data.",
           "field_type": {
             "id": "Number",
-            "type": "Number",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
-            "fixed_list_items": [],
-            "complex_fields": [],
-            "collection_field_type": null
+            "type": "Number"
           },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value": "164528",
-          "display_context": "OPTIONAL",
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": true,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": [
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "formatted_value": "164528"
         },
         {
+          "_extends_": "F-028_ResponseData_2",
           "id": "YesOrNoField",
           "label": "A `YesOrNo` field",
-          "hidden": false,
           "value": "Yes",
-          "metadata": false,
           "hint_text": "A simple boolean.",
           "field_type": {
             "id": "YesOrNo",
-            "type": "YesOrNo",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
-            "fixed_list_items": [],
-            "complex_fields": [],
-            "collection_field_type": null
+            "type": "YesOrNo"
           },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value": "Yes",
-          "display_context": "OPTIONAL",
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": true,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": [
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "formatted_value": "Yes"
         },
         {
+          "_extends_": "F-028_ResponseData_2",
           "id": "PhoneUKField",
           "label": "A `PhoneUK` field",
-          "hidden": false,
-          "value": "[[ANYTHING_PRESENT]]",
-          "metadata": false,
           "hint_text": "A UK phone number.",
           "field_type": {
             "id": "PhoneUK",
             "type": "PhoneUK",
-            "min": null,
-            "max": null,
-            "regular_expression": "^(((\\+44\\s?\\d{4}|\\(?0\\d{4}\\)?)\\s?\\d{3}\\s?\\d{3})|((\\+44\\s?\\d{3}|\\(?0\\d{3}\\)?)\\s?\\d{3}\\s?\\d{4})|((\\+44\\s?\\d{2}|\\(?0\\d{2}\\)?)\\s?\\d{4}\\s?\\d{4}))(\\s?\\#(\\d{4}|\\d{3}))?$",
-            "fixed_list_items": [],
-            "complex_fields": [],
-            "collection_field_type": null
+            "regular_expression": "^(((\\+44\\s?\\d{4}|\\(?0\\d{4}\\)?)\\s?\\d{3}\\s?\\d{3})|((\\+44\\s?\\d{3}|\\(?0\\d{3}\\)?)\\s?\\d{3}\\s?\\d{4})|((\\+44\\s?\\d{2}|\\(?0\\d{2}\\)?)\\s?\\d{4}\\s?\\d{4}))(\\s?\\#(\\d{4}|\\d{3}))?$"
           },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value": "07123456789",
-          "display_context": "OPTIONAL",
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": true,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": [
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "formatted_value": "07123456789"
         },
         {
+          "_extends_": "F-028_ResponseData_2",
           "id": "EmailField",
           "label": "An `Email` field",
-          "hidden": false,
-          "value": "[[ANYTHING_PRESENT]]",
-          "metadata": false,
           "hint_text": "A valid email address.",
           "field_type": {
             "id": "Email",
-            "type": "Email",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
-            "fixed_list_items": [],
-            "complex_fields": [],
-            "collection_field_type": null
+            "type": "Email"
           },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value": "ccd@hmcts.net",
-          "display_context": "OPTIONAL",
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": true,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": [
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "formatted_value": "ccd@hmcts.net"
         },
         {
+          "_extends_": "F-028_ResponseData_2",
           "id": "MoneyGBPField",
           "label": "A `MoneyGBP` field",
-          "hidden": false,
-          "value": "[[ANYTHING_PRESENT]]",
-          "metadata": false,
           "hint_text": "A monetary value.",
           "field_type": {
             "id": "MoneyGBP",
-            "type": "MoneyGBP",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
-            "fixed_list_items": [],
-            "complex_fields": [],
-            "collection_field_type": null
+            "type": "MoneyGBP"
           },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value": "4200",
-          "display_context": "OPTIONAL",
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": true,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": [
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "formatted_value": "4200"
         },
         {
+          "_extends_": "F-028_ResponseData_2",
           "id": "DateField",
           "label": "A `Date` field",
-          "hidden": false,
-          "value": "[[ANYTHING_PRESENT]]",
-          "metadata": false,
           "hint_text": "A temporal value without time.",
           "field_type": {
             "id": "Date",
-            "type": "Date",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
-            "fixed_list_items": [],
-            "complex_fields": [],
-            "collection_field_type": null
+            "type": "Date"
           },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value": "2017-02-13",
-          "display_context": "OPTIONAL",
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": true,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": [
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "formatted_value": "2017-02-13"
         },
         {
+          "_extends_": "F-028_ResponseData_2",
           "id": "DateTimeField",
           "label": "A `DateTime` field",
-          "hidden": false,
           "value": "[[ANYTHING_PRESENT]]",
-          "metadata": false,
           "hint_text": "A temporal value with time.",
           "field_type": {
             "id": "DateTime",
-            "type": "DateTime",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
-            "fixed_list_items": [],
-            "complex_fields": [],
-            "collection_field_type": null
+            "type": "DateTime"
           },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value": "1988-07-07T22:20:00",
-          "display_context": "OPTIONAL",
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": true,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": [
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "formatted_value": "1988-07-07T22:20:00"
         },
         {
+          "_extends_": "F-028_ResponseData_2",
           "id": "TextAreaField",
           "label": "A `TextArea` field",
-          "hidden": false,
           "value": "Line1\nLine2",
-          "metadata": false,
           "hint_text": "Multiple lines of text.",
           "field_type": {
             "id": "TextArea",
-            "type": "TextArea",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
-            "fixed_list_items": [],
-            "complex_fields": [],
-            "collection_field_type": null
+            "type": "TextArea"
           },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value": "Line1\nLine2",
-          "display_context": "OPTIONAL",
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": true,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": [
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "formatted_value": "Line1\nLine2"
         },
         {
+          "_extends_": "F-028_ResponseData_2",
           "id": "FixedListField",
           "label": "A `FixedList` field",
-          "hidden": false,
           "value": "VALUE3",
-          "metadata": false,
           "hint_text": "A dropdown to select one value out of many.",
           "field_type": {
             "id": "FixedList-FixedListType",
             "type": "FixedList",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
             "fixed_list_items": [
               {
                 "code": "VALUE3",
@@ -453,38 +149,12 @@
                 "label": "Value 1",
                 "order": null
               }
-            ],
-            "complex_fields": [],
-            "collection_field_type": null
+            ]
           },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value" : "VALUE3",
-          "display_context": "OPTIONAL",
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": true,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": [
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "formatted_value" : "VALUE3"
         },
         {
+          "_extends_": "F-028_ResponseData_2",
           "id": "MultiSelectListField",
           "label": "A `MultiSelectList` field",
           "hidden": false,
