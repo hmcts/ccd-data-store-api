@@ -26,6 +26,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.types.CaseDataValidator;
+import uk.gov.hmcts.ccd.domain.types.ValidationContext;
 import uk.gov.hmcts.ccd.domain.types.ValidationResult;
 import uk.gov.hmcts.ccd.domain.types.ValidationResultBuilder;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException;
@@ -116,7 +117,7 @@ class CaseTypeServiceTest {
         void shouldCallCaseDataValidator() {
 
             // ARRANGE
-            when(caseDataValidator.validate(any(), any())).thenReturn(new ArrayList<>()); // i.e. no errors
+            when(caseDataValidator.validate(any())).thenReturn(new ArrayList<>()); // i.e. no errors
 
             Map<String, JsonNode> data = new HashMap<>();
             List<CaseFieldDefinition> caseFieldDefinitions = new ArrayList<>();
@@ -127,7 +128,7 @@ class CaseTypeServiceTest {
             subject.validateData(data, caseTypeDefinition);
 
             // ASSERT
-            verify(caseDataValidator, times(1)).validate(data, caseFieldDefinitions);
+            verify(caseDataValidator, times(1)).validate(getValidationContext(data, caseFieldDefinitions));
         }
 
         @Test
@@ -141,7 +142,7 @@ class CaseTypeServiceTest {
             validationResults.add(new ValidationResultBuilder().setErrorMessage("message 2").setFieldId("field 2")
                     .build());
 
-            when(caseDataValidator.validate(any(), any())).thenReturn(validationResults); // i.e. two errors
+            when(caseDataValidator.validate(any())).thenReturn(validationResults); // i.e. two errors
 
             Map<String, JsonNode> data = new HashMap<>();
             List<CaseFieldDefinition> caseFieldDefinitions = new ArrayList<>();
@@ -151,6 +152,12 @@ class CaseTypeServiceTest {
             // ASSERT (() -> ACT))
             assertThrows(CaseValidationException.class, () -> subject.validateData(data, caseTypeDefinition));
         }
+    }
+
+    private ValidationContext getValidationContext(Map<String, JsonNode> values, List<CaseFieldDefinition> caseFieldDefinitions ) {
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
+        return new ValidationContext(values, caseTypeDefinition);
     }
 }
 
