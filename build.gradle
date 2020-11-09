@@ -636,8 +636,6 @@ jacocoTestReport {
 }
 
 test {
-	maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1   
-
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     generateCucumberReports.enabled = false
     systemProperty 'java.locale.providers', 'COMPAT'
