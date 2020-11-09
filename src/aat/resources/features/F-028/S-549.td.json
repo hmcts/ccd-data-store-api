@@ -22,11 +22,9 @@
 			"Content-Encoding" : "gzip"
 		},
 		"body": {
+      "_extends_": "F-028_ResponseData",
 			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-			"message": "Case reference is not valid",
-			"details": null,
-			"callbackErrors": null,
-			"callbackWarnings": null
+			"message": "Case reference is not valid"
 		}
 	}
 }
