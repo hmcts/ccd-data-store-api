@@ -27,6 +27,5 @@
   "show_summary_change_option": null,
   "show_summary_content_option": null,
   "retain_hidden_value": null,
-  "acls": [],
-  "default_value": null
+  "acls": []
 }
