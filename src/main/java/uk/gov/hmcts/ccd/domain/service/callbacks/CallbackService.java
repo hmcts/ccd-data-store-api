@@ -30,7 +30,9 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -39,7 +41,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @Service
 public class CallbackService {
     private static final Logger LOG = LoggerFactory.getLogger(CallbackService.class);
-    private static final String STAR_STR = "*";
+    private static final String WILDCARD = "*";
 
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
@@ -139,7 +141,7 @@ public class CallbackService {
             }
             ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, clazz);
             if (logCallbackDetails(url)) {
-                LOG.info("The callback {} response received: {}", url, responseEntity);
+                LOG.info("Callback {} response received: {}", url, responseEntity);
             }
             httpStatus = responseEntity.getStatusCodeValue();
             return Optional.of(responseEntity);
@@ -170,8 +172,9 @@ public class CallbackService {
     private boolean logCallbackDetails(final String url) {
         boolean logCallBack = false;
         List<String> ccdCallbackLogControl = applicationParams.getCcdCallbackLogControl();
-        if (ccdCallbackLogControl.size() > 0 && (STAR_STR.equals(ccdCallbackLogControl.get(0))
-            || ccdCallbackLogControl.stream().anyMatch(url::contains))) {
+        if (ccdCallbackLogControl.size() > 0 && (WILDCARD.equals(ccdCallbackLogControl.get(0))
+            || ccdCallbackLogControl.stream().filter(Objects::nonNull).filter(Predicate.not(String::isEmpty))
+            .anyMatch(url::contains))) {
             logCallBack = true;
         }
         return logCallBack;

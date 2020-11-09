@@ -162,9 +162,9 @@ class CallbackServiceTest {
     }
 
     @Test
-    @DisplayName("Should LogAll callback event")
+    @DisplayName("Should LogAll callbacks")
     public void shouldLogAllCallbackEvent() throws Exception {
-        List<String> ccdCallbackLogControl = new ArrayList<String>();
+        List<String> ccdCallbackLogControl = new ArrayList();
         ccdCallbackLogControl.add("*");
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
@@ -174,7 +174,7 @@ class CallbackServiceTest {
     }
 
     @Test
-    @DisplayName("Should Log callback test multiple event")
+    @DisplayName("Should Log callback test multiple callbacks")
     public void shouldLogCallbackEventMultiple() throws Exception {
         List<String> ccdCallbackLogControl = new ArrayList<String>();
         ccdCallbackLogControl.add("abc-callback");
@@ -188,9 +188,9 @@ class CallbackServiceTest {
     }
 
     @Test
-    @DisplayName("Should Log callback test event")
+    @DisplayName("Should Log callback test single callbacks")
     public void shouldLogCallbackEvent() throws Exception {
-        List<String> ccdCallbackLogControl = new ArrayList<String>();
+        List<String> ccdCallbackLogControl = new ArrayList();
         ccdCallbackLogControl.add("test-callback");
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
@@ -204,7 +204,7 @@ class CallbackServiceTest {
     @Test
     @DisplayName("Should Not Log callback event")
     public void shouldNotLogCallbackEvent() throws Exception {
-        List<String> ccdCallbackLogControl = new ArrayList<String>();
+        List<String> ccdCallbackLogControl = new ArrayList();
         ccdCallbackLogControl.add("Notest-callback");
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
@@ -216,6 +216,7 @@ class CallbackServiceTest {
     @DisplayName("Should Not Log callback event when empty")
     public void shouldNotLogCallbackEventEmpty() throws Exception {
         List<String> ccdCallbackLogControl = new ArrayList<String>();
+        ccdCallbackLogControl.add("");
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
         List<ILoggingEvent> logsList = listAppender.list;
