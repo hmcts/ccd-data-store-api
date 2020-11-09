@@ -1,0 +1,11 @@
+{
+  "_guid_": "F-034_ResponseData_2",
+
+  "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+  "timestamp": "[[ANYTHING_PRESENT]]",
+  "message": "Error when getting case type version. Unknown case type 'abc'.",
+  "path": "/case-types/abc/validate",
+  "details": null,
+  "callbackErrors": null,
+  "callbackWarnings": null
+}

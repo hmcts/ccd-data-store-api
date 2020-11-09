@@ -1,0 +1,14 @@
+{
+  "_guid_": "F-034_ResponseData",
+
+  "DateField": "1970-02-11",
+  "DateTimeField": "1970-04-30T01:01:00.000",
+  "StandardDate": "2010-02-02",
+  "StandardDateTime": "2019-12-20T01:01:01.000",
+  "NestedComplex": {
+    "DateField": "2019-01-01",
+    "DateTimeField": "2019-01-01T00:00:00.000",
+    "StandardDate": "2019-01-01",
+    "StandardDateTime": "2019-01-01T01:01:01.000"
+  }
+}
