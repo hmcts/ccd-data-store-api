@@ -24,11 +24,10 @@ import java.util.Map;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
 
 
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
@@ -170,13 +169,13 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     public void unknownType() throws Exception {
         final String unknownType =
             "[\n" +
-            "  {\n" +
-            "    \"id\": \"Person\",\n" +
-            "    \"field_type\": {\n" +
-            "      \"type\": \"Unknown\"\n" +
-            "    }\n" +
-            "  }\n" +
-            "]\n";
+                "  {\n" +
+                "    \"id\": \"Person\",\n" +
+                "    \"field_type\": {\n" +
+                "      \"type\": \"Unknown\"\n" +
+                "    }\n" +
+                "  }\n" +
+                "]\n";
         final List<CaseFieldDefinition> caseFields = BaseTest.getCaseFieldsFromJson(unknownType);
         final String data =
             "{\n" +
@@ -406,7 +405,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
             "        \"CaseReference\": \"1596104840593131\"\n" +
             "      }";
 
-        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {});
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
+        });
         final ValidationContext validationContext = getValidationContext(values);
         final List<ValidationResult> results = caseDataValidator.validate(validationContext);
 
@@ -436,12 +436,13 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
                 "  ]\n" +
                 "}";
 
-        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {});
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
+        });
         final ValidationContext validationContext = getValidationContext(values);
         final List<ValidationResult> results = caseDataValidator.validate(validationContext);
 
         assertEquals(results.toString(), 0, results.size());
-        verify(textCaseReferenceCaseLinkValidator,times(2))
+        verify(textCaseReferenceCaseLinkValidator, times(2))
             .validate(any(ValidationContext.class));
     }
 
@@ -449,15 +450,15 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     public void textFieldWithMaxMin() throws Exception {
         final String caseFieldString =
             "[{\n" +
-            "  \"id\": \"PersonFirstName\",\n" +
-            "  \"case_type_id\": \"TestAddressBookCase\",\n" +
-            "  \"label\": \"First name\",\n" +
-            "  \"field_type\": {\n" +
-            "    \"type\": \"Text\",\n" +
-            "    \"max\": 100,\n" +
-            "    \"min\": 10\n" +
-            "  }\n" +
-            "}]";
+                "  \"id\": \"PersonFirstName\",\n" +
+                "  \"case_type_id\": \"TestAddressBookCase\",\n" +
+                "  \"label\": \"First name\",\n" +
+                "  \"field_type\": {\n" +
+                "    \"type\": \"Text\",\n" +
+                "    \"max\": 100,\n" +
+                "    \"min\": 10\n" +
+                "  }\n" +
+                "}]";
         final List<CaseFieldDefinition> caseFields =
             MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class,
                 CaseFieldDefinition.class));
@@ -467,7 +468,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setCaseFieldDefinitions(caseFields);
-        final ValidationContext validationContext =  new ValidationContext(values, caseTypeDefinition);
+        final ValidationContext validationContext = new ValidationContext(values, caseTypeDefinition);
         assertEquals(0, caseDataValidator.validate(validationContext).size());
     }
 
@@ -479,31 +480,33 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     public void textFieldWithInvalidMaxMin() throws Exception {
         final String caseFieldString =
             "[{\n" +
-            "  \"id\": \"PersonFirstName\",\n" +
-            "  \"case_type_id\": \"TestAddressBookCase\",\n" +
-            "  \"label\": \"First name\",\n" +
-            "  \"field_type\": {\n" +
-            "    \"type\": \"Text\",\n" +
-            "    \"max\": 10,\n" +
-            "    \"min\": 5\n" +
-            "  }\n" +
-            "}]";
+                "  \"id\": \"PersonFirstName\",\n" +
+                "  \"case_type_id\": \"TestAddressBookCase\",\n" +
+                "  \"label\": \"First name\",\n" +
+                "  \"field_type\": {\n" +
+                "    \"type\": \"Text\",\n" +
+                "    \"max\": 10,\n" +
+                "    \"min\": 5\n" +
+                "  }\n" +
+                "}]";
         final List<CaseFieldDefinition> caseFields =
             MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class,
                 CaseFieldDefinition.class));
 
         final Map<String, JsonNode> invalidMaxVal =
             MAPPER.readValue("{\"PersonFirstName\" : \"Test Name Test Name\"}",
-                new TypeReference<HashMap<String, JsonNode>>() {});
+                new TypeReference<HashMap<String, JsonNode>>() {
+                });
 
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setCaseFieldDefinitions(caseFields);
-        final ValidationContext validationContext =  new ValidationContext(invalidMaxVal, caseTypeDefinition);
+        final ValidationContext validationContext = new ValidationContext(invalidMaxVal, caseTypeDefinition);
         assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(validationContext).size());
 
         final Map<String, JsonNode> invalidMinVal =
-            MAPPER.readValue("{\"PersonFirstName\" : \"Test\"}", new TypeReference<HashMap<String, JsonNode>>() {});
-        final ValidationContext validationContext1 =  new ValidationContext(invalidMinVal, caseTypeDefinition);
+            MAPPER.readValue("{\"PersonFirstName\" : \"Test\"}", new TypeReference<HashMap<String, JsonNode>>() {
+            });
+        final ValidationContext validationContext1 = new ValidationContext(invalidMinVal, caseTypeDefinition);
         assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(validationContext1).size());
     }
 }

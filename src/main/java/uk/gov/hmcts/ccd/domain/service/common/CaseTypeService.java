@@ -68,8 +68,8 @@ public class CaseTypeService {
         }
     }
 
-    public void validateData(final Map<String, JsonNode> data,final CaseTypeDefinition caseTypeDefinition){
-        validateData(new ValidationContext(data,caseTypeDefinition));
+    public void validateData(final Map<String, JsonNode> data, final CaseTypeDefinition caseTypeDefinition) {
+        validateData(new ValidationContext(data, caseTypeDefinition));
     }
 
     public CaseTypeDefinition getCaseTypeForJurisdiction(final String caseTypeId,

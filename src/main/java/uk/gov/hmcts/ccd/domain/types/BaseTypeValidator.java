@@ -20,7 +20,11 @@ public interface BaseTypeValidator extends FieldValidator {
     }
 
     default List<ValidationResult> validate(ValidationContext validationContext) {
-        return validate(validationContext.getFieldId(), validationContext.getDataValue(), validationContext.getCaseFieldDefinition());
+        return validate(
+            validationContext.getFieldId(),
+            validationContext.getDataValue(),
+            validationContext.getCaseFieldDefinition()
+        );
     }
 
     List<ValidationResult> validate(final String dataFieldId,

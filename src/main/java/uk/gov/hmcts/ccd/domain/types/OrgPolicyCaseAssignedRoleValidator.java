@@ -21,7 +21,9 @@ public class OrgPolicyCaseAssignedRoleValidator implements FieldIdBasedValidator
 
 
     @Inject
-    public OrgPolicyCaseAssignedRoleValidator(@Qualifier(CachedCaseRoleRepository.QUALIFIER) final CaseRoleRepository caseRoleRepository) {
+    public OrgPolicyCaseAssignedRoleValidator(
+                        @Qualifier(CachedCaseRoleRepository.QUALIFIER) final CaseRoleRepository caseRoleRepository
+    ) {
         this.caseRoleRepository = caseRoleRepository;
     }
 
@@ -46,13 +48,18 @@ public class OrgPolicyCaseAssignedRoleValidator implements FieldIdBasedValidator
         return errors;
     }
 
-    private void validateContent(ValidationContext validationContext, final Set<String> caseRoles, final List<ValidationResult> errors) {
+    private void validateContent(ValidationContext validationContext, final Set<String> caseRoles,
+                                 final List<ValidationResult> errors) {
+
         final JsonNode orgPolicyRoleNode = validationContext.getDataValue();
         final String caseFieldId = validationContext.getCaseTypeId();
         if (orgPolicyRoleNode.isNull()) {
-            errors.add(new ValidationResult(validationContext.getPath() + " organisation role cannot have an empty value.", validationContext.getFieldId()));
+            errors.add(new ValidationResult(validationContext.getPath()
+                + " organisation role cannot have an empty value.", validationContext.getFieldId()));
         } else if (!caseRolesContainsCaseInsensitive(caseRoles, orgPolicyRoleNode)) {
-            errors.add(new ValidationResult(validationContext.getPath() + " The value  " + orgPolicyRoleNode.textValue() + " is not a valid organisation role.", validationContext.getFieldId()));
+            errors.add(new ValidationResult(validationContext.getPath()
+                + " The value  " + orgPolicyRoleNode.textValue()
+                + " is not a valid organisation role.", validationContext.getFieldId()));
         }
     }
 

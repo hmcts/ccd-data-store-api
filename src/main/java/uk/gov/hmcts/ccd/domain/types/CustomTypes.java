@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 /**
- * Custom types IDs
+ * Custom types IDs.
  */
 public enum CustomTypes {
 

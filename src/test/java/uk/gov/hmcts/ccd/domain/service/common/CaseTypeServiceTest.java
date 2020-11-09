@@ -1,19 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,6 +17,20 @@ import uk.gov.hmcts.ccd.domain.types.ValidationResult;
 import uk.gov.hmcts.ccd.domain.types.ValidationResultBuilder;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class CaseTypeServiceTest {
 
@@ -128,7 +128,8 @@ class CaseTypeServiceTest {
             subject.validateData(data, caseTypeDefinition);
 
             // ASSERT
-            verify(caseDataValidator, times(1)).validate(getValidationContext(data, caseFieldDefinitions));
+            verify(caseDataValidator,
+                times(1)).validate(getValidationContext(data, caseFieldDefinitions));
         }
 
         @Test
@@ -154,7 +155,9 @@ class CaseTypeServiceTest {
         }
     }
 
-    private ValidationContext getValidationContext(Map<String, JsonNode> values, List<CaseFieldDefinition> caseFieldDefinitions ) {
+    private ValidationContext getValidationContext(
+        Map<String, JsonNode> values, List<CaseFieldDefinition> caseFieldDefinitions) {
+
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
         return new ValidationContext(values, caseTypeDefinition);

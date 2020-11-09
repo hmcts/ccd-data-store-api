@@ -26,7 +26,12 @@ public class ValidationContext {
         this(null, null, caseTypeDefinition, data);
     }
 
-    public ValidationContext(CaseDataContent currentCaseDataContent, String caseTypeId, CaseTypeDefinition caseTypeDefinition, Map<String, JsonNode> data) {
+    public ValidationContext(
+                            CaseDataContent currentCaseDataContent,
+                            String caseTypeId,
+                            CaseTypeDefinition caseTypeDefinition,
+                            Map<String, JsonNode> data
+    ) {
         this.currentCaseDataContent = currentCaseDataContent;
         this.caseTypeId = caseTypeId;
         this.caseTypeDefinition = caseTypeDefinition;
