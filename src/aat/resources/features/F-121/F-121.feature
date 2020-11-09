@@ -7,7 +7,7 @@ Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-121.1
+@S-121.1 @Ignore
 Scenario: Must successfully display the ordering for an imported definition file containing a complex type with two address fields
 
     Given a user with [an active profile in CCD],
@@ -20,7 +20,7 @@ Scenario: Must successfully display the ordering for an imported definition file
       And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-121.2
+  @S-121.2 @Ignore
   Scenario: Must display Complex types and Sub fields as they are ordered in the definition file
 
     Given a user with [an active profile in CCD],
@@ -33,7 +33,7 @@ Scenario: Must successfully display the ordering for an imported definition file
     And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-121.3
+  @S-121.3 @Ignore
   Scenario: If no 'DisplayOrder' is defined in the definition file then must display Complex types and Sub fields in the order entered on the definition file
 
     Given a user with [an active profile in CCD],
@@ -59,7 +59,7 @@ Scenario: Must successfully display the ordering for an imported definition file
     And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-121.5
+  @S-121.5 @Ignore
   Scenario: CaseEventToFields mixed ordering should make elements with no ordering defined float to the bottom on Non leaf fields
 
     Given a user with [an active profile in CCD],

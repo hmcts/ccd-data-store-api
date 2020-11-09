@@ -1,0 +1,24 @@
+{
+  "_guid_": "F-125_Swagger_UI",
+  "title": "Verify swagger UI Content",
+
+  "productName": "CCD Data Store",
+  "operationName": "Get Swagger UI Page",
+
+  "method": "GET",
+  "uri": "/swagger-ui/index.html",
+
+  "expectedResponse": {
+    "responseCode" : 200,
+    "responseMessage" : "OK",
+    "headers" : {
+      "Accept-Ranges" : "bytes",
+      "Content-Encoding" : "gzip",
+      "Content-Length" : "${[scenarioContext][customValues][approximately 1190]}",
+      "Content-Type" : "text/html"
+    },
+    "body" : {
+      "__plainTextValue__": "${[scenarioContext][customValues][contains Swagger UI]}"
+    }
+  }
+}

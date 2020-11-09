@@ -1,0 +1,17 @@
+{
+  "_guid_": "S-125.3",
+  "title": "must show Swagger UI page for Internal V2 APIs",
+  "_extends_": "F-125_Swagger_UI",
+
+  "specs": [
+    "to observe the swagger UI content"
+  ],
+
+  "request": {
+    "queryParams": {
+      "urls.primaryName": "v1_internal"
+    }
+  }
+
+}
+
