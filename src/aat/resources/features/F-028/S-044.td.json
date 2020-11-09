@@ -157,19 +157,14 @@
           "_extends_": "F-028_ResponseData_2",
           "id": "MultiSelectListField",
           "label": "A `MultiSelectList` field",
-          "hidden": false,
           "value": [
             "OPTION2",
             "OPTION4"
           ],
-          "metadata": false,
           "hint_text": "Checkboxes to select many values.",
           "field_type": {
             "id": "MultiSelectList-MultiSelectListType",
             "type": "MultiSelectList",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
             "fixed_list_items": [
               {
                 "code": "OPTION5",
@@ -196,44 +191,17 @@
                 "label": "Option 1",
                 "order": null
               }
-            ],
-            "complex_fields": [],
-            "collection_field_type": null
+            ]
           },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
           "formatted_value": [
             "OPTION2",
             "OPTION4"
-          ],
-          "display_context": "OPTIONAL",
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": true,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": [
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
           ]
         },
         {
+          "_extends_": "F-028_ResponseData_2",
           "id": "CollectionField",
           "label": "A `Collection` of `Text` fields",
-          "hidden": false,
           "value": [
             {
               "id": "[[ANYTHING_PRESENT]]",
@@ -244,16 +212,10 @@
               "value": "Alias 2"
             }
           ],
-          "metadata": false,
           "hint_text": "Zero to many items, here of type `Text`",
           "field_type": {
             "id": "[[ANYTHING_PRESENT]]",
             "type": "Collection",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
-            "fixed_list_items": [],
-            "complex_fields": [],
             "collection_field_type": {
               "id": "Text",
               "type": "Text",
@@ -265,9 +227,6 @@
               "collection_field_type": null
             }
           },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
           "formatted_value": [
             {
               "id": "CollectionField1",
@@ -278,107 +237,40 @@
               "value": "Alias 2"
             }
           ],
-          "display_context": "OPTIONAL",
           "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)",
-          "show_condition": null,
-          "show_summary_change_option": false,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": [
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "show_summary_change_option": false
         },
         {
+          "_extends_": "F-028_ResponseData_2",
           "id": "ComplexField",
           "label": "A `Complex` field",
-          "hidden": false,
           "value": {
             "ComplexTextField": "Nested text",
             "ComplexFixedListField": "VALUE2"
           },
-          "metadata": false,
           "hint_text": "Aggregate of fields",
           "field_type": {
             "id": "ComplexType",
             "type": "Complex",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
-            "fixed_list_items": [],
             "complex_fields": [
               {
-                "id": "ComplexTextField",
-                "label": "A `Text` field inside a complex",
-                "hidden": false,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
-                "field_type": {
-                  "id": "Text",
-                  "type": "Text",
-                  "min": null,
-                  "max": null,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
+                "_guid_": "F-028_ResponseData_3",
                 "acls": [
                   {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true,
                     "listElementCode": "ComplexTextField"
                   },
                   {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true,
                     "listElementCode": "ComplexTextField"
                   }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
+                ]
               },
               {
+                "_guid_": "F-028_ResponseData_3",
                 "id": "ComplexFixedListField",
                 "label": "A `FixedList` field inside a complex",
-                "hidden": false,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
                 "field_type": {
                   "id": "FixedList-FixedListType",
                   "type": "FixedList",
-                  "min": null,
-                  "max": null,
-                  "regular_expression": null,
                   "fixed_list_items": [
                     {
                       "code": "VALUE3",
@@ -395,114 +287,41 @@
                       "label": "Value 1",
                       "order": null
                     }
-                  ],
-                  "complex_fields": [],
-                  "collection_field_type": null
+                  ]
                 },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
                 "acls": [
                   {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true,
                     "listElementCode": "ComplexFixedListField"
                   },
                   {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true,
                     "listElementCode": "ComplexFixedListField"
                   }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
+                ]
               },
               {
+                "_guid_": "F-028_ResponseData_3",
                 "id": "ComplexNestedField",
                 "label": "A `Complex` field inside a complex",
-                "hidden": false,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
                 "field_type": {
                   "id": "NestedComplexType",
                   "type": "Complex",
-                  "min": null,
-                  "max": null,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
                   "complex_fields": [
                     {
+                      "_guid_": "F-028_ResponseData_3",
                       "id": "NestedNumberField",
                       "label": "A `Number` field inside a nested complex",
-                      "hidden": false,
-                      "order": null,
-                      "metadata": false,
-                      "case_type_id": null,
-                      "hint_text": null,
                       "field_type": {
                         "id": "Number",
-                        "type": "Number",
-                        "min": null,
-                        "max": null,
-                        "regular_expression": null,
-                        "fixed_list_items": [],
-                        "complex_fields": [],
-                        "collection_field_type": null
-                      },
-                      "security_classification": "PUBLIC",
-                      "live_from": null,
-                      "live_until": null,
-                      "show_condition": null,
-                      "acls": [
-                        {
-                          "role": "[[ANYTHING_PRESENT]]",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
-                        },
-                        {
-                          "role": "[[ANYTHING_PRESENT]]",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
-                        }
-                      ],
-                      "complexACLs": [],
-                      "display_context": null,
-                      "display_context_parameter": null,
-                      "retain_hidden_value": null,
-                      "formatted_value": null
+                        "type": "Number"
+                      }
                     },
                     {
+                      "_guid_": "F-028_ResponseData_3",
                       "id": "[[ANYTHING_PRESENT]]",
                       "label": "A `Collection` field of `Text` inside a nested complex",
-                      "hidden": false,
-                      "order": null,
-                      "metadata": false,
-                      "case_type_id": null,
-                      "hint_text": null,
                       "field_type": {
                         "id": "[[ANYTHING_PRESENT]]",
                         "type": "Collection",
-                        "min": null,
-                        "max": null,
-                        "regular_expression": null,
-                        "fixed_list_items": [],
-                        "complex_fields": [],
                         "collection_field_type": {
                           "id": "Text",
                           "type": "Text",
@@ -514,100 +333,31 @@
                           "collection_field_type": null
                         }
                       },
-                      "security_classification": "PUBLIC",
-                      "live_from": null,
-                      "live_until": null,
-                      "show_condition": null,
-                      "acls": [
-                        {
-                          "role": "[[ANYTHING_PRESENT]]",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
-                        },
-                        {
-                          "role": "[[ANYTHING_PRESENT]]",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
-                        }
-                      ],
-                      "complexACLs": [],
-                      "display_context": null,
-                      "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)",
-                      "retain_hidden_value": null,
-                      "formatted_value": null
+                      "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)"
                     }
-                  ],
-                  "collection_field_type": null
+                  ]
                 },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
                 "acls": [
                   {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true,
                     "listElementCode": "ComplexNestedField"
                   },
                   {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true,
                     "listElementCode": "ComplexNestedField"
                   }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
+                ]
               }
-            ],
-            "collection_field_type": null
+            ]
           },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
           "formatted_value": {
             "ComplexTextField" : "Nested text",
             "ComplexFixedListField" : "VALUE2"
           },
-          "display_context": "OPTIONAL",
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": false,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": [
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "show_summary_change_option": false
         },
         {
+          "_guid_": "F-028_ResponseData_2",
           "id": "AddressUKField",
           "label": "A `AddressUK` field",
-          "hidden": false,
           "value": {
             "County": "[[ANYTHING_PRESENT]]",
             "Country": "[[ANYTHING_PRESENT]]",
@@ -617,330 +367,83 @@
             "AddressLine2": "[[ANYTHING_PRESENT]]",
             "AddressLine3": "[[ANYTHING_PRESENT]]"
           },
-          "metadata": false,
           "hint_text": "A UK address.",
           "field_type": {
             "id": "AddressUK",
             "type": "Complex",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
-            "fixed_list_items": [],
             "complex_fields": [
               {
+                "_guid_": "F-028_ResponseData_3",
                 "id": "AddressLine1",
                 "label": "Building and Street",
                 "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
                 "field_type": {
                   "id": "TextMax150",
-                  "type": "Text",
-                  "min": null,
-                  "max": 150,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
+                  "max": 150
+                }
               },
               {
+                "_guid_": "F-028_ResponseData_3",
                 "id": "AddressLine2",
                 "label": "Address Line 2",
                 "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
                 "field_type": {
                   "id": "TextMax50",
-                  "type": "Text",
-                  "min": null,
-                  "max": 50,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
+                  "max": 50
+                }
               },
               {
+                "_guid_": "F-028_ResponseData_3",
                 "id": "AddressLine3",
                 "label": "Address Line 3",
                 "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
                 "field_type": {
                   "id": "TextMax50",
-                  "type": "Text",
-                  "min": null,
-                  "max": 50,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
+                  "max": 50
+                }
               },
               {
+                "_guid_": "F-028_ResponseData_3",
                 "id": "PostTown",
                 "label": "Town or City",
                 "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
                 "field_type": {
                   "id": "TextMax50",
-                  "type": "Text",
-                  "min": null,
-                  "max": 50,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
+                  "max": 50
+                }
               },
               {
+                "_guid_": "F-028_ResponseData_3",
                 "id": "County",
                 "label": "County",
                 "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
                 "field_type": {
                   "id": "TextMax50",
-                  "type": "Text",
-                  "min": null,
-                  "max": 50,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
+                  "max": 50
+                }
               },
               {
+                "_guid_": "F-028_ResponseData_3",
                 "id": "PostCode",
                 "label": "Postcode/Zipcode",
                 "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
                 "field_type": {
                   "id": "TextMax14",
-                  "type": "Text",
-                  "min": null,
-                  "max": 14,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
+                  "max": 14
+                }
               },
               {
+                "_guid_": "F-028_ResponseData_3",
                 "id": "Country",
                 "label": "Country",
                 "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
                 "field_type": {
                   "id": "TextMax50",
-                  "type": "Text",
-                  "min": null,
-                  "max": 50,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
+                  "max": 50
+                }
               }
-            ],
-            "collection_field_type": null
+            ]
           },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
           "formatted_value": {
             "AddressLine1" : "102 Petty France",
             "AddressLine2" : "CCD",
@@ -950,72 +453,19 @@
             "PostCode" : "SW1H 9AJ",
             "Country" : "UK"
           },
-          "display_context": "OPTIONAL",
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": false,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": [
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "show_summary_change_option": false
         },
         {
+          "_guid_": "F-028_ResponseData_2",
           "id": "DocumentField",
           "label": "A `Document` field",
-          "hidden": false,
           "value": null,
-          "metadata": false,
           "hint_text": "A document",
           "field_type": {
             "id": "Document",
-            "type": "Document",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
-            "fixed_list_items": [],
-            "complex_fields": [],
-            "collection_field_type": null
+            "type": "Document"
           },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value": null,
-          "display_context": "OPTIONAL",
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": true,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": [
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "formatted_value": null
         }
       ],
       "event_token": "[[ANYTHING_PRESENT]]",

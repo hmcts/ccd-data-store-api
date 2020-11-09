@@ -1,12 +1,13 @@
 {
-  "_guid_": "F-028_ResponseData_2",
+  "_guid_": "F-028_ResponseData_3",
 
-  "id": "TextField",
-  "label": "A `Text` field",
+  "id": "ComplexTextField",
+  "label": "A `Text` field inside a complex",
   "hidden": false,
-  "value": "[[ANYTHING_PRESENT]]",
+  "order": null,
   "metadata": false,
-  "hint_text": "Some generic textual data.",
+  "case_type_id": null,
+  "hint_text": null,
   "field_type": {
     "id": "Text",
     "type": "Text",
@@ -17,16 +18,10 @@
     "complex_fields": [],
     "collection_field_type": null
   },
-  "validation_expr": null,
-  "security_label": "PUBLIC",
-  "order": null,
-  "formatted_value": "Some Text",
-  "display_context": "OPTIONAL",
-  "display_context_parameter": null,
+  "security_classification": "PUBLIC",
+  "live_from": null,
+  "live_until": null,
   "show_condition": null,
-  "show_summary_change_option": true,
-  "show_summary_content_option": null,
-  "retain_hidden_value": null,
   "acls": [
     {
       "role": "[[ANYTHING_PRESENT]]",
@@ -42,5 +37,10 @@
       "update": true,
       "delete": true
     }
-  ]
+  ],
+  "complexACLs": [],
+  "display_context": null,
+  "display_context_parameter": null,
+  "retain_hidden_value": null,
+  "formatted_value": null
 }
