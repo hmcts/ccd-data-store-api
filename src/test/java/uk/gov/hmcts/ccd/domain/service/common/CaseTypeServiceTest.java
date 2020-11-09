@@ -73,7 +73,7 @@ class CaseTypeServiceTest {
             final ResourceNotFoundException
                 exception = assertThrows(ResourceNotFoundException.class, () -> subject.findState(c, "ngitb"));
             assertThat(exception.getMessage(),
-                       is("No state found with id 'ngitb' for case type 'nOonEhaStimEtodomYcodEreview'"));
+                is("No state found with id 'ngitb' for case type 'nOonEhaStimEtodomYcodEreview'"));
         }
 
         private CaseStateDefinition buildCaseState(final String name) {
@@ -129,7 +129,7 @@ class CaseTypeServiceTest {
 
             // ASSERT
             verify(caseDataValidator,
-                times(1)).validate(getValidationContext(data, caseFieldDefinitions));
+                times(1)).validate(any(ValidationContext.class));
         }
 
         @Test
@@ -139,9 +139,9 @@ class CaseTypeServiceTest {
             // ARRANGE
             List<ValidationResult> validationResults = new ArrayList<>();
             validationResults.add(new ValidationResultBuilder().setErrorMessage("message 1").setFieldId("field 1")
-                    .build());
+                .build());
             validationResults.add(new ValidationResultBuilder().setErrorMessage("message 2").setFieldId("field 2")
-                    .build());
+                .build());
 
             when(caseDataValidator.validate(any())).thenReturn(validationResults); // i.e. two errors
 
