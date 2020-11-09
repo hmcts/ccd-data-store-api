@@ -183,7 +183,7 @@ class CallbackServiceTest {
         doReturn(ccdCallbackLogControl).when(applicationParams).getCcdCallbackLogControl();
         callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
         List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals("The callback {} response received: {}", logsList.get(1)
+        assertEquals("Callback {} response received: {}", logsList.get(1)
             .getMessage());
     }
 
@@ -197,7 +197,7 @@ class CallbackServiceTest {
         List<ILoggingEvent> logsList = listAppender.list;
         assertEquals("Invoking callback {} of type {} with request: {}", logsList.get(0)
             .getMessage());
-        assertEquals("The callback {} response received: {}", logsList.get(1)
+        assertEquals("Callback {} response received: {}", logsList.get(1)
             .getMessage());
     }
 
