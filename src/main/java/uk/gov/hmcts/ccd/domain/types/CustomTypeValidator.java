@@ -1,5 +1,4 @@
 package uk.gov.hmcts.ccd.domain.types;
-
 /**
  * Validator for custom non-base field types, such as CaseLink's custom type TextCaseReference.
  * It allows to execute custom validation specific for the custom type. A custom type extends from a base type.
@@ -9,6 +8,8 @@ package uk.gov.hmcts.ccd.domain.types;
  * If a predefined complex type sub-field can be declared of a base type, prefer using a FieldIdBasedValidator
  * to add additional validation logic
  */
+
+@SuppressWarnings("checkstyle:SummaryJavadoc")
 public interface CustomTypeValidator extends FieldValidator {
 
     /**

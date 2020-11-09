@@ -54,7 +54,9 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
                 + " is not found in case type definition");
         }
         content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, content.getEventId()));
-        caseTypeService.validateData(createValidationContext(caseTypeId, content, content.getData(), caseTypeDefinition));
+        caseTypeService.validateData(
+            createValidationContext(caseTypeId, content, content.getData(), caseTypeDefinition)
+        );
         return content.getData();
     }
 
@@ -66,10 +68,15 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
     public void validateData(Map<String, JsonNode> data,
                              CaseTypeDefinition caseTypeDefinition,
                              final CaseDataContent content) {
-        caseTypeService.validateData(createValidationContext(caseTypeDefinition.getId(), content, data, caseTypeDefinition));
+        caseTypeService.validateData(
+            createValidationContext(caseTypeDefinition.getId(), content, data, caseTypeDefinition)
+        );
     }
 
-    public ValidationContext createValidationContext(String caseTypeId, CaseDataContent content, Map<String, JsonNode> data, CaseTypeDefinition caseTypeDefinition) {
+    public ValidationContext createValidationContext(
+                                                        String caseTypeId, CaseDataContent content,
+                                                        Map<String, JsonNode> data,
+                                                        CaseTypeDefinition caseTypeDefinition) {
         return new ValidationContext(content, caseTypeId,caseTypeDefinition,data);
     }
 }
