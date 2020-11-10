@@ -254,7 +254,7 @@
             "type": "Complex",
             "complex_fields": [
               {
-                "_guid_": "F-028_ResponseData_3",
+                "_extends_": "F-028_ResponseData_3",
                 "acls": [
                   {
                     "listElementCode": "ComplexTextField"
@@ -265,7 +265,7 @@
                 ]
               },
               {
-                "_guid_": "F-028_ResponseData_3",
+                "_extends_": "F-028_ResponseData_3",
                 "id": "ComplexFixedListField",
                 "label": "A `FixedList` field inside a complex",
                 "field_type": {
@@ -299,7 +299,7 @@
                 ]
               },
               {
-                "_guid_": "F-028_ResponseData_3",
+                "_extends_": "F-028_ResponseData_3",
                 "id": "ComplexNestedField",
                 "label": "A `Complex` field inside a complex",
                 "field_type": {
@@ -307,7 +307,7 @@
                   "type": "Complex",
                   "complex_fields": [
                     {
-                      "_guid_": "F-028_ResponseData_3",
+                      "_extends_": "F-028_ResponseData_3",
                       "id": "NestedNumberField",
                       "label": "A `Number` field inside a nested complex",
                       "field_type": {
@@ -316,7 +316,7 @@
                       }
                     },
                     {
-                      "_guid_": "F-028_ResponseData_3",
+                      "_extends_": "F-028_ResponseData_3",
                       "id": "[[ANYTHING_PRESENT]]",
                       "label": "A `Collection` field of `Text` inside a nested complex",
                       "field_type": {
@@ -355,7 +355,7 @@
           "show_summary_change_option": false
         },
         {
-          "_guid_": "F-028_ResponseData_2",
+          "_extends_": "F-028_ResponseData_2",
           "id": "AddressUKField",
           "label": "A `AddressUK` field",
           "value": {
@@ -373,7 +373,7 @@
             "type": "Complex",
             "complex_fields": [
               {
-                "_guid_": "F-028_ResponseData_3",
+                "_extends_": "F-028_ResponseData_3",
                 "id": "AddressLine1",
                 "label": "Building and Street",
                 "hidden": null,
@@ -383,7 +383,7 @@
                 }
               },
               {
-                "_guid_": "F-028_ResponseData_3",
+                "_extends_": "F-028_ResponseData_3",
                 "id": "AddressLine2",
                 "label": "Address Line 2",
                 "hidden": null,
@@ -393,7 +393,7 @@
                 }
               },
               {
-                "_guid_": "F-028_ResponseData_3",
+                "_extends_": "F-028_ResponseData_3",
                 "id": "AddressLine3",
                 "label": "Address Line 3",
                 "hidden": null,
@@ -403,7 +403,7 @@
                 }
               },
               {
-                "_guid_": "F-028_ResponseData_3",
+                "_extends_": "F-028_ResponseData_3",
                 "id": "PostTown",
                 "label": "Town or City",
                 "hidden": null,
@@ -413,7 +413,7 @@
                 }
               },
               {
-                "_guid_": "F-028_ResponseData_3",
+                "_extends_": "F-028_ResponseData_3",
                 "id": "County",
                 "label": "County",
                 "hidden": null,
@@ -423,7 +423,7 @@
                 }
               },
               {
-                "_guid_": "F-028_ResponseData_3",
+                "_extends_": "F-028_ResponseData_3",
                 "id": "PostCode",
                 "label": "Postcode/Zipcode",
                 "hidden": null,
@@ -433,7 +433,7 @@
                 }
               },
               {
-                "_guid_": "F-028_ResponseData_3",
+                "_extends_": "F-028_ResponseData_3",
                 "id": "Country",
                 "label": "Country",
                 "hidden": null,
@@ -456,7 +456,7 @@
           "show_summary_change_option": false
         },
         {
-          "_guid_": "F-028_ResponseData_2",
+          "_extends_": "F-028_ResponseData_2",
           "id": "DocumentField",
           "label": "A `Document` field",
           "value": null,
