@@ -5,13 +5,13 @@
         "type": "custom",
         "tokenizer": "keyword",
         "filter": [
-          "shingle_filter",
+          "custom_shingle",
           "whitespace_remove"
         ]
       }
     },
     "filter": {
-      "shingle_filter": {
+      "custom_shingle": {
         "type": "shingle",
         "min_shingle_size": 2,
         "max_shingle_size": 3,
