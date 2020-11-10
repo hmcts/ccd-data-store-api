@@ -32,7 +32,7 @@ Feature: F-109: Role-Based Authorisation of Caseworker CAAs
     And the request [contains the case type of Jurisdiction Befta_Jurisdiction2]
     And the response has all the details as expected
 
-  @S-944 @elasticsearch @Smoke
+  @S-944 @elasticsearch
   Scenario: Must return a positive response when required CRUD permissions have not been configured for the caseworker-caa for the case type (/searchCases)
     Given a user [with access to create case for Befta_Jurisdiction3]
     And a case that has just been created as in [F-109-Befta_Jurisdiction3_Case_Type1_Creation]
