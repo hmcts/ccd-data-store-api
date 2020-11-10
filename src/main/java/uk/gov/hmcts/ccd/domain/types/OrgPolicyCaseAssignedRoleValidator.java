@@ -52,7 +52,6 @@ public class OrgPolicyCaseAssignedRoleValidator implements FieldIdBasedValidator
                                  final List<ValidationResult> errors) {
 
         final JsonNode orgPolicyRoleNode = validationContext.getDataValue();
-        final String caseFieldId = validationContext.getCaseTypeId();
         if (orgPolicyRoleNode.isNull()) {
             errors.add(new ValidationResult(validationContext.getPath()
                 + " organisation role cannot have an empty value.", validationContext.getFieldId()));
