@@ -23,7 +23,6 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseTypeService caseTypeService;
     private final FieldProcessorService fieldProcessorService;
-    private final CaseRoleRepository caseRoleRepository;
     public static final String ORGANISATION_POLICY_ROLE = "OrgPolicyCaseAssignedRole";
 
     @Inject
@@ -35,7 +34,6 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
     ) {
 
         this.caseDefinitionRepository = caseDefinitionRepository;
-        this.caseRoleRepository = caseRoleRepository;
         this.caseTypeService = caseTypeService;
         this.fieldProcessorService = fieldProcessorService;
     }
