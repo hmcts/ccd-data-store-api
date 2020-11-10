@@ -48,7 +48,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.validate.DefaultValidateCaseFieldsOperation.ORGANISATION_POLICY_ROLE;
+import static uk.gov.hmcts.ccd.domain.types.OrgPolicyCaseAssignedRoleValidator.ORGANISATION_POLICY_ROLE;
 
 class DefaultValidateCaseFieldsOperationTest {
 
@@ -89,7 +89,6 @@ class DefaultValidateCaseFieldsOperationTest {
         doReturn(eventId).when(caseDataContent).getEventId();
 
         validateCaseFieldsOperation = new DefaultValidateCaseFieldsOperation(caseDefinitionRepository,
-            caseRoleRepository,
             caseTypeService,
             fieldProcessorService);
     }
