@@ -22,20 +22,8 @@ class ValidationContextTest {
     private Map<String, JsonNode> data = new HashMap<>();
 
     @Test
-    public void testDefaultConstructor() {
-        final ValidationContext validationContext = new ValidationContext();
-        assertNull(validationContext.getCaseFieldDefinition());
-        assertNull(validationContext.getCaseTypeDefinition());
-        assertNull(validationContext.getCaseTypeId());
-        assertNull(validationContext.getData());
-        assertNull(validationContext.getDataValue());
-        assertNull(validationContext.getFieldId());
-        assertNull(validationContext.getPath());
-    }
-
-
-    @Test
     public void test4ParamConstructor() {
+        caseTypeDefinition.setId("TEST");
         ValidationContext validationContext = new ValidationContext(
             caseTypeDefinition,
             data
