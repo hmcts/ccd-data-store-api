@@ -18,12 +18,10 @@ import java.util.Set;
 public class OrgPolicyCaseAssignedRoleValidator implements FieldIdBasedValidator {
 
     private final CaseRoleRepository caseRoleRepository;
-    public static final String ORGANISATION_POLICY_ROLE = "OrgPolicyCaseAssignedRole";
-
 
     @Inject
     public OrgPolicyCaseAssignedRoleValidator(
-                        @Qualifier(CachedCaseRoleRepository.QUALIFIER) final CaseRoleRepository caseRoleRepository
+        @Qualifier(CachedCaseRoleRepository.QUALIFIER) final CaseRoleRepository caseRoleRepository
     ) {
         this.caseRoleRepository = caseRoleRepository;
     }

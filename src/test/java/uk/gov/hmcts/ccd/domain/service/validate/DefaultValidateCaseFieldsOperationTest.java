@@ -48,10 +48,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.types.OrgPolicyCaseAssignedRoleValidator.ORGANISATION_POLICY_ROLE;
+import static uk.gov.hmcts.ccd.domain.types.PredefinedFieldsIDs.ORG_POLICY_CASE_ASSIGNED_ROLE;
 
 class DefaultValidateCaseFieldsOperationTest {
 
+
+    private static final String ORGANISATION_POLICY_ROLE = ORG_POLICY_CASE_ASSIGNED_ROLE.getId();
     private static final String CASE_TYPE_ID = "caseTypeId";
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
