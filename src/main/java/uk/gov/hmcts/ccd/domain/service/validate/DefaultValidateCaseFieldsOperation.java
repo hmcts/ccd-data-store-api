@@ -49,7 +49,7 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
         }
         content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, content.getEventId()));
         caseTypeService.validateData(
-            createValidationContext(caseTypeId, content, content.getData(), caseTypeDefinition)
+            createValidationContext(content.getData(), caseTypeDefinition)
         );
         return content.getData();
     }
@@ -63,14 +63,12 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
                              CaseTypeDefinition caseTypeDefinition,
                              final CaseDataContent content) {
         caseTypeService.validateData(
-            createValidationContext(caseTypeDefinition.getId(), content, data, caseTypeDefinition)
+            createValidationContext(data, caseTypeDefinition)
         );
     }
 
-    public ValidationContext createValidationContext(
-                                                        String caseTypeId, CaseDataContent content,
-                                                        Map<String, JsonNode> data,
-                                                        CaseTypeDefinition caseTypeDefinition) {
-        return new ValidationContext(content, caseTypeId,caseTypeDefinition,data);
+    public ValidationContext createValidationContext(Map<String, JsonNode> data,
+                                                     CaseTypeDefinition caseTypeDefinition) {
+        return new ValidationContext(caseTypeDefinition, data);
     }
 }

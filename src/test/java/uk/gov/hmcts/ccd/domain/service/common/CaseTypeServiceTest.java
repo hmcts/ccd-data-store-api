@@ -160,7 +160,7 @@ class CaseTypeServiceTest {
 
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
-        return new ValidationContext(values, caseTypeDefinition);
+        return new ValidationContext(caseTypeDefinition, values);
     }
 }
 
