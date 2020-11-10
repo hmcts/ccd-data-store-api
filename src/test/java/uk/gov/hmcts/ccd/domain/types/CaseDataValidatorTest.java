@@ -80,7 +80,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     private ValidationContext getValidationContext(Map<String, JsonNode> values) {
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setCaseFieldDefinitions(caseFields);
-        return new ValidationContext(values, caseTypeDefinition);
+        return new ValidationContext(caseTypeDefinition, values);
     }
 
 
@@ -468,7 +468,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setCaseFieldDefinitions(caseFields);
-        final ValidationContext validationContext = new ValidationContext(values, caseTypeDefinition);
+        final ValidationContext validationContext = new ValidationContext(caseTypeDefinition, values);
         assertEquals(0, caseDataValidator.validate(validationContext).size());
     }
 
@@ -500,13 +500,13 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setCaseFieldDefinitions(caseFields);
-        final ValidationContext validationContext = new ValidationContext(invalidMaxVal, caseTypeDefinition);
+        final ValidationContext validationContext = new ValidationContext(caseTypeDefinition, invalidMaxVal);
         assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(validationContext).size());
 
         final Map<String, JsonNode> invalidMinVal =
             MAPPER.readValue("{\"PersonFirstName\" : \"Test\"}", new TypeReference<HashMap<String, JsonNode>>() {
             });
-        final ValidationContext validationContext1 = new ValidationContext(invalidMinVal, caseTypeDefinition);
+        final ValidationContext validationContext1 = new ValidationContext(caseTypeDefinition, invalidMinVal);
         assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(validationContext1).size());
     }
 }
