@@ -129,25 +129,11 @@
 </suppress>
     <suppress>
    <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
+   file name: elasticsearch-6.8.12.jar
    ]]></notes>
    <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2018-17244</vulnerabilityName>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2019-7611</vulnerabilityName>
-</suppress>
-    <suppress>
-   <notes><![CDATA[
-   file name: elasticsearch-6.4.2.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
-</suppress>
+   <vulnerabilityName>CVE-2020-7020</vulnerabilityName>
+    </suppress>
     <suppress>
    <notes><![CDATA[
    file name: dom4j-2.1.1.jar
