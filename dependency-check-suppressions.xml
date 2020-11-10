@@ -24,9 +24,10 @@
     <cve>CVE-2020-11022</cve><!-- liquibase -->
     <cve>CVE-2020-11023</cve><!-- liquibase -->
     <cve>CVE-2017-18640</cve> <!-- Resolution : not available until hazelcast bump jackson version. -->
-    <cve>CVE-2016-10750</cve><!-- hazelcast -->
-    <cve>CVE-2007-1651</cve>
-    <cve>CVE-2007-1652</cve>
+    <cve>CVE-2007-1651</cve>  <!-- new, temporary -->
+    <cve>CVE-2007-1652</cve>  <!-- new, temporary -->
+    <cve>CVE-2020-13943</cve> <!-- new, temporary -->
+    <cve>CVE-2020-7020</cve> <!-- new, temporary -->
   </suppress>
   <suppress>
    <notes><![CDATA[
