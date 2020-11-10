@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
@@ -53,7 +54,6 @@ class TextCaseReferenceCaseLinkValidatorTest {
         BaseType.register(textAreaBaseType);
         textValidator =  new TextValidator();
         validator = new TextCaseReferenceCaseLinkValidator(textValidator,caseService);
-
         caseFieldDefinition = caseField().build();
     }
 
@@ -83,7 +83,8 @@ class TextCaseReferenceCaseLinkValidatorTest {
     }
 
     private ValidationContext createValidationContext(CaseFieldDefinition caseFieldDefinition, JsonNode validValue) {
-        final ValidationContext validationContext  = new ValidationContext();
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        final ValidationContext validationContext  = new ValidationContext(caseTypeDefinition,null);
         validationContext.setDataValue(validValue);
         validationContext.setCaseFieldDefinition(caseFieldDefinition);
         validationContext.setFieldId(FIELD_ID);

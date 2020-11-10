@@ -16,10 +16,6 @@ public class ValidationContext {
     private JsonNode dataValue;
     private CaseFieldDefinition caseFieldDefinition;
 
-    public ValidationContext() {
-        this(null, null);
-    }
-
     public ValidationContext(
         CaseTypeDefinition caseTypeDefinition,
         Map<String, JsonNode> data
