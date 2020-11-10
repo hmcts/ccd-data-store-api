@@ -3,8 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.validate;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseRoleRepository;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -23,12 +21,10 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseTypeService caseTypeService;
     private final FieldProcessorService fieldProcessorService;
-    public static final String ORGANISATION_POLICY_ROLE = "OrgPolicyCaseAssignedRole";
 
     @Inject
     DefaultValidateCaseFieldsOperation(
         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
-        @Qualifier(CachedCaseRoleRepository.QUALIFIER) final CaseRoleRepository caseRoleRepository,
         final CaseTypeService caseTypeService,
         final FieldProcessorService fieldProcessorService
     ) {
