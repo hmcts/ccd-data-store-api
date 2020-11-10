@@ -170,13 +170,9 @@ public class CallbackService {
     }
 
     private boolean logCallbackDetails(final String url) {
-        boolean logCallBack = false;
-        List<String> ccdCallbackLogControl = applicationParams.getCcdCallbackLogControl();
-        if (ccdCallbackLogControl.size() > 0 && (WILDCARD.equals(ccdCallbackLogControl.get(0))
-            || ccdCallbackLogControl.stream().filter(Objects::nonNull).filter(Predicate.not(String::isEmpty))
-            .anyMatch(url::contains))) {
-            logCallBack = true;
-        }
-        return logCallBack;
+        return (applicationParams.getCcdCallbackLogControl().size() > 0
+            && (WILDCARD.equals(applicationParams.getCcdCallbackLogControl().get(0))
+            || applicationParams.getCcdCallbackLogControl().stream()
+            .filter(Objects::nonNull).filter(Predicate.not(String::isEmpty)).anyMatch(url::contains)));
     }
 }
