@@ -1,0 +1,39 @@
+{
+	"_guid_": "S-122.7",
+  "_extends_": "F-122-UpdateEventBase",
+  "title": "*(FieldA) will keep the state as is (End state: CaseCreated)",
+
+  "productName": "CCD data store",
+  "operationName": "submit updateCase2 event with TextField and EmailField values",
+
+  "specs": [
+    "contains state: CaseCreated, updated values for TextField, EmailField along with an HTTP-201 Created"
+  ],
+
+  "request": {
+    "body": {
+      "data": {
+        "_extends_": "FT_ConditionalPostState_Base_Case_Data",
+        "TextField": "keepstate"
+      },
+      "event": {
+        "id": "updateCase2",
+        "summary": "",
+        "description": ""
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 201,
+    "responseMessage": "OK",
+    "body": {
+      "state": "CaseCreated",
+      "case_data": {
+        "_extends_": "FT_ConditionalPostState_Base_Case_Data",
+        "TextField": "keepstate",
+        "EmailField": null
+      }
+    }
+  }
+}
