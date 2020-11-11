@@ -35,27 +35,27 @@
           "__ordering__": "unordered"
         },
         {
-          "_extends_": "F-027_ResponseData",
+          "_extends_": "CaseViewField",
           "id": "[STATE]",
           "label": "State",
           "value": "TODO",
           "field_type": "[[ANYTHING_PRESENT]]"
         },
         {
-          "_extends_": "F-027_ResponseData"
+          "_extends_": "CaseViewField"
         },
         {
-          "_extends_": "F-027_ResponseData",
+          "_extends_": "CaseViewField",
           "id": "[LAST_MODIFIED_DATE]",
           "label": "Last Modified Date"
         },
         {
-          "_extends_": "F-027_ResponseData",
+          "_extends_": "CaseViewField",
           "id": "[CREATED_DATE]",
           "label": "Created Date"
         },
         {
-          "_extends_": "F-027_ResponseData",
+          "_extends_": "CaseViewField",
           "id": "[JURISDICTION]",
           "label": "Jurisdiction",
           "value": "BEFTA_JURISDICTION_3",
@@ -65,7 +65,7 @@
           }
         },
         {
-          "_extends_": "F-027_ResponseData",
+          "_extends_": "CaseViewField",
           "id": "[CASE_TYPE]",
           "label": "Case Type",
           "value": "BEFTA_CASETYPE_3_4",
@@ -75,7 +75,7 @@
           }
         },
         {
-          "_extends_": "F-027_ResponseData",
+          "_extends_": "CaseViewField",
           "id": "[SECURITY_CLASSIFICATION]",
           "label": "Security Classification",
           "value": "PUBLIC",
@@ -85,7 +85,7 @@
           }
         },
         {
-          "_extends_": "F-027_ResponseData",
+          "_extends_": "CaseViewField",
           "id": "[CASE_REFERENCE]",
           "label": "Case Reference",
           "value": "[[ANY_NUMBER_NOT_NULLABLE]]",
