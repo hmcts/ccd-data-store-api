@@ -23,8 +23,8 @@
 			"Content-Encoding" : "gzip"
 		},
 		"body": {
-      "_extends_": "F-028_ResponseData",
-			"message" : "[[ANYTHING_PRESENT]]"
+      "_extends_": "ErrorResponse",
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException"
 		}
 	}
 }

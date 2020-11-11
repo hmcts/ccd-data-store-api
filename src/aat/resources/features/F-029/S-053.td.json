@@ -18,7 +18,7 @@
 	"expectedResponse": {
 		"_extends_": "Common_404_Response",
 		"body": {
-      "_extends_": "F-029_ResponseData"
+      "_extends_": "ErrorResponse"
     }
 	}
 }

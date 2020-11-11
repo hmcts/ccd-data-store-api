@@ -22,7 +22,9 @@
 			"Content-Encoding" : "gzip"
 		},
 		"body": {
-      "_extends_": "F-028_ResponseData"
+      "_extends_": "ErrorResponse",
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message" : "No case exist with id=157375164884070311"
 		}
 	}
 }
