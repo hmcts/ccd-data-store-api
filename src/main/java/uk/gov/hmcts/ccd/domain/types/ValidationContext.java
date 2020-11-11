@@ -8,7 +8,6 @@ import java.util.Map;
 
 public class ValidationContext {
 
-    private final String caseTypeId;
     private final CaseTypeDefinition caseTypeDefinition;
     private final Map<String, JsonNode> data;
     private String fieldId;
@@ -20,13 +19,12 @@ public class ValidationContext {
         CaseTypeDefinition caseTypeDefinition,
         Map<String, JsonNode> data
     ) {
-        this.caseTypeId = caseTypeDefinition.getId();
         this.caseTypeDefinition = caseTypeDefinition;
         this.data = data;
     }
 
     public String getCaseTypeId() {
-        return caseTypeId;
+        return caseTypeDefinition.getId();
     }
 
     public String getPath() {

@@ -52,12 +52,16 @@ public class OrgPolicyCaseAssignedRoleValidator implements FieldIdBasedValidator
 
         final JsonNode orgPolicyRoleNode = validationContext.getDataValue();
         if (orgPolicyRoleNode.isNull()) {
-            errors.add(new ValidationResult(validationContext.getPath()
-                + " organisation role cannot have an empty value.", validationContext.getFieldId()));
+            errors.add(new ValidationResult(
+                String.format("%s Organisation role cannot have an empty value.", validationContext.getPath()),
+                validationContext.getFieldId())
+            );
         } else if (!caseRolesContainsCaseInsensitive(caseRoles, orgPolicyRoleNode)) {
-            errors.add(new ValidationResult(validationContext.getPath()
-                + " The value  " + orgPolicyRoleNode.textValue()
-                + " is not a valid organisation role.", validationContext.getFieldId()));
+            final String error = String.format("%1$s The value %2$s is not a valid organisation role.",
+                validationContext.getPath(),
+                orgPolicyRoleNode.textValue()
+            );
+            errors.add(new ValidationResult(error, validationContext.getFieldId()));
         }
     }
 
