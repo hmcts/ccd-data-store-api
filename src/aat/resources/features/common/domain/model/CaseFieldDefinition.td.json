@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-028_ResponseData_3",
+  "_guid_": "CaseFieldDefinition",
 
   "id": "ComplexTextField",
   "label": "A `Text` field inside a complex",
@@ -9,14 +9,9 @@
   "case_type_id": null,
   "hint_text": null,
   "field_type": {
+    "_extends_" : "FieldTypeDefinition",
     "id": "Text",
-    "type": "Text",
-    "min": null,
-    "max": null,
-    "regular_expression": null,
-    "fixed_list_items": [],
-    "complex_fields": [],
-    "collection_field_type": null
+    "type": "Text"
   },
   "security_classification": "PUBLIC",
   "live_from": null,
@@ -24,18 +19,10 @@
   "show_condition": null,
   "acls": [
     {
-      "role": "[[ANYTHING_PRESENT]]",
-      "create": true,
-      "read": true,
-      "update": true,
-      "delete": true
+      "_extends_" : "AccessControlList"
     },
     {
-      "role": "[[ANYTHING_PRESENT]]",
-      "create": true,
-      "read": true,
-      "update": true,
-      "delete": true
+      "_extends_" : "AccessControlList"
     }
   ],
   "complexACLs": [],
