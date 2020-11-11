@@ -1,0 +1,36 @@
+{
+  "_guid_": "S-125_Swagger_JSON_V2_Internal",
+  "title": "Must return a positive appropriate response when Swagger JSON Internal V2 URL is accessed",
+  "_extends_": "F-125_Swagger_JSON",
+
+  "specs": [
+    "to observe the swagger json content"
+  ],
+
+  "request" :{
+    "pathVariables" : {
+      "ccd-data-store-api-version": "ccd-data-store-api.v2_internal.json"
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode" : 200,
+    "responseMessage" : "OK",
+    "body" : {
+      "host" : "[[ANYTHING_PRESENT]]",
+      "basePath": "/",
+      "tags": "[[ANYTHING_PRESENT]]",
+      "paths": "[[ANYTHING_PRESENT]]",
+      "definitions": "[[ANYTHING_PRESENT]]",
+      "swagger": "2.0",
+      "info": {
+        "description": "Create, modify, retrieve and search cases",
+        "title": "CCD Data Store API",
+        "contact":"[[ANYTHING_PRESENT]]",
+        "license": "[[ANYTHING_PRESENT]]",
+        "version": "[[ANYTHING_PRESENT]]"
+
+      }
+    }
+  }
+}

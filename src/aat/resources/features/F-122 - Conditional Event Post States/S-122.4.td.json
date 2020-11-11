@@ -1,0 +1,52 @@
+{
+	"_guid_": "S-122.4",
+  "_extends_": "F-122-UpdateEventBase",
+  "title": "Sets the state defined with a matching post state condition using a complex field (End state: CaseRevoked)",
+
+  "productName": "CCD data store",
+  "operationName": "submit updateCase event with AddressField.AddressLine1 and EmailField values",
+
+  "specs": [
+    "contains state: CaseRevoked, updated values for AddressField.AddressLine1, EmailField along with an HTTP-201 Created"
+  ],
+
+  "request": {
+    "body": {
+      "data": {
+        "_extends_": "FT_ConditionalPostState_Base_Case_Data",
+        "TextField": null,
+        "EmailField": "matched@test.com",
+        "AddressField": {
+          "AddressLine1": "Some address",
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "Country": null
+        }
+      },
+      "event": {
+        "id": "updateCase",
+        "summary": "",
+        "description": ""
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 201,
+    "responseMessage": "OK",
+    "body": {
+      "state": "CaseRevoked",
+      "case_data": {
+        "_extends_": "FT_ConditionalPostState_Base_Case_Data",
+        "TextField": null,
+        "EmailField": "matched@test.com",
+        "AddressField": {
+          "AddressLine1": "Some address",
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "Country": null
+        }
+      }
+    }
+  }
+}
