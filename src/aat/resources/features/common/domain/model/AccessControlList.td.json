@@ -1,0 +1,9 @@
+{
+  "_guid_": "AccessControlList",
+
+  "role": "[[ANYTHING_PRESENT]]",
+  "create": true,
+  "read": true,
+  "update": true,
+  "delete": true
+}
