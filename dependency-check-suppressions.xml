@@ -13,6 +13,7 @@
     <cve>CVE-2020-13943</cve> <!-- new, temporary -->
 		<cve>CVE-2020-5421</cve>  <!-- new, temporary -->
 		<cve>CVE-2016-10750</cve> <!-- new, temporary -->
+		<cve>CVE-2020-7020</cve> <!-- new, temporary -->
   </suppress>
 
   <suppress>
