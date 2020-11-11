@@ -24,10 +24,17 @@
     <cve>CVE-2020-11022</cve><!-- liquibase -->
     <cve>CVE-2020-11023</cve><!-- liquibase -->
     <cve>CVE-2017-18640</cve> <!-- Resolution : not available until hazelcast bump jackson version. -->
-    <cve>CVE-2007-1651</cve>  <!-- new, temporary -->
-    <cve>CVE-2007-1652</cve>  <!-- new, temporary -->
-    <cve>CVE-2020-13943</cve> <!-- new, temporary -->
-    <cve>CVE-2020-7020</cve> <!-- new, temporary -->
+
+      <cve>CVE-2007-1651</cve>  <!-- new, temporary -->
+      <cve>CVE-2007-1652</cve>  <!-- new, temporary -->
+      <cve>CVE-2020-13943</cve> <!-- new, temporary -->
+      <cve>CVE-2020-5421</cve>  <!-- new, temporary -->
+      <cve>CVE-2016-10750</cve> <!-- new, temporary -->
+      <cve>CVE-2020-7020</cve> <!-- new, temporary -->
+  </suppress>
+    <cve>CVE-2016-10750</cve><!-- hazelcast -->
+    <cve>CVE-2007-1651</cve>
+    <cve>CVE-2007-1652</cve>
   </suppress>
   <suppress>
    <notes><![CDATA[
@@ -130,11 +137,25 @@
 </suppress>
     <suppress>
    <notes><![CDATA[
-   file name: elasticsearch-6.8.12.jar
+   file name: elasticsearch-6.4.2.jar
    ]]></notes>
    <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
-   <vulnerabilityName>CVE-2020-7020</vulnerabilityName>
-    </suppress>
+   <vulnerabilityName>CVE-2018-17244</vulnerabilityName>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: elasticsearch-6.4.2.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
+   <vulnerabilityName>CVE-2019-7611</vulnerabilityName>
+</suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: elasticsearch-6.4.2.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
+   <vulnerabilityName>CVE-2019-7614</vulnerabilityName>
+</suppress>
     <suppress>
    <notes><![CDATA[
    file name: dom4j-2.1.1.jar
@@ -151,7 +172,6 @@
     <cve>CVE-2020-13934</cve>
     <cve>CVE-2020-13935</cve>
     <cve>CVE-2020-8022</cve>
-    <cve>CVE-2020-7020</cve>
 </suppress>
 
 	<suppress>
@@ -162,19 +182,25 @@
    <cve>CVE-2020-13934</cve>
 </suppress>
 	<suppress>
-		<notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security (any version), see https://pivotal.io/security/cve-2018-1258
-			False positive confirmed.</notes>
-		<cve>CVE-2018-1258</cve>
-	</suppress>
-
+   <notes><![CDATA[
+   file name: tomcat-embed-websocket-9.0.36.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-websocket@.*$</packageUrl>
+   <cve>CVE-2020-13935</cve>
+</suppress>
 	<suppress>
-		<!-- Temporary suppressions to allow continued development -->
-		<cve>CVE-2017-18640</cve> <!-- Resolution : not available until hazelcast bump jackson version. -->
-		<cve>CVE-2007-1651</cve>  <!-- new, temporary -->
-		<cve>CVE-2007-1652</cve>  <!-- new, temporary -->
-		<cve>CVE-2020-13943</cve>  <!-- new, temporary -->
-		<cve>CVE-2020-7020</cve>
-		<cve>CVE-2020-26168</cve>
-	</suppress>
+   <notes><![CDATA[
+   file name: tomcat-embed-core-9.0.36.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-core@.*$</packageUrl>
+   <cve>CVE-2020-13934</cve>
+</suppress>
+	<suppress>
+   <notes><![CDATA[
+   file name: tomcat-embed-core-9.0.36.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-core@.*$</packageUrl>
+   <cve>CVE-2020-13935</cve>
+</suppress>
 
 </suppressions>
