@@ -54,16 +54,14 @@
           "OrgPolicyCaseAssignedRole": "[Claimant]",
           "OrgPolicyReference": null,
           "Organisation": {
-            "OrganisationID": null,
-            "OrganisationName": null
+            "OrganisationID": null
           }
         },
         "OrganisationPolicyField2": {
           "OrgPolicyCaseAssignedRole": "[Defendant]",
           "OrgPolicyReference": null,
           "Organisation": {
-            "OrganisationID": null,
-            "OrganisationName": null
+            "OrganisationID": null
           }
         },
         "CaseLinkField": {
