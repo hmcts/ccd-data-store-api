@@ -126,7 +126,7 @@ public class CaseDataValidator {
                                                        final BaseType fieldType,
                                                        final ValidationContext validationContext) {
         validationContext.setPath(fieldIdPrefix);
-        validationContext.setDataValue(dataValue);
+        validationContext.setFieldValue(dataValue);
         validationContext.setCaseFieldDefinition(caseFieldDefinition);
         validationContext.setFieldId(fieldId);
         Optional<FieldValidator> fieldIdBasedValidator = validators.stream().filter(
