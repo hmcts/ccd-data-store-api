@@ -25,7 +25,6 @@
     <cve>CVE-2020-5421</cve>  <!-- new, temporary -->
 	<cve>CVE-2016-10750</cve> <!-- new, temporary -->
     <cve>CVE-2020-7020</cve> <!-- new, temporary -->
-  </suppress>
     <cve>CVE-2016-10750</cve><!-- hazelcast -->
     <cve>CVE-2007-1651</cve>
     <cve>CVE-2007-1652</cve>
