@@ -22,7 +22,7 @@ class ValidationContextTest {
     private Map<String, JsonNode> data = new HashMap<>();
 
     @Test
-    public void test4ParamConstructor() {
+    void test4ParamConstructor() {
         caseTypeDefinition.setId("TEST");
         ValidationContext validationContext = new ValidationContext(
             caseTypeDefinition,
