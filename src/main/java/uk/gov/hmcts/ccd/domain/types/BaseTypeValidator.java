@@ -22,8 +22,8 @@ public interface BaseTypeValidator extends FieldValidator {
     default List<ValidationResult> validate(ValidationContext validationContext) {
         return validate(
             validationContext.getFieldId(),
-            validationContext.getDataValue(),
-            validationContext.getCaseFieldDefinition()
+            validationContext.getFieldValue(),
+            validationContext.getFieldDefinition()
         );
     }
 

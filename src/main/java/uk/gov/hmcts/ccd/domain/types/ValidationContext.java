@@ -12,7 +12,7 @@ public class ValidationContext {
     private final Map<String, JsonNode> data;
     private String fieldId;
     private String path;
-    private JsonNode dataValue;
+    private JsonNode fieldValue;
     private CaseFieldDefinition caseFieldDefinition;
 
     public ValidationContext(
@@ -43,15 +43,15 @@ public class ValidationContext {
         return data;
     }
 
-    public JsonNode getDataValue() {
-        return dataValue;
+    public JsonNode getFieldValue() {
+        return fieldValue;
     }
 
-    public void setDataValue(JsonNode dataValue) {
-        this.dataValue = dataValue;
+    public void setFieldValue(JsonNode fieldValue) {
+        this.fieldValue = fieldValue;
     }
 
-    public CaseFieldDefinition getCaseFieldDefinition() {
+    public CaseFieldDefinition getFieldDefinition() {
         return caseFieldDefinition;
     }
 

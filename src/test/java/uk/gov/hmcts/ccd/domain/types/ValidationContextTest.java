@@ -28,11 +28,11 @@ class ValidationContextTest {
             caseTypeDefinition,
             data
         );
-        assertNull(validationContext.getCaseFieldDefinition());
+        assertNull(validationContext.getFieldDefinition());
         assertNotNull(validationContext.getCaseTypeDefinition());
         assertNotNull(validationContext.getCaseTypeId());
         assertNotNull(validationContext.getData());
-        assertNull(validationContext.getDataValue());
+        assertNull(validationContext.getFieldValue());
         assertNull(validationContext.getFieldId());
         assertNull(validationContext.getPath());
     }
