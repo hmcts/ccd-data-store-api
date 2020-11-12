@@ -48,8 +48,7 @@
           "OrgPolicyCaseAssignedRole" : "[Defendant]",
           "OrgPolicyReference" : null,
           "Organisation" : {
-            "OrganisationID" : null,
-            "OrganisationName" : null
+            "OrganisationID" : null
           }
         },
         "TextAreaField" : null,
@@ -57,8 +56,7 @@
           "OrgPolicyCaseAssignedRole" : "[Claimant]",
           "OrgPolicyReference" : null,
           "Organisation" : {
-            "OrganisationID" : null,
-            "OrganisationName" : null
+            "OrganisationID" : null
           }
         },
         "CaseLinkField" : {
@@ -105,8 +103,7 @@
             "Organisation" : {
               "classification" : "PUBLIC",
               "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
+                "OrganisationID" : "PUBLIC"
               }
             }
           }
@@ -120,8 +117,7 @@
             "Organisation" : {
               "classification" : "PUBLIC",
               "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
+                "OrganisationID" : "PUBLIC"
               }
             }
           }
@@ -182,8 +178,7 @@
             "Organisation" : {
               "classification" : "PUBLIC",
               "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
+                "OrganisationID" : "PUBLIC"
               }
             }
           }
@@ -197,8 +192,7 @@
             "Organisation" : {
               "classification" : "PUBLIC",
               "value" : {
-                "OrganisationID" : "PUBLIC",
-                "OrganisationName" : "PUBLIC"
+                "OrganisationID" : "PUBLIC"
               }
             }
           }
