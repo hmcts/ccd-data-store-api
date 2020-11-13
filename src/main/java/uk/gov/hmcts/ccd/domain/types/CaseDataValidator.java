@@ -64,6 +64,9 @@ public class CaseDataValidator {
                                                  final String fieldIdPrefix) {
         final String caseFieldType = caseFieldDefinition.getFieldTypeDefinition().getType();
 
+
+
+
         if (!BaseType.contains(caseFieldType)) {
             return Collections.singletonList(new ValidationResult("Unknown Type:" + caseFieldType, dataFieldId));
         }
