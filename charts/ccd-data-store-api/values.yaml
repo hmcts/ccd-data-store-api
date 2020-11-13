@@ -6,6 +6,9 @@ java:
   ingressHost: ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   applicationPort: 4452
   aadIdentityName: ccd
+  autoscaling:
+    enabled: true 
+    maxReplicas: 8
   keyVaults:
     ccd:
       secrets:
