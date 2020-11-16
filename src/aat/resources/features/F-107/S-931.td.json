@@ -34,7 +34,7 @@
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
       "timestamp" : "[[ANYTHING_PRESENT]]",
       "status" : 422,
-      "error" : "Bad Request",
+      "error" : "Unprocessable Entity",
       "message" : "[[ANYTHING_PRESENT]]",
       "path" : "[[ANYTHING_PRESENT]]",
       "details" : null,
