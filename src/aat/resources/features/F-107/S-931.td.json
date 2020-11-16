@@ -37,7 +37,7 @@
       "error" : "Unprocessable Entity",
       "message" : "[[ANYTHING_PRESENT]]",
       "path" : "[[ANYTHING_PRESENT]]",
-      "details" : null,
+      "details" : "[[ANYTHING_PRESENT]]",
       "callbackErrors" : null,
       "callbackWarnings" : null
     }
