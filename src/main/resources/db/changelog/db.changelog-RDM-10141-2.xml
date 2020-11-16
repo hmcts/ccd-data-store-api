@@ -13,9 +13,6 @@
             CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_isscottishcase ON public.case_data USING btree (btrim(upper((data #>> '{isScottishCase}'::text[]))));
             CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_application_type ON public.case_data USING btree (btrim(upper((data #>> '{applicationType}'::text[]))));
 
-            DROP INDEX IF EXISTS idx_case_data_isscottishcase_documentsenttodwp;
-            DROP INDEX IF EXISTS idx_case_data_applicationtype_evidencehandled_registrylocation_;
-
         </sql>
     </changeSet>
 </databaseChangeLog>
