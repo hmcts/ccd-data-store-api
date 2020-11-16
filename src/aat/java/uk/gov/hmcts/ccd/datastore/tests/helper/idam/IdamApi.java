@@ -20,7 +20,8 @@ public interface IdamApi {
 
     @RequestLine("POST /oauth2/token")
     @Headers("Content-Type: application/x-www-form-urlencoded")
-    @Body("code={code}&grant_type={grant_type}&client_id={client_id}&client_secret={client_secret}&redirect_uri={redirect_uri}")
+    @Body("code={code}&grant_type={grant_type}&client_id={client_id}&client_secret={client_secret}"
+        + "&redirect_uri={redirect_uri}")
     TokenExchangeResponse exchangeCode(@Param("code") String code,
                                        @Param("grant_type") String grantType,
                                        @Param("client_id") String clientId,

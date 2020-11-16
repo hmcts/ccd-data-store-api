@@ -1,39 +1,43 @@
 {
-  "_guid_": "S-048.01_Case",
-  "_extends_": "Case_Creation_Data_Base",
-  "user": {
-      "username": "befta.caseworker.3@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
-  },
-  "request": {
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_JURISDICTION_3",
-      "ctid": "BEFTA_CASETYPE_3_4"
-    },
-    "body" : {
-      "event_token": "${[scenarioContext][parentContext][childContexts][S-048.01_GetToken][testData][actualResponse][body][token]}"
-    }
-  },
-  "expectedResponse": {
-    "body": {
-      "id" : "[[ANYTHING_PRESENT]]",
-      "jurisdiction" : "BEFTA_JURISDICTION_3",
-      "state" : "TODO",
-      "version" : 0,
-      "case_type_id" : "BEFTA_CASETYPE_3_4",
-      "created_date" : "[[ANYTHING_PRESENT]]",
-      "last_modified" : "[[ANYTHING_PRESENT]]",
-      "last_state_modified_date" : "[[ANYTHING_PRESENT]]",
-      "security_classification" : "PUBLIC",
-      "case_data" : { },
-      "data_classification" : { },
-      "after_submit_callback_response" : null,
-      "callback_response_status_code" : null,
-      "callback_response_status" : null,
-      "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null,
-      "security_classifications" : { }
-    }
-  }
+	"_guid_": "S-048.01_Case",
+	"_extends_": "Case_Creation_Data_Base",
+
+	"user": {
+			"username": "befta.caseworker.3@gmail.com",
+			"password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
+	},
+
+	"request": {
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "BEFTA_JURISDICTION_3",
+			"ctid": "BEFTA_CASETYPE_3_4"
+		},
+		"body" : {
+			"event_token": "${[scenarioContext][parentContext][childContexts][S-048.01_GetToken][testData][actualResponse][body][token]}"
+		}
+	},
+
+	"expectedResponse": {
+		"body": {
+			"id" : "[[ANYTHING_PRESENT]]",
+			"jurisdiction" : "BEFTA_JURISDICTION_3",
+			"state" : "TODO",
+			"version" : 0,
+			"case_type_id" : "BEFTA_CASETYPE_3_4",
+			"created_date" : "[[ANYTHING_PRESENT]]",
+			"last_modified" : "[[ANYTHING_PRESENT]]",
+			"last_state_modified_date" : "[[ANYTHING_PRESENT]]",
+			"security_classification" : "PUBLIC",
+			"case_data" : { },
+			"data_classification" : { },
+			"supplementary_data": null,
+			"after_submit_callback_response" : null,
+			"callback_response_status_code" : null,
+			"callback_response_status" : null,
+			"delete_draft_response_status_code" : null,
+			"delete_draft_response_status" : null,
+			"security_classifications" : { }
+		}
+	}
 }

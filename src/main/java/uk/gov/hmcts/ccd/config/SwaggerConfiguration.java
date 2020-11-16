@@ -1,28 +1,24 @@
 package uk.gov.hmcts.ccd.config;
 
+import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Arrays;
-
 import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.ParameterBuilder;
+import springfox.documentation.builders.RequestParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
-import springfox.documentation.service.Parameter;
+import springfox.documentation.service.ParameterType;
+import springfox.documentation.service.RequestParameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 import uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint;
 import uk.gov.hmcts.ccd.endpoint.ui.QueryEndpoint;
 import uk.gov.hmcts.ccd.v2.external.controller.CaseController;
 import uk.gov.hmcts.ccd.v2.internal.controller.UICaseController;
 
 @Configuration
-@EnableSwagger2WebMvc
 public class SwaggerConfiguration {
 
     @Bean
@@ -53,7 +49,7 @@ public class SwaggerConfiguration {
                 .paths(PathSelectors.any())
                 .build().useDefaultResponseMessages(false)
                 .apiInfo(apiInfo)
-                .globalOperationParameters(Arrays.asList(headerAuthorization(), headerServiceAuthorization()));
+                .globalRequestParameters(Arrays.asList(headerAuthorization(), headerServiceAuthorization()));
     }
 
     private ApiInfo apiV1Info() {
@@ -83,22 +79,20 @@ public class SwaggerConfiguration {
             .build();
     }
 
-    private Parameter headerAuthorization() {
-        return new ParameterBuilder()
+    private RequestParameter headerAuthorization() {
+        return new RequestParameterBuilder()
             .name("Authorization")
             .description("Keyword `Bearer` followed by a valid IDAM user token")
-            .modelRef(new ModelRef("string"))
-            .parameterType("header")
+            .in(ParameterType.HEADER)
             .required(true)
             .build();
     }
 
-    private Parameter headerServiceAuthorization() {
-        return new ParameterBuilder()
+    private RequestParameter headerServiceAuthorization() {
+        return new RequestParameterBuilder()
             .name("ServiceAuthorization")
             .description("Valid Service-to-Service JWT token for a whitelisted micro-service")
-            .modelRef(new ModelRef("string"))
-            .parameterType("header")
+            .in(ParameterType.HEADER)
             .required(true)
             .build();
     }

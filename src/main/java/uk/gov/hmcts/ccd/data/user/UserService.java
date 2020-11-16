@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.data.user;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,6 +15,10 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.WorkbasketDefault;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class UserService {
 
@@ -30,7 +31,8 @@ public class UserService {
 
     @Inject
     public UserService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
-                       @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
+                       @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                           CaseDefinitionRepository caseDefinitionRepository,
                        JurisdictionMapper jurisdictionMapper,
                        @Qualifier(IdamJurisdictionsResolver.QUALIFIER) JurisdictionsResolver jurisdictionsResolver) {
         this.userRepository = userRepository;
@@ -58,7 +60,9 @@ public class UserService {
         return createUserProfile(idamProperties, userId, jurisdictionDefinitions);
     }
 
-    private UserProfile createUserProfile(IdamProperties idamProperties, String userId, List<JurisdictionDefinition> jurisdictionsDefinition) {
+    private UserProfile createUserProfile(IdamProperties idamProperties,
+                                          String userId,
+                                          List<JurisdictionDefinition> jurisdictionsDefinition) {
 
         JurisdictionDisplayProperties[] resultJurisdictions = toResponse(jurisdictionsDefinition);
 
@@ -73,7 +77,7 @@ public class UserService {
             workbasketDefault.setStateId(userDefault.getWorkBasketDefaultState());
             userProfile.getDefaultSettings().setWorkbasketDefault(workbasketDefault);
         } catch (ResourceNotFoundException ae) {
-            LOGGER.debug("User Profile not exists for userId {}", userId, ae);
+            LOGGER.debug("User Profile not exists for userId {}", idamProperties.getId(), ae);
         }
 
         return userProfile;
@@ -82,5 +86,9 @@ public class UserService {
     private JurisdictionDisplayProperties[] toResponse(List<JurisdictionDefinition> jurisdictionsDefinition) {
         return jurisdictionsDefinition.stream().map(jurisdictionMapper::toResponse)
         .toArray(JurisdictionDisplayProperties[]::new);
+    }
+
+    public List<String> getUserRolesJurisdictions() {
+        return userRepository.getCaseworkerUserRolesJurisdictions();
     }
 }

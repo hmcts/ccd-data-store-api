@@ -11,7 +11,13 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 
 public class HttpUIDefinitionGatewayTest extends WireMockBaseTest {
@@ -20,11 +26,12 @@ public class HttpUIDefinitionGatewayTest extends WireMockBaseTest {
     private static final String ORG_CASES = "ORGCASES";
 
     @Inject
-    private HttpUIDefinitionGateway httpUIDefinitionGateway;
+    private uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway httpUIDefinitionGateway;
 
     @Test
     public void getDefinition() {
-        final SearchResultDefinition workBasketResult = httpUIDefinitionGateway.getWorkBasketResult(VERSION,"TestAddressBookCase");
+        final SearchResultDefinition workBasketResult =
+            httpUIDefinitionGateway.getWorkBasketResult(VERSION,"TestAddressBookCase");
         assertThat(workBasketResult.getFields().length, is(3));
     }
 
@@ -48,14 +55,16 @@ public class HttpUIDefinitionGatewayTest extends WireMockBaseTest {
     @DisplayName("should Return jurisdiction UI configs")
     public void shouldReturnJurisdictionUiConfigs() {
         List<String> jurisdictionIds = Lists.newArrayList("PROBATE", "DIVORCE");
-        final JurisdictionUiConfigResult configResult = httpUIDefinitionGateway.getJurisdictionUiConfigs(jurisdictionIds);
+        final JurisdictionUiConfigResult configResult =
+            httpUIDefinitionGateway.getJurisdictionUiConfigs(jurisdictionIds);
         assertThat(configResult.getConfigs().size(), is(2));
     }
 
     @Test
     @DisplayName("should Return search cases result fields")
     public void shouldReturnSearchCasesResultFields() {
-        final SearchResultDefinition searchResult = httpUIDefinitionGateway.getSearchCasesResultDefinition(VERSION, "TestAddressBookCase", ORG_CASES);
+        final SearchResultDefinition searchResult =
+            httpUIDefinitionGateway.getSearchCasesResultDefinition(VERSION, "TestAddressBookCase", ORG_CASES);
         assertAll(
             () -> assertThat(searchResult.getFields().length, is(7)),
             () -> assertThat(searchResult.getFields()[0].getUseCase(), is(ORG_CASES))

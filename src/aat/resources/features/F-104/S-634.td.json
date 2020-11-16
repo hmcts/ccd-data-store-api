@@ -1,110 +1,110 @@
 {
-  "_guid_": "S-634",
-  "_extends_": "F-104_Test_Data_Base",
-  "specs": [
-    "is configured to search for the previously created case via exact match",
-    "a valid user profile",
-    "is configured to return specific fields that the user does not have access to",
-    "contains headers only for the specified fields the user has access to",
-    "contains data for only the specified fields the user has access to",
-    "contains data for and all meta data fields"
-  ],
-  "user" : {
-    "username": "[[$CCD_RESTRICTED_CASEWORKER_EMAIL]]",
-    "password": "[[$CCD_RESTRICTED_CASEWORKER_PASSWORD]]"
-  },
-  "request": {
-    "body": {
-      "_source" : ["reference", "data.MoneyGBPField", "data.TextAreaField"],
-      "query": {
-        "match": {
-          "reference": "${[scenarioContext][childContexts][Private_Case_Creation_Autotest1_Data][testData][actualResponse][body][id]}"
-        }
-      }
-    }
-  },
+	"_guid_": "S-634",
+	"_extends_": "F-104_Test_Data_Base",
+	"specs": [
+		"is configured to search for the previously created case via exact match",
+		"a valid user profile",
+		"is configured to return specific fields that the user does not have access to",
+		"contains headers only for the specified fields the user has access to",
+		"contains data for only the specified fields the user has access to",
+		"contains data for and all meta data fields"
+	],
+	"user" : {
+		"username": "[[$CCD_RESTRICTED_CASEWORKER_EMAIL]]",
+		"password": "[[$CCD_RESTRICTED_CASEWORKER_PASSWORD]]"
+	},
+	"request": {
+		"body": {
+			"_source" : ["reference", "data.MoneyGBPField", "data.TextAreaField"],
+			"query": {
+				"match": {
+					"reference": "${[scenarioContext][childContexts][Private_Case_Creation_Autotest1_Data][testData][actualResponse][body][id]}"
+				}
+			}
+		}
+	},
 
-  "expectedResponse": {
-    "body": {
-      "headers": [
-        {
-          "metadata": {
-            "jurisdiction": "AUTOTEST1",
-            "case_type_id": "AAT_PRIVATE"
-          },
-          "fields": [
-            {
-              "__operator__": "equivalent",
-              "__ordering__": "unordered",
-              "__elementId__": "label"
-            },
-            {
-              "label": "A `MoneyGBP` field",
-              "order": null,
-              "metadata": false,
-              "case_field_id": "MoneyGBPField",
-              "case_field_type": {
-                "id": "MoneyGBP",
-                "type": "MoneyGBP",
-                "min": null,
-                "max": null,
-                "regular_expression": null,
-                "fixed_list_items": [],
-                "complex_fields": [],
-                "collection_field_type": null
-              },
-              "display_context_parameter": null
-            },
-            {
-              "label": "Case Reference",
-              "order": null,
-              "metadata": true,
-              "case_field_id": "[CASE_REFERENCE]",
-              "case_field_type": {
-                "id": "Number",
-                "type": "Number",
-                "min": null,
-                "max": null,
-                "regular_expression": null,
-                "fixed_list_items": [],
-                "complex_fields": [],
-                "collection_field_type": null
-              },
-              "display_context_parameter": null
-            }
-          ],
-          "cases": "[[ANYTHING_PRESENT]]"
-        }
-      ],
-      "cases": [
-        {
-          "fields": {
-            "[STATE]": "TODO",
-            "MoneyGBPField": "1000",
-            "[SECURITY_CLASSIFICATION]": "PRIVATE",
-            "[JURISDICTION]": "AUTOTEST1",
-            "[LAST_STATE_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
-            "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
-            "[CASE_TYPE]": "AAT_PRIVATE",
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data]}",
-            "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
-          },
-          "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data]}",
-          "fields_formatted": {
-            "[STATE]": "TODO",
-            "MoneyGBPField": "1000",
-            "[SECURITY_CLASSIFICATION]": "PRIVATE",
-            "[JURISDICTION]": "AUTOTEST1",
-            "[LAST_STATE_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
-            "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
-            "[CASE_TYPE]": "AAT_PRIVATE",
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data]}",
-            "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
-          }
-        }
-      ],
-      "total": 1
-    }
-  }
+	"expectedResponse": {
+		"body": {
+			"headers": [
+				{
+					"metadata": {
+						"jurisdiction": "AUTOTEST1",
+						"case_type_id": "AAT_PRIVATE"
+					},
+					"fields": [
+						{
+							"__operator__": "equivalent",
+							"__ordering__": "unordered",
+							"__elementId__": "label"
+						},
+						{
+							"label": "A `MoneyGBP` field",
+							"order": null,
+							"metadata": false,
+							"case_field_id": "MoneyGBPField",
+							"case_field_type": {
+								"id": "MoneyGBP",
+								"type": "MoneyGBP",
+								"min": null,
+								"max": null,
+								"regular_expression": null,
+								"fixed_list_items": [],
+								"complex_fields": [],
+								"collection_field_type": null
+							},
+							"display_context_parameter": null
+						},
+						{
+							"label": "Case Reference",
+							"order": null,
+							"metadata": true,
+							"case_field_id": "[CASE_REFERENCE]",
+							"case_field_type": {
+								"id": "Number",
+								"type": "Number",
+								"min": null,
+								"max": null,
+								"regular_expression": null,
+								"fixed_list_items": [],
+								"complex_fields": [],
+								"collection_field_type": null
+							},
+							"display_context_parameter": null
+						}
+					],
+					"cases": "[[ANYTHING_PRESENT]]"
+				}
+			],
+			"cases": [
+				{
+					"fields": {
+						"[STATE]": "TODO",
+						"MoneyGBPField": "1000",
+						"[SECURITY_CLASSIFICATION]": "PRIVATE",
+						"[JURISDICTION]": "AUTOTEST1",
+						"[LAST_STATE_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
+						"[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
+						"[CASE_TYPE]": "AAT_PRIVATE",
+						"[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data]}",
+						"[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
+					},
+					"case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data]}",
+					"fields_formatted": {
+						"[STATE]": "TODO",
+						"MoneyGBPField": "1000",
+						"[SECURITY_CLASSIFICATION]": "PRIVATE",
+						"[JURISDICTION]": "AUTOTEST1",
+						"[LAST_STATE_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
+						"[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
+						"[CASE_TYPE]": "AAT_PRIVATE",
+						"[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data]}",
+						"[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
+					}
+				}
+			],
+			"total": 1
+		}
+	}
 
 }

@@ -210,7 +210,11 @@
             }
           ],
           "pre_states": [],
-          "post_state": "TODO",
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "TODO"
+          }],
           "callback_url_about_to_start_event": null,
           "retries_timeout_about_to_start_event": [],
           "callback_url_about_to_submit_event": null,
@@ -241,7 +245,11 @@
           "pre_states": [
             "IN_PROGRESS"
           ],
-          "post_state": "TODO",
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "TODO"
+          }],
           "callback_url_about_to_start_event": null,
           "retries_timeout_about_to_start_event": [],
           "callback_url_about_to_submit_event": null,
@@ -272,7 +280,11 @@
           "pre_states": [
             "TODO"
           ],
-          "post_state": "IN_PROGRESS",
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "IN_PROGRESS"
+          }],
           "callback_url_about_to_start_event": null,
           "retries_timeout_about_to_start_event": [],
           "callback_url_about_to_submit_event": null,
@@ -303,7 +315,11 @@
           "pre_states": [
             "IN_PROGRESS"
           ],
-          "post_state": "DONE",
+                    "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "IN_PROGRESS"
+          }],
           "callback_url_about_to_start_event": null,
           "retries_timeout_about_to_start_event": [],
           "callback_url_about_to_submit_event": null,
@@ -500,7 +516,11 @@
           "pre_states": [
             "*"
           ],
-          "post_state": "*",
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "*"
+          }],
           "callback_url_about_to_start_event": null,
           "retries_timeout_about_to_start_event": [],
           "callback_url_about_to_submit_event": null,
@@ -686,7 +706,11 @@
           "pre_states": [
             "*"
           ],
-          "post_state": "*",
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "*"
+          }],
           "callback_url_about_to_start_event": null,
           "retries_timeout_about_to_start_event": [],
           "callback_url_about_to_submit_event": null,

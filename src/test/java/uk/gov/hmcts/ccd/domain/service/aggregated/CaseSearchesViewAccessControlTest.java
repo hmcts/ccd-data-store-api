@@ -1,30 +1,45 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.node.*;
-import com.google.common.collect.*;
-import org.junit.jupiter.api.*;
-import org.mockito.*;
-import uk.gov.hmcts.ccd.data.casedetails.*;
-import uk.gov.hmcts.ccd.data.user.*;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.domain.service.common.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Sets;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
-import uk.gov.hmcts.ccd.domain.service.search.*;
+import uk.gov.hmcts.ccd.domain.service.search.CaseSearchesViewAccessControl;
+import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
 
-import java.io.*;
-import java.time.*;
-import java.util.*;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.*;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.*;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.searchResult;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildData;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class CaseSearchesViewAccessControlTest {
 
@@ -133,36 +148,112 @@ class CaseSearchesViewAccessControlTest {
                 buildSearchResultField(CASE_TYPE_ID_1, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
             .build();
 
-        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(caseType1SearchResult);
+        when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any()))
+            .thenReturn(caseType1SearchResult);
         doAnswer(i -> i.getArgument(1)).when(dateTimeSearchResultProcessor).execute(any(), any());
-        when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any())).thenReturn(true);
+        when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any()))
+            .thenReturn(true);
 
-        classUnderTest = new CaseSearchesViewAccessControl(userRepository, caseTypeService, searchResultDefinitionService, securityClassificationService);
+        classUnderTest = new CaseSearchesViewAccessControl(userRepository, caseTypeService,
+            searchResultDefinitionService, securityClassificationService);
 
     }
 
     @Test
     void shouldReturnTrueForFilterResultsBySearchResultsDefinition() {
+        CaseTypeDefinition caseTypeDefinition1 = newCaseType()
+            .withCaseTypeId(CASE_TYPE_ID_1)
+            .withJurisdiction(jurisdiction)
+            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
+                .withAcl(anAcl()
+                    .withRole(ROLE_IN_USER_ROLE_1)
+                    .withRead(true)
+                    .build()).build())
+            .withSecurityClassification(SecurityClassification.PUBLIC)
+            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
+                .withAcl(anAcl()
+                    .withRole(ROLE_IN_USER_ROLE_1)
+                    .withRead(true)
+                    .build()).build())
+            .withSecurityClassification(SecurityClassification.PUBLIC)
+            .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
+                .withAcl(anAcl()
+                    .withRole(ROLE_IN_USER_ROLE_1)
+                    .withRead(true)
+                    .build()).build())
+            .withSecurityClassification(SecurityClassification.PUBLIC)
+            .build();
+
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
         List<String> requestedFields = new ArrayList<>();
 
-        assertTrue(classUnderTest.filterResultsBySearchResultsDefinition("ORGCASES", CASE_REFERENCE.toString(), requestedFields, CASE_FIELD_1));
+        assertTrue(classUnderTest
+            .filterResultsBySearchResultsDefinition("ORGCASES", caseTypeDefinition1, requestedFields, CASE_FIELD_1));
     }
 
     @Test
     void shouldReturnTrueForFilterResultsBySearchResultsDefinitionWhenUseCaseIsNull() {
+        CaseTypeDefinition caseTypeDefinition1 = newCaseType()
+            .withCaseTypeId(CASE_TYPE_ID_1)
+            .withJurisdiction(jurisdiction)
+            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
+                .withAcl(anAcl()
+                    .withRole(ROLE_IN_USER_ROLE_1)
+                    .withRead(true)
+                    .build()).build())
+            .withSecurityClassification(SecurityClassification.PUBLIC)
+            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
+                .withAcl(anAcl()
+                    .withRole(ROLE_IN_USER_ROLE_1)
+                    .withRead(true)
+                    .build()).build())
+            .withSecurityClassification(SecurityClassification.PUBLIC)
+            .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
+                .withAcl(anAcl()
+                    .withRole(ROLE_IN_USER_ROLE_1)
+                    .withRead(true)
+                    .build()).build())
+            .withSecurityClassification(SecurityClassification.PUBLIC)
+            .build();
+
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
         List<String> requestedFields = new ArrayList<>();
 
-        assertTrue(classUnderTest.filterResultsBySearchResultsDefinition(null, CASE_REFERENCE.toString(), requestedFields, CASE_FIELD_1));
+        assertTrue(classUnderTest
+            .filterResultsBySearchResultsDefinition(null, caseTypeDefinition1, requestedFields, CASE_FIELD_1));
     }
 
     @Test
     void shouldReturnFalseForFilterResultsBySearchResultsDefinition() {
+        CaseTypeDefinition caseTypeDefinition1 = newCaseType()
+            .withCaseTypeId(CASE_TYPE_ID_1)
+            .withJurisdiction(jurisdiction)
+            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
+                .withAcl(anAcl()
+                    .withRole(ROLE_IN_USER_ROLE_1)
+                    .withRead(true)
+                    .build()).build())
+            .withSecurityClassification(SecurityClassification.PUBLIC)
+            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
+                .withAcl(anAcl()
+                    .withRole(ROLE_IN_USER_ROLE_1)
+                    .withRead(true)
+                    .build()).build())
+            .withSecurityClassification(SecurityClassification.PUBLIC)
+            .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
+                .withAcl(anAcl()
+                    .withRole(ROLE_IN_USER_ROLE_1)
+                    .withRead(true)
+                    .build()).build())
+            .withSecurityClassification(SecurityClassification.PUBLIC)
+            .build();
+
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
         List<String> requestedFields = new ArrayList<>();
 
-        assertFalse(classUnderTest.filterResultsBySearchResultsDefinition("ORGCASES", CASE_REFERENCE.toString(), requestedFields, CASE_FIELD_2));
+
+        assertFalse(classUnderTest
+            .filterResultsBySearchResultsDefinition("ORGCASES", caseTypeDefinition1, requestedFields, CASE_FIELD_2));
     }
 
     @Test
@@ -266,7 +357,8 @@ class CaseSearchesViewAccessControlTest {
             .build();
 
         when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_2));
-        when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any())).thenReturn(false);
+        when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any()))
+            .thenReturn(false);
         assertFalse(classUnderTest.filterResultsBySecurityClassification(caseFieldDefinition1, caseTypeDefinition1));
     }
 

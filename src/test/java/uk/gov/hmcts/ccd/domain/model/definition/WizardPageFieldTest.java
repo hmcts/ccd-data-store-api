@@ -13,20 +13,23 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 class WizardPageFieldTest {
 
-    private WizardPageField wizardPageField;
+    private uk.gov.hmcts.ccd.domain.model.definition.WizardPageField wizardPageField;
 
     @BeforeEach
     public void setup() {
-        wizardPageField = new WizardPageField();
+        wizardPageField = new uk.gov.hmcts.ccd.domain.model.definition.WizardPageField();
     }
 
     @Test
     void shouldFindComplexFieldOverrideByPath() {
-        WizardPageComplexFieldOverride override1 = override("LABEL1", "ComplexField.NestedField1");
-        WizardPageComplexFieldOverride override2 = override("LABEL2", "ComplexField.NestedField2.SubNestedField");
+        uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride override1 =
+                override("LABEL1", "ComplexField.NestedField1");
+        uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride override2 =
+                override("LABEL2", "ComplexField.NestedField2.SubNestedField");
         wizardPageField.setComplexFieldOverrides(Arrays.asList(override1, override2));
 
-        Optional<WizardPageComplexFieldOverride> result = wizardPageField.getComplexFieldOverride("ComplexField.NestedField2.SubNestedField");
+        Optional<uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride> result =
+                wizardPageField.getComplexFieldOverride("ComplexField.NestedField2.SubNestedField");
 
         assertAll(
             () -> assertThat(result.isPresent(), is(true)),
@@ -36,11 +39,14 @@ class WizardPageFieldTest {
 
     @Test
     void shouldNotFindOverrideForInvalidPath() {
-        WizardPageComplexFieldOverride override1 = override("LABEL1", "ComplexField.NestedField1");
-        WizardPageComplexFieldOverride override2 = override("LABEL2", "ComplexField.NestedField2.SubNestedField");
+        uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride override1 =
+                override("LABEL1", "ComplexField.NestedField1");
+        uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride override2 =
+                override("LABEL2", "ComplexField.NestedField2.SubNestedField");
         wizardPageField.setComplexFieldOverrides(Arrays.asList(override1, override2));
 
-        Optional<WizardPageComplexFieldOverride> result = wizardPageField.getComplexFieldOverride("InvalidFieldPath");
+        Optional<uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride> result =
+                wizardPageField.getComplexFieldOverride("InvalidFieldPath");
 
         assertAll(
             () -> assertThat(result.isPresent(), is(false))
@@ -51,15 +57,18 @@ class WizardPageFieldTest {
     void shouldNotFindOverrideForEmptyList() {
         wizardPageField.setComplexFieldOverrides(Collections.emptyList());
 
-        Optional<WizardPageComplexFieldOverride> result = wizardPageField.getComplexFieldOverride("FieldPath");
+        Optional<uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride> result =
+                wizardPageField.getComplexFieldOverride("FieldPath");
 
         assertAll(
             () -> assertThat(result.isPresent(), is(false))
         );
     }
 
-    private WizardPageComplexFieldOverride override(String label, String fieldPath) {
-        WizardPageComplexFieldOverride override = new WizardPageComplexFieldOverride();
+    private uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride override(String label,
+                                                                                             String fieldPath) {
+        uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride override =
+                new uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride();
         override.setLabel(label);
         override.setComplexFieldElementId(fieldPath);
         return override;

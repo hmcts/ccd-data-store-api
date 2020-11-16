@@ -1,0 +1,58 @@
+{
+  "_guid_": "S-910",
+  "_extends_": "F-108_Test_Data_Base",
+  "specs": [
+    "private access to AUTOTEST1 jurisdiction only",
+    "is configured to search for both the previously created cases",
+    "contains only S-910_Create_Case_Private_Autotest1"
+  ],
+
+  "request": {
+    "queryParams": {
+      "ctid": "AAT_PRIVATE,AAT_PRIVATE2"
+    },
+    "body": {
+      "_source": [
+        "alias.NumberFieldAlias",
+        "alias.EmailFieldAlias"
+      ],
+      "query": {
+        "match": {
+          "alias.NumberFieldAlias": 910
+        }
+      }
+    }
+  },
+
+
+  "expectedResponse": {
+    "body": {
+      "total": 1,
+      "cases": [{
+        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-910_Create_Case_Private_Autotest1]}",
+        "jurisdiction": "AUTOTEST1",
+        "state": "TODO",
+        "version": null,
+        "case_type_id": "AAT_PRIVATE",
+        "created_date": "[[ANYTHING_PRESENT]]",
+        "last_modified": "[[ANYTHING_PRESENT]]",
+        "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+        "security_classification": "PRIVATE",
+        "case_data": {
+          "NumberFieldAlias": "910"
+        },
+        "data_classification": "[[ANYTHING_PRESENT]]",
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null,
+        "security_classifications": "[[ANYTHING_PRESENT]]"
+      }],
+      "case_types_results" : [{
+        "total" : 1,
+        "case_type_id" : "AAT_PRIVATE"
+      }]
+    }
+  }
+}

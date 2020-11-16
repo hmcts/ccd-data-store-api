@@ -37,7 +37,8 @@ public class CaseAccessService {
     private final CaseUserRepository caseUserRepository;
 
     private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN
-        = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-.+-localAuthority$");
+        = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-."
+        + "+-localAuthority$");
 
     public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                              @Qualifier(CachedCaseUserRepository.QUALIFIER)  CaseUserRepository caseUserRepository) {
@@ -96,7 +97,7 @@ public class CaseAccessService {
 
     public boolean isJurisdictionAccessAllowed(String jurisdiction) {
         return this.userRepository
-            .getUserRolesJurisdictions()
+            .getCaseworkerUserRolesJurisdictions()
             .stream()
             .anyMatch(jurisdiction::equalsIgnoreCase);
     }

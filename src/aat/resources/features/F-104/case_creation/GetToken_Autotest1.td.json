@@ -1,69 +1,70 @@
 {
-  "_guid_": "Private_Case_Creation_Autotest1_Data_1_Token_Creation",
-  "productName": "CCD Data Store",
-  "operationName": "Start event creation as Case worker",
-  "method": "GET",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+	"_guid_": "Private_Case_Creation_Autotest1_Data_1_Token_Creation",
+	"productName": "CCD Data Store",
+	"operationName": "Start event creation as Case worker",
+	"method": "GET",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
 
-  "specs": [
-    "a case that has just been created as in Private_Case_Creation_Data",
-    "a case that has just been created as in [Private_Case_Creation_Data]",
-    "to create a full case",
-    "to create a token for case creation"
-  ],
+	"specs": [
+		"a case that has just been created as in Private_Case_Creation_Data",
+		"a case that has just been created as in [Private_Case_Creation_Data]",
+		"to create a full case",
+		"to create a token for case creation"
+	],
 
-  "users": {
-    "invokingUser": {
-      "username": "[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
-      "password": "[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
-    }
-  },
+	"users": {
+		"invokingUser": {
+			"username": "[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
+			"password": "[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
+		}
+	},
 
-  "request": {
-    "headers":{
-      "Authorization": "[[DEFAULT_AUTO_VALUE]]",
-      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]",
-      "Content-Type": "application/json"
-    },
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT_PRIVATE",
-      "etid": "CREATE"
-    }
-  },
+	"request": {
+		"headers":{
+			"Authorization": "[[DEFAULT_AUTO_VALUE]]",
+			"ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]",
+			"Content-Type": "application/json"
+		},
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "AUTOTEST1",
+			"ctid": "AAT_PRIVATE",
+			"etid": "CREATE"
+		}
+	},
 
-  "expectedResponse": {
-    "responseCode": 200,
-    "responseMessage": "OK",
-    "headers" : {
-      "Content-Encoding" : "gzip",
-      "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]",
-      "VaRy": "aCCept-EncodIng"
-    },
-    "body" : {
-      "token" : "[[ANY_STRING_NOT_NULLABLE]]",
-      "case_details" : {
-        "id": null,
-        "jurisdiction": "[[ANYTHING_PRESENT]]",
-        "state": null,
-        "version": null,
-        "case_type_id": "[[ANYTHING_PRESENT]]",
-        "created_date": null,
-        "last_modified": null,
-        "last_state_modified_date": null,
-        "security_classification": null,
-        "case_data": {},
-        "data_classification": {},
-        "after_submit_callback_response": null,
-        "callback_response_status_code": null,
-        "callback_response_status": null,
-        "delete_draft_response_status_code": null,
-        "delete_draft_response_status": null,
-        "security_classifications": {}
-      },
-      "event_id" : "CREATE"
-    }
-  }
+	"expectedResponse": {
+		"responseCode": 200,
+		"responseMessage": "OK",
+		"headers" : {
+			"Content-Encoding" : "gzip",
+			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]",
+			"VaRy": "aCCept-EncodIng"
+		},
+		"body" : {
+			"token" : "[[ANY_STRING_NOT_NULLABLE]]",
+			"case_details" : {
+				"id": null,
+				"jurisdiction": "[[ANYTHING_PRESENT]]",
+				"state": null,
+				"version": null,
+				"case_type_id": "[[ANYTHING_PRESENT]]",
+				"created_date": null,
+				"last_modified": null,
+				"last_state_modified_date": null,
+				"security_classification": null,
+				"case_data": {},
+				"data_classification": {},
+				"supplementary_data": null,
+				"after_submit_callback_response": null,
+				"callback_response_status_code": null,
+				"callback_response_status": null,
+				"delete_draft_response_status_code": null,
+				"delete_draft_response_status": null,
+				"security_classifications": {}
+			},
+			"event_id" : "CREATE"
+		}
+	}
 
 }

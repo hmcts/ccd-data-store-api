@@ -49,6 +49,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -57,8 +58,7 @@
               "update": true,
               "delete": false
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "NumberField",
@@ -86,6 +86,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -94,8 +95,7 @@
               "update": true,
               "delete": false
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "YesOrNoField",
@@ -123,6 +123,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -131,8 +132,7 @@
               "update": true,
               "delete": false
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "PhoneUKField",
@@ -160,6 +160,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -168,8 +169,7 @@
               "update": true,
               "delete": false
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "EmailField",
@@ -197,6 +197,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -205,8 +206,7 @@
               "update": true,
               "delete": false
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "MoneyGBPField",
@@ -234,6 +234,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -242,8 +243,7 @@
               "update": true,
               "delete": false
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "DateField",
@@ -271,6 +271,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -279,8 +280,7 @@
               "update": true,
               "delete": false
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "DateTimeField",
@@ -308,6 +308,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -316,8 +317,7 @@
               "update": true,
               "delete": false
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "TextAreaField",
@@ -345,6 +345,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -353,8 +354,7 @@
               "update": true,
               "delete": false
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "FixedListField",
@@ -398,6 +398,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -406,8 +407,7 @@
               "update": true,
               "delete": false
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "MultiSelectListField",
@@ -461,6 +461,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -469,8 +470,7 @@
               "update": true,
               "delete": false
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "CollectionField",
@@ -507,6 +507,7 @@
           "show_condition": null,
           "show_summary_change_option": false,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -515,8 +516,7 @@
               "update": true,
               "delete": false
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "ComplexField",
@@ -568,8 +568,8 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
-                "formatted_value": null,
-                "default_value": null
+                "retain_hidden_value": null,
+                "formatted_value": null
               },
               {
                 "id": "ComplexFixedListField",
@@ -622,8 +622,8 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
-                "formatted_value": null,
-                "default_value": null
+                "retain_hidden_value": null,
+                "formatted_value": null
               },
               {
                 "id": "ComplexNestedField",
@@ -675,8 +675,8 @@
                       "complexACLs": [],
                       "display_context": null,
                       "display_context_parameter": null,
-                      "formatted_value": null,
-                      "default_value": null
+                      "retain_hidden_value": null,
+                      "formatted_value": null
                     },
                     {
                       "id": "NestedCollectionTextField",
@@ -721,8 +721,8 @@
                       "complexACLs": [],
                       "display_context": null,
                       "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)",
-                      "formatted_value": null,
-                      "default_value": null
+                      "retain_hidden_value": null,
+                      "formatted_value": null
                     }
                   ],
                   "collection_field_type": null
@@ -744,8 +744,8 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
-                "formatted_value": null,
-                "default_value": null
+                "retain_hidden_value": null,
+                "formatted_value": null
               }
             ],
             "collection_field_type": null
@@ -759,6 +759,7 @@
           "show_condition": null,
           "show_summary_change_option": false,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -767,8 +768,7 @@
               "update": true,
               "delete": false
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "AddressUKField",
@@ -819,8 +819,8 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
-                "formatted_value": null,
-                "default_value": null
+                "retain_hidden_value": null,
+                "formatted_value": null
               },
               {
                 "id": "AddressLine2",
@@ -856,8 +856,8 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
-                "formatted_value": null,
-                "default_value": null
+                "retain_hidden_value": null,
+                "formatted_value": null
               },
               {
                 "id": "AddressLine3",
@@ -893,8 +893,8 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
-                "formatted_value": null,
-                "default_value": null
+                "retain_hidden_value": null,
+                "formatted_value": null
               },
               {
                 "id": "PostTown",
@@ -930,8 +930,8 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
-                "formatted_value": null,
-                "default_value": null
+                "retain_hidden_value": null,
+                "formatted_value": null
               },
               {
                 "id": "County",
@@ -967,8 +967,8 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
-                "formatted_value": null,
-                "default_value": null
+                "retain_hidden_value": null,
+                "formatted_value": null
               },
               {
                 "id": "PostCode",
@@ -1004,8 +1004,8 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
-                "formatted_value": null,
-                "default_value": null
+                "retain_hidden_value": null,
+                "formatted_value": null
               },
               {
                 "id": "Country",
@@ -1041,8 +1041,8 @@
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
-                "formatted_value": null,
-                "default_value": null
+                "retain_hidden_value": null,
+                "formatted_value": null
               }
             ],
             "collection_field_type": null
@@ -1056,6 +1056,7 @@
           "show_condition": null,
           "show_summary_change_option": false,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -1064,8 +1065,7 @@
               "update": true,
               "delete": false
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "DocumentField",
@@ -1093,6 +1093,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -1101,8 +1102,7 @@
               "update": true,
               "delete": false
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "FixedRadioListField",
@@ -1146,6 +1146,7 @@
           "show_condition": null,
           "show_summary_change_option": true,
           "show_summary_content_option": null,
+          "retain_hidden_value": null,
           "acls": [
             {
               "role": "caseworker-autotest1",
@@ -1154,8 +1155,7 @@
               "update": true,
               "delete": false
             }
-          ],
-          "default_value": null
+          ]
         }
       ],
       "event_token": "[[ANYTHING_PRESENT]]",

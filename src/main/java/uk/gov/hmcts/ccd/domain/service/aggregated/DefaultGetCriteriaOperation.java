@@ -39,25 +39,30 @@ public class DefaultGetCriteriaOperation implements GetCriteriaOperation {
     private final CaseDefinitionRepository caseDefinitionRepository;
 
     public DefaultGetCriteriaOperation(UIDefinitionRepository uiDefinitionRepository,
-                                       @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository) {
+                                       @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                       final CaseDefinitionRepository caseDefinitionRepository) {
         this.uiDefinitionRepository = uiDefinitionRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
     }
 
     @Override
-    public <T> List<? extends CriteriaInput> execute(final String caseTypeId, final Predicate<AccessControlList> access, CriteriaType criteriaType) {
+    public <T> List<? extends CriteriaInput> execute(final String caseTypeId,
+                                                     final Predicate<AccessControlList> access,
+                                                     CriteriaType criteriaType) {
         LOG.debug("Finding WorkbasketInput fields for caseType={}", caseTypeId);
 
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         List<CriteriaInput> criteriaInputs;
         if (criteriaType.equals(WORKBASKET)) {
-            WorkbasketInputFieldsDefinition workbasketInputFieldsDefinition = uiDefinitionRepository.getWorkbasketInputDefinitions(caseTypeId);
+            WorkbasketInputFieldsDefinition workbasketInputFieldsDefinition =
+                uiDefinitionRepository.getWorkbasketInputDefinitions(caseTypeId);
             criteriaInputs = workbasketInputFieldsDefinition.getFields()
                 .stream()
                 .map(field -> toCriteriaInput(field, caseTypeDefinition, criteriaType))
                 .collect(toList());
         } else if (criteriaType.equals(SEARCH)) {
-            final SearchInputFieldsDefinition searchInputFieldsDefinition = uiDefinitionRepository.getSearchInputFieldDefinitions(caseTypeId);
+            final SearchInputFieldsDefinition searchInputFieldsDefinition =
+                uiDefinitionRepository.getSearchInputFieldDefinitions(caseTypeId);
             criteriaInputs = searchInputFieldsDefinition.getFields()
                 .stream()
                 .map(field -> toCriteriaInput(field, caseTypeDefinition, criteriaType))
@@ -68,7 +73,8 @@ public class DefaultGetCriteriaOperation implements GetCriteriaOperation {
         return criteriaInputs;
     }
 
-    private CriteriaInput toCriteriaInput(final CriteriaField in, final CaseTypeDefinition caseTypeDefinition, CriteriaType criteriaType) {
+    private CriteriaInput toCriteriaInput(final CriteriaField in, final CaseTypeDefinition caseTypeDefinition,
+                                          CriteriaType criteriaType) {
         CriteriaInput result;
         if (criteriaType.equals(WORKBASKET)) {
             result = new WorkbasketInput();
@@ -80,10 +86,13 @@ public class DefaultGetCriteriaOperation implements GetCriteriaOperation {
         result.setRole(in.getRole());
 
         CaseFieldDefinition caseFieldDefinition = caseTypeDefinition.getCaseField(in.getCaseFieldId())
-            .orElseThrow(() -> new BadRequestException(format(CASE_FIELD_NOT_FOUND, in.getCaseFieldId(), in.getCaseFieldPath())));
+            .orElseThrow(() -> new BadRequestException(format(CASE_FIELD_NOT_FOUND, in.getCaseFieldId(),
+                in.getCaseFieldPath())));
 
-        CaseFieldDefinition caseFieldDefinitionByPath = (CaseFieldDefinition) caseFieldDefinition.getComplexFieldNestedField(in.getCaseFieldPath())
-            .orElseThrow(() -> new BadRequestException(format(CASE_FIELD_NOT_FOUND, caseFieldDefinition.getId(), in.getCaseFieldPath())));
+        CaseFieldDefinition caseFieldDefinitionByPath =
+            (CaseFieldDefinition) caseFieldDefinition.getComplexFieldNestedField(in.getCaseFieldPath())
+            .orElseThrow(() -> new BadRequestException(
+                format(CASE_FIELD_NOT_FOUND, caseFieldDefinition.getId(), in.getCaseFieldPath())));
 
         result.setDisplayContextParameter(
             Strings.isNullOrEmpty(in.getCaseFieldPath())

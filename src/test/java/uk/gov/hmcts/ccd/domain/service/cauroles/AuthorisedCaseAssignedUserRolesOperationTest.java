@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
+import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.ccd.domain.service.cauroles.rolevalidator.CaseAssignedUserRoleValidator;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseRoleAccessException;
 
@@ -32,19 +33,23 @@ class AuthorisedCaseAssignedUserRolesOperationTest {
         authorisedCaseAssignedUserRolesOperation = new AuthorisedCaseAssignedUserRolesOperation(
             defaultCaseAssignedUserRolesOperation,
             caseAssignedUserRoleValidator);
-        when(defaultCaseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList())).thenReturn(createCaseAssignedUserRoles());
+        when(defaultCaseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList()))
+                .thenReturn(createCaseAssignedUserRoles());
     }
 
     @Test
     void shouldCallDefaultAddCaseUserRoles() {
         // ARRANGE
-        List<CaseAssignedUserRole> caseAssignedUserRoles = createCaseAssignedUserRoles();
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRolesRequests = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(),
+            new CaseAssignedUserRoleWithOrganisation()
+        );
 
         // ACT
-        authorisedCaseAssignedUserRolesOperation.addCaseUserRoles(caseAssignedUserRoles);
+        authorisedCaseAssignedUserRolesOperation.addCaseUserRoles(caseUserRolesRequests);
 
         // ASSERT
-        verify(defaultCaseAssignedUserRolesOperation).addCaseUserRoles(caseAssignedUserRoles);
+        verify(defaultCaseAssignedUserRolesOperation).addCaseUserRoles(caseUserRolesRequests);
     }
 
     @Test
@@ -74,6 +79,18 @@ class AuthorisedCaseAssignedUserRolesOperationTest {
             CaseRoleAccessException.class, () -> authorisedCaseAssignedUserRolesOperation
                 .findCaseUserRoles(caseIds, userIds)
         );
+    }
+
+    @Test
+    void shouldCallDefaultremoveCaseUserRoles() {
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRolesRequests = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(),
+                new CaseAssignedUserRoleWithOrganisation()
+        );
+
+        authorisedCaseAssignedUserRolesOperation.removeCaseUserRoles(caseUserRolesRequests);
+
+        verify(defaultCaseAssignedUserRolesOperation).removeCaseUserRoles(caseUserRolesRequests);
     }
 
     private List<CaseAssignedUserRole> createCaseAssignedUserRoles() {

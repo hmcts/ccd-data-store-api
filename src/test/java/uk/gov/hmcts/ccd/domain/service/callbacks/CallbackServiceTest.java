@@ -15,16 +15,22 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
+
+import java.time.Duration;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doReturn;
@@ -34,11 +40,14 @@ import static org.mockito.Mockito.when;
 class CallbackServiceTest {
 
     public static final String URL = "/test-callback.*";
+    public static final CallbackType CALLBACK_TYPE = CallbackType.ABOUT_TO_START;
     @Mock
     private SecurityUtils securityUtils;
 
     @Mock
     private RestTemplate restTemplate;
+    @Mock
+    private AppInsights appinsights;
 
     @Mock
     private Authentication authentication;
@@ -71,7 +80,7 @@ class CallbackServiceTest {
         callbackResponse.setData(caseDetails.getData());
 
         initSecurityContext();
-        callbackService = new CallbackService(securityUtils, restTemplate);
+        callbackService = new CallbackService(securityUtils, restTemplate, appinsights);
 
         final ResponseEntity<CallbackResponse> responseEntity = new ResponseEntity<>(callbackResponse, HttpStatus.OK);
         when(restTemplate
@@ -82,7 +91,7 @@ class CallbackServiceTest {
     @Test
     @DisplayName("Should set ignore warning flag in callback request if set by client")
     public void shouldSetIgnoreWarningsFlagInCallbackRequestIfSetByClient() throws Exception {
-        callbackService.send(URL, caseEventDefinition, null, caseDetails, true);
+        callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, true);
 
         verify(restTemplate).exchange(eq(URL), eq(HttpMethod.POST), argument.capture(), eq(CallbackResponse.class));
         assertThat(argument.getValue().getBody(), hasProperty("ignoreWarning", is(true)));
@@ -91,7 +100,7 @@ class CallbackServiceTest {
     @Test
     @DisplayName("Should not set ignore warning flag in callback request if not set by client")
     public void shouldNotSetIgnoreWarningsFlagInCallbackRequestIfNotSetByClient() throws Exception {
-        callbackService.send(URL, caseEventDefinition, null, caseDetails, false);
+        callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, false);
 
         verify(restTemplate).exchange(eq(URL), eq(HttpMethod.POST), argument.capture(), eq(CallbackResponse.class));
         assertThat(argument.getValue().getBody(), hasProperty("ignoreWarning", is(false)));
@@ -100,10 +109,34 @@ class CallbackServiceTest {
     @Test
     @DisplayName("Should not set ignore warning flag in callback request if null set by client")
     public void shouldNotSetIgnoreWarningsFlagInCallbackRequestIfNullSetByClient() throws Exception {
-        callbackService.send(URL, caseEventDefinition, null, caseDetails, (Boolean)null);
+        callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
 
         verify(restTemplate).exchange(eq(URL), eq(HttpMethod.POST), argument.capture(), eq(CallbackResponse.class));
         assertThat(argument.getValue().getBody(), hasProperty("ignoreWarning", nullValue()));
+    }
+
+    @Test
+    @DisplayName("Should track callback event")
+    public void shouldTrackCallbackEvent() throws Exception {
+        callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
+
+        verify(appinsights).trackCallbackEvent(eq(CALLBACK_TYPE), eq(URL), eq("200"), any(Duration.class));
+    }
+
+    @Test
+    @DisplayName("Should track callback event on exception")
+    public void shouldTrackCallbackEventOnException() throws Exception {
+        when(restTemplate
+            .exchange(eq(URL), eq(HttpMethod.POST), isA(HttpEntity.class), eq(CallbackResponse.class)))
+            .thenThrow(new HttpStatusCodeException(HttpStatus.BAD_REQUEST) {
+            });
+
+        try {
+            callbackService.send(URL, CALLBACK_TYPE, caseEventDefinition, null, caseDetails, (Boolean)null);
+        } catch (CallbackException ex) {
+            verify(appinsights).trackCallbackEvent(eq(CALLBACK_TYPE), eq(URL), eq("400"), any(Duration.class));
+        }
+
     }
 
     private void initSecurityContext() {

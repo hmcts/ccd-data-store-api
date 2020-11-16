@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd;
 
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,20 +9,27 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
-import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
+import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.security.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.ccd.security.filters.SecurityLoggingFilter;
 import uk.gov.hmcts.ccd.security.filters.V1EndpointsPathParamSecurityFilter;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
+
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
 @EnableWebSecurity
@@ -38,18 +43,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final ServiceAuthFilter serviceAuthFilter;
     private final V1EndpointsPathParamSecurityFilter v1EndpointsPathParamSecurityFilter;
+    private final SecurityLoggingFilter securityLoggingFilter;
     private JwtAuthenticationConverter jwtAuthenticationConverter;
 
     private static final String[] AUTH_WHITELIST = {
-        "/swagger-ui.html",
-        "/webjars/springfox-swagger-ui/**",
-        "/swagger-resources/**",
         "/v2/**",
-        "/health",
         "/health/liveness",
-        "/status/health",
+        "/health/readiness",
+        "/health",
         "/loggers/**",
-        "/"
+        "/",
+        "/swagger-resources/**",
+        "/swagger-ui/**",
+        "/webjars/**"
     };
 
     @Inject
@@ -57,9 +63,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                                  final ServiceAuthFilter serviceAuthFilter,
                                  final Function<HttpServletRequest, Optional<String>> userIdExtractor,
                                  final Function<HttpServletRequest, Collection<String>> authorizedRolesExtractor,
-                                 final SecurityUtils securityUtils) {
+                                 final SecurityUtils securityUtils,
+                                 @Value("${security.logging.filter.path.regex}") String loggingFilterPathRegex) {
         this.v1EndpointsPathParamSecurityFilter = new V1EndpointsPathParamSecurityFilter(
             userIdExtractor, authorizedRolesExtractor, securityUtils);
+        this.securityLoggingFilter = new SecurityLoggingFilter(securityUtils, loggingFilterPathRegex);
         this.serviceAuthFilter = serviceAuthFilter;
         jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
@@ -74,7 +82,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
         http
             .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
-            .addFilterAfter(v1EndpointsPathParamSecurityFilter, BearerTokenAuthenticationFilter.class)
+            .addFilterAfter(securityLoggingFilter, BearerTokenAuthenticationFilter.class)
+            .addFilterAfter(v1EndpointsPathParamSecurityFilter, SecurityLoggingFilter.class)
             .sessionManagement().sessionCreationPolicy(STATELESS).and()
             .csrf().disable()
             .formLogin().disable()

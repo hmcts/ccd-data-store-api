@@ -1,0 +1,20 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="rdm-9696" runInTransaction="false" author="suman.sreenivasan@hmcts.net">
+        <sql dbms="postgresql"
+             endDelimiter="\nGO"
+             splitStatements="true"
+             stripComments="true">
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_languagePreferenceWelsh ON public.case_data USING btree (btrim(upper((data #>> '{languagePreferenceWelsh}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_interlocReferralDate ON public.case_data USING btree (btrim(upper((data #>> '{interlocReferralDate}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_translationWorkOutstanding ON public.case_data USING btree (btrim(upper((data #>> '{translationWorkOutstanding}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_welsh_dnout_d8_sol_apply ON public.case_data USING btree (btrim(upper((data #>> '{{LanguagePreferenceWelsh}}'::text[]))), btrim(upper((data #>> '{DnOutcomeCase}'::text[]))), btrim(upper((data #>> '{D8DivorceUnit}'::text[]))), btrim(upper((data #>> '{SolPaymentHowToPay}'::text[]))), btrim(upper((data #>> '{ApplyForDecreeAbsolute}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_Probate_applicationSubmittedDate ON public.case_data USING btree (btrim(upper((data #>> '{applicationSubmittedDate}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_cmc_previousServiceCaseReference ON public.case_data USING btree (jurisdiction,case_type_id,(btrim(upper((data #>> '{previousServiceCaseReference}'::text[]))))) WHERE jurisdiction='CMC' AND case_type_id='MoneyClaimCase';
+            DROP INDEX IF EXISTS idx_case_data_welsh_dnoutcomecase_solhowtopay_applyforda;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

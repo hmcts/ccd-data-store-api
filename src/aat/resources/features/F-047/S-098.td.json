@@ -1,25 +1,27 @@
 {
-  "title": "must return 200 and an empty list of no case is found",
-  "_guid_": "S-098",
-  "_extends_": "F-047_Test_Data_Base",
-  "specs": [
-    "an active profile in CCD",
-    "contains an userId which doesn't have access to the case",
-    "contains an empty list of case ids, along with an HTTP-200 OK"
-  ],
+	"_guid_": "S-098",
+	"_extends_": "F-047_Test_Data_Base",
+	"title": "must return 200 and an empty list of no case is found",
 
-  "request": {
-    "queryParams": {
-      "userId": "NoAccessGrantedForCase"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_200_Response",
-    "headers": {
-      "Vary": "Accept-Encoding"
-    },
-    "body": {
-      "arrayInMap": []
-    }
-  }
+	"specs": [
+		"an active profile in CCD",
+		"contains an userId which doesn't have access to the case",
+		"contains an empty list of case ids, along with an HTTP-200 OK"
+	],
+
+	"request": {
+		"queryParams": {
+			"userId": "NoAccessGrantedForCase"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Vary": "Accept-Encoding"
+		},
+		"body": {
+			"arrayInMap": []
+		}
+	}
 }

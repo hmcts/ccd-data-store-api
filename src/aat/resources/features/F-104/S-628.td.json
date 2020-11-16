@@ -114,12 +114,17 @@
                     "read" : true,
                     "update" : true,
                     "delete" : false
+                  },{
+                    "role" : "[DEFENDANT]",
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : false
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 }, {
                   "id" : "AddressLine2",
                   "label" : "Address Line 2",
@@ -160,12 +165,17 @@
                     "read" : true,
                     "update" : true,
                     "delete" : false
+                  },{
+                    "role" : "[DEFENDANT]",
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : false
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 }, {
                   "id" : "AddressLine3",
                   "label" : "Address Line 3",
@@ -206,12 +216,17 @@
                     "read" : true,
                     "update" : true,
                     "delete" : false
+                  },{
+                    "role" : "[DEFENDANT]",
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : false
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 }, {
                   "id" : "PostTown",
                   "label" : "Town or City",
@@ -252,12 +267,17 @@
                     "read" : true,
                     "update" : true,
                     "delete" : false
-                  } ],
+                  },{
+                      "role" : "[DEFENDANT]",
+                      "create" : true,
+                      "read" : true,
+                      "update" : true,
+                      "delete" : false
+                    }],
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 }, {
                   "id" : "County",
                   "label" : "County",
@@ -298,12 +318,17 @@
                     "read" : true,
                     "update" : true,
                     "delete" : false
+                  },{
+                    "role" : "[DEFENDANT]",
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : false
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 }, {
                   "id" : "PostCode",
                   "label" : "Postcode/Zipcode",
@@ -344,12 +369,17 @@
                     "read" : true,
                     "update" : true,
                     "delete" : false
+                  },{
+                    "role" : "[DEFENDANT]",
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : false
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 }, {
                   "id" : "Country",
                   "label" : "Country",
@@ -390,12 +420,17 @@
                     "read" : true,
                     "update" : true,
                     "delete" : false
+                  },{
+                    "role" : "[DEFENDANT]",
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : false
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 } ],
                 "collection_field_type" : null
               },
@@ -453,12 +488,17 @@
                     "read" : true,
                     "update" : true,
                     "delete" : false
+                  },{
+                    "role" : "[DEFENDANT]",
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : false
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 }, {
                   "id" : "ComplexFixedListField",
                   "label" : "A `FixedList` field inside a complex",
@@ -474,6 +514,10 @@
                     "max" : null,
                     "regular_expression" : null,
                     "fixed_list_items" : [ {
+                      "code" : "VALUE4",
+                      "label" : "Value 4",
+                      "order" : null
+                    },{
                       "code" : "VALUE3",
                       "label" : "Value 3",
                       "order" : null
@@ -511,12 +555,17 @@
                     "read" : true,
                     "update" : true,
                     "delete" : false
+                  },{
+                    "role" : "[DEFENDANT]",
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : false
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 }, {
                   "id" : "ComplexNestedField",
                   "label" : "A `Complex` field inside a complex",
@@ -572,12 +621,17 @@
                         "read" : true,
                         "update" : true,
                         "delete" : false
+                      },{
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       } ],
                       "complexACLs" : [ ],
                       "display_context" : null,
                       "display_context_parameter" : null,
-                      "formatted_value" : null,
-                      "default_value" : null
+                      "formatted_value" : null
                     }, {
                       "id" : "NestedCollectionTextField",
                       "label" : "A `Collection` field of `Text` inside a nested complex",
@@ -627,12 +681,17 @@
                         "read" : true,
                         "update" : true,
                         "delete" : false
+                      },{
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       } ],
                       "complexACLs" : [ ],
                       "display_context" : null,
                       "display_context_parameter" : null,
-                      "formatted_value" : null,
-                      "default_value" : null
+                      "formatted_value" : null
                     } ],
                     "collection_field_type" : null
                   },
@@ -658,12 +717,17 @@
                     "read" : true,
                     "update" : true,
                     "delete" : false
+                  },{
+                    "role" : "[DEFENDANT]",
+                    "create" : true,
+                    "read" : true,
+                    "update" : true,
+                    "delete" : false
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 } ],
                 "collection_field_type" : null
               },
@@ -880,10 +944,14 @@
                 "max" : null,
                 "regular_expression" : null,
                 "fixed_list_items" : [ {
-                  "code" : "VALUE3",
-                  "label" : "Value 3",
-                  "order" : null
-                }, {
+                      "code" : "VALUE4",
+                      "label" : "Value 4",
+                      "order" : null
+                    },{
+                      "code" : "VALUE3",
+                      "label" : "Value 3",
+                      "order" : null
+                    }, {
                   "code" : "VALUE2",
                   "label" : "Value 2",
                   "order" : null

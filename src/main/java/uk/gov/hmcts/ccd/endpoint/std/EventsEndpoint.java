@@ -32,7 +32,8 @@ public class EventsEndpoint {
     }
 
     @Transactional
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events", method = RequestMethod.GET)
+    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
+        method = RequestMethod.GET)
     @ApiOperation(value = "Get events for case", notes = "Retrieve all events for a case")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Events found for the given ID"),

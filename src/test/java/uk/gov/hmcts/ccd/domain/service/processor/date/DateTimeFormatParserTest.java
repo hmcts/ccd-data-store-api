@@ -20,7 +20,9 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.powermock.api.mockito.PowerMockito.when;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.*;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATE;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DATETIME;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class DateTimeFormatParserTest {
@@ -327,7 +329,8 @@ class DateTimeFormatParserTest {
 
     @Test
     void shouldCreateTextNodeForDateTime_ToIso() {
-        TextNode result = dateTimeFormatParser.valueToTextNode("2010", BaseType.get(DATETIME), "FieldId", "yyyy", true);
+        TextNode result =
+            dateTimeFormatParser.valueToTextNode("2010", BaseType.get(DATETIME), "FieldId", "yyyy", true);
 
         assertAll(
             () -> assertThat(result.asText(), is("2010-01-01T00:00:00.000"))
@@ -336,7 +339,8 @@ class DateTimeFormatParserTest {
 
     @Test
     void shouldCreateTextNodeForDate_FromIso() {
-        TextNode result = dateTimeFormatParser.valueToTextNode("2010-01-01", BaseType.get(DATE), "FieldId", "yyyy", false);
+        TextNode result =
+            dateTimeFormatParser.valueToTextNode("2010-01-01", BaseType.get(DATE), "FieldId", "yyyy", false);
 
         assertAll(
             () -> assertThat(result.asText(), is("2010"))
@@ -345,7 +349,8 @@ class DateTimeFormatParserTest {
 
     @Test
     void shouldCreateTextNodeForDateTime_FromIso() {
-        TextNode result = dateTimeFormatParser.valueToTextNode("2010-01-01T00:00:00.000", BaseType.get(DATETIME), "FieldId", "yyyy", false);
+        TextNode result = dateTimeFormatParser.valueToTextNode("2010-01-01T00:00:00.000", BaseType.get(DATETIME),
+            "FieldId", "yyyy", false);
 
         assertAll(
             () -> assertThat(result.asText(), is("2010"))
@@ -390,7 +395,8 @@ class DateTimeFormatParserTest {
 
         assertAll(
             () -> assertThat(exception.getDetails(),
-                is("Unable to process field FieldId with value abc. Expected format to be either dd/MM/yyyy or yyyy-MM-dd'T'HH:mm:ss.SSS"))
+                is("Unable to process field FieldId with value abc. Expected format to be either dd/MM/yyyy or "
+                    + "yyyy-MM-dd'T'HH:mm:ss.SSS"))
         );
     }
 
@@ -402,7 +408,8 @@ class DateTimeFormatParserTest {
 
         assertAll(
             () -> assertThat(exception.getDetails(),
-                is("Unable to process field FieldId with value abc. Expected format to be either dd/MM/yyyy or yyyy-MM-dd"))
+                is("Unable to process field FieldId with value abc. Expected format to be either dd/MM/yyyy or "
+                    + "yyyy-MM-dd"))
         );
     }
 
@@ -426,7 +433,8 @@ class DateTimeFormatParserTest {
 
         assertAll(
             () -> assertThat(exception.getDetails(),
-                is("Unable to process field FieldId with value abc. Expected format to be either dd/MM/yyyy or yyyy-MM-dd'T'HH:mm:ss.SSS"))
+                is("Unable to process field FieldId with value abc. Expected format to be either dd/MM/yyyy or "
+                    + "yyyy-MM-dd'T'HH:mm:ss.SSS"))
         );
     }
 
@@ -438,7 +446,8 @@ class DateTimeFormatParserTest {
 
         assertAll(
             () -> assertThat(exception.getDetails(),
-                is("Unable to process field FieldId with value abc. Expected format to be either dd/MM/yyyy or yyyy-MM-dd"))
+                is("Unable to process field FieldId with value abc. Expected format to be either dd/MM/yyyy or "
+                    + "yyyy-MM-dd"))
         );
     }
 

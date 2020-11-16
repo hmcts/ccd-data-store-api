@@ -7,7 +7,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class ElasticsearchMappingsTest {
@@ -17,10 +18,12 @@ class ElasticsearchMappingsTest {
     @BeforeEach
     void setUp() {
         ElasticsearchMappings.TypeMappings typeMappings = new ElasticsearchMappings.TypeMappings(
-            Arrays.asList("Text", "TextArea", "FixedList", "FixedListEdit", "MultiSelectList", "FixedRadioList", "DynamicList")
+            Arrays.asList("Text", "TextArea", "FixedList", "FixedListEdit", "MultiSelectList", "FixedRadioList",
+                    "DynamicList")
         );
 
-        ElasticsearchMappings.CasePredefinedMappings casePredefinedMappings = new ElasticsearchMappings.CasePredefinedMappings(
+        ElasticsearchMappings.CasePredefinedMappings casePredefinedMappings =
+                new ElasticsearchMappings.CasePredefinedMappings(
             Arrays.asList("reference", "jurisdiction", "state", "case_type_id")
         );
 

@@ -14,7 +14,7 @@ import java.time.Clock;
 @SpringBootApplication
 @EnableTransactionManagement(proxyTargetClass = true)
 @EnableRetry
-@ComponentScan({ "uk.gov.hmcts.ccd", "springfox" })
+@ComponentScan({ "uk.gov.hmcts.ccd" })
 @EnableCaching
 @EnableHypermediaSupport(type = { EnableHypermediaSupport.HypermediaType.HAL })
 public class CoreCaseDataApplication {
@@ -29,10 +29,12 @@ public class CoreCaseDataApplication {
     public static void main(String[] args) {
 
         if (System.getProperty(LOGGING_LEVEL_CCD) != null) {
-//            Configurator.setLevel(LOGGING_LEVEL_CCD, Level.valueOf(System.getProperty(LOGGING_LEVEL_CCD).toUpperCase()));
+//          Configurator.setLevel(LOGGING_LEVEL_CCD,
+//                                Level.valueOf(System.getProperty(LOGGING_LEVEL_CCD).toUpperCase()));
         }
         if (System.getProperty(LOGGING_LEVEL_SPRINGFRAMEWORK) != null) {
-//            Configurator.setLevel(LOGGING_LEVEL_SPRINGFRAMEWORK, Level.valueOf(System.getProperty(LOGGING_LEVEL_SPRINGFRAMEWORK).toUpperCase()));
+//          Configurator.setLevel(LOGGING_LEVEL_SPRINGFRAMEWORK,
+//                                Level.valueOf(System.getProperty(LOGGING_LEVEL_SPRINGFRAMEWORK).toUpperCase()));
         }
         SpringApplication.run(CoreCaseDataApplication.class, args);
     }

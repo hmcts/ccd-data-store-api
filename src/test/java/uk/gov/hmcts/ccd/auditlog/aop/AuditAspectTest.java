@@ -69,7 +69,8 @@ public class AuditAspectTest {
 
         public static final String JURISDICTION = "PROBATE";
 
-        @LogAudit(operationType = AuditOperationType.CASE_ACCESSED, caseId = "#reference",caseType = "#result.caseTypeId",
+        @LogAudit(operationType = AuditOperationType.CASE_ACCESSED, caseId = "#reference",
+            caseType = "#result.caseTypeId",
             jurisdiction = "#result.jurisdiction", eventName = "#eventName")
         public CaseDetails getCase(String reference, String eventName) {
             CaseDetails caseDetails = new CaseDetails();
@@ -78,7 +79,8 @@ public class AuditAspectTest {
             return caseDetails;
         }
 
-        @LogAudit(operationType = AuditOperationType.CREATE_CASE, caseType = "#caseType", targetIdamId = "#targetIdamId")
+        @LogAudit(operationType = AuditOperationType.CREATE_CASE, caseType = "#caseType",
+            targetIdamId = "#targetIdamId")
         public CaseDetails createCase(String caseType, String targetIdamId) {
             throw new RuntimeException("get case failed");
         }
