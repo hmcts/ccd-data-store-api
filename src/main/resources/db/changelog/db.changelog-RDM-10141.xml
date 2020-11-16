@@ -46,7 +46,6 @@
         CREATE INDEX IF NOT EXISTS idx_case_data_sscs_surname ON public.case_data USING btree (btrim(upper((data #>> '{surname}'::text[]))));
         CREATE INDEX IF NOT EXISTS idx_case_data_sscs_urgentCase ON public.case_data USING btree (btrim(upper((data #>> '{urgentCase}'::text[]))));
         CREATE INDEX IF NOT EXISTS idx_case_data_sscs_createdInGapsFrom ON public.case_data USING btree (btrim(upper((data #>> '{createdInGapsFrom}'::text[]))));
-        CREATE INDEX IF NOT EXISTS idx_case_data_last_state_modified_date ON case_data (last_state_modified_date);
 
         CREATE INDEX IF NOT EXISTS idx_case_data_sscs_subscriptionsjp_tya ON public.case_data USING btree (btrim(upper((data #>> '{subscriptions,jointPartySubscription,tya}'::text[]))));
 
