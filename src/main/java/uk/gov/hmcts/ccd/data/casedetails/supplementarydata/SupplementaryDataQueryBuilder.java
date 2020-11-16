@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.vladmihalcea.hibernate.type.json.JsonNodeBinaryType;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Properties;
 import java.util.regex.Pattern;
 import javax.persistence.EntityManager;
