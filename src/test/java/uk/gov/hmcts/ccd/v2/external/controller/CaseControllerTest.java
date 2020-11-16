@@ -91,7 +91,7 @@ class CaseControllerTest {
 
         when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(TRUE);
         when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.of(caseDetails));
-        when(createEventOperation.createCaseEvent(CASE_REFERENCE, CASE_DATA_CONTENT)).thenReturn(caseDetails);
+        when(createEventOperation.createCaseEvent(CASE_REFERENCE, null, CASE_DATA_CONTENT)).thenReturn(caseDetails);
         when(createCaseOperation.createCaseDetails(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING))
             .thenReturn(caseDetails);
         List<AuditEvent> auditEvents = Lists.newArrayList(new AuditEvent(), new AuditEvent());
@@ -169,7 +169,7 @@ class CaseControllerTest {
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
-            when(createEventOperation.createCaseEvent(CASE_REFERENCE, CASE_DATA_CONTENT))
+            when(createEventOperation.createCaseEvent(CASE_REFERENCE, null, CASE_DATA_CONTENT))
                 .thenThrow(RuntimeException.class);
 
             assertThrows(Exception.class,

@@ -41,6 +41,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
 
     @Override
     public CaseDetails createCaseEvent(final String caseReference,
+                                       final String onBehalfOfUser,
                                        final CaseDataContent content) {
         eventValidator.validate(content.getEvent());
 

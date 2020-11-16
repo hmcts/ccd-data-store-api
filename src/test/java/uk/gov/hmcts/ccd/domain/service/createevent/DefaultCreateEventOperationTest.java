@@ -144,7 +144,7 @@ class DefaultCreateEventOperationTest {
                 caseDetailsBefore,
                 caseDetails);
 
-        final CaseDetails caseDetails = createEventOperation.createCaseEvent(CASE_REFERENCE, caseDataContent);
+        final CaseDetails caseDetails = createEventOperation.createCaseEvent(CASE_REFERENCE, null, caseDataContent);
 
         assertAll(
             () -> verify(callbackInvoker).invokeSubmittedCallback(caseEventDefinition, caseDetailsBefore,
@@ -165,7 +165,7 @@ class DefaultCreateEventOperationTest {
                 caseDetailsBefore,
                 caseDetails);
 
-        final CaseDetails caseDetails = createEventOperation.createCaseEvent(CASE_REFERENCE, caseDataContent);
+        final CaseDetails caseDetails = createEventOperation.createCaseEvent(CASE_REFERENCE, null, caseDataContent);
 
         assertAll(
             () -> assertNull(caseDetails.getAfterSubmitCallbackResponse()),

@@ -214,7 +214,7 @@ class CaseDetailsEndpointTest {
         final CaseDetails toBeReturned = new CaseDetails();
         doReturn(toBeReturned).when(createEventOperation).createCaseEvent(
             CASE_ID,
-            EVENT_DATA);
+                null, EVENT_DATA);
 
         final CaseDetails output = endpoint.createCaseEventForCaseWorker(
             UID,
@@ -227,7 +227,7 @@ class CaseDetailsEndpointTest {
             () -> assertThat(output, sameInstance(toBeReturned)),
             () -> verify(createEventOperation).createCaseEvent(
                 CASE_ID,
-                EVENT_DATA)
+                    null, EVENT_DATA)
         );
     }
 

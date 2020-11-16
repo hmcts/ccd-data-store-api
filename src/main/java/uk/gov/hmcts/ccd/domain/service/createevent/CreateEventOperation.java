@@ -5,5 +5,6 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 public interface CreateEventOperation {
     CaseDetails createCaseEvent(String caseReference,
+                                String onBehalfOfUser,
                                 CaseDataContent caseDataContent);
 }
