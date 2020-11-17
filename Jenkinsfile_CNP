@@ -106,6 +106,10 @@ withPipeline(type, product, component) {
     onPR {
         enableSlackNotifications('#ccd-pr-builds')
     }
+    
+    if (env.BRANCH_NAME.toLowerCase() == dataStoreApiDevelopPr.toLowerCase()) {
+        enableSlackNotifications('#ccd-develop-builds')
+    }   
 
     // Check if the build should be wired to an environment higher than 'preview'.
     if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc' || prsToUseAat.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
