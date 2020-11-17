@@ -3,7 +3,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
 
-    <changeSet id="rdm-10141-1" author="sita.kandala@hmcts.net">
+    <changeSet id="rdm-10141-1" runInTransaction="false" author="sita.kandala@hmcts.net">
         <sql dbms="postgresql"
              endDelimiter="\nGO"
              splitStatements="true"
@@ -53,10 +53,10 @@
             CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_user_user_id ON case_users (user_id);
 
             DROP INDEX IF EXISTS idx_case_data_generated_surname;
-            DROP INDEX IF EXISTS idx_case_data_welsh_dnoutcomecase_solhowtopay_applyforda  ;
+            DROP INDEX IF EXISTS idx_case_data_welsh_dnoutcomecase_solhowtopay_applyforda;
             DROP INDEX IF EXISTS idx_case_data_welsh_dnout_d8_sol_apply;
             DROP INDEX IF EXISTS idx_case_data_interlocreferraldate;
-            DROP INDEX IF EXISTS idx_case_data_isscottishcase ;
+            DROP INDEX IF EXISTS idx_case_data_isscottishcase;
             DROP INDEX IF EXISTS idx_case_data_application_type;
 
         </sql>
