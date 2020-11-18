@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.mockito.ArgumentCaptor;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -26,9 +27,14 @@ import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
+import uk.gov.hmcts.ccd.v2.V2;
+import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.containing;
+import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
@@ -38,6 +44,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -59,6 +66,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     private static final String REQUEST_ID = "request-id";
     private static final String REQUEST_ID_VALUE = "1234567898765432";
     public static final String ROLE_PROBATE_SOLICITOR = "caseworker-probate-solicitor";
+    private static final String UID_WITH_EVENT_ACCESS = "123";
 
     @Inject
     private WebApplicationContext wac;
@@ -146,6 +154,45 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
         assertThat(captor.getValue().getEventSelected(), is("HAS_PRE_STATES_EVENT"));
         assertThat(captor.getValue().getRequestId(), is(REQUEST_ID_VALUE));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldSaveOnBehalfOfUserAndProxiedByUser() throws Exception {
+        String caseId = "1504259907353529";
+        final String URL =  "/cases/" + caseId + "/events";
+
+        UserInfo userInfo = UserInfo.builder()
+            .uid("TestUserId")
+            .givenName("firstname")
+            .familyName("familyname")
+            .build();
+        stubFor(WireMock.get(urlMatching("/o/userinfo"))
+            .withHeader(HttpHeaders.AUTHORIZATION, containing("Test_Token"))
+            .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent()
+            .withCaseReference(caseId)
+            .withOnBehalfOfUserToken("Test_Token")
+            .withEvent(anEvent()
+                .withEventId("HAS_PRE_STATES_EVENT")
+                .withSummary("Short comment")
+                .build())
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "HAS_PRE_STATES_EVENT"))
+            .build();
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .header(EXPERIMENTAL_HEADER, "experimental")
+            .header(REQUEST_ID, REQUEST_ID_VALUE)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsString(caseDetailsToSave))
+        ).andReturn();
+
+        assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String content = mvcResult.getResponse().getContentAsString();
+        CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
+        assertNotNull("Saved Case Details should not be null", savedCaseResource);
     }
 
     @Test

@@ -170,7 +170,6 @@ public class CaseController {
     public ResponseEntity<CaseResource> createEvent(@ApiParam(value = "Case ID for which the event is being submitted",
                                                     required = true)
                                                     @PathVariable("caseId") String caseId,
-                                                    @RequestParam(value = "on_behalf_of", required = false) String onBehalfOfUser,
                                                     @ApiParam(value = "Case data content for the event. Note that the "
                                                         + "`data` property "
                                                         + "is used for event submission data; NOT the `event_data`. "
@@ -233,8 +232,7 @@ public class CaseController {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
 
-        final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseId,
-            null, content);
+        final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseId, content);
 
         return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content));
     }

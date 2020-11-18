@@ -57,7 +57,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
     @Override
     public CaseDetails createCaseEvent(String caseReference,
-                                       String onBehalfOfUser, CaseDataContent content) {
+                                       CaseDataContent content) {
 
         CaseDetails existingCaseDetails = getCaseOperation.execute(caseReference)
             .orElseThrow(() -> new ResourceNotFoundException("Case not found"));
@@ -76,7 +76,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
         verifyUpsertAccess(content.getEvent(), content.getData(), existingCaseDetails, caseTypeDefinition, userRoles);
 
-        final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseReference, onBehalfOfUser, content);
+        final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseReference, content);
         return verifyReadAccess(caseTypeDefinition, userRoles, caseDetails);
     }
 

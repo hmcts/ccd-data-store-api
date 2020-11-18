@@ -34,6 +34,9 @@ public class CaseDataContent {
     @JsonProperty("case_reference")
     private String caseReference;
 
+    @JsonProperty("on_behalf_of_token")
+    private String onBehalfOfUserToken;
+
     public Event getEvent() {
         return event;
     }
@@ -109,5 +112,13 @@ public class CaseDataContent {
 
     public void setCaseReference(String caseReference) {
         this.caseReference = caseReference;
+    }
+
+    public String getOnBehalfOfUserToken() {
+        return onBehalfOfUserToken;
+    }
+
+    public void setOnBehalfOfUserToken(String onBehalfOfUserToken) {
+        this.onBehalfOfUserToken = onBehalfOfUserToken;
     }
 }

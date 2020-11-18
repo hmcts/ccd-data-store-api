@@ -89,6 +89,12 @@ public class DefaultUserRepository implements UserRepository {
     }
 
     @Override
+    public IdamUser getUser(String userToken) {
+        UserInfo userInfo = securityUtils.getUserInfo(userToken);
+        return toIdamUser(userInfo);
+    }
+
+    @Override
     public Set<String> getUserRoles() {
         LOG.debug("retrieving user roles");
 

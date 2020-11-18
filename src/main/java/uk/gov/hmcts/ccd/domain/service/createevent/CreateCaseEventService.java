@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -29,8 +30,8 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
@@ -156,7 +157,8 @@ public class CreateCaseEventService {
             caseEventDefinition,
             savedCaseDetails,
             caseTypeDefinition,
-            timeNow);
+            timeNow,
+            content.getOnBehalfOfUserToken());
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsBefore)
@@ -248,8 +250,10 @@ public class CreateCaseEventService {
                                               final Event event,
                                               final CaseEventDefinition caseEventDefinition,
                                               final CaseDetails caseDetails,
-                                              final CaseTypeDefinition caseTypeDefinition, LocalDateTime timeNow) {
-        final IdamUser user = userRepository.getUser();
+                                              final CaseTypeDefinition caseTypeDefinition,
+                                              final LocalDateTime timeNow,
+                                              final String onBehalfOfUserToken) {
+
         final CaseStateDefinition caseStateDefinition =
             caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
         final AuditEvent auditEvent = new AuditEvent();
@@ -264,15 +268,29 @@ public class CreateCaseEventService {
         auditEvent.setStateName(caseStateDefinition.getName());
         auditEvent.setCaseTypeId(caseTypeDefinition.getId());
         auditEvent.setCaseTypeVersion(caseTypeDefinition.getVersion().getNumber());
-        auditEvent.setUserId(user.getId());
-        auditEvent.setUserLastName(user.getSurname());
-        auditEvent.setUserFirstName(user.getForename());
         auditEvent.setCreatedDate(timeNow);
         auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseTypeDefinition,
             caseEventDefinition));
         auditEvent.setDataClassification(caseDetails.getDataClassification());
         auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
+        saveUserDetails(onBehalfOfUserToken, auditEvent);
 
         caseAuditEventRepository.set(auditEvent);
+    }
+
+    private void saveUserDetails(String onBehalfOfUserToken, AuditEvent auditEvent) {
+        boolean onBehalfOfUserTokenExists = !StringUtils.isEmpty(onBehalfOfUserToken);
+        IdamUser user = onBehalfOfUserTokenExists
+            ? userRepository.getUser(onBehalfOfUserToken)
+            : userRepository.getUser();
+        auditEvent.setUserId(user.getId());
+        auditEvent.setUserLastName(user.getSurname());
+        auditEvent.setUserFirstName(user.getForename());
+        if (onBehalfOfUserTokenExists) {
+            user = userRepository.getUser();
+            auditEvent.setProxiedBy(user.getId());
+            auditEvent.setProxiedByLastName(user.getForename());
+            auditEvent.setProxiedByFirstName(user.getSurname());
+        }
     }
 }
