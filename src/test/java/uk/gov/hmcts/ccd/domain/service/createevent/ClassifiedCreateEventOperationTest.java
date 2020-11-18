@@ -44,7 +44,7 @@ class ClassifiedCreateEventOperationTest {
 
         caseDetails = new CaseDetails();
         doReturn(caseDetails).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
-                CASE_DATA_CONTENT);
+                                                                         CASE_DATA_CONTENT);
 
         classifiedCase = new CaseDetails();
         doReturn(Optional.of(classifiedCase)).when(classificationService).applyClassification(caseDetails);
@@ -57,20 +57,20 @@ class ClassifiedCreateEventOperationTest {
     @DisplayName("should call decorated operation")
     void shouldCallDecoratedOperation() {
         classifiedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
-                CASE_DATA_CONTENT);
+                                                       CASE_DATA_CONTENT);
 
         verify(createEventOperation).createCaseEvent(CASE_REFERENCE,
-                CASE_DATA_CONTENT);
+                                                     CASE_DATA_CONTENT);
     }
 
     @Test
     @DisplayName("should return null when decorated operation returns null")
     void shouldReturnNullWhenOperationReturnsNull() {
         doReturn(null).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
-                CASE_DATA_CONTENT);
+                                                                  CASE_DATA_CONTENT);
 
         final CaseDetails output = classifiedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
-                CASE_DATA_CONTENT);
+                                                                                  CASE_DATA_CONTENT);
 
         assertThat(output, is(nullValue()));
     }
@@ -80,7 +80,7 @@ class ClassifiedCreateEventOperationTest {
     void shouldReturnClassifiedCaseDetails() {
 
         final CaseDetails output = classifiedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
-                CASE_DATA_CONTENT);
+                                                                                  CASE_DATA_CONTENT);
 
         assertAll(
             () -> assertThat(output, sameInstance(classifiedCase)),
@@ -95,7 +95,7 @@ class ClassifiedCreateEventOperationTest {
         doReturn(Optional.empty()).when(classificationService).applyClassification(caseDetails);
 
         final CaseDetails output = classifiedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
-                CASE_DATA_CONTENT);
+                                                                                  CASE_DATA_CONTENT);
 
         assertThat(output, is(nullValue()));
     }

@@ -374,7 +374,7 @@ public class CaseDetailsEndpoint {
         @PathVariable("cid") final String caseId,
         @RequestBody final CaseDataContent content) {
         return createEventOperation.createCaseEvent(caseId,
-            content);
+                                                    content);
     }
 
     @Transactional
@@ -403,7 +403,7 @@ public class CaseDetailsEndpoint {
         @PathVariable("cid") final String caseId,
         @RequestBody final CaseDataContent content) {
         return createEventOperation.createCaseEvent(caseId,
-            content);
+                                                    content);
     }
 
     @Transactional

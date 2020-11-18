@@ -132,7 +132,7 @@ class AuthorisedCreateEventOperationTest {
         Map<String, JsonNode> classifiedData = Maps.newHashMap();
         classifiedCase.setData(classifiedData);
         doReturn(classifiedCase).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
-                CASE_DATA_CONTENT);
+            CASE_DATA_CONTENT);
         caseTypeDefinition.setEvents(events);
         caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
@@ -166,10 +166,10 @@ class AuthorisedCreateEventOperationTest {
     void shouldCallDecoratedOperation() {
 
         authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
-                CASE_DATA_CONTENT);
+            CASE_DATA_CONTENT);
 
         verify(createEventOperation).createCaseEvent(CASE_REFERENCE,
-                CASE_DATA_CONTENT);
+            CASE_DATA_CONTENT);
     }
 
     @Test
@@ -185,9 +185,9 @@ class AuthorisedCreateEventOperationTest {
     @DisplayName("should return null when decorated operation returns null")
     void shouldReturnNullWhenOperationReturnsNull() {
         doReturn(null).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
-                CASE_DATA_CONTENT);
+            CASE_DATA_CONTENT);
         final CaseDetails output = authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
-                CASE_DATA_CONTENT);
+            CASE_DATA_CONTENT);
 
         assertThat(output, is(nullValue()));
     }
@@ -197,7 +197,7 @@ class AuthorisedCreateEventOperationTest {
     void shouldReturnAuthorisedCaseDetailsIfCreateEventAndCreateUpdateAndReadAccessGranted() {
 
         final CaseDetails output = authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
-                CASE_DATA_CONTENT);
+            CASE_DATA_CONTENT);
         InOrder inOrder = inOrder(caseDefinitionRepository, caseAccessService, getCaseOperation,
             createEventOperation, accessControlService);
         assertAll(
@@ -218,7 +218,7 @@ class AuthorisedCreateEventOperationTest {
                 eq(caseFieldDefinitions),
                 eq(USER_ROLES)),
             () -> inOrder.verify(createEventOperation).createCaseEvent(CASE_REFERENCE,
-                    CASE_DATA_CONTENT),
+                CASE_DATA_CONTENT),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
                 eq(USER_ROLES),
                 eq(CAN_READ)),
@@ -235,11 +235,11 @@ class AuthorisedCreateEventOperationTest {
     void shouldReturnNullCaseDetailsWhenNoCaseTypeAccess() {
 
         doReturn(null).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
-                CASE_DATA_CONTENT);
+            CASE_DATA_CONTENT);
 
 
         final CaseDetails output = authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
-                CASE_DATA_CONTENT);
+            CASE_DATA_CONTENT);
 
         assertThat(output, is(nullValue()));
     }
@@ -251,7 +251,7 @@ class AuthorisedCreateEventOperationTest {
         doReturn(null).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
 
         assertThrows(ValidationException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
-                CASE_DATA_CONTENT));
+            CASE_DATA_CONTENT));
     }
 
     @Test
@@ -261,7 +261,7 @@ class AuthorisedCreateEventOperationTest {
         doReturn(Collections.EMPTY_SET).when(caseAccessService).getUserRoles();
 
         assertThrows(ValidationException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
-                CASE_DATA_CONTENT));
+            CASE_DATA_CONTENT));
     }
 
     @Test
@@ -329,7 +329,7 @@ class AuthorisedCreateEventOperationTest {
             eq(CAN_READ))).thenReturn(false);
 
         final CaseDetails caseDetails = authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
-                CASE_DATA_CONTENT);
+            CASE_DATA_CONTENT);
         assertThat(caseDetails, is(nullValue()));
     }
 }
