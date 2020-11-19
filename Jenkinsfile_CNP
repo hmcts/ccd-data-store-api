@@ -40,7 +40,7 @@ def secrets = [
         secret('ccd-restricted-cross-case-type-caseworker-email', 'CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_EMAIL'),
         secret('ccd-restricted-cross-case-type-caseworker-password', 'CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_PASSWORD'),
         secret('ccd-api-gateway-oauth2-client-secret', 'OAUTH2_CLIENT_SECRET'),
-        secret('TEST-DATA-RELOAD-FREQUENCY', 'TEST_DATA_RELOAD_FREQUENCY'),
+        secret('default-test-data-load-skip-period', 'DEFAULT_TEST_DATA_LOAD_SKIP_PERIOD'),
 
         //Required for FTA test RDM-6943
         secret('ccd-befta-caseworker-2-solicitor-1-pwd', 'CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD'),
