@@ -80,6 +80,7 @@
 		<cve>CVE-2020-13943</cve>
 		<cve>CVE-2016-10750</cve>
 		<cve>CVE-2020-7020</cve>
+		<cve>CVE-2020-26168</cve>
 	</suppress>
 	<suppress>
 		<notes><![CDATA[
