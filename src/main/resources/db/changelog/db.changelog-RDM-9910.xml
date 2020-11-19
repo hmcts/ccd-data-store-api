@@ -19,7 +19,7 @@
             $$ LANGUAGE plpgsql;
 
             CREATE TRIGGER trg_case_data_updated
-            BEFORE INSERT OR UPDATE OF data, data_classification, last_modified, last_state_modified, security_classification, state, supplementary_data ON case_data
+            BEFORE INSERT OR UPDATE OF data, data_classification, last_modified, last_state_modified_date, security_classification, state, supplementary_data ON case_data
             FOR EACH ROW EXECUTE PROCEDURE set_case_data_db_ls_processed();
 
             ALTER TABLE case_data DROP COLUMN supplementary_data_last_modified;
