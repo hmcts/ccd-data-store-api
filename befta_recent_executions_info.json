@@ -1,1 +1,5 @@
-{"lastExecutionTime":"2020-11-04T12:09:39.379","lastExecutionProjectRepo":"origin\tgit@github.com:hmcts/ccd-data-store-api.git (fetch)","lastExecutionProjectBranch":"RDM-8934-timebasedReExecutionOfTestData"}
+{
+  "lastExecutionTime" : "2020-11-18T22:53:33.954",
+  "lastExecutionProjectRepo" : "ccd-data-store-api",
+  "lastExecutionProjectBranch" : "RDM-8934-timebasedReExecutionOfTestData"
+}
