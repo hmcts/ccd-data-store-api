@@ -11,7 +11,8 @@ import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-@SuppressWarnings({"checkstyle:SummaryJavadoc", "squid:common-java:DuplicatedBlocks"}) // Javadoc predates checkstyle implementation in module
+// Javadoc predates checkstyle implementation in module
+@SuppressWarnings({"checkstyle:SummaryJavadoc", "squid:common-java:DuplicatedBlocks"})
 public class AuditEvent extends Event {
     @JsonIgnore
     private Long id;
