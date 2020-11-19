@@ -6,23 +6,21 @@
             endDelimiter="\nGO"
             splitStatements="true"
             stripComments="true">
-            ALTER TABLE case_data ADD db_last_modified timestamp;
+            ALTER TABLE case_data ADD ls_processed boolean DEFAULT false;
 
-            CREATE INDEX idx_db_last_modified ON case_data (db_last_modified);
+            UPDATE case_data SET ls_processed = true;
 
-            UPDATE case_data SET db_last_modified = last_modified;
-
-            CREATE OR REPLACE FUNCTION set_case_data_db_last_modified()
+            CREATE OR REPLACE FUNCTION set_case_data_db_ls_processed()
             RETURNS TRIGGER AS $$
             BEGIN
-                NEW.db_last_modified := now();
+                NEW.ls_processed := false;
                 RETURN NEW;
             END
             $$ LANGUAGE plpgsql;
 
             CREATE TRIGGER trg_case_data_updated
-            BEFORE INSERT OR UPDATE ON case_data
-            FOR EACH ROW EXECUTE PROCEDURE set_case_data_db_last_modified();
+            BEFORE INSERT OR UPDATE OF data, data_classification, last_modified, last_state_modified, security_classification, state, supplementary_data ON case_data
+            FOR EACH ROW EXECUTE PROCEDURE set_case_data_db_ls_processed();
 
             ALTER TABLE case_data DROP COLUMN supplementary_data_last_modified;
         </sql>
