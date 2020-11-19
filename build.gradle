@@ -159,7 +159,7 @@ dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.2'
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
 
-    compile group: 'org.liquibase', name: 'liquibase-core', version: '3.8.9'
+    compile group: 'org.liquibase', name: 'liquibase-core', version: '3.10.3'
     compile group: 'org.yaml', name: 'snakeyaml', version: '1.26'
     compile group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.1'
@@ -226,13 +226,12 @@ dependencies {
     compile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
     }
-    compile(group: 'org.elasticsearch', name: 'elasticsearch', version: '6.8.12') {
+    compile(group: 'org.elasticsearch', name: 'elasticsearch', version: '6.8.13') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
-
-
     testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: 'RDM-8934-V1'
+
 }
 // end::dependencies[]
 
@@ -246,7 +245,7 @@ dependencyManagement {
         dependency 'com.google.guava:guava:24.1.1-jre'
 
         // CVE-2019-0232 - Java and Command Line injections in Windows
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.37') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.38') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
