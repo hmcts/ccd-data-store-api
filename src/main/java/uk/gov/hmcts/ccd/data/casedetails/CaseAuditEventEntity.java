@@ -38,6 +38,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_ID_
 })
 @Table(name = "case_event")
 @Entity
+@SuppressWarnings({"squid:common-java:DuplicatedBlocks"})
 public class CaseAuditEventEntity {
 
     static final String FIND_BY_CASE_DATA_ID_HQL = "SELECT cae FROM CaseAuditEventEntity cae"
