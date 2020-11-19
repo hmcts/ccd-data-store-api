@@ -1,14 +1,13 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
+import java.util.Map;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-
-import java.util.List;
-import java.util.Map;
 
 @ToString
 public class CaseViewField implements CommonField {
