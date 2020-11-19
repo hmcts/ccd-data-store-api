@@ -3,9 +3,6 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
-import lombok.ToString;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +10,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.ToString;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
