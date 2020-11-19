@@ -87,7 +87,7 @@ ext {
     appInsightsVersion = '2.4.1'
     swagger2Version = '3.0.0'
     hibernateVersion = '5.4.18.Final!!'
-    hazelcastVersion = '4.0'
+    hazelcastVersion = '4.0.3'
     limits = [
             'instruction': 90,
             'branch'     : 85,
