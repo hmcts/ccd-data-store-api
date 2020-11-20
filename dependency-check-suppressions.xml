@@ -12,6 +12,7 @@
 		<cve>CVE-2007-1652</cve>  <!-- new, temporary -->
 		<cve>CVE-2020-13943</cve>  <!-- new, temporary -->
 		<cve>CVE-2020-7020</cve>
+		<cve>CVE-2020-26168</cve>
 	</suppress>
 
 </suppressions>
