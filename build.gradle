@@ -232,7 +232,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.20.0'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.15.1'
 
 }
 // end::dependencies[]
@@ -536,7 +536,7 @@ jsonSchema2Pojo {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "build/generated-sources/**/*.java,**/AuditRepository.java"
+        property "sonar.exclusions", "build/generated-sources/**/*.java,**/AuditRepository.java,**/ReadinessHealthIndicator.java"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
