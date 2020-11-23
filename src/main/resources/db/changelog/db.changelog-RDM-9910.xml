@@ -8,9 +8,9 @@
             stripComments="true">
             ALTER TABLE case_data ADD ls_processed boolean DEFAULT false;
 
-            UPDATE case_data SET ls_processed = true;
+            CREATE INDEX idx_case_data_ls_processed ON case_data (ls_processed);
 
-            CREATE OR REPLACE FUNCTION set_case_data_db_ls_processed()
+            CREATE OR REPLACE FUNCTION set_case_data_ls_processed()
             RETURNS TRIGGER AS $$
             BEGIN
                 NEW.ls_processed := false;
