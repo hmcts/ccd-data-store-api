@@ -230,7 +230,7 @@ dependencies {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.23.2-RDM-8934'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.23.3-RDM-8934'
 
 }
 // end::dependencies[]
