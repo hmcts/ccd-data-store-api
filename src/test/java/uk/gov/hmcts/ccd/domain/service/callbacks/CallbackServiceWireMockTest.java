@@ -290,7 +290,7 @@ public class CallbackServiceWireMockTest extends WireMockBaseTest {
 
         // Builds a new callback service to avoid wiremock exception to get in the way
         final CallbackService underTest = new CallbackService(Mockito.mock(SecurityUtils.class), restTemplate,
-            Mockito.mock(AppInsights.class));
+            Mockito.mock(ApplicationParams.class), Mockito.mock(AppInsights.class));
         final CaseDetails caseDetails = new CaseDetails();
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setId("TEST-EVENT");
