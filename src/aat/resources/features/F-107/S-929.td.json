@@ -40,7 +40,8 @@
           "OrgPolicyCaseAssignedRole": "[Defendant]",
           "OrgPolicyReference": "ref",
           "Organisation": {
-            "OrganisationID": "[[ANYTHING_PRESENT]]"
+            "OrganisationID": "[[ANYTHING_PRESENT]]",
+            "OrganisationName": "[[ANYTHING_PRESENT]]"
           }
         },
         "TextAreaField": "[[ANYTHING_PRESENT]]",
@@ -48,7 +49,8 @@
           "OrgPolicyCaseAssignedRole": "[Claimant]",
           "OrgPolicyReference": "ref",
           "Organisation": {
-            "OrganisationID": "[[ANYTHING_PRESENT]]"
+            "OrganisationID": "[[ANYTHING_PRESENT]]",
+            "OrganisationName": "[[ANYTHING_PRESENT]]"
           }
         }
       },
@@ -71,7 +73,8 @@
             "Organisation": {
               "classification": "PUBLIC",
               "value": {
-                "OrganisationID": "PUBLIC"
+                "OrganisationID": "PUBLIC",
+                "OrganisationName": "PUBLIC"
               }
             }
           }
@@ -85,7 +88,8 @@
             "Organisation": {
               "classification": "PUBLIC",
               "value": {
-                "OrganisationID": "PUBLIC"
+                "OrganisationID": "PUBLIC",
+                "OrganisationName": "PUBLIC"
               }
             }
           }
