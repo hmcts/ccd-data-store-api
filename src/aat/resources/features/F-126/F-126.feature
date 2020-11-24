@@ -1,4 +1,4 @@
-@F-126 @currentrun
+@F-126
 Feature: F-126: On Behalf Of User and Proxied by User on event creation
 
     Background: Load test data for the scenario
