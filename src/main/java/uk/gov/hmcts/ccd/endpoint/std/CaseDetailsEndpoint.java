@@ -30,6 +30,7 @@ import uk.gov.hmcts.ccd.domain.service.search.PaginatedSearchMetaDataOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import uk.gov.hmcts.ccd.domain.service.startevent.StartEventOperation;
 import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
+import uk.gov.hmcts.ccd.domain.service.validate.DefaultValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -76,7 +77,7 @@ public class CaseDetailsEndpoint {
                                @Qualifier("authorised") final StartEventOperation startEventOperation,
                                @Qualifier(AuthorisedSearchOperation.QUALIFIER) final SearchOperation searchOperation,
                                final FieldMapSanitizeOperation fieldMapSanitizeOperation,
-                               final ValidateCaseFieldsOperation validateCaseFieldsOperation,
+                               @Qualifier(DefaultValidateCaseFieldsOperation.QUALIFIER) final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                final DocumentsOperation documentsOperation,
                                final PaginatedSearchMetaDataOperation paginatedSearchMetaDataOperation,
                                final MidEventCallback midEventCallback,

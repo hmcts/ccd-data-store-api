@@ -7,18 +7,21 @@ import javax.inject.Singleton;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
+import uk.gov.hmcts.ccd.domain.service.validate.DefaultValidateCaseFieldsOperation;
 
 @Named
 @Singleton
+@Qualifier(UIDefinitionRepository.QUALIFIER)
 public class UIDefinitionRepository {
 
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CachedUIDefinitionGateway cachedUiDefinitionGateway;
 
+    public static final String QUALIFIER = "default";
+
     @Inject
-    UIDefinitionRepository(@Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                           final CaseDefinitionRepository caseDefinitionRepository,
-                           CachedUIDefinitionGateway cachedUiDefinitionGateway) {
+    public UIDefinitionRepository(@Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                           final CaseDefinitionRepository caseDefinitionRepository, @Qualifier(CachedUIDefinitionGateway.QUALIFIER) CachedUIDefinitionGateway cachedUiDefinitionGateway) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.cachedUiDefinitionGateway = cachedUiDefinitionGateway;
     }

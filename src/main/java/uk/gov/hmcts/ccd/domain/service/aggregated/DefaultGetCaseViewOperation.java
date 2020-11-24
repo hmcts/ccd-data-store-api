@@ -42,7 +42,7 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
     @Autowired
     public DefaultGetCaseViewOperation(@Qualifier(CreatorGetCaseOperation.QUALIFIER) GetCaseOperation getCaseOperation,
                                        @Qualifier("authorised") GetEventsOperation getEventsOperation,
-                                       UIDefinitionRepository uiDefinitionRepository,
+                                       @Qualifier(UIDefinitionRepository.QUALIFIER) UIDefinitionRepository uiDefinitionRepository,
                                        CaseTypeService caseTypeService,
                                        EventTriggerService eventTriggerService,
                                        UIDService uidService,

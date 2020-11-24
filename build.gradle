@@ -32,6 +32,7 @@ plugins {
     id "org.jetbrains.gradle.plugin.idea-ext" version "0.7"
     id "info.solidsoft.pitest" version '1.4.0'
     id "io.freefair.lombok" version "5.1.0"
+    id 'au.com.dius.pact' version '4.1.0'
 }
 
 apply plugin: 'java'
@@ -52,6 +53,10 @@ apply plugin: 'se.patrikerdes.use-latest-versions'
 apply plugin: 'org.owasp.dependencycheck'
 
 apply from: 'liquibase.gradle'
+
+def versions = [
+        pact_version: '3.5.25'
+]
 
 pmd {
     toolVersion = '6.11.0'
@@ -139,6 +144,8 @@ configurations {
 
     aatCompile.extendsFrom(testCompile)
     aatRuntime.extendsFrom(testRuntime)
+    contractTestCompile.extendsFrom(testCompile)
+    contractTestRuntime.extendsFrom(testRuntime)
     cucumberRuntime.extendsFrom(functionalRuntime)
 }
 
@@ -268,6 +275,10 @@ dependencies {
 
     testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.3.0'
 
+    contractTestCompile group: 'au.com.dius', name: 'pact-jvm-provider-spring_2.12', version: versions.pact_version
+    contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+    contractTestRuntime group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+
 }
 // end::dependencies[]
 
@@ -304,6 +315,8 @@ dependencyManagement {
             entry 'groovy-xml'
             entry 'groovy-json'
         }
+
+
     }
 }
 
@@ -720,6 +733,17 @@ sourceSets {
             srcDir('src/aat/resources')
         }
     }
+
+    contractTest {
+        java {
+            srcDir('src/contractTest/java')
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+        }
+        resources {
+            srcDir('src/contractTest/resources')
+        }
+    }
 }
 
 task smoke() {
@@ -787,6 +811,23 @@ task functional() {
     outputs.upToDateWhen { false }
 }
 
+task contractTest(type: Test) {
+    logger.lifecycle("Runnning contract Tests")
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.contractTest.output.classesDirs
+    classpath = sourceSets.contractTest.runtimeClasspath
+
+}
+
+task runProviderPactVerification(type: Test) {
+    logger.lifecycle("Runs pact Tests")
+    testClassesDirs = sourceSets.contractTest.output.classesDirs
+}
+
+runProviderPactVerification.dependsOn contractTest
+
+runProviderPactVerification.finalizedBy pactVerify
+
 def timestamp() {
     def date = new Date()
     return date.format('yyyy-MM-dd HH:mm:ss')
@@ -802,6 +843,8 @@ repositories {
 }
 dependencies {
     codacy 'com.github.codacy:codacy-coverage-reporter:-SNAPSHOT'
+
+
 }
 task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
     main = "com.codacy.CodacyCoverageReporter"

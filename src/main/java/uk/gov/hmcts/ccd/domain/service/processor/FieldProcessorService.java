@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.processor;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.collections.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
@@ -23,7 +24,7 @@ public class FieldProcessorService {
     @Autowired
     public FieldProcessorService(final List<CaseDataFieldProcessor> caseDataFieldProcessors,
                                  final List<CaseViewFieldProcessor> caseViewFieldProcessors,
-                                 final UIDefinitionRepository uiDefinitionRepository,
+                                 @Qualifier(UIDefinitionRepository.QUALIFIER) final UIDefinitionRepository uiDefinitionRepository,
                                  final EventTriggerService eventTriggerService) {
         this.caseDataFieldProcessors = caseDataFieldProcessors;
         this.caseViewFieldProcessors = caseViewFieldProcessors;

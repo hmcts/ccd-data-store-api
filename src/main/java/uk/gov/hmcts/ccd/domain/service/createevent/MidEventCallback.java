@@ -38,7 +38,7 @@ public class MidEventCallback {
 
     @Autowired
     public MidEventCallback(CallbackInvoker callbackInvoker,
-                            UIDefinitionRepository uiDefinitionRepository,
+                            @Qualifier(UIDefinitionRepository.QUALIFIER) UIDefinitionRepository uiDefinitionRepository,
                             EventTriggerService eventTriggerService,
                             @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
                             CaseService caseService) {

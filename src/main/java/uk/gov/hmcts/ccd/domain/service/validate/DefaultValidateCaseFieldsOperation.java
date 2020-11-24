@@ -19,7 +19,10 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 @Service
+@Qualifier(DefaultValidateCaseFieldsOperation.QUALIFIER)
 public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOperation {
+
+    public static final String QUALIFIER = "default";
 
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseTypeService caseTypeService;
@@ -27,7 +30,7 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
     public static final String ORGANISATION_POLICY_ROLE = "OrgPolicyCaseAssignedRole";
 
     @Inject
-    DefaultValidateCaseFieldsOperation(
+    public DefaultValidateCaseFieldsOperation(
         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
         final CaseTypeService caseTypeService,
         final FieldProcessorService fieldProcessorService

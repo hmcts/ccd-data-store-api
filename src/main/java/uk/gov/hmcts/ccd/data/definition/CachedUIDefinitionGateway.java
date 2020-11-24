@@ -12,15 +12,17 @@ import uk.gov.hmcts.ccd.domain.model.definition.*;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 
 @Named
-@Qualifier("Cache")
+@Qualifier(CachedUIDefinitionGateway.QUALIFIER)
 @Singleton
 public class CachedUIDefinitionGateway implements UIDefinitionGateway {
+
+    public static final String QUALIFIER = "Cache";
 
     private static final Logger LOG = LoggerFactory.getLogger(CachedUIDefinitionGateway.class);
     private UIDefinitionGateway httpUiDefinitionGateway;
 
     @Inject
-    CachedUIDefinitionGateway(@Qualifier("Http") UIDefinitionGateway httpUiDefinitionGateway) {
+    public CachedUIDefinitionGateway(@Qualifier("Http") UIDefinitionGateway httpUiDefinitionGateway) {
         this.httpUiDefinitionGateway = httpUiDefinitionGateway;
     }
 

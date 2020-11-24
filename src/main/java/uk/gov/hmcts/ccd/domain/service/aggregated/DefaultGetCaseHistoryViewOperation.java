@@ -34,7 +34,7 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
     public DefaultGetCaseHistoryViewOperation(
         @Qualifier(CreatorGetCaseOperation.QUALIFIER) GetCaseOperation getCaseOperation,
         @Qualifier("authorised") GetEventsOperation getEventsOperation,
-        UIDefinitionRepository uiDefinitionRepository, CaseTypeService caseTypeService,
+        @Qualifier(UIDefinitionRepository.QUALIFIER) UIDefinitionRepository uiDefinitionRepository, CaseTypeService caseTypeService,
         UIDService uidService,
         DefaultObjectMapperService defaultObjectMapperService,
         CompoundFieldOrderService compoundFieldOrderService,

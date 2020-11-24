@@ -34,7 +34,7 @@ import static javax.transaction.Transactional.TxType.REQUIRES_NEW;
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 @Service
-class SubmitCaseTransaction {
+public class SubmitCaseTransaction {
 
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;

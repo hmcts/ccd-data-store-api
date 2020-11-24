@@ -28,6 +28,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.domain.service.validate.DefaultValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
@@ -61,7 +62,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
                                       final CaseSanitiser caseSanitiser,
                                       final CaseTypeService caseTypeService,
                                       final CallbackInvoker callbackInvoker,
-                                      final ValidateCaseFieldsOperation validateCaseFieldsOperation,
+                                      @Qualifier(DefaultValidateCaseFieldsOperation.QUALIFIER) final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                       @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -107,32 +108,46 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
 
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId, caseDataContent);
 
-        final CaseDetails newCaseDetails = new CaseDetails();
-
-        newCaseDetails.setCaseTypeId(caseTypeId);
-        newCaseDetails.setJurisdiction(caseTypeDefinition.getJurisdictionId());
-        newCaseDetails.setState(caseEventDefinition.getPostState());
-        newCaseDetails.setSecurityClassification(caseTypeDefinition.getSecurityClassification());
-        Map<String, JsonNode> data = caseDataContent.getData();
-        newCaseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition, data));
-        newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(
-            caseTypeDefinition,
-            newCaseDetails.getData(),
-            EMPTY_DATA_CLASSIFICATION));
-
-        final IdamUser idamUser = userRepository.getUser();
-        final CaseDetails savedCaseDetails = submitCaseTransaction.submitCase(event,
-                                                                              caseTypeDefinition,
-                                                                              idamUser,
-                                                                              caseEventDefinition,
-                                                                              newCaseDetails,
-                                                                              ignoreWarning);
+        final CaseDetails savedCaseDetails =
+            submitCaseDetails(caseTypeId, caseDataContent, ignoreWarning, event, caseTypeDefinition, caseEventDefinition);
 
         submittedCallback(caseEventDefinition, savedCaseDetails);
 
         deleteDraft(caseDataContent, savedCaseDetails);
 
         return savedCaseDetails;
+    }
+
+    public CaseDetails submitCaseDetails(String caseTypeId, CaseDataContent caseDataContent, Boolean ignoreWarning, Event event,
+                                          CaseTypeDefinition caseTypeDefinition, CaseEventDefinition caseEventDefinition) {
+        final CaseDetails newCaseDetails =
+            getCaseDetails(caseTypeId, caseDataContent, caseTypeDefinition, caseEventDefinition);
+        Map<String, JsonNode> data = caseDataContent.getData();
+        newCaseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition, data));
+        newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(
+            caseTypeDefinition,
+            newCaseDetails.getData(),
+            EMPTY_DATA_CLASSIFICATION));
+        final IdamUser idamUser = userRepository.getUser();
+        final CaseDetails savedCaseDetails = submitCaseTransaction.submitCase(event,
+            caseTypeDefinition,
+                                                                              idamUser,
+            caseEventDefinition,
+                                                                              newCaseDetails,
+            ignoreWarning);
+        return savedCaseDetails;
+    }
+
+    protected CaseDetails getCaseDetails(String caseTypeId, CaseDataContent caseDataContent, CaseTypeDefinition caseTypeDefinition,
+                                       CaseEventDefinition caseEventDefinition) {
+        final CaseDetails newCaseDetails = new CaseDetails();
+
+        newCaseDetails.setCaseTypeId(caseTypeId);
+        newCaseDetails.setJurisdiction(caseTypeDefinition.getJurisdictionId());
+        newCaseDetails.setState(caseEventDefinition.getPostState());
+        newCaseDetails.setSecurityClassification(caseTypeDefinition.getSecurityClassification());
+
+        return newCaseDetails;
     }
 
     private void deleteDraft(CaseDataContent caseDataContent, CaseDetails savedCaseDetails) {

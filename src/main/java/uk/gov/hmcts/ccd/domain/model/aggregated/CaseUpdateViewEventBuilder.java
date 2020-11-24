@@ -29,7 +29,7 @@ public class CaseUpdateViewEventBuilder {
     private final FieldProcessorService fieldProcessorService;
 
     public CaseUpdateViewEventBuilder(@Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
-                                      final UIDefinitionRepository uiDefinitionRepository,
+                                      @Qualifier(UIDefinitionRepository.QUALIFIER) final UIDefinitionRepository uiDefinitionRepository,
                                       final EventTriggerService eventTriggerService,
                                       final CaseViewFieldBuilder caseViewFieldBuilder,
                                       final FieldProcessorService fieldProcessorService) {

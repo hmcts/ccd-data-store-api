@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.search;
 
 import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
@@ -22,7 +23,7 @@ public class SearchResultDefinitionService {
     private final UIDefinitionRepository uiDefinitionRepository;
 
     @Autowired
-    public SearchResultDefinitionService(UIDefinitionRepository uiDefinitionRepository) {
+    public SearchResultDefinitionService(@Qualifier(UIDefinitionRepository.QUALIFIER) UIDefinitionRepository uiDefinitionRepository) {
         this.uiDefinitionRepository = uiDefinitionRepository;
     }
 
