@@ -1,26 +1,8 @@
 {
-	"title": "must return 200 for event creation request with on_behalf_of user",
-	"_guid_": "S-1261",
-	"_extends_": "F126_Update_Case_With_On_Behalf_Of_User",
-  "productName": "CCD Data Store api",
-  "operationName": "Post Event Data",
-
-	"specs": [
-		"an active profile in CCD",
-		"contains on_behalf_of user token"
-	],
-  "users": {
-    "solicitor3": {
-      "username": "befta.caseworker.2.solicitor.3@gmail.com",
-      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
-    }
-  },
-
-  "request": {
-    "body": {
-      "data": {
-        "on_behalf_of": "${[scenarioContext][testData][users][solicitor3][accessToken]}"
-      }
-    }
-  }
+  "title": "Must get event data after updating with on_behalf_of user",
+  "_guid_": "S-1261",
+  "_extends_": "F126_Get_CaseEvent_With_On_Behalf_Of_User",
+  "specs": [
+    "an active profile in CCD"
+  ]
 }

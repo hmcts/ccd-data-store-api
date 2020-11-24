@@ -1,47 +1,15 @@
 {
-	"_guid_": "F-126_Prerequisite_Citizen_Token_For_Update_Case",
-	"title": "should create an event token for correct inputs",
-
-	"productName": "CCD Data Store",
-	"operationName": "Retrieve a create token",
-
-	"method": "GET",
-	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+	"_guid_": "F126_Prerequisite_Citizen_Token_For_Update_Case",
+	"title": "should create an update event token",
+  "_extends_": "Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Update_Solicitor_1",
 
 	"specs": [
-		"to get an update event token for the case just created"
+		"to get an event token for the case just created"
 	],
 
-	"users": {
-		"invokingUser": {
-			"username": "befta.citizen.2@gmail.com",
-			"password": "[[$CCD_BEFTA_CITIZEN_2_PWD]]"
-		}
-	},
-
 	"request": {
-		"headers": {
-			"_extends_": "Common_Request_Headers"
-		},
 		"pathVariables": {
-			"uid": "[[DEFAULT_AUTO_VALUE]]",
-			"jid": "BEFTA_JURISDICTION_2",
-			"ctid": "BEFTA_CASETYPE_2_1",
-			"cid": "${[scenarioContext][parentContext][childContexts][Befta_Jurisdiction2_Default_Citizen_Case_Creation_Data][testData][actualResponse][body][id]}",
-			"etid": "UPDATE"
-		}
-	},
-
-	"expectedResponse": {
-		"_extends_": "Common_200_Response",
-		"headers": {
-			"Content-Encoding": "gzip",
-			"Content-Length": "[[ANYTHING_PRESENT]]"
-		},
-		"body": {
-			"token": "[[ANYTHING_PRESENT]]",
-			"case_details": "[[ANYTHING_PRESENT]]",
-			"event_id": "UPDATE"
+      "cid": "${[scenarioContext][siblingContexts][F126_Case_Data_Create_C1][testData][actualResponse][body][id]}"
 		}
 	}
 }
