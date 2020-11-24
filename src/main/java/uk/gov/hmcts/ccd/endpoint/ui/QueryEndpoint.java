@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,7 +45,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
@@ -132,6 +132,7 @@ public class QueryEndpoint {
             .orElseThrow(() -> new ResourceNotFoundException("No case types found")));
     }
 
+    @Transactional
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions")
     @ApiOperation(value = "Get jurisdictions available to the user")
     @ApiResponses(value = {
