@@ -220,5 +220,6 @@
    ]]></notes>
         <cve>CVE-2020-10518</cve>
         <cve>CVE-2020-10517</cve>
+        <cve>CVE-2020-26168</cve>
     </suppress>
 </suppressions>
