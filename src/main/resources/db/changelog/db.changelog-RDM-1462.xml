@@ -38,7 +38,7 @@
     <changeSet id="17" author="tim.jacomb@hmcts.net">
         <dropTable tableName="case_users_audit"/>
         <createTable tableName="case_users_audit">
-            <column name="id" type="bigserial">
+            <column name="id" type="bigserial" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="case_data_id" type="bigint">
