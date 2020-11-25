@@ -15,4 +15,5 @@
 		<cve>CVE-2017-18640</cve>
 		<cve>CVE-2020-26168</cve>
 	</suppress>
+
 </suppressions>
