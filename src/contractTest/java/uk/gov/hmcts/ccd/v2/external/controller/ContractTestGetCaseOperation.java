@@ -18,7 +18,7 @@ import java.util.Optional;
 public class ContractTestGetCaseOperation extends DefaultGetCaseOperation {
 
     private String testCaseReference;
-    private ContractTestSecurityUtils contractTestSecurityUtils;
+    private final ContractTestSecurityUtils contractTestSecurityUtils;
 
 
     @Autowired
@@ -29,15 +29,10 @@ public class ContractTestGetCaseOperation extends DefaultGetCaseOperation {
 
     }
 
-    @Override
-    public Optional<CaseDetails> execute(String caseReference) {
-        contractTestSecurityUtils.setSecurityContextUserAsCaseworker();
-        return super.execute(testCaseReference);
-    }
 
     @Override
     public Optional<CaseDetails> execute(final String jurisdictionId, final String caseTypeId, final String caseReference) {
-        contractTestSecurityUtils.setSecurityContextUserAsCaseworker();
+        contractTestSecurityUtils.setSecurityContextUserAsCaseworkerForJurisdiction(jurisdictionId);
         return super.execute(jurisdictionId, caseTypeId, testCaseReference);
     }
 

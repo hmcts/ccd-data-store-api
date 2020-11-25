@@ -30,6 +30,7 @@ import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import java.util.Map;
 
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.when;
 
 
@@ -41,13 +42,16 @@ import static org.mockito.Mockito.when;
     "ccd.dm.domain=http://dm-store-aat.service.core-compute-aat.internal"
 })
 @ActiveProfiles("SECURITY_MOCK")
-@Import(CasesControllerProviderTestConfiguration.class)
 @IgnoreNoPactsToVerify
 public class CasesControllerProviderTest {
 
-    @Autowired
-    SecurityUtils securityUtils;
+    private static final String CASEWORKER_USERNAME = "caseworkerUsername";
+    private static final String CASEWORKER_PASSWORD = "caseworkerPassword";
+    private static final String CASE_DATA_CONTENT = "caseDataContent";
+    public static final String JURISDICTION_ID = "jurisdictionId";
 
+    @Autowired
+    ContractTestSecurityUtils securityUtils;
 
     @MockBean
     UserAuthorisationSecurity userAuthorisationSecurity;
@@ -103,8 +107,14 @@ public class CasesControllerProviderTest {
     @State({"A Read For Citizen is  requested"})
     public void toReadADivorceCaseCitizen(Map<String, Object> dataMap) {
 
-        securityUtils.setSecurityContextUserAsCaseworker();
-        CaseDataContent caseDataContent = objectMapper.convertValue(dataMap, CaseDataContent.class);
+        Map<String, Object> contentDataMap = (Map<String, Object>) dataMap.get(CASE_DATA_CONTENT);
+        String caseworkerUsername = (String) dataMap.get(CASEWORKER_USERNAME);
+        String caseworkerPassword = (String) dataMap.get(CASEWORKER_PASSWORD);
+        String jurisdictionId = (String)dataMap.get(JURISDICTION_ID);
+
+        securityUtils.setSecurityContextUserAsCaseworker(jurisdictionId, caseworkerUsername, caseworkerPassword);
+
+        CaseDataContent caseDataContent = objectMapper.convertValue(contentDataMap, CaseDataContent.class);
 
         CaseDetails caseDetails = defaultCreateCaseOperation.createCaseDetails("DIVORCE", caseDataContent, true);
         getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());

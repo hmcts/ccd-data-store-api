@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import uk.gov.hmcts.ccd.data.definition.CachedUIDefinitionGateway;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
@@ -10,10 +11,10 @@ import javax.inject.Singleton;
 
 @Named
 @Singleton
-@Qualifier("contractTest")
+@Primary
 public class ContractTestUIDefinitionRepository extends UIDefinitionRepository {
-    public ContractTestUIDefinitionRepository( @Qualifier("contractTest") CaseDefinitionRepository caseDefinitionRepository,
-                                               @Qualifier("contractTest") CachedUIDefinitionGateway cachedUiDefinitionGateway) {
+    public ContractTestUIDefinitionRepository( CaseDefinitionRepository caseDefinitionRepository,
+                                               CachedUIDefinitionGateway cachedUiDefinitionGateway) {
         super(caseDefinitionRepository, cachedUiDefinitionGateway);
     }
 }

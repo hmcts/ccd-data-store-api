@@ -35,30 +35,14 @@ public class SecurityUtils {
 
     private static final String AUD_CLAIM = "aud";
     private static final String BEARER = "Bearer ";
-    private static final String BASIC = "Basic ";
-    private static final String AUTHORIZATION_CODE = "authorization_code";
-    private static final String CODE = "code";
 
-    @Value("${auth.provider.client.redirect}")
-    private String authRedirectUrl;
 
-    @Value("${auth.provider.client.id}")
-    private String authClientId;
-
-    @Value("${auth.provider.client.secret}")
-    private String authClientSecret;
-
-    @Value("${auth.provider.caseworker.email}")
-    private String caseworkerUserName;
-
-    @Value("${auth.provider.caseworker.password}")
-    private String caseworkerPassword;
 
 
 
     private final AuthTokenGenerator authTokenGenerator;
     private final IdamRepository idamRepository;
-    private final IdamApi idamClient;
+    protected final IdamApi idamClient;
 
     @Autowired
     public SecurityUtils(final AuthTokenGenerator authTokenGenerator, IdamRepository idamRepository, IdamApi idamApi) {
@@ -134,37 +118,4 @@ public class SecurityUtils {
     }
 
 
-    public void setSecurityContextUserAsCaseworker() {
-        SecurityContextHolder.getContext()
-            .setAuthentication(new UsernamePasswordAuthenticationToken(caseworkerUserName, getCaseworkerToken()));
-    }
-
-    private String getCaseworkerToken() {
-        return getIdamOauth2Token(caseworkerUserName, caseworkerPassword);
-    }
-
-    private String getIdamOauth2Token(String username, String password) {
-        String basicAuthHeader = getBasicAuthHeader(username, password);
-
-        log.info("Client ID: {} . Authenticating...", authClientId);
-
-        AuthenticateUserResponse authenticateUserResponse = idamClient.authenticateUser(
-            basicAuthHeader, new AuthenticateUserRequest(CODE, authClientId, authRedirectUrl)
-        );
-
-        log.info("Authenticated. Exchanging...");
-        TokenExchangeResponse tokenExchangeResponse = idamClient.exchangeCode(new ExchangeCodeRequest(authenticateUserResponse.getCode(),
-            AUTHORIZATION_CODE,
-            authRedirectUrl,
-            authClientId,
-            authClientSecret));
-
-        log.info("Getting AccessToken...");
-        return tokenExchangeResponse.getAccessToken();
-    }
-
-    private String getBasicAuthHeader(String username, String password) {
-        String authorisation = username + ":" + password;
-        return BASIC + Base64.getEncoder().encodeToString(authorisation.getBytes());
-    }
 }

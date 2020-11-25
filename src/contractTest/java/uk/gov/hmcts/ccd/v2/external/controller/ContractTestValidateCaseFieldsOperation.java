@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -10,14 +11,14 @@ import uk.gov.hmcts.ccd.domain.service.validate.DefaultValidateCaseFieldsOperati
 import javax.inject.Inject;
 
 @Service
-@Qualifier("contractTest")
+@Primary
 public class ContractTestValidateCaseFieldsOperation extends DefaultValidateCaseFieldsOperation {
 
     @Inject
     ContractTestValidateCaseFieldsOperation(
-        @Qualifier("contractTest") final CaseDefinitionRepository caseDefinitionRepository,
+       final CaseDefinitionRepository caseDefinitionRepository,
         final CaseTypeService caseTypeService,
-        @Qualifier("contractTest") final FieldProcessorService fieldProcessorService
+        final FieldProcessorService fieldProcessorService
     ) {
 
         super(caseDefinitionRepository, caseTypeService, fieldProcessorService);

@@ -3,8 +3,10 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
+import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
@@ -27,16 +29,16 @@ import javax.inject.Inject;
 public class ContractTestCreateCaseOperation extends DefaultCreateCaseOperation {
 
     @Inject
-    public ContractTestCreateCaseOperation(@Qualifier("contractTest") UserRepository userRepository,
-                                           @Qualifier("contractTest") CaseDefinitionRepository caseDefinitionRepository,
+    public ContractTestCreateCaseOperation( @Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository,
+                                            @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
                                            EventTriggerService eventTriggerService,
                                            EventTokenService eventTokenService,
                                            CaseDataService caseDataService,
-                                           @Qualifier("contractTest") SubmitCaseTransaction submitCaseTransaction,
+                                           SubmitCaseTransaction submitCaseTransaction,
                                            CaseSanitiser caseSanitiser,
                                            CaseTypeService caseTypeService,
                                            CallbackInvoker callbackInvoker,
-                                           @Qualifier("contractTest") ValidateCaseFieldsOperation validateCaseFieldsOperation,
+                                           ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                            @Qualifier(DefaultDraftGateway.QUALIFIER) DraftGateway draftGateway) {
         super(userRepository, caseDefinitionRepository, eventTriggerService, eventTokenService, caseDataService, submitCaseTransaction, caseSanitiser,
             caseTypeService, callbackInvoker, validateCaseFieldsOperation, draftGateway);
