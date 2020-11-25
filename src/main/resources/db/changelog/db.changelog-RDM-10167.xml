@@ -5,7 +5,7 @@
 <changeSet id="RDM-10167" author="tobias.derose@hmcts.net">
     <createTable tableName="message_queue_candidates">
 
-        <column name="id" type="bigint">
+        <column name="id" type="bigint" autoIncrement="true">
             <constraints nullable="false" primaryKey="true"/>
         </column>
 
