@@ -10,6 +10,7 @@ import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 
 @Service
 @Primary
+@Qualifier("cached")
 public class ContractTestCaseDefinitionRepository extends DefaultCaseDefinitionRepository {
     public ContractTestCaseDefinitionRepository(ApplicationParams applicationParams,
                                                 SecurityUtils securityUtils,
