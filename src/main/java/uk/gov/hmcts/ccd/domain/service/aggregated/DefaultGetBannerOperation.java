@@ -16,7 +16,7 @@ public class DefaultGetBannerOperation implements GetBannerOperation {
     private final UIDefinitionRepository repository;
 
     @Autowired
-    public DefaultGetBannerOperation(@Qualifier(UIDefinitionRepository.QUALIFIER) final UIDefinitionRepository repository) {
+    public DefaultGetBannerOperation(final UIDefinitionRepository repository) {
         this.repository = repository;
     }
 

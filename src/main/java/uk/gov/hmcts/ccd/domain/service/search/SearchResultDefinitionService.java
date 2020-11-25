@@ -23,7 +23,7 @@ public class SearchResultDefinitionService {
     private final UIDefinitionRepository uiDefinitionRepository;
 
     @Autowired
-    public SearchResultDefinitionService(@Qualifier(UIDefinitionRepository.QUALIFIER) UIDefinitionRepository uiDefinitionRepository) {
+    public SearchResultDefinitionService(UIDefinitionRepository uiDefinitionRepository) {
         this.uiDefinitionRepository = uiDefinitionRepository;
     }
 

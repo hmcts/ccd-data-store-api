@@ -24,7 +24,7 @@ public class FieldProcessorService {
     @Autowired
     public FieldProcessorService(final List<CaseDataFieldProcessor> caseDataFieldProcessors,
                                  final List<CaseViewFieldProcessor> caseViewFieldProcessors,
-                                 @Qualifier(UIDefinitionRepository.QUALIFIER) final UIDefinitionRepository uiDefinitionRepository,
+                                 final UIDefinitionRepository uiDefinitionRepository,
                                  final EventTriggerService eventTriggerService) {
         this.caseDataFieldProcessors = caseDataFieldProcessors;
         this.caseViewFieldProcessors = caseViewFieldProcessors;

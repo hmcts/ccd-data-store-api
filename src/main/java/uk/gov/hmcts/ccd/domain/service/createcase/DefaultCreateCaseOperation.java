@@ -28,7 +28,6 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
-import uk.gov.hmcts.ccd.domain.service.validate.DefaultValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
@@ -62,7 +61,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
                                       final CaseSanitiser caseSanitiser,
                                       final CaseTypeService caseTypeService,
                                       final CallbackInvoker callbackInvoker,
-                                      @Qualifier(DefaultValidateCaseFieldsOperation.QUALIFIER) final ValidateCaseFieldsOperation validateCaseFieldsOperation,
+                                      final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                       @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;

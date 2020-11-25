@@ -19,10 +19,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 @Service
-@Qualifier(DefaultValidateCaseFieldsOperation.QUALIFIER)
 public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOperation {
-
-    public static final String QUALIFIER = "default";
 
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseTypeService caseTypeService;

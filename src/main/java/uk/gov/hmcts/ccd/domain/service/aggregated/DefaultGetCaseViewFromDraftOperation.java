@@ -48,7 +48,7 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
 
     @Autowired
     public DefaultGetCaseViewFromDraftOperation(@Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
-                                                @Qualifier(UIDefinitionRepository.QUALIFIER) final UIDefinitionRepository uiDefinitionRepository,
+                                                final UIDefinitionRepository uiDefinitionRepository,
                                                 final CaseTypeService caseTypeService,
                                                 final UIDService uidService,
                                                 @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,

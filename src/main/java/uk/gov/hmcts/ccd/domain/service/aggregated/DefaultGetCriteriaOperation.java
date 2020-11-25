@@ -38,7 +38,7 @@ public class DefaultGetCriteriaOperation implements GetCriteriaOperation {
     private final UIDefinitionRepository uiDefinitionRepository;
     private final CaseDefinitionRepository caseDefinitionRepository;
 
-    public DefaultGetCriteriaOperation(@Qualifier(UIDefinitionRepository.QUALIFIER) UIDefinitionRepository uiDefinitionRepository,
+    public DefaultGetCriteriaOperation(UIDefinitionRepository uiDefinitionRepository,
                                        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository) {
         this.uiDefinitionRepository = uiDefinitionRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;

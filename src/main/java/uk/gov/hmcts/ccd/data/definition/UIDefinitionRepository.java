@@ -1,27 +1,29 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
+
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import org.springframework.beans.factory.annotation.Qualifier;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
-import uk.gov.hmcts.ccd.domain.service.validate.DefaultValidateCaseFieldsOperation;
 
 @Named
 @Singleton
-@Qualifier(UIDefinitionRepository.QUALIFIER)
 public class UIDefinitionRepository {
 
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CachedUIDefinitionGateway cachedUiDefinitionGateway;
 
-    public static final String QUALIFIER = "default";
-
     @Inject
-    public UIDefinitionRepository(@Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                           final CaseDefinitionRepository caseDefinitionRepository, @Qualifier(CachedUIDefinitionGateway.QUALIFIER) CachedUIDefinitionGateway cachedUiDefinitionGateway) {
+    public UIDefinitionRepository(@Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
+                                  CachedUIDefinitionGateway cachedUiDefinitionGateway) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.cachedUiDefinitionGateway = cachedUiDefinitionGateway;
     }

@@ -16,7 +16,7 @@ public class DefaultGetJurisdictionUiConfigOperation implements GetJurisdictionU
     private final UIDefinitionRepository repository;
 
     @Autowired
-    public DefaultGetJurisdictionUiConfigOperation(@Qualifier(UIDefinitionRepository.QUALIFIER) final UIDefinitionRepository repository) {
+    public DefaultGetJurisdictionUiConfigOperation(final UIDefinitionRepository repository) {
         this.repository = repository;
     }
 
