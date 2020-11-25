@@ -18,7 +18,7 @@ Feature: F-120 Additional supplementary data property returned by ES Search APIs
     Then the response [contains supplementary data],
     And the response has all other details as expected.
 
-  @S-120.2 @Ignore
+  @S-120.2
   Scenario: standard internal search api returns supplementary data by default
     Given the request [is configured to search for the previously created case],
     And the request [does not explicitly request supplementary_data]
