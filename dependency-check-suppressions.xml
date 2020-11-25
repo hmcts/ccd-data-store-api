@@ -15,7 +15,6 @@
         <cve>CVE-2018-14042</cve>
     </suppress>
 
-
     <suppress>
         <!-- Temporary suppressions to allow continued development -->
 
