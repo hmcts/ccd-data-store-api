@@ -1,13 +1,14 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService.ROOT;

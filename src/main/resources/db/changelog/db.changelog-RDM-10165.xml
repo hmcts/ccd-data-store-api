@@ -8,22 +8,19 @@
         <addColumn tableName="case_event">
             <column
                     name="proxied_by"
-                    type="varchar(64)"
-                    defaultValue="">
+                    type="varchar(64)">
                 <constraints nullable="true"/>
             </column>
             <column
                     name="proxied_by_first_name"
                     afterColumn="proxied_by"
-                    type="varchar(255)"
-                    defaultValue="">
+                    type="varchar(255)">
                 <constraints nullable="true"/>
             </column>
             <column
                     name="proxied_by_last_name"
                     afterColumn="proxied_by"
-                    type="varchar(255)"
-                    defaultValue="">
+                    type="varchar(255)">
                 <constraints nullable="true"/>
             </column>
         </addColumn>

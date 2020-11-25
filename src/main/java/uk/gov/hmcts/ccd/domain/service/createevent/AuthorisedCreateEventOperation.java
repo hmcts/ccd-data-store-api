@@ -76,7 +76,8 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
 
         verifyUpsertAccess(content.getEvent(), content.getData(), existingCaseDetails, caseTypeDefinition, userRoles);
 
-        final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseReference, content);
+        final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseReference,
+                                                                             content);
         return verifyReadAccess(caseTypeDefinition, userRoles, caseDetails);
     }
 
