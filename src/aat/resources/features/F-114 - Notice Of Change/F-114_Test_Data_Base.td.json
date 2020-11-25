@@ -31,13 +31,15 @@
     "body": {
       "data": {
         "OrganisationField": {
-          "OrganisationID": null
+          "OrganisationID": null,
+          "OrganisationName": null
         },
         "OrganisationPolicyField": {
           "OrgPolicyCaseAssignedRole": "[Claimant]",
           "OrgPolicyReference": null,
           "Organisation": {
-            "OrganisationID": null
+            "OrganisationID": null,
+            "OrganisationName": null
           }
         },
         "ChangeOrganisationRequestField": {
@@ -48,10 +50,12 @@
           "ApprovalRejectionTimestamp": null,
           "NotesReason": null,
           "OrganisationToAdd": {
-            "OrganisationID": null
+            "OrganisationID": null,
+            "OrganisationName": null
           },
           "OrganisationToRemove": {
-            "OrganisationID": null
+            "OrganisationID": null,
+            "OrganisationName": null
           }
         }
       },
