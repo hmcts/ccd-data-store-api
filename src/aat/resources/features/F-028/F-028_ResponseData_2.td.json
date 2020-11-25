@@ -4,7 +4,6 @@
   "id": "TextField",
   "label": "A `Text` field",
   "hidden": false,
-  "value": "[[ANYTHING_PRESENT]]",
   "metadata": false,
   "hint_text": "Some generic textual data.",
   "field_type": {
@@ -20,7 +19,6 @@
   "validation_expr": null,
   "security_label": "PUBLIC",
   "order": null,
-  "formatted_value": "Some Text",
   "display_context": "OPTIONAL",
   "display_context_parameter": null,
   "show_condition": null,
