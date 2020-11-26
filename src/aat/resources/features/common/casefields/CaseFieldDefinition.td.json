@@ -17,10 +17,10 @@
   "show_condition": null,
   "acls": [
     {
-      "_extends_" : "AccessControlList"
+      "_extends_" : "AllGrantedAccessControlList"
     },
     {
-      "_extends_" : "AccessControlList"
+      "_extends_" : "AllGrantedAccessControlList"
     }
   ],
   "complexACLs": [],
