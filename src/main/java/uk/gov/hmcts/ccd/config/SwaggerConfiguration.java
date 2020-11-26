@@ -1,15 +1,17 @@
 package uk.gov.hmcts.ccd.config;
 
 import java.util.Arrays;
+import java.util.Collections;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.RequestParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.builders.RequestParameterBuilder;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
-import springfox.documentation.service.ParameterType;
 import springfox.documentation.service.RequestParameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -28,11 +30,13 @@ public class SwaggerConfiguration {
 
     @Bean
     public Docket apiV2External() {
+
         return getNewDocketForPackageOf(CaseController.class, "v2_external", apiV2Info());
     }
 
     @Bean
     public Docket apiV1Internal() {
+
         return getNewDocketForPackageOf(QueryEndpoint.class, "v1_internal", apiV1Info());
     }
 
@@ -43,13 +47,13 @@ public class SwaggerConfiguration {
 
     private Docket getNewDocketForPackageOf(Class<?> klazz, String groupName, ApiInfo apiInfo) {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName(groupName)
-                .select()
-                .apis(RequestHandlerSelectors.basePackage(klazz.getPackage().getName()))
-                .paths(PathSelectors.any())
-                .build().useDefaultResponseMessages(false)
-                .apiInfo(apiInfo)
-                .globalRequestParameters(Arrays.asList(headerAuthorization(), headerServiceAuthorization()));
+            .groupName(groupName)
+            .select()
+            .apis(RequestHandlerSelectors.basePackage(klazz.getPackage().getName()))
+            .paths(PathSelectors.any())
+            .build().useDefaultResponseMessages(false)
+            .apiInfo(apiInfo)
+            .globalRequestParameters(Arrays.asList(headerAuthorization(), headerServiceAuthorization()));
     }
 
     private ApiInfo apiV1Info() {
@@ -60,8 +64,8 @@ public class SwaggerConfiguration {
             .licenseUrl("")
             .version("1.0.1")
             .contact(new Contact("CCD",
-                                 "https://tools.hmcts.net/confluence/display/RCCD/Reform%3A+Core+Case+Data+Home",
-                                 "corecasedatateam@hmcts.net"))
+                "https://tools.hmcts.net/confluence/display/RCCD/Reform%3A+Core+Case+Data+Home",
+                "corecasedatateam@hmcts.net"))
             .termsOfServiceUrl("")
             .build();
     }
@@ -74,8 +78,8 @@ public class SwaggerConfiguration {
             .licenseUrl("https://opensource.org/licenses/MIT")
             .version("2-beta")
             .contact(new Contact("CCD",
-                                 "https://tools.hmcts.net/confluence/display/RCCD/Reform%3A+Core+Case+Data+Home",
-                                 "corecasedatateam@hmcts.net"))
+                "https://tools.hmcts.net/confluence/display/RCCD/Reform%3A+Core+Case+Data+Home",
+                "corecasedatateam@hmcts.net"))
             .build();
     }
 
@@ -83,7 +87,8 @@ public class SwaggerConfiguration {
         return new RequestParameterBuilder()
             .name("Authorization")
             .description("Keyword `Bearer` followed by a valid IDAM user token")
-            .in(ParameterType.HEADER)
+            .in("header")
+            .accepts(Collections.singleton(MediaType.APPLICATION_JSON))
             .required(true)
             .build();
     }
@@ -92,7 +97,8 @@ public class SwaggerConfiguration {
         return new RequestParameterBuilder()
             .name("ServiceAuthorization")
             .description("Valid Service-to-Service JWT token for a whitelisted micro-service")
-            .in(ParameterType.HEADER)
+            .in("header")
+            .accepts(Collections.singleton(MediaType.APPLICATION_JSON))
             .required(true)
             .build();
     }
