@@ -6,5 +6,6 @@
   "regular_expression": null,
   "fixed_list_items": [],
   "complex_fields": [],
-  "collection_field_type": null
+  "collection_field_type": {
+  }
 }
