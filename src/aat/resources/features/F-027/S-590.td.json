@@ -39,20 +39,28 @@
           "id": "[STATE]",
           "label": "State",
           "value": "TODO",
-          "field_type": "[[ANYTHING_PRESENT]]"
+          "field_type": "[[ANYTHING_PRESENT]]",
+          "formatted_value": null
         },
         {
-          "_extends_": "CaseViewField"
+          "_extends_": "CaseViewField",
+          "value": "[[ANY_DATE_NOT_NULLABLE]]",
+          "formatted_value": null
         },
         {
           "_extends_": "CaseViewField",
           "id": "[LAST_MODIFIED_DATE]",
-          "label": "Last Modified Date"
+          "label": "Last Modified Date",
+          "value": "[[ANY_DATE_NOT_NULLABLE]]",
+          "formatted_value": null
+
         },
         {
           "_extends_": "CaseViewField",
           "id": "[CREATED_DATE]",
-          "label": "Created Date"
+          "label": "Created Date",
+          "value": "[[ANY_DATE_NOT_NULLABLE]]",
+          "formatted_value": null
         },
         {
           "_extends_": "CaseViewField",
@@ -61,7 +69,8 @@
           "value": "BEFTA_JURISDICTION_3",
           "field_type": {
             "_extends_": "BaseTextFieldType"
-          }
+          },
+          "formatted_value": null
         },
         {
           "_extends_": "CaseViewField",
@@ -70,7 +79,8 @@
           "value": "BEFTA_CASETYPE_3_4",
           "field_type": {
             "_extends_": "BaseTextFieldType"
-          }
+          },
+          "formatted_value": null
         },
         {
           "_extends_": "CaseViewField",
@@ -79,7 +89,8 @@
           "value": "PUBLIC",
           "field_type": {
             "_extends_": "BaseTextFieldType"
-          }
+          },
+          "formatted_value": null
         },
         {
           "_extends_": "CaseViewField",
@@ -88,7 +99,8 @@
           "value": "[[ANY_NUMBER_NOT_NULLABLE]]",
           "field_type": {
             "_extends_": "BaseNumberFieldType"
-          }
+          },
+          "formatted_value": null
         }
       ],
       "state": {

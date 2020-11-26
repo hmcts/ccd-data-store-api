@@ -4,7 +4,6 @@
   "id": "[LAST_STATE_MODIFIED_DATE]",
   "label": "Last State Modified Date",
   "hidden": false,
-  "value": "[[ANY_DATE_NOT_NULLABLE]]",
   "metadata": true,
   "hint_text": null,
   "field_type": {
@@ -13,7 +12,6 @@
   "validation_expr": null,
   "security_label": "PUBLIC",
   "order": null,
-  "formatted_value": null,
   "display_context": null,
   "display_context_parameter": null,
   "show_condition": null,
