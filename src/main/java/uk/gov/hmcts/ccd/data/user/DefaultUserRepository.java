@@ -90,7 +90,7 @@ public class DefaultUserRepository implements UserRepository {
 
     @Override
     public Set<String> getUserRoles() {
-        LOG.debug("retrieving user roles");
+        LOG.debug("Getting user roles from security context.");
 
         Collection<? extends GrantedAuthority> authorities =
             SecurityContextHolder.getContext().getAuthentication().getAuthorities();
@@ -99,7 +99,7 @@ public class DefaultUserRepository implements UserRepository {
             .collect(Collectors.toSet());
 
         String userId = getUser().getId();
-        LOG.info("Retrieved roles for userId={} roles={}", userId, userRoles);
+        LOG.info("User id from idam: {}. User roles in the security context: {}.", userId, userRoles);
 
         return userRoles;
     }
