@@ -1,0 +1,10 @@
+{
+  "_guid_": "CommonFieldType",
+
+  "min": null,
+  "max": null,
+  "regular_expression": null,
+  "fixed_list_items": [],
+  "complex_fields": [],
+  "collection_field_type": null
+}

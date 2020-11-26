@@ -8,7 +8,8 @@
     "contains Last State Modified Date metadata field"
   ],
   "user": {
-    "_extends_": "BeftaCaseworker3"
+    "username": "befta.caseworker.3@gmail.com",
+    "password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
   },
   "request": {
     "pathVariables": {
@@ -34,189 +35,60 @@
           "__ordering__": "unordered"
         },
         {
-          "_extends_": "CaseViewFieldMetadataTrue",
+          "_extends_": "CaseViewField",
           "id": "[STATE]",
           "label": "State",
           "value": "TODO",
-          "field_type": "[[ANYTHING_PRESENT]]",
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value": null,
-          "display_context": null,
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": null,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": []
+          "field_type": "[[ANYTHING_PRESENT]]"
         },
         {
-          "_extends_": "CaseViewFieldMetadataTrue",
-          "id": "[LAST_STATE_MODIFIED_DATE]",
-          "label": "Last State Modified Date",
-          "value": "[[ANY_DATE_NOT_NULLABLE]]",
-          "metadata": true,
-          "hint_text": null,
-          "field_type": {
-            "id": "DateTime",
-            "type": "DateTime",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
-            "fixed_list_items": [],
-            "complex_fields": [],
-            "collection_field_type": null
-          },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value": null,
-          "display_context": null,
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": null,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": []
+          "_extends_": "CaseViewField"
         },
         {
-          "_extends_": "CaseViewFieldMetadataTrue",
+          "_extends_": "CaseViewField",
           "id": "[LAST_MODIFIED_DATE]",
-          "label": "Last Modified Date",
-          "value": "[[ANY_DATE_NOT_NULLABLE]]",
-          "metadata": true,
-          "hint_text": null,
-          "field_type": {
-            "id": "DateTime",
-            "type": "DateTime",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
-            "fixed_list_items": [],
-            "complex_fields": [],
-            "collection_field_type": null
-          },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value": null,
-          "display_context": null,
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": null,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": []
+          "label": "Last Modified Date"
         },
         {
-          "_extends_": "CaseViewFieldMetadataTrue",
+          "_extends_": "CaseViewField",
           "id": "[CREATED_DATE]",
-          "label": "Created Date",
-          "value": "[[ANY_DATE_NOT_NULLABLE]]",
-          "metadata": true,
-          "hint_text": null,
-          "field_type": {
-            "id": "DateTime",
-            "type": "DateTime",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
-            "fixed_list_items": [],
-            "complex_fields": [],
-            "collection_field_type": null
-          },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value": null,
-          "display_context": null,
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": null,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": []
+          "label": "Created Date"
         },
         {
-          "_extends_": "CaseViewFieldMetadataTrue",
+          "_extends_": "CaseViewField",
           "id": "[JURISDICTION]",
           "label": "Jurisdiction",
           "value": "BEFTA_JURISDICTION_3",
           "field_type": {
             "_extends_": "BaseTextFieldType"
-          },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value": null,
-          "display_context": null,
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": null,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": []
+          }
         },
         {
-          "_extends_": "CaseViewFieldMetadataTrue",
+          "_extends_": "CaseViewField",
           "id": "[CASE_TYPE]",
           "label": "Case Type",
           "value": "BEFTA_CASETYPE_3_4",
           "field_type": {
             "_extends_": "BaseTextFieldType"
-          },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value": null,
-          "display_context": null,
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": null,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": []
+          }
         },
         {
-          "_extends_": "CaseViewFieldMetadataTrue",
+          "_extends_": "CaseViewField",
           "id": "[SECURITY_CLASSIFICATION]",
           "label": "Security Classification",
           "value": "PUBLIC",
           "field_type": {
             "_extends_": "BaseTextFieldType"
-          },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value": null,
-          "display_context": null,
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": null,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": []
+          }
         },
         {
-          "_extends_": "CaseViewFieldMetadataTrue",
+          "_extends_": "CaseViewField",
           "id": "[CASE_REFERENCE]",
           "label": "Case Reference",
           "value": "[[ANY_NUMBER_NOT_NULLABLE]]",
           "field_type": {
             "_extends_": "BaseNumberFieldType"
-          },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value": null,
-          "display_context": null,
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": null,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "acls": []
+          }
         }
       ],
       "state": {
@@ -259,10 +131,7 @@
           "user_first_name": "[[ANYTHING_PRESENT]]",
           "state_name": "[[ANYTHING_PRESENT]]",
           "state_id": "[[ANYTHING_PRESENT]]",
-          "significant_item": null,
-          "proxied_by" : null,
-          "proxied_by_last_name" : null,
-          "proxied_by_first_name" : null
+          "significant_item": null
         }
       ],
       "case_id": "[[ANYTHING_PRESENT]]",

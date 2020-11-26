@@ -1,5 +1,5 @@
 {
-  "_guid_": "NegativeResponseBody",
+  "_guid_": "ErrorResponse",
 
   "exception" : "[[ANYTHING_PRESENT]]",
   "message" : "[[ANYTHING_PRESENT]]",
