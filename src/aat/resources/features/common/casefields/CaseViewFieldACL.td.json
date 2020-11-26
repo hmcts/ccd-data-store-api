@@ -7,10 +7,10 @@
   "show_summary_change_option": true,
   "acls": [
     {
-      "_extends_": "AccessControlList"
+      "_extends_": "AllGrantedAccessControlList"
     },
     {
-      "_extends_": "AccessControlList"
+      "_extends_": "AllGrantedAccessControlList"
     }
   ]
 }

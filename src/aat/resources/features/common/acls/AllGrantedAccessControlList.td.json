@@ -1,5 +1,5 @@
 {
-  "_guid_": "AccessControlList",
+  "_guid_": "AllGrantedAccessControlList",
 
   "role": "[[ANYTHING_PRESENT]]",
   "create": true,
