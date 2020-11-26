@@ -44,8 +44,7 @@
           "order": 2,
           "case_field_id": "TextField",
           "case_field_type": {
-            "id": "Text",
-            "type": "Text"
+            "_extends_": "BaseTextFieldType"
           }
         },
         {
@@ -54,8 +53,7 @@
           "order": 3,
           "case_field_id": "NumberField",
           "case_field_type": {
-            "id": "Number",
-            "type": "Number"
+            "_extends_": "BaseNumberFieldType"
           }
         },
         {
@@ -64,8 +62,7 @@
           "order": 4,
           "case_field_id": "YesOrNoField",
           "case_field_type": {
-            "id": "YesOrNo",
-            "type": "YesOrNo"
+            "_extends_": "BaseYesOrNoFieldType"
           }
         }
 			],
