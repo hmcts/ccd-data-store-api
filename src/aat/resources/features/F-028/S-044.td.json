@@ -30,12 +30,14 @@
         },
         {
           "_extends_": "F-028_ResponseData_2",
-          "value": "Some Text"
+          "value": "Some Text",
+          "formatted_value": "Some Text"
         },
         {
           "_extends_": "F-028_ResponseData_2",
           "id": "NumberField",
           "label": "A `Number` field",
+          "value": "[[ANYTHING_PRESENT]]",
           "hint_text": "A numeric data.",
           "field_type": {
             "id": "Number",
@@ -59,6 +61,7 @@
           "_extends_": "F-028_ResponseData_2",
           "id": "PhoneUKField",
           "label": "A `PhoneUK` field",
+          "value": "[[ANYTHING_PRESENT]]",
           "hint_text": "A UK phone number.",
           "field_type": {
             "id": "PhoneUK",
@@ -71,6 +74,7 @@
           "_extends_": "F-028_ResponseData_2",
           "id": "EmailField",
           "label": "An `Email` field",
+          "value": "[[ANYTHING_PRESENT]]",
           "hint_text": "A valid email address.",
           "field_type": {
             "id": "Email",
@@ -82,6 +86,7 @@
           "_extends_": "F-028_ResponseData_2",
           "id": "MoneyGBPField",
           "label": "A `MoneyGBP` field",
+          "value": "[[ANYTHING_PRESENT]]",
           "hint_text": "A monetary value.",
           "field_type": {
             "id": "MoneyGBP",
@@ -93,6 +98,7 @@
           "_extends_": "F-028_ResponseData_2",
           "id": "DateField",
           "label": "A `Date` field",
+          "value": "[[ANYTHING_PRESENT]]",
           "hint_text": "A temporal value without time.",
           "field_type": {
             "id": "Date",
