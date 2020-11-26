@@ -8,7 +8,7 @@
   "metadata": true,
   "hint_text": null,
   "field_type": {
-    "_extends_" : "FieldTypeDefinition"
+    "_extends_" : "BaseDateTimeFieldType"
   },
   "validation_expr": null,
   "security_label": "PUBLIC",

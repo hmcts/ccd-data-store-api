@@ -1,8 +1,6 @@
 {
-  "_guid_": "FieldTypeDefinition",
+  "_guid_": "CommonFieldType",
 
-  "id": "DateTime",
-  "type": "DateTime",
   "min": null,
   "max": null,
   "regular_expression": null,

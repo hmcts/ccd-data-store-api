@@ -29,116 +29,112 @@
           "__ordering__": "unordered"
         },
         {
-          "_extends_": "F-028_ResponseData_2",
+          "_extends_": "CaseViewFieldACL",
+          "id": "TextField",
+          "label": "A `Text` field",
           "value": "Some Text",
-          "formatted_value": "Some Text"
+          "hint_text": "Some generic textual data.",
+          "formatted_value": "Some Text",
+          "field_type": {
+            "_extends_": "BaseTextFieldType"
+          }
         },
         {
-          "_extends_": "F-028_ResponseData_2",
+          "_extends_": "CaseViewFieldACL",
           "id": "NumberField",
           "label": "A `Number` field",
           "value": "[[ANYTHING_PRESENT]]",
           "hint_text": "A numeric data.",
           "field_type": {
-            "id": "Number",
-            "type": "Number"
+            "_extends_": "BaseNumberFieldType"
           },
           "formatted_value": "164528"
         },
         {
-          "_extends_": "F-028_ResponseData_2",
+          "_extends_": "CaseViewFieldACL",
           "id": "YesOrNoField",
           "label": "A `YesOrNo` field",
           "value": "Yes",
           "hint_text": "A simple boolean.",
           "field_type": {
-            "id": "YesOrNo",
-            "type": "YesOrNo"
+            "_extends_": "BaseYesOrNoFieldType"
           },
           "formatted_value": "Yes"
         },
         {
-          "_extends_": "F-028_ResponseData_2",
+          "_extends_": "CaseViewFieldACL",
           "id": "PhoneUKField",
           "label": "A `PhoneUK` field",
           "value": "[[ANYTHING_PRESENT]]",
           "hint_text": "A UK phone number.",
           "field_type": {
-            "id": "PhoneUK",
-            "type": "PhoneUK",
-            "regular_expression": "^(((\\+44\\s?\\d{4}|\\(?0\\d{4}\\)?)\\s?\\d{3}\\s?\\d{3})|((\\+44\\s?\\d{3}|\\(?0\\d{3}\\)?)\\s?\\d{3}\\s?\\d{4})|((\\+44\\s?\\d{2}|\\(?0\\d{2}\\)?)\\s?\\d{4}\\s?\\d{4}))(\\s?\\#(\\d{4}|\\d{3}))?$"
+            "_extends_": "BasePhoneUKFieldType"
           },
           "formatted_value": "07123456789"
         },
         {
-          "_extends_": "F-028_ResponseData_2",
+          "_extends_": "CaseViewFieldACL",
           "id": "EmailField",
           "label": "An `Email` field",
           "value": "[[ANYTHING_PRESENT]]",
           "hint_text": "A valid email address.",
           "field_type": {
-            "id": "Email",
-            "type": "Email"
+            "_extends_": "BaseEmailFieldType"
           },
           "formatted_value": "ccd@hmcts.net"
         },
         {
-          "_extends_": "F-028_ResponseData_2",
+          "_extends_": "CaseViewFieldACL",
           "id": "MoneyGBPField",
           "label": "A `MoneyGBP` field",
           "value": "[[ANYTHING_PRESENT]]",
           "hint_text": "A monetary value.",
           "field_type": {
-            "id": "MoneyGBP",
-            "type": "MoneyGBP"
+            "_extends_": "BaseMoneyGBPFieldType"
           },
           "formatted_value": "4200"
         },
         {
-          "_extends_": "F-028_ResponseData_2",
+          "_extends_": "CaseViewFieldACL",
           "id": "DateField",
           "label": "A `Date` field",
           "value": "[[ANYTHING_PRESENT]]",
           "hint_text": "A temporal value without time.",
           "field_type": {
-            "id": "Date",
-            "type": "Date"
+            "_extends_": "BaseDateFieldType"
           },
           "formatted_value": "2017-02-13"
         },
         {
-          "_extends_": "F-028_ResponseData_2",
+          "_extends_": "CaseViewFieldACL",
           "id": "DateTimeField",
           "label": "A `DateTime` field",
           "value": "[[ANYTHING_PRESENT]]",
           "hint_text": "A temporal value with time.",
           "field_type": {
-            "id": "DateTime",
-            "type": "DateTime"
+            "_extends_": "BaseDateTimeFieldType"
           },
           "formatted_value": "1988-07-07T22:20:00"
         },
         {
-          "_extends_": "F-028_ResponseData_2",
+          "_extends_": "CaseViewFieldACL",
           "id": "TextAreaField",
           "label": "A `TextArea` field",
           "value": "Line1\nLine2",
           "hint_text": "Multiple lines of text.",
           "field_type": {
-            "id": "TextArea",
-            "type": "TextArea"
+            "_extends_": "BaseTextAreaFieldType"
           },
           "formatted_value": "Line1\nLine2"
         },
         {
-          "_extends_": "F-028_ResponseData_2",
+          "_extends_": "CaseViewFieldACL",
           "id": "FixedListField",
           "label": "A `FixedList` field",
           "value": "VALUE3",
           "hint_text": "A dropdown to select one value out of many.",
           "field_type": {
-            "id": "FixedList-FixedListType",
-            "type": "FixedList",
+            "_extends_": "BaseFixedListFieldType",
             "fixed_list_items": [
               {
                 "code": "VALUE3",
@@ -160,7 +156,7 @@
           "formatted_value" : "VALUE3"
         },
         {
-          "_extends_": "F-028_ResponseData_2",
+          "_extends_": "CaseViewFieldACL",
           "id": "MultiSelectListField",
           "label": "A `MultiSelectList` field",
           "value": [
@@ -169,8 +165,7 @@
           ],
           "hint_text": "Checkboxes to select many values.",
           "field_type": {
-            "id": "MultiSelectList-MultiSelectListType",
-            "type": "MultiSelectList",
+            "_extends_": "BaseMultiSelectListFieldType",
             "fixed_list_items": [
               {
                 "code": "OPTION5",
@@ -205,7 +200,7 @@
           ]
         },
         {
-          "_extends_": "F-028_ResponseData_2",
+          "_extends_": "CaseViewFieldACL",
           "id": "CollectionField",
           "label": "A `Collection` of `Text` fields",
           "value": [
@@ -220,17 +215,9 @@
           ],
           "hint_text": "Zero to many items, here of type `Text`",
           "field_type": {
-            "id": "[[ANYTHING_PRESENT]]",
-            "type": "Collection",
+            "_extends_": "BaseCollectionFieldType",
             "collection_field_type": {
-              "id": "Text",
-              "type": "Text",
-              "min": null,
-              "max": null,
-              "regular_expression": null,
-              "fixed_list_items": [],
-              "complex_fields": [],
-              "collection_field_type": null
+              "_extends_": "BaseTextFieldType"
             }
           },
           "formatted_value": [
@@ -247,7 +234,7 @@
           "show_summary_change_option": false
         },
         {
-          "_extends_": "F-028_ResponseData_2",
+          "_extends_": "CaseViewFieldACL",
           "id": "ComplexField",
           "label": "A `Complex` field",
           "value": {
@@ -256,8 +243,7 @@
           },
           "hint_text": "Aggregate of fields",
           "field_type": {
-            "id": "ComplexType",
-            "type": "Complex",
+            "_extends_": "BaseComplexFieldType",
             "complex_fields": [
               {
                 "_extends_": "CaseFieldDefinition",
@@ -275,8 +261,7 @@
                 "id": "ComplexFixedListField",
                 "label": "A `FixedList` field inside a complex",
                 "field_type": {
-                  "id": "FixedList-FixedListType",
-                  "type": "FixedList",
+                  "_extends_": "BaseFixedListFieldType",
                   "fixed_list_items": [
                     {
                       "code": "VALUE3",
@@ -309,16 +294,14 @@
                 "id": "ComplexNestedField",
                 "label": "A `Complex` field inside a complex",
                 "field_type": {
-                  "id": "NestedComplexType",
-                  "type": "Complex",
+                  "_extends_": "BaseNestedComplexFieldType",
                   "complex_fields": [
                     {
                       "_extends_": "CaseFieldDefinition",
                       "id": "NestedNumberField",
                       "label": "A `Number` field inside a nested complex",
                       "field_type": {
-                        "id": "Number",
-                        "type": "Number"
+                        "_extends_": "BaseNumberFieldType"
                       }
                     },
                     {
@@ -326,17 +309,9 @@
                       "id": "[[ANYTHING_PRESENT]]",
                       "label": "A `Collection` field of `Text` inside a nested complex",
                       "field_type": {
-                        "id": "[[ANYTHING_PRESENT]]",
-                        "type": "Collection",
+                        "_extends_": "BaseCollectionFieldType",
                         "collection_field_type": {
-                          "id": "Text",
-                          "type": "Text",
-                          "min": null,
-                          "max": null,
-                          "regular_expression": null,
-                          "fixed_list_items": [],
-                          "complex_fields": [],
-                          "collection_field_type": null
+                          "_extends_": "BaseTextFieldType"
                         }
                       },
                       "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)"
@@ -361,7 +336,7 @@
           "show_summary_change_option": false
         },
         {
-          "_extends_": "F-028_ResponseData_2",
+          "_extends_": "CaseViewFieldACL",
           "id": "AddressUKField",
           "label": "A `AddressUK` field",
           "value": {
@@ -462,14 +437,13 @@
           "show_summary_change_option": false
         },
         {
-          "_extends_": "F-028_ResponseData_2",
+          "_extends_": "CaseViewFieldACL",
           "id": "DocumentField",
           "label": "A `Document` field",
           "value": null,
           "hint_text": "A document",
           "field_type": {
-            "id": "Document",
-            "type": "Document"
+            "_extends_": "BaseDocumentFieldType"
           },
           "formatted_value": null
         }

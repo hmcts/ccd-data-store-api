@@ -60,8 +60,7 @@
           "label": "Jurisdiction",
           "value": "BEFTA_JURISDICTION_3",
           "field_type": {
-            "id": "Text",
-            "type": "Text"
+            "_extends_": "BaseTextFieldType"
           }
         },
         {
@@ -70,8 +69,7 @@
           "label": "Case Type",
           "value": "BEFTA_CASETYPE_3_4",
           "field_type": {
-            "id": "Text",
-            "type": "Text"
+            "_extends_": "BaseTextFieldType"
           }
         },
         {
@@ -80,8 +78,7 @@
           "label": "Security Classification",
           "value": "PUBLIC",
           "field_type": {
-            "id": "Text",
-            "type": "Text"
+            "_extends_": "BaseTextFieldType"
           }
         },
         {
@@ -90,8 +87,7 @@
           "label": "Case Reference",
           "value": "[[ANY_NUMBER_NOT_NULLABLE]]",
           "field_type": {
-            "id": "Number",
-            "type": "Number"
+            "_extends_": "BaseNumberFieldType"
           }
         }
       ],

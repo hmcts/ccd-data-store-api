@@ -9,9 +9,7 @@
   "case_type_id": null,
   "hint_text": null,
   "field_type": {
-    "_extends_" : "FieldTypeDefinition",
-    "id": "Text",
-    "type": "Text"
+    "_extends_" : "BaseTextFieldType"
   },
   "security_classification": "PUBLIC",
   "live_from": null,
