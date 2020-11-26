@@ -1,5 +1,5 @@
 {
-  "_guid_": "BaseMoneyGBPFieldType",
+  "_guid_": "BaseDateFieldType",
   "_extends_": "CommonFieldType",
 
   "id": "Date",
