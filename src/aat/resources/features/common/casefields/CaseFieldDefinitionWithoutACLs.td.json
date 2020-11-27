@@ -1,5 +1,5 @@
 {
-  "_guid_": "CaseFieldDefinition",
+  "_guid_": "CaseFieldDefinitionWithoutACLs",
 
   "id": "ComplexTextField",
   "label": "A `Text` field inside a complex",
@@ -15,14 +15,6 @@
   "live_from": null,
   "live_until": null,
   "show_condition": null,
-  "acls": [
-    {
-      "_extends_" : "AllGrantedAccessControlList"
-    },
-    {
-      "_extends_" : "AllGrantedAccessControlList"
-    }
-  ],
   "complexACLs": [],
   "display_context": null,
   "display_context_parameter": null,
