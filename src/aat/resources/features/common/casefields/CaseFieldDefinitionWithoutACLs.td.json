@@ -1,0 +1,23 @@
+{
+  "_guid_": "CaseFieldDefinitionWithoutACLs",
+
+  "id": "ComplexTextField",
+  "label": "A `Text` field inside a complex",
+  "hidden": false,
+  "order": null,
+  "metadata": false,
+  "case_type_id": null,
+  "hint_text": null,
+  "field_type": {
+    "_extends_" : "BaseTextFieldType"
+  },
+  "security_classification": "PUBLIC",
+  "live_from": null,
+  "live_until": null,
+  "show_condition": null,
+  "complexACLs": [],
+  "display_context": null,
+  "display_context_parameter": null,
+  "retain_hidden_value": null,
+  "formatted_value": null
+}

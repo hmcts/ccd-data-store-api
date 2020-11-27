@@ -1,0 +1,7 @@
+{
+  "_guid_": "BaseDateFieldType",
+  "_extends_": "CommonFieldType",
+
+  "id": "Date",
+  "type": "Date"
+}

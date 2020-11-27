@@ -1,0 +1,13 @@
+{
+  "_guid_": "CaseFieldDefinitionWithACLs",
+  "_extends_": "CaseFieldDefinitionWithoutACLs",
+
+  "acls": [
+    {
+      "_extends_" : "AllGrantedAccessControlList"
+    },
+    {
+      "_extends_" : "AllGrantedAccessControlList"
+    }
+  ]
+}
