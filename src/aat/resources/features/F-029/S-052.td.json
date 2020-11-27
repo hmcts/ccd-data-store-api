@@ -18,11 +18,7 @@
 	"expectedResponse": {
 		"_extends_": "Common_404_Response",
 		"body": {
-			"exception" : "[[ANYTHING_PRESENT]]",
-			"message" : "[[ANYTHING_PRESENT]]",
-			"details" : null,
-			"callbackErrors" : null,
-			"callbackWarnings" : null
-		}
+      "_extends_": "NegativeResponseBody"
+    }
 	}
 }

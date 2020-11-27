@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +34,6 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
-import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -88,6 +88,7 @@ public class DraftsEndpoint {
         return upsertDraftOperation.executeSave(caseTypeId, caseDataContent);
     }
 
+    @Transactional
     @PutMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-trigger/{etid}/drafts/{did}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
