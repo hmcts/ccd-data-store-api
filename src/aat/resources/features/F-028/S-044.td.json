@@ -1,580 +1,580 @@
 {
-  "title": "must return event trigger data successfully for valid pre-state conditions",
-  "_guid_": "S-044",
-  "_extends_": "F-028_Test_Data_Base",
-  "specs": [
-    "an active profile in CCD",
-    "is prepared with valid Jurisdiction, Case ID and User ID",
-    "has the 200 return code"
-  ],
-  "request": {
-    "pathVariables": {
-      "cid": "[[DEFAULT_AUTO_VALUE]]"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_200_Response",
-    "headers": {
-      "Transfer-Encoding": "chunked",
-      "Content-Encoding": "gzip"
-    },
-    "body": {
-      "id": "UPDATE",
-      "name": "Update",
-      "description": null,
-      "case_id": "[[ANYTHING_PRESENT]]",
-      "case_fields": [
-        {
-          "__operator__": "equivalent",
-          "__ordering__": "unordered"
-        },
-        {
-          "_extends_": "CaseViewFieldACL",
-          "id": "TextField",
-          "label": "A `Text` field",
-          "value": "Some Text",
-          "hint_text": "Some generic textual data.",
-          "formatted_value": "Some Text",
-          "field_type": {
-            "_extends_": "BaseTextFieldType"
-          }
-        },
-        {
-          "_extends_": "CaseViewFieldACL",
-          "id": "NumberField",
-          "label": "A `Number` field",
-          "value": "[[ANYTHING_PRESENT]]",
-          "hint_text": "A numeric data.",
-          "field_type": {
-            "_extends_": "BaseNumberFieldType"
-          },
-          "formatted_value": "164528"
-        },
-        {
-          "_extends_": "CaseViewFieldACL",
-          "id": "YesOrNoField",
-          "label": "A `YesOrNo` field",
-          "value": "Yes",
-          "hint_text": "A simple boolean.",
-          "field_type": {
-            "_extends_": "BaseYesOrNoFieldType"
-          },
-          "formatted_value": "Yes"
-        },
-        {
-          "_extends_": "CaseViewFieldACL",
-          "id": "PhoneUKField",
-          "label": "A `PhoneUK` field",
-          "value": "[[ANYTHING_PRESENT]]",
-          "hint_text": "A UK phone number.",
-          "field_type": {
-            "_extends_": "BasePhoneUKFieldType"
-          },
-          "formatted_value": "07123456789"
-        },
-        {
-          "_extends_": "CaseViewFieldACL",
-          "id": "EmailField",
-          "label": "An `Email` field",
-          "value": "[[ANYTHING_PRESENT]]",
-          "hint_text": "A valid email address.",
-          "field_type": {
-            "_extends_": "BaseEmailFieldType"
-          },
-          "formatted_value": "ccd@hmcts.net"
-        },
-        {
-          "_extends_": "CaseViewFieldACL",
-          "id": "MoneyGBPField",
-          "label": "A `MoneyGBP` field",
-          "value": "[[ANYTHING_PRESENT]]",
-          "hint_text": "A monetary value.",
-          "field_type": {
-            "_extends_": "BaseMoneyGBPFieldType"
-          },
-          "formatted_value": "4200"
-        },
-        {
-          "_extends_": "CaseViewFieldACL",
-          "id": "DateField",
-          "label": "A `Date` field",
-          "value": "[[ANYTHING_PRESENT]]",
-          "hint_text": "A temporal value without time.",
-          "field_type": {
-            "_extends_": "BaseDateFieldType"
-          },
-          "formatted_value": "2017-02-13"
-        },
-        {
-          "_extends_": "CaseViewFieldACL",
-          "id": "DateTimeField",
-          "label": "A `DateTime` field",
-          "value": "[[ANYTHING_PRESENT]]",
-          "hint_text": "A temporal value with time.",
-          "field_type": {
-            "_extends_": "BaseDateTimeFieldType"
-          },
-          "formatted_value": "1988-07-07T22:20:00"
-        },
-        {
-          "_extends_": "CaseViewFieldACL",
-          "id": "TextAreaField",
-          "label": "A `TextArea` field",
-          "value": "Line1\nLine2",
-          "hint_text": "Multiple lines of text.",
-          "field_type": {
-            "_extends_": "BaseTextAreaFieldType"
-          },
-          "formatted_value": "Line1\nLine2"
-        },
-        {
-          "_extends_": "CaseViewFieldACL",
-          "id": "FixedListField",
-          "label": "A `FixedList` field",
-          "value": "VALUE3",
-          "hint_text": "A dropdown to select one value out of many.",
-          "field_type": {
-            "_extends_": "BaseFixedListFieldType",
-            "fixed_list_items": [
-              {
-                "code": "VALUE3",
-                "label": "Value 3",
-                "order": null
-              },
-              {
-                "code": "VALUE2",
-                "label": "Value 2",
-                "order": null
-              },
-              {
-                "code": "VALUE1",
-                "label": "Value 1",
-                "order": null
-              }
-            ]
-          },
-          "formatted_value" : "VALUE3"
-        },
-        {
-          "_extends_": "CaseViewFieldACL",
-          "id": "MultiSelectListField",
-          "label": "A `MultiSelectList` field",
-          "value": [
-            "OPTION2",
-            "OPTION4"
-          ],
-          "hint_text": "Checkboxes to select many values.",
-          "field_type": {
-            "_extends_": "BaseMultiSelectListFieldType",
-            "fixed_list_items": [
-              {
-                "code": "OPTION5",
-                "label": "Option 5",
-                "order": null
-              },
-              {
-                "code": "OPTION4",
-                "label": "Option 4",
-                "order": null
-              },
-              {
-                "code": "OPTION3",
-                "label": "Option 3",
-                "order": null
-              },
-              {
-                "code": "OPTION2",
-                "label": "Option 2",
-                "order": null
-              },
-              {
-                "code": "OPTION1",
-                "label": "Option 1",
-                "order": null
-              }
-            ]
-          },
-          "formatted_value": [
-            "OPTION2",
-            "OPTION4"
-          ]
-        },
-        {
-          "_extends_": "CaseViewFieldACL",
-          "id": "CollectionField",
-          "label": "A `Collection` of `Text` fields",
-          "value": [
-            {
-              "id": "[[ANYTHING_PRESENT]]",
-              "value": "Alias 1"
-            },
-            {
-              "id": "[[ANYTHING_PRESENT]]",
-              "value": "Alias 2"
-            }
-          ],
-          "hint_text": "Zero to many items, here of type `Text`",
-          "field_type": {
-            "_extends_": "BaseCollectionFieldType",
-            "collection_field_type": {
-              "_extends_": "BaseTextFieldType"
-            }
-          },
-          "formatted_value": [
-            {
-              "id": "CollectionField1",
-              "value": "Alias 1"
-            },
-            {
-              "id": "CollectionField2",
-              "value": "Alias 2"
-            }
-          ],
-          "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)",
-          "show_summary_change_option": false
-        },
-        {
-          "_extends_": "CaseViewFieldACL",
-          "id": "ComplexField",
-          "label": "A `Complex` field",
-          "value": {
-            "ComplexTextField": "Nested text",
-            "ComplexFixedListField": "VALUE2"
-          },
-          "hint_text": "Aggregate of fields",
-          "field_type": {
-            "_extends_": "BaseComplexFieldType",
-            "complex_fields": [
-              {
-                "_extends_": "CaseFieldDefinition",
-                "acls": [
-                  {
-                    "listElementCode": "ComplexTextField"
-                  },
-                  {
-                    "listElementCode": "ComplexTextField"
-                  }
-                ]
-              },
-              {
-                "_extends_": "CaseFieldDefinition",
-                "id": "ComplexFixedListField",
-                "label": "A `FixedList` field inside a complex",
-                "field_type": {
-                  "_extends_": "BaseFixedListFieldType",
-                  "fixed_list_items": [
-                    {
-                      "code": "VALUE3",
-                      "label": "Value 3",
-                      "order": null
-                    },
-                    {
-                      "code": "VALUE2",
-                      "label": "Value 2",
-                      "order": null
-                    },
-                    {
-                      "code": "VALUE1",
-                      "label": "Value 1",
-                      "order": null
-                    }
-                  ]
-                },
-                "acls": [
-                  {
-                    "listElementCode": "ComplexFixedListField"
-                  },
-                  {
-                    "listElementCode": "ComplexFixedListField"
-                  }
-                ]
-              },
-              {
-                "_extends_": "CaseFieldDefinition",
-                "id": "ComplexNestedField",
-                "label": "A `Complex` field inside a complex",
-                "field_type": {
-                  "_extends_": "BaseNestedComplexFieldType",
-                  "complex_fields": [
-                    {
-                      "_extends_": "CaseFieldDefinition",
-                      "id": "NestedNumberField",
-                      "label": "A `Number` field inside a nested complex",
-                      "field_type": {
-                        "_extends_": "BaseNumberFieldType"
-                      }
-                    },
-                    {
-                      "_extends_": "CaseFieldDefinition",
-                      "id": "[[ANYTHING_PRESENT]]",
-                      "label": "A `Collection` field of `Text` inside a nested complex",
-                      "field_type": {
-                        "_extends_": "BaseCollectionFieldType",
-                        "collection_field_type": {
-                          "_extends_": "BaseTextFieldType"
-                        }
-                      },
-                      "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)"
-                    }
-                  ]
-                },
-                "acls": [
-                  {
-                    "listElementCode": "ComplexNestedField"
-                  },
-                  {
-                    "listElementCode": "ComplexNestedField"
-                  }
-                ]
-              }
-            ]
-          },
-          "formatted_value": {
-            "ComplexTextField" : "Nested text",
-            "ComplexFixedListField" : "VALUE2"
-          },
-          "show_summary_change_option": false
-        },
-        {
-          "_extends_": "CaseViewFieldACL",
-          "id": "AddressUKField",
-          "label": "A `AddressUK` field",
-          "value": {
-            "County": "[[ANYTHING_PRESENT]]",
-            "Country": "[[ANYTHING_PRESENT]]",
-            "PostCode": "[[ANYTHING_PRESENT]]",
-            "PostTown": "[[ANYTHING_PRESENT]]",
-            "AddressLine1": "[[ANYTHING_PRESENT]]",
-            "AddressLine2": "[[ANYTHING_PRESENT]]",
-            "AddressLine3": "[[ANYTHING_PRESENT]]"
-          },
-          "hint_text": "A UK address.",
-          "field_type": {
-            "id": "AddressUK",
-            "type": "Complex",
-            "complex_fields": [
-              {
-                "_extends_": "CaseFieldDefinition",
-                "id": "AddressLine1",
-                "label": "Building and Street",
-                "hidden": null,
-                "field_type": {
-                  "id": "TextMax150",
-                  "max": 150
-                }
-              },
-              {
-                "_extends_": "CaseFieldDefinition",
-                "id": "AddressLine2",
-                "label": "Address Line 2",
-                "hidden": null,
-                "field_type": {
-                  "id": "TextMax50",
-                  "max": 50
-                }
-              },
-              {
-                "_extends_": "CaseFieldDefinition",
-                "id": "AddressLine3",
-                "label": "Address Line 3",
-                "hidden": null,
-                "field_type": {
-                  "id": "TextMax50",
-                  "max": 50
-                }
-              },
-              {
-                "_extends_": "CaseFieldDefinition",
-                "id": "PostTown",
-                "label": "Town or City",
-                "hidden": null,
-                "field_type": {
-                  "id": "TextMax50",
-                  "max": 50
-                }
-              },
-              {
-                "_extends_": "CaseFieldDefinition",
-                "id": "County",
-                "label": "County",
-                "hidden": null,
-                "field_type": {
-                  "id": "TextMax50",
-                  "max": 50
-                }
-              },
-              {
-                "_extends_": "CaseFieldDefinition",
-                "id": "PostCode",
-                "label": "Postcode/Zipcode",
-                "hidden": null,
-                "field_type": {
-                  "id": "TextMax14",
-                  "max": 14
-                }
-              },
-              {
-                "_extends_": "CaseFieldDefinition",
-                "id": "Country",
-                "label": "Country",
-                "hidden": null,
-                "field_type": {
-                  "id": "TextMax50",
-                  "max": 50
-                }
-              }
-            ]
-          },
-          "formatted_value": {
-            "AddressLine1" : "102 Petty France",
-            "AddressLine2" : "CCD",
-            "AddressLine3" : "c/o HMCTS Reform",
-            "PostTown" : "Westminster",
-            "County" : "Greater London",
-            "PostCode" : "SW1H 9AJ",
-            "Country" : "UK"
-          },
-          "show_summary_change_option": false
-        },
-        {
-          "_extends_": "CaseViewFieldACL",
-          "id": "DocumentField",
-          "label": "A `Document` field",
-          "value": null,
-          "hint_text": "A document",
-          "field_type": {
-            "_extends_": "BaseDocumentFieldType"
-          },
-          "formatted_value": null
-        }
-      ],
-      "event_token": "[[ANYTHING_PRESENT]]",
-      "wizard_pages": [
-        {
-          "id": "UPDATEfirst",
-          "label": "First page",
-          "order": 1,
-          "wizard_page_fields": [
-            {
-              "case_field_id": "TextField",
-              "order": 1,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            },
-            {
-              "case_field_id": "NumberField",
-              "order": 2,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            },
-            {
-              "case_field_id": "YesOrNoField",
-              "order": 3,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            },
-            {
-              "case_field_id": "PhoneUKField",
-              "order": 4,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            },
-            {
-              "case_field_id": "EmailField",
-              "order": 5,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            }
-          ],
-          "show_condition": null,
-          "callback_url_mid_event": null,
-          "retries_timeout_mid_event": []
-        },
-        {
-          "id": "UPDATEsecond",
-          "label": "Second page",
-          "order": 2,
-          "wizard_page_fields": [
-            {
-              "case_field_id": "MoneyGBPField",
-              "order": 1,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            },
-            {
-              "case_field_id": "DateField",
-              "order": 2,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            },
-            {
-              "case_field_id": "DateTimeField",
-              "order": 3,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            },
-            {
-              "case_field_id": "TextAreaField",
-              "order": 4,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            },
-            {
-              "case_field_id": "FixedListField",
-              "order": 5,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            },
-            {
-              "case_field_id": "MultiSelectListField",
-              "order": 6,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            }
-          ],
-          "show_condition": null,
-          "callback_url_mid_event": null,
-          "retries_timeout_mid_event": []
-        },
-        {
-          "id": "UPDATEthird",
-          "label": "Third page",
-          "order": 3,
-          "wizard_page_fields": [
-            {
-              "case_field_id": "CollectionField",
-              "order": 2,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            },
-            {
-              "case_field_id": "ComplexField",
-              "order": 1,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            },
-            {
-              "case_field_id": "AddressUKField",
-              "order": 3,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            },
-            {
-              "case_field_id": "DocumentField",
-              "order": 4,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            }
-          ],
-          "show_condition": null,
-          "callback_url_mid_event": null,
-          "retries_timeout_mid_event": []
-        }
-      ],
-      "show_summary": true,
-      "show_event_notes": null,
-      "end_button_label": null,
-      "can_save_draft": null
-    }
-  }
+	"title": "must return event trigger data successfully for valid pre-state conditions",
+	"_guid_": "S-044",
+	"_extends_": "F-028_Test_Data_Base",
+	"specs": [
+		"an active profile in CCD",
+		"is prepared with valid Jurisdiction, Case ID and User ID",
+		"has the 200 return code"
+	],
+	"request": {
+		"pathVariables": {
+			"cid": "[[DEFAULT_AUTO_VALUE]]"
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Transfer-Encoding": "chunked",
+			"Content-Encoding": "gzip"
+		},
+		"body": {
+			"id": "UPDATE",
+			"name": "Update",
+			"description": null,
+			"case_id": "[[ANYTHING_PRESENT]]",
+			"case_fields": [
+				{
+					"__operator__": "equivalent",
+					"__ordering__": "unordered"
+				},
+				{
+					"_extends_": "CaseViewFieldACL",
+					"id": "TextField",
+					"label": "A `Text` field",
+					"value": "Some Text",
+					"hint_text": "Some generic textual data.",
+					"formatted_value": "Some Text",
+					"field_type": {
+						"_extends_": "BaseTextFieldType"
+					}
+				},
+				{
+					"_extends_": "CaseViewFieldACL",
+					"id": "NumberField",
+					"label": "A `Number` field",
+					"value": "[[ANYTHING_PRESENT]]",
+					"hint_text": "A numeric data.",
+					"field_type": {
+						"_extends_": "BaseNumberFieldType"
+					},
+					"formatted_value": "164528"
+				},
+				{
+					"_extends_": "CaseViewFieldACL",
+					"id": "YesOrNoField",
+					"label": "A `YesOrNo` field",
+					"value": "Yes",
+					"hint_text": "A simple boolean.",
+					"field_type": {
+						"_extends_": "BaseYesOrNoFieldType"
+					},
+					"formatted_value": "Yes"
+				},
+				{
+					"_extends_": "CaseViewFieldACL",
+					"id": "PhoneUKField",
+					"label": "A `PhoneUK` field",
+					"value": "[[ANYTHING_PRESENT]]",
+					"hint_text": "A UK phone number.",
+					"field_type": {
+						"_extends_": "BasePhoneUKFieldType"
+					},
+					"formatted_value": "07123456789"
+				},
+				{
+					"_extends_": "CaseViewFieldACL",
+					"id": "EmailField",
+					"label": "An `Email` field",
+					"value": "[[ANYTHING_PRESENT]]",
+					"hint_text": "A valid email address.",
+					"field_type": {
+						"_extends_": "BaseEmailFieldType"
+					},
+					"formatted_value": "ccd@hmcts.net"
+				},
+				{
+					"_extends_": "CaseViewFieldACL",
+					"id": "MoneyGBPField",
+					"label": "A `MoneyGBP` field",
+					"value": "[[ANYTHING_PRESENT]]",
+					"hint_text": "A monetary value.",
+					"field_type": {
+						"_extends_": "BaseMoneyGBPFieldType"
+					},
+					"formatted_value": "4200"
+				},
+				{
+					"_extends_": "CaseViewFieldACL",
+					"id": "DateField",
+					"label": "A `Date` field",
+					"value": "[[ANYTHING_PRESENT]]",
+					"hint_text": "A temporal value without time.",
+					"field_type": {
+						"_extends_": "BaseDateFieldType"
+					},
+					"formatted_value": "2017-02-13"
+				},
+				{
+					"_extends_": "CaseViewFieldACL",
+					"id": "DateTimeField",
+					"label": "A `DateTime` field",
+					"value": "[[ANYTHING_PRESENT]]",
+					"hint_text": "A temporal value with time.",
+					"field_type": {
+						"_extends_": "BaseDateTimeFieldType"
+					},
+					"formatted_value": "1988-07-07T22:20:00"
+				},
+				{
+					"_extends_": "CaseViewFieldACL",
+					"id": "TextAreaField",
+					"label": "A `TextArea` field",
+					"value": "Line1\nLine2",
+					"hint_text": "Multiple lines of text.",
+					"field_type": {
+						"_extends_": "BaseTextAreaFieldType"
+					},
+					"formatted_value": "Line1\nLine2"
+				},
+				{
+					"_extends_": "CaseViewFieldACL",
+					"id": "FixedListField",
+					"label": "A `FixedList` field",
+					"value": "VALUE3",
+					"hint_text": "A dropdown to select one value out of many.",
+					"field_type": {
+						"_extends_": "BaseFixedListFieldType",
+						"fixed_list_items": [
+							{
+								"code": "VALUE3",
+								"label": "Value 3",
+								"order": null
+							},
+							{
+								"code": "VALUE2",
+								"label": "Value 2",
+								"order": null
+							},
+							{
+								"code": "VALUE1",
+								"label": "Value 1",
+								"order": null
+							}
+						]
+					},
+					"formatted_value": "VALUE3"
+				},
+				{
+					"_extends_": "CaseViewFieldACL",
+					"id": "MultiSelectListField",
+					"label": "A `MultiSelectList` field",
+					"value": [
+						"OPTION2",
+						"OPTION4"
+					],
+					"hint_text": "Checkboxes to select many values.",
+					"field_type": {
+						"_extends_": "BaseMultiSelectListFieldType",
+						"fixed_list_items": [
+							{
+								"code": "OPTION5",
+								"label": "Option 5",
+								"order": null
+							},
+							{
+								"code": "OPTION4",
+								"label": "Option 4",
+								"order": null
+							},
+							{
+								"code": "OPTION3",
+								"label": "Option 3",
+								"order": null
+							},
+							{
+								"code": "OPTION2",
+								"label": "Option 2",
+								"order": null
+							},
+							{
+								"code": "OPTION1",
+								"label": "Option 1",
+								"order": null
+							}
+						]
+					},
+					"formatted_value": [
+						"OPTION2",
+						"OPTION4"
+					]
+				},
+				{
+					"_extends_": "CaseViewFieldACL",
+					"id": "CollectionField",
+					"label": "A `Collection` of `Text` fields",
+					"value": [
+						{
+							"id": "[[ANYTHING_PRESENT]]",
+							"value": "Alias 1"
+						},
+						{
+							"id": "[[ANYTHING_PRESENT]]",
+							"value": "Alias 2"
+						}
+					],
+					"hint_text": "Zero to many items, here of type `Text`",
+					"field_type": {
+						"_extends_": "BaseCollectionFieldType",
+						"collection_field_type": {
+							"_extends_": "BaseTextFieldType"
+						}
+					},
+					"formatted_value": [
+						{
+							"id": "CollectionField1",
+							"value": "Alias 1"
+						},
+						{
+							"id": "CollectionField2",
+							"value": "Alias 2"
+						}
+					],
+					"display_context_parameter": "#COLLECTION(allowDelete,allowInsert)",
+					"show_summary_change_option": false
+				},
+				{
+					"_extends_": "CaseViewFieldACL",
+					"id": "ComplexField",
+					"label": "A `Complex` field",
+					"value": {
+						"ComplexTextField": "Nested text",
+						"ComplexFixedListField": "VALUE2"
+					},
+					"hint_text": "Aggregate of fields",
+					"field_type": {
+						"_extends_": "BaseComplexFieldType",
+						"complex_fields": [
+							{
+								"_extends_": "CaseFieldDefinition",
+								"acls": [
+									{
+										"listElementCode": "ComplexTextField"
+									},
+									{
+										"listElementCode": "ComplexTextField"
+									}
+								]
+							},
+							{
+								"_extends_": "CaseFieldDefinition",
+								"id": "ComplexFixedListField",
+								"label": "A `FixedList` field inside a complex",
+								"field_type": {
+									"_extends_": "BaseFixedListFieldType",
+									"fixed_list_items": [
+										{
+											"code": "VALUE3",
+											"label": "Value 3",
+											"order": null
+										},
+										{
+											"code": "VALUE2",
+											"label": "Value 2",
+											"order": null
+										},
+										{
+											"code": "VALUE1",
+											"label": "Value 1",
+											"order": null
+										}
+									]
+								},
+								"acls": [
+									{
+										"listElementCode": "ComplexFixedListField"
+									},
+									{
+										"listElementCode": "ComplexFixedListField"
+									}
+								]
+							},
+							{
+								"_extends_": "CaseFieldDefinition",
+								"id": "ComplexNestedField",
+								"label": "A `Complex` field inside a complex",
+								"field_type": {
+									"_extends_": "BaseNestedComplexFieldType",
+									"complex_fields": [
+										{
+											"_extends_": "CaseFieldDefinition",
+											"id": "NestedNumberField",
+											"label": "A `Number` field inside a nested complex",
+											"field_type": {
+												"_extends_": "BaseNumberFieldType"
+											}
+										},
+										{
+											"_extends_": "CaseFieldDefinition",
+											"id": "[[ANYTHING_PRESENT]]",
+											"label": "A `Collection` field of `Text` inside a nested complex",
+											"field_type": {
+												"_extends_": "BaseCollectionFieldType",
+												"collection_field_type": {
+													"_extends_": "BaseTextFieldType"
+												}
+											},
+											"display_context_parameter": "#COLLECTION(allowDelete,allowInsert)"
+										}
+									]
+								},
+								"acls": [
+									{
+										"listElementCode": "ComplexNestedField"
+									},
+									{
+										"listElementCode": "ComplexNestedField"
+									}
+								]
+							}
+						]
+					},
+					"formatted_value": {
+						"ComplexTextField": "Nested text",
+						"ComplexFixedListField": "VALUE2"
+					},
+					"show_summary_change_option": false
+				},
+				{
+					"_extends_": "CaseViewFieldACL",
+					"id": "AddressUKField",
+					"label": "A `AddressUK` field",
+					"value": {
+						"County": "[[ANYTHING_PRESENT]]",
+						"Country": "[[ANYTHING_PRESENT]]",
+						"PostCode": "[[ANYTHING_PRESENT]]",
+						"PostTown": "[[ANYTHING_PRESENT]]",
+						"AddressLine1": "[[ANYTHING_PRESENT]]",
+						"AddressLine2": "[[ANYTHING_PRESENT]]",
+						"AddressLine3": "[[ANYTHING_PRESENT]]"
+					},
+					"hint_text": "A UK address.",
+					"field_type": {
+						"id": "AddressUK",
+						"type": "Complex",
+						"complex_fields": [
+							{
+								"_extends_": "CaseFieldDefinition",
+								"id": "AddressLine1",
+								"label": "Building and Street",
+								"hidden": null,
+								"field_type": {
+									"id": "TextMax150",
+									"max": 150
+								}
+							},
+							{
+								"_extends_": "CaseFieldDefinition",
+								"id": "AddressLine2",
+								"label": "Address Line 2",
+								"hidden": null,
+								"field_type": {
+									"id": "TextMax50",
+									"max": 50
+								}
+							},
+							{
+								"_extends_": "CaseFieldDefinition",
+								"id": "AddressLine3",
+								"label": "Address Line 3",
+								"hidden": null,
+								"field_type": {
+									"id": "TextMax50",
+									"max": 50
+								}
+							},
+							{
+								"_extends_": "CaseFieldDefinition",
+								"id": "PostTown",
+								"label": "Town or City",
+								"hidden": null,
+								"field_type": {
+									"id": "TextMax50",
+									"max": 50
+								}
+							},
+							{
+								"_extends_": "CaseFieldDefinition",
+								"id": "County",
+								"label": "County",
+								"hidden": null,
+								"field_type": {
+									"id": "TextMax50",
+									"max": 50
+								}
+							},
+							{
+								"_extends_": "CaseFieldDefinition",
+								"id": "PostCode",
+								"label": "Postcode/Zipcode",
+								"hidden": null,
+								"field_type": {
+									"id": "TextMax14",
+									"max": 14
+								}
+							},
+							{
+								"_extends_": "CaseFieldDefinition",
+								"id": "Country",
+								"label": "Country",
+								"hidden": null,
+								"field_type": {
+									"id": "TextMax50",
+									"max": 50
+								}
+							}
+						]
+					},
+					"formatted_value": {
+						"AddressLine1": "102 Petty France",
+						"AddressLine2": "CCD",
+						"AddressLine3": "c/o HMCTS Reform",
+						"PostTown": "Westminster",
+						"County": "Greater London",
+						"PostCode": "SW1H 9AJ",
+						"Country": "UK"
+					},
+					"show_summary_change_option": false
+				},
+				{
+					"_extends_": "CaseViewFieldACL",
+					"id": "DocumentField",
+					"label": "A `Document` field",
+					"value": null,
+					"hint_text": "A document",
+					"field_type": {
+						"_extends_": "BaseDocumentFieldType"
+					},
+					"formatted_value": null
+				}
+			],
+			"event_token": "[[ANYTHING_PRESENT]]",
+			"wizard_pages": [
+				{
+					"id": "UPDATEfirst",
+					"label": "First page",
+					"order": 1,
+					"wizard_page_fields": [
+						{
+							"case_field_id": "TextField",
+							"order": 1,
+							"page_column_no": null,
+							"complex_field_overrides": []
+						},
+						{
+							"case_field_id": "NumberField",
+							"order": 2,
+							"page_column_no": null,
+							"complex_field_overrides": []
+						},
+						{
+							"case_field_id": "YesOrNoField",
+							"order": 3,
+							"page_column_no": null,
+							"complex_field_overrides": []
+						},
+						{
+							"case_field_id": "PhoneUKField",
+							"order": 4,
+							"page_column_no": null,
+							"complex_field_overrides": []
+						},
+						{
+							"case_field_id": "EmailField",
+							"order": 5,
+							"page_column_no": null,
+							"complex_field_overrides": []
+						}
+					],
+					"show_condition": null,
+					"callback_url_mid_event": null,
+					"retries_timeout_mid_event": []
+				},
+				{
+					"id": "UPDATEsecond",
+					"label": "Second page",
+					"order": 2,
+					"wizard_page_fields": [
+						{
+							"case_field_id": "MoneyGBPField",
+							"order": 1,
+							"page_column_no": null,
+							"complex_field_overrides": []
+						},
+						{
+							"case_field_id": "DateField",
+							"order": 2,
+							"page_column_no": null,
+							"complex_field_overrides": []
+						},
+						{
+							"case_field_id": "DateTimeField",
+							"order": 3,
+							"page_column_no": null,
+							"complex_field_overrides": []
+						},
+						{
+							"case_field_id": "TextAreaField",
+							"order": 4,
+							"page_column_no": null,
+							"complex_field_overrides": []
+						},
+						{
+							"case_field_id": "FixedListField",
+							"order": 5,
+							"page_column_no": null,
+							"complex_field_overrides": []
+						},
+						{
+							"case_field_id": "MultiSelectListField",
+							"order": 6,
+							"page_column_no": null,
+							"complex_field_overrides": []
+						}
+					],
+					"show_condition": null,
+					"callback_url_mid_event": null,
+					"retries_timeout_mid_event": []
+				},
+				{
+					"id": "UPDATEthird",
+					"label": "Third page",
+					"order": 3,
+					"wizard_page_fields": [
+						{
+							"case_field_id": "CollectionField",
+							"order": 2,
+							"page_column_no": null,
+							"complex_field_overrides": []
+						},
+						{
+							"case_field_id": "ComplexField",
+							"order": 1,
+							"page_column_no": null,
+							"complex_field_overrides": []
+						},
+						{
+							"case_field_id": "AddressUKField",
+							"order": 3,
+							"page_column_no": null,
+							"complex_field_overrides": []
+						},
+						{
+							"case_field_id": "DocumentField",
+							"order": 4,
+							"page_column_no": null,
+							"complex_field_overrides": []
+						}
+					],
+					"show_condition": null,
+					"callback_url_mid_event": null,
+					"retries_timeout_mid_event": []
+				}
+			],
+			"show_summary": true,
+			"show_event_notes": null,
+			"end_button_label": null,
+			"can_save_draft": null
+		}
+	}
 }
