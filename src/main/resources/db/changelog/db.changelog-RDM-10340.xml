@@ -19,8 +19,8 @@
             CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_openingdate ON public.case_data USING BTREE((TRIM(UPPER(data#>>'{openingDate}'))));
             CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_poboxjurisdiction ON public.case_data USING BTREE((TRIM(UPPER(data#>>'{poBoxJurisdiction}'))));
             CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_pobox ON public.case_data USING BTREE((TRIM(UPPER(data#>>'{poBox}'))));
-            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_sscs_formtype ON public.case_data USING BTREE (jurisdiction, btrim(upper((data #>> '{formType}'::text[])))) WHERE (((jurisdiction)::text = 'SSCS'::text);
-            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_probate_formtype ON public.case_data USING BTREE (jurisdiction, btrim(upper((data #>> '{formType}'::text[])))) WHERE (((jurisdiction)::text = 'PROBATE'::text);
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_sscs_formtype ON public.case_data USING BTREE (jurisdiction, btrim(upper((data #>> '{formType}'::text[])))) WHERE ((jurisdiction)::text = 'SSCS'::text);
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_probate_formtype ON public.case_data USING BTREE (jurisdiction, btrim(upper((data #>> '{formType}'::text[])))) WHERE ((jurisdiction)::text = 'PROBATE'::text);
             CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_hmctsdwpstate ON public.case_data USING BTREE((TRIM(UPPER(data#>>'{hmctsDwpState}'))));
 
             CREATE INDEX IF NOT EXISTS idx_case_event_significant_items_case_event_id ON case_event_significant_items (case_event_id);
