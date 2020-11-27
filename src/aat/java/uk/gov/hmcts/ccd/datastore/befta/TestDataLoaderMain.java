@@ -7,7 +7,7 @@ public class TestDataLoaderMain {
     }
 
     public static void main(String[] args) {
-        new DataStoreTestAutomationAdapter();
+        new DataStoreTestAutomationAdapter().getDataLoader().loadTestDataIfNecessary();
     }
 
 }
