@@ -116,13 +116,13 @@
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
+                    "role" : "caseworker-autotest1-senior",
                     "create" : true,
                     "read" : true,
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-senior",
+                    "role" : "caseworker-autotest1-solicitor",
                     "create" : true,
                     "read" : true,
                     "update" : true,
@@ -169,13 +169,13 @@
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
+                    "role" : "caseworker-autotest1-senior",
                     "create" : true,
                     "read" : true,
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-senior",
+                    "role" : "caseworker-autotest1-solicitor",
                     "create" : true,
                     "read" : true,
                     "update" : true,
@@ -222,13 +222,13 @@
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
+                    "role" : "caseworker-autotest1-senior",
                     "create" : true,
                     "read" : true,
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-senior",
+                    "role" : "caseworker-autotest1-solicitor",
                     "create" : true,
                     "read" : true,
                     "update" : true,
@@ -275,13 +275,13 @@
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
+                    "role" : "caseworker-autotest1-senior",
                     "create" : true,
                     "read" : true,
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-senior",
+                    "role" : "caseworker-autotest1-solicitor",
                     "create" : true,
                     "read" : true,
                     "update" : true,
@@ -328,13 +328,13 @@
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
+                    "role" : "caseworker-autotest1-senior",
                     "create" : true,
                     "read" : true,
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-senior",
+                    "role" : "caseworker-autotest1-solicitor",
                     "create" : true,
                     "read" : true,
                     "update" : true,
@@ -381,13 +381,13 @@
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
+                    "role" : "caseworker-autotest1-senior",
                     "create" : true,
                     "read" : true,
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-senior",
+                    "role" : "caseworker-autotest1-solicitor",
                     "create" : true,
                     "read" : true,
                     "update" : true,
@@ -434,13 +434,13 @@
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
+                    "role" : "caseworker-autotest1-senior",
                     "create" : true,
                     "read" : true,
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-senior",
+                    "role" : "caseworker-autotest1-solicitor",
                     "create" : true,
                     "read" : true,
                     "update" : true,
@@ -504,13 +504,13 @@
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
+                    "role" : "caseworker-autotest1-senior",
                     "create" : true,
                     "read" : true,
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-senior",
+                    "role" : "caseworker-autotest1-solicitor",
                     "create" : true,
                     "read" : true,
                     "update" : true,
@@ -573,13 +573,13 @@
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
+                    "role" : "caseworker-autotest1-senior",
                     "create" : true,
                     "read" : true,
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-senior",
+                    "role" : "caseworker-autotest1-solicitor",
                     "create" : true,
                     "read" : true,
                     "update" : true,
@@ -641,13 +641,13 @@
                         "update" : true,
                         "delete" : false
                       }, {
-                        "role" : "caseworker-autotest1-solicitor",
+                        "role" : "caseworker-autotest1-senior",
                         "create" : true,
                         "read" : true,
                         "update" : true,
                         "delete" : false
                       }, {
-                        "role" : "caseworker-autotest1-senior",
+                        "role" : "caseworker-autotest1-solicitor",
                         "create" : true,
                         "read" : true,
                         "update" : true,
@@ -703,13 +703,13 @@
                         "update" : true,
                         "delete" : false
                       }, {
-                        "role" : "caseworker-autotest1-solicitor",
+                        "role" : "caseworker-autotest1-senior",
                         "create" : true,
                         "read" : true,
                         "update" : true,
                         "delete" : false
                       }, {
-                        "role" : "caseworker-autotest1-senior",
+                        "role" : "caseworker-autotest1-solicitor",
                         "create" : true,
                         "read" : true,
                         "update" : true,
@@ -741,13 +741,13 @@
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
+                    "role" : "caseworker-autotest1-senior",
                     "create" : true,
                     "read" : true,
                     "update" : true,
                     "delete" : false
                   }, {
-                    "role" : "caseworker-autotest1-senior",
+                    "role" : "caseworker-autotest1-solicitor",
                     "create" : true,
                     "read" : true,
                     "update" : true,
