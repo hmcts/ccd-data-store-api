@@ -53,6 +53,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/health",
         "/loggers/**",
         "/",
+        "/status/health",
         "/swagger-resources/**",
         "/swagger-ui/**",
         "/webjars/**"
