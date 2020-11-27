@@ -246,18 +246,20 @@
 						"_extends_": "BaseComplexFieldType",
 						"complex_fields": [
 							{
-								"_extends_": "CaseFieldDefinition",
+								"_extends_": "CaseFieldDefinitionWithoutACLs",
 								"acls": [
 									{
+									    "_extends_" : "AllGrantedAccessControlList",
 										"listElementCode": "ComplexTextField"
 									},
 									{
+									    "_extends_" : "AllGrantedAccessControlList",
 										"listElementCode": "ComplexTextField"
 									}
 								]
 							},
 							{
-								"_extends_": "CaseFieldDefinition",
+								"_extends_": "CaseFieldDefinitionWithoutACLs",
 								"id": "ComplexFixedListField",
 								"label": "A `FixedList` field inside a complex",
 								"field_type": {
@@ -282,22 +284,24 @@
 								},
 								"acls": [
 									{
+									    "_extends_" : "AllGrantedAccessControlList",
 										"listElementCode": "ComplexFixedListField"
 									},
 									{
+									    "_extends_" : "AllGrantedAccessControlList",
 										"listElementCode": "ComplexFixedListField"
 									}
 								]
 							},
 							{
-								"_extends_": "CaseFieldDefinition",
+								"_extends_": "CaseFieldDefinitionWithoutACLs",
 								"id": "ComplexNestedField",
 								"label": "A `Complex` field inside a complex",
 								"field_type": {
 									"_extends_": "BaseNestedComplexFieldType",
 									"complex_fields": [
 										{
-											"_extends_": "CaseFieldDefinition",
+											"_extends_": "CaseFieldDefinitionWithACLs",
 											"id": "NestedNumberField",
 											"label": "A `Number` field inside a nested complex",
 											"field_type": {
@@ -305,7 +309,7 @@
 											}
 										},
 										{
-											"_extends_": "CaseFieldDefinition",
+											"_extends_": "CaseFieldDefinitionWithACLs",
 											"id": "[[ANYTHING_PRESENT]]",
 											"label": "A `Collection` field of `Text` inside a nested complex",
 											"field_type": {
@@ -320,9 +324,11 @@
 								},
 								"acls": [
 									{
+									    "_extends_" : "AllGrantedAccessControlList",
 										"listElementCode": "ComplexNestedField"
 									},
 									{
+									    "_extends_" : "AllGrantedAccessControlList",
 										"listElementCode": "ComplexNestedField"
 									}
 								]
@@ -354,7 +360,7 @@
 						"type": "Complex",
 						"complex_fields": [
 							{
-								"_extends_": "CaseFieldDefinition",
+								"_extends_": "CaseFieldDefinitionWithACLs",
 								"id": "AddressLine1",
 								"label": "Building and Street",
 								"hidden": null,
@@ -364,7 +370,7 @@
 								}
 							},
 							{
-								"_extends_": "CaseFieldDefinition",
+								"_extends_": "CaseFieldDefinitionWithACLs",
 								"id": "AddressLine2",
 								"label": "Address Line 2",
 								"hidden": null,
@@ -374,7 +380,7 @@
 								}
 							},
 							{
-								"_extends_": "CaseFieldDefinition",
+								"_extends_": "CaseFieldDefinitionWithACLs",
 								"id": "AddressLine3",
 								"label": "Address Line 3",
 								"hidden": null,
@@ -384,7 +390,7 @@
 								}
 							},
 							{
-								"_extends_": "CaseFieldDefinition",
+								"_extends_": "CaseFieldDefinitionWithACLs",
 								"id": "PostTown",
 								"label": "Town or City",
 								"hidden": null,
@@ -394,7 +400,7 @@
 								}
 							},
 							{
-								"_extends_": "CaseFieldDefinition",
+								"_extends_": "CaseFieldDefinitionWithACLs",
 								"id": "County",
 								"label": "County",
 								"hidden": null,
@@ -404,7 +410,7 @@
 								}
 							},
 							{
-								"_extends_": "CaseFieldDefinition",
+								"_extends_": "CaseFieldDefinitionWithACLs",
 								"id": "PostCode",
 								"label": "Postcode/Zipcode",
 								"hidden": null,
@@ -414,7 +420,7 @@
 								}
 							},
 							{
-								"_extends_": "CaseFieldDefinition",
+								"_extends_": "CaseFieldDefinitionWithACLs",
 								"id": "Country",
 								"label": "Country",
 								"hidden": null,
