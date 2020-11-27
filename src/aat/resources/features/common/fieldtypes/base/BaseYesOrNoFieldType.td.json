@@ -1,0 +1,7 @@
+{
+  "_guid_": "BaseYesOrNoFieldType",
+  "_extends_": "CommonFieldType",
+
+  "id": "YesOrNo",
+  "type": "YesOrNo"
+}

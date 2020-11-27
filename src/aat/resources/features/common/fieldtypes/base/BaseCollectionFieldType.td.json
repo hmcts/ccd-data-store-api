@@ -1,0 +1,7 @@
+{
+  "_guid_": "BaseCollectionFieldType",
+  "_extends_": "CommonFieldType",
+
+  "id": "[[ANYTHING_PRESENT]]",
+  "type": "Collection"
+}
