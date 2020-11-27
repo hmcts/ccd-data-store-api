@@ -165,6 +165,7 @@
     <cve>CVE-2020-13934</cve>
     <cve>CVE-2020-13935</cve>
     <cve>CVE-2020-8022</cve>
+    <cve>CVE-2020-26168</cve>
 </suppress>
 
 	<suppress>
