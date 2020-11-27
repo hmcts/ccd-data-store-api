@@ -47,13 +47,13 @@ public class SwaggerConfiguration {
 
     private Docket getNewDocketForPackageOf(Class<?> klazz, String groupName, ApiInfo apiInfo) {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName(groupName)
-                .select()
-                .apis(RequestHandlerSelectors.basePackage(klazz.getPackage().getName()))
-                .paths(PathSelectors.any())
-                .build().useDefaultResponseMessages(false)
-                .apiInfo(apiInfo)
-                .globalRequestParameters(Arrays.asList(headerAuthorization(), headerServiceAuthorization()));
+            .groupName(groupName)
+            .select()
+            .apis(RequestHandlerSelectors.basePackage(klazz.getPackage().getName()))
+            .paths(PathSelectors.any())
+            .build().useDefaultResponseMessages(false)
+            .apiInfo(apiInfo)
+            .globalRequestParameters(Arrays.asList(headerAuthorization(), headerServiceAuthorization()));
     }
 
     private ApiInfo apiV1Info() {
@@ -64,8 +64,8 @@ public class SwaggerConfiguration {
             .licenseUrl("")
             .version("1.0.1")
             .contact(new Contact("CCD",
-                                 "https://tools.hmcts.net/confluence/display/RCCD/Reform%3A+Core+Case+Data+Home",
-                                 "corecasedatateam@hmcts.net"))
+                "https://tools.hmcts.net/confluence/display/RCCD/Reform%3A+Core+Case+Data+Home",
+                "corecasedatateam@hmcts.net"))
             .termsOfServiceUrl("")
             .build();
     }
@@ -78,8 +78,8 @@ public class SwaggerConfiguration {
             .licenseUrl("https://opensource.org/licenses/MIT")
             .version("2-beta")
             .contact(new Contact("CCD",
-                                 "https://tools.hmcts.net/confluence/display/RCCD/Reform%3A+Core+Case+Data+Home",
-                                 "corecasedatateam@hmcts.net"))
+                "https://tools.hmcts.net/confluence/display/RCCD/Reform%3A+Core+Case+Data+Home",
+                "corecasedatateam@hmcts.net"))
             .build();
     }
 
