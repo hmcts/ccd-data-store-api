@@ -1,0 +1,9 @@
+{
+  "_guid_": "NegativeResponseBody",
+
+  "exception" : "[[ANYTHING_PRESENT]]",
+  "message" : "[[ANYTHING_PRESENT]]",
+  "details" : null,
+  "callbackErrors" : null,
+  "callbackWarnings" : null
+}

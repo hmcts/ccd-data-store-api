@@ -23,11 +23,8 @@
 			"Content-Encoding" : "gzip"
 		},
 		"body": {
-			"exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-			"message" : "[[ANYTHING_PRESENT]]",
-			"details" : null,
-			"callbackErrors" : null,
-			"callbackWarnings" : null
+      "_extends_": "NegativeResponseBody",
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException"
 		}
 	}
 }
