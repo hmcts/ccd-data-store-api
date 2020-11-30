@@ -7,8 +7,9 @@ java:
   applicationPort: 4452
   aadIdentityName: ccd
   autoscaling:
-    enabled: true 
-    maxReplicas: 8
+    enabled: true
+    maxReplicas: 12
+    minReplicas: 6
   keyVaults:
     ccd:
       secrets:
