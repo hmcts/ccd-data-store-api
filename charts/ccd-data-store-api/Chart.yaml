@@ -8,7 +8,7 @@ maintainers:
     email: ccd-devops@HMCTS.NET
 dependencies:
   - name: java
-    version: 3.4.2
+    version: 3.4.4
     repository: '@hmctspublic'
   - name: elasticsearch
     version: 7.8.1
