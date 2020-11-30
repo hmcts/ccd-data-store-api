@@ -20,7 +20,6 @@ def definitionStoreDevelopPr = "PR-830"  // This doesn't change frequently, but 
 def dataStoreApiDevelopPr    = "PR-601" // This doesn't change frequently, but when it does, only change this value.
 def prsToUseAat              = "PR-1193" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
 
-
 def secrets = [
     'ccd-${env}': [
         secret('ccd-caseworker-autotest-email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
