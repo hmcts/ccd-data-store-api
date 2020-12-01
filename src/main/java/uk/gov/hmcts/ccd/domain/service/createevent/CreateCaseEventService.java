@@ -289,8 +289,8 @@ public class CreateCaseEventService {
         if (onBehalfOfUserTokenExists) {
             user = userRepository.getUser();
             auditEvent.setProxiedBy(user.getId());
-            auditEvent.setProxiedByLastName(user.getForename());
-            auditEvent.setProxiedByFirstName(user.getSurname());
+            auditEvent.setProxiedByLastName(user.getSurname());
+            auditEvent.setProxiedByFirstName(user.getForename());
         }
     }
 }

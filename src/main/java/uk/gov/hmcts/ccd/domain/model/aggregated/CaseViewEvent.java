@@ -39,6 +39,15 @@ public class CaseViewEvent {
     @JsonProperty("significant_item")
     private SignificantItem significantItem;
 
+    @JsonProperty("proxied_by")
+    private String proxiedBy;
+
+    @JsonProperty("proxied_by_last_name")
+    private String proxiedByLastName;
+
+    @JsonProperty("proxied_by_first_name")
+    private String proxiedByFirstName;
+
     public Long getId() {
         return id;
     }
@@ -135,6 +144,30 @@ public class CaseViewEvent {
         this.significantItem = significantItem;
     }
 
+    public String getProxiedBy() {
+        return proxiedBy;
+    }
+
+    public void setProxiedBy(String proxiedBy) {
+        this.proxiedBy = proxiedBy;
+    }
+
+    public String getProxiedByLastName() {
+        return proxiedByLastName;
+    }
+
+    public void setProxiedByLastName(String proxiedByLastName) {
+        this.proxiedByLastName = proxiedByLastName;
+    }
+
+    public String getProxiedByFirstName() {
+        return proxiedByFirstName;
+    }
+
+    public void setProxiedByFirstName(String proxiedByFirstName) {
+        this.proxiedByFirstName = proxiedByFirstName;
+    }
+
     public static CaseViewEvent createFrom(AuditEvent event) {
         CaseViewEvent caseEvent = new CaseViewEvent();
         caseEvent.setId(event.getId());
@@ -143,6 +176,9 @@ public class CaseViewEvent {
         caseEvent.setUserId(event.getUserId());
         caseEvent.setUserLastName(event.getUserLastName());
         caseEvent.setUserFirstName(event.getUserFirstName());
+        caseEvent.setProxiedBy(event.getProxiedBy());
+        caseEvent.setProxiedByFirstName(event.getProxiedByFirstName());
+        caseEvent.setProxiedByLastName(event.getProxiedByLastName());
         caseEvent.setSummary(event.getSummary());
         caseEvent.setComment(event.getDescription());
         caseEvent.setTimestamp(event.getCreatedDate());
