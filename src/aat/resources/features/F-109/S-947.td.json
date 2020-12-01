@@ -56,54 +56,6 @@
           },
           "display_context_parameter" : null
         }, {
-          "label" : "Last State Modified Date",
-          "order" : null,
-          "metadata" : true,
-          "case_field_id" : "[LAST_STATE_MODIFIED_DATE]",
-          "case_field_type" : {
-            "id" : "DateTime",
-            "type" : "DateTime",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          },
-          "display_context_parameter" : null
-        }, {
-          "label" : "Last Modified Date",
-          "order" : null,
-          "metadata" : true,
-          "case_field_id" : "[LAST_MODIFIED_DATE]",
-          "case_field_type" : {
-            "id" : "DateTime",
-            "type" : "DateTime",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          },
-          "display_context_parameter" : null
-        }, {
-          "label" : "Created Date",
-          "order" : null,
-          "metadata" : true,
-          "case_field_id" : "[CREATED_DATE]",
-          "case_field_type" : {
-            "id" : "DateTime",
-            "type" : "DateTime",
-            "min" : null,
-            "max" : null,
-            "regular_expression" : null,
-            "fixed_list_items" : [ ],
-            "complex_fields" : [ ],
-            "collection_field_type" : null
-          },
-          "display_context_parameter" : null
-        }, {
           "label" : "Jurisdiction",
           "order" : null,
           "metadata" : true,
@@ -135,7 +87,7 @@
             "collection_field_type" : null
           },
           "display_context_parameter" : null
-        }, {
+        },  {
           "label" : "Security Classification",
           "order" : null,
           "metadata" : true,
@@ -167,7 +119,55 @@
             "collection_field_type" : null
           },
           "display_context_parameter" : null
-        } ],
+        }, {
+          "label" : "Created Date",
+          "order" : null,
+          "metadata" : true,
+          "case_field_id" : "[CREATED_DATE]",
+          "case_field_type" : {
+            "id" : "DateTime",
+            "type" : "DateTime",
+            "min" : null,
+            "max" : null,
+            "regular_expression" : null,
+            "fixed_list_items" : [ ],
+            "complex_fields" : [ ],
+            "collection_field_type" : null
+          },
+          "display_context_parameter" : null
+        }, {
+          "label" : "Last Modified Date",
+          "order" : null,
+          "metadata" : true,
+          "case_field_id" : "[LAST_MODIFIED_DATE]",
+          "case_field_type" : {
+            "id" : "DateTime",
+            "type" : "DateTime",
+            "min" : null,
+            "max" : null,
+            "regular_expression" : null,
+            "fixed_list_items" : [ ],
+            "complex_fields" : [ ],
+            "collection_field_type" : null
+          },
+          "display_context_parameter" : null
+        }, {
+          "label" : "Last State Modified Date",
+          "order" : null,
+          "metadata" : true,
+          "case_field_id" : "[LAST_STATE_MODIFIED_DATE]",
+          "case_field_type" : {
+            "id" : "DateTime",
+            "type" : "DateTime",
+            "min" : null,
+            "max" : null,
+            "regular_expression" : null,
+            "fixed_list_items" : [ ],
+            "complex_fields" : [ ],
+            "collection_field_type" : null
+          },
+          "display_context_parameter" : null
+        }],
         "cases" : [ ]
       } ],
       "cases" : [ ],
