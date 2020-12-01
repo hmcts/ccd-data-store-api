@@ -32,8 +32,8 @@
       "case_id": null,
       "case_fields": [
         {
-          "id": "Address1",
-          "label": "Address 1",
+          "id": "Address2",
+          "label": "Address 2",
           "hidden": false,
           "value": null,
           "metadata": false,
@@ -337,8 +337,8 @@
           "default_value": null
         },
         {
-          "id": "Address2",
-          "label": "Address 2",
+          "id": "Address1",
+          "label": "Address 1",
           "hidden": false,
           "value": null,
           "metadata": false,
