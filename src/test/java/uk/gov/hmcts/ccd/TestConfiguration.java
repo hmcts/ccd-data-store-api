@@ -34,7 +34,8 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 
 @Configuration
 @Profile("test")
-@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+@SuppressWarnings("checkstyle:OperatorWrap")
 class TestConfiguration extends ContextCleanupListener {
 
     private final ApplicationParams applicationParams;
@@ -107,7 +108,8 @@ class TestConfiguration extends ContextCleanupListener {
     @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
     @Primary
     CaseDefinitionRepository caseDefinitionRepository() throws IOException {
-        final FieldTypeDefinition[] fieldTypeDefinitions = mapper.readValue(baseTypes.getBytes(), FieldTypeDefinition[].class);
+        final FieldTypeDefinition[] fieldTypeDefinitions =
+            mapper.readValue(baseTypes.getBytes(), FieldTypeDefinition[].class);
         final DefaultCaseDefinitionRepository caseDefinitionRepository = mock(DefaultCaseDefinitionRepository.class);
 
         ReflectionTestUtils.setField(caseDefinitionRepository, "applicationParams", applicationParams);

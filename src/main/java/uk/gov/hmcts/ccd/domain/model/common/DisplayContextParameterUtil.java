@@ -15,7 +15,7 @@ import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollec
 public class DisplayContextParameterUtil {
 
     private DisplayContextParameterUtil() {
-        // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
+      // Hide Utility Class Constructor : Utility classes should not have a public or default constructor (squid:S1118)
     }
 
     public static final String COLLECTION = "COLLECTION";

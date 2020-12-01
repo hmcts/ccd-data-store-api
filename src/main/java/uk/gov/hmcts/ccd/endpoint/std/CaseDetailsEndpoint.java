@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -21,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ccd.AppInsights;
+import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
@@ -47,6 +45,7 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
+import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -54,7 +53,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.transaction.Transactional;
 
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
@@ -130,15 +128,13 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
         @ApiParam(value = "Case ID", required = true)
-        @PathVariable("cid") final String caseId) throws JsonProcessingException {
+        @PathVariable("cid") final String caseId) {
 
         final Instant start = Instant.now();
         final CaseDetails caseDetails = getCaseOperation.execute(jurisdictionId, caseTypeId, caseId)
             .orElseThrow(() -> new CaseNotFoundException(jurisdictionId, caseTypeId, caseId));
         final Duration duration = Duration.between(start, Instant.now());
         appInsights.trackRequest("findCaseDetailsForCaseworker", duration.toMillis(), true);
-
-        String json = new ObjectMapper().writeValueAsString(caseDetails);
         return caseDetails;
     }
 
@@ -167,9 +163,10 @@ public class CaseDetailsEndpoint {
     }
 
     @Transactional
-    @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token")
+    @GetMapping(
+        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token")
     @ApiOperation(value = "Start event creation as Case worker",
-        notes = "Start the event creation process for an existing case. Triggers `AboutToStart` callback.")
+                  notes = "Start the event creation process for an existing case. Triggers `AboutToStart` callback.")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Event creation process started"),
         @ApiResponse(code = 404, message = "No case found for the given ID"),
@@ -194,7 +191,8 @@ public class CaseDetailsEndpoint {
 
     @Transactional
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token")
-    @ApiOperation(value = "Start event creation as Citizen", notes = "Start the event creation process for an existing case. Triggers `AboutToStart` callback.")
+    @ApiOperation(value = "Start event creation as Citizen", notes = "Start the event creation process for an existing "
+        + "case. Triggers `AboutToStart` callback.")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Event creation process started"),
         @ApiResponse(code = 404, message = "No case found for the given ID"),
@@ -212,16 +210,15 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Event ID", required = true)
         @PathVariable("etid") final String eventId,
         @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
-        @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) throws JsonProcessingException {
+        @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-        StartEventResult startEventResult = startEventOperation.triggerStartForCase(caseId, eventId, ignoreWarning);
-        String json = new ObjectMapper().writeValueAsString(startEventResult);
-        return startEventResult;
+        return startEventOperation.triggerStartForCase(caseId, eventId, ignoreWarning);
     }
 
     @Transactional
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token")
-    @ApiOperation(value = "Start case creation as Case worker", notes = "Start the case creation process for a new case. Triggers `AboutToStart` callback.")
+    @ApiOperation(value = "Start case creation as Case worker", notes = "Start the case creation process for a new "
+        + "case. Triggers `AboutToStart` callback.")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Case creation process started"),
         @ApiResponse(code = 422, message = "Process could not be started")
@@ -236,17 +233,15 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Event ID", required = true)
         @PathVariable("etid") final String eventId,
         @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
-        @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) throws JsonProcessingException {
+        @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
 
-
-        StartEventResult startEventResult = startEventOperation.triggerStartForCaseType(caseTypeId, eventId, ignoreWarning);
-        String json = new ObjectMapper().writeValueAsString(startEventResult);
-        return startEventResult;
+        return startEventOperation.triggerStartForCaseType(caseTypeId, eventId, ignoreWarning);
     }
 
     @Transactional
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token")
-    @ApiOperation(value = "Start case creation as Citizen", notes = "Start the case creation process for a new case. Triggers `AboutToStart` callback.")
+    @ApiOperation(value = "Start case creation as Citizen", notes = "Start the case creation process for a new case. "
+        + "Triggers `AboutToStart` callback.")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Case creation process started"),
         @ApiResponse(code = 422, message = "Process could not be started")
@@ -270,7 +265,8 @@ public class CaseDetailsEndpoint {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(
         value = "Submit case creation as Case worker",
-        notes = "Complete the case creation process. This requires a valid event token to be provided, as generated by `startCaseForCaseworker`."
+        notes = "Complete the case creation process. This requires a valid event token to be provided, as generated by"
+            + " `startCaseForCaseworker`."
     )
     @ApiResponses(value = {
         @ApiResponse(code = 201, message = "Case created"),
@@ -288,18 +284,17 @@ public class CaseDetailsEndpoint {
         @PathVariable("ctid") final String caseTypeId,
         @ApiParam(value = "Should `AboutToSubmit` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning,
-        @RequestBody final CaseDataContent content) throws JsonProcessingException {
+        @RequestBody final CaseDataContent content) {
 
-        CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
-        String json = new ObjectMapper().writeValueAsString(caseDetails);
-        return caseDetails;
+        return createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
     }
 
     @PostMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(
         value = "Submit case creation as Citizen",
-        notes = "Complete the case creation process. This requires a valid event token to be provided, as generated by `startCaseForCitizen`."
+        notes = "Complete the case creation process. This requires a valid event token to be provided, as generated by"
+            + " `startCaseForCitizen`."
     )
     @ApiResponses(value = {
         @ApiResponse(code = 201, message = "Case created"),
@@ -346,11 +341,11 @@ public class CaseDetailsEndpoint {
         @RequestBody final CaseDataContent content) {
 
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId,
-            content);
+                                                        content);
 
         return midEventCallback.invoke(caseTypeId,
-            content,
-            pageId);
+                                       content,
+                                       pageId);
     }
 
     @Transactional
@@ -358,7 +353,8 @@ public class CaseDetailsEndpoint {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(
         value = "Submit event creation as Case worker",
-        notes = "Complete the event creation process. This requires a valid event token to be provided, as generated by `startEventForCaseworker`."
+        notes = "Complete the event creation process. This requires a valid event token to be provided, as generated by"
+            + " `startEventForCaseworker`."
     )
     @ApiResponses(value = {
         @ApiResponse(code = 201, message = "Case event created"),
@@ -376,13 +372,9 @@ public class CaseDetailsEndpoint {
         @PathVariable("ctid") final String caseTypeId,
         @ApiParam(value = "Case ID", required = true)
         @PathVariable("cid") final String caseId,
-        @RequestBody final CaseDataContent content) throws JsonProcessingException {
-
-
-        CaseDetails caseEvent = createEventOperation.createCaseEvent(caseId,
-            content);
-        String json = new ObjectMapper().writeValueAsString(caseEvent);
-        return caseEvent;
+        @RequestBody final CaseDataContent content) {
+        return createEventOperation.createCaseEvent(caseId,
+                                                    content);
     }
 
     @Transactional
@@ -390,7 +382,8 @@ public class CaseDetailsEndpoint {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(
         value = "Submit event creation as Citizen",
-        notes = "Complete the event creation process. This requires a valid event token to be provided, as generated by `startEventForCitizen`."
+        notes = "Complete the event creation process. This requires a valid event token to be provided, as generated by"
+            + " `startEventForCitizen`."
     )
     @ApiResponses(value = {
         @ApiResponse(code = 201, message = "Case event created"),
@@ -410,7 +403,7 @@ public class CaseDetailsEndpoint {
         @PathVariable("cid") final String caseId,
         @RequestBody final CaseDataContent content) {
         return createEventOperation.createCaseEvent(caseId,
-            content);
+                                                    content);
     }
 
     @Transactional
@@ -427,7 +420,8 @@ public class CaseDetailsEndpoint {
         try {
             return documentsOperation.getPrintableDocumentsForCase(cid);
         } catch (NumberFormatException e) {
-            throw new ApiException(String.format("Unrecognised Case Reference %s. Case Reference should be a number", cid));
+            throw new ApiException(String.format("Unrecognised Case Reference %s. Case Reference should be a number",
+                cid));
         }
     }
 
@@ -436,12 +430,12 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get case data for a given case type")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
-    @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId", caseType = "#caseTypeId",
-        caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint).buildCaseIds(#result)")
+    @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId",
+        caseType = "#caseTypeId", caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint).buildCaseIds(#result)")
     public List<CaseDetails> searchCasesForCaseWorkers(@PathVariable("uid") final String uid,
                                                        @PathVariable("jid") final String jurisdictionId,
                                                        @PathVariable("ctid") final String caseTypeId,
-                                                       @RequestParam Map<String, String> queryParameters) throws JsonProcessingException {
+                                                       @RequestParam Map<String, String> queryParameters) {
         return searchCases(jurisdictionId, caseTypeId, queryParameters);
     }
 
@@ -450,26 +444,24 @@ public class CaseDetailsEndpoint {
     @ApiOperation(value = "Get case data for a given case type")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search criteria")})
-    @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId", caseType = "#caseTypeId",
-        caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint).buildCaseIds(#result)")
+    @LogAudit(operationType = AuditOperationType.SEARCH_CASE, jurisdiction = "#jurisdictionId",
+        caseType = "#caseTypeId", caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseDetailsEndpoint).buildCaseIds(#result)")
     public List<CaseDetails> searchCasesForCitizens(@PathVariable("uid") final String uid,
                                                     @PathVariable("jid") final String jurisdictionId,
                                                     @PathVariable("ctid") final String caseTypeId,
-                                                    @RequestParam Map<String, String> queryParameters) throws JsonProcessingException {
+                                                    @RequestParam Map<String, String> queryParameters) {
         return searchCases(jurisdictionId, caseTypeId, queryParameters);
     }
 
     private List<CaseDetails> searchCases(final String jurisdictionId,
                                           final String caseTypeId,
-                                          final Map<String, String> queryParameters) throws JsonProcessingException {
+                                          final Map<String, String> queryParameters) {
 
         final MetaData metadata = createMetadata(jurisdictionId, caseTypeId, queryParameters);
 
         final Map<String, String> sanitizedParams = fieldMapSanitizeOperation.execute(queryParameters);
 
-        List<CaseDetails> results = searchOperation.execute(metadata, sanitizedParams);
-        String json = new ObjectMapper().writeValueAsString(results);
-        return results;
+        return searchOperation.execute(metadata, sanitizedParams);
     }
 
     @Transactional
@@ -480,7 +472,8 @@ public class CaseDetailsEndpoint {
     public PaginatedSearchMetadata searchCasesMetadataForCaseworkers(@PathVariable("uid") final String uid,
                                                                      @PathVariable("jid") final String jurisdictionId,
                                                                      @PathVariable("ctid") final String caseTypeId,
-                                                                     @RequestParam Map<String, String> queryParameters) {
+                                                                     @RequestParam Map<String, String>
+                                                                             queryParameters) {
         return searchMetadata(jurisdictionId, caseTypeId, queryParameters);
     }
 
@@ -509,11 +502,11 @@ public class CaseDetailsEndpoint {
 
 
     private void validateMetadataSearchParameters(Map<String, String> queryParameters) {
-        List<String> metadataParams =
-            queryParameters.keySet().stream().filter(p -> !FieldMapSanitizeOperation.isCaseFieldParameter(p)).collect(toList());
+        List<String> metadataParams = queryParameters.keySet().stream().filter(p ->
+            !FieldMapSanitizeOperation.isCaseFieldParameter(p)).collect(toList());
         if (!MetaData.unknownMetadata(metadataParams).isEmpty()) {
             throw new BadRequestException(String.format("unknown metadata search parameters: %s",
-                String.join((","), MetaData.unknownMetadata(metadataParams))));
+                                                        String.join((","), MetaData.unknownMetadata(metadataParams))));
         }
         param(queryParameters, SECURITY_CLASSIFICATION.getParameterName()).ifPresent(sc -> {
             if (!EnumUtils.isValidEnum(SecurityClassification.class, sc.toUpperCase())) {

@@ -33,7 +33,8 @@ public class CaseDataService {
 
     public Map<String, JsonNode> getDefaultSecurityClassifications(final CaseTypeDefinition caseType,
                                                                    final Map<String, JsonNode> caseData,
-                                                                   final Map<String, JsonNode> currentDataClassification) {
+                                                                   final Map<String, JsonNode>
+                                                                       currentDataClassification) {
         final JsonNode clonedDataClassification = cloneAndConvertDataMap(caseData);
         deduceDefaultClassifications(
             clonedDataClassification,
@@ -85,18 +86,22 @@ public class CaseDataService {
         }
     }
 
-    private JsonNode getExistingDataClassificationNodeOrEmpty(JsonNode existingDataClassificationNode, String fieldName) {
-        return existingDataClassificationNode.has(fieldName) ? existingDataClassificationNode.get(fieldName) : JSON_NODE_FACTORY.objectNode();
+    private JsonNode getExistingDataClassificationNodeOrEmpty(JsonNode existingDataClassificationNode,
+                                                              String fieldName) {
+        return existingDataClassificationNode.has(fieldName) ? existingDataClassificationNode.get(fieldName)
+            : JSON_NODE_FACTORY.objectNode();
     }
 
-    private JsonNode getExistingDataClassificationFromArrayOrEmpty(JsonNode existingDataClassificationArray, JsonNode field) {
+    private JsonNode getExistingDataClassificationFromArrayOrEmpty(JsonNode existingDataClassificationArray,
+                                                                   JsonNode field) {
         if (!existingDataClassificationArray.has(VALUE)) {
             return JSON_NODE_FACTORY.objectNode();
         }
         Iterator<JsonNode> iterator = existingDataClassificationArray.get(VALUE).iterator();
         JsonNode dataClassificationForData = getDataClassificationForData(field,
             iterator);
-        return dataClassificationForData.has(VALUE) ? dataClassificationForData.get(VALUE) : JSON_NODE_FACTORY.objectNode();
+        return dataClassificationForData.has(VALUE) ? dataClassificationForData.get(VALUE)
+            : JSON_NODE_FACTORY.objectNode();
     }
 
     private void deduceClassificationForSimpleType(ObjectNode dataNode,
@@ -119,7 +124,8 @@ public class CaseDataService {
         final JsonNode fieldNode = dataNode.get(fieldName);
         if (null != fieldNode && fieldNode.isArray()) {
             ArrayNode arrayNode = (ArrayNode) fieldNode;
-            final FieldTypeDefinition collectionFieldType = caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition();
+            final FieldTypeDefinition collectionFieldType =
+                caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition();
             for (JsonNode field : arrayNode) {
 
                 final JsonNode itemClassification = getExistingDataClassificationFromArrayOrEmpty(

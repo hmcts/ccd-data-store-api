@@ -35,13 +35,15 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     private final Map<String, List<FieldTypeDefinition>> baseTypes = newHashMap();
 
     @Autowired
-    public CachedCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository) {
+    public CachedCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
+                                                  CaseDefinitionRepository caseDefinitionRepository) {
         this.caseDefinitionRepository = caseDefinitionRepository;
     }
 
     @Override
     public List<CaseTypeDefinition> getCaseTypesForJurisdiction(final String jurisdictionId) {
-        return caseTypesForJurisdictions.computeIfAbsent(jurisdictionId, caseDefinitionRepository::getCaseTypesForJurisdiction);
+        return caseTypesForJurisdictions.computeIfAbsent(jurisdictionId,
+                                                         caseDefinitionRepository::getCaseTypesForJurisdiction);
     }
 
     @Override
@@ -74,7 +76,8 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
             .collect(Collectors.toList());
 
         missingClassifications
-            .forEach(userClassification -> userRoleClassifications.putIfAbsent(userClassification.getRole(), userClassification));
+            .forEach(userClassification ->
+                userRoleClassifications.putIfAbsent(userClassification.getRole(), userClassification));
 
         return userRoles.stream().map(userRoleClassifications::get).collect(Collectors.toList());
     }

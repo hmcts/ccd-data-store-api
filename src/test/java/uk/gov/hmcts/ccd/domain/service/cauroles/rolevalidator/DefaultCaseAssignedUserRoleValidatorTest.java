@@ -49,7 +49,8 @@ class DefaultCaseAssignedUserRoleValidatorTest {
     @DisplayName("Can access case roles when user has caseworker-caa")
     void canAccessUserCaseRolesWhenUserRolesContainsValidAccessRole() {
         when(userRepository.anyRoleEqualsAnyOf(any())).thenReturn(true);
-        when(applicationParams.getCcdAccessControlCrossJurisdictionRoles()).thenReturn(Arrays.asList(roleCaseworkerCaa));
+        when(applicationParams.getCcdAccessControlCrossJurisdictionRoles())
+                .thenReturn(Arrays.asList(roleCaseworkerCaa));
         boolean canAccess = caseAssignedUserRoleValidator.canAccessUserCaseRoles(Lists.newArrayList());
         assertTrue(canAccess);
     }
@@ -68,7 +69,8 @@ class DefaultCaseAssignedUserRoleValidatorTest {
     void canAccessSelfUserCaseRolesWhenSelfUserIdPassedMoreThanOnce() {
         when(userRepository.getUserRoles()).thenReturn(Collections.singleton(roleCaseworkerSolicitor));
         when(userRepository.getUserId()).thenReturn("1234567");
-        boolean canAccess = caseAssignedUserRoleValidator.canAccessUserCaseRoles(Lists.newArrayList("1234567", "1234567"));
+        boolean canAccess = caseAssignedUserRoleValidator.canAccessUserCaseRoles(
+                Lists.newArrayList("1234567", "1234567"));
         assertTrue(canAccess);
     }
 
@@ -77,7 +79,8 @@ class DefaultCaseAssignedUserRoleValidatorTest {
     void canNotAccessOtherUserCaseRolesWhenMoreUserIdsPassedOtherThanSelf() {
         when(userRepository.getUserRoles()).thenReturn(Collections.singleton(roleCaseworkerSolicitor));
         when(userRepository.getUserId()).thenReturn("1234567");
-        boolean canAccess = caseAssignedUserRoleValidator.canAccessUserCaseRoles(Lists.newArrayList("1234567", "1234568"));
+        boolean canAccess = caseAssignedUserRoleValidator.canAccessUserCaseRoles(
+                Lists.newArrayList("1234567", "1234568"));
         assertFalse(canAccess);
     }
 

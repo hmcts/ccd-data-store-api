@@ -64,7 +64,8 @@ public class DefaultUserRepository implements UserRepository {
 
     @Autowired
     public DefaultUserRepository(ApplicationParams applicationParams,
-                                 @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
+                                 @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                     CaseDefinitionRepository caseDefinitionRepository,
                                  SecurityUtils securityUtils,
                                  @Qualifier("restTemplate") RestTemplate restTemplate,
                                  AuthCheckerConfiguration authCheckerConfiguration) {
@@ -89,15 +90,16 @@ public class DefaultUserRepository implements UserRepository {
 
     @Override
     public Set<String> getUserRoles() {
-        LOG.debug("retrieving user roles");
+        LOG.debug("Getting user roles from security context.");
 
-        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        Collection<? extends GrantedAuthority> authorities =
+            SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         Set<String> userRoles = authorities.stream()
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.toSet());
 
-        String email = getUser().getEmail();
-        LOG.info("Retrieved roles for user={} roles={}", email, userRoles);
+        String userId = getUser().getId();
+        LOG.info("User id from idam: {}. User roles in the security context: {}.", userId, userRoles);
 
         return userRoles;
     }
@@ -120,7 +122,6 @@ public class DefaultUserRepository implements UserRepository {
     @Override
     public UserDefault getUserDefaultSettings(final String userId) {
         try {
-            LOG.debug("retrieving default user settings for user {}", userId);
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             final Map<String, String> queryParams = new HashMap<>();
             queryParams.put("uid", ApplicationParams.encode(userId.toLowerCase()));

@@ -59,8 +59,10 @@ public class CaseSearchEndpoint {
     private final ApplicationParams applicationParams;
 
     @Autowired
-    public CaseSearchEndpoint(@Qualifier(AuthorisedCaseSearchOperation.QUALIFIER) CaseSearchOperation caseSearchOperation,
-                              @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
+    public CaseSearchEndpoint(@Qualifier(AuthorisedCaseSearchOperation.QUALIFIER)
+                                      CaseSearchOperation caseSearchOperation,
+                              @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                  CaseDefinitionRepository caseDefinitionRepository,
                               @Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository,
                               ElasticsearchQueryHelper elasticsearchQueryHelper,
                               ApplicationParams applicationParams) {
@@ -72,7 +74,8 @@ public class CaseSearchEndpoint {
     }
 
     @PostMapping(value = "/searchCases")
-    @ApiOperation("Search cases according to the provided ElasticSearch query. Supports searching across multiple case types.")
+    @ApiOperation("Search cases according to the provided ElasticSearch query. Supports searching across multiple case"
+        + " types.")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case data for the given search request")
     })
@@ -93,7 +96,12 @@ public class CaseSearchEndpoint {
 
         Instant start = Instant.now();
         validateCtid(caseTypeIds);
-        ElasticsearchRequest elasticsearchRequest = elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
+        ElasticsearchRequest elasticsearchRequest =
+            elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
+
+        if (!elasticsearchRequest.hasRequestedSupplementaryData()) {
+            elasticsearchRequest.setRequestedSupplementaryData(ElasticsearchRequest.WILDCARD);
+        }
 
         CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(getCaseTypeIds(caseTypeIds))
@@ -130,7 +138,8 @@ public class CaseSearchEndpoint {
 
     private void validateCtid(List<String> caseTypeIds) {
         if (caseTypeIds == null || caseTypeIds.size() == 0) {
-            throw new BadRequestException("Missing required case type. Please provide a case type or list of case types to search.");
+            throw new BadRequestException("Missing required case type. Please provide a case type or list of case types"
+                + " to search.");
         }
     }
 

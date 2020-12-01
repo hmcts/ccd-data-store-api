@@ -9,10 +9,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
 
-import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.List;
 
 @Named
 @Singleton
@@ -22,8 +23,9 @@ public class UIDefinitionRepository {
     private final CachedUIDefinitionGateway cachedUiDefinitionGateway;
 
     @Inject
-    public UIDefinitionRepository(@Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
-                                  CachedUIDefinitionGateway cachedUiDefinitionGateway) {
+    UIDefinitionRepository(@Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                           final CaseDefinitionRepository caseDefinitionRepository,
+                           CachedUIDefinitionGateway cachedUiDefinitionGateway) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.cachedUiDefinitionGateway = cachedUiDefinitionGateway;
     }

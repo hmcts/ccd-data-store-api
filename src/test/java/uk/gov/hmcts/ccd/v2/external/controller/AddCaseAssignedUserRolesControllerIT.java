@@ -33,7 +33,8 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         "classpath:sql/insert_cases_with_valid_case_ids.sql"
     })
     @DisplayName(
-        "addCaseUserRoles: AC-1: must successfully assign a user and case role for a specific case by a user calling through/from an authorised application"
+        "addCaseUserRoles: AC-1: must successfully assign a user and case role for a specific case by a user calling "
+            + "through/from an authorised application"
     )
     void addCaseUserRoles_shouldAddCaseUserRoleForAuthorisedApp() throws Exception {
         // ARRANGE
@@ -198,7 +199,8 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
 
     // RDM-8606: AC-6
     @Test
-    @DisplayName("addCaseUserRoles: AC-6: must return an error response when the request is made from an un-authorised application")
+    @DisplayName("addCaseUserRoles: AC-6: must return an error response when the request is made from an un-authorised"
+        + " application")
     void addCaseUserRoles_shouldThrowExceptionWhenCalledFromUnauthorisedApp() throws Exception {
         // ARRANGE
         MockUtils.setSecurityAuthorities(authentication);
@@ -206,7 +208,8 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
 
         // override s2s token in HTTP headers
         HttpHeaders httpHeaders = createHttpHeaders();
-        httpHeaders.set(SecurityUtils.SERVICE_AUTHORIZATION, "Bearer " + MockUtils.generateDummyS2SToken(UNAUTHORISED_ADD_SERVICE));
+        httpHeaders.set(SecurityUtils.SERVICE_AUTHORIZATION, "Bearer "
+            + MockUtils.generateDummyS2SToken(UNAUTHORISED_ADD_SERVICE));
 
         List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
             new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_1)
@@ -423,7 +426,8 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
 
         // override s2s token in HTTP headers to check it also supports S2S token without bearer
         HttpHeaders httpHeaders = createHttpHeaders();
-        httpHeaders.set(SecurityUtils.SERVICE_AUTHORIZATION, MockUtils.generateDummyS2SToken(AUTHORISED_ADD_SERVICE_2));
+        httpHeaders.set(SecurityUtils.SERVICE_AUTHORIZATION,
+            MockUtils.generateDummyS2SToken(AUTHORISED_ADD_SERVICE_2));
 
         List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
             new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, CASE_ROLE_1),
@@ -461,7 +465,8 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         "classpath:sql/insert_cases_with_valid_case_ids.sql"
     })
     @DisplayName(
-        "addCaseUserRoles: RDM-8442.AC-1: must successfully increment Assigned User Count when assigning a user and case role for a specific case"
+        "addCaseUserRoles: RDM-8442.AC-1: must successfully increment Assigned User Count when assigning a user and "
+            + "case role for a specific case"
     )
     void addCaseUserRoles_shouldIncrementOrganisationUserCountForNewRelationships() throws Exception {
         // ARRANGE
@@ -529,7 +534,8 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
     })
     @DisplayName(
         "addCaseUserRoles: RDM-8442.AC-2: Must not increment Assigned User Count when assigning a user and case role"
-            + " for a specific case if there was already a case user role assignment with the respective values in the request"
+            + " for a specific case if there was already a case user role assignment with the respective values in "
+            + "the request"
     )
     void addCaseUserRoles_shouldNotIncrementOrganisationUserCountForExistingRelationship() throws Exception {
         // ARRANGE
@@ -582,7 +588,8 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         );
 
         // set a default count for any organisation
-        supplementaryDataRepository.setSupplementaryData(CASE_ID_EXTRA, getOrgUserCountSupDataKey(ORGANISATION_ID_2), 0L);
+        supplementaryDataRepository.setSupplementaryData(CASE_ID_EXTRA, getOrgUserCountSupDataKey(ORGANISATION_ID_2),
+            0L);
 
         // ACT
         // initial user counters
@@ -626,7 +633,8 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         );
 
         // set a default count for any organisation
-        supplementaryDataRepository.setSupplementaryData(CASE_ID_EXTRA, getOrgUserCountSupDataKey(ORGANISATION_ID_2), 0L);
+        supplementaryDataRepository.setSupplementaryData(CASE_ID_EXTRA, getOrgUserCountSupDataKey(ORGANISATION_ID_2),
+            0L);
 
         // ACT
         // initial user counters

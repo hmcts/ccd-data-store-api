@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
@@ -70,7 +71,13 @@ public class SecurityUtils {
     }
 
     public UserInfo getUserInfo() {
-        return idamRepository.getUserInfo(getUserToken());
+        UserInfo userInfo = idamRepository.getUserInfo(getUserToken());
+        if (userInfo != null) {
+            log.info("SecurityUtils retrieved user info from idamRepository. User Id={}. Roles={}.",
+                    userInfo.getUid(),
+                    userInfo.getRoles());
+        }
+        return userInfo;
     }
 
     public String getUserId() {
@@ -91,7 +98,8 @@ public class SecurityUtils {
     }
 
     public String getUserRolesHeader() {
-        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        Collection<? extends GrantedAuthority> authorities =
+            SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         return authorities.stream()
                              .map(GrantedAuthority::getAuthority)
                              .collect(Collectors.joining(","));

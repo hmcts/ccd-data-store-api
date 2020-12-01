@@ -6,14 +6,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
@@ -36,6 +28,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.Banner;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplexDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -62,6 +56,15 @@ import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
@@ -789,6 +792,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseEventBuilder withCaseFields(List<CaseEventFieldDefinition> caseEventFieldDefinitions) {
+            caseEventDefinition.setCaseFields(caseEventFieldDefinitions);
+            return this;
+        }
+
         public CaseEventBuilder withId(String id) {
             caseEventDefinition.setId(id);
             return this;
@@ -822,6 +830,35 @@ public class TestBuildersUtil {
         public CaseEventBuilder withShowEventNotes(Boolean showEventNotes) {
             caseEventDefinition.setShowEventNotes(showEventNotes);
             return this;
+        }
+    }
+
+    public static class CaseEventFieldDefinitionBuilder {
+        private final CaseEventFieldDefinition caseField;
+        private final List<CaseEventFieldComplexDefinition> complexFieldDefinitions = new ArrayList<>();
+
+        private CaseEventFieldDefinitionBuilder() {
+            this.caseField = new CaseEventFieldDefinition();
+        }
+
+        public static CaseEventFieldDefinitionBuilder newCaseEventField() {
+            return new CaseEventFieldDefinitionBuilder();
+        }
+
+        public CaseEventFieldDefinitionBuilder withCaseFieldId(String caseFieldId) {
+            caseField.setCaseFieldId(caseFieldId);
+            return this;
+        }
+
+        public CaseEventFieldDefinitionBuilder addCaseEventFieldComplexDefinitions(
+            CaseEventFieldComplexDefinition complexFieldDefinition) {
+            complexFieldDefinitions.add(complexFieldDefinition);
+            return this;
+        }
+
+        public CaseEventFieldDefinition build() {
+            caseField.setCaseEventFieldComplexDefinitions(complexFieldDefinitions);
+            return caseField;
         }
     }
 
@@ -1056,7 +1093,8 @@ public class TestBuildersUtil {
             return this;
         }
 
-        public WizardPageBuilder withField(CaseViewField caseField, List<WizardPageComplexFieldOverride> complexFieldOverrides) {
+        public WizardPageBuilder withField(CaseViewField caseField,
+                                           List<WizardPageComplexFieldOverride> complexFieldOverrides) {
             WizardPageField wizardPageField = new WizardPageField();
             wizardPageField.setCaseFieldId(caseField.getId());
             wizardPageField.setPageColumnNumber(1);
@@ -1781,7 +1819,8 @@ public class TestBuildersUtil {
             return new UserProfileBuilder();
         }
 
-        public UserProfileBuilder withJurisdictionDisplayProperties(JurisdictionDisplayProperties[] jurisdictionDisplayProperties) {
+        public UserProfileBuilder withJurisdictionDisplayProperties(JurisdictionDisplayProperties[]
+                                                                            jurisdictionDisplayProperties) {
             userProfile.setJurisdictions(jurisdictionDisplayProperties);
             return this;
         }

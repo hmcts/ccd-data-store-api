@@ -167,10 +167,13 @@ public class CaseController {
     @ResponseStatus(HttpStatus.CREATED) // To remove default 200 response from Swagger
     @LogAudit(operationType = UPDATE_CASE, caseId = "#caseId", jurisdiction = "#result.body.jurisdiction",
         caseType = "#result.body.caseType", eventName = "#content.event.eventId")
-    public ResponseEntity<CaseResource> createEvent(@ApiParam(value = "Case ID for which the event is being submitted", required = true)
+    public ResponseEntity<CaseResource> createEvent(@ApiParam(value = "Case ID for which the event is being submitted",
+                                                    required = true)
                                                     @PathVariable("caseId") String caseId,
-                                                    @ApiParam(value = "Case data content for the event. Note that the `data` property "
-                                                        + "is used for event submission data; NOT the `event_data`. For example:\n"
+                                                    @ApiParam(value = "Case data content for the event. Note that the "
+                                                        + "`data` property "
+                                                        + "is used for event submission data; NOT the `event_data`. "
+                                                        + "For example:\n"
                                                         + "```\n"
                                                         + "{\n"
                                                         + "    \"data\": {\n"
@@ -308,7 +311,8 @@ public class CaseController {
         jurisdiction = "#result.body.jurisdiction", caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public ResponseEntity<CaseResource> createCase(@PathVariable("caseTypeId") String caseTypeId,
                                                    @RequestBody final CaseDataContent content,
-                                                   @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
+                                                   @RequestParam(value = "ignore-warning", required = false)
+                                                       final Boolean ignoreWarning) {
         final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
 
         return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content, ignoreWarning));
@@ -415,13 +419,14 @@ public class CaseController {
                 }))
     })
     public ResponseEntity<SupplementaryDataResource> updateCaseSupplementaryData(@PathVariable("caseId") String caseId,
-                                                                                 @RequestBody SupplementaryDataUpdateRequest supplementaryDataUpdateRequest) {
+                                           @RequestBody SupplementaryDataUpdateRequest supplementaryDataUpdateRequest) {
 
         this.requestValidator.validate(supplementaryDataUpdateRequest);
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
-        SupplementaryData supplementaryDataUpdated = supplementaryDataUpdateOperation.updateSupplementaryData(caseId, supplementaryDataUpdateRequest);
+        SupplementaryData supplementaryDataUpdated = supplementaryDataUpdateOperation.updateSupplementaryData(caseId,
+            supplementaryDataUpdateRequest);
         return status(HttpStatus.OK).body(new SupplementaryDataResource(supplementaryDataUpdated));
     }
 }

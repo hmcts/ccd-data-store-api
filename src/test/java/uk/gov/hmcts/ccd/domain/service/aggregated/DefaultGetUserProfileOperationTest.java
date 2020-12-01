@@ -27,8 +27,10 @@ public class DefaultGetUserProfileOperationTest {
 
     private final UserProfile userProfile = new UserProfile();
     private final User user = new User();
-    private final JurisdictionDisplayProperties test1JurisdictionDisplayProperties = new JurisdictionDisplayProperties();
-    private final JurisdictionDisplayProperties test2JurisdictionDisplayProperties = new JurisdictionDisplayProperties();
+    private final JurisdictionDisplayProperties test1JurisdictionDisplayProperties =
+        new JurisdictionDisplayProperties();
+    private final JurisdictionDisplayProperties test2JurisdictionDisplayProperties =
+        new JurisdictionDisplayProperties();
     private final String test1Channel = "test1Channel";
     private final String test2Channel = "test2Channel";
     private final DefaultSettings testDefaultSettings = new DefaultSettings();
@@ -39,7 +41,8 @@ public class DefaultGetUserProfileOperationTest {
         defaultGetUserProfileOperation = new DefaultGetUserProfileOperation(userService);
 
         userProfile.setUser(user);
-        userProfile.setJurisdictions(new JurisdictionDisplayProperties[] {test1JurisdictionDisplayProperties, test2JurisdictionDisplayProperties});
+        userProfile.setJurisdictions(new JurisdictionDisplayProperties[] {test1JurisdictionDisplayProperties,
+            test2JurisdictionDisplayProperties});
         userProfile.setChannels(new String[] {test1Channel, test2Channel});
         userProfile.setDefaultSettings(testDefaultSettings);
         doReturn(userProfile).when(userService).getUserProfile();
@@ -53,7 +56,8 @@ public class DefaultGetUserProfileOperationTest {
             () -> assertThat(userProfile.getUser(), is(equalTo(user))),
             () -> assertThat(userProfile.getDefaultSettings(), is(equalTo(testDefaultSettings))),
             () -> assertThat(userProfile.getChannels(), arrayContainingInAnyOrder(test1Channel, test2Channel)),
-            () -> assertThat(userProfile.getJurisdictions(), arrayContainingInAnyOrder(test1JurisdictionDisplayProperties, test2JurisdictionDisplayProperties))
+            () -> assertThat(userProfile.getJurisdictions(),
+                arrayContainingInAnyOrder(test1JurisdictionDisplayProperties, test2JurisdictionDisplayProperties))
         );
 
     }

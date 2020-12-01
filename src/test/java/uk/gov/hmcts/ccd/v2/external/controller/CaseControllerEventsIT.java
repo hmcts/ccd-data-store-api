@@ -44,13 +44,15 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
 
     @Before
     public void setUp() {
-        MockUtils.setSecurityAuthorities(RandomStringUtils.randomAlphanumeric(10), authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
+        MockUtils.setSecurityAuthorities(RandomStringUtils.randomAlphanumeric(10), authentication,
+            MockUtils.ROLE_CASEWORKER_PUBLIC);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         template = new JdbcTemplate(db);
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
     public void shouldNotReturnEventHistoryDataForCitizenWhoHasNoAccessToEvents() throws Exception {
 
         assertCaseDataResultSetSize();
@@ -83,11 +85,13 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
         assertNotNull("Content Should not be null", content);
         CaseEventsResource saveCaseEventsResource = mapper.readValue(content, CaseEventsResource.class);
         assertNotNull("Saved Case Details should not be null", saveCaseEventsResource);
-        assertEquals("Should not contain events with case role access", 1, saveCaseEventsResource.getAuditEvents().size());
+        assertEquals("Should not contain events with case role access", 1,
+            saveCaseEventsResource.getAuditEvents().size());
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
     public void shouldReturnEventHistoryDataForCitizenWhoHasCaseRoleAccess() throws Exception {
 
         assertCaseDataResultSetSize();
@@ -108,7 +112,8 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
         assertNotNull("Content Should not be null", content);
         CaseEventsResource savedCaseEventsResource = mapper.readValue(content, CaseEventsResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseEventsResource);
-        assertEquals("Should contain events with case role access", 2, savedCaseEventsResource.getAuditEvents().size());
+        assertEquals("Should contain events with case role access", 2,
+            savedCaseEventsResource.getAuditEvents().size());
 
     }
 

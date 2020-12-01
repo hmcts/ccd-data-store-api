@@ -1,19 +1,18 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 
-@Named
-@Singleton
 public class NumberValidator implements BaseTypeValidator {
+    private static final Logger LOG = LoggerFactory.getLogger(NumberValidator.class);
+
     static final String TYPE_ID = "Number";
 
     public BaseType getType() {
@@ -27,6 +26,7 @@ public class NumberValidator implements BaseTypeValidator {
         if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }
+        LOG.info("Validating Number field id {}", caseFieldDefinition.getId());
 
         final String value = dataValue.textValue();
         final BigDecimal numberValue;
@@ -36,19 +36,23 @@ public class NumberValidator implements BaseTypeValidator {
                 numberValue = dataValue.decimalValue();
             } else if (null == value) {
                 // dataValue may be a boolean, array or pojo node
-                return Collections.singletonList(new ValidationResult(dataValue + " is not a number", dataFieldId));
+                return Collections.singletonList(new ValidationResult(dataValue + " is not a number",
+                    dataFieldId));
             } else {
                 numberValue = new BigDecimal(value);
             }
+            LOG.info("Number field text value {} & number value {}", value, numberValue);
             if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), numberValue)) {
                 return Collections.singletonList(
-                    new ValidationResult("Should be less than or equal to " + caseFieldDefinition.getFieldTypeDefinition().getMax(), dataFieldId)
+                    new ValidationResult("Should be less than or equal to " + caseFieldDefinition
+                        .getFieldTypeDefinition().getMax(), dataFieldId)
                 );
             }
 
             if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), numberValue)) {
                 return Collections.singletonList(
-                    new ValidationResult("Should be more than or equal to " + caseFieldDefinition.getFieldTypeDefinition().getMin(), dataFieldId)
+                    new ValidationResult("Should be more than or equal to " + caseFieldDefinition
+                        .getFieldTypeDefinition().getMin(), dataFieldId)
                 );
             }
 
@@ -61,6 +65,7 @@ public class NumberValidator implements BaseTypeValidator {
                     + "' failed number Type Regex check: " + getType().getRegularExpression(), dataFieldId));
             }
         } catch (NumberFormatException e) {
+            LOG.info("Number field exception {} ", e);
             return Collections.singletonList(new ValidationResult(value + " is not a number", dataFieldId));
         }
 

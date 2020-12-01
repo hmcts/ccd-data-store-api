@@ -44,7 +44,8 @@ class JurisdictionConfigViewResourceTest {
     @Test
     @DisplayName("should copy jurisdiction UI config list")
     void shouldCopyJurisdictionUIConfigList() {
-        List<JurisdictionUiConfigDefinition> newArrayList = Lists.newArrayList(new JurisdictionUiConfigDefinition(), new JurisdictionUiConfigDefinition());
+        List<JurisdictionUiConfigDefinition> newArrayList =
+                Lists.newArrayList(new JurisdictionUiConfigDefinition(), new JurisdictionUiConfigDefinition());
         final JurisdictionConfigViewResource resource = new JurisdictionConfigViewResource(newArrayList);
         assertAll(
             () -> assertThat(resource.getConfigs(), sameInstance(newArrayList))

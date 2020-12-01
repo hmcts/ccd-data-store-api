@@ -54,6 +54,7 @@
 			"data_classification": {
 				"DocumentField": "PUBLIC"
 			},
+			"supplementary_data": null,
 			"security_classifications": {
 				"DocumentField": "PUBLIC"
 			}

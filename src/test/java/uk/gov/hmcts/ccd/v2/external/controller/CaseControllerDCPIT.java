@@ -20,11 +20,8 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource;
 
 import javax.inject.Inject;
-
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -36,7 +33,21 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.v2.DCPTestHelper.*;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COLLECTION_COMPLEX_DATE_TIME;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COLLECTION_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COMPLEX_DATE_TIME_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COMPLEX_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COMPLEX_NESTED_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.DATE_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.DATE_TIME_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.NESTED_COMPLEX;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.NESTED_NUMBER_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.STANDARD_DATE;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.STANDARD_DATE_TIME;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.TEXT_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.createCaseRequestContent;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.jsonPath;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.updateEventRequestContent;
 
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public class CaseControllerDCPIT extends WireMockBaseTest {
@@ -86,7 +97,8 @@ public class CaseControllerDCPIT extends WireMockBaseTest {
 
         assertEquals(result.getResponse().getContentAsString(), 201, result.getResponse().getStatus());
         String content = result.getResponse().getContentAsString();
-        CaseResource caseResource = mapper.readValue(content, CaseResource.class);
+        uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource =
+                mapper.readValue(content, uk.gov.hmcts.ccd.v2.external.resource.CaseResource.class);
 
         Map<String, JsonNode> data = caseResource.getData();
 
@@ -120,7 +132,8 @@ public class CaseControllerDCPIT extends WireMockBaseTest {
 
         assertEquals(result.getResponse().getContentAsString(), 201, result.getResponse().getStatus());
         String content = result.getResponse().getContentAsString();
-        CaseResource caseResource = mapper.readValue(content, CaseResource.class);
+        uk.gov.hmcts.ccd.v2.external.resource.CaseResource caseResource =
+                mapper.readValue(content, uk.gov.hmcts.ccd.v2.external.resource.CaseResource.class);
 
         Map<String, JsonNode> data = caseResource.getData();
 
@@ -172,7 +185,9 @@ public class CaseControllerDCPIT extends WireMockBaseTest {
             .andReturn();
 
         String startTriggerContent = startTriggerResult.getResponse().getContentAsString();
-        CaseUpdateViewEventResource caseUpdateViewEventResource = mapper.readValue(startTriggerContent, CaseUpdateViewEventResource.class);
+        uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource caseUpdateViewEventResource =
+                mapper.readValue(startTriggerContent,
+                        uk.gov.hmcts.ccd.v2.internal.resource.CaseUpdateViewEventResource.class);
         return caseUpdateViewEventResource.getCaseUpdateViewEvent().getEventToken();
     }
 

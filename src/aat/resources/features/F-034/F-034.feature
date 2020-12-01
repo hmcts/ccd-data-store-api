@@ -7,7 +7,7 @@ Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-314
+@S-314 @Smoke
 Scenario: must return 200 when the case type and event exists
 
     Given a user with [an active profile in CCD],
