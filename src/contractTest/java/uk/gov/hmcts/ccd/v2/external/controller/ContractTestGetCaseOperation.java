@@ -37,6 +37,11 @@ public class ContractTestGetCaseOperation extends DefaultGetCaseOperation {
     }
 
 
+    @Override
+    public Optional<CaseDetails> execute(String caseReference) {
+        return super.execute(testCaseReference);
+    }
+
     public void setTestCaseReference(String testCaseReference) {
         this.testCaseReference = testCaseReference;
     }

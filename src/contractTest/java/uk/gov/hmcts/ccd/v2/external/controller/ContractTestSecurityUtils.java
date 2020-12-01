@@ -39,6 +39,7 @@ public class ContractTestSecurityUtils extends SecurityUtils {
 
 
     private HashMap<String,UserCredentials> jurisdictionUserCredentials = new HashMap<>();
+    private HashMap<String,UserCredentials> eventUserCredentials = new HashMap<>();
 
 
     @Autowired
@@ -62,10 +63,19 @@ public class ContractTestSecurityUtils extends SecurityUtils {
         setAuthenticationOnSecurityContext(userCredentials.username, userCredentials.password);
     }
 
+    public void setSecurityContextUserAsCaseworkerForEvent(String eventId) {
+        UserCredentials userCredentials =eventUserCredentials.get(eventId);
+        setAuthenticationOnSecurityContext(userCredentials.username, userCredentials.password);
+    }
 
-    public void setSecurityContextUserAsCaseworker(String jurisdictionId, String caseworkerUserName, String caseworkerPassword) {
+    public void setSecurityContextUserAsCaseworkerByJurisdiction(String jurisdictionId, String caseworkerUserName, String caseworkerPassword) {
         setAuthenticationOnSecurityContext(caseworkerUserName, caseworkerPassword);
         jurisdictionUserCredentials.put(jurisdictionId, new UserCredentials(caseworkerUserName, caseworkerPassword));
+    }
+
+    public void setSecurityContextUserAsCaseworkerByEvent(String eventId, String caseworkerUserName, String caseworkerPassword) {
+        setAuthenticationOnSecurityContext(caseworkerUserName, caseworkerPassword);
+        eventUserCredentials.put(eventId, new UserCredentials(caseworkerUserName, caseworkerPassword));
     }
 
     private void setAuthenticationOnSecurityContext(String caseworkerUserName, String caseworkerPassword) {

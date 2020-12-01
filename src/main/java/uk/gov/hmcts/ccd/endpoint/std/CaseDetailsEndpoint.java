@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -128,13 +130,15 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Case type ID", required = true)
         @PathVariable("ctid") final String caseTypeId,
         @ApiParam(value = "Case ID", required = true)
-        @PathVariable("cid") final String caseId) {
+        @PathVariable("cid") final String caseId) throws JsonProcessingException {
 
         final Instant start = Instant.now();
         final CaseDetails caseDetails = getCaseOperation.execute(jurisdictionId, caseTypeId, caseId)
             .orElseThrow(() -> new CaseNotFoundException(jurisdictionId, caseTypeId, caseId));
         final Duration duration = Duration.between(start, Instant.now());
         appInsights.trackRequest("findCaseDetailsForCaseworker", duration.toMillis(), true);
+
+        String json = new ObjectMapper().writeValueAsString(caseDetails);
         return caseDetails;
     }
 
@@ -208,9 +212,11 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Event ID", required = true)
         @PathVariable("etid") final String eventId,
         @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
-        @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
+        @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) throws JsonProcessingException {
 
-        return startEventOperation.triggerStartForCase(caseId, eventId, ignoreWarning);
+        StartEventResult startEventResult = startEventOperation.triggerStartForCase(caseId, eventId, ignoreWarning);
+        String json = new ObjectMapper().writeValueAsString(startEventResult);
+        return startEventResult;
     }
 
     @Transactional
@@ -230,9 +236,12 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Event ID", required = true)
         @PathVariable("etid") final String eventId,
         @ApiParam(value = "Should `AboutToStart` callback warnings be ignored")
-        @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
+        @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) throws JsonProcessingException {
 
-        return startEventOperation.triggerStartForCaseType(caseTypeId, eventId, ignoreWarning);
+
+        StartEventResult startEventResult = startEventOperation.triggerStartForCaseType(caseTypeId, eventId, ignoreWarning);
+        String json = new ObjectMapper().writeValueAsString(startEventResult);
+        return startEventResult;
     }
 
     @Transactional
@@ -279,9 +288,11 @@ public class CaseDetailsEndpoint {
         @PathVariable("ctid") final String caseTypeId,
         @ApiParam(value = "Should `AboutToSubmit` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning,
-        @RequestBody final CaseDataContent content) {
+        @RequestBody final CaseDataContent content) throws JsonProcessingException {
 
-        return createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
+        CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
+        String json = new ObjectMapper().writeValueAsString(caseDetails);
+        return caseDetails;
     }
 
     @PostMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")
@@ -365,9 +376,13 @@ public class CaseDetailsEndpoint {
         @PathVariable("ctid") final String caseTypeId,
         @ApiParam(value = "Case ID", required = true)
         @PathVariable("cid") final String caseId,
-        @RequestBody final CaseDataContent content) {
-        return createEventOperation.createCaseEvent(caseId,
+        @RequestBody final CaseDataContent content) throws JsonProcessingException {
+
+
+        CaseDetails caseEvent = createEventOperation.createCaseEvent(caseId,
             content);
+        String json = new ObjectMapper().writeValueAsString(caseEvent);
+        return caseEvent;
     }
 
     @Transactional
@@ -426,7 +441,7 @@ public class CaseDetailsEndpoint {
     public List<CaseDetails> searchCasesForCaseWorkers(@PathVariable("uid") final String uid,
                                                        @PathVariable("jid") final String jurisdictionId,
                                                        @PathVariable("ctid") final String caseTypeId,
-                                                       @RequestParam Map<String, String> queryParameters) {
+                                                       @RequestParam Map<String, String> queryParameters) throws JsonProcessingException {
         return searchCases(jurisdictionId, caseTypeId, queryParameters);
     }
 
@@ -440,19 +455,21 @@ public class CaseDetailsEndpoint {
     public List<CaseDetails> searchCasesForCitizens(@PathVariable("uid") final String uid,
                                                     @PathVariable("jid") final String jurisdictionId,
                                                     @PathVariable("ctid") final String caseTypeId,
-                                                    @RequestParam Map<String, String> queryParameters) {
+                                                    @RequestParam Map<String, String> queryParameters) throws JsonProcessingException {
         return searchCases(jurisdictionId, caseTypeId, queryParameters);
     }
 
     private List<CaseDetails> searchCases(final String jurisdictionId,
                                           final String caseTypeId,
-                                          final Map<String, String> queryParameters) {
+                                          final Map<String, String> queryParameters) throws JsonProcessingException {
 
         final MetaData metadata = createMetadata(jurisdictionId, caseTypeId, queryParameters);
 
         final Map<String, String> sanitizedParams = fieldMapSanitizeOperation.execute(queryParameters);
 
-        return searchOperation.execute(metadata, sanitizedParams);
+        List<CaseDetails> results = searchOperation.execute(metadata, sanitizedParams);
+        String json = new ObjectMapper().writeValueAsString(results);
+        return results;
     }
 
     @Transactional

@@ -59,13 +59,17 @@ public class SecurityMockConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) {
         web.ignoring().antMatchers(
             "/case-types/**",
+            "/caseworkers/**",
+            "/searchCases/**",
             "/");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests().antMatchers(
-            "/case-types/**"
+            "/case-types/**",
+            "/caseworkers/**",
+            "/searchCases/**"
         ).permitAll();
 
     }
