@@ -136,10 +136,10 @@
           },
           "display_context_parameter" : null
         }, {
-          "label" : "Last State Modified Date",
+          "label" : "Last Modified Date",
           "order" : null,
           "metadata" : true,
-          "case_field_id" : "[LAST_STATE_MODIFIED_DATE]",
+          "case_field_id" : "[LAST_MODIFIED_DATE]",
           "case_field_type" : {
             "id" : "DateTime",
             "type" : "DateTime",
@@ -152,10 +152,10 @@
           },
           "display_context_parameter" : null
         }, {
-          "label" : "Last Modified Date",
+          "label" : "Last State Modified Date",
           "order" : null,
           "metadata" : true,
-          "case_field_id" : "[LAST_MODIFIED_DATE]",
+          "case_field_id" : "[LAST_STATE_MODIFIED_DATE]",
           "case_field_type" : {
             "id" : "DateTime",
             "type" : "DateTime",
