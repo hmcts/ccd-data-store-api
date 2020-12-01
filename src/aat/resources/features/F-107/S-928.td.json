@@ -25,15 +25,15 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_400_Response",
+    "_extends_": "Common_422_Response",
     "body" : {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
       "timestamp" : "[[ANYTHING_PRESENT]]",
-      "status" : 400,
-      "error" : "Bad Request",
+      "status" : 422,
+      "error" : "Unprocessable Entity",
       "message" : "[[ANYTHING_PRESENT]]",
       "path" : "[[ANYTHING_PRESENT]]",
-      "details" : null,
+      "details" : "[[ANYTHING_PRESENT]]",
       "callbackErrors" : null,
       "callbackWarnings" : null
     }
