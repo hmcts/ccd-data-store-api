@@ -1,0 +1,64 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="rdm-10141-1" runInTransaction="false" author="sita.kandala@hmcts.net">
+        <sql dbms="postgresql"
+             endDelimiter="\nGO"
+             splitStatements="true"
+             stripComments="true">
+
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_pl_familyManCaseNumber ON public.case_data USING btree (btrim(upper((data #>> '{familyManCaseNumber}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_pl_dateAndTimeSubmitted ON public.case_data USING btree (btrim(upper((data #>> '{dateAndTimeSubmitted}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_pr_journeyClassification ON public.case_data USING btree (btrim(upper((data #>> '{journeyClassification}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_pr_caseType ON public.case_data USING btree (btrim(upper((data #>> '{caseType}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_pr_casePrinted ON public.case_data USING btree (btrim(upper((data #>> '{casePrinted}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_pr_expiryDate ON public.case_data USING btree (btrim(upper((data #>> '{expiryDate}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_user_user_id ON case_users (user_id);
+
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_cmc_submitterEmail ON public.case_data USING btree (btrim(upper((data #>> '{submitterEmail}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_divorce_ApplyForDecreeAbsolute ON public.case_data USING btree (btrim(upper((data #>> '{ApplyForDecreeAbsolute}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_divorce_D8MarriagePetitionerName ON public.case_data USING btree (btrim(upper((data #>> '{D8MarriagePetitionerName}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_divorce_D8MarriageRespondentName ON public.case_data USING btree (btrim(upper((data #>> '{D8MarriageRespondentName}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_divorce_D8RespondentLastName ON public.case_data USING btree (btrim(upper((data #>> '{D8RespondentLastName}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_divorce_D8RespondentFirstName ON public.case_data USING btree (btrim(upper((data #>> '{D8RespondentFirstName}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_divorce_divorceCaseNumber ON public.case_data USING btree (btrim(upper((data #>> '{divorceCaseNumber}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_divorce_DnOutcomeCase ON public.case_data USING btree (btrim(upper((data #>> '{DnOutcomeCase}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_divorce_D8HelpWithFeesNeedHelp ON public.case_data USING btree (btrim(upper((data #>> '{D8HelpWithFeesNeedHelp}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_divorce_SolPaymentHowToPay ON public.case_data USING btree (btrim(upper((data #>> '{SolPaymentHowToPay}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_divorce_solicitorReference ON public.case_data USING btree (btrim(upper((data #>> '{solicitorReference}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_divorce_regionList ON public.case_data USING btree (btrim(upper((data #>> '{regionList}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_divorce_midlandsFRCList ON public.case_data USING btree (btrim(upper((data #>> '{midlandsFRCList}'::text[]))));
+
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_IA_appealReferenceNumber ON public.case_data USING btree (btrim(upper((data #>> '{appealReferenceNumber}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_IA_appellantDateOfBirth ON public.case_data USING btree (btrim(upper((data #>> '{appellantDateOfBirth}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_IA_appellantNameForDisplay ON public.case_data USING btree (btrim(upper((data #>> '{appellantNameForDisplay}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_IA_searchPostcode ON public.case_data USING btree (btrim(upper((data #>> '{searchPostcode}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_IA_legalRepReferenceNumber ON public.case_data USING btree (btrim(upper((data #>> '{legalRepReferenceNumber}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_IA_homeOfficeReferenceNumber ON public.case_data USING btree (btrim(upper((data #>> '{homeOfficeReferenceNumber}'::text[]))));
+
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_sscs_appellant_dob ON public.case_data USING btree (btrim(upper((data #>> '{appeal,appellant,identity,dob}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_sscs_attachToCaseReference ON public.case_data USING btree (btrim(upper((data #>> '{attachToCaseReference}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_sscs_dateSentToDwp ON public.case_data USING btree (btrim(upper((data #>> '{dateSentToDwp}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_sscs_directionDueDate ON public.case_data USING btree (btrim(upper((data #>> '{directionDueDate}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_sscs_appeal_hearingType ON public.case_data USING btree (btrim(upper((data #>> '{appeal,hearingType}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_sscs_surname ON public.case_data USING btree (btrim(upper((data #>> '{surname}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_sscs_urgentCase ON public.case_data USING btree (btrim(upper((data #>> '{urgentCase}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_sscs_createdInGapsFrom ON public.case_data USING btree (btrim(upper((data #>> '{createdInGapsFrom}'::text[]))));
+
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_sscs_subscriptionsjp_tya ON public.case_data USING btree (btrim(upper((data #>> '{subscriptions,jointPartySubscription,tya}'::text[]))));
+
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_last_state_modified_date ON case_data (last_state_modified_date);
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_user_user_id ON case_users (user_id);
+
+            DROP INDEX IF EXISTS idx_case_data_generated_surname;
+            DROP INDEX IF EXISTS idx_case_data_welsh_dnoutcomecase_solhowtopay_applyforda;
+            DROP INDEX IF EXISTS idx_case_data_welsh_dnout_d8_sol_apply;
+            DROP INDEX IF EXISTS idx_case_data_interlocreferraldate;
+            DROP INDEX IF EXISTS idx_case_data_isscottishcase;
+            DROP INDEX IF EXISTS idx_case_data_application_type;
+
+        </sql>
+    </changeSet>
+</databaseChangeLog>
