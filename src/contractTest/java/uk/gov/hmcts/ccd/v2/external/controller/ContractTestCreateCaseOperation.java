@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
+import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.createcase.DefaultCreateCaseOperation;
@@ -25,35 +27,38 @@ import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import javax.inject.Inject;
 
 @Service
-@Qualifier("contractTest")
+@Qualifier("authorised")
+@Primary
 public class ContractTestCreateCaseOperation extends DefaultCreateCaseOperation {
 
-    @Inject
-    public ContractTestCreateCaseOperation( @Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository,
-                                            @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
+
+    private String testCaseReference;
+    private final ContractTestSecurityUtils contractTestSecurityUtils;
+
+
+    public ContractTestCreateCaseOperation(@Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository,
+                                           @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
                                            EventTriggerService eventTriggerService,
                                            EventTokenService eventTokenService,
                                            CaseDataService caseDataService,
                                            SubmitCaseTransaction submitCaseTransaction,
-                                           CaseSanitiser caseSanitiser,
-                                           CaseTypeService caseTypeService,
+                                           CaseSanitiser caseSanitiser, CaseTypeService caseTypeService,
                                            CallbackInvoker callbackInvoker,
                                            ValidateCaseFieldsOperation validateCaseFieldsOperation,
-                                           @Qualifier(DefaultDraftGateway.QUALIFIER) DraftGateway draftGateway) {
+                                           CasePostStateService casePostStateService,
+                                           @Qualifier(DefaultDraftGateway.QUALIFIER) DraftGateway draftGateway,
+                                           ContractTestSecurityUtils contractTestSecurityUtils) {
         super(userRepository, caseDefinitionRepository, eventTriggerService, eventTokenService, caseDataService, submitCaseTransaction, caseSanitiser,
-            caseTypeService, callbackInvoker, validateCaseFieldsOperation, draftGateway);
+            caseTypeService, callbackInvoker, validateCaseFieldsOperation, casePostStateService, draftGateway);
+        this.contractTestSecurityUtils = contractTestSecurityUtils;
     }
 
     @Override
-    protected CaseDetails getCaseDetails(String caseTypeId, CaseDataContent caseDataContent, CaseTypeDefinition caseTypeDefinition,
-                                         CaseEventDefinition caseEventDefinition) {
-        final CaseDetails newCaseDetails = new CaseDetails();
+    public CaseDetails createCaseDetails(final String caseTypeId,
+                                         final CaseDataContent caseDataContent,
+                                         final Boolean ignoreWarning) {
+        contractTestSecurityUtils.setSecurityContextUserAsCaseworkerForEvent(caseDataContent.getEventId());
+        return super.createCaseDetails(caseTypeId, caseDataContent, ignoreWarning);
 
-        newCaseDetails.setCaseTypeId(caseTypeId);
-        newCaseDetails.setJurisdiction(caseTypeDefinition.getJurisdictionId());
-        newCaseDetails.setState("AwaitingPayment");
-        newCaseDetails.setSecurityClassification(caseTypeDefinition.getSecurityClassification());
-        return newCaseDetails;
     }
-
 }

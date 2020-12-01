@@ -8,13 +8,14 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.DefaultGetCaseOperation;
 
 import java.util.Optional;
 
 @Service
 @Primary
-@Qualifier("authorised")
+@Qualifier(CreatorGetCaseOperation.QUALIFIER)
 public class ContractTestGetCaseOperation extends DefaultGetCaseOperation {
 
     private String testCaseReference;

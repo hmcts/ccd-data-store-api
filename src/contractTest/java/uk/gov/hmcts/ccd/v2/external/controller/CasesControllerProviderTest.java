@@ -63,7 +63,7 @@ public class CasesControllerProviderTest {
     UserAuthorisationSecurity userAuthorisationSecurity;
 
     @Autowired
-    ContractTestCreateCaseOperation defaultCreateCaseOperation;
+    ContractTestCreateCaseOperation contractTestCreateCaseOperation;
 
     @Autowired
     ContractTestGetCaseOperation getCaseOperation;
@@ -184,15 +184,29 @@ public class CasesControllerProviderTest {
         createEventOperation.setTestCaseReference(caseDetails.getReferenceAsString());
     }
 
+    //Submit for caseworker is triggered
+    @State({"Submit for caseworker is triggered"})
+    public void toSubmitForACaseworker(Map<String, Object> dataMap) {
+        setUpSecurityContextForEvent(dataMap);
+
+    }
+
+    @State({"A Submit For Citizen is triggered"})
+    public void toSubmitForACitizen(Map<String, Object> dataMap) {
+        setUpSecurityContextForEvent(dataMap);
+
+    }
+
     private CaseDetails setUpCaseDetailsFromStateMap(Map<String, Object> dataMap) {
         Map<String, Object> contentDataMap = (Map<String, Object>) dataMap.get(CASE_DATA_CONTENT);
         String caseworkerUsername = (String) dataMap.get(CASEWORKER_USERNAME);
         String caseworkerPassword = (String) dataMap.get(CASEWORKER_PASSWORD);
         String jurisdictionId = (String) dataMap.get(JURISDICTION_ID);
-        securityUtils.setSecurityContextUserAsCaseworkerByJurisdiction(jurisdictionId, caseworkerUsername, caseworkerPassword);
         CaseDataContent caseDataContent = objectMapper.convertValue(contentDataMap, CaseDataContent.class);
 
-        return defaultCreateCaseOperation.createCaseDetails("DIVORCE", caseDataContent, true);
+        securityUtils.setSecurityContextUserAsCaseworkerByJurisdiction(jurisdictionId, caseworkerUsername, caseworkerPassword);
+        securityUtils.setSecurityContextUserAsCaseworkerByEvent(caseDataContent.getEventId(), caseworkerUsername, caseworkerPassword);
+        return contractTestCreateCaseOperation.createCaseDetails("DIVORCE", caseDataContent, true);
 
     }
 
@@ -201,7 +215,7 @@ public class CasesControllerProviderTest {
         setUpSecurityContextForEvent(dataMap);
         CaseDataContent caseDataContent = objectMapper.convertValue(contentDataMap, CaseDataContent.class);
 
-        return defaultCreateCaseOperation.createCaseDetails("DIVORCE", caseDataContent, true);
+        return contractTestCreateCaseOperation.createCaseDetails("DIVORCE", caseDataContent, true);
 
     }
 

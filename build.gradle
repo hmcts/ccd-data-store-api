@@ -244,6 +244,8 @@ dependencies {
     contractTestCompile group: 'au.com.dius', name: 'pact-jvm-provider-spring_2.12', version: versions.pact_version
     contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     contractTestRuntime group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+    contractTestRuntime group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
+
 }
 // end::dependencies[]
 

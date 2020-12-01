@@ -60,6 +60,7 @@ public class SecurityMockConfiguration extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(
             "/case-types/**",
             "/caseworkers/**",
+            "/citizens/**",
             "/searchCases/**",
             "/");
     }
@@ -69,6 +70,7 @@ public class SecurityMockConfiguration extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers(
             "/case-types/**",
             "/caseworkers/**",
+            "/citizens/**",
             "/searchCases/**"
         ).permitAll();
 
