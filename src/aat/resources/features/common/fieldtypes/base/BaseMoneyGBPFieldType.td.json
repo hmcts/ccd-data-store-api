@@ -1,0 +1,7 @@
+{
+  "_guid_": "BaseMoneyGBPFieldType",
+  "_extends_": "CommonFieldType",
+
+  "id": "MoneyGBP",
+  "type": "MoneyGBP"
+}

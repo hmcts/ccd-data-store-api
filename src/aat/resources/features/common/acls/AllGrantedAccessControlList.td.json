@@ -1,0 +1,9 @@
+{
+  "_guid_": "AllGrantedAccessControlList",
+
+  "role": "[[ANYTHING_PRESENT]]",
+  "create": true,
+  "read": true,
+  "update": true,
+  "delete": true
+}

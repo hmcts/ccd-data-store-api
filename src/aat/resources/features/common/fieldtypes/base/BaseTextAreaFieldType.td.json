@@ -1,0 +1,7 @@
+{
+  "_guid_": "BaseTextAreaFieldType",
+  "_extends_": "CommonFieldType",
+
+  "id": "TextArea",
+  "type": "TextArea"
+}

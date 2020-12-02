@@ -10,9 +10,14 @@
 	</suppress>
 
 	<suppress>
+		<notes>False Positive. Please check the link below. The below CVE's are not listed in that page.
+			https://www.cvedetails.com/product/21861/Openid-Openid4java.html?vendor_id=6314.
+		Also please check the page https://github.com/jeremylong/DependencyCheck/issues/713.
+		</notes>
 		<cve>CVE-2007-1652</cve>
 		<cve>CVE-2007-1651</cve>
-		<cve>CVE-2017-18640</cve>
+    <cve>CVE-2017-18640</cve>
 		<cve>CVE-2020-26168</cve>
 	</suppress>
+
 </suppressions>
