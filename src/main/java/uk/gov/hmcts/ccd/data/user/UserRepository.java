@@ -15,6 +15,8 @@ public interface UserRepository {
 
     IdamUser getUser();
 
+    IdamUser getUser(String userToken);
+
     UserDefault getUserDefaultSettings(String userId);
 
     Set<String> getUserRoles();
