@@ -39,7 +39,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 
-@Provider("ccdDataStoreAPI_CaseController")
+@Provider("ccdDataStoreAPI_Cases")
 @RunWith(SpringRestPactRunner.class)
 @PactBroker(scheme = "${pact.broker.scheme}", host = "${pact.broker.baseUrl}",
     port = "${pact.broker.port}", tags = {"${pact.broker.consumer.tag}"})
@@ -119,28 +119,28 @@ public class CasesControllerProviderTest {
         when(userAuthorisation.getUserId()).thenReturn("userId");
     }
 
-    @State({"A Read For Citizen is  requested"})
-    public void toReadADivorceCaseCitizen(Map<String, Object> dataMap) {
+    @State({"A Read for a Citizen is requested"})
+    public void toReadForACitizen(Map<String, Object> dataMap) {
         CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
         getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
 
     }
 
-    @State({"Read For Caseworker"})
+    @State({"A Read for a Caseworker is requested"})
     public void toReadForCaseworker(Map<String, Object> dataMap) {
         CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
         getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
 
     }
 
-    @State({"SearchCases for Citizen is requested"})
+    @State({"A Search for cases is requested"})
     public void toSearchCasesForACitizen(Map<String, Object> dataMap) {
         CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
         when(elasticsearchCaseSearchOperationMock.execute(any(CrossCaseTypeSearchRequest.class)))
             .thenReturn(new CaseSearchResult(1L, Arrays.asList(caseDetails), null));
     }
 
-    @State({"A Search For Citizen requested"})
+    @State({"A Search cases for a Citizen is requested"})
     public void toSearchForACitizen(Map<String, Object> dataMap) {
         CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
         when(authorisedSearchOperation.execute(any(MetaData.class), any(Map.class)))
@@ -148,7 +148,7 @@ public class CasesControllerProviderTest {
 
     }
 
-    @State({"A StartEvent for Caseworker is  requested"})
+    @State({"A Start Event for a Caseworker is  requested"})
     public void toStartEventForACaseworker(Map<String, Object> dataMap) {
         CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
         startEventOperation.setCaseReferenceOverride((String) dataMap.get(EVENT_ID),
@@ -156,7 +156,7 @@ public class CasesControllerProviderTest {
 
     }
 
-    @State({"A StartEvent for citizen is received"})
+    @State({"A Start Event for a Citizen is requested"})
     public void toStartEventForACitizen(Map<String, Object> dataMap) {
         CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
         startEventOperation.setCaseReferenceOverride((String) dataMap.get(EVENT_ID),
@@ -164,38 +164,37 @@ public class CasesControllerProviderTest {
 
     }
 
-    @State({"A Start for Caseworker is requested"})
+    @State({"A Start for a Caseworker is requested"})
     public void toStartForACaseworker(Map<String, Object> dataMap) {
         setUpSecurityContextForEvent(dataMap);
 
     }
 
-    @State({"A Start for Citizen is received"})
+    @State({"A Start for a Citizen is requested"})
     public void toStartForACitizen(Map<String, Object> dataMap) {
         setUpSecurityContextForEvent(dataMap);
 
     }
 
-    @State({"A SubmitEvent for Caseworker is triggered"})
+    @State({"A Submit Event for a Caseworker is requested"})
     public void toSubmitEventForACaseworker(Map<String, Object> dataMap) {
         CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
         createEventOperation.setTestCaseReference(caseDetails.getReferenceAsString());
     }
 
-    @State({"A SubmitEvent for a Citizen is triggered"})
+    @State({"A Submit Event for a Citizen is requested"})
     public void toSubmitEventForACitizen(Map<String, Object> dataMap) {
         CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
         createEventOperation.setTestCaseReference(caseDetails.getReferenceAsString());
     }
 
-    //Submit for caseworker is triggered
-    @State({"Submit for caseworker is triggered"})
+    @State({"A Submit for a Caseworker is requested"})
     public void toSubmitForACaseworker(Map<String, Object> dataMap) {
         setUpSecurityContextForEvent(dataMap);
 
     }
 
-    @State({"A Submit For Citizen is triggered"})
+    @State({"A Submit for a Citizen is requested"})
     public void toSubmitForACitizen(Map<String, Object> dataMap) {
         setUpSecurityContextForEvent(dataMap);
 
