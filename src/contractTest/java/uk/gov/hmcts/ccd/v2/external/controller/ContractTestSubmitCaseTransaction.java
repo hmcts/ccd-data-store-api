@@ -27,7 +27,8 @@ public class ContractTestSubmitCaseTransaction extends SubmitCaseTransaction {
                                              SecurityClassificationService securityClassificationService,
                                              DefaultCaseUserRepository caseUserRepository,
                                              UserAuthorisation userAuthorisation) {
-        super(caseDetailsRepository, caseAuditEventRepository, caseTypeService, callbackInvoker, uidService, securityClassificationService,
+        super(caseDetailsRepository, caseAuditEventRepository, caseTypeService,
+            callbackInvoker, uidService, securityClassificationService,
             caseUserRepository, userAuthorisation);
     }
 }

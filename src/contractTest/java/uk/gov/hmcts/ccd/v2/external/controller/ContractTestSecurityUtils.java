@@ -37,8 +37,8 @@ public class ContractTestSecurityUtils extends SecurityUtils {
     private static final String AUTHORIZATION_CODE = "authorization_code";
     private static final String CODE = "code";
 
-    private HashMap<String,UserCredentials> jurisdictionUserCredentials = new HashMap<>();
-    private HashMap<String,UserCredentials> eventUserCredentials = new HashMap<>();
+    private HashMap<String, UserCredentials> jurisdictionUserCredentials = new HashMap<>();
+    private HashMap<String, UserCredentials> eventUserCredentials = new HashMap<>();
 
     private final IdamApi idamClient;
 
@@ -46,7 +46,7 @@ public class ContractTestSecurityUtils extends SecurityUtils {
     public ContractTestSecurityUtils(AuthTokenGenerator authTokenGenerator,
                                      IdamRepository idamRepository, IdamApi idamApi) {
         super(authTokenGenerator, idamRepository);
-        this.idamClient= idamApi;
+        this.idamClient = idamApi;
     }
 
     @Override
@@ -65,16 +65,18 @@ public class ContractTestSecurityUtils extends SecurityUtils {
     }
 
     public void setSecurityContextUserAsCaseworkerForEvent(String eventId) {
-        UserCredentials userCredentials =eventUserCredentials.get(eventId);
+        UserCredentials userCredentials = eventUserCredentials.get(eventId);
         setAuthenticationOnSecurityContext(userCredentials.username, userCredentials.password);
     }
 
-    public void setSecurityContextUserAsCaseworkerByJurisdiction(String jurisdictionId, String caseworkerUserName, String caseworkerPassword) {
+    public void setSecurityContextUserAsCaseworkerByJurisdiction(String jurisdictionId, String caseworkerUserName,
+                                                                 String caseworkerPassword) {
         setAuthenticationOnSecurityContext(caseworkerUserName, caseworkerPassword);
         jurisdictionUserCredentials.put(jurisdictionId, new UserCredentials(caseworkerUserName, caseworkerPassword));
     }
 
-    public void setSecurityContextUserAsCaseworkerByEvent(String eventId, String caseworkerUserName, String caseworkerPassword) {
+    public void setSecurityContextUserAsCaseworkerByEvent(String eventId, String caseworkerUserName,
+                                                          String caseworkerPassword) {
         setAuthenticationOnSecurityContext(caseworkerUserName, caseworkerPassword);
         eventUserCredentials.put(eventId, new UserCredentials(caseworkerUserName, caseworkerPassword));
     }
@@ -82,7 +84,8 @@ public class ContractTestSecurityUtils extends SecurityUtils {
     private void setAuthenticationOnSecurityContext(String caseworkerUserName, String caseworkerPassword) {
         SecurityContextHolder.getContext()
             .setAuthentication(
-                new UsernamePasswordAuthenticationToken(caseworkerUserName, getCaseworkerToken(caseworkerUserName, caseworkerPassword)));
+                new UsernamePasswordAuthenticationToken(caseworkerUserName, getCaseworkerToken(caseworkerUserName,
+                    caseworkerPassword)));
     }
 
     private String getCaseworkerToken(String caseworkerUserName, String caseworkerPassword) {
@@ -99,11 +102,12 @@ public class ContractTestSecurityUtils extends SecurityUtils {
         );
 
         log.info("Authenticated. Exchanging...");
-        TokenExchangeResponse tokenExchangeResponse = idamClient.exchangeCode(new ExchangeCodeRequest(authenticateUserResponse.getCode(),
-            AUTHORIZATION_CODE,
-            authRedirectUrl,
-            authClientId,
-            authClientSecret));
+        TokenExchangeResponse tokenExchangeResponse = idamClient.exchangeCode(
+            new ExchangeCodeRequest(authenticateUserResponse.getCode(),
+                AUTHORIZATION_CODE,
+                authRedirectUrl,
+                authClientId,
+                authClientSecret));
 
         log.info("Getting AccessToken...");
         return tokenExchangeResponse.getAccessToken();
@@ -118,9 +122,9 @@ public class ContractTestSecurityUtils extends SecurityUtils {
         private final String username;
         private final String password;
 
-        UserCredentials(String username, String password){
-            this.username=username;
-            this.password=password;
+        UserCredentials(String username, String password) {
+            this.username = username;
+            this.password = password;
         }
     }
 }

@@ -10,8 +10,6 @@ import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
@@ -24,8 +22,6 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 
-import javax.inject.Inject;
-
 @Service
 @Qualifier("authorised")
 @Primary
@@ -37,7 +33,8 @@ public class ContractTestCreateCaseOperation extends DefaultCreateCaseOperation 
 
 
     public ContractTestCreateCaseOperation(@Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository,
-                                           @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
+                                           @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
+                                               CaseDefinitionRepository caseDefinitionRepository,
                                            EventTriggerService eventTriggerService,
                                            EventTokenService eventTokenService,
                                            CaseDataService caseDataService,
@@ -48,7 +45,8 @@ public class ContractTestCreateCaseOperation extends DefaultCreateCaseOperation 
                                            CasePostStateService casePostStateService,
                                            @Qualifier(DefaultDraftGateway.QUALIFIER) DraftGateway draftGateway,
                                            ContractTestSecurityUtils contractTestSecurityUtils) {
-        super(userRepository, caseDefinitionRepository, eventTriggerService, eventTokenService, caseDataService, submitCaseTransaction, caseSanitiser,
+        super(userRepository, caseDefinitionRepository, eventTriggerService, eventTokenService, caseDataService,
+            submitCaseTransaction, caseSanitiser,
             caseTypeService, callbackInvoker, validateCaseFieldsOperation, casePostStateService, draftGateway);
         this.contractTestSecurityUtils = contractTestSecurityUtils;
     }

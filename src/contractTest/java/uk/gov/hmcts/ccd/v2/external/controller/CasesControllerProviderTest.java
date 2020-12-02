@@ -41,7 +41,8 @@ import static org.mockito.Mockito.when;
 
 @Provider("ccdDataStoreAPI_CaseController")
 @RunWith(SpringRestPactRunner.class)
-@PactBroker(scheme = "${pact.broker.scheme}", host = "${pact.broker.baseUrl}", port = "${pact.broker.port}", tags = {"${pact.broker.consumer.tag}"})
+@PactBroker(scheme = "${pact.broker.scheme}", host = "${pact.broker.baseUrl}",
+    port = "${pact.broker.port}", tags = {"${pact.broker.consumer.tag}"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
     "server.port=8123", "spring.application.name=PACT_TEST",
     "ccd.dm.domain=http://dm-store-aat.service.core-compute-aat.internal"
@@ -142,21 +143,24 @@ public class CasesControllerProviderTest {
     @State({"A Search For Citizen requested"})
     public void toSearchForACitizen(Map<String, Object> dataMap) {
         CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
-        when(authorisedSearchOperation.execute(any(MetaData.class), any(Map.class))).thenReturn(Arrays.asList(caseDetails));
+        when(authorisedSearchOperation.execute(any(MetaData.class), any(Map.class)))
+            .thenReturn(Arrays.asList(caseDetails));
 
     }
 
     @State({"A StartEvent for Caseworker is  requested"})
     public void toStartEventForACaseworker(Map<String, Object> dataMap) {
         CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
-        startEventOperation.setCaseReferenceOverride((String) dataMap.get(EVENT_ID), caseDetails.getReferenceAsString());
+        startEventOperation.setCaseReferenceOverride((String) dataMap.get(EVENT_ID),
+            caseDetails.getReferenceAsString());
 
     }
 
     @State({"A StartEvent for citizen is received"})
     public void toStartEventForACitizen(Map<String, Object> dataMap) {
         CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
-        startEventOperation.setCaseReferenceOverride((String) dataMap.get(EVENT_ID), caseDetails.getReferenceAsString());
+        startEventOperation.setCaseReferenceOverride((String) dataMap.get(EVENT_ID),
+            caseDetails.getReferenceAsString());
 
     }
 
@@ -204,8 +208,10 @@ public class CasesControllerProviderTest {
         String jurisdictionId = (String) dataMap.get(JURISDICTION_ID);
         CaseDataContent caseDataContent = objectMapper.convertValue(contentDataMap, CaseDataContent.class);
 
-        securityUtils.setSecurityContextUserAsCaseworkerByJurisdiction(jurisdictionId, caseworkerUsername, caseworkerPassword);
-        securityUtils.setSecurityContextUserAsCaseworkerByEvent(caseDataContent.getEventId(), caseworkerUsername, caseworkerPassword);
+        securityUtils.setSecurityContextUserAsCaseworkerByJurisdiction(jurisdictionId, caseworkerUsername,
+            caseworkerPassword);
+        securityUtils.setSecurityContextUserAsCaseworkerByEvent(caseDataContent.getEventId(), caseworkerUsername,
+            caseworkerPassword);
         return contractTestCreateCaseOperation.createCaseDetails("DIVORCE", caseDataContent, true);
 
     }
@@ -230,7 +236,8 @@ public class CasesControllerProviderTest {
         String caseworkerUsername = (String) dataMap.get(CASEWORKER_USERNAME);
         String caseworkerPassword = (String) dataMap.get(CASEWORKER_PASSWORD);
         String jurisdictionId = (String) dataMap.get(JURISDICTION_ID);
-        securityUtils.setSecurityContextUserAsCaseworkerByJurisdiction(jurisdictionId, caseworkerUsername, caseworkerPassword);
+        securityUtils.setSecurityContextUserAsCaseworkerByJurisdiction(jurisdictionId,
+            caseworkerUsername, caseworkerPassword);
     }
 
 }

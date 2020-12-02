@@ -1,11 +1,7 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,7 +10,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.security.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.ccd.security.filters.SecurityLoggingFilter;
 import uk.gov.hmcts.ccd.security.filters.V1EndpointsPathParamSecurityFilter;
@@ -73,13 +68,5 @@ public class SecurityMockConfiguration extends WebSecurityConfigurerAdapter {
             "/citizens/**",
             "/searchCases/**"
         ).permitAll();
-
-    }
-
-    @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-    @Bean
-    @Primary
-    CachedCaseDefinitionRepository cachedCaseDefinitionRepository(){
-        return Mockito.mock(CachedCaseDefinitionRepository.class);
     }
 }

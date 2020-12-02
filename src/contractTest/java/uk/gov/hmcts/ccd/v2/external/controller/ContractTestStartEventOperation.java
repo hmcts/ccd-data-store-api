@@ -30,7 +30,8 @@ public class ContractTestStartEventOperation extends DefaultStartEventOperation 
 
     public ContractTestStartEventOperation(EventTokenService eventTokenService,
                                            CaseDefinitionRepository caseDefinitionRepository,
-                                           @Qualifier(DefaultCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository,
+                                           @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
+                                               CaseDetailsRepository caseDetailsRepository,
                                            @Qualifier(DefaultDraftGateway.QUALIFIER) DraftGateway draftGateway,
                                            EventTriggerService eventTriggerService,
                                            CaseService caseService,
@@ -38,7 +39,8 @@ public class ContractTestStartEventOperation extends DefaultStartEventOperation 
                                            CallbackInvoker callbackInvoker,
                                            UIDService uidService,
                                            ContractTestSecurityUtils contractTestSecurityUtils) {
-        super(eventTokenService, caseDefinitionRepository, caseDetailsRepository, draftGateway, eventTriggerService, caseService, userAuthorisation,
+        super(eventTokenService, caseDefinitionRepository, caseDetailsRepository, draftGateway,
+            eventTriggerService, caseService, userAuthorisation,
             callbackInvoker, uidService);
         this.contractTestSecurityUtils = contractTestSecurityUtils;
     }
@@ -52,15 +54,15 @@ public class ContractTestStartEventOperation extends DefaultStartEventOperation 
 
         String caseReferenceOverride = caseReferenceMap.get(eventId);
 
-         contractTestSecurityUtils.setSecurityContextUserAsCaseworkerForEvent(eventId);
+        contractTestSecurityUtils.setSecurityContextUserAsCaseworkerForEvent(eventId);
         return super.triggerStartForCase(caseReferenceOverride, eventId, ignoreWarning);
     }
 
 
     @Override
     public StartEventResult triggerStartForCaseType(final String caseTypeId,
-                                                final String eventId,
-                                                final Boolean ignoreWarning) {
+                                                    final String eventId,
+                                                    final Boolean ignoreWarning) {
 
         contractTestSecurityUtils.setSecurityContextUserAsCaseworkerForEvent(eventId);
         return super.triggerStartForCaseType(caseTypeId, eventId, ignoreWarning);

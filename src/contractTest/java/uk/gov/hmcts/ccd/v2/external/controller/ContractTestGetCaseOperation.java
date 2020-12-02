@@ -23,20 +23,20 @@ public class ContractTestGetCaseOperation extends DefaultGetCaseOperation {
 
 
     @Autowired
-    public ContractTestGetCaseOperation(@Qualifier(DefaultCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository,
+    public ContractTestGetCaseOperation(@Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
+                                            CaseDetailsRepository caseDetailsRepository,
                                         UIDService uidService, ContractTestSecurityUtils contractTestSecurityUtils) {
         super(caseDetailsRepository, uidService);
         this.contractTestSecurityUtils = contractTestSecurityUtils;
 
     }
 
-
     @Override
-    public Optional<CaseDetails> execute(final String jurisdictionId, final String caseTypeId, final String caseReference) {
+    public Optional<CaseDetails> execute(final String jurisdictionId, final String caseTypeId,
+                                         final String caseReference) {
         contractTestSecurityUtils.setSecurityContextUserAsCaseworkerForJurisdiction(jurisdictionId);
         return super.execute(jurisdictionId, caseTypeId, testCaseReference);
     }
-
 
     @Override
     public Optional<CaseDetails> execute(String caseReference) {
