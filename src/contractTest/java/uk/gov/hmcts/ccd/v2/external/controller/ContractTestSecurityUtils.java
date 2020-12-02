@@ -37,15 +37,16 @@ public class ContractTestSecurityUtils extends SecurityUtils {
     private static final String AUTHORIZATION_CODE = "authorization_code";
     private static final String CODE = "code";
 
-
     private HashMap<String,UserCredentials> jurisdictionUserCredentials = new HashMap<>();
     private HashMap<String,UserCredentials> eventUserCredentials = new HashMap<>();
 
+    private final IdamApi idamClient;
 
     @Autowired
     public ContractTestSecurityUtils(AuthTokenGenerator authTokenGenerator,
                                      IdamRepository idamRepository, IdamApi idamApi) {
-        super(authTokenGenerator, idamRepository, idamApi);
+        super(authTokenGenerator, idamRepository);
+        this.idamClient= idamApi;
     }
 
     @Override

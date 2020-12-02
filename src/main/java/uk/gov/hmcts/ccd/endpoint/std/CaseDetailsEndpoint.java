@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -286,11 +284,9 @@ public class CaseDetailsEndpoint {
         @PathVariable("ctid") final String caseTypeId,
         @ApiParam(value = "Should `AboutToSubmit` callback warnings be ignored")
         @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning,
-        @RequestBody final CaseDataContent content) throws JsonProcessingException {
+        @RequestBody final CaseDataContent content) {
 
-        CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
-        final String josn = new ObjectMapper().writeValueAsString(caseDetails);
-        return caseDetails;
+        return createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
     }
 
     @PostMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")

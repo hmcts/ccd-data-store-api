@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -92,7 +90,7 @@ public class CaseSearchEndpoint {
             + "search results, please state the alias fields to be returned in the _source property for e.g."
             + " \"_source\":[\"alias.customer\",\"alias.postcode\"]",
             required = true)
-        @RequestBody String jsonSearchRequest) throws JsonProcessingException {
+        @RequestBody String jsonSearchRequest) {
 
         Instant start = Instant.now();
         validateCtid(caseTypeIds);
@@ -112,7 +110,6 @@ public class CaseSearchEndpoint {
 
         Duration between = Duration.between(start, Instant.now());
         log.debug("searchCases execution completed in {} millisecs...", between.toMillis());
-        String json = new ObjectMapper().writeValueAsString(result);
         return result;
     }
 

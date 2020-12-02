@@ -37,19 +37,13 @@ public class SecurityUtils {
     private static final String AUD_CLAIM = "aud";
     private static final String BEARER = "Bearer ";
 
-
-
-
-
     private final AuthTokenGenerator authTokenGenerator;
     private final IdamRepository idamRepository;
-    protected final IdamApi idamClient;
 
     @Autowired
-    public SecurityUtils(final AuthTokenGenerator authTokenGenerator, IdamRepository idamRepository, IdamApi idamApi) {
+    public SecurityUtils(final AuthTokenGenerator authTokenGenerator, IdamRepository idamRepository) {
         this.authTokenGenerator = authTokenGenerator;
         this.idamRepository = idamRepository;
-        this.idamClient = idamApi;
     }
 
     public HttpHeaders authorizationHeaders() {
@@ -124,6 +118,4 @@ public class SecurityUtils {
             return token.substring(BEARER.length());
         }
     }
-
-
 }
