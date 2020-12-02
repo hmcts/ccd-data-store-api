@@ -45,7 +45,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
     private final RestTemplate restTemplate;
 
     @Inject
-    public HttpUIDefinitionGateway(final ApplicationParams applicationParams,
+    HttpUIDefinitionGateway(final ApplicationParams applicationParams,
                             final SecurityUtils securityUtils,
                             final RestTemplate restTemplate) {
         this.applicationParams = applicationParams;

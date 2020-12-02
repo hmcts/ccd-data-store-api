@@ -32,7 +32,7 @@ public class DefaultValidateCaseFieldsOperation implements ValidateCaseFieldsOpe
     public static final String ORGANISATION_POLICY_ROLE = "OrgPolicyCaseAssignedRole";
 
     @Inject
-    public DefaultValidateCaseFieldsOperation(
+    DefaultValidateCaseFieldsOperation(
         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
         @Qualifier(CachedCaseRoleRepository.QUALIFIER) final CaseRoleRepository caseRoleRepository,
         final CaseTypeService caseTypeService,

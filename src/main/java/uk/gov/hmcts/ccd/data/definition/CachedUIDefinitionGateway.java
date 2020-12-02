@@ -20,17 +20,15 @@ import javax.inject.Singleton;
 import java.util.List;
 
 @Named
-@Qualifier(CachedUIDefinitionGateway.QUALIFIER)
+@Qualifier("Cache")
 @Singleton
 public class CachedUIDefinitionGateway implements UIDefinitionGateway {
-
-    public static final String QUALIFIER = "Cache";
 
     private static final Logger LOG = LoggerFactory.getLogger(CachedUIDefinitionGateway.class);
     private UIDefinitionGateway httpUiDefinitionGateway;
 
     @Inject
-    public CachedUIDefinitionGateway(@Qualifier("Http") UIDefinitionGateway httpUiDefinitionGateway) {
+    CachedUIDefinitionGateway(@Qualifier("Http") UIDefinitionGateway httpUiDefinitionGateway) {
         this.httpUiDefinitionGateway = httpUiDefinitionGateway;
     }
 
