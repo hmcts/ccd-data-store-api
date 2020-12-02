@@ -87,7 +87,7 @@ ext {
     appInsightsVersion = '2.4.1'
     swagger2Version = '3.0.0'
     hibernateVersion = '5.4.18.Final!!'
-    hazelcastVersion = '4.0'
+    hazelcastVersion = '4.0.3'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -226,7 +226,7 @@ dependencies {
     compile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
     }
-    compile(group: 'org.elasticsearch', name: 'elasticsearch', version: '6.8.12') {
+    compile(group: 'org.elasticsearch', name: 'elasticsearch', version: '6.8.13') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
@@ -245,7 +245,7 @@ dependencyManagement {
         dependency 'com.google.guava:guava:24.1.1-jre'
 
         // CVE-2019-0232 - Java and Command Line injections in Windows
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.37') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.38') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
