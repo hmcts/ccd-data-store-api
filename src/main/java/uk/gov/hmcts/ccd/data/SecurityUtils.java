@@ -15,11 +15,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 @Service
+@Slf4j
 public class SecurityUtils {
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
@@ -54,7 +56,17 @@ public class SecurityUtils {
     }
 
     public UserInfo getUserInfo() {
-        return idamRepository.getUserInfo(getUserToken());
+        UserInfo userInfo = idamRepository.getUserInfo(getUserToken());
+        if (userInfo != null) {
+            log.info("SecurityUtils retrieved user info from idamRepository. User Id={}. Roles={}.",
+                    userInfo.getUid(),
+                    userInfo.getRoles());
+        }
+        return userInfo;
+    }
+
+    public UserInfo getUserInfo(String userToken) {
+        return idamRepository.getUserInfo(userToken);
     }
 
     public String getUserId() {
