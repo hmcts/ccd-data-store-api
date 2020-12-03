@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 @Service
 @Primary
 @Qualifier("authorised")
+@Profile("SECURITY_MOCK")
 public class ContractTestStartEventOperation extends DefaultStartEventOperation {
 
     private HashMap<String, String> caseReferenceMap = new HashMap<>();

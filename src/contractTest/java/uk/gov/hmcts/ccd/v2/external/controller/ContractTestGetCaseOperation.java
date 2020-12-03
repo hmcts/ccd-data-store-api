@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
@@ -16,6 +17,7 @@ import java.util.Optional;
 @Service
 @Primary
 @Qualifier(CreatorGetCaseOperation.QUALIFIER)
+@Profile("SECURITY_MOCK")
 public class ContractTestGetCaseOperation extends DefaultGetCaseOperation {
 
     private String testCaseReference;

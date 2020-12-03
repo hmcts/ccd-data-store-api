@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
@@ -16,6 +17,7 @@ import javax.inject.Inject;
 
 @Service
 @Primary
+@Profile("SECURITY_MOCK")
 public class ContractTestSubmitCaseTransaction extends SubmitCaseTransaction {
 
     @Inject

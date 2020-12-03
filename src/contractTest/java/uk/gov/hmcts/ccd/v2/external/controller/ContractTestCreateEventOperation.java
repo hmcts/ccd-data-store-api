@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 @Service
 @Qualifier("authorised")
 @Primary
+@Profile("SECURITY_MOCK")
 public class ContractTestCreateEventOperation extends DefaultCreateEventOperation {
 
     private String testCaseReference;
