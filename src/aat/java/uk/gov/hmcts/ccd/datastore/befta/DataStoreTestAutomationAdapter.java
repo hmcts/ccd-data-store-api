@@ -33,12 +33,12 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
     }
 
     @Override
-    public BeftaTestDataLoader getDataLoader() {
+    protected BeftaTestDataLoader buildTestDataLoader() {
         return new DefaultBeftaTestDataLoader() {
             @Override
-            protected void doLoadTestData() {
-                loader.addCcdRoles();
-                loader.importDefinitions();
+            public void doLoadTestData() {
+                DataStoreTestAutomationAdapter.this.loader.addCcdRoles();
+                DataStoreTestAutomationAdapter.this.loader.importDefinitions();
             }
         };
     }

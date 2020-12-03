@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,7 +46,6 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
-import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -261,6 +261,7 @@ public class CaseDetailsEndpoint {
         return startEventOperation.triggerStartForCaseType(caseTypeId, eventId, ignoreWarning);
     }
 
+    @Transactional
     @PostMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(
@@ -289,6 +290,7 @@ public class CaseDetailsEndpoint {
         return createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
     }
 
+    @Transactional
     @PostMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(
@@ -317,6 +319,7 @@ public class CaseDetailsEndpoint {
         return createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
     }
 
+    @Transactional
     @PostMapping(value = {"/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate",
         "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate"})
     @ResponseStatus(HttpStatus.OK)

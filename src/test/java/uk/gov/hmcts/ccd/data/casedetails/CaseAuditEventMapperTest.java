@@ -20,6 +20,9 @@ public class CaseAuditEventMapperTest {
     private static final String URL = "http://www.yahoo.com";
     private static final String DESCRIPTION = "description";
     private static final String USER_ID = "USER_ID";
+    private static final String USER_ID_PROXY_BY = "USER_ID_PROXY_BY";
+    private static final String USER_ID_PROXY_BY_LAST_NAME = "USER_ID_PROXY_BY_LAST_NAME";
+    private static final String USER_ID_PROXY_BY_FIRST_NAME = "USER_ID_PROXY_BY_FIRST_NAME";
     private static final LocalDateTime DATE_TIME = LocalDateTime.now();
 
     @Test
@@ -43,6 +46,31 @@ public class CaseAuditEventMapperTest {
         assertEquals(SignificantItemType.DOCUMENT, result.getSignificantItemEntity().getType());
     }
 
+    @Test
+    @DisplayName("Should map model to entity with proxy by user details")
+    public void modelToProxyBy() {
+        CaseAuditEventMapper caseAuditEventMapper = new CaseAuditEventMapper();
+        AuditEvent auditEvent = getAuditEventProxyUserDetails();
+        CaseAuditEventEntity result = caseAuditEventMapper.modelToEntity(auditEvent);
+
+        assertEquals(USER_ID, result.getUserId());
+        assertEquals(CASE_DATA_ID, result.getCaseDataId());
+        assertEquals(CASE_TYPE_ID, result.getCaseTypeId());
+        assertEquals(EVENT_NAME, result.getEventName());
+        assertEquals(STATE_NAME, result.getStateName());
+        assertEquals(CASE_TYPE_VERSION, result.getCaseTypeVersion());
+        assertEquals(DATE_TIME, result.getCreatedDate());
+        assertEquals(LAST_NAME, result.getUserLastName());
+        assertEquals(FIRST_NAME, result.getUserFirstName());
+        assertEquals(DESCRIPTION, result.getSignificantItemEntity().getDescription());
+        assertEquals(URL, result.getSignificantItemEntity().getUrl().toString());
+        assertEquals(SignificantItemType.DOCUMENT, result.getSignificantItemEntity().getType());
+
+        assertEquals(USER_ID_PROXY_BY, result.getProxiedBy());
+        assertEquals(USER_ID_PROXY_BY_FIRST_NAME, result.getProxiedByFirstName());
+        assertEquals(USER_ID_PROXY_BY_LAST_NAME, result.getProxiedByLastName());
+    }
+
     private AuditEvent getAuditEvent() {
         final AuditEvent auditEvent = new AuditEvent();
         final SignificantItem significantItem = new SignificantItem();
@@ -60,6 +88,15 @@ public class CaseAuditEventMapperTest {
         auditEvent.setCreatedDate(DATE_TIME);
         auditEvent.setUserFirstName(FIRST_NAME);
         auditEvent.setUserLastName(LAST_NAME);
+
+        return auditEvent;
+    }
+
+    private AuditEvent getAuditEventProxyUserDetails() {
+        final AuditEvent auditEvent = getAuditEvent();
+        auditEvent.setProxiedBy(USER_ID_PROXY_BY);
+        auditEvent.setProxiedByFirstName(USER_ID_PROXY_BY_FIRST_NAME);
+        auditEvent.setProxiedByLastName(USER_ID_PROXY_BY_LAST_NAME);
 
         return auditEvent;
     }
