@@ -231,7 +231,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.2.0-ACA-112'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.2.0-ACA-112_2'
 }
 // end::dependencies[]
 
