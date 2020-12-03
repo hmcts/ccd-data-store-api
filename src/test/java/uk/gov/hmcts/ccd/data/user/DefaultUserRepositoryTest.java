@@ -109,6 +109,7 @@ class DefaultUserRepositoryTest {
         initSecurityContext();
 
         mockUserInfo("userId");
+        mockUserInfo("userId", "user_Token", emptyList());
 
         when(applicationParams.getCcdAccessControlCrossJurisdictionRoles())
             .thenReturn(singletonList(ROLE_CASEWORKER_CAA));
@@ -419,6 +420,20 @@ class DefaultUserRepositoryTest {
     }
 
     @Nested
+    @DisplayName("getUser(user_token)")
+    class GetUserByToken {
+        @Test
+        @DisplayName("should retrieve user from IDAM")
+        void shouldRetrieveUserFromIdam() {
+            String userId = "userId";
+
+            IdamUser result = userRepository.getUser("user_Token");
+
+            assertThat(result.getId(), is(userId));
+        }
+    }
+
+    @Nested
     @DisplayName("getCaseworkerUserRolesJurisdictions()")
     class GetCaseworkerUserRolesJurisdictions {
 
@@ -542,6 +557,14 @@ class DefaultUserRepositoryTest {
             .roles(roles)
             .build();
         when(securityUtils.getUserInfo()).thenReturn(userInfo);
+    }
+
+    private void mockUserInfo(String userId, String token, List<String> roles) {
+        UserInfo userInfo = UserInfo.builder()
+            .uid(userId)
+            .roles(roles)
+            .build();
+        when(securityUtils.getUserInfo(token)).thenReturn(userInfo);
     }
 
     private void asOtherRoles() {

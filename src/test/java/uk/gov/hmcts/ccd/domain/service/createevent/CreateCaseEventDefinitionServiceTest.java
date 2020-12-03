@@ -48,6 +48,7 @@ import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
@@ -178,6 +179,7 @@ class CreateCaseEventDefinitionServiceTest {
         doReturn(caseDetails).when(caseDetailsRepository).set(caseDetails);
         doReturn(postState).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
         doReturn(user).when(userRepository).getUser();
+        doReturn(user).when(userRepository).getUser(anyString());
         doReturn(caseDetailsBefore).when(caseService).clone(caseDetails);
         doReturn(data).when(fieldProcessorService).processData(any(), any(), any(CaseEventDefinition.class));
         given(callbackInvoker.invokeAboutToSubmitCallback(any(),
@@ -254,6 +256,26 @@ class CreateCaseEventDefinitionServiceTest {
             caseDetails,
             caseTypeDefinition,
             IGNORE_WARNING);
+    }
+
+    @Test
+    @DisplayName("should update Last state modified")
+    void shouldUpdateUserDetailsWhenOnBehalfOfUserTokenIsPassed() {
+        caseDataContent = newCaseDataContent()
+            .withEvent(event)
+            .withData(data)
+            .withToken(TOKEN)
+            .withIgnoreWarning(IGNORE_WARNING)
+            .withOnBehalfOfUserToken("Test_Token").build();
+
+        CreateCaseEventResult caseEventResult = createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        verify(userRepository).getUser("Test_Token");
+        verify(userRepository).getUser();
+
+        assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
+        assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate())
+            .isEqualTo(LocalDateTime.now(clock));
     }
 
     private void createCaseEvent() {

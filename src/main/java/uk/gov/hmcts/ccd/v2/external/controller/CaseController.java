@@ -233,8 +233,7 @@ public class CaseController {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
 
-        final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseId,
-            content);
+        final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseId, content);
 
         return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content));
     }
