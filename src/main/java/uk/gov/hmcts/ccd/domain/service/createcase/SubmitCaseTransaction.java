@@ -19,6 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
@@ -44,6 +45,7 @@ class SubmitCaseTransaction {
     private final SecurityClassificationService securityClassificationService;
     private final CaseUserRepository caseUserRepository;
     private final UserAuthorisation userAuthorisation;
+    private final MessageService messageService;
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
@@ -55,7 +57,8 @@ class SubmitCaseTransaction {
                                  final SecurityClassificationService securityClassificationService,
                                  final @Qualifier(CachedCaseUserRepository.QUALIFIER)
                                          CaseUserRepository caseUserRepository,
-                                 final UserAuthorisation userAuthorisation
+                                 final UserAuthorisation userAuthorisation,
+                                 final MessageService messageService
                                  ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
@@ -65,6 +68,7 @@ class SubmitCaseTransaction {
         this.securityClassificationService = securityClassificationService;
         this.caseUserRepository = caseUserRepository;
         this.userAuthorisation = userAuthorisation;
+        this.messageService = messageService;
     }
 
     @Transactional(REQUIRES_NEW)
@@ -140,6 +144,7 @@ class SubmitCaseTransaction {
         auditEvent.setSignificantItem(response.getSignificantItem());
 
         caseAuditEventRepository.set(auditEvent);
+        messageService.handleMessage(event, caseEventDefinition, savedCaseDetails);
         return savedCaseDetails;
     }
 

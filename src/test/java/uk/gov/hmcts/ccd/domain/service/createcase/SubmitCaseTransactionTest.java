@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,10 +24,14 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -90,6 +92,9 @@ class SubmitCaseTransactionTest {
     @Mock
     private UserAuthorisation userAuthorisation;
 
+    @Mock
+    private MessageService messageService;
+
     @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
     private Event event;
@@ -109,7 +114,7 @@ class SubmitCaseTransactionTest {
                                                           uidService,
                                                           securityClassificationService,
                                                           caseUserRepository,
-                                                          userAuthorisation);
+                                                          userAuthorisation, messageService);
 
         event = buildEvent();
         caseTypeDefinition = buildCaseType();

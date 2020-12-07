@@ -3,11 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Optional;
-import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -29,12 +24,13 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.message.CaseEventMessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
@@ -44,6 +40,12 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+
+import javax.inject.Inject;
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
@@ -71,6 +73,7 @@ public class CreateCaseEventService {
     private final FieldProcessorService fieldProcessorService;
     private final Clock clock;
     private final CasePostStateService casePostStateService;
+    private final CaseEventMessageService messagingOperations;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -92,7 +95,8 @@ public class CreateCaseEventService {
                                   final UserAuthorisation userAuthorisation,
                                   final FieldProcessorService fieldProcessorService,
                                   final CasePostStateService casePostStateService,
-                                  @Qualifier("utcClock") final Clock clock) {
+                                  @Qualifier("utcClock") final Clock clock,
+                                  final CaseEventMessageService messagingOperations) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -111,6 +115,7 @@ public class CreateCaseEventService {
         this.fieldProcessorService = fieldProcessorService;
         this.casePostStateService = casePostStateService;
         this.clock = clock;
+        this.messagingOperations = messagingOperations;
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
@@ -274,5 +279,6 @@ public class CreateCaseEventService {
         auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
 
         caseAuditEventRepository.set(auditEvent);
+        messagingOperations.handleMessage(event, caseEventDefinition, caseDetails);
     }
 }
