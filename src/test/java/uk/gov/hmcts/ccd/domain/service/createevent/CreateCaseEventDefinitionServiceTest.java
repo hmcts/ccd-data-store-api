@@ -31,7 +31,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.message.MessageService;
+import uk.gov.hmcts.ccd.domain.service.message.CaseEventMessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
@@ -108,7 +108,7 @@ class CreateCaseEventDefinitionServiceTest {
     @Mock
     private CasePostStateService casePostStateService;
     @Mock
-    private MessageService messageService;
+    private CaseEventMessageService caseEventMessageService;
 
     private Clock fixedClock = Clock.fixed(Instant.parse("2018-08-19T16:02:42.00Z"), ZoneOffset.UTC);
 
@@ -151,6 +151,7 @@ class CreateCaseEventDefinitionServiceTest {
         caseTypeDefinition.setVersion(version);
         caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setPostStates(getEventPostStates(POST_STATE));
+        caseEventDefinition.setPublish(Boolean.TRUE);
         final SignificantItem significantItem = new SignificantItem();
         significantItem.setUrl("http://www.yahoo.com");
         significantItem.setDescription("description");

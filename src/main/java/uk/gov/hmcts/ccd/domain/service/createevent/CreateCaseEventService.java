@@ -30,7 +30,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.message.CaseEventMessageService;
+import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
@@ -73,7 +73,7 @@ public class CreateCaseEventService {
     private final FieldProcessorService fieldProcessorService;
     private final Clock clock;
     private final CasePostStateService casePostStateService;
-    private final CaseEventMessageService messagingOperations;
+    private final MessageService messageService;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -96,7 +96,7 @@ public class CreateCaseEventService {
                                   final FieldProcessorService fieldProcessorService,
                                   final CasePostStateService casePostStateService,
                                   @Qualifier("utcClock") final Clock clock,
-                                  final CaseEventMessageService messagingOperations) {
+                                  final MessageService messageService) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -115,7 +115,7 @@ public class CreateCaseEventService {
         this.fieldProcessorService = fieldProcessorService;
         this.casePostStateService = casePostStateService;
         this.clock = clock;
-        this.messagingOperations = messagingOperations;
+        this.messageService = messageService;
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
@@ -279,6 +279,6 @@ public class CreateCaseEventService {
         auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
 
         caseAuditEventRepository.set(auditEvent);
-        messagingOperations.handleMessage(event, caseEventDefinition, caseDetails);
+        messageService.handleMessage(event, caseEventDefinition, caseDetails);
     }
 }
