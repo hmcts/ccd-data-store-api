@@ -1,0 +1,32 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="rdm-10340" runInTransaction="false" author="sita.kandala@hmcts.net">
+        <sql dbms="postgresql"
+             endDelimiter="\nGO"
+             splitStatements="true"
+             stripComments="true">
+
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_paymentreference ON public.case_data USING BTREE((TRIM(UPPER(data#>>'{paymentReference}'))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_issuedon ON public.case_data USING BTREE((TRIM(UPPER(data#>>'{issuedOn}'))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_assignedto ON public.case_data USING BTREE((TRIM(UPPER(data#>>'{assignedTo}'))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_applicantlname ON public.case_data USING BTREE((TRIM(UPPER(data#>>'{applicantLName}'))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_d8marriagedate ON public.case_data USING BTREE((TRIM(UPPER(data#>>'{D8MarriageDate}'))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_southeastfrclist ON public.case_data USING BTREE((TRIM(UPPER(data#>>'{southEastFRCList}'))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_deliverydate ON public.case_data USING BTREE((TRIM(UPPER(data#>>'{deliveryDate}'))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_openingdate ON public.case_data USING BTREE((TRIM(UPPER(data#>>'{openingDate}'))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_poboxjurisdiction ON public.case_data USING BTREE((TRIM(UPPER(data#>>'{poBoxJurisdiction}'))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_pobox ON public.case_data USING BTREE((TRIM(UPPER(data#>>'{poBox}'))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_hmctsdwpstate ON public.case_data USING BTREE((TRIM(UPPER(data#>>'{hmctsDwpState}'))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_sscs_formtype ON public.case_data USING BTREE (jurisdiction, btrim(upper((data #>> '{formType}'::text[])))) WHERE ((jurisdiction)::text = 'SSCS'::text);
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_probate_formtype ON public.case_data USING BTREE (jurisdiction, btrim(upper((data #>> '{formType}'::text[])))) WHERE ((jurisdiction)::text = 'PROBATE'::text);
+
+            CREATE INDEX IF NOT EXISTS idx_case_event_significant_items_case_event_id ON case_event_significant_items (case_event_id);
+            CREATE INDEX IF NOT EXISTS idx_case_users_case_data_id ON case_users (case_data_id);
+
+        </sql>
+    </changeSet>
+</databaseChangeLog>
+
