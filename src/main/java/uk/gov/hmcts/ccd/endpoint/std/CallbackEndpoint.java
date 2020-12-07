@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.domain.service.stdapi.PrintableDocumentListOperation;
@@ -38,6 +40,8 @@ public class CallbackEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Printable documents list retrieved")
     })
+    @LogAudit(operationType = AuditOperationType.GET_PRINTABLE_DOCUMENTS, jurisdiction = "#jurisdictionId",
+        caseId = "#caseDetails.reference", caseType = "#caseTypeId")
     public List<Document> getPrintableDocuments(
         @ApiParam(value = "Jurisdiction ID", required = true)
         @PathVariable("jid") final String jurisdictionId,

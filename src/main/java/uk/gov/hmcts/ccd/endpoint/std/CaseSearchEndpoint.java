@@ -80,7 +80,8 @@ public class CaseSearchEndpoint {
         @ApiResponse(code = 200, message = "List of case data for the given search request")
     })
     @LogAudit(operationType = AuditOperationType.SEARCH_CASE, caseTypeIds = "#caseTypeIds",
-        caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseSearchEndpoint).buildCaseIds(#result)")
+        caseId = "T(uk.gov.hmcts.ccd.endpoint.std.CaseSearchEndpoint).buildCaseIds(#result)",
+        jurisdiction = "T(uk.gov.hmcts.ccd.endpoint.std.CaseSearchEndpoint).buildJurisdictions(#result)")
     public CaseSearchResult searchCases(
         @ApiParam(value = "Comma separated list of case type ID(s) or '*' if the search should be applied on any "
             + "existing case type. Note that using '*' is an expensive operation and might have low response times so "
@@ -150,6 +151,12 @@ public class CaseSearchEndpoint {
     public static String buildCaseIds(CaseSearchResult caseSearchResult) {
         return caseSearchResult.getCases().stream().limit(MAX_CASE_IDS_LIST)
             .map(c -> String.valueOf(c.getReference()))
+            .collect(Collectors.joining(CASE_ID_SEPARATOR));
+    }
+
+    public static String buildJurisdictions(CaseSearchResult caseSearchResult) {
+        return caseSearchResult.getCases().stream().limit(MAX_CASE_IDS_LIST)
+            .map(c -> String.valueOf(c.getJurisdiction()))
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 }

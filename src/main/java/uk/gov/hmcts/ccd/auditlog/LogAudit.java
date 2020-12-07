@@ -20,6 +20,8 @@ public @interface LogAudit {
 
     String caseType() default "";
 
+    String eventId() default "";
+
     String eventName() default "";
 
     String targetIdamId() default "";
@@ -28,5 +30,25 @@ public @interface LogAudit {
     String caseTypeIds() default "";
 
     String targetCaseRoles() default "";
+
+    String customMeasurements() default "";
+
+    String operationName() default "";
+
+    String operationId() default "";
+
+    String operationParentId() default "";
+
+    String operationSyntheticSource() default "";
+
+    String sessionID() default "";
+
+    String userId() default "";
+
+    String userAuthenticatedId() default "";
+
+    String userAccountId() default "";
+
+    String applicationVersion() default "";
 
 }

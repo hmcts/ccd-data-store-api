@@ -45,6 +45,8 @@ public class CaseAccessEndpoint {
         @ApiResponse(code = 200, message = "List of cases ids found"),
         @ApiResponse(code = 400, message = "Invalid case ID")
     })
+    @LogAudit(operationType = AuditOperationType.FIND_USER_ACCESSIBLE_CASES, jurisdiction = "#jurisdictionId",
+        caseId = "#caseId", targetIdamId = "#userId.id", caseType = "#caseTypeId")
     public List<String> findCaseIdsGivenUserIdHasAccessTo(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -71,7 +73,7 @@ public class CaseAccessEndpoint {
     })
     @ResponseStatus(value = HttpStatus.CREATED)
     @LogAudit(operationType = AuditOperationType.GRANT_CASE_ACCESS, jurisdiction = "#jurisdictionId",
-        caseId = "#caseId", targetIdamId = "#userId.id")
+        caseId = "#caseId", targetIdamId = "#userId.id", caseType = "#caseTypeId")
     public void grantAccessToCase(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -99,7 +101,7 @@ public class CaseAccessEndpoint {
     })
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @LogAudit(operationType = AuditOperationType.REVOKE_CASE_ACCESS, jurisdiction = "#jurisdictionId",
-        caseId = "#caseId", targetIdamId = "#idToDelete")
+        caseId = "#caseId", targetIdamId = "#idToDelete", caseType = "#caseTypeId")
     public void revokeAccessToCase(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,

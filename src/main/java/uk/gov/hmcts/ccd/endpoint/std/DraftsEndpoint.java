@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
@@ -74,6 +76,8 @@ public class DraftsEndpoint {
         @ApiResponse(code = 201, message = "Draft created"),
         @ApiResponse(code = 400, message = "Bad request")
     })
+    @LogAudit(operationType = AuditOperationType.SAVE_DRAFT_FOR_CASEWORKER, jurisdiction = "#jurisdictionId",
+        caseType = "#caseTypeId", eventId = "#eventId", caseId = "#caseDataContent.caseReference")
     public DraftResponse saveDraftForCaseWorker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -98,6 +102,8 @@ public class DraftsEndpoint {
         @ApiResponse(code = 200, message = "Draft updated"),
         @ApiResponse(code = 400, message = "Bad request")
     })
+    @LogAudit(operationType = AuditOperationType.UPDATE_DRAFT_FOR_CASEWORKER, jurisdiction = "#jurisdictionId",
+        caseType = "#caseTypeId", eventId = "#eventId", caseId = "#caseDataContent.caseReference")
     public DraftResponse updateDraftForCaseWorker(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
@@ -121,10 +127,17 @@ public class DraftsEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "A displayable draft")
     })
-    public CaseView findDraft(@PathVariable("uid") final String uid,
-                              @PathVariable("jid") final String jurisdictionId,
-                              @PathVariable("ctid") final String caseTypeId,
-                              @PathVariable("did") final String did) {
+    @LogAudit(operationType = AuditOperationType.FIND_DRAFT_FOR_CASEWORKER, jurisdiction = "#jurisdictionId",
+        caseType = "#caseTypeId")
+    public CaseView findDraft(
+        @ApiParam(value = "Idam user ID", required = true)
+        @PathVariable("uid") final String uid,
+        @ApiParam(value = "Jurisdiction ID", required = true)
+        @PathVariable("jid") final String jurisdictionId,
+        @ApiParam(value = "Case type ID", required = true)
+        @PathVariable("ctid") final String caseTypeId,
+        @ApiParam(value = "Draft ID", required = true)
+        @PathVariable("did") final String did) {
         Instant start = Instant.now();
         CaseView caseView = getDraftViewOperation.execute(did);
         final Duration between = Duration.between(start, Instant.now());
@@ -138,10 +151,17 @@ public class DraftsEndpoint {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "A draft deleted successfully")
     })
-    public void deleteDraft(@PathVariable("uid") final String uid,
-                            @PathVariable("jid") final String jurisdictionId,
-                            @PathVariable("ctid") final String caseTypeId,
-                            @PathVariable("did")  final String did) {
+    @LogAudit(operationType = AuditOperationType.DELETE_DRAFT_FOR_CASEWORKER, jurisdiction = "#jurisdictionId",
+        caseType = "#caseTypeId")
+    public void deleteDraft(
+        @ApiParam(value = "Idam user ID", required = true)
+        @PathVariable("uid") final String uid,
+        @ApiParam(value = "Jurisdiction ID", required = true)
+        @PathVariable("jid") final String jurisdictionId,
+        @ApiParam(value = "Case type ID", required = true)
+        @PathVariable("ctid") final String caseTypeId,
+        @ApiParam(value = "Draft ID", required = true)
+        @PathVariable("did") final String did) {
         Instant start = Instant.now();
         String validDraftId = validateDraftId(did);
         draftGateway.delete(validDraftId);

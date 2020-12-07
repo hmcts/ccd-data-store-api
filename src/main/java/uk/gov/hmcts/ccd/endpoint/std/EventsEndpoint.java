@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 
@@ -40,6 +42,8 @@ public class EventsEndpoint {
         @ApiResponse(code = 400, message = "Invalid case ID"),
         @ApiResponse(code = 404, message = "No case found for the given ID")
     })
+    @LogAudit(operationType = AuditOperationType.FIND_EVENT_FOR_CASEWORKER, jurisdiction = "#jurisdictionId",
+        caseType = "#caseTypeId", caseId = "#caseId")
     public List<AuditEvent> findEventDetailsForCase(
         @ApiParam(value = "Idam user ID", required = true)
         @PathVariable("uid") final String uid,
