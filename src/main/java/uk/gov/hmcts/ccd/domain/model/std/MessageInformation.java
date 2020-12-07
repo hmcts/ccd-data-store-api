@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 @SuppressWarnings("checkstyle:SummaryJavadoc") // Javadoc predates checkstyle implementation in module
-public class MessageInformation extends Event {
+public class MessageInformation {
     @JsonIgnore
     private Long id;
     @JsonProperty("user_id")
