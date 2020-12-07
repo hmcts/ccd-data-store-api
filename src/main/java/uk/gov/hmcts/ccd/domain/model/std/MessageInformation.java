@@ -51,20 +51,20 @@ public class MessageInformation {
         this.userId = userId;
     }
 
-    public String getJurisdictionId() {
-        return jurisdictionId;
-    }
-
-    public void setJurisdictionId(String jurisdictionId) {
-        this.jurisdictionId = jurisdictionId;
-    }
-
     public String getCaseTypeId() {
         return caseTypeId;
     }
 
     public void setCaseTypeId(String caseTypeId) {
         this.caseTypeId = caseTypeId;
+    }
+
+    public String getJurisdictionId() {
+        return jurisdictionId;
+    }
+
+    public void setJurisdictionId(String jurisdictionId) {
+        this.jurisdictionId = jurisdictionId;
     }
 
     public String getCaseId() {
