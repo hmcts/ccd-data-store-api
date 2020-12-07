@@ -1,7 +1,7 @@
 DELETE FROM case_event;
 DELETE FROM case_data;
 
-INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date, supplementary_data, supplementary_data_last_modified)
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date, supplementary_data)
 VALUES (1001, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Janet",
@@ -42,11 +42,10 @@ VALUES (1001, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
 	          "orgs_assigned_users": {
 		            "organisationA": 10
 	          }
-          }',
-        '2020-06-24 15:15:52.824'
+          }'
 );
 
-INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date, supplementary_data, supplementary_data_last_modified)
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date, supplementary_data)
 VALUES (1002, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "George",
@@ -79,11 +78,10 @@ VALUES (1002, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '2016-08-24 20:44:52.824',
         '2016-08-24 20:44:52.824',
         '{
-          }',
-        '2020-06-24 15:15:52.824'
+          }'
 );
 
-INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date, supplementary_data, supplementary_data_last_modified)
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date, supplementary_data)
 VALUES (1003, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Peter",
@@ -119,14 +117,13 @@ VALUES (1003, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
                 "organisationA": 15,
                  "organisationB": 3
           }
-        }',
-        '2020-06-24 15:15:52.824'
+        }'
 );
 
 
 
 
-INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date, supplementary_data, supplementary_data_last_modified)
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date, supplementary_data)
 VALUES (1004, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
 '{
   "PersonFirstName": "George",
@@ -158,6 +155,5 @@ VALUES (1004, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
 '2016-08-22 20:44:52.824',
 '2016-08-24 20:44:52.824',
 '2016-08-24 20:44:52.824',
- NULL,
  NULL
 );
