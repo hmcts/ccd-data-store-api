@@ -39,7 +39,7 @@ public class CaseEventMessageService implements MessageService {
                               CaseEventDefinition caseEventDefinition,
                               CaseDetails caseDetails) {
         final MessageQueueCandidate messageQueueCandidate = new MessageQueueCandidate();
-        if(Boolean.TRUE.equals(caseEventDefinition.getPublish())) {
+        if (Boolean.TRUE.equals(caseEventDefinition.getPublish())) {
 
             MessageInformation messageInformation = populateMessageInformation(event, caseEventDefinition, caseDetails);
             JsonNode node = mapper.convertValue(messageInformation, JsonNode.class);
@@ -52,8 +52,8 @@ public class CaseEventMessageService implements MessageService {
     }
 
     private MessageInformation populateMessageInformation(Event event,
-                                        CaseEventDefinition caseEventDefinition,
-                                        CaseDetails caseDetails) {
+                                                          CaseEventDefinition caseEventDefinition,
+                                                          CaseDetails caseDetails) {
 
         final MessageInformation messageInformation = new MessageInformation();
         final IdamUser user = userRepository.getUser();
@@ -68,6 +68,6 @@ public class CaseEventMessageService implements MessageService {
         messageInformation.setPreviousStateId(caseEventDefinition.getPreStates().get(0));
         messageInformation.setNewStateId(caseDetails.getState());
 
-       return messageInformation;
+        return messageInformation;
     }
 }

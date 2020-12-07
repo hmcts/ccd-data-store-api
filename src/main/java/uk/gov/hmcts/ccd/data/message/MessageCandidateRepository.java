@@ -26,7 +26,8 @@ public class MessageCandidateRepository {
     }
 
     public MessageQueueCandidate set(final MessageQueueCandidate messageQueueCandidate) {
-        final MessageQueueCandidateEntity newMessageCandidateEntity = messageCandidateMapper.modelToEntity(messageQueueCandidate);
+        final MessageQueueCandidateEntity newMessageCandidateEntity =
+            messageCandidateMapper.modelToEntity(messageQueueCandidate);
         em.persist(newMessageCandidateEntity);
         return messageCandidateMapper.entityToModel(newMessageCandidateEntity);
     }

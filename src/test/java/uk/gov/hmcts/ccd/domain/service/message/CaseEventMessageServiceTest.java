@@ -38,7 +38,8 @@ class CaseEventMessageServiceTest {
     private static final String JURISDICTION = "Some Jurisdiction";
     private static final String CASE_TYPE = "Some case type";
     private static final String STATE = "State one";
-    private static final LocalDateTime DATE_TIME = LocalDateTime.of(2000, 12, 07, 13, 13, 13);
+    private static final LocalDateTime DATE_TIME =
+        LocalDateTime.of(2000, 12, 07, 13, 13, 13);
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @Mock
@@ -46,7 +47,6 @@ class CaseEventMessageServiceTest {
 
     @Mock
     private MessageCandidateRepository messageCandidateRepository;
-
 
     @InjectMocks
     private CaseEventMessageService caseEventMessageService;
@@ -67,9 +67,10 @@ class CaseEventMessageServiceTest {
     @Test
     @DisplayName("should persist case event message")
     void shouldPersistEvent() {
-        final ArgumentCaptor<MessageQueueCandidate> messageCaptor = ArgumentCaptor.forClass(MessageQueueCandidate.class);
+        final ArgumentCaptor<MessageQueueCandidate> messageCaptor =
+            ArgumentCaptor.forClass(MessageQueueCandidate.class);
 
-        MessageInformation messageInformation = buildMessageInformation(event, caseEventDefinition, caseDetails);
+        MessageInformation messageInformation = buildMessageInformation();
         JsonNode node = mapper.convertValue(messageInformation, JsonNode.class);
 
         caseEventMessageService.handleMessage(event,
@@ -87,10 +88,10 @@ class CaseEventMessageServiceTest {
             () -> assertThat(messageQueueCandidate.getMessageInformation(), is(node)),
             () -> assertThat(messageQueueCandidate.getMessageType(), is(CASE_EVENT)),
             () -> assertNull(messageQueueCandidate.getPublished())
-           );
+        );
     }
 
-    private MessageInformation buildMessageInformation(Event event, CaseEventDefinition ced, CaseDetails caseDetails) {
+    private MessageInformation buildMessageInformation() {
         final MessageInformation msgInfo = new MessageInformation();
         msgInfo.setCaseId(caseDetails.getReference().toString());
         msgInfo.setJurisdictionId(caseDetails.getJurisdiction());

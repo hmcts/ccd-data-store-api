@@ -55,7 +55,7 @@ public class MessageInformation extends Event {
         return jurisdictionId;
     }
 
-    public void setJurisdictionId (String jurisdictionId) {
+    public void setJurisdictionId(String jurisdictionId) {
         this.jurisdictionId = jurisdictionId;
     }
 
