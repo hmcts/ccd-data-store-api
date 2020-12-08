@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.message.MessageCandidateRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.MessageInformation;
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
@@ -17,6 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
 @Service
 @Qualifier("default")
@@ -25,13 +28,16 @@ public class CaseEventMessageService implements MessageService {
     private static final ObjectMapper mapper = new ObjectMapper();
     private final UserRepository userRepository;
     private final MessageCandidateRepository messageCandidateRepository;
+    private final CaseAuditEventRepository caseAuditEventRepository;
     private static String CASE_EVENT_MESSAGE_TYPE = "CASE_EVENT";
 
     @Inject
     public CaseEventMessageService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                   final MessageCandidateRepository messageCandidateRepository) {
+                                   final MessageCandidateRepository messageCandidateRepository,
+                                   CaseAuditEventRepository caseAuditEventRepository) {
         this.userRepository = userRepository;
         this.messageCandidateRepository = messageCandidateRepository;
+        this.caseAuditEventRepository = caseAuditEventRepository;
     }
 
     @Override
@@ -57,17 +63,22 @@ public class CaseEventMessageService implements MessageService {
 
         final MessageInformation messageInformation = new MessageInformation();
         final IdamUser user = userRepository.getUser();
+        List<AuditEvent> auditEvent = caseAuditEventRepository.findByCase(caseDetails);
 
         messageInformation.setCaseId(caseDetails.getReference().toString());
         messageInformation.setJurisdictionId(caseDetails.getJurisdiction());
         messageInformation.setCaseTypeId(caseDetails.getCaseTypeId());
-        messageInformation.setEventInstanceId(event.getEventId());
+        messageInformation.setEventInstanceId(auditEvent.get(0).getId().toString());
         messageInformation.setEventTimestamp(caseDetails.getLastStateModifiedDate());
         messageInformation.setEventId(event.getEventId());
         messageInformation.setUserId(user.getId());
-        messageInformation.setPreviousStateId(caseEventDefinition.getPreStates().get(0));
+        messageInformation.setPreviousStateId(getPreState(caseEventDefinition.getPreStates()));
         messageInformation.setNewStateId(caseDetails.getState());
 
         return messageInformation;
+    }
+
+    private String getPreState(List<String> preStates) {
+        return preStates.isEmpty() ? null : preStates.get(0);
     }
 }

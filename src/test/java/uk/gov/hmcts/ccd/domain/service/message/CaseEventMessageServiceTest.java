@@ -9,28 +9,33 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.message.MessageCandidateRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.MessageInformation;
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 class CaseEventMessageServiceTest {
 
     private static final String USER_ID = "123";
+    private static final Long EVENT_INSTANCE_ID = 2L;
     private static final Long CASE_ID = 456L;
     private static final String EVENT_ID = "SomeEvent";
     private static final String EVENT_NAME = "Some event";
@@ -46,6 +51,9 @@ class CaseEventMessageServiceTest {
     private UserRepository userRepository;
 
     @Mock
+    private CaseAuditEventRepository caseAuditEventRepository;
+
+    @Mock
     private MessageCandidateRepository messageCandidateRepository;
 
     @InjectMocks
@@ -58,6 +66,7 @@ class CaseEventMessageServiceTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
         doReturn(getUser()).when(userRepository).getUser();
+        doReturn(getAuditEvent()).when(caseAuditEventRepository).findByCase(any());
 
         caseEventDefinition = buildEventTrigger();
         event = buildEvent();
@@ -96,7 +105,7 @@ class CaseEventMessageServiceTest {
         msgInfo.setCaseId(caseDetails.getReference().toString());
         msgInfo.setJurisdictionId(caseDetails.getJurisdiction());
         msgInfo.setCaseTypeId(caseDetails.getCaseTypeId());
-        msgInfo.setEventInstanceId(event.getEventId());
+        msgInfo.setEventInstanceId(EVENT_INSTANCE_ID.toString());
         msgInfo.setEventTimestamp(caseDetails.getLastStateModifiedDate());
         msgInfo.setEventId(event.getEventId());
         msgInfo.setUserId(userRepository.getUser().getId());
@@ -136,6 +145,12 @@ class CaseEventMessageServiceTest {
         user.setEmail("test@email.com");
         user.setId(USER_ID);
         return user;
+    }
+
+    private List<AuditEvent> getAuditEvent() {
+        final AuditEvent event = new AuditEvent();
+        event.setId(EVENT_INSTANCE_ID);
+        return Arrays.asList(event);
     }
 
 }
