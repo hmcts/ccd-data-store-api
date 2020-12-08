@@ -180,7 +180,7 @@ dependencies {
     compile group: 'org.awaitility', name: 'awaitility', version: '3.1.6'
 
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.3'
-    compile "com.fasterxml.jackson.core:jackson-databind:2.11.0"
+    compile "com.fasterxml.jackson.core:jackson-databind:2.11.1"
 
     // use the latest org.springframework.security
     compile group: 'org.springframework.security', name: 'spring-security-core', version: '5.3.4.RELEASE'
