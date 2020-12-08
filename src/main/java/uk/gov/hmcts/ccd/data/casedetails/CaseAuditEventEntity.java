@@ -42,7 +42,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_ID_
 public class CaseAuditEventEntity {
 
     static final String FIND_BY_CASE_DATA_ID_HQL = "SELECT cae FROM CaseAuditEventEntity cae"
-        + " WHERE cae.caseDataId = :" + CaseAuditEventEntity.CASE_DATA_ID;
+        + " LEFT JOIN FETCH cae.significantItemEntity WHERE cae.caseDataId = :" + CaseAuditEventEntity.CASE_DATA_ID;
 
     static final String FIND_BY_ID_HQL = "SELECT cae FROM CaseAuditEventEntity cae"
         + " WHERE cae.id = :" + CaseAuditEventEntity.EVENT_ID;
