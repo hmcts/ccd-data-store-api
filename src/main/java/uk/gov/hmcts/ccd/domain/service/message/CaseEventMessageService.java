@@ -45,7 +45,8 @@ public class CaseEventMessageService implements MessageService {
         final MessageQueueCandidate messageQueueCandidate = new MessageQueueCandidate();
         if (Boolean.TRUE.equals(caseEventDefinition.getPublish())) {
 
-            MessageInformation messageInformation = populateMessageInformation(caseEventDefinition, caseDetails, oldState);
+            MessageInformation messageInformation = populateMessageInformation(caseEventDefinition,
+                caseDetails, oldState);
             JsonNode node = mapper.convertValue(messageInformation, JsonNode.class);
 
             messageQueueCandidate.setMessageInformation(node);
