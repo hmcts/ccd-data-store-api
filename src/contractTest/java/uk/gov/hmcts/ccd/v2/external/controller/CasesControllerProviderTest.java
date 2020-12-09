@@ -10,6 +10,7 @@ import au.com.dius.pact.provider.junit.target.Target;
 import au.com.dius.pact.provider.junit.target.TestTarget;
 import au.com.dius.pact.provider.spring.SpringRestPactRunner;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.microsoft.applicationinsights.TelemetryClient;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,7 @@ public class CasesControllerProviderTest {
     private static final String CASE_DATA_CONTENT = "caseDataContent";
     public static final String JURISDICTION_ID = "jurisdictionId";
     public static final String EVENT_ID = "eventId";
+    private static final String CASE_TYPE = "caseType";
 
     @Autowired
     ContractTestSecurityUtils securityUtils;
@@ -90,7 +92,6 @@ public class CasesControllerProviderTest {
     @MockBean
     AuthorisedSearchOperation authorisedSearchOperation;
 
-
     @MockBean
     UserAuthorisation userAuthorisation;
 
@@ -102,6 +103,8 @@ public class CasesControllerProviderTest {
     @MockBean
     AccessControlService accessControlService;
 
+    @MockBean
+    TelemetryClient telemetryClient;
 
     @Autowired
     ContractTestCreateEventOperation createEventOperation;
@@ -205,22 +208,24 @@ public class CasesControllerProviderTest {
         String caseworkerUsername = (String) dataMap.get(CASEWORKER_USERNAME);
         String caseworkerPassword = (String) dataMap.get(CASEWORKER_PASSWORD);
         String jurisdictionId = (String) dataMap.get(JURISDICTION_ID);
+        String caseType = (String) dataMap.get(CASE_TYPE);
         CaseDataContent caseDataContent = objectMapper.convertValue(contentDataMap, CaseDataContent.class);
 
         securityUtils.setSecurityContextUserAsCaseworkerByJurisdiction(jurisdictionId, caseworkerUsername,
             caseworkerPassword);
         securityUtils.setSecurityContextUserAsCaseworkerByEvent(caseDataContent.getEventId(), caseworkerUsername,
             caseworkerPassword);
-        return contractTestCreateCaseOperation.createCaseDetails("DIVORCE", caseDataContent, true);
+        return contractTestCreateCaseOperation.createCaseDetails(caseType, caseDataContent, true);
 
     }
 
     private CaseDetails setUpCaseDetailsFromStateMapForEvent(Map<String, Object> dataMap) {
         Map<String, Object> contentDataMap = (Map<String, Object>) dataMap.get(CASE_DATA_CONTENT);
         setUpSecurityContextForEvent(dataMap);
+        String caseType = (String) dataMap.get(CASE_TYPE);
         CaseDataContent caseDataContent = objectMapper.convertValue(contentDataMap, CaseDataContent.class);
 
-        return contractTestCreateCaseOperation.createCaseDetails("DIVORCE", caseDataContent, true);
+        return contractTestCreateCaseOperation.createCaseDetails(caseType, caseDataContent, true);
 
     }
 
