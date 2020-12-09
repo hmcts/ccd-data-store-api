@@ -16,7 +16,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.MessageInformation;
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 
@@ -58,7 +57,6 @@ class CaseEventMessageServiceTest {
 
     @InjectMocks
     private CaseEventMessageService caseEventMessageService;
-    private Event event;
     private CaseEventDefinition caseEventDefinition;
     private CaseDetails caseDetails;
 
@@ -69,7 +67,6 @@ class CaseEventMessageServiceTest {
         doReturn(getAuditEvent()).when(caseAuditEventRepository).findByCase(any());
 
         caseEventDefinition = buildEventTrigger();
-        event = buildEvent();
         caseDetails = buildCaseDetails();
     }
 
@@ -82,9 +79,9 @@ class CaseEventMessageServiceTest {
         MessageInformation messageInformation = buildMessageInformation();
         JsonNode node = mapper.convertValue(messageInformation, JsonNode.class);
 
-        caseEventMessageService.handleMessage(event,
+        caseEventMessageService.handleMessage(
             caseEventDefinition,
-            caseDetails);
+            caseDetails, STATE);
 
         assertAll(
             () -> verify(messageCandidateRepository).set(messageCaptor.capture()),
@@ -105,11 +102,11 @@ class CaseEventMessageServiceTest {
         msgInfo.setCaseId(caseDetails.getReference().toString());
         msgInfo.setJurisdictionId(caseDetails.getJurisdiction());
         msgInfo.setCaseTypeId(caseDetails.getCaseTypeId());
-        msgInfo.setEventInstanceId(EVENT_INSTANCE_ID.toString());
-        msgInfo.setEventTimestamp(caseDetails.getLastStateModifiedDate());
-        msgInfo.setEventId(event.getEventId());
+        msgInfo.setEventInstanceId(EVENT_INSTANCE_ID);
+        msgInfo.setEventTimestamp(caseDetails.getLastModified());
+        msgInfo.setEventId(caseEventDefinition.getId());
         msgInfo.setUserId(userRepository.getUser().getId());
-        msgInfo.setPreviousStateId(caseEventDefinition.getPreStates().get(0));
+        msgInfo.setPreviousStateId(STATE);
         msgInfo.setNewStateId(caseDetails.getState());
         return msgInfo;
     }
@@ -130,14 +127,8 @@ class CaseEventMessageServiceTest {
         caseDetails.setJurisdiction(JURISDICTION);
         caseDetails.setCaseTypeId(CASE_TYPE);
         caseDetails.setState(STATE);
-        caseDetails.setLastStateModifiedDate(DATE_TIME);
+        caseDetails.setLastModified(DATE_TIME);
         return caseDetails;
-    }
-
-    private Event buildEvent() {
-        final Event event = new Event();
-        event.setEventId(EVENT_ID);
-        return event;
     }
 
     private IdamUser getUser() {

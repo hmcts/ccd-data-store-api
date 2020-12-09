@@ -12,7 +12,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.MessageInformation;
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 
@@ -29,7 +28,7 @@ public class CaseEventMessageService implements MessageService {
     private final UserRepository userRepository;
     private final MessageCandidateRepository messageCandidateRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
-    private static String CASE_EVENT_MESSAGE_TYPE = "CASE_EVENT";
+    private static final String CASE_EVENT_MESSAGE_TYPE = "CASE_EVENT";
 
     @Inject
     public CaseEventMessageService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -41,13 +40,12 @@ public class CaseEventMessageService implements MessageService {
     }
 
     @Override
-    public void handleMessage(Event event,
-                              CaseEventDefinition caseEventDefinition,
-                              CaseDetails caseDetails) {
+    public void handleMessage(CaseEventDefinition caseEventDefinition,
+                              CaseDetails caseDetails, String oldState) {
         final MessageQueueCandidate messageQueueCandidate = new MessageQueueCandidate();
         if (Boolean.TRUE.equals(caseEventDefinition.getPublish())) {
 
-            MessageInformation messageInformation = populateMessageInformation(event, caseEventDefinition, caseDetails);
+            MessageInformation messageInformation = populateMessageInformation(caseEventDefinition, caseDetails, oldState);
             JsonNode node = mapper.convertValue(messageInformation, JsonNode.class);
 
             messageQueueCandidate.setMessageInformation(node);
@@ -57,9 +55,8 @@ public class CaseEventMessageService implements MessageService {
         }
     }
 
-    private MessageInformation populateMessageInformation(Event event,
-                                                          CaseEventDefinition caseEventDefinition,
-                                                          CaseDetails caseDetails) {
+    private MessageInformation populateMessageInformation(CaseEventDefinition caseEventDefinition,
+                                                          CaseDetails caseDetails, String oldState) {
 
         final MessageInformation messageInformation = new MessageInformation();
         final IdamUser user = userRepository.getUser();
@@ -68,17 +65,13 @@ public class CaseEventMessageService implements MessageService {
         messageInformation.setCaseId(caseDetails.getReference().toString());
         messageInformation.setJurisdictionId(caseDetails.getJurisdiction());
         messageInformation.setCaseTypeId(caseDetails.getCaseTypeId());
-        messageInformation.setEventInstanceId(auditEvent.get(0).getId().toString());
-        messageInformation.setEventTimestamp(caseDetails.getLastStateModifiedDate());
-        messageInformation.setEventId(event.getEventId());
+        messageInformation.setEventInstanceId(auditEvent.get(0).getId());
+        messageInformation.setEventTimestamp(caseDetails.getLastModified());
+        messageInformation.setEventId(caseEventDefinition.getId());
         messageInformation.setUserId(user.getId());
-        messageInformation.setPreviousStateId(getPreState(caseEventDefinition.getPreStates()));
+        messageInformation.setPreviousStateId(oldState);
         messageInformation.setNewStateId(caseDetails.getState());
 
         return messageInformation;
-    }
-
-    private String getPreState(List<String> preStates) {
-        return preStates.isEmpty() ? null : preStates.get(0);
     }
 }

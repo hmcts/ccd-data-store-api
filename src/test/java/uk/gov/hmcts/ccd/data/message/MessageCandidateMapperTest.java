@@ -18,6 +18,7 @@ public class MessageCandidateMapperTest {
     private static final String CASE_TYPE_ID = "121212";
     private static final String EVENT_NAME = "eventName";
     private static final String EVENT_ID = "eventName";
+    private static final Long EVENT_INSTNACE_ID = 2L;
     private static final String STATE_NAME = "stateName";
     private static final String JURISDICTION = "Jurisdiction";
     private static final String USER_ID = "USER_ID";
@@ -87,7 +88,7 @@ public class MessageCandidateMapperTest {
         messageInformation.setCaseId(CASE_DATA_ID.toString());
         messageInformation.setJurisdictionId(JURISDICTION);
         messageInformation.setCaseTypeId(CASE_TYPE_ID);
-        messageInformation.setEventInstanceId(EVENT_ID);
+        messageInformation.setEventInstanceId(EVENT_INSTNACE_ID);
         messageInformation.setEventTimestamp(DATE_TIME);
         messageInformation.setEventId(EVENT_ID);
         messageInformation.setUserId(USER_ID);

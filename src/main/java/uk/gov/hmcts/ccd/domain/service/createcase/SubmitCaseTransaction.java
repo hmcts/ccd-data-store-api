@@ -144,7 +144,7 @@ class SubmitCaseTransaction {
         auditEvent.setSignificantItem(response.getSignificantItem());
 
         caseAuditEventRepository.set(auditEvent);
-        messageService.handleMessage(event, caseEventDefinition, savedCaseDetails);
+        messageService.handleMessage(caseEventDefinition, savedCaseDetails, null);
         return savedCaseDetails;
     }
 

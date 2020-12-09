@@ -23,7 +23,7 @@ public class MessageInformation {
     @JsonProperty("event_timestamp")
     private LocalDateTime eventTimestamp;
     @JsonProperty("event_instance_id")
-    private String eventInstanceId;
+    private Long eventInstanceId;
     @JsonProperty("event_id")
     private String eventId;
     @JsonProperty("previous_state_id")
@@ -75,11 +75,11 @@ public class MessageInformation {
         this.caseId = caseId;
     }
 
-    public String getEventInstanceId() {
+    public Long getEventInstanceId() {
         return eventInstanceId;
     }
 
-    public void setEventInstanceId(String eventInstanceId) {
+    public void setEventInstanceId(Long eventInstanceId) {
         this.eventInstanceId = eventInstanceId;
     }
 

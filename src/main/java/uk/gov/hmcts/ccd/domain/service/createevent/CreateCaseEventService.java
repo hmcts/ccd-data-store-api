@@ -138,6 +138,7 @@ public class CreateCaseEventService {
 
         validatePreState(caseDetails, caseEventDefinition);
         content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, caseEventDefinition));
+        String oldState = caseDetails.getState();
         mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, caseEventDefinition, caseTypeDefinition);
         AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse =
             callbackInvoker.invokeAboutToSubmitCallback(caseEventDefinition,
@@ -161,7 +162,7 @@ public class CreateCaseEventService {
             caseEventDefinition,
             savedCaseDetails,
             caseTypeDefinition,
-            timeNow);
+            timeNow, oldState);
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsBefore)
@@ -253,12 +254,14 @@ public class CreateCaseEventService {
                                               final Event event,
                                               final CaseEventDefinition caseEventDefinition,
                                               final CaseDetails caseDetails,
-                                              final CaseTypeDefinition caseTypeDefinition, LocalDateTime timeNow) {
+                                              final CaseTypeDefinition caseTypeDefinition,
+                                              LocalDateTime timeNow,
+                                              String oldState) {
+
         final IdamUser user = userRepository.getUser();
         final CaseStateDefinition caseStateDefinition =
             caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
         final AuditEvent auditEvent = new AuditEvent();
-
         auditEvent.setEventId(event.getEventId());
         auditEvent.setEventName(caseEventDefinition.getName());
         auditEvent.setSummary(event.getSummary());
@@ -279,6 +282,6 @@ public class CreateCaseEventService {
         auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
 
         caseAuditEventRepository.set(auditEvent);
-        messageService.handleMessage(event, caseEventDefinition, caseDetails);
+        messageService.handleMessage(caseEventDefinition, caseDetails, oldState);
     }
 }

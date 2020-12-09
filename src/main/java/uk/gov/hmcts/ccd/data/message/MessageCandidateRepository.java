@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.data.message;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 
 import javax.inject.Inject;
@@ -13,8 +11,6 @@ import javax.persistence.PersistenceContext;
 @Named
 @Singleton
 public class MessageCandidateRepository {
-    private static final Logger LOG = LoggerFactory.getLogger(MessageCandidateRepository.class);
-
     private final MessageCandidateMapper messageCandidateMapper;
 
     @PersistenceContext
