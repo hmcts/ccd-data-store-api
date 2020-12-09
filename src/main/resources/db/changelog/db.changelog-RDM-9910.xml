@@ -6,9 +6,10 @@
             endDelimiter="\nGO"
             splitStatements="true"
             stripComments="true">
-            ALTER TABLE case_data ADD marked_by_logstash boolean DEFAULT false;
+            ALTER TABLE case_data ADD marked_by_logstash boolean;
+            ALTER TABLE case_data ALTER COLUMN marked_by_logstash SET DEFAULT false;
 
-            CREATE INDEX idx_case_data_marked_by_logstash ON case_data (marked_by_logstash);
+            CREATE INDEX CONCURRENTLY idx_case_data_marked_by_logstash ON case_data (marked_by_logstash);
 
             CREATE OR REPLACE FUNCTION set_case_data_marked_by_logstash()
             RETURNS TRIGGER AS $$
