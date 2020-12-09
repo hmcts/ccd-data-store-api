@@ -3,6 +3,7 @@
     <AgentLogger>INFO</AgentLogger>
     <Instrumentation>
         <BuiltIn enabled="true">
+            <Logging threshold="info"/>
             <HTTP enabled="true"/>
             <JDBC enabled="true"/>
             <!-- Set SQL query duration above which query plan is reported. Default is 10000 ms. -->
