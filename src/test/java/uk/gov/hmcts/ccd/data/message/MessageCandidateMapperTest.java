@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class MessageCandidateMapperTest {
+class MessageCandidateMapperTest {
     private static final Long CASE_DATA_ID = 101111L;
     private static final String MESSAGE_TYPE = "CASE_EVENT";
     private static final String CASE_TYPE_ID = "121212";
@@ -27,7 +27,7 @@ public class MessageCandidateMapperTest {
 
     @Test
     @DisplayName("Should map model to entity ")
-    public void modelTo() {
+    void modelTo() {
         LocalDateTime timestamp = LocalDateTime.now();
         MessageCandidateMapper messageCandidateMapper = new MessageCandidateMapper();
         MessageQueueCandidate messageCandidate = getMessageCandidate(timestamp);
@@ -43,7 +43,7 @@ public class MessageCandidateMapperTest {
 
     @Test
     @DisplayName("Should map entity to model ")
-    public void entityTo() {
+    void entityTo() {
         LocalDateTime timestamp = LocalDateTime.now();
         MessageCandidateMapper messageCandidateMapper = new MessageCandidateMapper();
         MessageQueueCandidateEntity messageQueueCandidateEntity = getMessageCandidateEntity(timestamp);
