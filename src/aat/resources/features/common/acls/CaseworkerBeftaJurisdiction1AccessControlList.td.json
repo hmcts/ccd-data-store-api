@@ -1,0 +1,7 @@
+{
+  "_guid_": "CaseworkerBeftaJurisdiction1AccessControlList",
+  "_extends_": "AllGrantedAccessControlList",
+
+  "role": "caseworker-befta_jurisdiction_1",
+  "delete": false
+}
