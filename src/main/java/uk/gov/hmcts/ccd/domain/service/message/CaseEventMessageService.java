@@ -52,7 +52,7 @@ public class CaseEventMessageService implements MessageService {
             messageQueueCandidate.setMessageInformation(node);
             messageQueueCandidate.setMessageType(CASE_EVENT_MESSAGE_TYPE);
             messageQueueCandidate.setTimeStamp(LocalDateTime.now(ZoneOffset.UTC));
-            messageCandidateRepository.set(messageQueueCandidate);
+            messageCandidateRepository.save(messageQueueCandidate);
         }
     }
 

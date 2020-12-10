@@ -84,7 +84,7 @@ class CaseEventMessageServiceTest {
             caseDetails, STATE);
 
         assertAll(
-            () -> verify(messageCandidateRepository).set(messageCaptor.capture()),
+            () -> verify(messageCandidateRepository).save(messageCaptor.capture()),
             () -> assertMessage(messageCaptor.getValue(), node)
         );
     }

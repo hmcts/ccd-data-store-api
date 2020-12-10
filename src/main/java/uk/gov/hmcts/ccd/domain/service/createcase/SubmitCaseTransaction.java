@@ -58,7 +58,7 @@ class SubmitCaseTransaction {
                                  final @Qualifier(CachedCaseUserRepository.QUALIFIER)
                                          CaseUserRepository caseUserRepository,
                                  final UserAuthorisation userAuthorisation,
-            final  @Qualifier("caseEventMessageService") MessageService messageService
+                                 final @Qualifier("caseEventMessageService") MessageService messageService
                                  ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
