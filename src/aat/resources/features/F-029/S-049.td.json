@@ -52,11 +52,7 @@
           "retain_hidden_value": null,
           "acls": [
             {
-              "role": "caseworker-autotest1",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": false
+              "_extends_": "CaseworkerAutotest1AccessControlList"
             }
           ]
         },
@@ -89,11 +85,7 @@
           "retain_hidden_value": null,
           "acls": [
             {
-              "role": "caseworker-autotest1",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": false
+              "_extends_": "CaseworkerAutotest1AccessControlList"
             }
           ]
         },
@@ -126,11 +118,7 @@
           "retain_hidden_value": null,
           "acls": [
             {
-              "role": "caseworker-autotest1",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": false
+              "_extends_": "CaseworkerAutotest1AccessControlList"
             }
           ]
         },
@@ -163,11 +151,7 @@
           "retain_hidden_value": null,
           "acls": [
             {
-              "role": "caseworker-autotest1",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": false
+              "_extends_": "CaseworkerAutotest1AccessControlList"
             }
           ]
         },
@@ -200,11 +184,7 @@
           "retain_hidden_value": null,
           "acls": [
             {
-              "role": "caseworker-autotest1",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": false
+              "_extends_": "CaseworkerAutotest1AccessControlList"
             }
           ]
         },
@@ -237,11 +217,7 @@
           "retain_hidden_value": null,
           "acls": [
             {
-              "role": "caseworker-autotest1",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": false
+              "_extends_": "CaseworkerAutotest1AccessControlList"
             }
           ]
         },
@@ -274,11 +250,7 @@
           "retain_hidden_value": null,
           "acls": [
             {
-              "role": "caseworker-autotest1",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": false
+              "_extends_": "CaseworkerAutotest1AccessControlList"
             }
           ]
         },
@@ -311,11 +283,7 @@
           "retain_hidden_value": null,
           "acls": [
             {
-              "role": "caseworker-autotest1",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": false
+              "_extends_": "CaseworkerAutotest1AccessControlList"
             }
           ]
         },
@@ -348,11 +316,7 @@
           "retain_hidden_value": null,
           "acls": [
             {
-              "role": "caseworker-autotest1",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": false
+              "_extends_": "CaseworkerAutotest1AccessControlList"
             }
           ]
         },
@@ -401,11 +365,7 @@
           "retain_hidden_value": null,
           "acls": [
             {
-              "role": "caseworker-autotest1",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": false
+              "_extends_": "CaseworkerAutotest1AccessControlList"
             }
           ]
         },
@@ -464,11 +424,7 @@
           "retain_hidden_value": null,
           "acls": [
             {
-              "role": "caseworker-autotest1",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": false
+              "_extends_": "CaseworkerAutotest1AccessControlList"
             }
           ]
         },
@@ -510,11 +466,7 @@
           "retain_hidden_value": null,
           "acls": [
             {
-              "role": "caseworker-autotest1",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": false
+              "_extends_": "CaseworkerAutotest1AccessControlList"
             }
           ]
         },
@@ -557,11 +509,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-autotest1",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": false,
+                    "_extends_": "CaseworkerAutotest1AccessControlList",
                     "listElementCode": "ComplexTextField"
                   }
                 ],
@@ -611,11 +559,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-autotest1",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": false,
+                    "_extends_": "CaseworkerAutotest1AccessControlList",
                     "listElementCode": "ComplexFixedListField"
                   }
                 ],
@@ -665,11 +609,7 @@
                       "show_condition": null,
                       "acls": [
                         {
-                          "role": "caseworker-autotest1",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": false
+                          "_extends_": "CaseworkerAutotest1AccessControlList"
                         }
                       ],
                       "complexACLs": [],
@@ -711,11 +651,7 @@
                       "show_condition": null,
                       "acls": [
                         {
-                          "role": "caseworker-autotest1",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": false
+                          "_extends_": "CaseworkerAutotest1AccessControlList"
                         }
                       ],
                       "complexACLs": [],
@@ -733,11 +669,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-autotest1",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": false,
+                    "_extends_": "CaseworkerAutotest1AccessControlList",
                     "listElementCode": "ComplexNestedField"
                   }
                 ],
@@ -762,11 +694,7 @@
           "retain_hidden_value": null,
           "acls": [
             {
-              "role": "caseworker-autotest1",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": false
+              "_extends_": "CaseworkerAutotest1AccessControlList"
             }
           ]
         },
@@ -809,11 +737,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-autotest1",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": false
+                    "_extends_": "CaseworkerAutotest1AccessControlList"
                   }
                 ],
                 "complexACLs": [],
@@ -846,11 +770,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-autotest1",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": false
+                    "_extends_": "CaseworkerAutotest1AccessControlList"
                   }
                 ],
                 "complexACLs": [],
@@ -883,11 +803,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-autotest1",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": false
+                    "_extends_": "CaseworkerAutotest1AccessControlList"
                   }
                 ],
                 "complexACLs": [],
@@ -920,11 +836,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-autotest1",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": false
+                    "_extends_": "CaseworkerAutotest1AccessControlList"
                   }
                 ],
                 "complexACLs": [],
@@ -957,11 +869,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-autotest1",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": false
+                    "_extends_": "CaseworkerAutotest1AccessControlList"
                   }
                 ],
                 "complexACLs": [],
@@ -994,11 +902,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-autotest1",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": false
+                    "_extends_": "CaseworkerAutotest1AccessControlList"
                   }
                 ],
                 "complexACLs": [],
@@ -1031,11 +935,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-autotest1",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": false
+                    "_extends_": "CaseworkerAutotest1AccessControlList"
                   }
                 ],
                 "complexACLs": [],
@@ -1059,11 +959,7 @@
           "retain_hidden_value": null,
           "acls": [
             {
-              "role": "caseworker-autotest1",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": false
+              "_extends_": "CaseworkerAutotest1AccessControlList"
             }
           ]
         },
@@ -1096,11 +992,7 @@
           "retain_hidden_value": null,
           "acls": [
             {
-              "role": "caseworker-autotest1",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": false
+              "_extends_": "CaseworkerAutotest1AccessControlList"
             }
           ]
         },
@@ -1149,11 +1041,7 @@
           "retain_hidden_value": null,
           "acls": [
             {
-              "role": "caseworker-autotest1",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": false
+              "_extends_": "CaseworkerAutotest1AccessControlList"
             }
           ]
         }
