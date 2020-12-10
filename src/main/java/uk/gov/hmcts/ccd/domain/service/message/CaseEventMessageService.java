@@ -21,7 +21,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 
 @Service
-@Qualifier("default")
+@Qualifier("caseEventMessageService")
 public class CaseEventMessageService implements MessageService {
 
     private static final ObjectMapper mapper = new ObjectMapper();
