@@ -16,7 +16,6 @@ public class MessageCandidateMapperTest {
     private static final Long CASE_DATA_ID = 101111L;
     private static final String MESSAGE_TYPE = "CASE_EVENT";
     private static final String CASE_TYPE_ID = "121212";
-    private static final String EVENT_NAME = "eventName";
     private static final String EVENT_ID = "eventName";
     private static final Long EVENT_INSTNACE_ID = 2L;
     private static final String STATE_NAME = "stateName";

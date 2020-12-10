@@ -19,7 +19,10 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.MessageInformation;
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 
@@ -50,6 +53,10 @@ class CaseEventMessageServiceTest {
     private UserRepository userRepository;
 
     @Mock
+    private Clock clock;
+    private Clock fixedClock;
+
+    @Mock
     private CaseAuditEventRepository caseAuditEventRepository;
 
     @Mock
@@ -65,6 +72,9 @@ class CaseEventMessageServiceTest {
         MockitoAnnotations.initMocks(this);
         doReturn(getUser()).when(userRepository).getUser();
         doReturn(getAuditEvent()).when(caseAuditEventRepository).findByCase(any());
+        fixedClock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
+        doReturn(fixedClock.instant()).when(clock).instant();
+        doReturn(fixedClock.getZone()).when(clock).getZone();
 
         caseEventDefinition = buildEventTrigger();
         caseDetails = buildCaseDetails();
@@ -79,9 +89,9 @@ class CaseEventMessageServiceTest {
         MessageInformation messageInformation = buildMessageInformation();
         JsonNode node = mapper.convertValue(messageInformation, JsonNode.class);
 
-        caseEventMessageService.handleMessage(
-            caseEventDefinition,
-            caseDetails, STATE);
+        caseEventMessageService.handleMessage(MessageContext.builder().caseDetails(caseDetails)
+                .caseEventDefinition(caseEventDefinition)
+                .oldState(STATE).build());
 
         assertAll(
             () -> verify(messageCandidateRepository).save(messageCaptor.capture()),

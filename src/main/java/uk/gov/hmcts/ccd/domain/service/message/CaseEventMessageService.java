@@ -8,71 +8,40 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.message.MessageCandidateRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
-import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.MessageInformation;
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 
 import javax.inject.Inject;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.List;
+import java.time.Clock;
 
 @Service
 @Qualifier("caseEventMessageService")
-public class CaseEventMessageService implements MessageService {
+public class CaseEventMessageService extends AbstractMessageService {
 
     private static final ObjectMapper mapper = new ObjectMapper();
-    private final UserRepository userRepository;
     private final MessageCandidateRepository messageCandidateRepository;
-    private final CaseAuditEventRepository caseAuditEventRepository;
-    private static final String CASE_EVENT_MESSAGE_TYPE = "CASE_EVENT";
 
     @Inject
     public CaseEventMessageService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                    final MessageCandidateRepository messageCandidateRepository,
-                                   CaseAuditEventRepository caseAuditEventRepository) {
-        this.userRepository = userRepository;
+                                   CaseAuditEventRepository caseAuditEventRepository,
+                                   @Qualifier("utcClock") final Clock clock) {
+        super(userRepository, caseAuditEventRepository, clock);
         this.messageCandidateRepository = messageCandidateRepository;
-        this.caseAuditEventRepository = caseAuditEventRepository;
     }
 
     @Override
-    public void handleMessage(CaseEventDefinition caseEventDefinition,
-                              CaseDetails caseDetails, String oldState) {
+    public void handleMessage(MessageContext messageContext) {
         final MessageQueueCandidate messageQueueCandidate = new MessageQueueCandidate();
-        if (Boolean.TRUE.equals(caseEventDefinition.getPublish())) {
+        if (Boolean.TRUE.equals(messageContext.getCaseEventDefinition().getPublish())) {
 
-            MessageInformation messageInformation = populateMessageInformation(caseEventDefinition,
-                caseDetails, oldState);
+            MessageInformation messageInformation = populateMessageInformation(messageContext);
             JsonNode node = mapper.convertValue(messageInformation, JsonNode.class);
 
             messageQueueCandidate.setMessageInformation(node);
-            messageQueueCandidate.setMessageType(CASE_EVENT_MESSAGE_TYPE);
-            messageQueueCandidate.setTimeStamp(LocalDateTime.now(ZoneOffset.UTC));
+            messageQueueCandidate.setMessageType(MessageType.CASE_EVENT.name());
+            messageQueueCandidate.setTimeStamp(now());
             messageCandidateRepository.save(messageQueueCandidate);
         }
-    }
-
-    private MessageInformation populateMessageInformation(CaseEventDefinition caseEventDefinition,
-                                                          CaseDetails caseDetails, String oldState) {
-
-        final MessageInformation messageInformation = new MessageInformation();
-        final IdamUser user = userRepository.getUser();
-        List<AuditEvent> auditEvent = caseAuditEventRepository.findByCase(caseDetails);
-
-        messageInformation.setCaseId(caseDetails.getReference().toString());
-        messageInformation.setJurisdictionId(caseDetails.getJurisdiction());
-        messageInformation.setCaseTypeId(caseDetails.getCaseTypeId());
-        messageInformation.setEventInstanceId(auditEvent.get(0).getId());
-        messageInformation.setEventTimestamp(caseDetails.getLastModified());
-        messageInformation.setEventId(caseEventDefinition.getId());
-        messageInformation.setUserId(user.getId());
-        messageInformation.setPreviousStateId(oldState);
-        messageInformation.setNewStateId(caseDetails.getState());
-
-        return messageInformation;
     }
 }

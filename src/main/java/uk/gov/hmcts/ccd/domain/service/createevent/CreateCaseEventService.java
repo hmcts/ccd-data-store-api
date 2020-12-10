@@ -30,6 +30,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
@@ -282,6 +283,9 @@ public class CreateCaseEventService {
         auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
 
         caseAuditEventRepository.set(auditEvent);
-        messageService.handleMessage(caseEventDefinition, caseDetails, oldState);
+        messageService.handleMessage(MessageContext.builder()
+            .caseDetails(caseDetails)
+            .caseEventDefinition(caseEventDefinition)
+            .oldState(oldState).build());
     }
 }

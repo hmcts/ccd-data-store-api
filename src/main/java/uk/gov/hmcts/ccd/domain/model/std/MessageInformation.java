@@ -2,11 +2,9 @@ package uk.gov.hmcts.ccd.domain.model.std;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 @SuppressWarnings("checkstyle:SummaryJavadoc") // Javadoc predates checkstyle implementation in module
 public class MessageInformation {
@@ -33,7 +31,7 @@ public class MessageInformation {
     @JsonProperty("additional_data")
     @ApiModelProperty("A JSON object (for future use) that contains additional case fields that have been configured "
         + "to be included in the event information that is published.")
-    private Map<String, JsonNode> data;
+    private AdditionalMessageInformation data;
 
     public Long getId() {
         return id;
@@ -115,11 +113,11 @@ public class MessageInformation {
         this.eventTimestamp = eventTimestamp;
     }
 
-    public Map<String, JsonNode> getData() {
+    public AdditionalMessageInformation getData() {
         return data;
     }
 
-    public void setData(Map<String, JsonNode> data) {
+    public void setData(AdditionalMessageInformation data) {
         this.data = data;
     }
 
