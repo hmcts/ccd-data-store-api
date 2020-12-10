@@ -107,11 +107,7 @@
 											"delete": false
 										},
 										{
-											"role": "caseworker-caa",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerCaaAccessControlList"
 										}
 									]
 								},
@@ -149,12 +145,8 @@
 											"delete": false
 										},
 										{
-											"role": "caseworker-caa",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
-										}
+                      "_extends_": "CaseworkerCaaAccessControlList"
+                    }
 									]
 								},
 								{
@@ -191,12 +183,8 @@
 											"delete": false
 										},
 										{
-											"role": "caseworker-caa",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
-										}
+                      "_extends_": "CaseworkerCaaAccessControlList"
+                    }
 									]
 								},
 								{
@@ -233,12 +221,8 @@
 											"delete": false
 										},
 										{
-											"role": "caseworker-caa",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
-										}
+                      "_extends_": "CaseworkerCaaAccessControlList"
+                    }
 									]
 								},
 								{
@@ -275,12 +259,8 @@
 											"delete": false
 										},
 										{
-											"role": "caseworker-caa",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
-										}
+                      "_extends_": "CaseworkerCaaAccessControlList"
+                    }
 									]
 								},
 								{
@@ -315,12 +295,8 @@
 											"delete": false
 										},
 										{
-											"role": "caseworker-caa",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
-										}
+                      "_extends_": "CaseworkerCaaAccessControlList"
+                    }
 									]
 								}
 							],
@@ -344,12 +320,8 @@
 											"delete": false
 										},
 										{
-											"role": "caseworker-caa",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
-										}
+                      "_extends_": "CaseworkerCaaAccessControlList"
+                    }
 									]
 								},
 								{
@@ -371,12 +343,8 @@
 											"delete": false
 										},
 										{
-											"role": "caseworker-caa",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
-										}
+                      "_extends_": "CaseworkerCaaAccessControlList"
+                    }
 									]
 								},
 								{
@@ -398,12 +366,8 @@
 											"delete": false
 										},
 										{
-											"role": "caseworker-caa",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
-										}
+                      "_extends_": "CaseworkerCaaAccessControlList"
+                    }
 									]
 								}
 							],
