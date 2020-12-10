@@ -96,7 +96,7 @@ public class CreateCaseEventService {
                                   final FieldProcessorService fieldProcessorService,
                                   final CasePostStateService casePostStateService,
                                   @Qualifier("utcClock") final Clock clock,
-                                  final MessageService messageService) {
+final  @Qualifier("caseEventMessageService") MessageService messageService
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
