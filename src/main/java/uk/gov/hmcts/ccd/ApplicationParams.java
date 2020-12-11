@@ -38,6 +38,9 @@ public class ApplicationParams {
     @Value("#{'${ccd.callback.retries}'.split(',')}")
     private List<Integer> callbackRetries;
 
+    @Value("#{'${ccd.callback.log.control}'.split(',')}")
+    private List<String> ccdCallbackLogControl;
+
     @Value("${ccd.token.secret}")
     private String tokenSecret;
 
@@ -366,6 +369,10 @@ public class ApplicationParams {
 
     public List<String> getReadFromAMCaseTypes() {
         return readFromAMCaseTypes;
+    }
+
+    public List<String> getCcdCallbackLogControl() {
+        return ccdCallbackLogControl;
     }
 
     public Integer getElasticSearchRequestTimeout() {
