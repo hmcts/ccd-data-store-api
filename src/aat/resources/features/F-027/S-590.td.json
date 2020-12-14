@@ -34,7 +34,7 @@
           "__ordering__": "unordered"
         },
         {
-          "_extends_": "CaseViewField",
+          "_extends_": "CaseViewFieldMetadataTrue",
           "id": "[STATE]",
           "label": "State",
           "value": "TODO",
@@ -42,12 +42,14 @@
           "formatted_value": null
         },
         {
-          "_extends_": "CaseViewField",
+          "_extends_": "CaseViewFieldMetadataTrue",
+          "id": "[LAST_STATE_MODIFIED_DATE]",
+          "label": "Last State Modified Date",
           "value": "[[ANY_DATE_NOT_NULLABLE]]",
           "formatted_value": null
         },
         {
-          "_extends_": "CaseViewField",
+          "_extends_": "CaseViewFieldMetadataTrue",
           "id": "[LAST_MODIFIED_DATE]",
           "label": "Last Modified Date",
           "value": "[[ANY_DATE_NOT_NULLABLE]]",
@@ -55,14 +57,14 @@
 
         },
         {
-          "_extends_": "CaseViewField",
+          "_extends_": "CaseViewFieldMetadataTrue",
           "id": "[CREATED_DATE]",
           "label": "Created Date",
           "value": "[[ANY_DATE_NOT_NULLABLE]]",
           "formatted_value": null
         },
         {
-          "_extends_": "CaseViewField",
+          "_extends_": "CaseViewFieldMetadataTrue",
           "id": "[JURISDICTION]",
           "label": "Jurisdiction",
           "value": "BEFTA_JURISDICTION_3",
@@ -72,7 +74,7 @@
           "formatted_value": null
         },
         {
-          "_extends_": "CaseViewField",
+          "_extends_": "CaseViewFieldMetadataTrue",
           "id": "[CASE_TYPE]",
           "label": "Case Type",
           "value": "BEFTA_CASETYPE_3_4",
@@ -82,7 +84,7 @@
           "formatted_value": null
         },
         {
-          "_extends_": "CaseViewField",
+          "_extends_": "CaseViewFieldMetadataTrue",
           "id": "[SECURITY_CLASSIFICATION]",
           "label": "Security Classification",
           "value": "PUBLIC",
@@ -92,7 +94,7 @@
           "formatted_value": null
         },
         {
-          "_extends_": "CaseViewField",
+          "_extends_": "CaseViewFieldMetadataTrue",
           "id": "[CASE_REFERENCE]",
           "label": "Case Reference",
           "value": "[[ANY_NUMBER_NOT_NULLABLE]]",

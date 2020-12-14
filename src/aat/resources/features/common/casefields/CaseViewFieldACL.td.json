@@ -1,10 +1,7 @@
 {
   "_guid_": "CaseViewFieldACL",
-  "_extends_": "CaseViewField",
+  "_extends_": "CaseViewFieldMetadataFalse",
 
-  "metadata": false,
-  "display_context": "OPTIONAL",
-  "show_summary_change_option": true,
   "acls": [
     {
       "_extends_": "AllGrantedAccessControlList"
