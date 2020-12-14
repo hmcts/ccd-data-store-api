@@ -17,8 +17,6 @@ import java.time.LocalDateTime;
 @Entity
 @Data
 public class MessageQueueCandidateEntity {
-
-    private static final String TIME_STAMP = "time_stamp" ;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
