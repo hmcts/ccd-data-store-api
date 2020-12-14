@@ -12,7 +12,6 @@ import uk.gov.hmcts.ccd.domain.model.std.MessageInformation;
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 
 import javax.inject.Inject;
-import java.time.Clock;
 
 @Service
 @Qualifier("caseEventMessageService")
@@ -24,9 +23,8 @@ public class CaseEventMessageService extends AbstractMessageService {
     @Inject
     public CaseEventMessageService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                    final MessageCandidateRepository messageCandidateRepository,
-                                   CaseAuditEventRepository caseAuditEventRepository,
-                                   @Qualifier("utcClock") final Clock clock) {
-        super(userRepository, caseAuditEventRepository, clock);
+                                   CaseAuditEventRepository caseAuditEventRepository) {
+        super(userRepository, caseAuditEventRepository);
         this.messageCandidateRepository = messageCandidateRepository;
     }
 
@@ -40,7 +38,6 @@ public class CaseEventMessageService extends AbstractMessageService {
 
             messageQueueCandidate.setMessageInformation(node);
             messageQueueCandidate.setMessageType(MessageType.CASE_EVENT.name());
-            messageQueueCandidate.setTimeStamp(now());
             messageCandidateRepository.save(messageQueueCandidate);
         }
     }

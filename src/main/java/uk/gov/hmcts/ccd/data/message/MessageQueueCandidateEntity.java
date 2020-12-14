@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.message;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 import uk.gov.hmcts.ccd.data.JsonDataConverter;
 
 import javax.persistence.Convert;
@@ -17,10 +18,12 @@ import java.time.LocalDateTime;
 @Data
 public class MessageQueueCandidateEntity {
 
+    private static final String TIME_STAMP = "time_stamp" ;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String messageType;
+    @CreationTimestamp
     private LocalDateTime timeStamp;
     private LocalDateTime published;
     @Convert(converter = JsonDataConverter.class)

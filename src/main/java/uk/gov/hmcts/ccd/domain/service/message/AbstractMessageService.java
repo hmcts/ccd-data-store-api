@@ -8,25 +8,16 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.MessageInformation;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public abstract class AbstractMessageService implements MessageService {
-    private final Clock clock;
     private final UserRepository userRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
 
     protected AbstractMessageService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                     CaseAuditEventRepository caseAuditEventRepository,
-                                     @Qualifier("utcClock") final Clock clock) {
-        this.clock = clock;
+                                     CaseAuditEventRepository caseAuditEventRepository) {
         this.userRepository = userRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
-    }
-
-    LocalDateTime now() {
-        return LocalDateTime.now(clock);
     }
 
     MessageInformation populateMessageInformation(MessageContext messageContext) {

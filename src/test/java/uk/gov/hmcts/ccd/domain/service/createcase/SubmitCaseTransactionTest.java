@@ -24,6 +24,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
@@ -181,6 +182,7 @@ class SubmitCaseTransactionTest {
     @DisplayName("should persist event")
     void shouldPersistEvent() {
         final ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
+        final ArgumentCaptor<MessageContext> messageCandidateCaptor = ArgumentCaptor.forClass(MessageContext.class);
 
         submitCaseTransaction.submitCase(event,
                                          caseTypeDefinition,
@@ -191,7 +193,8 @@ class SubmitCaseTransactionTest {
 
         assertAll(
             () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
-            () -> assertAuditEvent(auditEventCaptor.getValue())
+            () -> assertAuditEvent(auditEventCaptor.getValue()),
+            () -> verify(messageService).handleMessage(messageCandidateCaptor.capture())
         );
     }
 
