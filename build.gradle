@@ -232,7 +232,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.2.0'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.4.0-pre.3'
 }
 // end::dependencies[]
 
@@ -702,8 +702,13 @@ task smoke() {
         javaexec {
             main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
-            args = ['--plugin', "json:${rootDir}/target/cucumber.json", '--tags', '@Smoke and not @Ignore', '--glue',
-                    'uk.gov.hmcts.befta.player', '--glue', "uk.gov.hmcts.ccd.datastore.befta", 'src/aat/resources/features']
+            args = [
+                      '--plugin', "json:${rootDir}/target/cucumber.json", 
+                      '--tags', '@Smoke and not @Ignore', 
+                      '--glue', 'uk.gov.hmcts.befta.player',
+                      '--glue', "uk.gov.hmcts.ccd.datastore.befta",
+                      'classpath:features'
+                   ]
             jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
         }
     }
@@ -734,12 +739,14 @@ task functional() {
         javaexec {
             main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['--threads', '10',
-                    '--plugin', "json:${rootDir}/target/cucumber.json",
-                    '--tags', 'not @Ignore',
-                    '--glue', 'uk.gov.hmcts.befta.player',
-                    '--glue', "uk.gov.hmcts.ccd.datastore.befta",
-                    'src/aat/resources/features']
+            args = [
+                      '--threads', '10',
+                      '--plugin', "json:${rootDir}/target/cucumber.json",
+                      '--tags', 'not @Ignore',
+                      '--glue', 'uk.gov.hmcts.befta.player',
+                      '--glue', "uk.gov.hmcts.ccd.datastore.befta",
+                      'classpath:features'
+                   ]
             jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
         }
 
