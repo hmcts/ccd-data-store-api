@@ -1,0 +1,7 @@
+{
+  "_guid_": "BaseNestedComplexFieldType",
+  "_extends_": "CommonFieldType",
+
+  "id": "NestedComplexType",
+  "type": "Complex"
+}

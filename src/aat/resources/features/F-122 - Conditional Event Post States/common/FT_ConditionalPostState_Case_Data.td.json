@@ -1,0 +1,21 @@
+{
+  "_guid_": "FT_ConditionalPostState_Base_Case_Data",
+
+  "TextField": null,
+  "TextAreaField": null,
+  "DateField": null,
+  "AddressField": {
+    "AddressLine1": null,
+    "AddressLine2": null,
+    "AddressLine3": null,
+    "Country": null
+  },
+  "PhoneField": null,
+  "NumberField": null,
+  "YesNoField": null,
+  "MarritalStatus": null,
+  "MoneyField": null,
+  "EmailField": null,
+  "MultiSelectField": []
+
+}

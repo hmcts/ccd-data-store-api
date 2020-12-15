@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,7 +31,6 @@ import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.DraftViewResource;
 
-import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -56,6 +56,7 @@ public class UIDraftsController {
         this.draftGateway = draftGateway;
     }
 
+    @Transactional
     @PostMapping(
         path = "/case-types/{ctid}/drafts",
         headers = {
@@ -85,6 +86,7 @@ public class UIDraftsController {
             caseTypeId));
     }
 
+    @Transactional
     @PutMapping(
         path = "/case-types/{ctid}/drafts/{did}",
         headers = {

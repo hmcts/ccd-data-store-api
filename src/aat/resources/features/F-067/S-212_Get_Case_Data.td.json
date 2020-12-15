@@ -71,7 +71,10 @@
           "user_first_name": "[[ANYTHING_PRESENT]]",
           "state_name": "To do",
           "state_id": "TODO",
-          "significant_item": null
+          "significant_item": null,
+          "proxied_by" : null,
+          "proxied_by_last_name" : null,
+          "proxied_by_first_name" : null
         }
       ]
     }

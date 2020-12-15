@@ -247,6 +247,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseDataContentBuilder withOnBehalfOfUserToken(String onBehalfOfUserToken) {
+            this.caseDataContent.setOnBehalfOfUserToken(onBehalfOfUserToken);
+            return this;
+        }
+
         public static CaseDataContentBuilder newCaseDataContent() {
             return new CaseDataContentBuilder();
         }
