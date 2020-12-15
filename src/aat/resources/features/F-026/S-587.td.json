@@ -30,11 +30,16 @@
 		"body": {
 			"columns": [
 				{
-          "_extends_": "SearchResultViewColumn",
-          "metadata": true
+          "_extends_": "SearchResultViewColumnMetadataTrue",
+          "label": "Last State Modified Date",
+          "order": 1,
+          "case_field_id": "[LAST_STATE_MODIFIED_DATE]",
+          "case_field_type": {
+            "_extends_": "BaseDateTimeFieldType"
+          }
         },
 				{
-          "_extends_": "SearchResultViewColumn",
+          "_extends_": "SearchResultViewColumnMetadataFalse",
 					"label": "`Text` field",
 					"order": 2,
 					"case_field_id": "TextField",
@@ -43,7 +48,7 @@
 					}
 				},
 				{
-          "_extends_": "SearchResultViewColumn",
+          "_extends_": "SearchResultViewColumnMetadataFalse",
 					"label": "`Number` field",
 					"order": 3,
 					"case_field_id": "NumberField",
@@ -52,7 +57,7 @@
 					}
 				},
 				{
-          "_extends_": "SearchResultViewColumn",
+          "_extends_": "SearchResultViewColumnMetadataFalse",
 					"label": "`YesOrNo` field",
 					"order": 4,
 					"case_field_id": "YesOrNoField",

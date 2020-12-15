@@ -8,16 +8,12 @@
 			},
 			"fields": [
 				{
-					"label": "State",
-					"order": null,
-					"metadata": true,
+          "_extends_": "SearchResultViewColumnMetadataTrue",
+          "label": "State",
 					"case_field_id": "[STATE]",
 					"case_field_type": {
-						"id": "FixedList-AAT_PRIVATE[STATE]",
-						"type": "FixedList",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
+            "_extends_": "BaseFixedListFieldType",
+            "id": "FixedList-AAT_PRIVATE[STATE]",
 						"fixed_list_items": [
 							{
 								"code": "DONE",
@@ -34,24 +30,15 @@
 								"label": "To do",
 								"order": null
 							}
-						],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+						]
+					}
 				},
 				{
-					"label": "A `AddressUK` field",
-					"order": null,
-					"metadata": false,
+          "_extends_": "SearchResultViewColumnMetadataFalse",
+          "label": "A `AddressUK` field",
 					"case_field_id": "AddressUKField",
 					"case_field_type": {
-						"id": "AddressUK",
-						"type": "Complex",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
+            "_extends_": "BaseAddressUKFieldType",
 						"complex_fields": [
 							{
 								"id": "AddressLine1",
@@ -319,23 +306,15 @@
 								"display_context_parameter": null,
 								"formatted_value": null
 							}
-						],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+						]
+					}
 				},
 				{
-					"label": "A `Complex` field",
-					"order": null,
-					"metadata": false,
+          "_extends_": "SearchResultViewColumnMetadataFalse",
+          "label": "A `Complex` field",
 					"case_field_id": "ComplexField",
 					"case_field_type": {
-						"id": "ComplexType",
-						"type": "Complex",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
+            "_extends_": "BaseComplexFieldType",
 						"complex_fields": [
 							{
 								"id": "ComplexTextField",
@@ -346,14 +325,7 @@
 								"case_type_id": null,
 								"hint_text": null,
 								"field_type": {
-									"id": "Text",
-									"type": "Text",
-									"min": null,
-									"max": null,
-									"regular_expression": null,
-									"fixed_list_items": [],
-									"complex_fields": [],
-									"collection_field_type": null
+                  "_extends_": "BaseTextFieldType"
 								},
 								"security_classification": "PRIVATE",
 								"live_from": null,
@@ -384,11 +356,7 @@
 								"case_type_id": null,
 								"hint_text": null,
 								"field_type": {
-									"id": "FixedList-FixedListType",
-									"type": "FixedList",
-									"min": null,
-									"max": null,
-									"regular_expression": null,
+                  "_extends_": "BaseFixedListFieldType",
 									"fixed_list_items": [
 										{
 											"code": "VALUE3",
@@ -405,9 +373,7 @@
 											"label": "Value 1",
 											"order": null
 										}
-									],
-									"complex_fields": [],
-									"collection_field_type": null
+									]
 								},
 								"security_classification": "PRIVATE",
 								"live_from": null,
@@ -438,12 +404,7 @@
 								"case_type_id": null,
 								"hint_text": null,
 								"field_type": {
-									"id": "NestedComplexType",
-									"type": "Complex",
-									"min": null,
-									"max": null,
-									"regular_expression": null,
-									"fixed_list_items": [],
+                  "_extends_": "BaseNestedComplexFieldType",
 									"complex_fields": [
 										{
 											"id": "NestedNumberField",
@@ -454,14 +415,7 @@
 											"case_type_id": null,
 											"hint_text": null,
 											"field_type": {
-												"id": "Number",
-												"type": "Number",
-												"min": null,
-												"max": null,
-												"regular_expression": null,
-												"fixed_list_items": [],
-												"complex_fields": [],
-												"collection_field_type": null
+                        "_extends_": "BaseNumberFieldType"
 											},
 											"security_classification": "PRIVATE",
 											"live_from": null,
@@ -492,22 +446,10 @@
 											"case_type_id": null,
 											"hint_text": null,
 											"field_type": {
-												"id": "NestedCollectionTextField-144881ab-cbab-4669-b543-57be41fdf654",
-												"type": "Collection",
-												"min": null,
-												"max": null,
-												"regular_expression": null,
-												"fixed_list_items": [],
-												"complex_fields": [],
+                        "_extends_": "BaseCollectionFieldType",
+                        "id": "NestedCollectionTextField-144881ab-cbab-4669-b543-57be41fdf654",
 												"collection_field_type": {
-													"id": "Text",
-													"type": "Text",
-													"min": null,
-													"max": null,
-													"regular_expression": null,
-													"fixed_list_items": [],
-													"complex_fields": [],
-													"collection_field_type": null
+                          "_extends_": "BaseTextFieldType"
 												}
 											},
 											"security_classification": "PRIVATE",
@@ -530,8 +472,7 @@
 											"display_context_parameter": null,
 											"formatted_value": null
 										}
-									],
-									"collection_field_type": null
+									]
 								},
 								"security_classification": "PRIVATE",
 								"live_from": null,
@@ -553,48 +494,27 @@
 								"display_context_parameter": null,
 								"formatted_value": null
 							}
-						],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+						]
+					}
 				},
 				{
-					"label": "A `Collection` of `Text` fields",
-					"order": null,
-					"metadata": false,
+          "_extends_": "SearchResultViewColumnMetadataFalse",
+          "label": "A `Collection` of `Text` fields",
 					"case_field_id": "CollectionField",
 					"case_field_type": {
-						"id": "CollectionField-2f991554-4726-432b-97b4-3260a2ae7a9a",
-						"type": "Collection",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
+            "_extends_": "BaseCollectionFieldType",
+            "id": "CollectionField-2f991554-4726-432b-97b4-3260a2ae7a9a",
 						"collection_field_type": {
-							"id": "Text",
-							"type": "Text",
-							"min": null,
-							"max": null,
-							"regular_expression": null,
-							"fixed_list_items": [],
-							"complex_fields": [],
-							"collection_field_type": null
+              "_extends_": "BaseTextFieldType"
 						}
-					},
-					"display_context_parameter": null
+					}
 				},
 				{
-					"label": "A `MultiSelectList` field",
-					"order": null,
-					"metadata": false,
+          "_extends_": "SearchResultViewColumnMetadataFalse",
+          "label": "A `MultiSelectList` field",
 					"case_field_id": "MultiSelectListField",
 					"case_field_type": {
-						"id": "MultiSelectList-MultiSelectListType",
-						"type": "MultiSelectList",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
+            "_extends_": "BaseMultiSelectListFieldType",
 						"fixed_list_items": [
 							{
 								"code": "OPTION5",
@@ -621,23 +541,15 @@
 								"label": "Option 1",
 								"order": null
 							}
-						],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+						]
+					}
 				},
 				{
-					"label": "A `FixedList` field",
-					"order": null,
-					"metadata": false,
+          "_extends_": "SearchResultViewColumnMetadataFalse",
+          "label": "A `FixedList` field",
 					"case_field_id": "FixedListField",
 					"case_field_type": {
-						"id": "FixedList-FixedListType",
-						"type": "FixedList",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
+            "_extends_": "BaseFixedListFieldType",
 						"fixed_list_items": [
 							{
 								"code": "VALUE3",
@@ -654,283 +566,136 @@
 								"label": "Value 1",
 								"order": null
 							}
-						],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+						]
+					}
 				},
 				{
-					"label": "A `TextArea` field",
-					"order": null,
-					"metadata": false,
+          "_extends_": "SearchResultViewColumnMetadataFalse",
+          "label": "A `TextArea` field",
 					"case_field_id": "TextAreaField",
 					"case_field_type": {
-						"id": "TextArea",
-						"type": "TextArea",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+            "_extends_": "BaseTextAreaFieldType"
+					}
 				},
 				{
-					"label": "A `DateTime` field",
-					"order": null,
-					"metadata": false,
+          "_extends_": "SearchResultViewColumnMetadataFalse",
+          "label": "A `DateTime` field",
 					"case_field_id": "DateTimeField",
 					"case_field_type": {
-						"id": "DateTime",
-						"type": "DateTime",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+            "_extends_": "BaseDateTimeFieldType"
+					}
 				},
 				{
-					"label": "A `Date` field",
-					"order": null,
-					"metadata": false,
+          "_extends_": "SearchResultViewColumnMetadataFalse",
+          "label": "A `Date` field",
 					"case_field_id": "DateField",
 					"case_field_type": {
-						"id": "Date",
-						"type": "Date",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+            "_extends_": "BaseDateFieldType"
+					}
 				},
 				{
-					"label": "A `MoneyGBP` field",
-					"order": null,
-					"metadata": false,
+          "_extends_": "SearchResultViewColumnMetadataFalse",
+          "label": "A `MoneyGBP` field",
 					"case_field_id": "MoneyGBPField",
 					"case_field_type": {
-						"id": "MoneyGBP",
-						"type": "MoneyGBP",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+            "_extends_": "BaseMoneyGBPFieldType"
+					}
 				},
 				{
-					"label": "An `Email` field",
-					"order": null,
-					"metadata": false,
+          "_extends_": "SearchResultViewColumnMetadataFalse",
+          "label": "An `Email` field",
 					"case_field_id": "EmailField",
 					"case_field_type": {
-						"id": "Email",
-						"type": "Email",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+            "_extends_": "BaseEmailFieldType"
+					}
 				},
 				{
-					"label": "A `PhoneUK` field",
-					"order": null,
-					"metadata": false,
+          "_extends_": "SearchResultViewColumnMetadataFalse",
+          "label": "A `PhoneUK` field",
 					"case_field_id": "PhoneUKField",
 					"case_field_type": {
-						"id": "PhoneUK",
-						"type": "PhoneUK",
-						"min": null,
-						"max": null,
-						"regular_expression": "^(((\\+44\\s?\\d{4}|\\(?0\\d{4}\\)?)\\s?\\d{3}\\s?\\d{3})|((\\+44\\s?\\d{3}|\\(?0\\d{3}\\)?)\\s?\\d{3}\\s?\\d{4})|((\\+44\\s?\\d{2}|\\(?0\\d{2}\\)?)\\s?\\d{4}\\s?\\d{4}))(\\s?\\#(\\d{4}|\\d{3}))?$",
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+            "_extends_": "BasePhoneUKFieldType"
+					}
 				},
 				{
-					"label": "A `YesOrNo` field",
-					"order": null,
-					"metadata": false,
+          "_extends_": "SearchResultViewColumnMetadataFalse",
+          "label": "A `YesOrNo` field",
 					"case_field_id": "YesOrNoField",
 					"case_field_type": {
-						"id": "YesOrNo",
-						"type": "YesOrNo",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+            "_extends_": "BaseYesOrNoFieldType"
+					}
 				},
 				{
-					"label": "A `Number` field",
-					"order": null,
-					"metadata": false,
+          "_extends_": "SearchResultViewColumnMetadataFalse",
+          "label": "A `Number` field",
 					"case_field_id": "NumberField",
 					"case_field_type": {
-						"id": "Number",
-						"type": "Number",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+            "_extends_": "BaseNumberFieldType"
+					}
 				},
 				{
-					"label": "A `Text` field",
-					"order": null,
-					"metadata": false,
+          "_extends_": "SearchResultViewColumnMetadataFalse",
+          "label": "A `Text` field",
 					"case_field_id": "TextField",
 					"case_field_type": {
-						"id": "Text",
-						"type": "Text",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+            "_extends_": "BaseTextFieldType"
+					}
 				},
 				{
-					"label": "Last State Modified Date",
-					"order": null,
-					"metadata": true,
+          "_extends_": "SearchResultViewColumnMetadataTrue",
+          "label": "Last State Modified Date",
 					"case_field_id": "[LAST_STATE_MODIFIED_DATE]",
 					"case_field_type": {
-						"id": "DateTime",
-						"type": "DateTime",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+            "_extends_": "BaseDateTimeFieldType"
+					}
 				},
 				{
-					"label": "Last Modified Date",
-					"order": null,
-					"metadata": true,
+          "_extends_": "SearchResultViewColumnMetadataTrue",
+          "label": "Last Modified Date",
 					"case_field_id": "[LAST_MODIFIED_DATE]",
 					"case_field_type": {
-						"id": "DateTime",
-						"type": "DateTime",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+            "_extends_": "BaseDateTimeFieldType"
+          }
 				},
 				{
-					"label": "Created Date",
-					"order": null,
-					"metadata": true,
+          "_extends_": "SearchResultViewColumnMetadataTrue",
+          "label": "Created Date",
 					"case_field_id": "[CREATED_DATE]",
 					"case_field_type": {
-						"id": "DateTime",
-						"type": "DateTime",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+            "_extends_": "BaseDateTimeFieldType"
+          }
 				},
 				{
-					"label": "Jurisdiction",
-					"order": null,
-					"metadata": true,
+          "_extends_": "SearchResultViewColumnMetadataTrue",
+          "label": "Jurisdiction",
 					"case_field_id": "[JURISDICTION]",
 					"case_field_type": {
-						"id": "Text",
-						"type": "Text",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+            "_extends_": "BaseTextFieldType"
+					}
 				},
 				{
-					"label": "Case Type",
-					"order": null,
-					"metadata": true,
+          "_extends_": "SearchResultViewColumnMetadataTrue",
+          "label": "Case Type",
 					"case_field_id": "[CASE_TYPE]",
 					"case_field_type": {
-						"id": "Text",
-						"type": "Text",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+            "_extends_": "BaseTextFieldType"
+          }
 				},
 				{
-					"label": "Security Classification",
-					"order": null,
-					"metadata": true,
+          "_extends_": "SearchResultViewColumnMetadataTrue",
+          "label": "Security Classification",
 					"case_field_id": "[SECURITY_CLASSIFICATION]",
 					"case_field_type": {
-						"id": "Text",
-						"type": "Text",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+            "_extends_": "BaseTextFieldType"
+          }
 				},
 				{
-					"label": "Case Reference",
-					"order": null,
-					"metadata": true,
+          "_extends_": "SearchResultViewColumnMetadataTrue",
+          "label": "Case Reference",
 					"case_field_id": "[CASE_REFERENCE]",
 					"case_field_type": {
-						"id": "Number",
-						"type": "Number",
-						"min": null,
-						"max": null,
-						"regular_expression": null,
-						"fixed_list_items": [],
-						"complex_fields": [],
-						"collection_field_type": null
-					},
-					"display_context_parameter": null
+            "_extends_": "BaseNumberFieldType"
+					}
 				}
 			]
 		}
