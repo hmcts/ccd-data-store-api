@@ -47,7 +47,6 @@ class CaseEventMessageServiceTest {
     private static final String STATE = "State one";
     private static final LocalDateTime DATE_TIME =
         LocalDateTime.of(2000, 12, 07, 13, 13, 13);
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     @Mock
     private UserRepository userRepository;
@@ -55,6 +54,9 @@ class CaseEventMessageServiceTest {
     @Mock
     private Clock clock;
     private Clock fixedClock;
+
+    @Mock
+    private ObjectMapper mapper;
 
     @Mock
     private CaseAuditEventRepository caseAuditEventRepository;

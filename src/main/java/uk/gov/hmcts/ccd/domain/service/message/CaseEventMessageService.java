@@ -17,15 +17,18 @@ import javax.inject.Inject;
 @Qualifier("caseEventMessageService")
 public class CaseEventMessageService extends AbstractMessageService {
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
+
     private final MessageCandidateRepository messageCandidateRepository;
 
     @Inject
     public CaseEventMessageService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                    final MessageCandidateRepository messageCandidateRepository,
-                                   CaseAuditEventRepository caseAuditEventRepository) {
+                                   CaseAuditEventRepository caseAuditEventRepository,
+                                   @Qualifier("DefaultObjectMapper") ObjectMapper objectMapper) {
         super(userRepository, caseAuditEventRepository);
         this.messageCandidateRepository = messageCandidateRepository;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -34,7 +37,7 @@ public class CaseEventMessageService extends AbstractMessageService {
         if (Boolean.TRUE.equals(messageContext.getCaseEventDefinition().getPublish())) {
 
             MessageInformation messageInformation = populateMessageInformation(messageContext);
-            JsonNode node = mapper.convertValue(messageInformation, JsonNode.class);
+            JsonNode node = objectMapper.convertValue(messageInformation, JsonNode.class);
 
             messageQueueCandidate.setMessageInformation(node);
             messageQueueCandidate.setMessageType(MessageType.CASE_EVENT.name());
