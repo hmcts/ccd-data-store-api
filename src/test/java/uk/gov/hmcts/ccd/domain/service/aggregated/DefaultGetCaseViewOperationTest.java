@@ -17,7 +17,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.enablingcondition.EnablingConditionParser;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -29,6 +28,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.service.common.CaseEventEnablingService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
@@ -50,12 +50,10 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_HISTORY_VIEWER;
@@ -103,7 +101,7 @@ class DefaultGetCaseViewOperationTest {
     private FieldProcessorService fieldProcessorService;
 
     @Mock
-    private EnablingConditionParser enablingConditionParser;
+    private CaseEventEnablingService caseEventEnablingService;
 
     @Spy
     @InjectMocks
@@ -263,7 +261,7 @@ class DefaultGetCaseViewOperationTest {
             caseEventDefinition.setEndButtonLabel("dataTestField1=\"dataTestField1\"");
             caseTypeDefinition.setEvents(Lists.newArrayList(caseEventDefinition));
             doReturn(true).when(eventTriggerService).isPreStateValid(anyString(), any());
-            doReturn(true).when(enablingConditionParser).evaluate(any(), any());
+            doReturn(true).when(caseEventEnablingService).evaluate(any(), any());
 
             CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
             assertNotNull(caseView);
@@ -277,7 +275,7 @@ class DefaultGetCaseViewOperationTest {
             caseEventDefinition.setEndButtonLabel("dataTestField1=\"dataTestField1\" AND dataTestField2=\"Test\"");
             caseTypeDefinition.setEvents(Lists.newArrayList(caseEventDefinition));
             doReturn(true).when(eventTriggerService).isPreStateValid(anyString(), any());
-            doReturn(false).when(enablingConditionParser).evaluate(any(), any());
+            doReturn(false).when(caseEventEnablingService).evaluate(any(), any());
 
             CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
             assertNotNull(caseView);

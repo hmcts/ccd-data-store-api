@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.enablingcondition.EnablingConditionParser;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
@@ -18,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.service.common.CaseEventEnablingService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
@@ -38,7 +38,7 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
     private final GetEventsOperation getEventsOperation;
     private final CaseTypeService caseTypeService;
     private final EventTriggerService eventTriggerService;
-    private final EnablingConditionParser enablingConditionParser;
+    private final CaseEventEnablingService caseEventEnablingService;
 
     @Autowired
     public DefaultGetCaseViewOperation(@Qualifier(CreatorGetCaseOperation.QUALIFIER) GetCaseOperation getCaseOperation,
@@ -50,13 +50,13 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
                                        ObjectMapperService objectMapperService,
                                        CompoundFieldOrderService compoundFieldOrderService,
                                        FieldProcessorService fieldProcessorService,
-                                       EnablingConditionParser enablingConditionParser) {
+                                       CaseEventEnablingService caseEventEnablingService) {
         super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService,
               compoundFieldOrderService, fieldProcessorService);
         this.getEventsOperation = getEventsOperation;
         this.caseTypeService = caseTypeService;
         this.eventTriggerService = eventTriggerService;
-        this.enablingConditionParser = enablingConditionParser;
+        this.caseEventEnablingService = caseEventEnablingService;
     }
 
     @Override
@@ -96,7 +96,7 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
         final CaseViewActionableEvent[] actionableEvents = caseTypeDefinition.getEvents()
             .stream()
             .filter(event -> eventTriggerService.isPreStateValid(caseStateDefinition.getId(), event))
-            .filter(event -> this.enablingConditionParser
+            .filter(event -> this.caseEventEnablingService
                 .evaluate(event.getEventEnablingCondition(), caseDetails.getData()))
             .map(event -> {
                 final CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
