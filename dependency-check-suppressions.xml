@@ -19,4 +19,11 @@
 		<cve>CVE-2020-25638</cve>
 		<cve>CVE-2020-13956</cve>
 	</suppress>
+	<suppress>
+		<notes><![CDATA[
+   file name: guava-24.1.1-jre.jar
+   ]]></notes>
+		<packageUrl regex="true">^pkg:maven/com\.google\.guava/guava@.*$</packageUrl>
+		<cve>CVE-2020-8908</cve>
+	</suppress>
 </suppressions>
