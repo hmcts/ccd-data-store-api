@@ -1,0 +1,30 @@
+{
+	"_guid_": "S-127.2",
+  "_extends_": "F-127_Get_Case_View_Base",
+  "title": "Get Case event view to validate the events returned in the response when event enabling conditions are valid",
+
+  "specs": [
+    "contains a case Id that has just been created"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][FT_ConditionalPostState_Create_Case][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
+    },
+    "body": {
+      "exception": "[[ANYTHING_PRESENT]]",
+      "message": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
