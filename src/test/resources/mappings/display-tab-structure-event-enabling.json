@@ -1,0 +1,145 @@
+{
+  "request" : {
+    "method" : "GET",
+    "url" : "/api/display/tab-structure/TestAddressBookCaseEventEnablingCondition?version=33"
+  },
+  "response" : {
+    "status" : 200,
+    "headers" : {
+      "Content-Type" : "application/json"
+    },
+    "jsonBody" : {
+      "case_type_id" : "TestAddressBookCaseEventEnablingCondition",
+      "channels" : ["channel1"],
+      "tabs" : [{
+        "id" : "NameTab",
+        "label" : "Name",
+        "order" : 1,
+        "show_condition": "PersonFirstName=\"George\"",
+        "tab_fields" : [{
+          "show_condition": "PersonLastName=\"Jones\"",
+          "case_field" : {
+            "id" : "PersonFirstName",
+            "case_type_id" : "TestAddressBookCaseEventEnablingCondition",
+            "label" : "First Name",
+            "hint_text" : null,
+            "field_type" : {
+              "type" : "Text"
+            },
+            "hidden" : false,
+            "validation_expr" : null,
+            "security_label" : null,
+            "live_from" : null,
+            "live_until" : null,
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }
+            ]
+          },
+          "order" : 1
+        }, {
+          "show_condition": "PersonFirstName=\"Tom\"",
+          "case_field" : {
+            "id" : "PersonLastName",
+            "case_type_id" : "TestAddressBookCaseEventEnablingCondition",
+            "label" : "Last Name",
+            "hint_text" : null,
+            "field_type" : {
+              "type" : "Text"
+            },
+            "hidden" : false,
+            "validation_expr" : null,
+            "security_label" : null,
+            "live_from" : null,
+            "live_until" : null,
+            "acls": [
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": false
+              }
+            ]
+          },
+          "order" : 2
+        }
+        ]
+      },
+        {
+          "id" : "AddressTab",
+          "label" : "Address",
+          "order" : 2,
+          "show_condition": "PersonLastName=\"Smith\"",
+          "tab_fields" : [{
+            "show_condition": "PersonLastName=\"Smart\"",
+            "case_field" : {
+              "id" : "PersonAddress",
+              "case_type_id" : "TestAddressBookCaseEventEnablingCondition",
+              "label" : "Address",
+              "hint_text" : null,
+              "field_type" : {
+                "type" : "Address"
+              },
+              "hidden" : false,
+              "validation_expr" : null,
+              "security_label" : null,
+              "live_from" : null,
+              "live_until" : null,
+              "acls": [
+                {
+                  "role": "caseworker-probate-public",
+                  "create": true,
+                  "read": true,
+                  "update": true,
+                  "delete": false
+                }
+              ]
+            },
+            "order" : 1
+          }
+          ]
+        },
+        {
+          "id" : "DocumentsTab",
+          "label" : "Documents",
+          "order" : 3,
+          "show_condition": "PersonFistName=\"George\"",
+          "tab_fields" : [{
+            "show_condition": "PersonLastName=\"Dumb\"",
+            "case_field" : {
+              "id" : "D8Document",
+              "case_type_id" : "TestAddressBookCaseEventEnablingCondition",
+              "label" : "Document",
+              "hint_text" : null,
+              "field_type" : {
+                "type" : "Document"
+              },
+              "hidden" : false,
+              "validation_expr" : null,
+              "security_label" : null,
+              "live_from" : null,
+              "live_until" : null,
+              "acls": [
+                {
+                  "role": "caseworker-probate-public",
+                  "create": true,
+                  "read": true,
+                  "update": true,
+                  "delete": false
+                }
+              ]
+            },
+            "order" : 1
+          }
+          ]
+        }
+      ]
+    }
+  }
+}
