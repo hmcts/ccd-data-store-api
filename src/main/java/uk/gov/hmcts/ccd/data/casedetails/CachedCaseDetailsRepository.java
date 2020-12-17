@@ -4,6 +4,7 @@ import static com.google.common.collect.Maps.newHashMap;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 
+import org.springframework.cache.annotation.Cacheable;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -38,8 +39,8 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     private final Map<String, PaginatedSearchMetadata> hashToPaginatedSearchMetadata = newHashMap();
 
     @Inject
-    public CachedCaseDetailsRepository(final @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
-                                               CaseDetailsRepository caseDetailsRepository) {
+    public CachedCaseDetailsRepository(@Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
+                                           final CaseDetailsRepository caseDetailsRepository) {
         this.caseDetailsRepository = caseDetailsRepository;
     }
 
@@ -49,8 +50,9 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
+    @Cacheable("caseDetailsByJurisdictionAndIDCache")
     public Optional<CaseDetails> findById(String jurisdiction, Long id) {
-        return idToCaseDetails.computeIfAbsent(id, key -> caseDetailsRepository.findById(jurisdiction, id));
+        return caseDetailsRepository.findById(jurisdiction, id);
     }
 
     @Override
@@ -71,21 +73,21 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
+    @Cacheable("caseDetailsByJurisdictionAndReferenceCache")
     public Optional<CaseDetails> findByReference(String jurisdiction, String reference) {
-        return referenceToCaseDetails.computeIfAbsent(reference, key ->
-            caseDetailsRepository.findByReference(jurisdiction, reference));
+        return caseDetailsRepository.findByReference(jurisdiction, reference);
     }
 
     @Override
+    @Cacheable("caseDetailsByReferenceCache")
     public Optional<CaseDetails> findByReference(String reference) {
-        return referenceToCaseDetails.computeIfAbsent(reference, key ->
-            caseDetailsRepository.findByReference(reference));
+        return caseDetailsRepository.findByReference(reference);
     }
 
     @Override
+    @Cacheable("caseDetailsByReferenceWithNoAccessCtlCache")
     public Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference) {
-        return referenceToCaseDetails.computeIfAbsent(reference, key ->
-            caseDetailsRepository.findByReferenceWithNoAccessControl(reference));
+        return caseDetailsRepository.findByReferenceWithNoAccessControl(reference);
     }
 
     @Override
