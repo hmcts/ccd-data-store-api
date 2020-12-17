@@ -242,8 +242,8 @@ dependencyManagement {
     }
 
     dependencies {
-        // Versions prior to 24.1.1 vulnerable to CVE-2018-10237
-        dependency 'com.google.guava:guava:24.1.1-jre'
+        // Versions prior to 30.0 vulnerable to CVE-2020-8908
+        dependency 'com.google.guava:guava:30.0-jre'
 
         // CVE-2019-0232 - Java and Command Line injections in Windows
         dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.40') {
