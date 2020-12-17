@@ -1,0 +1,20 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="rdm-10519" runInTransaction="false" author="sita.kandala@hmcts.net">
+        <sql dbms="postgresql"
+             endDelimiter="\nGO"
+             splitStatements="true"
+             stripComments="true">
+
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_applicationtype_evidencehandled_registrylocation_ ON public.case_data USING btree (btrim(upper((data #>> '{applicationType}'::text[]))), btrim(upper((data #>> '{evidenceHandled}'::text[]))), btrim(upper((data #>> '{registryLocation}'::text[]))), btrim(upper((data #>> '{caseType}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_isscottishcase_documentsenttodwp ON public.case_data USING btree (btrim(upper((data #>> '{isScottishCase}'::text[]))), btrim(upper((data #>> '{documentSentToDwp}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_welsh_dnoutcomecase_solhowtopay_applyforda ON public.case_data USING btree (btrim(upper((data #>> '{{LanguagePreferenceWelsh}}'::text[]))), btrim(upper((data #>> '{DnOutcomeCase}'::text[]))), btrim(upper((data #>> '{SolPaymentHowToPay}'::text[]))), btrim(upper((data #>> '{ApplyForDecreeAbsolute}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_welsh_dnout_d8_sol_apply ON public.case_data USING btree (btrim(upper((data #>> '{{LanguagePreferenceWelsh}}'::text[]))), btrim(upper((data #>> '{DnOutcomeCase}'::text[]))), btrim(upper((data #>> '{D8DivorceUnit}'::text[]))), btrim(upper((data #>> '{SolPaymentHowToPay}'::text[]))), btrim(upper((data #>> '{ApplyForDecreeAbsolute}'::text[]))));
+            CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_case_data_generated_surname ON public.case_data USING btree (btrim(upper((data #>> '{generatedSurname}'::text[]))));
+
+        </sql>
+    </changeSet>
+</databaseChangeLog>

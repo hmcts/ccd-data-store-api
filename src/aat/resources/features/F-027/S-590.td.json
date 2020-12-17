@@ -40,27 +40,102 @@
           "label": "State",
           "value": "TODO",
           "field_type": "[[ANYTHING_PRESENT]]",
-          "formatted_value": null
+          "validation_expr": null,
+          "security_label": "PUBLIC",
+          "order": null,
+          "formatted_value": null,
+          "display_context": null,
+          "display_context_parameter": null,
+          "show_condition": null,
+          "show_summary_change_option": null,
+          "show_summary_content_option": null,
+          "retain_hidden_value": null,
+          "acls": []
         },
         {
           "_extends_": "CaseViewField",
           "value": "[[ANY_DATE_NOT_NULLABLE]]",
-          "formatted_value": null
+          "metadata": true,
+          "hint_text": null,
+          "field_type": {
+            "id": "DateTime",
+            "type": "DateTime",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": null
+          },
+          "validation_expr": null,
+          "security_label": "PUBLIC",
+          "order": null,
+          "formatted_value": null,
+          "display_context": null,
+          "display_context_parameter": null,
+          "show_condition": null,
+          "show_summary_change_option": null,
+          "show_summary_content_option": null,
+          "retain_hidden_value": null,
+          "acls": []
         },
         {
           "_extends_": "CaseViewField",
           "id": "[LAST_MODIFIED_DATE]",
           "label": "Last Modified Date",
           "value": "[[ANY_DATE_NOT_NULLABLE]]",
-          "formatted_value": null
-
+          "metadata": true,
+          "hint_text": null,
+          "field_type": {
+            "id": "DateTime",
+            "type": "DateTime",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": null
+          },
+          "validation_expr": null,
+          "security_label": "PUBLIC",
+          "order": null,
+          "formatted_value": null,
+          "display_context": null,
+          "display_context_parameter": null,
+          "show_condition": null,
+          "show_summary_change_option": null,
+          "show_summary_content_option": null,
+          "retain_hidden_value": null,
+          "acls": []
         },
         {
           "_extends_": "CaseViewField",
           "id": "[CREATED_DATE]",
           "label": "Created Date",
           "value": "[[ANY_DATE_NOT_NULLABLE]]",
-          "formatted_value": null
+          "metadata": true,
+          "hint_text": null,
+          "field_type": {
+            "id": "DateTime",
+            "type": "DateTime",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": null
+          },
+          "validation_expr": null,
+          "security_label": "PUBLIC",
+          "order": null,
+          "formatted_value": null,
+          "display_context": null,
+          "display_context_parameter": null,
+          "show_condition": null,
+          "show_summary_change_option": null,
+          "show_summary_content_option": null,
+          "retain_hidden_value": null,
+          "acls": []
         },
         {
           "_extends_": "CaseViewField",
@@ -70,7 +145,17 @@
           "field_type": {
             "_extends_": "BaseTextFieldType"
           },
-          "formatted_value": null
+          "validation_expr": null,
+          "security_label": "PUBLIC",
+          "order": null,
+          "formatted_value": null,
+          "display_context": null,
+          "display_context_parameter": null,
+          "show_condition": null,
+          "show_summary_change_option": null,
+          "show_summary_content_option": null,
+          "retain_hidden_value": null,
+          "acls": []
         },
         {
           "_extends_": "CaseViewField",
@@ -80,7 +165,17 @@
           "field_type": {
             "_extends_": "BaseTextFieldType"
           },
-          "formatted_value": null
+          "validation_expr": null,
+          "security_label": "PUBLIC",
+          "order": null,
+          "formatted_value": null,
+          "display_context": null,
+          "display_context_parameter": null,
+          "show_condition": null,
+          "show_summary_change_option": null,
+          "show_summary_content_option": null,
+          "retain_hidden_value": null,
+          "acls": []
         },
         {
           "_extends_": "CaseViewField",
@@ -90,7 +185,17 @@
           "field_type": {
             "_extends_": "BaseTextFieldType"
           },
-          "formatted_value": null
+          "validation_expr": null,
+          "security_label": "PUBLIC",
+          "order": null,
+          "formatted_value": null,
+          "display_context": null,
+          "display_context_parameter": null,
+          "show_condition": null,
+          "show_summary_change_option": null,
+          "show_summary_content_option": null,
+          "retain_hidden_value": null,
+          "acls": []
         },
         {
           "_extends_": "CaseViewField",
@@ -100,7 +205,17 @@
           "field_type": {
             "_extends_": "BaseNumberFieldType"
           },
-          "formatted_value": null
+          "validation_expr": null,
+          "security_label": "PUBLIC",
+          "order": null,
+          "formatted_value": null,
+          "display_context": null,
+          "display_context_parameter": null,
+          "show_condition": null,
+          "show_summary_change_option": null,
+          "show_summary_content_option": null,
+          "retain_hidden_value": null,
+          "acls": []
         }
       ],
       "state": {
