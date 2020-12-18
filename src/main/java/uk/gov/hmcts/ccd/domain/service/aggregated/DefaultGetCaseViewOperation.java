@@ -97,7 +97,7 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
             .stream()
             .filter(event -> eventTriggerService.isPreStateValid(caseStateDefinition.getId(), event))
             .filter(event -> this.caseEventEnablingService
-                .evaluate(event.getEventEnablingCondition(), caseDetails.getData()))
+                .isEventEnabled(event.getEventEnablingCondition(), caseDetails))
             .map(event -> {
                 final CaseViewActionableEvent caseViewActionableEvent = new CaseViewActionableEvent();
                 caseViewActionableEvent.setId(event.getId());

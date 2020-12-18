@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.enablingcondition.jexl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -49,7 +48,7 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
     }
 
     @Override
-    public Boolean evaluate(String enablingCondition, Map<String, JsonNode> caseEventData) {
+    public Boolean evaluate(String enablingCondition, Map<String, ?> caseEventData) {
         try {
             String expression = this.enablingConditionConverter.convert(enablingCondition);
             if (expression != null) {
@@ -63,7 +62,7 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
         return false;
     }
 
-    private Map<String, Object> retrieveContextData(Map<String, JsonNode> caseEventData,
+    private Map<String, Object> retrieveContextData(Map<String, ?> caseEventData,
                                                     Set<List<String>> variableLists) {
         Set<String> variables = getVariableNames(variableLists);
         Map<String, Object> contextData = new HashMap<>();
@@ -84,7 +83,7 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
             .collect(Collectors.toSet());
     }
 
-    private String caseDataToJsonString(Map<String, JsonNode> caseData) {
+    private String caseDataToJsonString(Map<String, ?> caseData) {
         try {
             return this.objectMapper.writeValueAsString(caseData);
         } catch (JsonProcessingException e) {

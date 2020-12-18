@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.enablingcondition.EnablingConditionParser;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,24 +30,26 @@ class CaseEventEnablingServiceTest {
 
     @Test
     void shouldReturnTrueWhenEnablingConditionIsNull() {
-        Boolean value = this.caseEventEnablingService.evaluate(
-            null, new HashMap<>());
+        Boolean value = this.caseEventEnablingService.isEventEnabled(
+            null, new CaseDetails());
 
         assertTrue(value);
     }
 
     @Test
     void shouldReturnTrueWhenEnablingConditionIsEmpty() {
-        Boolean value = this.caseEventEnablingService.evaluate(
-            "", new HashMap<>());
+        Boolean value = this.caseEventEnablingService.isEventEnabled(
+            "",  new CaseDetails());
 
         assertTrue(value);
     }
 
     @Test
     void shouldInvokeParserWhenEnablingConditionIsNotEmpty() {
-        Boolean value = this.caseEventEnablingService.evaluate(
-            "FieldA='Test' AND FieldB='Test1'", new HashMap<>());
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setData(new HashMap<>());
+        this.caseEventEnablingService.isEventEnabled(
+            "FieldA='Test' AND FieldB='Test1'",  caseDetails);
 
         verify(this.enablingConditionParser,
             times(1)).evaluate(any(String.class), any(Map.class));
