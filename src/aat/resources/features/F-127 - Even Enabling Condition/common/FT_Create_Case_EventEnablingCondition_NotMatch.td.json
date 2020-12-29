@@ -1,5 +1,5 @@
 {
-  "_guid_": "FT_ConditionalPostState_Create_Case",
+  "_guid_": "FT_Create_Case_EventEnablingCondition_NotMatch",
 
   "productName": "CCD Data Store",
   "operationName": "Submit case creation as Case worker",
@@ -26,8 +26,8 @@
     "body": {
       "data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
-        "TextField": "amended2",
-        "EmailField": "matched@test.com"
+        "TextField": "amended21",
+        "EmailField": "matched1@test.com"
       },
       "event": {
         "id": "createCase",
@@ -64,8 +64,8 @@
       "security_classifications": "[[ANYTHING_PRESENT]]",
       "case_data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
-        "TextField": "amended2",
-        "EmailField": "matched@test.com"
+        "TextField": "amended21",
+        "EmailField": "matched1@test.com"
       },
       "data_classification": "[[ANYTHING_PRESENT]]",
       "supplementary_data": null,
