@@ -8,7 +8,7 @@ Feature: F-122: Event Enabling Condition
 
 #-----------------------------------------------------------------------------------------------------------------------
   @S-127.1
-  Scenario: Create Case and check the events when event enabling condition is not valid
+  Scenario: Create Case and check the events when event enabling condition is matching
 
     Given a user with [an active profile in CCD],
     And a successful call [to create a token for case creation] as in [S-127-GetToken_CaseCreate],
@@ -23,11 +23,11 @@ Feature: F-122: Event Enabling Condition
 
 #-----------------------------------------------------------------------------------------------------------------------
   @S-122.2
-  Scenario: Create Case and check the events when event enabling condition is valid
+  Scenario: Create Case and check the events when event enabling condition is not matching
 
     Given a user with [an active profile in CCD],
     And a successful call [to create a token for case creation] as in [S-127-GetToken_CaseCreate],
-    And a successful call [to create a case] as in [FT_ConditionalPostState_Create_Case_Event_NotMatch],
+    And a successful call [to create a case] as in [FT_Create_Case_EventEnablingCondition_NotMatch],
 
     When a request is prepared with appropriate values,
     And the request [contains a case Id that has just been created],
