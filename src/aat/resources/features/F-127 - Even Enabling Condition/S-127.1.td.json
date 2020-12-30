@@ -14,17 +14,37 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_400_Response",
+    "_extends_": "Common_200_Response",
     "headers": {
-      "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Encoding": "gzip"
+      "Content-Encoding": "gzip",
+      "Transfer-Encoding": "chunked"
     },
     "body": {
-      "exception": "[[ANYTHING_PRESENT]]",
-      "message": "[[ANYTHING_PRESENT]]",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
+      "tabs": "[[ANYTHING_PRESENT]]",
+      "metadataFields": "[[ANYTHING_PRESENT]]",
+      "state": "[[ANYTHING_PRESENT]]",
+      "channels": "[[ANYTHING_PRESENT]]",
+      "triggers": [
+        {
+          "id": "[[ANYTHING_PRESENT]]",
+          "name": "updateCase2",
+          "description": null,
+          "order": "[[ANYTHING_PRESENT]]"
+        }
+      ],
+      "events": "[[ANYTHING_PRESENT]]",
+      "case_id": "[[ANYTHING_PRESENT]]",
+      "case_type": {
+        "id": "[[ANYTHING_PRESENT]]",
+        "name": "[[ANYTHING_PRESENT]]",
+        "description": "[[ANYTHING_PRESENT]]",
+        "jurisdiction": {
+          "id": "[[ANYTHING_PRESENT]]",
+          "name": "[[ANYTHING_PRESENT]]",
+          "description": "[[ANYTHING_PRESENT]]"
+        },
+        "printEnabled": false
+      }
     }
   }
 }

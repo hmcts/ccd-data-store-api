@@ -12,7 +12,7 @@ Feature: F-122: Event Enabling Condition
 
     Given a user with [an active profile in CCD],
     And a successful call [to create a token for case creation] as in [S-127-GetToken_CaseCreate],
-    And a successful call [to create a case] as in [FT_ConditionalPostState_Create_Case],
+    And a successful call [to create a case] as in [FT_Create_Case_EventEnablingCondition],
 
     When a request is prepared with appropriate values,
     And the request [contains a case Id that has just been created],
