@@ -1,0 +1,35 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+<changeSet id="RDM-10167" author="tobias.derose@hmcts.net">
+    <createTable tableName="message_queue_candidates">
+
+        <column name="id" type="bigint" autoIncrement="true">
+            <constraints nullable="false" primaryKey="true"/>
+        </column>
+
+        <column name="message_type"  type="varchar(70)" >
+            <constraints nullable="false"/>
+        </column>
+
+        <column name="time_stamp" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+            <constraints nullable="false"/>
+        </column>
+
+        <column name="published" type="timestamp">
+            <constraints nullable="true"/>
+        </column>
+
+        <column name="message_information" type="jsonb">
+            <constraints nullable="false"/>
+        </column>
+    </createTable>
+
+    <createIndex indexName="idx_message_queue_candidates_time_stamp"
+                 schemaName="public"
+                 tableName="message_queue_candidates">
+        <column name="time_stamp"/>
+    </createIndex>
+</changeSet>
+</databaseChangeLog>
