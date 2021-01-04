@@ -28,18 +28,9 @@ public class CasePostStateService {
     public String evaluateCaseState(CaseEventDefinition caseEventDefinition, CaseDetails caseDetails) {
         List<EventPostStateDefinition> eventPostStateDefinitions = prioritiseEnablingCondition
             .prioritiseEventPostStates(caseEventDefinition.getPostStates());
-        Map<String, JsonNode> caseEventData = caseDetails.getCaseEventData(getCaseFieldIds(caseEventDefinition));
         String postStateReference = casePostStateEvaluationService
-            .evaluatePostStateCondition(eventPostStateDefinitions, caseEventData);
+            .evaluatePostStateCondition(eventPostStateDefinitions, caseDetails.getCaseDataAndMetadata());
         return postStateReference;
-    }
-
-    private Set<String> getCaseFieldIds(CaseEventDefinition caseEventDefinition) {
-        return caseEventDefinition
-            .getCaseFields()
-            .stream()
-            .map(caseField -> caseField.getCaseFieldId())
-            .collect(Collectors.toSet());
     }
 
 }
