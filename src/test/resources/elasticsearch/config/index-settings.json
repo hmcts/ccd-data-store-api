@@ -8,6 +8,13 @@
           "custom_shingle",
           "whitespace_remove"
         ]
+      },
+      "case_id_analyzer":{
+        "type":"custom",
+        "tokenizer":"keyword",
+        "filter":[
+          "hyphen_remove"
+        ]
       }
     },
     "filter": {
@@ -21,6 +28,11 @@
         "type": "pattern_replace",
         "pattern": " ",
         "replacement": ""
+      },
+      "hyphen_remove":{
+        "type":"pattern_replace",
+        "pattern":"-",
+        "replacement":""
       }
     }
   },
