@@ -15,12 +15,6 @@
 		<cve>CVE-2007-1652</cve>
 		<cve>CVE-2007-1651</cve>
 	</suppress>
-
-	<suppress>
-		<notes>Temporary suppression</notes>
-		<cve>CVE-2020-8908</cve>
-	</suppress>
-
 	<suppress>
 		<notes>Temporary suppresssions</notes>
 		<cve>CVE-2020-26939</cve>
