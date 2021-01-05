@@ -32,7 +32,7 @@
       "case_id": null,
       "case_fields": [
         {
-          "__ordering__": "unordered"
+          "__ordering__": "UNORDERED"
         },
         {
           "id": "Address1",
@@ -49,6 +49,9 @@
             "regular_expression": null,
             "fixed_list_items": [],
             "complex_fields": [
+              {
+                "__ordering__": "UNORDERED"
+              },
               {
                 "id": "AddressLine1",
                 "label": "Building and Street",
@@ -346,6 +349,9 @@
             "regular_expression": null,
             "fixed_list_items": [],
             "complex_fields": [
+              {
+                "__ordering__": "UNORDERED"
+              },
               {
                 "id": "AddressLine1",
                 "label": "Building and Street",
