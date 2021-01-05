@@ -57,6 +57,7 @@ public class SecurityMockConfiguration extends WebSecurityConfigurerAdapter {
             "/caseworkers/**",
             "/citizens/**",
             "/searchCases/**",
+            "/cases/**",
             "/");
     }
 
@@ -66,7 +67,8 @@ public class SecurityMockConfiguration extends WebSecurityConfigurerAdapter {
             "/case-types/**",
             "/caseworkers/**",
             "/citizens/**",
-            "/searchCases/**"
+            "/searchCases/**",
+            "/cases/**"
         ).permitAll();
     }
 }

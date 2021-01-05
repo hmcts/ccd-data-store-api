@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-
 import au.com.dius.pact.provider.junit.IgnoreNoPactsToVerify;
 import au.com.dius.pact.provider.junit.Provider;
 import au.com.dius.pact.provider.junit.State;
@@ -12,6 +11,7 @@ import au.com.dius.pact.provider.spring.SpringRestPactRunner;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.applicationinsights.TelemetryClient;
 import org.junit.Before;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,6 +36,7 @@ import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import java.util.Arrays;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -120,6 +121,13 @@ public class CasesControllerProviderTest {
         BaseType.setCaseDefinitionRepository(contractTestCaseDefinitionRepository);
         when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
         when(userAuthorisation.getUserId()).thenReturn("userId");
+    }
+
+    @State({"A Get Case is requested"})
+    public void toGetACase(Map<String, Object> dataMap) {
+        CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
+        getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
+
     }
 
     @State({"A Read for a Citizen is requested"})
@@ -207,11 +215,10 @@ public class CasesControllerProviderTest {
         Map<String, Object> contentDataMap = (Map<String, Object>) dataMap.get(CASE_DATA_CONTENT);
         String caseworkerUsername = (String) dataMap.get(CASEWORKER_USERNAME);
         String caseworkerPassword = (String) dataMap.get(CASEWORKER_PASSWORD);
-        String jurisdictionId = (String) dataMap.get(JURISDICTION_ID);
         String caseType = (String) dataMap.get(CASE_TYPE);
         CaseDataContent caseDataContent = objectMapper.convertValue(contentDataMap, CaseDataContent.class);
 
-        securityUtils.setSecurityContextUserAsCaseworkerByJurisdiction(jurisdictionId, caseworkerUsername,
+        securityUtils.setSecurityContextUserAsCaseworkerByCaseType(caseType, caseworkerUsername,
             caseworkerPassword);
         securityUtils.setSecurityContextUserAsCaseworkerByEvent(caseDataContent.getEventId(), caseworkerUsername,
             caseworkerPassword);
@@ -233,15 +240,9 @@ public class CasesControllerProviderTest {
         String caseworkerUsername = (String) dataMap.get(CASEWORKER_USERNAME);
         String caseworkerPassword = (String) dataMap.get(CASEWORKER_PASSWORD);
         String eventId = (String) dataMap.get(EVENT_ID);
+        String caseTypeId = (String) dataMap.get(CASE_TYPE);
         securityUtils.setSecurityContextUserAsCaseworkerByEvent(eventId, caseworkerUsername, caseworkerPassword);
-    }
-
-    private void setUpSecurityContextForJurisdiction(Map<String, Object> dataMap) {
-        String caseworkerUsername = (String) dataMap.get(CASEWORKER_USERNAME);
-        String caseworkerPassword = (String) dataMap.get(CASEWORKER_PASSWORD);
-        String jurisdictionId = (String) dataMap.get(JURISDICTION_ID);
-        securityUtils.setSecurityContextUserAsCaseworkerByJurisdiction(jurisdictionId,
-            caseworkerUsername, caseworkerPassword);
+        securityUtils.setSecurityContextUserAsCaseworkerByCaseType(caseTypeId, caseworkerUsername, caseworkerPassword);
     }
 
 }

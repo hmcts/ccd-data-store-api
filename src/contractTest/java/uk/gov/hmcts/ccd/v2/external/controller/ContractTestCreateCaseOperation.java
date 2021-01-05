@@ -57,7 +57,7 @@ public class ContractTestCreateCaseOperation extends DefaultCreateCaseOperation 
     public CaseDetails createCaseDetails(final String caseTypeId,
                                          final CaseDataContent caseDataContent,
                                          final Boolean ignoreWarning) {
-        contractTestSecurityUtils.setSecurityContextUserAsCaseworkerForEvent(caseDataContent.getEventId());
+        contractTestSecurityUtils.setSecurityContextUserAsCaseworkerForCaseType(caseTypeId);
         return super.createCaseDetails(caseTypeId, caseDataContent, ignoreWarning);
 
     }

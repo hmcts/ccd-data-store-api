@@ -39,7 +39,7 @@ public class ContractTestSecurityUtils extends SecurityUtils {
     private static final String AUTHORIZATION_CODE = "authorization_code";
     private static final String CODE = "code";
 
-    private HashMap<String, UserCredentials> jurisdictionUserCredentials = new HashMap<>();
+    private HashMap<String, UserCredentials> caseTypeUserCredentials = new HashMap<>();
     private HashMap<String, UserCredentials> eventUserCredentials = new HashMap<>();
 
     private final IdamApi idamClient;
@@ -61,26 +61,29 @@ public class ContractTestSecurityUtils extends SecurityUtils {
         return (String) SecurityContextHolder.getContext().getAuthentication().getCredentials();
     }
 
-    public void setSecurityContextUserAsCaseworkerForJurisdiction(String jurisdictionId) {
-        UserCredentials userCredentials = jurisdictionUserCredentials.get(jurisdictionId);
-        setAuthenticationOnSecurityContext(userCredentials.username, userCredentials.password);
-    }
 
     public void setSecurityContextUserAsCaseworkerForEvent(String eventId) {
         UserCredentials userCredentials = eventUserCredentials.get(eventId);
         setAuthenticationOnSecurityContext(userCredentials.username, userCredentials.password);
     }
 
-    public void setSecurityContextUserAsCaseworkerByJurisdiction(String jurisdictionId, String caseworkerUserName,
-                                                                 String caseworkerPassword) {
-        setAuthenticationOnSecurityContext(caseworkerUserName, caseworkerPassword);
-        jurisdictionUserCredentials.put(jurisdictionId, new UserCredentials(caseworkerUserName, caseworkerPassword));
-    }
 
     public void setSecurityContextUserAsCaseworkerByEvent(String eventId, String caseworkerUserName,
                                                           String caseworkerPassword) {
         setAuthenticationOnSecurityContext(caseworkerUserName, caseworkerPassword);
         eventUserCredentials.put(eventId, new UserCredentials(caseworkerUserName, caseworkerPassword));
+    }
+
+    public void setSecurityContextUserAsCaseworkerForCaseType(String caseType) {
+        UserCredentials userCredentials = caseTypeUserCredentials.get(caseType);
+        setAuthenticationOnSecurityContext(userCredentials.username, userCredentials.password);
+    }
+
+
+    public void setSecurityContextUserAsCaseworkerByCaseType(String caseType, String caseworkerUserName,
+                                                          String caseworkerPassword) {
+        setAuthenticationOnSecurityContext(caseworkerUserName, caseworkerPassword);
+        caseTypeUserCredentials.put(caseType, new UserCredentials(caseworkerUserName, caseworkerPassword));
     }
 
     private void setAuthenticationOnSecurityContext(String caseworkerUserName, String caseworkerPassword) {

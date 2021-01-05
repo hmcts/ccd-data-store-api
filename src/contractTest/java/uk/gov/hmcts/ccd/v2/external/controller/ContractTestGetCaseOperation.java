@@ -36,7 +36,7 @@ public class ContractTestGetCaseOperation extends DefaultGetCaseOperation {
     @Override
     public Optional<CaseDetails> execute(final String jurisdictionId, final String caseTypeId,
                                          final String caseReference) {
-        contractTestSecurityUtils.setSecurityContextUserAsCaseworkerForJurisdiction(jurisdictionId);
+        contractTestSecurityUtils.setSecurityContextUserAsCaseworkerForCaseType(caseTypeId);
         return super.execute(jurisdictionId, caseTypeId, testCaseReference);
     }
 
