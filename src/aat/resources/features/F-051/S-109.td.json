@@ -94,7 +94,6 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
-                  "event_enabling_condition": "[[ANY_STRING_NULLABLE]]",
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -137,7 +136,6 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
-                  "event_enabling_condition": "[[ANY_STRING_NULLABLE]]",
                   "acls": [
 										{
 											"__ordering__": "unordered",
@@ -180,7 +178,6 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
-                  "event_enabling_condition": "[[ANY_STRING_NULLABLE]]",
                   "acls": [
 										{
 											"__ordering__": "unordered",
@@ -223,7 +220,6 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
-                  "event_enabling_condition": "[[ANY_STRING_NULLABLE]]",
                   "acls": [
 										{
 											"__ordering__": "unordered",
@@ -266,7 +262,6 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
-                  "event_enabling_condition": "[[ANY_STRING_NULLABLE]]",
                   "acls": [
 										{
 											"__ordering__": "unordered",
@@ -307,7 +302,6 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
-                  "event_enabling_condition": "[[ANY_STRING_NULLABLE]]",
                   "acls": [
 										{
 											"__ordering__": "unordered",
