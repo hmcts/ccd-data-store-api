@@ -4,6 +4,7 @@
   "title": "Get Case event view to validate the events returned in the response when event enabling conditions are not valid",
 
   "specs": [
+    "an active profile in CCD",
     "contains a case Id that has just been created"
   ],
 
