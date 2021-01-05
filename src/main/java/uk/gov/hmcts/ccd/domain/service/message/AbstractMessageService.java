@@ -30,7 +30,7 @@ public abstract class AbstractMessageService implements MessageService {
         messageInformation.setJurisdictionId(messageContext.getCaseDetails().getJurisdiction());
         messageInformation.setCaseTypeId(messageContext.getCaseDetails().getCaseTypeId());
         messageInformation.setEventInstanceId(auditEvent.get(0).getId());
-        messageInformation.setEventTimestamp(messageContext.getCaseDetails().getLastModified());
+        messageInformation.setEventTimestamp(auditEvent.get(0).getCreatedDate());
         messageInformation.setEventId(messageContext.getCaseEventDefinition().getId());
         messageInformation.setUserId(user.getId());
         messageInformation.setPreviousStateId(messageContext.getOldState());
