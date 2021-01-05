@@ -1,5 +1,5 @@
 #==============================================
-@F-127
+@F-127 @currentrun
 Feature: F-122: Event Enabling Condition
 #==============================================
 
@@ -7,7 +7,7 @@ Feature: F-122: Event Enabling Condition
     Given an appropriate test context as detailed in the test data source
 
 #-----------------------------------------------------------------------------------------------------------------------
-  @S-127.1
+  @S-127.1 @ignored
   Scenario: Create Case and check the events when event enabling condition is matching
 
     Given an appropriate test context as detailed in the test data source
