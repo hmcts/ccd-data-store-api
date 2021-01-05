@@ -23,6 +23,8 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
     private String label = null;
     private String hintText = null;
     private Boolean retainHiddenValue;
+    private Boolean publish;
+    private String publishAs;
     private String defaultValue;
     private List<CaseEventFieldComplexDefinition> caseEventFieldComplexDefinitions = new ArrayList<>();
 
@@ -141,6 +143,27 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
 
     public void setRetainHiddenValue(Boolean retainHiddenValue) {
         this.retainHiddenValue = retainHiddenValue;
+    }
+
+    @ApiModelProperty(value = "whether this field is data should be published")
+    @JsonProperty("publish")
+    public Boolean getPublish() {
+        return publish;
+    }
+
+    public void setPublish(Boolean publish) {
+        this.publish = publish;
+    }
+
+
+    @ApiModelProperty(value = "Alias for field id if published is set to true")
+    @JsonProperty("publishAs")
+    public String getPublishAs() {
+        return publishAs;
+    }
+
+    public void setPublishAs(String publishAs) {
+        this.publishAs = publishAs;
     }
 
 }
