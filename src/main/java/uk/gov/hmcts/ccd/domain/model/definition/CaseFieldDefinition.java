@@ -57,6 +57,10 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     private Object formattedValue;
     @JsonProperty("default_value")
     private String defaultValue;
+    @JsonProperty("publish")
+    private Boolean publish;
+    @JsonProperty("publishAs")
+    private String publishAs;
 
     @Override
     public String getId() {
@@ -207,6 +211,22 @@ public class CaseFieldDefinition implements Serializable, CommonField {
 
     public void setRetainHiddenValue(Boolean retainHiddenValue) {
         this.retainHiddenValue = retainHiddenValue;
+    }
+
+    public Boolean getPublish() {
+        return publish;
+    }
+
+    public void setPublish(Boolean publish) {
+        this.publish = publish;
+    }
+
+    public String getPublishAs() {
+        return publishAs;
+    }
+
+    public void setPublishAs(String publishAs) {
+        this.publishAs = publishAs;
     }
 
     @Override
