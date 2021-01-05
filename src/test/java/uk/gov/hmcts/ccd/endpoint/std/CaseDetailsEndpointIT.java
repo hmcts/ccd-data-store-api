@@ -5,17 +5,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -38,11 +32,22 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageCollection;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
+import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
+
+import javax.inject.Inject;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
@@ -51,9 +56,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.google.common.collect.Lists.newArrayList;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
@@ -127,6 +132,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private MockMvc mockMvc;
     private JdbcTemplate template;
 
+    @Mock
+    MessageContext messageContext;
+
     @SpyBean
     private AuditRepository auditRepository;
 
@@ -141,6 +149,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 
+        doReturn(createEventDefinition(TEST_EVENT_ID,SHORT_COMMENT, LONG_COMMENT)).when(messageContext).getCaseEventDefinition();
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         template = new JdbcTemplate(db);
     }
@@ -361,6 +370,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("Incorrect number of case events", 1, caseAuditEventList.size());
 
+        final List<MessageQueueCandidate> messageQueueList = template.query("SELECT * FROM message_queue_candidates", this::mapMessageCandidate);
+        assertEquals("Incorrect number of rows in messageQueue", 1, messageQueueList.size());
+
         // Assertion belows are for creation event
         final AuditEvent caseAuditEvent = caseAuditEventList.get(0);
         assertEquals("123", caseAuditEvent.getUserId());
@@ -375,6 +387,16 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
         assertEquals(savedCaseDetails.getDataClassification(), caseAuditEvent.getDataClassification());
         assertThat(caseAuditEvent.getSecurityClassification(), equalTo(PRIVATE));
+
+        assertThat(messageQueueList.get(0).getMessageInformation().findPath("case_id").toString(), containsString(savedCaseDetails.getId()));
+        assertThat(messageQueueList.get(0).getMessageInformation().findPath("user_id").toString(), containsString(caseAuditEvent.getUserId()));
+        assertThat(messageQueueList.get(0).getMessageInformation().findPath("event_id").toString(), containsString(caseAuditEvent.getEventId()));
+        assertThat(messageQueueList.get(0).getMessageInformation().findPath("case_type_id").toString(), containsString(savedCaseDetails.getCaseTypeId()));
+        assertThat(messageQueueList.get(0).getMessageInformation().findPath("new_state_id").toString(), containsString(savedCaseDetails.getState()));
+        assertThat(messageQueueList.get(0).getMessageInformation().findPath("event_instance_id").toString(), containsString(caseAuditEvent.getId().toString()));
+        assertEquals("null", messageQueueList.get(0).getMessageInformation().findPath("previous_state_id").toString());
+        assertThat(messageQueueList.get(0).getId(), equalTo(1L));
+        assertEquals("CASE_EVENT", messageQueueList.get(0).getMessageType());
     }
 
     @Test
@@ -1636,6 +1658,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
         assertEquals("A new event should have been created", 5, caseAuditEventList.size());
 
+        final List<MessageQueueCandidate> messageQueueList = template.query("SELECT * FROM message_queue_candidates", this::mapMessageCandidate);
+        assertEquals("Incorrect number of rows in messageQueue", 0, messageQueueList.size());
         // Assertion belows are for creation event
         final AuditEvent caseAuditEvent = caseAuditEventList.get(4);
         assertEquals("123", caseAuditEvent.getUserId());
@@ -4586,9 +4610,15 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .build();
     }
 
+    private static CaseEventDefinition createEventDefinition(String eventId, String summary, String description) {
+        CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setPublish(Boolean.TRUE);
+        caseEventDefinition.setDescription(description);
+        return caseEventDefinition;
+    }
+
     private static Event createEvent(String eventId) {
         return anEvent()
-            .withEventId(eventId)
             .build();
     }
 }
