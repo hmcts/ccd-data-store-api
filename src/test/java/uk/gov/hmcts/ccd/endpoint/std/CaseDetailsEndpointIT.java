@@ -4613,6 +4613,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private static Event createEvent(String eventId) {
         return anEvent()
+            .withEventId(eventId)
             .build();
     }
 }
