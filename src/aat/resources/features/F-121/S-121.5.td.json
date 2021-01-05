@@ -32,6 +32,9 @@
       "case_id": null,
       "case_fields": [
         {
+          "__ordering__": "unordered"
+        },
+        {
           "id": "Address1",
           "label": "Address 1",
           "hidden": false,
