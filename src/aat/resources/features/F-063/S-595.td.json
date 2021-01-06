@@ -32,6 +32,9 @@
     "body": {
       "searchInputs": [
         {
+          "__ordering__": "unordered"
+        },
+        {
           "label": "Search `Text` field",
           "order": 1,
           "field": {

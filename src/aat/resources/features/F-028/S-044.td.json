@@ -1383,6 +1383,9 @@
           "order": 1,
           "wizard_page_fields": [
             {
+              "__ordering__": "unordered"
+            },
+            {
               "case_field_id": "TextField",
               "order": 1,
               "page_column_no": null,
@@ -1422,6 +1425,9 @@
           "label": "Second page",
           "order": 2,
           "wizard_page_fields": [
+            {
+              "__ordering__": "unordered"
+            },
             {
               "case_field_id": "MoneyGBPField",
               "order": 1,
@@ -1468,6 +1474,9 @@
           "label": "Third page",
           "order": 3,
           "wizard_page_fields": [
+            {
+              "__ordering__": "unordered"
+            },
             {
               "case_field_id": "CollectionField",
               "order": 2,
