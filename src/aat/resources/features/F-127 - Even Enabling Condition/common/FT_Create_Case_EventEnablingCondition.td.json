@@ -11,11 +11,9 @@
     "to create a case"
   ],
 
-  "users": {
-    "invokingUser": {
-      "username": "befta.caseworker.1@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
-    }
+  "user": {
+    "username": "master.caseworker@gmail.com",
+    "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
   },
 
   "request": {
@@ -29,7 +27,7 @@
       "data": {
         "_extends_": "FT_EventEnablingCondition_Base_Case_Data",
         "TextField": "amended2",
-        "EmailField": "matched@test.com"
+        "EmailField": "matched1@test.com"
       },
       "event": {
         "id": "createCase",

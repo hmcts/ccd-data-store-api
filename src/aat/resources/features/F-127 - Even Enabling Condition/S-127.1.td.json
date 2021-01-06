@@ -14,6 +14,11 @@
     }
   },
 
+  "user": {
+    "username": "master.caseworker@gmail.com",
+    "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
+  },
+
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
@@ -27,9 +32,9 @@
       "channels": "[[ANYTHING_PRESENT]]",
       "triggers": [
         {
-          "id": "[[ANYTHING_PRESENT]]",
-          "name": "updateCase2",
-          "description": null,
+          "id": "updateCase",
+          "name": "Update a case",
+          "description": "[[ANYTHING_PRESENT]]",
           "order": "[[ANYTHING_PRESENT]]"
         }
       ],

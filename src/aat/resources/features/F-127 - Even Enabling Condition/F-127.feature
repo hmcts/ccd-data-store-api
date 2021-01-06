@@ -1,13 +1,13 @@
 #==============================================
 @F-127
-Feature: F-122: Event Enabling Condition
+Feature: F-127: Event Enabling Condition
 #==============================================
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
 #-----------------------------------------------------------------------------------------------------------------------
-  @S-127.1
+  @S-127.1 @currentrun
   Scenario: Create Case and check the events when event enabling condition is matching
 
     Given an appropriate test context as detailed in the test data source
@@ -21,7 +21,7 @@ Feature: F-122: Event Enabling Condition
     And the response has all the details as expected
 
 #-----------------------------------------------------------------------------------------------------------------------
-  @S-122.2
+  @S-127.2
   Scenario: Create Case and check the events when event enabling condition is not matching
 
     Given an appropriate test context as detailed in the test data source
