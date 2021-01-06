@@ -30,14 +30,7 @@
       "metadataFields": "[[ANYTHING_PRESENT]]",
       "state": "[[ANYTHING_PRESENT]]",
       "channels": "[[ANYTHING_PRESENT]]",
-      "triggers": [
-        {
-          "id": "updateCase2",
-          "name": "Update a case 2",
-          "description": "[[ANYTHING_PRESENT]]",
-          "order": "[[ANYTHING_PRESENT]]"
-        }
-      ],
+      "triggers": [],
       "events": "[[ANYTHING_PRESENT]]",
       "case_id": "[[ANYTHING_PRESENT]]",
       "case_type": {
