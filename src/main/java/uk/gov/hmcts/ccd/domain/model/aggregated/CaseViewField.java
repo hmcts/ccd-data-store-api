@@ -47,7 +47,7 @@ public class CaseViewField implements CommonField {
     private Boolean retainHiddenValue;
     @JsonProperty("publish")
     private Boolean publish;
-    @JsonProperty("publishAs")
+    @JsonProperty("publish_as")
     private String publishAs;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;

@@ -157,7 +157,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
 
 
     @ApiModelProperty(value = "Alias for field id if published is set to true")
-    @JsonProperty("publishAs")
+    @JsonProperty("publish_as")
     public String getPublishAs() {
         return publishAs;
     }

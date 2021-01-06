@@ -59,7 +59,7 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     private String defaultValue;
     @JsonProperty("publish")
     private Boolean publish;
-    @JsonProperty("publishAs")
+    @JsonProperty("publish_as")
     private String publishAs;
 
     @Override
