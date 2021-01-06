@@ -27,7 +27,7 @@
       "data": {
         "_extends_": "FT_EventEnablingCondition_Base_Case_Data",
         "TextField": "amended2",
-        "EmailField": "matched1@test.com"
+        "EmailField": "matched@test.com"
       },
       "event": {
         "id": "createCase",
