@@ -8,14 +8,15 @@ import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.ccd.datastore.util.CaseIdHelper.hypheniseACaseId;
 
 public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
@@ -36,6 +37,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         loader.importDefinitions();
     }
 
+    @SuppressWarnings("checkstyle:systemout")
     @Override
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {
         if (key.toString().startsWith("caseIdAsIntegerFrom")) {
@@ -52,6 +54,18 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                 long longRef = (long) ReflectionUtils.deepGetFieldInObject(
                     scenarioContext,"childContexts." + childContext + ".testData.actualResponse.body.id");
                 return Long.toString(longRef);
+            } catch (Exception e) {
+                throw new FunctionalTestException("Problem getting case id as long", e);
+            }
+        } else if (key.toString().startsWith("HyphenisedCaseIdFromCaseCreation")) {
+            String childContext = key.toString().replace("HyphenisedCaseIdFromCaseCreation_","");
+            try {
+                System.out.println("ACA1!!!!!!");
+                long longRef = (long) ReflectionUtils.deepGetFieldInObject(
+                    scenarioContext,"childContexts." + childContext + ".testData.actualResponse.body.id");
+                String result = hypheniseACaseId(Long.toString(longRef));
+                System.out.println("ACA2!!!!!!" + result);
+                return result;
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem getting case id as long", e);
             }
