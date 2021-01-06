@@ -115,11 +115,7 @@
                   }, {
                     "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -155,11 +151,7 @@
                   }, {
                     "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -195,11 +187,7 @@
                   }, {
                     "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -235,11 +223,7 @@
                   }, {
                     "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   }],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -275,11 +259,7 @@
                   }, {
                     "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -315,11 +295,7 @@
                   }, {
                     "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -355,11 +331,7 @@
                   }, {
                     "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -412,11 +384,7 @@
                   }, {
                     "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -468,11 +436,7 @@
                   }, {
                     "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -523,11 +487,7 @@
                       }, {
                         "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                       },{
-                        "role" : "[DEFENDANT]",
-                        "create" : true,
-                        "read" : true,
-                        "update" : true,
-                        "delete" : false
+                        "_extends_": "DefendantAccessControlList"
                       } ],
                       "complexACLs" : [ ],
                       "display_context" : null,
@@ -572,11 +532,7 @@
                       }, {
                         "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                       },{
-                        "role" : "[DEFENDANT]",
-                        "create" : true,
-                        "read" : true,
-                        "update" : true,
-                        "delete" : false
+                        "_extends_": "DefendantAccessControlList"
                       } ],
                       "complexACLs" : [ ],
                       "display_context" : null,
@@ -597,11 +553,7 @@
                   }, {
                     "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
