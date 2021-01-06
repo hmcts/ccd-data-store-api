@@ -1298,7 +1298,7 @@
               "__elementId__": "case_field_id"
             },
             {
-              "case_field_id": "[[ANYTHING_PRESENT]]",
+              "case_field_id": "CollectionField",
               "order": "[[ANYTHING_PRESENT]]",
               "page_column_no": null,
               "complex_field_overrides": []
