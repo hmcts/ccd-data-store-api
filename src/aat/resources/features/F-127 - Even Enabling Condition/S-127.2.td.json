@@ -32,8 +32,8 @@
       "channels": "[[ANYTHING_PRESENT]]",
       "triggers": [
         {
-          "id": "updateCase",
-          "name": "Update a case",
+          "id": "updateCase2",
+          "name": "Update a case 2",
           "description": "[[ANYTHING_PRESENT]]",
           "order": "[[ANYTHING_PRESENT]]"
         }
