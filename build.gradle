@@ -711,8 +711,11 @@ task smoke() {
     finalizedBy {
         generateCucumberReports {
             doLast{
+                delete "${rootDir}/BEFTA Report for Smoke Tests/"
                 new File("${rootDir}/BEFTA Report for Smoke Tests").mkdirs()
                 file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Smoke Tests"))
+
+                logger.quiet("Smoke test report moved to ---> file://${rootDir}/BEFTA%20Report%20for%20Smoke%20Tests/overview-features.html")
             }
         }
     }
@@ -722,6 +725,7 @@ task smoke() {
 
 task functional() {
     description = 'Executes functional tests against an the CCD Data Store API instance just deployed'
+    dependsOn aatClasses
 
     new File("$buildDir/test-results/test").mkdirs()
     copy {
@@ -736,7 +740,7 @@ task functional() {
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
             args = [
                      '--threads', '10',
-                     '--plugin', 'json:${rootDir}/target/cucumber.json',
+                     '--plugin', "json:${rootDir}/target/cucumber.json",
                      '--tags', 'not @Ignore',
                      '--glue', 'uk.gov.hmcts.befta.player',
                      '--glue', 'uk.gov.hmcts.ccd.datastore.befta', 'src/aat/resources/features'
@@ -749,8 +753,11 @@ task functional() {
     finalizedBy {
         generateCucumberReports {
             doLast{
+                delete "${rootDir}/BEFTA Report for Functional Tests/"
                 new File("${rootDir}/BEFTA Report for Functional Tests").mkdirs()
                 file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Functional Tests"))
+
+                logger.quiet("Functional test report moved to ---> file://${rootDir}/BEFTA%20Report%20for%20Functional%20Tests/overview-features.html")
             }
         }
     }
