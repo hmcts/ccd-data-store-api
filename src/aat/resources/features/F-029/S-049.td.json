@@ -1194,7 +1194,8 @@
           "order": "[[ANYTHING_PRESENT]]",
           "wizard_page_fields": [
             {
-              "__ordering__": "unordered"
+              "__ordering__": "unordered",
+              "__elementId__": "case_field_id"
             },
             {
               "case_field_id": "TextField",
@@ -1237,7 +1238,8 @@
           "order": "[[ANYTHING_PRESENT]]",
           "wizard_page_fields": [
             {
-              "__ordering__": "unordered"
+              "__ordering__": "unordered",
+              "__elementId__": "case_field_id"
             },
             {
               "case_field_id": "MoneyGBPField",
@@ -1292,7 +1294,8 @@
           "order": "[[ANYTHING_PRESENT]]",
           "wizard_page_fields": [
             {
-              "__ordering__": "unordered"
+              "__ordering__": "unordered",
+              "__elementId__": "case_field_id"
             },
             {
               "case_field_id": "[[ANYTHING_PRESENT]]",

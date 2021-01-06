@@ -29,7 +29,8 @@
     "body": {
       "workbasketInputs": [
         {
-          "__ordering__": "unordered"
+          "__ordering__": "unordered",
+          "__elementId__": "label"
         },
         {
           "label": "Search `Text` field",
