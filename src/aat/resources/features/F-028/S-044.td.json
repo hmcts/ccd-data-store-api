@@ -1383,7 +1383,8 @@
           "order": 1,
           "wizard_page_fields": [
             {
-              "__ordering__": "unordered"
+              "__ordering__": "unordered",
+              "__elementId__": "case_field_id"
             },
             {
               "case_field_id": "TextField",
