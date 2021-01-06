@@ -37,7 +37,6 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         loader.importDefinitions();
     }
 
-    @SuppressWarnings("checkstyle:systemout")
     @Override
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {
         if (key.toString().startsWith("caseIdAsIntegerFrom")) {
@@ -60,11 +59,9 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         } else if (key.toString().startsWith("HyphenisedCaseIdFromCaseCreation")) {
             String childContext = key.toString().replace("HyphenisedCaseIdFromCaseCreation_","");
             try {
-                System.out.println("ACA1!!!!!!");
                 long longRef = (long) ReflectionUtils.deepGetFieldInObject(
                     scenarioContext,"childContexts." + childContext + ".testData.actualResponse.body.id");
                 String result = hypheniseACaseId(Long.toString(longRef));
-                System.out.println("ACA2!!!!!!" + result);
                 return result;
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem getting case id as long", e);
