@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -42,6 +43,11 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
     @JsonProperty("display_context")
     public String getDisplayContext() {
         return displayContext;
+    }
+
+    @JsonIgnore
+    public DisplayContext getDisplayContextEnum() {
+        return DisplayContext.valueOf(displayContext);
     }
 
     public void setDisplayContext(String displayContext) {
