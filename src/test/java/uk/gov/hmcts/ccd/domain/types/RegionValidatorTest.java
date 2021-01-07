@@ -36,7 +36,7 @@ class RegionValidatorTest {
     @Mock
     private CaseDefinitionRepository definitionRepository;
 
-    private TextValidator validator;
+    private RegionValidator validator;
     private CaseFieldDefinition caseFieldDefinition;
 
     @BeforeEach
@@ -47,10 +47,10 @@ class RegionValidatorTest {
         BaseType.setCaseDefinitionRepository(definitionRepository);
         BaseType.initialise();
 
-        when(regionBaseType.getType()).thenReturn(TextValidator.TYPE_ID);
+        when(regionBaseType.getType()).thenReturn(RegionValidator.TYPE_ID);
         BaseType.register(regionBaseType);
 
-        validator = new TextValidator();
+        validator = new RegionValidator();
 
         caseFieldDefinition = caseField().withMin(5)
             .withMax(10)
@@ -59,7 +59,7 @@ class RegionValidatorTest {
 
     @Test
     @DisplayName("should be valid when text length between min and max")
-    void textFieldWithValidMinMax() {
+    void regionFieldWithValidMinMax() {
         final JsonNode DATA = NODE_FACTORY.textNode("5 & 10");
         final List<ValidationResult> validMinMaxResults = validator.validate(FIELD_ID, DATA, caseFieldDefinition);
 
@@ -68,7 +68,7 @@ class RegionValidatorTest {
 
     @Test
     @DisplayName("should NOT be valid when text length outside of min and max")
-    void textFieldWithInvalidMinMax() {
+    void regionFieldWithInvalidMinMax() {
         final JsonNode invalidMin = NODE_FACTORY.textNode("Test");
         final List<ValidationResult> validMinResults = validator.validate(FIELD_ID, invalidMin, caseFieldDefinition);
 
@@ -89,7 +89,7 @@ class RegionValidatorTest {
 
     @Test
     @DisplayName("should be valid when no min and max defined")
-    void textFieldWithNoMinMax() {
+    void regionFieldWithNoMinMax() {
         final CaseFieldDefinition caseFieldDefinition = caseField().build();
         final JsonNode value = NODE_FACTORY.textNode("Test");
         final List<ValidationResult> validMinMaxResults = validator.validate(FIELD_ID, value, caseFieldDefinition);
@@ -98,7 +98,7 @@ class RegionValidatorTest {
 
     @Test
     @DisplayName("should test exact length when min and max are equal")
-    void textFieldWithSameMinMax() {
+    void regionFieldWithSameMinMax() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withMin(5)
             .withMax(5)
             .build();
@@ -124,7 +124,7 @@ class RegionValidatorTest {
 
     @Test
     @DisplayName("should test against regular expression")
-    void textRegex() {
+    void regionRegex() {
         final CaseFieldDefinition caseFieldDefinition = caseField().withRegExp("\\d{4}-\\d{2}-\\d{2}").build();
         final JsonNode validValue = NODE_FACTORY.textNode("1234-56-78");
         final List<ValidationResult> validResult = validator.validate(FIELD_ID, validValue, caseFieldDefinition);
@@ -141,7 +141,7 @@ class RegionValidatorTest {
     @Test
     @DisplayName("should be linked to base type")
     void getType() {
-        assertThat(validator.getType(), is(BaseType.get("Text")));
+        assertThat(validator.getType(), is(BaseType.get("Region")));
     }
 
     @Test
@@ -160,6 +160,6 @@ class RegionValidatorTest {
     }
 
     private CaseFieldDefinitionBuilder caseField() {
-        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(TextValidator.TYPE_ID);
+        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(RegionValidator.TYPE_ID);
     }
 }

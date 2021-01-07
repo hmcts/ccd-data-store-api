@@ -35,26 +35,28 @@ public class RegionValidator implements BaseTypeValidator {
         if (!dataValue.isTextual()) {
             final String nodeType = dataValue.getNodeType().toString().toLowerCase();
             return Collections.singletonList(new ValidationResult(nodeType + " is not a string",
-                dataFieldId));
+                dataFieldId)
+            );
         }
 
         final String value = dataValue.textValue();
 
         if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), value)) {
-            return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId));
+            return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId)
+            );
         }
 
         if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), value)) {
             return Collections.singletonList(
-                new ValidationResult("Region '" + value
-                    + "' requires minimum length " + caseFieldDefinition.getFieldTypeDefinition().getMin(), dataFieldId)
+                new ValidationResult(value + " require minimum length " + caseFieldDefinition
+                    .getFieldTypeDefinition().getMin(), dataFieldId)
             );
         }
 
         if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), value)) {
             return Collections.singletonList(
-                new ValidationResult("Region '" + value
-                    + "' exceeds maximum length " + caseFieldDefinition.getFieldTypeDefinition().getMax(), dataFieldId)
+                new ValidationResult(value + " exceed maximum length " + caseFieldDefinition
+                    .getFieldTypeDefinition().getMax(), dataFieldId)
             );
         }
 

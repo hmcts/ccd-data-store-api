@@ -14,9 +14,7 @@ import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
 
 @Named("BaseLocationValidator")
 @Singleton
-
 public class BaseLocationValidator implements BaseTypeValidator {
-
     public static final String TYPE_ID = "BaseLocation";
 
     @Override
@@ -29,25 +27,19 @@ public class BaseLocationValidator implements BaseTypeValidator {
                                            final JsonNode dataValue,
                                            final CaseFieldDefinition caseFieldDefinition) {
 
-        if (!dataValue.isTextual()) {
-            final String nodeType = dataValue.getNodeType().toString().toLowerCase();
-            return Collections.singletonList(new ValidationResult(nodeType + " is not a string",
-                dataFieldId));
-        }
-
         // Empty text should still check against MIN - MIN may or may not be 0
         if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }
 
-        final String value = dataValue.textValue();
-
-        if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), value)) {
-            return Collections.singletonList(
-                new ValidationResult("Base Location '" + value
-                    + "' exceeds maximum length " + caseFieldDefinition.getFieldTypeDefinition().getMax(), dataFieldId)
+        if (!dataValue.isTextual()) {
+            final String nodeType = dataValue.getNodeType().toString().toLowerCase();
+            return Collections.singletonList(new ValidationResult(nodeType + " is not a string",
+                dataFieldId)
             );
         }
+
+        final String value = dataValue.textValue();
 
         if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), value)) {
             return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId)
@@ -56,8 +48,15 @@ public class BaseLocationValidator implements BaseTypeValidator {
 
         if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), value)) {
             return Collections.singletonList(
-                new ValidationResult("Base Location '" + value
-                    + "' requires minimum length " + caseFieldDefinition.getFieldTypeDefinition().getMin(), dataFieldId)
+                new ValidationResult(value + " require minimum length " + caseFieldDefinition
+                    .getFieldTypeDefinition().getMin(), dataFieldId)
+            );
+        }
+
+        if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), value)) {
+            return Collections.singletonList(
+                new ValidationResult(value + " exceed maximum length " + caseFieldDefinition
+                    .getFieldTypeDefinition().getMax(), dataFieldId)
             );
         }
 
