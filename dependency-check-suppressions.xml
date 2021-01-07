@@ -17,17 +17,12 @@
 	</suppress>
 
 	<suppress>
-		<notes><![CDATA[
-			This occurs in org.bouncycastle.crypto.encodings.OAEPEncoding. Sending invalid ciphertext that decrypts to
-			a short payload in the OAEP Decoder could result in the throwing of an early exception, potentially leaking
-			some information about the private exponent of the RSA private key performing the encryption.
-		]]></notes>
-		<cve>CVE-2020-29243</cve>
-		<cve>CVE-2020-29242</cve>
-		<cve>CVE-2020-29245</cve>
-		<cve>CVE-2020-29244</cve>
-		<cve>CVE-2020-26939</cve>
 		<cve>CVE-2020-8908</cve>
+		<cve>CVE-2020-29242</cve>
+		<cve>CVE-2020-29243</cve>
+		<cve>CVE-2020-29244</cve>
+		<cve>CVE-2020-29245</cve>
+		<cve>CVE-2020-26939</cve>
 	</suppress>
 
 </suppressions>
