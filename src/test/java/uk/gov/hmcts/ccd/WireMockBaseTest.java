@@ -50,9 +50,11 @@ public abstract class WireMockBaseTest extends BaseTest {
 
     @Configuration
     static class WireMockTestConfiguration {
+
         @Bean
         public WireMockConfigurationCustomizer wireMockConfigurationCustomizer() {
             return config -> config.extensions(new ResponseDefinitionTransformer() {
+
                 @Override
                 public String getName() {
                     return "keep-alive-disabler";
