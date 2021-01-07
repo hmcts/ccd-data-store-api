@@ -44,7 +44,7 @@ public class BaseLocationValidator implements BaseTypeValidator {
 
         if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), value)) {
             return Collections.singletonList(
-                new ValidationResult( "Base Location '" + value
+                new ValidationResult("Base Location '" + value
                     + "' exceeds maximum length " + caseFieldDefinition.getFieldTypeDefinition().getMax(), dataFieldId)
             );
         }
@@ -57,7 +57,8 @@ public class BaseLocationValidator implements BaseTypeValidator {
         }
 
         if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), value)) {
-            return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId));
+            return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId)
+            );
         }
 
         return Collections.emptyList();

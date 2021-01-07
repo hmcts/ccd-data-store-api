@@ -18,7 +18,9 @@ public class RegionValidator implements BaseTypeValidator {
     public static final String TYPE_ID = "Region";
 
     @Override
-    public BaseType getType() { return BaseType.get(TYPE_ID); }
+    public BaseType getType() {
+        return BaseType.get(TYPE_ID);
+    }
 
     @Override
     public List<ValidationResult> validate(final String dataFieldId,
