@@ -1194,6 +1194,10 @@
           "order": "[[ANYTHING_PRESENT]]",
           "wizard_page_fields": [
             {
+              "__ordering__": "unordered",
+              "__elementId__": "case_field_id"
+            },
+            {
               "case_field_id": "TextField",
               "order": "[[ANYTHING_PRESENT]]",
               "page_column_no": null,
@@ -1233,6 +1237,10 @@
           "label": "Second page",
           "order": "[[ANYTHING_PRESENT]]",
           "wizard_page_fields": [
+            {
+              "__ordering__": "unordered",
+              "__elementId__": "case_field_id"
+            },
             {
               "case_field_id": "MoneyGBPField",
               "order": "[[ANYTHING_PRESENT]]",
@@ -1286,7 +1294,11 @@
           "order": "[[ANYTHING_PRESENT]]",
           "wizard_page_fields": [
             {
-              "case_field_id": "[[ANYTHING_PRESENT]]",
+              "__ordering__": "unordered",
+              "__elementId__": "case_field_id"
+            },
+            {
+              "case_field_id": "CollectionField",
               "order": "[[ANYTHING_PRESENT]]",
               "page_column_no": null,
               "complex_field_overrides": []
