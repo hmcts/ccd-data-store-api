@@ -40,11 +40,8 @@ public class RegionValidator implements BaseTypeValidator {
 
         final String value = dataValue.textValue();
 
-        if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), value)) {
-            return Collections.singletonList(
-                new ValidationResult("Region '" + value
-                    + "' exceeds maximum length " + caseFieldDefinition.getFieldTypeDefinition().getMax(), dataFieldId)
-            );
+        if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), value)) {
+            return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId));
         }
 
         if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), value)) {
@@ -54,8 +51,11 @@ public class RegionValidator implements BaseTypeValidator {
             );
         }
 
-        if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), value)) {
-            return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId));
+        if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), value)) {
+            return Collections.singletonList(
+                new ValidationResult("Region '" + value
+                    + "' exceeds maximum length " + caseFieldDefinition.getFieldTypeDefinition().getMax(), dataFieldId)
+            );
         }
 
         return Collections.emptyList();

@@ -29,15 +29,15 @@ public class BaseLocationValidator implements BaseTypeValidator {
                                            final JsonNode dataValue,
                                            final CaseFieldDefinition caseFieldDefinition) {
 
-        // Empty text should still check against MIN - MIN may or may not be 0
-        if (isNullOrEmpty(dataValue)) {
-            return Collections.emptyList();
-        }
-
         if (!dataValue.isTextual()) {
             final String nodeType = dataValue.getNodeType().toString().toLowerCase();
             return Collections.singletonList(new ValidationResult(nodeType + " is not a string",
                 dataFieldId));
+        }
+
+        // Empty text should still check against MIN - MIN may or may not be 0
+        if (isNullOrEmpty(dataValue)) {
+            return Collections.emptyList();
         }
 
         final String value = dataValue.textValue();
@@ -49,15 +49,15 @@ public class BaseLocationValidator implements BaseTypeValidator {
             );
         }
 
+        if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), value)) {
+            return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId)
+            );
+        }
+
         if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), value)) {
             return Collections.singletonList(
                 new ValidationResult("Base Location '" + value
                     + "' requires minimum length " + caseFieldDefinition.getFieldTypeDefinition().getMin(), dataFieldId)
-            );
-        }
-
-        if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), value)) {
-            return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId)
             );
         }
 
