@@ -8,10 +8,6 @@ import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.List;
 
-import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkMax;
-import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkMin;
-import static uk.gov.hmcts.ccd.domain.types.TextValidator.checkRegex;
-
 @Named("BaseLocationValidator")
 @Singleton
 public class BaseLocationValidator implements BaseTypeValidator {
@@ -41,25 +37,23 @@ public class BaseLocationValidator implements BaseTypeValidator {
 
         final String value = dataValue.textValue();
 
-        if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), value)) {
-            return Collections.singletonList(new ValidationResult(REGEX_GUIDANCE, dataFieldId)
-            );
+        List<ValidationResult> response = (validateRegex(caseFieldDefinition, value, dataFieldId));
+        if ((response != null)) {
+            return response;
         }
 
-        if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), value)) {
-            return Collections.singletonList(
-                new ValidationResult(value + " require minimum length " + caseFieldDefinition
-                    .getFieldTypeDefinition().getMin(), dataFieldId)
-            );
+        response = (validateMin(caseFieldDefinition, value, dataFieldId));
+        if ((response != null)) {
+            return response;
         }
 
-        if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), value)) {
-            return Collections.singletonList(
-                new ValidationResult(value + " exceed maximum length " + caseFieldDefinition
-                    .getFieldTypeDefinition().getMax(), dataFieldId)
-            );
+        response = (validateMax(caseFieldDefinition, value, dataFieldId));
+        if ((response != null)) {
+            return response;
         }
 
         return Collections.emptyList();
+
     }
+
 }
