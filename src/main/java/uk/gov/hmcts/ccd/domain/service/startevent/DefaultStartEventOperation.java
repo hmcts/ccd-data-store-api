@@ -116,8 +116,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
         Map<String, JsonNode> defaultValueData = caseService
             .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
         if (!defaultValueData.isEmpty()) {
-            JacksonUtils.merge(defaultValueData, caseDetails.getData());
-            deduceDataClassificationForNewFields(caseTypeDefinition, caseDetails);
+            mergeDataAndClassificationForNewFields(defaultValueData, caseDetails, caseTypeDefinition);
         }
 
         final String eventToken = eventTokenService.generateToken(uid,
@@ -159,8 +158,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
         Map<String, JsonNode> defaultValueData = caseService
             .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
         if (!defaultValueData.isEmpty()) {
-            JacksonUtils.merge(defaultValueData, caseDetails.getData());
-            deduceDataClassificationForNewFields(caseTypeDefinition, caseDetails);
+            mergeDataAndClassificationForNewFields(defaultValueData, caseDetails, caseTypeDefinition);
         }
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateEmpty(caseEventDefinition));
@@ -173,6 +171,13 @@ public class DefaultStartEventOperation implements StartEventOperation {
         callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, ignoreWarning);
 
         return buildStartEventTrigger(eventId, eventToken, caseDetails);
+    }
+
+    private void mergeDataAndClassificationForNewFields(Map<String, JsonNode> defaultValueData,
+                                                        CaseDetails caseDetails,
+                                                        CaseTypeDefinition caseTypeDefinition) {
+        JacksonUtils.merge(defaultValueData, caseDetails.getData());
+        deduceDataClassificationForNewFields(caseTypeDefinition, caseDetails);
     }
 
     private StartEventResult buildStartEventTrigger(String eventId, String eventToken, CaseDetails caseDetails) {
