@@ -2,8 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.startevent;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +22,6 @@ import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -184,9 +181,6 @@ public class DefaultStartEventOperationTest {
 
     @Mock
     private UIDService uidService;
-    @Mock
-    private CaseDataService caseDataService;
-
 
     private DefaultStartEventOperation defaultStartEventOperation;
 
@@ -256,8 +250,7 @@ public class DefaultStartEventOperationTest {
                                                                     caseService,
                                                                     userAuthorisation,
                                                                     callbackInvoker,
-                                                                    uidService,
-                                                                    caseDataService);
+                                                                    uidService);
     }
 
     @Nested
@@ -430,16 +423,12 @@ public class DefaultStartEventOperationTest {
     @DisplayName("case tests")
     class StartEventResultForCase {
 
-        JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
-        Map<String, JsonNode> newFieldsDataClassification = ImmutableMap.of(
-            "key", JSON_NODE_FACTORY.textNode("value"));
 
         @BeforeEach
         void setUp() {
             caseDetails.setData(existingCaseData());
             caseDetails.setState(TEST_CASE_STATE);
             caseDetails.setCaseTypeId(TEST_CASE_TYPE_ID);
-            caseDetails.setDataClassification(DATA_CLASSIFICATION);
             doReturn(true).when(uidService).validateUID(TEST_CASE_REFERENCE);
             doReturn(true).when(eventTriggerService).isPreStateValid(TEST_CASE_STATE, caseEventDefinition);
             doReturn(TEST_EVENT_TOKEN).when(eventTokenService).generateToken(
@@ -448,10 +437,6 @@ public class DefaultStartEventOperationTest {
             doReturn(true).when(uidService).validateUID(TEST_CASE_REFERENCE);
             doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(TEST_CASE_REFERENCE);
             doReturn(UID).when(userAuthorisation).getUserId();
-
-            doReturn(newFieldsDataClassification).when(caseDataService).getDefaultSecurityClassifications(eq(caseTypeDefinition),
-                eq(caseDetails.getData()),
-                eq(caseDetails.getDataClassification()));
         }
 
         @Test
@@ -474,7 +459,6 @@ public class DefaultStartEventOperationTest {
                                                                          actual.getCaseDetails(), IGNORE_WARNING),
                 () -> assertThat(actual.getCaseDetails(), is(equalTo(caseDetails))),
                 () -> assertThat(actual.getCaseDetails().getData(), is(equalTo(expectedAfterMergeWithDefaultValue()))),
-                () -> assertThat(actual.getCaseDetails().getDataClassification(), is(equalTo(newFieldsDataClassification))),
                 () -> assertThat(actual.getToken(), is(equalTo(TEST_EVENT_TOKEN))),
                 () -> assertThat(actual.getEventId(), is(equalTo(TEST_EVENT_TRIGGER_ID)))
             );
