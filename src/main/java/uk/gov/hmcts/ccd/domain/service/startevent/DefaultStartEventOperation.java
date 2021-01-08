@@ -19,6 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -31,6 +32,9 @@ import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import java.util.Map;
 import java.util.function.Supplier;
+
+import static com.google.common.collect.Maps.newHashMap;
+import static java.util.Optional.ofNullable;
 
 
 @Service
@@ -46,19 +50,19 @@ public class DefaultStartEventOperation implements StartEventOperation {
     private final UserAuthorisation userAuthorisation;
     private final CallbackInvoker callbackInvoker;
     private final UIDService uidService;
+    private final CaseDataService caseDataService;;
 
     @Autowired
     public DefaultStartEventOperation(final EventTokenService eventTokenService,
-                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                          final CaseDefinitionRepository caseDefinitionRepository,
-                                      @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
-                                          final CaseDetailsRepository caseDetailsRepository,
+                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
+                                      @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
                                       @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
                                       final EventTriggerService eventTriggerService,
                                       final CaseService caseService,
                                       final UserAuthorisation userAuthorisation,
                                       final CallbackInvoker callbackInvoker,
-                                      final UIDService uidService) {
+                                      final UIDService uidService,
+                                      final CaseDataService caseDataService) {
 
         this.eventTokenService = eventTokenService;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -69,6 +73,7 @@ public class DefaultStartEventOperation implements StartEventOperation {
         this.userAuthorisation = userAuthorisation;
         this.callbackInvoker = callbackInvoker;
         this.uidService = uidService;
+        this.caseDataService = caseDataService;
     }
 
     @Override
@@ -108,7 +113,10 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         Map<String, JsonNode> defaultValueData = caseService
             .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
-        JacksonUtils.merge(defaultValueData, caseDetails.getData());
+        if (!defaultValueData.isEmpty()) {
+            JacksonUtils.merge(defaultValueData, caseDetails.getData());
+            deduceDataClassificationForNewFields(caseTypeDefinition, caseDetails);
+        }
 
         final String eventToken = eventTokenService.generateToken(uid,
             caseDetails,
@@ -200,6 +208,15 @@ public class DefaultStartEventOperation implements StartEventOperation {
         if (validationOperation.get()) {
             throw new ValidationException("The case status did not qualify for the event");
         }
+    }
+
+    private void deduceDataClassificationForNewFields(CaseTypeDefinition caseTypeDefinition, CaseDetails caseDetails) {
+        Map<String, JsonNode> defaultSecurityClassifications = caseDataService.getDefaultSecurityClassifications(
+            caseTypeDefinition,
+            caseDetails.getData(),
+            ofNullable(caseDetails.getDataClassification()).orElse(
+                newHashMap()));
+        caseDetails.setDataClassification(defaultSecurityClassifications);
     }
 
 }
