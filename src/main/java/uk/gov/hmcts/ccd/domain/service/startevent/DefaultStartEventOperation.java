@@ -158,7 +158,10 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         Map<String, JsonNode> defaultValueData = caseService
             .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
-        JacksonUtils.merge(defaultValueData, caseDetails.getData());
+        if (!defaultValueData.isEmpty()) {
+            JacksonUtils.merge(defaultValueData, caseDetails.getData());
+            deduceDataClassificationForNewFields(caseTypeDefinition, caseDetails);
+        }
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateEmpty(caseEventDefinition));
 
