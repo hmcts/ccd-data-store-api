@@ -173,13 +173,6 @@ public class DefaultStartEventOperation implements StartEventOperation {
         return buildStartEventTrigger(eventId, eventToken, caseDetails);
     }
 
-    private void mergeDataAndClassificationForNewFields(Map<String, JsonNode> defaultValueData,
-                                                        CaseDetails caseDetails,
-                                                        CaseTypeDefinition caseTypeDefinition) {
-        JacksonUtils.merge(defaultValueData, caseDetails.getData());
-        deduceDataClassificationForNewFields(caseTypeDefinition, caseDetails);
-    }
-
     private StartEventResult buildStartEventTrigger(String eventId, String eventToken, CaseDetails caseDetails) {
         final StartEventResult startEventResult = new StartEventResult();
         startEventResult.setCaseDetails(caseDetails);
@@ -218,6 +211,13 @@ public class DefaultStartEventOperation implements StartEventOperation {
         if (validationOperation.get()) {
             throw new ValidationException("The case status did not qualify for the event");
         }
+    }
+
+    private void mergeDataAndClassificationForNewFields(Map<String, JsonNode> defaultValueData,
+                                                        CaseDetails caseDetails,
+                                                        CaseTypeDefinition caseTypeDefinition) {
+        JacksonUtils.merge(defaultValueData, caseDetails.getData());
+        deduceDataClassificationForNewFields(caseTypeDefinition, caseDetails);
     }
 
     private void deduceDataClassificationForNewFields(CaseTypeDefinition caseTypeDefinition, CaseDetails caseDetails) {
