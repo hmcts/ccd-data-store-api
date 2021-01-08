@@ -75,6 +75,7 @@ public class DefaultStartEventOperationTest {
     private static final String PRIVATE = SecurityClassification.PRIVATE.name();
     private static final Map<String, JsonNode> DATA_CLASSIFICATION = Maps.newHashMap();
     private static final Map<String, JsonNode> DEFAULT_VALUE_DATA = expectedDefaultValue();
+    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
     static Map<String, JsonNode> expectedDefaultValue() {
         Map<String, JsonNode> data = new HashMap<>();
@@ -430,9 +431,7 @@ public class DefaultStartEventOperationTest {
     @DisplayName("case tests")
     class StartEventResultForCase {
 
-        JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
-        Map<String, JsonNode> newFieldsDataClassification = ImmutableMap.of(
-            "key", JSON_NODE_FACTORY.textNode("value"));
+        Map<String, JsonNode> newFieldsClassification = ImmutableMap.of("key", JSON_NODE_FACTORY.textNode("value"));
 
         @BeforeEach
         void setUp() {
@@ -449,7 +448,8 @@ public class DefaultStartEventOperationTest {
             doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(TEST_CASE_REFERENCE);
             doReturn(UID).when(userAuthorisation).getUserId();
 
-            doReturn(newFieldsDataClassification).when(caseDataService).getDefaultSecurityClassifications(eq(caseTypeDefinition),
+            doReturn(newFieldsClassification).when(caseDataService)
+                .getDefaultSecurityClassifications(eq(caseTypeDefinition),
                 eq(caseDetails.getData()),
                 eq(caseDetails.getDataClassification()));
         }
@@ -474,7 +474,7 @@ public class DefaultStartEventOperationTest {
                                                                          actual.getCaseDetails(), IGNORE_WARNING),
                 () -> assertThat(actual.getCaseDetails(), is(equalTo(caseDetails))),
                 () -> assertThat(actual.getCaseDetails().getData(), is(equalTo(expectedAfterMergeWithDefaultValue()))),
-                () -> assertThat(actual.getCaseDetails().getDataClassification(), is(equalTo(newFieldsDataClassification))),
+                () -> assertThat(actual.getCaseDetails().getDataClassification(), is(equalTo(newFieldsClassification))),
                 () -> assertThat(actual.getToken(), is(equalTo(TEST_EVENT_TOKEN))),
                 () -> assertThat(actual.getEventId(), is(equalTo(TEST_EVENT_TRIGGER_ID)))
             );
