@@ -22,6 +22,9 @@
 		"_extends_": "Common_200_Response",
 		"body": {
 			"arrayInMap": [
+        {
+          "__ordering__": "unordered"
+        },
 				{
 					"id": "BEFTA_JURISDICTION_1",
 					"name": "BEFTA_JURISDICTION_1",
@@ -607,6 +610,9 @@
 								}
 							],
 							"states": [
+                {
+                  "__ordering__": "unordered"
+                },
 								{
 									"id": "TODO",
 									"name": "To do",
