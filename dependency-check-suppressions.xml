@@ -1,32 +1,28 @@
-<?xml version="1.0" encoding="UTF-8"?><suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
-  <suppress>
-    <notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security (any version), see https://pivotal.io/security/cve-2018-1258
-      False positive confirmed.</notes>
-    <cve>CVE-2018-1258</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[file name: liquibase-core-3.6.3.jar: bootstrap.*]]>
-    </notes>
-    <packageUrl regex="true">^pkg:javascript/bootstrap@.*$</packageUrl>
-    <cve>CVE-2019-8331</cve>
-    <cve>CVE-2018-14040</cve>
-    <cve>CVE-2018-14041</cve>
-    <cve>CVE-2018-14042</cve>
-  </suppress>
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions
+	xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
 
+	<suppress>
+		<notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security
+			(any version), see https://pivotal.io/security/cve-2018-1258
+			False positive confirmed.
+		</notes>
+		<cve>CVE-2018-1258</cve>
+	</suppress>
 
-  <suppress>
-    <!-- Temporary suppressions to allow continued development -->
+	<suppress>
+		<notes>Analysis: No fix or work around available</notes>
+		<cve>CVE-2007-1652</cve>
+		<cve>CVE-2007-1651</cve>
+	</suppress>
+	<suppress>
+		<notes>Temporary suppresssions</notes>
+		<cve>CVE-2020-26939</cve>
+		<cve>CVE-2020-8908</cve>
+		<cve>CVE-2020-29242</cve>
+		<cve>CVE-2020-29243</cve>
+		<cve>CVE-2020-29244</cve>
+		<cve>CVE-2020-29245</cve>
+	</suppress>
 
-    <cve>CVE-2015-9251</cve><!-- liquibase -->
-    <cve>CVE-2019-11358</cve><!-- liquibase -->
-    <cve>CVE-2020-11022</cve><!-- liquibase -->
-    <cve>CVE-2020-11023</cve><!-- liquibase -->
-    <cve>CVE-2017-18640</cve> <!-- Resolution : not available until hazelcast bump jackson version. -->
-    <cve>CVE-2016-10750</cve><!-- hazelcast -->
-    <cve>CVE-2007-1651</cve>
-    <cve>CVE-2007-1652</cve>
-
-  </suppress>
 </suppressions>

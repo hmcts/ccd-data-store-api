@@ -76,10 +76,10 @@ import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NESTED_NUMBER_FIELD;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NESTED_NUMBER_FIELD_VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NUMBER_FIELD;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NUMBER_VALUE;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PARTIAL_PHONE_VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_FIELD;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_VALUE_WITH_SPACE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PARTIAL_PHONE_VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.STATE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.STATE_VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.TEXT_AREA_FIELD;
@@ -163,8 +163,7 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
                 .must(matchQuery(STATE, STATE_VALUE))) // Metadata
             .build();
 
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-            null);
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, null);
 
         SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
         assertAll(
@@ -189,8 +188,7 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
                 .must(matchQuery(STATE, STATE_VALUE))) // Metadata
             .build();
 
-        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
-            null);
+        CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, null);
 
         assertThat(caseSearchResultViewResource.getCases().size(),is(0));
     }

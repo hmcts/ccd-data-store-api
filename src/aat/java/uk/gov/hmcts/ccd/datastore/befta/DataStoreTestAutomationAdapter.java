@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.datastore.befta;
 
 import io.cucumber.java.Before;
 import org.junit.AssumptionViolatedException;
+import uk.gov.hmcts.befta.BeftaTestDataLoader;
+import uk.gov.hmcts.befta.DefaultBeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
@@ -31,9 +33,14 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
     }
 
     @Override
-    public void doLoadTestData() {
-        loader.addCcdRoles();
-        loader.importDefinitions();
+    protected BeftaTestDataLoader buildTestDataLoader() {
+        return new DefaultBeftaTestDataLoader() {
+            @Override
+            public void doLoadTestData() {
+                DataStoreTestAutomationAdapter.this.loader.addCcdRoles();
+                DataStoreTestAutomationAdapter.this.loader.importDefinitions();
+            }
+        };
     }
 
     @Override
@@ -73,6 +80,35 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             return uniqueStringsPerTestData
                     .computeIfAbsent(scenarioContext.getContextId(), k ->
                     UUID.randomUUID().toString());
+        } else if (key.toString().startsWith("approximately ")) {
+            try {
+                String actualSizeFromHeaderStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
+                        "testData.actualResponse.headers.Content-Length");
+                String expectedSizeStr = key.toString().replace("approximately ", "");
+
+                int actualSize =  Integer.parseInt(actualSizeFromHeaderStr);
+                int expectedSize = Integer.parseInt(expectedSizeStr);
+
+                if (Math.abs(actualSize - expectedSize) < (actualSize * 10 / 100)) {
+                    return actualSizeFromHeaderStr;
+                }
+                return expectedSize;
+            } catch (Exception e) {
+                throw new FunctionalTestException("Problem checking acceptable response payload: ", e);
+            }
+        } else if (key.toString().startsWith("contains ")) {
+            try {
+                String actualValueStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
+                    "testData.actualResponse.body.__plainTextValue__");
+                String expectedValueStr = key.toString().replace("contains ", "");
+
+                if (actualValueStr.contains(expectedValueStr)) {
+                    return actualValueStr;
+                }
+                return "expectedValueStr " + expectedValueStr + " not present in response ";
+            } catch (Exception e) {
+                throw new FunctionalTestException("Problem checking acceptable response payload: ", e);
+            }
         }
         return super.calculateCustomValue(scenarioContext, key);
     }

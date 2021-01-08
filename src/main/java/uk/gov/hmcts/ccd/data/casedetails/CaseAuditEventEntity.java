@@ -1,9 +1,7 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import uk.gov.hmcts.ccd.data.JsonDataConverter;
-import uk.gov.hmcts.ccd.data.SignificantItemEntity;
-
+import java.time.LocalDateTime;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -17,7 +15,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import java.time.LocalDateTime;
+import uk.gov.hmcts.ccd.data.JsonDataConverter;
+import uk.gov.hmcts.ccd.data.SignificantItemEntity;
 
 import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_CASE_DATA_ID_HQL;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_ID_HQL;
@@ -29,7 +28,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_ID_
     ),
     @NamedQuery(name = CaseAuditEventEntity.FIND_CREATE_EVENT, query =
         FIND_BY_CASE_DATA_ID_HQL
-            + " AND createdDate = "
+            + " AND cae.createdDate = "
             + "(select min(caeDate.createdDate) from CaseAuditEventEntity caeDate WHERE caeDate.caseDataId = :"
             + CaseAuditEventEntity.CASE_DATA_ID + ")"
     ),
@@ -42,7 +41,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_ID_
 public class CaseAuditEventEntity {
 
     static final String FIND_BY_CASE_DATA_ID_HQL = "SELECT cae FROM CaseAuditEventEntity cae"
-        + " WHERE cae.caseDataId = :" + CaseAuditEventEntity.CASE_DATA_ID;
+        + " LEFT JOIN FETCH cae.significantItemEntity WHERE cae.caseDataId = :" + CaseAuditEventEntity.CASE_DATA_ID;
 
     static final String FIND_BY_ID_HQL = "SELECT cae FROM CaseAuditEventEntity cae"
         + " WHERE cae.id = :" + CaseAuditEventEntity.EVENT_ID;
@@ -96,6 +95,15 @@ public class CaseAuditEventEntity {
     @Column(name = "data_classification", nullable = false)
     @Convert(converter = JsonDataConverter.class)
     private JsonNode dataClassification;
+
+    @Column(name = "proxied_by")
+    private String proxiedBy;
+
+    @Column(name = "proxied_by_last_name")
+    private String proxiedByLastName;
+
+    @Column(name = "proxied_by_first_name")
+    private String proxiedByFirstName;
 
     @OneToOne(mappedBy = "caseEvent", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private SignificantItemEntity significantItemEntity;
@@ -244,4 +252,27 @@ public class CaseAuditEventEntity {
         this.significantItemEntity = significantItemEntity;
     }
 
+    public String getProxiedBy() {
+        return proxiedBy;
+    }
+
+    public void setProxiedBy(String proxiedBy) {
+        this.proxiedBy = proxiedBy;
+    }
+
+    public String getProxiedByLastName() {
+        return proxiedByLastName;
+    }
+
+    public void setProxiedByLastName(String proxiedByLastName) {
+        this.proxiedByLastName = proxiedByLastName;
+    }
+
+    public String getProxiedByFirstName() {
+        return proxiedByFirstName;
+    }
+
+    public void setProxiedByFirstName(String proxiedByFirstName) {
+        this.proxiedByFirstName = proxiedByFirstName;
+    }
 }

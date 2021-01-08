@@ -14,7 +14,7 @@ import java.time.Clock;
 @SpringBootApplication
 @EnableTransactionManagement(proxyTargetClass = true)
 @EnableRetry
-@ComponentScan({ "uk.gov.hmcts.ccd", "springfox" })
+@ComponentScan({ "uk.gov.hmcts.ccd" })
 @EnableCaching
 @EnableHypermediaSupport(type = { EnableHypermediaSupport.HypermediaType.HAL })
 public class CoreCaseDataApplication {

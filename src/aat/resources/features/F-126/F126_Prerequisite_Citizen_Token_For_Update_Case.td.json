@@ -1,0 +1,15 @@
+{
+	"_guid_": "F126_Prerequisite_Citizen_Token_For_Update_Case",
+	"title": "should create an update event token",
+  "_extends_": "Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Update_Solicitor_1",
+
+	"specs": [
+		"to get an event token for the case just created"
+	],
+
+	"request": {
+		"pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F126_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+		}
+	}
+}

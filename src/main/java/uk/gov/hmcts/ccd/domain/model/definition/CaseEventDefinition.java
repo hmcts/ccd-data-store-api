@@ -1,12 +1,13 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.ToString;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import lombok.ToString;
-import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 
 @ToString
 public class CaseEventDefinition implements Serializable {

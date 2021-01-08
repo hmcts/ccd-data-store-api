@@ -48,6 +48,11 @@ public class CachedUserRepository implements UserRepository {
     }
 
     @Override
+    public IdamUser getUser(String userToken) {
+        return userRepository.getUser(userToken);
+    }
+
+    @Override
     public UserDefault getUserDefaultSettings(String userId) {
         return userRepository.getUserDefaultSettings(userId);
     }

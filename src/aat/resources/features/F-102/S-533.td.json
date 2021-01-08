@@ -24,6 +24,9 @@
 					"description": "Content for the Test Jurisdiction.",
 					"caseTypes": [
 						{
+							"__ordering__": "unordered"
+						},
+						{
 							"id": "BEFTA_CASETYPE_1_1",
 							"description": "Create a case of type BEFTA_CASETYPE_1_1",
 							"version": null,
