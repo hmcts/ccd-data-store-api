@@ -65,8 +65,9 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
     private Map<String, Object> retrieveContextData(Map<String, ?> caseEventData,
                                                     Set<List<String>> variableLists) {
         Set<String> variables = getVariableNames(variableLists);
+        Map<String, ?> convertedCaseData = convertMetaDataKeys(caseEventData);
+        DocumentContext context = JsonPath.parse(caseDataToJsonString(convertedCaseData));
         Map<String, Object> contextData = new HashMap<>();
-        DocumentContext context = JsonPath.parse(caseDataToJsonString(caseEventData));
         for (String variable : variables) {
             Optional<Object> value = getValueFromContext(context, variable);
             if (value.isPresent()) {
@@ -89,6 +90,19 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
         } catch (JsonProcessingException e) {
             throw new ServiceException("Unable to convert case data to JSON string", e);
         }
+    }
+
+    private Map<String, ?> convertMetaDataKeys(Map<String, ?> caseData) {
+        Map<String, Object> newCaseData = new HashMap<>();
+        caseData.keySet()
+            .forEach(key -> {
+                    String newKey = key.trim()
+                        .replace("[", "")
+                        .replaceAll("]", "");
+                    newCaseData.put(newKey, caseData.get(key));
+                }
+            );
+        return newCaseData;
     }
 
     private Optional<Object> getValueFromContext(DocumentContext context, String variable) {
