@@ -3,7 +3,7 @@
 
 	"users": {
 		"invokingUser": {
-      "_guid_": "CaseworkerAutotest"
+      "_extends_": "CaseworkerAutotest"
 		}
 	},
 
