@@ -37,6 +37,7 @@ class BaseLocationValidatorTest {
     private CaseDefinitionRepository definitionRepository;
 
     private BaseLocationValidator validator;
+    private TextValidator textValidator;
     private CaseFieldDefinition caseFieldDefinition;
 
     @BeforeEach
@@ -50,7 +51,8 @@ class BaseLocationValidatorTest {
         when(baseLocationBaseType.getType()).thenReturn(BaseLocationValidator.TYPE_ID);
         BaseType.register(baseLocationBaseType);
 
-        validator = new BaseLocationValidator();
+        textValidator = new TextValidator();
+        validator = new BaseLocationValidator(textValidator);
 
         caseFieldDefinition = caseField().withMin(5)
             .withMax(10)

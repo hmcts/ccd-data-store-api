@@ -37,6 +37,7 @@ class RegionValidatorTest {
     private CaseDefinitionRepository definitionRepository;
 
     private RegionValidator validator;
+    private TextValidator textValidator;
     private CaseFieldDefinition caseFieldDefinition;
 
     @BeforeEach
@@ -50,7 +51,8 @@ class RegionValidatorTest {
         when(regionBaseType.getType()).thenReturn(RegionValidator.TYPE_ID);
         BaseType.register(regionBaseType);
 
-        validator = new RegionValidator();
+        textValidator = new TextValidator();
+        validator = new RegionValidator(textValidator);
 
         caseFieldDefinition = caseField().withMin(5)
             .withMax(10)

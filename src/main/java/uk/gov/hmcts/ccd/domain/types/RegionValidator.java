@@ -1,10 +1,11 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.List;
@@ -13,10 +14,12 @@ import java.util.List;
 @Singleton
 public class RegionValidator implements BaseTypeValidator {
     public static final String TYPE_ID = "Region";
+    private TextValidator textValidator;
 
-    @Autowired
-    @Qualifier("TextValidator")
-    TextValidator textValidator;
+    @Inject
+    public RegionValidator(@Qualifier("TextValidator") TextValidator textValidator) {
+        this.textValidator = textValidator;
+    }
 
     @Override
     public BaseType getType() {
