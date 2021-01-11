@@ -135,31 +135,31 @@ module "data-store-db-v11" {
 
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER-V11" {
-  name         = "${var.component}-POSTGRES-USER"
-  value        = module.data-store-db.user_name
+  name         = "${var.component}-POSTGRES-USER-V11"
+  value        = module.data-store-db.user_name-v11
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-PASS-V11" {
-  name         = "${var.component}-POSTGRES-PASS"
-  value        = module.data-store-db.postgresql_password
+  name         = "${var.component}-POSTGRES-PASS-V11"
+  value        = module.data-store-db.postgresql_password-v11
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_HOST-V11" {
-  name         = "${var.component}-POSTGRES-HOST"
-  value        = module.data-store-db.host_name
+  name         = "${var.component}-POSTGRES-HOST-V11"
+  value        = module.data-store-db.host_name-v11
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_PORT-V11" {
-  name         = "${var.component}-POSTGRES-PORT"
-  value        = module.data-store-db.postgresql_listen_port
+  name         = "${var.component}-POSTGRES-PORT-V11"
+  value        = module.data-store-db.postgresql_listen_port-v11
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_DATABASE-V11" {
-  name         = "${var.component}-POSTGRES-DATABASE"
-  value        = module.data-store-db.postgresql_database
+  name         = "${var.component}-POSTGRES-DATABASE-V11"
+  value        = module.data-store-db.postgresql_database-v11
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
 }
