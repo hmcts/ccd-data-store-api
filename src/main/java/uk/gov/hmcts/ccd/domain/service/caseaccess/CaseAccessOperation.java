@@ -9,12 +9,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.util.set.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseRoleRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
@@ -72,6 +72,7 @@ public class CaseAccessOperation {
         caseUserRepository.revokeAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
     }
 
+    @Transactional
     public List<String> findCasesUserIdHasAccessTo(final String userId) {
         return caseUserRepository.findCasesUserIdHasAccessTo(userId)
             .stream()
