@@ -112,7 +112,7 @@ resource "azurerm_key_vault_secret" "draft-store-key" {
 }
 
 ////////////////////////////////
-// DB version 11
+// DB version 11             //
 ////////////////////////////////
 
 module "data-store-db-v11" {
