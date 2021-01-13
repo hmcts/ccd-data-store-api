@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ExampleProperty;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -127,13 +129,15 @@ public class CaseController {
         }
     )
     @ApiOperation(
-        value = "Submit event creation",
-        notes = V2.EXPERIMENTAL_WARNING
+        value = "Submit an event for a case"
     )
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = V2.EXPERIMENTAL_HEADER, value = "'true' to use this endpoint", paramType = "header")
+    })
     @ApiResponses({
         @ApiResponse(
             code = 201,
-            message = "Created",
+            message = "Event has been created successfully",
             response = CaseResource.class
         ),
         @ApiResponse(
@@ -141,17 +145,88 @@ public class CaseController {
             message = V2.Error.CASE_ID_INVALID
         ),
         @ApiResponse(
-            code = 404,
+            code = 400,
             message = V2.Error.EVENT_TRIGGER_NOT_FOUND
         ),
         @ApiResponse(
-            code = 409,
-            message = V2.Error.CASE_ALTERED
+            code = 404,
+            message = V2.Error.CASE_NOT_FOUND
+        ),
+        @ApiResponse(
+            code = 422,
+            message = "The event could not be processed, for example due to one of the following:\n"
+                + "- Data validation failed\n"
+                + "- Invalid event (e.g. event ID not provided/known)\n"
+                + "- Case does not comply with pre-state condition for event\n"
+        ),
+        @ApiResponse(
+            code = 504,
+            message = V2.Error.CALLBACK_EXCEPTION
         )
     })
+    @ResponseStatus(HttpStatus.CREATED) // To remove default 200 response from Swagger
     @LogAudit(operationType = UPDATE_CASE, caseId = "#caseId", jurisdiction = "#result.body.jurisdiction",
         caseType = "#result.body.caseType", eventName = "#content.event.eventId")
-    public ResponseEntity<CaseResource> createEvent(@PathVariable("caseId") String caseId,
+    public ResponseEntity<CaseResource> createEvent(@ApiParam(value = "Case ID for which the event is being submitted",
+                                                    required = true)
+                                                    @PathVariable("caseId") String caseId,
+                                                    @ApiParam(value = "Case data content for the event. Note that the "
+                                                        + "`data` property "
+                                                        + "is used for event submission data; NOT the `event_data`. "
+                                                        + "For example:\n"
+                                                        + "```\n"
+                                                        + "{\n"
+                                                        + "    \"data\": {\n"
+                                                        + "        \"TextField\": \"TextField1\",\n"
+                                                        + "        \"NumberField\": \"123\",\n"
+                                                        + "        \"YesOrNoField\": \"Yes\",\n"
+                                                        + "        \"PhoneUKField\": \"01234 567890\",\n"
+                                                        + "        \"EmailField\": \"email@gmail.com\",\n"
+                                                        + "        \"MoneyGBPField\": \"12300\",\n"
+                                                        + "        \"DateField\": \"2015-12-23\",\n"
+                                                        + "        \"DateTimeField\": \"2000-05-17T12:30:00.000\",\n"
+                                                        + "        \"FixedListField\": \"VALUE3\",\n"
+                                                        + "        \"MultiSelectListField\": [\n"
+                                                        + "            \"OPTION5\",\n"
+                                                        + "            \"OPTION4\"\n"
+                                                        + "        ],\n"
+                                                        + "        \"ComplexField\": {\n"
+                                                        + "            \"ComplexTextField\": \"Nested text field\",\n"
+                                                        + "            \"ComplexFixedListField\": null,\n"
+                                                        + "            \"ComplexNestedField\": {\n"
+                                                        + "                \"NestedNumberField\": \"987\",\n"
+                                                        + "                \"NestedCollectionTextField\": []\n"
+                                                        + "            }\n"
+                                                        + "        },\n"
+                                                        + "        \"CollectionField\": [\n"
+                                                        + "            {\n"
+                                                        + "                \"id\": null,\n"
+                                                        + "                \"value\": \"Collection field 1\"\n"
+                                                        + "            },\n"
+                                                        + "            {\n"
+                                                        + "                \"id\": null,\n"
+                                                        + "                \"value\": \"Collection field 2\"\n"
+                                                        + "            }\n"
+                                                        + "        ],\n"
+                                                        + "        \"AddressUKField\": {\n"
+                                                        + "            \"AddressLine1\": \"1 The Street\",\n"
+                                                        + "            \"AddressLine2\": \"\",\n"
+                                                        + "            \"AddressLine3\": \"\",\n"
+                                                        + "            \"PostTown\": \"Town\",\n"
+                                                        + "            \"County\": \"County\",\n"
+                                                        + "            \"PostCode\": \"AB1 2CD\",\n"
+                                                        + "            \"Country\": \"England\"\n"
+                                                        + "        }\n"
+                                                        + "    },\n"
+                                                        + "    \"event\": {\n"
+                                                        + "        \"id\": \"UPDATE\",\n"
+                                                        + "        \"summary\": \"\",\n"
+                                                        + "        \"description\": \"\"\n"
+                                                        + "    },\n"
+                                                        + "    \"event_token\": \"<event token>\",\n"
+                                                        + "    \"ignore_warning\": false\n"
+                                                        + "}"
+                                                        + "\n```", required = true)
                                                     @RequestBody final CaseDataContent content) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
@@ -236,7 +311,8 @@ public class CaseController {
         jurisdiction = "#result.body.jurisdiction", caseType = "#caseTypeId", eventName = "#content.event.eventId")
     public ResponseEntity<CaseResource> createCase(@PathVariable("caseTypeId") String caseTypeId,
                                                    @RequestBody final CaseDataContent content,
-                                                   @RequestParam(value = "ignore-warning", required = false) final Boolean ignoreWarning) {
+                                                   @RequestParam(value = "ignore-warning", required = false)
+                                                       final Boolean ignoreWarning) {
         final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
 
         return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content, ignoreWarning));
@@ -327,7 +403,7 @@ public class CaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(
             name = "supplementaryDataUpdateRequest",
-            dataType = "uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest",
+            dataTypeClass = SupplementaryDataUpdateRequest.class,
             examples = @io.swagger.annotations.Example(
                 value = {
                     @ExampleProperty(value = "{\n"
@@ -343,13 +419,14 @@ public class CaseController {
                 }))
     })
     public ResponseEntity<SupplementaryDataResource> updateCaseSupplementaryData(@PathVariable("caseId") String caseId,
-                                                                                 @RequestBody SupplementaryDataUpdateRequest supplementaryDataUpdateRequest) {
+                                           @RequestBody SupplementaryDataUpdateRequest supplementaryDataUpdateRequest) {
 
         this.requestValidator.validate(supplementaryDataUpdateRequest);
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
-        SupplementaryData supplementaryDataUpdated = supplementaryDataUpdateOperation.updateSupplementaryData(caseId, supplementaryDataUpdateRequest);
+        SupplementaryData supplementaryDataUpdated = supplementaryDataUpdateOperation.updateSupplementaryData(caseId,
+            supplementaryDataUpdateRequest);
         return status(HttpStatus.OK).body(new SupplementaryDataResource(supplementaryDataUpdated));
     }
 }

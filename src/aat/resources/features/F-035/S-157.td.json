@@ -1,33 +1,32 @@
 {
-  "title": "should get 400 when case reference invalid",
+	"_guid_": "S-157",
+	"_extends_": "F-035_Base_Test_Data",
+	"title": "should get 400 when case reference invalid",
 
-  "_guid_": "S-157",
-  "_extends_": "F-035_Base_Test_Data",
+	"specs": [
+		"an active profile in CCD",
+		"contains an invalid case reference",
+		"contains an HTTP-400 Bad Request"
+	],
 
-  "specs": [
-    "an active profile in CCD",
-    "contains an invalid case reference",
-    "contains an HTTP-400 Bad Request"
-  ],
+	"request": {
+		"pathVariables": {
+			"cid": "abc"
+		}
+	},
 
-  "request": {
-    "pathVariables": {
-      "cid": "abc"
-    }
-  },
-
-  "expectedResponse": {
-    "_extends_": "Common_400_Response",
-    "headers": {
-      "Content-Encoding": "gzip"
-    },
-    "body": {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-      "message": "Case ID is not valid",
-      "path": "/cases/abc",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
-    }
-  }
+	"expectedResponse": {
+		"_extends_": "Common_400_Response",
+		"headers": {
+			"Content-Encoding": "gzip"
+		},
+		"body": {
+			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+			"message": "Case ID is not valid",
+			"path": "/cases/abc",
+			"details": null,
+			"callbackErrors": null,
+			"callbackWarnings": null
+		}
+	}
 }

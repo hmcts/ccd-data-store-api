@@ -1,10 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
-import java.util.function.Supplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -28,6 +29,9 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 
 @Service
 @Qualifier("default")
@@ -45,8 +49,10 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
     @Autowired
     public DefaultStartEventOperation(final EventTokenService eventTokenService,
-                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
-                                      @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                          final CaseDefinitionRepository caseDefinitionRepository,
+                                      @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                          final CaseDetailsRepository caseDetailsRepository,
                                       @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
                                       final EventTriggerService eventTriggerService,
                                       final CaseService caseService,
@@ -74,11 +80,15 @@ public class DefaultStartEventOperation implements StartEventOperation {
 
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
 
+        final Map<String, JsonNode> data = Maps.newHashMap();
+
+        CaseDetails newCaseDetails = caseService
+            .createNewCaseDetails(caseTypeId, caseTypeDefinition.getJurisdictionId(), data);
         return buildStartEventTrigger(uid,
-            caseTypeDefinition,
-            eventId,
-            ignoreWarning,
-            (() -> caseService.createNewCaseDetails(caseTypeId, caseTypeDefinition.getJurisdictionId(), Maps.newHashMap())));
+                                      caseTypeDefinition,
+                                      eventId,
+                                      ignoreWarning,
+                                      newCaseDetails);
     }
 
     @Override
@@ -95,6 +105,10 @@ public class DefaultStartEventOperation implements StartEventOperation {
         final CaseEventDefinition caseEventDefinition = getCaseEventDefinition(eventId, caseTypeDefinition);
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), caseEventDefinition));
+
+        Map<String, JsonNode> defaultValueData = caseService
+            .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
+        JacksonUtils.merge(defaultValueData, caseDetails.getData());
 
         final String eventToken = eventTokenService.generateToken(uid,
             caseDetails,
@@ -119,25 +133,29 @@ public class DefaultStartEventOperation implements StartEventOperation {
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseDetails.getCaseTypeId());
 
         return buildStartEventTrigger(uid,
-            caseTypeDefinition,
+                                      caseTypeDefinition,
                                       draftResponse.getDocument().getEventId(),
                                       ignoreWarning,
-                                      (() -> caseDetails));
+                                      caseDetails);
     }
 
     private StartEventResult buildStartEventTrigger(final String uid,
                                                     final CaseTypeDefinition caseTypeDefinition,
                                                     final String eventId,
                                                     final Boolean ignoreWarning,
-                                                    final Supplier<CaseDetails> caseDetailsSupplier) {
+                                                    final CaseDetails caseDetails) {
         final CaseEventDefinition caseEventDefinition = getCaseEventDefinition(eventId, caseTypeDefinition);
 
-        final CaseDetails caseDetails = caseDetailsSupplier.get();
+        Map<String, JsonNode> defaultValueData = caseService
+            .buildJsonFromCaseFieldsWithDefaultValue(caseEventDefinition.getCaseFields());
+        JacksonUtils.merge(defaultValueData, caseDetails.getData());
 
         validateEventTrigger(() -> !eventTriggerService.isPreStateEmpty(caseEventDefinition));
 
-        // TODO: we may need to take care of drafts that are saved for existing case so token needs to include the relevant draft payload
-        final String eventToken = eventTokenService.generateToken(uid, caseEventDefinition, caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
+        // TODO: we may need to take care of drafts that are saved for existing case so token needs to include the
+        //  relevant draft payload
+        final String eventToken = eventTokenService.generateToken(uid, caseEventDefinition,
+            caseTypeDefinition.getJurisdictionDefinition(), caseTypeDefinition);
 
         callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, ignoreWarning);
 
@@ -164,7 +182,8 @@ public class DefaultStartEventOperation implements StartEventOperation {
     private CaseEventDefinition getCaseEventDefinition(String eventId, CaseTypeDefinition caseTypeDefinition) {
         final CaseEventDefinition caseEventDefinition = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
         if (caseEventDefinition == null) {
-            throw new ResourceNotFoundException("Cannot find event " + eventId + " for case type " + caseTypeDefinition.getId());
+            throw new ResourceNotFoundException("Cannot find event " + eventId + " for case type " + caseTypeDefinition
+                .getId());
         }
         return caseEventDefinition;
     }

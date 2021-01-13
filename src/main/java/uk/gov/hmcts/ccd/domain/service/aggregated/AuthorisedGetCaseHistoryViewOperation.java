@@ -25,14 +25,16 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
     private final GetCaseHistoryViewOperation getCaseHistoryViewOperation;
 
     public AuthorisedGetCaseHistoryViewOperation(
-        @Qualifier(DefaultGetCaseHistoryViewOperation.QUALIFIER) GetCaseHistoryViewOperation getCaseHistoryViewOperation,
+        @Qualifier(DefaultGetCaseHistoryViewOperation.QUALIFIER)
+            GetCaseHistoryViewOperation getCaseHistoryViewOperation,
         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
         AccessControlService accessControlService,
         @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
         @Qualifier(CachedCaseUserRepository.QUALIFIER)  CaseUserRepository caseUserRepository,
         @Qualifier(CachedCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository) {
 
-        super(caseDefinitionRepository, accessControlService, userRepository, caseUserRepository, caseDetailsRepository);
+        super(caseDefinitionRepository, accessControlService, userRepository,
+              caseUserRepository, caseDetailsRepository);
         this.getCaseHistoryViewOperation = getCaseHistoryViewOperation;
     }
 

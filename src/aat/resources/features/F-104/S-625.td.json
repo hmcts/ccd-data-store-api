@@ -4,7 +4,7 @@
   "specs": [
     "a valid user profile",
     "is configured to search for the previously created case via exact match",
-    "is using the query parameter usecase=search",
+    "is using the query parameter use_case=search",
     "contains the field headers as specified in the SearchResultsFields only",
     "contains the field data as specified in the SearchResultsFields",
     "contains the field data of all meta data fields"
@@ -12,7 +12,7 @@
 
   "request": {
     "queryParams": {
-      "usecase": "SEARCH"
+      "use_case": "SEARCH"
     },
     "body": {
       "query": {

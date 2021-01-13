@@ -35,18 +35,22 @@ class DefaultGetJurisdictionUiConfigDefinitionOperationTest {
     @Test
     @DisplayName("return empty list of jurisdiction UI configs for the passed jurisdictions")
     void shouldReturnEmptyJurisdictionUiConfigList() {
-        doReturn(createConfigResultWithEmptyCollection()).when(uiDefinitionRepository).getJurisdictionUiConfigs(jurisdictionReferences);
+        doReturn(createConfigResultWithEmptyCollection()).when(uiDefinitionRepository)
+            .getJurisdictionUiConfigs(jurisdictionReferences);
 
-        List<JurisdictionUiConfigDefinition> configs = defaultGetJurisdictionUiConfigOperation.execute(jurisdictionReferences);
+        List<JurisdictionUiConfigDefinition> configs =
+            defaultGetJurisdictionUiConfigOperation.execute(jurisdictionReferences);
         assertEquals(0, configs.size());
     }
 
     @Test
     @DisplayName("return list of jurisdiction UI configs for the passed jurisdictions")
     void shouldReturnJurisdictionUiConfigList() {
-        doReturn(createConfigResultWithCollection()).when(uiDefinitionRepository).getJurisdictionUiConfigs(jurisdictionReferences);
+        doReturn(createConfigResultWithCollection()).when(uiDefinitionRepository)
+            .getJurisdictionUiConfigs(jurisdictionReferences);
 
-        List<JurisdictionUiConfigDefinition> configs = defaultGetJurisdictionUiConfigOperation.execute(jurisdictionReferences);
+        List<JurisdictionUiConfigDefinition> configs =
+            defaultGetJurisdictionUiConfigOperation.execute(jurisdictionReferences);
         assertEquals(2, configs.size());
     }
 
@@ -56,7 +60,8 @@ class DefaultGetJurisdictionUiConfigDefinitionOperationTest {
     }
 
     private JurisdictionUiConfigResult createConfigResultWithCollection() {
-        List<JurisdictionUiConfigDefinition> configs = Lists.newArrayList(new JurisdictionUiConfigDefinition(), new JurisdictionUiConfigDefinition());
+        List<JurisdictionUiConfigDefinition> configs = Lists.newArrayList(new JurisdictionUiConfigDefinition(),
+            new JurisdictionUiConfigDefinition());
         JurisdictionUiConfigResult jurisdictionUiConfigResult = new JurisdictionUiConfigResult();
         jurisdictionUiConfigResult.setConfigs(configs);
         return jurisdictionUiConfigResult;

@@ -129,8 +129,8 @@ class SubmitCaseTransactionTest {
 
         doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition,
                                                                              null,
-                                                                             this.caseDetails, caseTypeDefinition, IGNORE_WARNING
-        );
+                                                                             this.caseDetails, caseTypeDefinition,
+                                                                             IGNORE_WARNING);
 
     }
 
@@ -155,9 +155,9 @@ class SubmitCaseTransactionTest {
     @DisplayName("should persist case")
     void shouldPersistCase() {
         final CaseDetails actualCaseDetails = submitCaseTransaction.submitCase(event,
-            caseTypeDefinition,
+                                                                               caseTypeDefinition,
                                                                                idamUser,
-            caseEventDefinition,
+                                                                               caseEventDefinition,
                                                                                this.caseDetails,
                                                                                IGNORE_WARNING);
 
@@ -178,9 +178,9 @@ class SubmitCaseTransactionTest {
         final ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
 
         submitCaseTransaction.submitCase(event,
-            caseTypeDefinition,
+                                         caseTypeDefinition,
                                          idamUser,
-            caseEventDefinition,
+                                         caseEventDefinition,
                                          this.caseDetails,
                                          IGNORE_WARNING);
 
@@ -229,9 +229,9 @@ class SubmitCaseTransactionTest {
         when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.ALL);
 
         submitCaseTransaction.submitCase(event,
-            caseTypeDefinition,
+                                         caseTypeDefinition,
                                          idamUser,
-            caseEventDefinition,
+                                         caseEventDefinition,
                                          this.caseDetails,
                                          IGNORE_WARNING);
 
@@ -248,7 +248,8 @@ class SubmitCaseTransactionTest {
                                          this.caseDetails,
                                          IGNORE_WARNING);
 
-        verify(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition, null, caseDetails, caseTypeDefinition, IGNORE_WARNING);
+        verify(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition, null, caseDetails, caseTypeDefinition,
+                IGNORE_WARNING);
     }
 
     private void assertAuditEvent(final AuditEvent auditEvent) {

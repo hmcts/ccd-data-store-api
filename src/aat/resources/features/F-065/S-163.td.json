@@ -1,30 +1,32 @@
 {
-  "title": "must return 404 when case reference does NOT exist",
   "_guid_": "S-163",
   "_extends_": "F-065_Test_Data_Base",
+  "title": "must return 404 when case reference does NOT exist",
 
   "specs": [
     "an active profile in CCD",
     "uses case-reference which is not exist in CCD",
     "has an HTTP-404 code"
   ],
+
   "request": {
     "pathVariables": {
       "cid": "1234123412341238"
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_404_Response",
     "headers": {
       "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
     },
     "body": {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message" : "No case found",
-      "path" : "/internal/cases/1234123412341238",
-      "details" : null,
-      "callbackErrors" : null,
-      "callbackWarnings" : null
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "No case found",
+      "path": "/internal/cases/1234123412341238",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
     }
   }
 }

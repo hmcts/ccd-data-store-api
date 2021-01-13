@@ -33,7 +33,14 @@ import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.v2.DCPTestHelper.*;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COLLECTION_COMPLEX_DATE_TIME;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.DATE_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.DATE_TIME_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.NESTED_COMPLEX;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.STANDARD_DATE;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.STANDARD_DATE_TIME;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.TEXT_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.invalidValidateContent;
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.validateContent;
 
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
@@ -86,25 +93,32 @@ public class CaseDataValidatorControllerDCPIT extends WireMockBaseTest {
         CaseDataResource caseDataResource = mapper.readValue(content, CaseDataResource.class);
 
         JsonNode data = caseDataResource.getData();
-        String collectionComplexDateTimeValuePointer = String.join("/", "", COLLECTION_COMPLEX_DATE_TIME, "0", CollectionValidator.VALUE);
+        String collectionComplexDateTimeValuePointer = String.join("/", "", COLLECTION_COMPLEX_DATE_TIME, "0",
+            CollectionValidator.VALUE);
 
         assertAll(
             () -> assertThat(data.get(TEXT_FIELD).asText(), is("Case 1 Text")),
             () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, DATE_FIELD)).asText(),
                 is("1963-05-07")),
-            () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, DATE_TIME_FIELD)).asText(),
+            () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, DATE_TIME_FIELD))
+                    .asText(),
                 is("2008-04-02T16:37:00.000")),
             () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, STANDARD_DATE)).asText(),
                 is("1999-08-19")),
-            () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, STANDARD_DATE_TIME)).asText(),
+            () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, STANDARD_DATE_TIME))
+                    .asText(),
                 is("2010-06-17T19:20:00.000")),
-            () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, NESTED_COMPLEX, DATE_FIELD)).asText(),
+            () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, NESTED_COMPLEX,
+                DATE_FIELD)).asText(),
                 is("1981-02-01")),
-            () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, NESTED_COMPLEX, DATE_TIME_FIELD)).asText(),
+            () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, NESTED_COMPLEX,
+                DATE_TIME_FIELD)).asText(),
                 is("2002-03-04T00:00:00.000")),
-            () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, NESTED_COMPLEX, STANDARD_DATE)).asText(),
+            () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, NESTED_COMPLEX,
+                STANDARD_DATE)).asText(),
                 is("2020-02-19")),
-            () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, NESTED_COMPLEX, STANDARD_DATE_TIME)).asText(),
+            () -> assertThat(data.at(String.join("/", collectionComplexDateTimeValuePointer, NESTED_COMPLEX,
+                STANDARD_DATE_TIME)).asText(),
                 is("2007-07-17T07:07:00.000"))
         );
     }

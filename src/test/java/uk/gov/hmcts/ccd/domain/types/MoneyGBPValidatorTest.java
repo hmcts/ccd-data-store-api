@@ -53,7 +53,8 @@ class MoneyGBPValidatorTest {
                 caseFieldDefinition);
         assertEquals(0, result01.size());
 
-        final List<ValidationResult> result02 = validator.validate(FIELD_ID, NODE_FACTORY.textNode("-100"), caseFieldDefinition);
+        final List<ValidationResult> result02 =
+                validator.validate(FIELD_ID, NODE_FACTORY.textNode("-100"), caseFieldDefinition);
         assertEquals(0, result02.size());
     }
 
@@ -65,12 +66,12 @@ class MoneyGBPValidatorTest {
 
     @Test
     void invalidMoney() {
-        final List<ValidationResult> result01 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("3321M1 1AA"),
-                caseFieldDefinition);
+        final List<ValidationResult> result01 =
+                validator.validate(FIELD_ID, NODE_FACTORY.textNode("3321M1 1AA"), caseFieldDefinition);
         assertEquals(1, result01.size(), result01.toString());
 
-        final List<ValidationResult> result02 = validator.validate(FIELD_ID, NODE_FACTORY.textNode("100.1"), caseFieldDefinition);
+        final List<ValidationResult> result02 =
+                validator.validate(FIELD_ID, NODE_FACTORY.textNode("100.1"), caseFieldDefinition);
         assertEquals(1, result01.size(), result02.toString());
     }
 

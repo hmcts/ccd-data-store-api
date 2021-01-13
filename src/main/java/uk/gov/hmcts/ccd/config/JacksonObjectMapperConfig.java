@@ -40,7 +40,8 @@ public class JacksonObjectMapperConfig {
     @Bean
     public MethodInvokingBean jsonPathParserForJackson() {
         MethodInvokingBean jsonPathParserForJackson = new MethodInvokingBean();
-        jsonPathParserForJackson.setStaticMethod("uk.gov.hmcts.ccd.config.JaywayJsonPathConfigHelper.configureJsonPathForJackson");
+        jsonPathParserForJackson
+            .setStaticMethod("uk.gov.hmcts.ccd.config.JaywayJsonPathConfigHelper.configureJsonPathForJackson");
         return jsonPathParserForJackson;
     }
 

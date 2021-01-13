@@ -1,28 +1,32 @@
 {
-  "title": "Must return the case view with only the respective fields with READ access for Solicitors",
-  "_extends_": "F-065_Test_Data_Base",
   "_guid_": "S-585",
+  "_extends_": "F-065_Test_Data_Base",
+  "title": "Must return the case view with only the respective fields with READ access for Solicitors",
+
   "specs": [
     "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
     "another active Solicitor profile with different variation of ACLs on the same case type",
     "is prepared on behalf of the privileged user creating the case above",
     "contains values for all fields under the case type for Solicitor 2"
   ],
+
   "user": {
     "username": "befta.caseworker.2.solicitor.2@gmail.com",
     "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
   },
+
   "request": {
     "pathVariables": {
       "cid": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Content-Encoding" : "[[ANYTHING_PRESENT]]",
-      "VaRy" : "[[ANYTHING_PRESENT]]",
-      "Transfer-Encoding" : "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANYTHING_PRESENT]]",
+      "VaRy": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
       "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-view.v2+json;charset=UTF-8"
     },
     "body": {

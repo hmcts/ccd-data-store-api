@@ -26,8 +26,8 @@ public class ExpressionEvaluatorTest {
     public void shouldCreateEvaluationContext() {
 
         Method method = ReflectionUtils.findMethod(SampleMethods.class, "hello", String.class, Boolean.class);
-        EvaluationContext context = evaluator.createEvaluationContext(this, SampleMethods.class, method, new Object[] {
-            "test", true});
+        EvaluationContext context = evaluator.createEvaluationContext(this, SampleMethods.class, method,
+            new Object[] {"test", true});
 
         assertThat(context.lookupVariable("a0")).isEqualTo("test");
         assertThat(context.lookupVariable("p0")).isEqualTo("test");
@@ -45,8 +45,8 @@ public class ExpressionEvaluatorTest {
     public void shouldParseValidExpressions() {
 
         Method method = ReflectionUtils.findMethod(SampleMethods.class, "hello", String.class, Boolean.class);
-        EvaluationContext context = evaluator.createEvaluationContext(this, SampleMethods.class, method, new Object[] {
-            "test", true});
+        EvaluationContext context = evaluator.createEvaluationContext(this, SampleMethods.class, method,
+            new Object[] {"test", true});
         AnnotatedElementKey elementKey = new AnnotatedElementKey(method, SampleMethods.class);
 
         assertThat(evaluator.condition("#foo", elementKey, context, String.class)).isEqualTo("test");
@@ -56,25 +56,28 @@ public class ExpressionEvaluatorTest {
 
     @Test
     public void shouldParseBeanExpressions() {
-        Method method = ReflectionUtils.findMethod(SampleMethods.class, "hello", String.class, CaseRoleDefinition.class);
+        Method method = ReflectionUtils.findMethod(SampleMethods.class, "hello", String.class,
+            CaseRoleDefinition.class);
         CaseRoleDefinition caseRole = new CaseRoleDefinition();
         caseRole.setName("citizen");
-        EvaluationContext context = evaluator.createEvaluationContext(this, SampleMethods.class, method, new Object[] {
-            "test", caseRole});
+        EvaluationContext context = evaluator.createEvaluationContext(this, SampleMethods.class, method,
+            new Object[] {"test", caseRole});
         AnnotatedElementKey elementKey = new AnnotatedElementKey(method, SampleMethods.class);
 
-        assertThat(evaluator.condition("#caseRole.name", elementKey, context, String.class)).isEqualTo("citizen");
+        assertThat(evaluator.condition("#caseRole.name", elementKey, context,
+            String.class)).isEqualTo("citizen");
     }
 
 
     @Test
     public void shouldThrowErrorWhenPropertyNotFound() {
 
-        Method method = ReflectionUtils.findMethod(SampleMethods.class, "hello", String.class, CaseRoleDefinition.class);
+        Method method =
+            ReflectionUtils.findMethod(SampleMethods.class, "hello", String.class, CaseRoleDefinition.class);
         CaseRoleDefinition caseRole = new CaseRoleDefinition();
         caseRole.setName("citizen");
-        EvaluationContext context = evaluator.createEvaluationContext(this, SampleMethods.class, method, new Object[] {
-            "test", caseRole});
+        EvaluationContext context =
+            evaluator.createEvaluationContext(this, SampleMethods.class, method, new Object[] {"test", caseRole});
         AnnotatedElementKey elementKey = new AnnotatedElementKey(method, SampleMethods.class);
 
         Exception exception = assertThrows(SpelEvaluationException.class, () -> {

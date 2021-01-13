@@ -1,0 +1,210 @@
+{
+	"title": "Must return the updated supplementary data values from Data store internal search elastic search call",
+	"_guid_": "S-608",
+	"_extends_": "F-106_Test_Data_Base",
+	"specs": [
+    "is configured to search for the previously created case by the updated supplementary data value",
+    "a valid profile",
+    "contains the previously created case"
+	],
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+    }
+  },
+  "request": {
+    "queryParams": {
+      "usecase": "workbasket"
+    },
+    "body": {
+      "query":{
+        "bool":{
+          "filter":[
+            { "bool":{
+              "should": [
+                { "range": { "supplementary_data.orgs_assigned_users.OrgZ": { "gte": 2500 } } }
+              ]
+            }
+            }
+          ]
+        }
+      },
+      "from":0,
+      "size":6,
+      "_source":true,
+      "sort":{
+        "created_date":{
+          "order":"desc"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "total": 1,
+      "cases": [
+        {
+          "id": "${[scenarioContext][childContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}",
+          "jurisdiction": "BEFTA_JURISDICTION_2",
+          "state": "[[ANY_STRING_NOT_NULLABLE]]",
+          "version": "[[ANY_NULLABLE]]",
+          "case_type_id": "BEFTA_CASETYPE_2_1",
+          "created_date": "[[ANY_DATE_NOT_NULLABLE]]",
+          "last_modified": "[[ANY_DATE_NOT_NULLABLE]]",
+          "last_state_modified_date": "[[ANY_DATE_NOT_NULLABLE]]",
+          "security_classification": "[[ANY_STRING_NOT_NULLABLE]]",
+          "case_data": {
+            "MoneyGBPField": "[[ANY_NULLABLE]]",
+            "FixedListField": "[[ANY_NULLABLE]]",
+            "DocumentField4": "[[ANY_NULLABLE]]",
+            "DocumentField7": "[[ANY_NULLABLE]]",
+            "AddressUKField": {
+              "PostCode": "[[ANY_NULLABLE]]",
+              "PostTown": "[[ANY_NULLABLE]]",
+              "County": "[[ANY_NULLABLE]]",
+              "Country": "[[ANY_NULLABLE]]",
+              "AddressLine2": "[[ANY_NULLABLE]]",
+              "AddressLine3": "[[ANY_NULLABLE]]",
+              "AddressLine1": "[[ANY_NULLABLE]]"
+            },
+            "ComplexField": {
+              "ComplexFixedListField": "[[ANY_NULLABLE]]",
+              "ComplexNestedField": {
+                "NestedCollectionTextField": [],
+                "NestedNumberField": "[[ANY_NULLABLE]]"
+              },
+              "ComplexTextField": "[[ANY_NULLABLE]]"
+            },
+            "FixedRadioListField": "[[ANY_NULLABLE]]",
+            "DateTimeField": "[[ANY_NULLABLE]]",
+            "PhoneUKField": "[[ANY_NULLABLE]]",
+            "NumberField":"[[ANY_NULLABLE]]",
+            "MultiSelectListField": [
+              "OPTION5",
+              "OPTION4",
+              "OPTION3"
+            ],
+            "YesOrNoField": "[[ANY_NULLABLE]]",
+            "EmailField": "[[ANY_NULLABLE]]",
+            "TextField": "[[ANY_NULLABLE]]",
+            "DateField": "[[ANY_NULLABLE]]",
+            "TextAreaField": "[[ANY_NULLABLE]]",
+            "CollectionField": []
+          },
+          "data_classification": {
+            "MoneyGBPField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "FixedListField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "DocumentField4": "[[ANY_NULLABLE]]",
+            "DocumentField7": "[[ANY_NULLABLE]]",
+            "AddressUKField": {
+              "value": {
+                "PostCode": "[[ANY_STRING_NOT_NULLABLE]]",
+                "PostTown": "[[ANY_STRING_NOT_NULLABLE]]",
+                "County": "[[ANY_STRING_NOT_NULLABLE]]",
+                "Country": "[[ANY_STRING_NOT_NULLABLE]]",
+                "AddressLine2": "[[ANY_STRING_NOT_NULLABLE]]",
+                "AddressLine3": "[[ANY_STRING_NOT_NULLABLE]]",
+                "AddressLine1": "[[ANY_STRING_NOT_NULLABLE]]"
+              },
+              "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+            },
+            "ComplexField": {
+              "value": {
+                "ComplexFixedListField": "[[ANY_STRING_NOT_NULLABLE]]",
+                "ComplexNestedField": {
+                  "value": {
+                    "NestedCollectionTextField": {
+                      "value": [],
+                      "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+                    },
+                    "NestedNumberField": "[[ANY_STRING_NOT_NULLABLE]]"
+                  },
+                  "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+                },
+                "ComplexTextField": "[[ANY_STRING_NOT_NULLABLE]]"
+              },
+              "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+            },
+            "FixedRadioListField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "DateTimeField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "PhoneUKField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "NumberField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "MultiSelectListField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "YesOrNoField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "EmailField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "TextField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "DateField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "TextAreaField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "CollectionField": {
+              "value": [],
+              "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+            }
+          },
+          "supplementary_data": null,
+          "after_submit_callback_response": "[[ANY_NULLABLE]]",
+          "callback_response_status_code": "[[ANY_NULLABLE]]",
+          "callback_response_status": "[[ANY_NULLABLE]]",
+          "delete_draft_response_status_code": "[[ANY_NULLABLE]]",
+          "delete_draft_response_status": "[[ANY_NULLABLE]]",
+          "security_classifications": {
+            "MoneyGBPField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "FixedListField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "DocumentField4": "[[ANY_NULLABLE]]",
+            "DocumentField7": "[[ANY_NULLABLE]]",
+            "AddressUKField": {
+              "value": {
+                "PostCode": "[[ANY_STRING_NOT_NULLABLE]]",
+                "PostTown": "[[ANY_STRING_NOT_NULLABLE]]",
+                "County": "[[ANY_STRING_NOT_NULLABLE]]",
+                "Country": "[[ANY_STRING_NOT_NULLABLE]]",
+                "AddressLine2": "[[ANY_STRING_NOT_NULLABLE]]",
+                "AddressLine3": "[[ANY_STRING_NOT_NULLABLE]]",
+                "AddressLine1": "[[ANY_STRING_NOT_NULLABLE]]"
+              },
+              "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+            },
+            "ComplexField": {
+              "value": {
+                "ComplexFixedListField": "[[ANY_STRING_NOT_NULLABLE]]",
+                "ComplexNestedField": {
+                  "value": {
+                    "NestedCollectionTextField": {
+                      "value": [],
+                      "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+                    },
+                    "NestedNumberField": "[[ANY_STRING_NOT_NULLABLE]]"
+                  },
+                  "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+                },
+                "ComplexTextField": "[[ANY_STRING_NOT_NULLABLE]]"
+              },
+              "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+            },
+            "FixedRadioListField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "DateTimeField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "PhoneUKField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "NumberField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "MultiSelectListField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "YesOrNoField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "EmailField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "TextField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "DateField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "TextAreaField": "[[ANY_STRING_NOT_NULLABLE]]",
+            "CollectionField": {
+              "value": [],
+              "classification": "[[ANY_STRING_NOT_NULLABLE]]"
+            }
+          }
+        }
+      ],
+      "case_types_results": [
+        {
+          "total": 1,
+          "case_type_id": "BEFTA_CASETYPE_2_1"
+        }
+      ]
+    }
+  }
+}

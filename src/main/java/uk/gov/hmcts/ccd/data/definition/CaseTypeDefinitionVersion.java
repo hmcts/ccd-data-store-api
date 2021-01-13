@@ -10,7 +10,8 @@ public class CaseTypeDefinitionVersion implements Serializable {
 
     private Integer version;
 
-    public CaseTypeDefinitionVersion() {}
+    public CaseTypeDefinitionVersion() {
+    }
 
     public Integer getVersion() {
         return version;

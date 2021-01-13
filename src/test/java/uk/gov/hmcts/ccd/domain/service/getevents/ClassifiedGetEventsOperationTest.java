@@ -73,7 +73,8 @@ class ClassifiedGetEventsOperationTest {
 
         doReturn(classifiedEvents).when(classificationService).applyClassification(JURISDICTION_ID, events);
 
-        classifiedOperation = new ClassifiedGetEventsOperation(getEventsOperation, classificationService, getCaseOperation);
+        classifiedOperation = new ClassifiedGetEventsOperation(getEventsOperation, classificationService,
+                getCaseOperation);
     }
 
     @Test

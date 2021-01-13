@@ -26,8 +26,15 @@ import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.Banner;
+import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
 
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -97,12 +104,18 @@ public class DefinitionsCachingIT {
 
     @Before
     public void setup() {
-        doReturn(caseTypeDefinitionVersion(VERSION_1)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_1);
-        doReturn(caseTypeDefinitionVersion(VERSION_2)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_2);
-        doReturn(caseTypeDefinitionVersion(VERSION_3)).when(this.caseDefinitionRepository).getLatestVersionFromDefinitionStore(ID_3);
-        doReturn(JURISDICTION_DEFINITION_1).when(this.caseDefinitionRepository).getJurisdictionFromDefinitionStore("J1");
-        doReturn(JURISDICTION_DEFINITION_2).when(this.caseDefinitionRepository).getJurisdictionFromDefinitionStore("J2");
-        doReturn(JURISDICTION_DEFINITION_3).when(this.caseDefinitionRepository).getJurisdictionFromDefinitionStore("J3");
+        doReturn(caseTypeDefinitionVersion(VERSION_1)).when(this.caseDefinitionRepository)
+            .getLatestVersionFromDefinitionStore(ID_1);
+        doReturn(caseTypeDefinitionVersion(VERSION_2)).when(this.caseDefinitionRepository)
+            .getLatestVersionFromDefinitionStore(ID_2);
+        doReturn(caseTypeDefinitionVersion(VERSION_3)).when(this.caseDefinitionRepository)
+            .getLatestVersionFromDefinitionStore(ID_3);
+        doReturn(JURISDICTION_DEFINITION_1).when(this.caseDefinitionRepository)
+            .getJurisdictionFromDefinitionStore("J1");
+        doReturn(JURISDICTION_DEFINITION_2).when(this.caseDefinitionRepository)
+            .getJurisdictionFromDefinitionStore("J2");
+        doReturn(JURISDICTION_DEFINITION_3).when(this.caseDefinitionRepository)
+            .getJurisdictionFromDefinitionStore("J3");
         doReturn(mockCaseTypeDefinition).when(this.caseDefinitionRepository).getCaseType(ID_1);
     }
 
@@ -209,7 +222,8 @@ public class DefinitionsCachingIT {
     @Test
     public void testWorkbasketInputDefinitionsAreCached() {
 
-        doReturn(workbasketInputFieldsDefinition).when(this.httpUIDefinitionGateway).getWorkbasketInputFieldsDefinitions(VERSION_1, ID_1);
+        doReturn(workbasketInputFieldsDefinition).when(this.httpUIDefinitionGateway)
+            .getWorkbasketInputFieldsDefinitions(VERSION_1, ID_1);
 
         uiDefinitionRepository.getWorkbasketInputDefinitions(ID_1);
         uiDefinitionRepository.getWorkbasketInputDefinitions(ID_1);
@@ -257,7 +271,8 @@ public class DefinitionsCachingIT {
     @Test
     public void testSearchInputDefinitionsAreCached() {
 
-        doReturn(searchInputFieldsDefinition).when(this.httpUIDefinitionGateway).getSearchInputFieldDefinitions(VERSION_1, ID_1);
+        doReturn(searchInputFieldsDefinition).when(this.httpUIDefinitionGateway)
+            .getSearchInputFieldDefinitions(VERSION_1, ID_1);
 
         uiDefinitionRepository.getSearchInputFieldDefinitions(ID_1);
         uiDefinitionRepository.getSearchInputFieldDefinitions(ID_1);

@@ -28,15 +28,18 @@ public class CaseUpdateViewEventResource extends RepresentationModel {
     @JsonUnwrapped
     private CaseUpdateViewEvent caseUpdateViewEvent;
 
-    public static CaseUpdateViewEventResource forCase(@NonNull CaseUpdateViewEvent caseUpdateViewEvent, String caseId, Boolean ignoreWarning) {
+    public static CaseUpdateViewEventResource forCase(@NonNull CaseUpdateViewEvent caseUpdateViewEvent, String caseId,
+                                                      Boolean ignoreWarning) {
         return new CaseUpdateViewEventResource(caseUpdateViewEvent, caseId, ignoreWarning, Origin.CASE);
     }
 
-    public static CaseUpdateViewEventResource forCaseType(@NonNull CaseUpdateViewEvent caseUpdateViewEvent, String caseType, Boolean ignoreWarning) {
+    public static CaseUpdateViewEventResource forCaseType(@NonNull CaseUpdateViewEvent caseUpdateViewEvent,
+                                                          String caseType, Boolean ignoreWarning) {
         return new CaseUpdateViewEventResource(caseUpdateViewEvent, caseType, ignoreWarning, Origin.CASE_TYPE);
     }
 
-    public static CaseUpdateViewEventResource forDraft(@NonNull CaseUpdateViewEvent caseUpdateViewEvent, String draftId, Boolean ignoreWarning) {
+    public static CaseUpdateViewEventResource forDraft(@NonNull CaseUpdateViewEvent caseUpdateViewEvent, String draftId,
+                                                       Boolean ignoreWarning) {
         return new CaseUpdateViewEventResource(caseUpdateViewEvent, draftId, ignoreWarning, Origin.DRAFT);
     }
 
@@ -45,7 +48,8 @@ public class CaseUpdateViewEventResource extends RepresentationModel {
         return caseUpdateViewEvent;
     }
 
-    private CaseUpdateViewEventResource(@NonNull CaseUpdateViewEvent caseUpdateViewEvent, String id, Boolean ignoreWarning, Origin origin) {
+    private CaseUpdateViewEventResource(@NonNull CaseUpdateViewEvent caseUpdateViewEvent, String id,
+                                        Boolean ignoreWarning, Origin origin) {
         copyProperties(caseUpdateViewEvent);
 
         switch (origin) {
@@ -59,7 +63,8 @@ public class CaseUpdateViewEventResource extends RepresentationModel {
                     caseUpdateViewEvent.getId(), ignoreWarning)).withSelfRel());
                 break;
             case DRAFT:
-                add(linkTo(methodOn(UIStartTriggerController.class).getStartDraftTrigger(id, ignoreWarning)).withSelfRel());
+                add(linkTo(methodOn(UIStartTriggerController.class).getStartDraftTrigger(id, ignoreWarning))
+                    .withSelfRel());
                 break;
             default:
                 LOG.warn("Origin={} not supported", origin);

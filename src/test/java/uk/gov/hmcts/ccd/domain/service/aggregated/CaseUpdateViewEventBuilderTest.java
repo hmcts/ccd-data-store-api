@@ -64,7 +64,8 @@ class CaseUpdateViewEventBuilderTest {
                                                             .withEvents(events)
                                                             .withCaseFields(caseFieldDefinitions).build();
     private final CaseDetails caseDetails = newCaseDetails().withCaseTypeId(CASE_TYPE_ID).build();
-    private final StartEventResult startEventResult = newStartEventTrigger().withCaseDetails(caseDetails).withEventToken(TOKEN).build();
+    private final StartEventResult startEventResult = newStartEventTrigger().withCaseDetails(caseDetails)
+        .withEventToken(TOKEN).build();
     private final List<WizardPage> wizardPageCollection = Lists.newArrayList();
     private final List<CaseViewField> viewFields = Lists.newArrayList();
 
@@ -90,8 +91,10 @@ class CaseUpdateViewEventBuilderTest {
 
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(eventTriggerService.findCaseEvent(caseTypeDefinition, EVENT_TRIGGER_ID)).thenReturn(caseEventDefinition);
-        when(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, EVENT_TRIGGER_ID)).thenReturn(wizardPageCollection);
-        when(caseViewFieldBuilder.build(caseFieldDefinitions, eventFields, caseDetails.getData())).thenReturn(viewFields);
+        when(uiDefinitionRepository.getWizardPageCollection(CASE_TYPE_ID, EVENT_TRIGGER_ID))
+            .thenReturn(wizardPageCollection);
+        when(caseViewFieldBuilder.build(caseFieldDefinitions, eventFields, caseDetails.getData()))
+            .thenReturn(viewFields);
 
         caseUpdateViewEventBuilder = new CaseUpdateViewEventBuilder(caseDefinitionRepository,
                                                               uiDefinitionRepository,
@@ -116,14 +119,16 @@ class CaseUpdateViewEventBuilderTest {
             () -> assertThat(caseUpdateViewEvent, hasProperty("name", equalTo(EVENT_TRIGGER_NAME))),
             () -> assertThat(caseUpdateViewEvent, hasProperty("description", equalTo(EVENT_TRIGGER_DESCRIPTION))),
             () -> assertThat(caseUpdateViewEvent, hasProperty("showSummary", equalTo(EVENT_TRIGGER_SHOW_SUMMARY))),
-            () -> assertThat(caseUpdateViewEvent, hasProperty("showEventNotes", equalTo(EVENT_TRIGGER_SHOW_EVENT_NOTES))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("showEventNotes",
+                equalTo(EVENT_TRIGGER_SHOW_EVENT_NOTES))),
             () -> assertThat(caseUpdateViewEvent, hasProperty("eventToken", equalTo(TOKEN))),
             () -> assertThat(caseUpdateViewEvent, hasProperty("caseId", equalTo(CASE_REFERENCE))),
             () -> assertThat(caseUpdateViewEvent, hasProperty("caseFields", equalTo(viewFields))),
             () -> assertThat(caseUpdateViewEvent, hasProperty("wizardPages", equalTo(wizardPageCollection))),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
             () -> inOrder.verify(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_TRIGGER_ID),
-            () -> inOrder.verify(caseViewFieldBuilder).build(caseFieldDefinitions, eventFields, caseDetails.getCaseDataAndMetadata()),
+            () -> inOrder.verify(caseViewFieldBuilder).build(caseFieldDefinitions, eventFields,
+                caseDetails.getCaseDataAndMetadata()),
             () -> inOrder.verify(uiDefinitionRepository).getWizardPageCollection(CASE_TYPE_ID, EVENT_TRIGGER_ID)
 
         );
@@ -157,10 +162,8 @@ class CaseUpdateViewEventBuilderTest {
     void shouldFailIfNoCaseDetails() {
         startEventResult.setCaseDetails(null);
 
-        final Exception exception = assertThrows(ResourceNotFoundException.class, () -> caseUpdateViewEventBuilder.build(startEventResult,
-                                                                                                                      CASE_TYPE_ID,
-                                                                                                                      EVENT_TRIGGER_ID,
-                                                                                                                      CASE_REFERENCE));
+        final Exception exception = assertThrows(ResourceNotFoundException.class, () ->
+            caseUpdateViewEventBuilder.build(startEventResult, CASE_TYPE_ID, EVENT_TRIGGER_ID, CASE_REFERENCE));
         assertThat(exception.getMessage(), startsWith("Case not found"));
     }
 

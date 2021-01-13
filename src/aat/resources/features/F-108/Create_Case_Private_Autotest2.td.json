@@ -17,116 +17,113 @@
   "users": {
     "invokingUser": {
       "username": "auto.test12.cnp+private@gmail.com",
-      "password": "Pa55word11"
-    }
-  },
-  "user": {
-    "username": "auto.test12.cnp+private@gmail.com",
-    "password": "Pa55word11"
-  },
-
-  "request": {
-    "_extends_": "Common_Request",
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "AUTOTEST2",
-      "ctid": "AAT_PRIVATE2"
-    },
-    "body": {
-      "event": {
-        "id": "CREATE",
-        "summary": "",
-        "description": ""
-      },
-      "event_token": "${[scenarioContext][parentContext][childContexts][Private_Case_Creation_Autotest2_Data_Token_Creation][testData][actualResponse][body][token]}",
-      "ignore_warning": false,
-      "draft_id": null,
-      "data": {
-        "TextField": "text",
-        "NumberField": "1",
-        "YesOrNoField": "Yes",
-        "PhoneUKField": "02033343555",
-        "EmailField": "fuctional@test.com",
-        "MoneyGBPField": "1000",
-        "DateField": "1989-09-19",
-        "DateTimeField": "1989-09-19T14:30:01.000",
-        "TextAreaField": "text area",
-        "FixedListField": "VALUE1",
-        "MultiSelectListField": [
-          "OPTION1"
-        ],
-        "ComplexField": {
-          "ComplexTextField": "text inside complex",
-          "ComplexFixedListField": "VALUE2",
-          "ComplexNestedField": {
-            "NestedNumberField": "20",
-            "NestedCollectionTextField": [
-              {
-                "id": null,
-                "value": "collection text inside complex"
-              }
-            ]
-          }
-        },
-        "CollectionField": [
-          {
-            "id": null,
-            "value": "collection text"
-          }
-        ],
-        "AddressUKField": {
-          "AddressLine1": "102 Petty France",
-          "AddressLine2": "",
-          "AddressLine3": "",
-          "PostTown": "London",
-          "County": "",
-          "PostCode": "SW1H 9AJ",
-          "Country": ""
-        }
-      }
+      "password": "[[$CCD_PRIVATE_CASEWORKER_AUTOTEST_1AND2_PASSWORD]]"
     }
   },
 
+	"request": {
+		"_extends_": "Common_Request",
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "AUTOTEST2",
+			"ctid": "AAT_PRIVATE2"
+		},
+		"body": {
+			"event": {
+				"id": "CREATE",
+				"summary": "",
+				"description": ""
+			},
+			"event_token": "${[scenarioContext][parentContext][childContexts][Private_Case_Creation_Autotest2_Data_Token_Creation][testData][actualResponse][body][token]}",
+			"ignore_warning": false,
+			"draft_id": null,
+			"data": {
+				"TextField": "text",
+				"NumberField": "1",
+				"YesOrNoField": "Yes",
+				"PhoneUKField": "02033343555",
+				"EmailField": "fuctional@test.com",
+				"MoneyGBPField": "1000",
+				"DateField": "1989-09-19",
+				"DateTimeField": "1989-09-19T14:30:01.000",
+				"TextAreaField": "text area",
+				"FixedListField": "VALUE1",
+				"MultiSelectListField": [
+					"OPTION1"
+				],
+				"ComplexField": {
+					"ComplexTextField": "text inside complex",
+					"ComplexFixedListField": "VALUE2",
+					"ComplexNestedField": {
+						"NestedNumberField": "20",
+						"NestedCollectionTextField": [
+							{
+								"id": null,
+								"value": "collection text inside complex"
+							}
+						]
+					}
+				},
+				"CollectionField": [
+					{
+						"id": null,
+						"value": "collection text"
+					}
+				],
+				"AddressUKField": {
+					"AddressLine1": "102 Petty France",
+					"AddressLine2": "",
+					"AddressLine3": "",
+					"PostTown": "London",
+					"County": "",
+					"PostCode": "SW1H 9AJ",
+					"Country": ""
+				}
+			}
+		}
+	},
 
-  "expectedResponse": {
-    "responseCode": 201,
-    "responseMessage": "Created",
-    "headers": {
-      "Content-Encoding": "gzip",
-      "vary": "accept-encoding",
-      "Content-Length": "[[ANYTHING_PRESENT]]",
-      "X-Frame-Options": "DENY",
-      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
-      "X-Content-Type-Options": "nosniff",
-      "Pragma": "no-cache",
-      "Expires": "0",
-      "X-XSS-Protection": "1; mode=block",
-      "Date": "[[ANYTHING_PRESENT]]",
-      "Strict-Transport-Security": "max-age=31536000 ; includeSubDomains",
-      "Request-Context": "[[ANY_STRING_NULLABLE]]",
-      "Content-Type": "application/json"
-    },
-    "body": {
-      "jurisdiction": "AUTOTEST2",
-      "case_type_id": "AAT_PRIVATE2",
-      "case_data" : "[[ANYTHING_PRESENT]]",
-      "id": "[[ANYTHING_PRESENT]]",
-      "state": "TODO",
-      "version": 0,
-      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
-      "created_date": "[[ANYTHING_PRESENT]]",
-      "last_modified": "[[ANYTHING_PRESENT]]",
-      "security_classification": "PRIVATE",
-      "security_classifications": "[[ANYTHING_PRESENT]]",
-      "data_classification" : "[[ANYTHING_PRESENT]]",
-      "after_submit_callback_response": null,
-      "callback_response_status_code": null,
-      "callback_response_status": null,
-      "delete_draft_response_status_code": null,
-      "delete_draft_response_status": null
-    },
-    "data_classification": "[[ANYTHING_PRESENT]]",
-    "security_classifications": "[[ANYTHING_PRESENT]]"
-  }
+
+	"expectedResponse": {
+		"responseCode": 201,
+		"responseMessage": "Created",
+		"headers": {
+			"Content-Encoding": "gzip",
+			"vary": "accept-encoding",
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"X-Frame-Options": "DENY",
+			"Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+			"X-Content-Type-Options": "nosniff",
+			"Pragma": "no-cache",
+			"Expires": "0",
+			"X-XSS-Protection": "1; mode=block",
+			"Date": "[[ANYTHING_PRESENT]]",
+			"Strict-Transport-Security": "max-age=31536000 ; includeSubDomains",
+			"Request-Context": "[[ANY_STRING_NULLABLE]]",
+			"Content-Type": "application/json"
+		},
+		"body": {
+			"jurisdiction": "AUTOTEST2",
+			"case_type_id": "AAT_PRIVATE2",
+			"case_data" : "[[ANYTHING_PRESENT]]",
+			"id": "[[ANYTHING_PRESENT]]",
+			"state": "TODO",
+			"version": 0,
+			"last_state_modified_date": "[[ANYTHING_PRESENT]]",
+			"created_date": "[[ANYTHING_PRESENT]]",
+			"last_modified": "[[ANYTHING_PRESENT]]",
+			"security_classification": "PRIVATE",
+			"security_classifications": "[[ANYTHING_PRESENT]]",
+			"data_classification" : "[[ANYTHING_PRESENT]]",
+			"supplementary_data": null,
+			"after_submit_callback_response": null,
+			"callback_response_status_code": null,
+			"callback_response_status": null,
+			"delete_draft_response_status_code": null,
+			"delete_draft_response_status": null
+		},
+		"data_classification": "[[ANYTHING_PRESENT]]",
+		"security_classifications": "[[ANYTHING_PRESENT]]"
+	}
 
 }

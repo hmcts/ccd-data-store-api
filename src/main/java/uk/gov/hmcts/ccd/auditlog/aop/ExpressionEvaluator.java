@@ -26,13 +26,18 @@ public class ExpressionEvaluator extends CachedExpressionEvaluator {
 
     private final Map<AnnotatedElementKey, Method> targetMethodCache = new ConcurrentHashMap<>(64);
 
-    public EvaluationContext createEvaluationContext(Object object, Class<?> targetClass, Method method, Object[] args) {
+    public EvaluationContext createEvaluationContext(Object object,
+                                                     Class<?> targetClass,
+                                                     Method method, Object[] args) {
         Method targetMethod = getTargetMethod(targetClass, method);
         ExpressionRootObject root = new ExpressionRootObject(object, args);
         return new MethodBasedEvaluationContext(root, targetMethod, args, this.paramNameDiscoverer);
     }
 
-    public <T> T condition(String conditionExpression, AnnotatedElementKey elementKey, EvaluationContext evalContext, Class<T> clazz) {
+    public <T> T condition(String conditionExpression,
+                           AnnotatedElementKey elementKey,
+                           EvaluationContext evalContext,
+                           Class<T> clazz) {
         return getExpression(this.conditionCache, elementKey, conditionExpression).getValue(evalContext, clazz);
     }
 

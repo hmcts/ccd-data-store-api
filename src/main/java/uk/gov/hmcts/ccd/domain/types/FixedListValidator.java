@@ -30,11 +30,12 @@ public class FixedListValidator implements BaseTypeValidator {
         }
 
         final String value = dataValue.textValue();
-        final List<FixedListItemDefinition> validValues = caseFieldDefinition.getFieldTypeDefinition().getFixedListItemDefinitions();
+        final List<FixedListItemDefinition> validValues =
+            caseFieldDefinition.getFieldTypeDefinition().getFixedListItemDefinitions();
 
         if (!checkRegex(getType().getRegularExpression(), value)) {
-            return Collections.singletonList(new ValidationResult("'" + value + "' failed FixedList Type Regex check: "
-                + getType().getRegularExpression(), dataFieldId));
+            return Collections.singletonList(new ValidationResult("'" + value + "' failed FixedList Type "
+                + "Regex check: " + getType().getRegularExpression(), dataFieldId));
         }
 
         return validValues.stream().anyMatch(fixedListItem -> fixedListItem.getCode().equals(value))

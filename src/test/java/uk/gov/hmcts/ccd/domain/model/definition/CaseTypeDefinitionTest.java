@@ -20,10 +20,14 @@ class CaseTypeDefinitionTest {
     private static final String NAME = "Name";
     private static final String SURNAME = "Surname";
 
-    private CaseFieldDefinition name = newCaseField().withId(NAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
-    private CaseFieldDefinition surname = newCaseField().withId(SURNAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build()).build();
+    private uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition name =
+            newCaseField().withId(NAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build())
+                    .build();
+    private uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition surname =
+            newCaseField().withId(SURNAME).withFieldType(aFieldType().withId(TEXT_TYPE).withType(TEXT_TYPE).build())
+                    .build();
 
-    private CaseTypeDefinition caseTypeDefinition;
+    private uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition caseTypeDefinition;
 
     @Nested
     @DisplayName("CaseField tests")
@@ -31,14 +35,15 @@ class CaseTypeDefinitionTest {
 
         @BeforeEach
         void setUp() {
-            caseTypeDefinition = new CaseTypeDefinition();
+            caseTypeDefinition = new uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition();
             caseTypeDefinition.setCaseFieldDefinitions(Arrays.asList(name, surname));
         }
 
         @Test
         @DisplayName("returns caseField optional for a valid caseFieldId")
         void getCaseFieldReturnsCaseFieldOptionalForValidCaseFieldId() {
-            Optional<CaseFieldDefinition> caseFieldOptional = caseTypeDefinition.getCaseField(surname.getId());
+            Optional<uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition> caseFieldOptional =
+                    caseTypeDefinition.getCaseField(surname.getId());
 
             assertTrue(caseFieldOptional.isPresent());
             assertThat(surname, is(caseFieldOptional.get()));
@@ -47,7 +52,8 @@ class CaseTypeDefinitionTest {
         @Test
         @DisplayName("returns empty optional when caseFieldId is invalid")
         void getCaseFieldReturnsEmptyOptionalWhenCaseFieldIdIsInvalid() {
-            Optional<CaseFieldDefinition> caseFieldOptional = caseTypeDefinition.getCaseField("invalidId");
+            Optional<uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition> caseFieldOptional =
+                    caseTypeDefinition.getCaseField("invalidId");
 
             assertThat(Optional.empty(), is(caseFieldOptional));
         }

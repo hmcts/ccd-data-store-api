@@ -1,32 +1,32 @@
 {
-  "title": "Must return an error response for empty case_users list",
-  "_guid_": "S-105.10",
-  "_extends_": "F-105_Add_Case_Assigned_User_Roles_Base",
+	"title": "Must return an error response for empty case_users list",
+	"_guid_": "S-105.10",
+	"_extends_": "F-105_Add_Case_Assigned_User_Roles_Base",
 
-  "specs": [
-    "Dil - who is to add some case role assignment for a case",
-    "is made from an authorised application by Dil, with an empty list of case_users supplied"
-  ],
+	"specs": [
+		"Dil - who is to add some case role assignment for a case",
+		"is made from an authorised application by Dil, with an empty list of case_users supplied"
+	],
 
-  "users": {
-    "userDil": {
-      "username": "befta.caseworker.2.solicitor.2@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
-    }
-  },
+	"users": {
+		"userDil": {
+			"username": "befta.caseworker.2.solicitor.2@gmail.com",
+			"password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+		}
+	},
 
-  "request": {
-    "headers": {
-      "Authorization": "Bearer ${[scenarioContext][testData][users][userDil][accessToken]}"
-    },
-    "body": {
-    }
-  },
+	"request": {
+		"headers": {
+			"Authorization": "Bearer ${[scenarioContext][testData][users][userDil][accessToken]}"
+		},
+		"body": {
+		}
+	},
 
-  "expectedResponse": {
-    "_extends_": "F-105_Add_Case_Assigned_User_Roles_400_response",
-    "body": {
-      "message": "Invalid data provided for the following inputs to the request:\nCase user roles list is empty"
-    }
-  }
+	"expectedResponse": {
+		"_extends_": "F-105_Add_Case_Assigned_User_Roles_400_response",
+		"body": {
+			"message": "Invalid data provided for the following inputs to the request:\nCase user roles list is empty"
+		}
+	}
 }

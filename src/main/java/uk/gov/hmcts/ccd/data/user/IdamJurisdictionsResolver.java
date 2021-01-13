@@ -22,6 +22,6 @@ public class IdamJurisdictionsResolver implements JurisdictionsResolver {
 
     @Override
     public List<String> getJurisdictions() {
-        return this.userRepository.getUserRolesJurisdictions();
+        return this.userRepository.getCaseworkerUserRolesJurisdictions();
     }
 }

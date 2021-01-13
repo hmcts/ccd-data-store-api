@@ -25,13 +25,15 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeB
 
 class CompoundFieldOrderServiceTest {
 
-    private static final FieldTypeDefinition TEXT_FIELD_TYPE_DEFINITION = aFieldType().withId("Text").withType("Text").build();
+    private static final FieldTypeDefinition TEXT_FIELD_TYPE_DEFINITION =
+        aFieldType().withId("Text").withType("Text").build();
     private static final CaseFieldDefinition CASE_FIELD = newCaseField()
         .withFieldType(TEXT_FIELD_TYPE_DEFINITION)
         .withId("PersonFirstName")
         .build();
     private static final String TEXT_TYPE = "Text";
-    public static final ArrayList<CaseEventFieldComplexDefinition> EMPTY_CASE_EVENT_COMPLEX_FIELDS = Lists.newArrayList();
+    public static final ArrayList<CaseEventFieldComplexDefinition> EMPTY_CASE_EVENT_COMPLEX_FIELDS =
+        Lists.newArrayList();
 
     private CompoundFieldOrderService compoundFieldOrderService = new CompoundFieldOrderService();
 
@@ -50,7 +52,8 @@ class CompoundFieldOrderServiceTest {
                                     .withCollectionFieldType(collectionComplexFieldTypeDefinition)
                                     .build());
 
-        compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD, null, ROOT);
+        compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD, null,
+            ROOT);
 
         List<CaseFieldDefinition> complexFields = CASE_FIELD.getFieldTypeDefinition().getChildren();
         assertThat(complexFields, contains(allOf(hasProperty("id", is("Three")),
@@ -76,7 +79,8 @@ class CompoundFieldOrderServiceTest {
                                     .withCollectionFieldType(collectionComplexFieldTypeDefinition)
                                     .build());
 
-        compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD, EMPTY_CASE_EVENT_COMPLEX_FIELDS, ROOT);
+        compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD,
+            EMPTY_CASE_EVENT_COMPLEX_FIELDS, ROOT);
 
         List<CaseFieldDefinition> complexFields = CASE_FIELD.getFieldTypeDefinition().getChildren();
         assertThat(complexFields, contains(allOf(hasProperty("id", is("Three")),
@@ -88,7 +92,8 @@ class CompoundFieldOrderServiceTest {
     }
 
     @Test
-    @DisplayName("should leave the case field order to remain as is if case event to complex fields not matching on simple type")
+    @DisplayName("should leave the case field order to remain as is if case event to complex fields not matching on"
+        + " simple type")
     void shouldLeaveTheCaseFieldOrderToRemainAsIsIfCaseEventComplexFieldsNotMatching() {
         FieldTypeDefinition collectionComplexFieldTypeDefinition = aFieldType()
             .withType(COMPLEX)
@@ -102,7 +107,8 @@ class CompoundFieldOrderServiceTest {
                                     .withCollectionFieldType(collectionComplexFieldTypeDefinition)
                                     .build());
 
-        List<CaseEventFieldComplexDefinition> caseEventComplexFields = Lists.newArrayList(builder().reference("OneTwo").order(3).build());
+        List<CaseEventFieldComplexDefinition> caseEventComplexFields =
+            Lists.newArrayList(builder().reference("OneTwo").order(3).build());
 
         compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD, caseEventComplexFields, ROOT);
 
@@ -116,7 +122,8 @@ class CompoundFieldOrderServiceTest {
     }
 
     @Test
-    @DisplayName("should leave the case field order to remain as is if case event to complex fields matching but no order")
+    @DisplayName("should leave the case field order to remain as is if case event to complex fields matching but"
+        + " no order")
     void shouldLeaveTheCaseFieldOrderToRemainAsIsIfCaseEventComplexFieldsMatchingButNoOrder() {
         FieldTypeDefinition collectionComplexFieldTypeDefinition = aFieldType()
             .withType(COMPLEX)
@@ -130,7 +137,8 @@ class CompoundFieldOrderServiceTest {
                                     .withCollectionFieldType(collectionComplexFieldTypeDefinition)
                                     .build());
 
-        List<CaseEventFieldComplexDefinition> caseEventComplexFields = Lists.newArrayList(builder().reference("One").order(null).build());
+        List<CaseEventFieldComplexDefinition> caseEventComplexFields =
+            Lists.newArrayList(builder().reference("One").order(null).build());
 
         compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD, caseEventComplexFields, ROOT);
 
@@ -144,7 +152,8 @@ class CompoundFieldOrderServiceTest {
     }
 
     @Test
-    @DisplayName("should override top level case fields order from case event complex fields order even if duplicates exist")
+    @DisplayName("should override top level case fields order from case event complex fields order even if duplicates"
+        + " exist")
     void shouldOverrideTopLevelCaseFieldsOrderFromCaseEventComplexFieldsOrderEvenIfDuplicatesExist() {
         FieldTypeDefinition collectionComplexFieldTypeDefinition = aFieldType()
             .withType(COMPLEX)
@@ -158,11 +167,12 @@ class CompoundFieldOrderServiceTest {
                                     .withCollectionFieldType(collectionComplexFieldTypeDefinition)
                                     .build());
 
-        List<CaseEventFieldComplexDefinition> caseEventComplexFields = Lists.newArrayList(builder().reference("One").order(5).build(),
-                                                                                builder().reference("One").order(6).build(),
-                                                                                builder().reference("Two").order(3).build(),
-                                                                                builder().reference("Two").order(4).build(),
-                                                                                builder().reference("Three").order(1).build());
+        List<CaseEventFieldComplexDefinition> caseEventComplexFields =
+            Lists.newArrayList(builder().reference("One").order(5).build(),
+                                builder().reference("One").order(6).build(),
+                                builder().reference("Two").order(3).build(),
+                                builder().reference("Two").order(4).build(),
+                                builder().reference("Three").order(1).build());
 
         compoundFieldOrderService.sortNestedFieldsFromCaseEventComplexFields(CASE_FIELD, caseEventComplexFields, ROOT);
 
@@ -177,7 +187,8 @@ class CompoundFieldOrderServiceTest {
     }
 
     @Test
-    @DisplayName("should override deeper level case fields order from case event fields order with missing order values")
+    @DisplayName("should override deeper level case fields order from case event fields order with missing order "
+        + "values")
     void shouldOverrideDeeperLevelCaseFieldsOrderFromCaseEventFieldsOrder() {
         FieldTypeDefinition complexOfSimpleTypes = aFieldType()
             .withType(COMPLEX)
@@ -207,13 +218,16 @@ class CompoundFieldOrderServiceTest {
                                                      .withType(COLLECTION)
                                                      .withCollectionFieldType(aFieldType()
                                                                                   .withType(COMPLEX)
-                                                                                  .withComplexField(newCaseField()
-                                                                                                        .withId("complex3")
-                                                                                                        .withFieldType(complexOfSimpleTypes)
-                                                                                                        .withOrder(1)
-                                                                                                        .build())
-                                                                                  .withComplexField(simpleField("simple14", 4))
-                                                                                  .withComplexField(simpleField("simple13", 5))
+                                                                                  .withComplexField(
+                                                                                      newCaseField().withId("complex3")
+                                                                                          .withFieldType(
+                                                                                              complexOfSimpleTypes)
+                                                                                          .withOrder(1)
+                                                                                          .build())
+                                                                                  .withComplexField(simpleField(
+                                                                                      "simple14", 4))
+                                                                                  .withComplexField(simpleField(
+                                                                                      "simple13", 5))
                                                                                   .build())
                                                      .build())
                                   .withOrder(2)
@@ -330,11 +344,13 @@ class CompoundFieldOrderServiceTest {
                                                      .withType(COLLECTION)
                                                      .withCollectionFieldType(aFieldType()
                                                                                   .withType(COMPLEX)
-                                                                                  .withComplexField(newCaseField()
-                                                                                                        .withId("complex3")
-                                                                                                        .withFieldType(complexOfSimpleTypes)
-                                                                                                        .withOrder(1)
-                                                                                                        .build())
+                                                                                  .withComplexField(
+                                                                                      newCaseField()
+                                                                                          .withId("complex3")
+                                                                                          .withFieldType(
+                                                                                              complexOfSimpleTypes)
+                                                                                          .withOrder(1)
+                                                                                          .build())
                                                                                   .build())
                                                      .build())
                                   .withOrder(2)

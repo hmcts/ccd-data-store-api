@@ -1,89 +1,90 @@
 {
 	"_guid_": "S-034.3",
 	"_extends_": "F-034_Test_Data_Base_2",
-
 	"title": "must return an error for date value with invalid format",
 
 	"specs": [
 		"an active profile in CCD",
-    "contains Date field with incorrect format",
+		"contains Date field with incorrect format",
 		"has 422 return code"
 	],
-  "request": {
-    "body": {
-      "data": {
-        "DateField": "23-01",
-        "DateTimeField": null,
-        "StandardDate": "2016-12-01",
-        "StandardDateTime": "1998-09-01T16:01",
-        "CollectionDate": [
-          {
-            "id": null,
-            "value": "03"
-          },
-          {
-            "id": null,
-            "value": ""
-          }
-        ],
-        "CollectionDateTime": [
-          {
-            "id": null,
-            "value": "2002-01"
-          }
-        ],
-        "ComplexDateTime": {
-          "DateField": null,
-          "DateTimeField": "04-30T01:01",
-          "StandardDate": "2010-02-02",
-          "StandardDateTime": "2019-12-20T01:01:01.000",
-          "NestedComplex": {
-            "DateField": "01-2019",
-            "DateTimeField": "2019-01-01",
-            "StandardDate": "2019-01-01",
-            "StandardDateTime": "2019-01-01T01:01:01.000"
-          }
-        },
-        "CollectionComplexDateTime": [
-          {
-            "id": null,
-            "value": {
-              "DateField": "01-02",
-              "DateTimeField": "10-01T01:01",
-              "StandardDate": "2019-01-01",
-              "StandardDateTime": "2019-01-01T01:01:01.000",
-              "NestedComplex": {
-                "DateField": "2019-01-01",
-                "DateTimeField": "2019-01-01T01:01:01.000",
-                "StandardDate": "2019-01-01",
-                "StandardDateTime": "2019-01-01T01:01:01.000"
-              }
-            }
-          },
-          {
-            "id": null,
-            "value": {
-              "DateField": "",
-              "DateTimeField": null,
-              "StandardDate": null,
-              "StandardDateTime": null,
-              "NestedComplex": {
-                "DateField": null,
-                "DateTimeField": null,
-                "StandardDate": null,
-                "StandardDateTime": null
-              }
-            }
-          }
-        ]
-      },
-      "event": {
-        "id": "CREATE",
-        "summary": "",
-        "description": ""
-      }
-    }
-  },
+
+	"request": {
+		"body": {
+			"data": {
+				"DateField": "23-01",
+				"DateTimeField": null,
+				"StandardDate": "2016-12-01",
+				"StandardDateTime": "1998-09-01T16:01",
+				"CollectionDate": [
+					{
+						"id": null,
+						"value": "03"
+					},
+					{
+						"id": null,
+						"value": ""
+					}
+				],
+				"CollectionDateTime": [
+					{
+						"id": null,
+						"value": "2002-01"
+					}
+				],
+				"ComplexDateTime": {
+					"DateField": null,
+					"DateTimeField": "04-30T01:01",
+					"StandardDate": "2010-02-02",
+					"StandardDateTime": "2019-12-20T01:01:01.000",
+					"NestedComplex": {
+						"DateField": "01-2019",
+						"DateTimeField": "2019-01-01",
+						"StandardDate": "2019-01-01",
+						"StandardDateTime": "2019-01-01T01:01:01.000"
+					}
+				},
+				"CollectionComplexDateTime": [
+					{
+						"id": null,
+						"value": {
+							"DateField": "01-02",
+							"DateTimeField": "10-01T01:01",
+							"StandardDate": "2019-01-01",
+							"StandardDateTime": "2019-01-01T01:01:01.000",
+							"NestedComplex": {
+								"DateField": "2019-01-01",
+								"DateTimeField": "2019-01-01T01:01:01.000",
+								"StandardDate": "2019-01-01",
+								"StandardDateTime": "2019-01-01T01:01:01.000"
+							}
+						}
+					},
+					{
+						"id": null,
+						"value": {
+							"DateField": "",
+							"DateTimeField": null,
+							"StandardDate": null,
+							"StandardDateTime": null,
+							"NestedComplex": {
+								"DateField": null,
+								"DateTimeField": null,
+								"StandardDate": null,
+								"StandardDateTime": null
+							}
+						}
+					}
+				]
+			},
+			"event": {
+				"id": "CREATE",
+				"summary": "",
+				"description": ""
+			}
+		}
+	},
+
 	"expectedResponse": {
 		"_extends_": "Common_422_Response",
 		"headers": {
@@ -91,16 +92,16 @@
 			"Content-Type": "application/json",
 			"Content-Length": "[[ANYTHING_PRESENT]]"
 		},
-    "body" : {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException",
-      "timestamp" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-      "status" : 422,
-      "error" : "Unprocessable Entity",
-      "message" : "Processing of data failed",
-      "path" : "/case-types/FT_DateTimeFormats/validate",
-      "details" : "Unable to process field DateField with value 23-01. Expected format to be either dd or yyyy-MM-dd",
-      "callbackErrors" : null,
-      "callbackWarnings" : null
-    }
+		"body": {
+			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException",
+			"timestamp": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+			"status": 422,
+			"error": "Unprocessable Entity",
+			"message": "Processing of data failed",
+			"path": "/case-types/FT_DateTimeFormats/validate",
+			"details": "Unable to process field DateField with value 23-01. Expected format to be either dd or yyyy-MM-dd",
+			"callbackErrors": null,
+			"callbackWarnings": null
+		}
 	}
 }

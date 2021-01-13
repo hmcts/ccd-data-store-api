@@ -1,32 +1,32 @@
 {
-  "title": "must return successfully all and only the respective documents with read access for solicitors",
+	"title": "must return successfully all and only the respective documents with read access for solicitors",
 
-  "_guid_": "S-123_Test_Data_Base",
-  "_extends_": "F-032_Base_Test_Data",
+	"_guid_": "S-123_Test_Data_Base",
+	"_extends_": "F-032_Base_Test_Data",
 
-  "users": {
-    "invokingUser": {
-      "username": "befta.caseworker.2.solicitor.2@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
-    }
-  },
+	"users": {
+		"invokingUser": {
+			"username": "befta.caseworker.2.solicitor.2@gmail.com",
+			"password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+		}
+	},
 
-  "request": {
-    "pathVariables": {
-      "jid": "BEFTA_JURISDICTION_2",
-      "ctid": "BEFTA_CASETYPE_2_1"
-    },
-    "body": {
-      "id": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
-    }
-  },
+	"request": {
+		"pathVariables": {
+			"jid": "BEFTA_JURISDICTION_2",
+			"ctid": "BEFTA_CASETYPE_2_1"
+		},
+		"body": {
+			"id": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+		}
+	},
 
-  "expectedResponse": {
-    "_extends_": "Common_200_Response",
-    "headers": {
-      "_extends_": "Common_Response_Headers"
-    },
-    "body": {
-    }
-  }
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"_extends_": "Common_Response_Headers"
+		},
+		"body": {
+		}
+	}
 }

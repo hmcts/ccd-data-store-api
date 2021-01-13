@@ -6,9 +6,13 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -45,7 +49,8 @@ public class CaseUserController {
         consumes = MediaType.APPLICATION_JSON_VALUE
     )
     @ApiOperation(
-        value = "Update a user's roles for a specific case. Grant access for added case roles and revoke access for removed case roles."
+        value = "Update a user's roles for a specific case. Grant access for added case roles and revoke access for "
+            + "removed case roles."
     )
     @ApiResponses({
         @ApiResponse(
@@ -73,7 +78,8 @@ public class CaseUserController {
             message = V2.Error.CASE_NOT_FOUND
         )
     })
-    @LogAudit(operationType = AuditOperationType.UPDATE_CASE_ACCESS, caseId = "#caseReference", targetIdamId = "#userId",
+    @LogAudit(operationType = AuditOperationType.UPDATE_CASE_ACCESS, caseId = "#caseReference",
+        targetIdamId = "#userId",
         targetCaseRoles = "#caseUser.caseRoles")
     public ResponseEntity<Void> putUser(
         @PathVariable("caseReference") String caseReference,

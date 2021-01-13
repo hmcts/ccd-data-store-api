@@ -110,7 +110,8 @@ class EmailValidatorTest {
         assertEquals(0, validResult.size(), validResult.toString());
 
         final JsonNode invalidValue = NODE_FACTORY.textNode("9k@hmcts.net");
-        final List<ValidationResult> invalidResult = validator.validate(FIELD_ID, invalidValue, regexCaseFieldDefinition);
+        final List<ValidationResult> invalidResult =
+                validator.validate(FIELD_ID, invalidValue, regexCaseFieldDefinition);
         assertEquals(1, invalidResult.size(), invalidResult.toString());
         assertEquals(REGEX_GUIDANCE, invalidResult.get(0).getErrorMessage());
     }
@@ -119,8 +120,8 @@ class EmailValidatorTest {
     void baseTypeRegEx() {
         when(emailBaseType.getRegularExpression()).thenReturn("\\\\w*@hmcts.net");
 
-        final List<ValidationResult> result01 = validator.validate(FIELD_ID,
-                                                                   NODE_FACTORY.textNode("9k@hmcts.net"), caseFieldDefinition);
+        final List<ValidationResult> result01 =
+                validator.validate(FIELD_ID, NODE_FACTORY.textNode("9k@hmcts.net"), caseFieldDefinition);
         assertEquals(1, result01.size());
         assertEquals(REGEX_GUIDANCE, result01.get(0).getErrorMessage());
     }

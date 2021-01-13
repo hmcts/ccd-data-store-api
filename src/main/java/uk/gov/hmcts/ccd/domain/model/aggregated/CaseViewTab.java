@@ -17,7 +17,8 @@ public class CaseViewTab {
         // default constructor
     }
 
-    public CaseViewTab(String id, String label, Integer order, CaseViewField[] fields, String showCondition, String role) {
+    public CaseViewTab(String id, String label, Integer order, CaseViewField[] fields,
+                       String showCondition, String role) {
         this.id = id;
         this.label = label;
         this.order = order;

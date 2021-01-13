@@ -1,8 +1,7 @@
 {
-  "title": "should retrieve search inputs for dynamic display",
-
   "_guid_": "S-215",
   "_extends_": "F-063_Base_Test_Data",
+  "title": "should retrieve search inputs for dynamic display",
 
   "specs": [
     "an active profile in CCD",
@@ -36,7 +35,7 @@
               "collection_field_type": null
             }
           },
-          "display_context_parameter" : null
+          "display_context_parameter": null
         }
       ],
       "_links": {

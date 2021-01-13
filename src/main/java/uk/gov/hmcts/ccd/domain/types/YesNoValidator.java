@@ -27,13 +27,15 @@ public class YesNoValidator implements BaseTypeValidator {
         }
 
         if (!dataValue.isTextual()) {
-            return Collections.singletonList(new ValidationResult(dataValue + " is not " + TYPE_ID, dataFieldId));
+            return Collections.singletonList(new ValidationResult(dataValue + " is not " + TYPE_ID,
+                dataFieldId));
         }
 
         final List<ValidationResult> results = new ArrayList<>();
 
         if (!"YES".equalsIgnoreCase(dataValue.textValue()) && !"NO".equalsIgnoreCase(dataValue.textValue())) {
-            results.add(new ValidationResult("YES_NO values needs to be YES or NO.  Given value is " + dataValue.textValue(), dataFieldId));
+            results.add(new ValidationResult("YES_NO values needs to be YES or NO.  Given value is "
+                + dataValue.textValue(), dataFieldId));
         }
 
         return results;

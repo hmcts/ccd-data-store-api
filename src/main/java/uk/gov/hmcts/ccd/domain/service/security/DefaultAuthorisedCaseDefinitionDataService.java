@@ -29,8 +29,10 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     private final UserRepository userRepository;
 
     @Autowired
-    public DefaultAuthorisedCaseDefinitionDataService(CaseTypeService caseTypeService, AccessControlService accessControlService,
-                                                      @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
+    public DefaultAuthorisedCaseDefinitionDataService(CaseTypeService caseTypeService,
+                                                      AccessControlService accessControlService,
+                                                      @Qualifier(CachedUserRepository.QUALIFIER)
+                                                              UserRepository userRepository) {
         this.caseTypeService = caseTypeService;
         this.accessControlService = accessControlService;
         this.userRepository = userRepository;
@@ -39,14 +41,16 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     @Override
     public Optional<CaseTypeDefinition> getAuthorisedCaseType(String caseTypeId, Predicate<AccessControlList> access) {
         CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseTypeId);
-        if (verifyAclOnCaseType(caseTypeDefinition, access) && verifySecurityClassificationOnCaseType(caseTypeDefinition)) {
+        if (verifyAclOnCaseType(caseTypeDefinition, access)
+            && verifySecurityClassificationOnCaseType(caseTypeDefinition)) {
             return Optional.of(caseTypeDefinition);
         }
         return Optional.empty();
     }
 
     @Override
-    public List<CaseStateDefinition> getUserAuthorisedCaseStates(String jurisdiction, String caseTypeId, Predicate<AccessControlList> access) {
+    public List<CaseStateDefinition> getUserAuthorisedCaseStates(String jurisdiction, String caseTypeId,
+                                                                 Predicate<AccessControlList> access) {
         CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdiction);
         return filterCaseStatesForUser(caseTypeDefinition.getStates(), access);
     }
@@ -54,12 +58,14 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     @Override
     public List<String> getUserAuthorisedCaseStateIds(String caseTypeId, Predicate<AccessControlList> access) {
         CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseTypeId);
-        List<CaseStateDefinition> caseStateDefinitions = filterCaseStatesForUser(caseTypeDefinition.getStates(), access);
+        List<CaseStateDefinition> caseStateDefinitions =
+            filterCaseStatesForUser(caseTypeDefinition.getStates(), access);
         return collectCaseStateIds(caseStateDefinitions);
     }
 
     @Override
-    public List<String> getUserAuthorisedCaseStateIds(String jurisdiction, String caseTypeId, Predicate<AccessControlList> access) {
+    public List<String> getUserAuthorisedCaseStateIds(String jurisdiction, String caseTypeId,
+                                                      Predicate<AccessControlList> access) {
         List<CaseStateDefinition> caseStateDefinitions = getUserAuthorisedCaseStates(jurisdiction, caseTypeId, access);
         return collectCaseStateIds(caseStateDefinitions);
     }
@@ -70,10 +76,12 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
 
     private boolean verifySecurityClassificationOnCaseType(CaseTypeDefinition caseTypeDefinition) {
         return userRepository.getHighestUserClassification(
-            caseTypeDefinition.getJurisdictionDefinition().getId()).higherOrEqualTo(caseTypeDefinition.getSecurityClassification());
+            caseTypeDefinition.getJurisdictionDefinition().getId())
+            .higherOrEqualTo(caseTypeDefinition.getSecurityClassification());
     }
 
-    private List<CaseStateDefinition> filterCaseStatesForUser(List<CaseStateDefinition> caseStateDefinitions, Predicate<AccessControlList> access) {
+    private List<CaseStateDefinition> filterCaseStatesForUser(List<CaseStateDefinition> caseStateDefinitions,
+                                                              Predicate<AccessControlList> access) {
         return accessControlService.filterCaseStatesByAccess(caseStateDefinitions, getUserRoles(), access);
     }
 

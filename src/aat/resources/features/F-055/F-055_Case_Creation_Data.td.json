@@ -1,18 +1,18 @@
 {
-  "_guid_": "F-055_Case_Creation_Data",
-  "_extends_": "Standard_Full_Case_Creation_Data",
+	"_guid_": "F-055_Case_Creation_Data",
+	"_extends_": "Standard_Full_Case_Creation_Data",
 
-  "users": {
-    "invokingUser": {
-      "username": "befta.citizen.3@gmail.com",
-      "password": "[[$CCD_BEFTA_CITIZEN_3_PWD]]"
-    }
-  },
+	"users": {
+		"invokingUser": {
+			"username": "befta.citizen.3@gmail.com",
+			"password": "[[$CCD_BEFTA_CITIZEN_3_PWD]]"
+		}
+	},
 
-  "request": {
-    "pathVariables": {
-      "jurisdiction": "BEFTA_JURISDICTION_3",
-      "caseType": "BEFTA_CASETYPE_3_2"
-    }
-  }
+	"request": {
+		"pathVariables": {
+			"jurisdiction": "BEFTA_JURISDICTION_3",
+			"caseType": "BEFTA_CASETYPE_3_2"
+		}
+	}
 }

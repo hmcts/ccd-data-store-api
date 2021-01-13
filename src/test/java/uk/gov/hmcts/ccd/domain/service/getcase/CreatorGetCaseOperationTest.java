@@ -4,7 +4,8 @@ import java.util.Optional;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.same;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -49,17 +50,21 @@ class CreatorGetCaseOperationTest {
 
         @Test
         @DisplayName("Should return an Optional containing the case if the case is visible")
+        @SuppressWarnings("checkstyle:LineLength") // don't want to break long method names
         void searchOperationReturnsCaseDetails_solicitorVisibilityServiceCalledForCaseDetailsAndReturnsTrue_caseDetailsReturned() {
             when(caseAccessService.canUserAccess(any())).thenReturn(true);
-            assertCaseDetailsPresent(true, true,JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+            assertCaseDetailsPresent(true, true,JURISDICTION_ID, CASE_TYPE_ID,
+                CASE_REFERENCE);
             verify(caseAccessService).canUserAccess(same(caseDetails));
         }
 
         @Test
         @DisplayName("Should return an empty optional if case is not visible")
+        @SuppressWarnings("checkstyle:LineLength") // don't want to break long method names
         void searchOperationReturnsCaseDetails_solicitorVisibilityServiceCalledForCaseDetailsAndReturnsFalse_caseDetailsReturned() {
             when(caseAccessService.canUserAccess(any())).thenReturn(false);
-            assertCaseDetailsPresent(false, true,JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+            assertCaseDetailsPresent(false, true,JURISDICTION_ID, CASE_TYPE_ID,
+                CASE_REFERENCE);
             verify(caseAccessService).canUserAccess(same(caseDetails));
         }
 
@@ -67,7 +72,8 @@ class CreatorGetCaseOperationTest {
         @DisplayName("Should return an empty optional when GetCaseOperation returns an empty optional")
         void searchOperationReturnsCaseDetails_GetCaseOperationReturnsEmptyOptional_caseDetailsReturned() {
             when(getCaseOperation.execute(any(),any(),any())).thenReturn(Optional.empty());
-            assertCaseDetailsPresent(false, false, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+            assertCaseDetailsPresent(false, false, JURISDICTION_ID, CASE_TYPE_ID,
+                CASE_REFERENCE);
         }
 
     }
@@ -78,6 +84,7 @@ class CreatorGetCaseOperationTest {
 
         @Test
         @DisplayName("Should return an Optional containing the case if the case is visible")
+        @SuppressWarnings("checkstyle:LineLength") // don't want to break long method names
         void searchOperationReturnsCaseDetails_solicitorVisibilityServiceCalledForCaseDetailsAndReturnsTrue_caseDetailsReturned() {
             when(caseAccessService.canUserAccess(any())).thenReturn(true);
             assertCaseDetailsPresent(true, true, JURISDICTION_ID);
@@ -85,6 +92,7 @@ class CreatorGetCaseOperationTest {
 
         @Test
         @DisplayName("Should return an empty optional if case is not visible")
+        @SuppressWarnings("checkstyle:LineLength") // don't want to break long method names
         void searchOperationReturnsCaseDetails_solicitorVisibilityServiceCalledForCaseDetailsAndReturnsFalse_caseDetailsReturned() {
             when(caseAccessService.canUserAccess(any())).thenReturn(false);
             assertCaseDetailsPresent(false, true, JURISDICTION_ID);
@@ -99,7 +107,8 @@ class CreatorGetCaseOperationTest {
 
     }
 
-    private void assertCaseDetailsPresent(boolean isPresent, boolean solicitorVisibilityServiceCalled, String... args)  {
+    private void assertCaseDetailsPresent(boolean isPresent,
+                                          boolean solicitorVisibilityServiceCalled, String... args)  {
 
         Optional<CaseDetails> result = (args.length == 1)
             ? classUnderTest.execute(args[0])

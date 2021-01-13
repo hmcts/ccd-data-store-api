@@ -19,13 +19,14 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 public class UserServiceTest {
 
     @Mock
-    private UserRepository userRepoMock;
+    private uk.gov.hmcts.ccd.data.user.UserRepository userRepoMock;
     @Mock
     private CaseDefinitionRepository caseDefinitionRepoMock;
     @Mock
@@ -39,17 +40,18 @@ public class UserServiceTest {
     @Mock
     private JurisdictionDisplayProperties jdp3;
     @Mock
-    private JurisdictionsResolver jurisdictionsResolver;
+    private uk.gov.hmcts.ccd.data.user.JurisdictionsResolver jurisdictionsResolver;
 
     private JurisdictionDefinition j1;
     private JurisdictionDefinition j2;
     private JurisdictionDefinition unknownJurisdictionDefinition;
-    private UserService userService;
+    private uk.gov.hmcts.ccd.data.user.UserService userService;
 
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        userService = new UserService(userRepoMock, caseDefinitionRepoMock, jurisdictionMapperMock,jurisdictionsResolver);
+        userService = new uk.gov.hmcts.ccd.data.user.UserService(userRepoMock, caseDefinitionRepoMock,
+                jurisdictionMapperMock,jurisdictionsResolver);
         when(mockIdamProps.getEmail()).thenReturn("email");
         initialiseJurisdictions();
     }
@@ -123,13 +125,5 @@ public class UserServiceTest {
         j2.setDescription("Desc2");
         unknownJurisdictionDefinition = new JurisdictionDefinition();
         unknownJurisdictionDefinition.setId("J3");
-    }
-
-    @Test
-    public void testGetUserRolesJurisdictions() {
-        final List<String> jurisdictions = newArrayList("jurisdiction1", "jurisdiction2");
-        when(userRepoMock.getUserRolesJurisdictions()).thenReturn(jurisdictions);
-        List<String> result = userService.getUserRolesJurisdictions();
-        assertEquals(2, result.size());
     }
 }

@@ -56,7 +56,8 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         CaseDetails caseDetails = caseEventResult.getSavedCaseDetails();
         try { // make a call back
             final ResponseEntity<AfterSubmitCallbackResponse> callBackResponse = callbackInvoker
-                .invokeSubmittedCallback(caseEventResult.getEventTrigger(), caseEventResult.getCaseDetailsBefore(), caseEventResult.getSavedCaseDetails());
+                .invokeSubmittedCallback(caseEventResult.getEventTrigger(), caseEventResult.getCaseDetailsBefore(),
+                    caseEventResult.getSavedCaseDetails());
             caseDetails.setAfterSubmitCallbackResponseEntity(callBackResponse);
         } catch (CallbackException ex) {
             LOG.warn("Submitted callback failed", ex);

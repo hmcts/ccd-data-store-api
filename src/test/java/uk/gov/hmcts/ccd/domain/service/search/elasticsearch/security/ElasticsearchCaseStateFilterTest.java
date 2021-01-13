@@ -37,7 +37,8 @@ class ElasticsearchCaseStateFilterTest {
     void shouldCreateTermsQueryBuilder() {
         String caseTypeId = "caseType";
         String state = "SomeState";
-        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(caseTypeId, CAN_READ)).thenReturn(Collections.singletonList(state));
+        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(caseTypeId, CAN_READ))
+                .thenReturn(Collections.singletonList(state));
 
         Optional<QueryBuilder> optQueryBuilder = filter.getFilter(caseTypeId);
 

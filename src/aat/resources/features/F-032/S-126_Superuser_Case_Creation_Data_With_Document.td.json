@@ -1,17 +1,17 @@
 {
-  "_guid_": "S-126_Superuser_Case_Creation_Data_With_Document",
-  "_extends_": "F-032_Case_Creation_Data_With_Document",
+	"_guid_": "S-126_Superuser_Case_Creation_Data_With_Document",
+	"_extends_": "F-032_Case_Creation_Data_With_Document",
 
-  "users": {
-    "invokingUser": {
-      "username": "[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
-      "password": "[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
-    }
-  },
+	"users": {
+		"invokingUser": {
+			"username": "[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
+			"password": "[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
+		}
+	},
 
-  "request": {
-    "pathVariables": {
-      "caseType": "AAT_AUTH_1"
-    }
-  }
+	"request": {
+		"pathVariables": {
+			"caseType": "AAT_AUTH_1"
+		}
+	}
 }

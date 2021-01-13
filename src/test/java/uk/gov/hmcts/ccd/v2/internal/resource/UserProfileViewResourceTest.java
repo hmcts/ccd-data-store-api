@@ -50,7 +50,8 @@ class UserProfileViewResourceTest {
         MockitoAnnotations.initMocks(this);
 
         channels = new String[]{channel1, channel2};
-        jurisdictionDisplayProperties = new JurisdictionDisplayProperties[]{jurisdictionDisplayProperties1, jurisdictionDisplayProperties2};
+        jurisdictionDisplayProperties =
+                new JurisdictionDisplayProperties[]{jurisdictionDisplayProperties1, jurisdictionDisplayProperties2};
         userProfile = newUserProfile()
             .withUser(user)
             .withChannels(channels)

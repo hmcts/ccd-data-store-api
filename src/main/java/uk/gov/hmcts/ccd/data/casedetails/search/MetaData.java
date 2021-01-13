@@ -30,12 +30,12 @@ public class MetaData {
         LAST_STATE_MODIFIED_DATE
     );
     private static final List<String> METADATA_QUERY_PARAMETERS = newArrayList(STATE.getParameterName(),
-                                                                               CASE_REFERENCE.getParameterName(),
-                                                                               CREATED_DATE.getParameterName(),
-                                                                               LAST_MODIFIED_DATE.getParameterName(),
-                                                                               LAST_STATE_MODIFIED_DATE.getParameterName(),
-                                                                               SECURITY_CLASSIFICATION.getParameterName(),
-                                                                               PAGE_PARAM, SORT_PARAM);
+                                                                        CASE_REFERENCE.getParameterName(),
+                                                                        CREATED_DATE.getParameterName(),
+                                                                        LAST_MODIFIED_DATE.getParameterName(),
+                                                                        LAST_STATE_MODIFIED_DATE.getParameterName(),
+                                                                        SECURITY_CLASSIFICATION.getParameterName(),
+                                                                        PAGE_PARAM, SORT_PARAM);
 
     // Metadata case fields
     public enum CaseField {
@@ -76,7 +76,14 @@ public class MetaData {
             return Arrays.stream(values())
                 .filter(v -> v.getDbColumnName().equals(dbColumnName))
                 .findAny()
-                .orElseThrow(() -> new IllegalArgumentException(String.format("No MetaData field exists with column name '%s'", dbColumnName)));
+                .orElseThrow(() -> new IllegalArgumentException(
+                    String.format("No MetaData field exists with column name '%s'", dbColumnName)));
+        }
+
+        public static List<String> getColumnNames() {
+            return Arrays.stream(values())
+                .map(CaseField::getDbColumnName)
+                .collect(toList());
         }
     }
 

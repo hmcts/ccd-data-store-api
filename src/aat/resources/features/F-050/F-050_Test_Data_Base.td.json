@@ -3,12 +3,14 @@
 
 	"productName": "CCD Data Store",
 	"operationName": "validation of a set of fields as Case worker",
+
 	"method": "POST",
 	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate",
 
 	"user": {
 		"_extends_": "Common_User_For_Request"
 	},
+
 	"request": {
 		"_extends_": "Common_Request",
 		"pathVariables": {

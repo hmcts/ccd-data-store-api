@@ -49,7 +49,11 @@
           "pre_states": [
             "some-state"
           ],
-          "post_state": "state4",
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "state4"
+          }],
           "security_classification": "PUBLIC",
           "acls": [
             {
@@ -69,7 +73,11 @@
           "pre_states": [
             "*", "* overwrites this one"
           ],
-          "post_state": "state3",
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "state3"
+          }],
           "security_classification": "PUBLIC",
           "acls": [
             {

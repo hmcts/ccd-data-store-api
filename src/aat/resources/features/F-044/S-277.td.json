@@ -2,16 +2,19 @@
 	"_guid_": "S-277",
 	"_extends_": "F-044_Test_Data_Base",
 	"title": "must return 404 when request contains a non-existing jurisdiction Id",
+
 	"specs": [
 		"an active profile in CCD",
 		"contains a non-existing jurisdiction Id",
 		"contains an HTTP 404 'Not Found'"
 	],
+
 	"request": {
 		"pathVariables": {
-      "jid": "Invalid_JID"
-    }
+			"jid": "Invalid_JID"
+		}
 	},
+
 	"expectedResponse": {
 		"_extends_": "Common_404_Response",
 		"body": {

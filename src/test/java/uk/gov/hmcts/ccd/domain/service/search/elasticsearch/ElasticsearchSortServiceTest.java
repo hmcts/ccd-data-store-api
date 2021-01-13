@@ -30,7 +30,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.SEARCH;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
@@ -50,14 +52,18 @@ class ElasticsearchSortServiceTest {
     private static final String LAST_MODIFIED_DATE = "LAST_MODIFIED_DATE";
     private static final FieldTypeDefinition TEXT_FIELD_TYPE = aFieldType().withType("Text").withId("Text").build();
     private static final FieldTypeDefinition DATE_FIELD_TYPE = aFieldType().withType("Date").withId("Date").build();
-    private static final FieldTypeDefinition COLLECTION_TEXT_FIELD_TYPE = aFieldType().withType("Collection").withId("Collection")
-        .withCollectionFieldType(TEXT_FIELD_TYPE).build();
-    private static final FieldTypeDefinition COLLECTION_DATE_FIELD_TYPE = aFieldType().withType("Collection").withId("Collection")
-        .withCollectionFieldType(DATE_FIELD_TYPE).build();
-    private static final CommonField JURISDICTION_FIELD = newCaseField().withMetadata(true).withId(JURISDICTION).build();
-    private static final CommonField LAST_MODIFIED_DATE_FIELD = newCaseField().withMetadata(true).withId(LAST_MODIFIED_DATE).build();
-    private static final CommonField TEXT_FIELD = newCaseField().withId(TEXT_FIELD_ID).withFieldType(TEXT_FIELD_TYPE).build();
-    private static final CommonField DATE_FIELD = newCaseField().withId(DATE_FIELD_ID).withFieldType(DATE_FIELD_TYPE).build();
+    private static final FieldTypeDefinition COLLECTION_TEXT_FIELD_TYPE = aFieldType().withType("Collection")
+        .withId("Collection").withCollectionFieldType(TEXT_FIELD_TYPE).build();
+    private static final FieldTypeDefinition COLLECTION_DATE_FIELD_TYPE = aFieldType().withType("Collection")
+        .withId("Collection").withCollectionFieldType(DATE_FIELD_TYPE).build();
+    private static final CommonField JURISDICTION_FIELD = newCaseField().withMetadata(true).withId(JURISDICTION)
+        .build();
+    private static final CommonField LAST_MODIFIED_DATE_FIELD = newCaseField().withMetadata(true)
+        .withId(LAST_MODIFIED_DATE).build();
+    private static final CommonField TEXT_FIELD = newCaseField().withId(TEXT_FIELD_ID).withFieldType(TEXT_FIELD_TYPE)
+        .build();
+    private static final CommonField DATE_FIELD = newCaseField().withId(DATE_FIELD_ID).withFieldType(DATE_FIELD_TYPE)
+        .build();
     private static final CommonField COLLECTION_TEXT_FIELD = newCaseField().withId(COLLECTION_TEXT_FIELD_ID)
         .withFieldType(COLLECTION_TEXT_FIELD_TYPE).build();
     private static final CommonField COLLECTION_DATE_FIELD = newCaseField().withId(COLLECTION_DATE_FIELD_ID)
@@ -91,28 +97,40 @@ class ElasticsearchSortServiceTest {
             .when(objectMapperService).convertStringToObject(anyString(), any());
         when(caseTypeService.getCaseType(any())).thenReturn(caseTypeDefinition);
         when(caseTypeDefinition.getId()).thenReturn(CASE_TYPE_A);
-        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(JURISDICTION))).thenReturn(Optional.of(JURISDICTION_FIELD));
-        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(LAST_MODIFIED_DATE))).thenReturn(Optional.of(LAST_MODIFIED_DATE_FIELD));
-        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(TEXT_FIELD_ID))).thenReturn(Optional.of(TEXT_FIELD));
-        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(DATE_FIELD_ID))).thenReturn(Optional.of(DATE_FIELD));
-        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(COLLECTION_TEXT_FIELD_ID))).thenReturn(Optional.of(COLLECTION_TEXT_FIELD));
-        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(COLLECTION_DATE_FIELD_ID))).thenReturn(Optional.of(COLLECTION_DATE_FIELD));
+        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(JURISDICTION)))
+            .thenReturn(Optional.of(JURISDICTION_FIELD));
+        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(LAST_MODIFIED_DATE)))
+            .thenReturn(Optional.of(LAST_MODIFIED_DATE_FIELD));
+        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(TEXT_FIELD_ID)))
+            .thenReturn(Optional.of(TEXT_FIELD));
+        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(DATE_FIELD_ID)))
+            .thenReturn(Optional.of(DATE_FIELD));
+        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(COLLECTION_TEXT_FIELD_ID)))
+            .thenReturn(Optional.of(COLLECTION_TEXT_FIELD));
+        when(caseTypeDefinition.getComplexSubfieldDefinitionByPath(eq(COLLECTION_DATE_FIELD_ID)))
+            .thenReturn(Optional.of(COLLECTION_DATE_FIELD));
         when(searchQueryOperation.getSortOrders(any(), any())).thenReturn(sortOrderFields);
     }
 
     @Test
     void shouldApplyConfiguredSortForMetadataFields() throws JsonProcessingException {
-        sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(JURISDICTION).metadata(true).direction(ASC).build());
-        sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(LAST_MODIFIED_DATE).metadata(true).direction(DESC).build());
-        when(elasticsearchMappings.isDefaultTextMetadata(eq(MetaData.CaseField.JURISDICTION.getDbColumnName()))).thenReturn(true);
-        when(elasticsearchMappings.isDefaultTextMetadata(eq(MetaData.CaseField.LAST_MODIFIED_DATE.getDbColumnName()))).thenReturn(false);
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(objectMapperES.readValue(QUERY_STRING, ObjectNode.class));
+        sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(JURISDICTION).metadata(true).direction(ASC)
+            .build());
+        sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(LAST_MODIFIED_DATE).metadata(true)
+            .direction(DESC).build());
+        when(elasticsearchMappings.isDefaultTextMetadata(eq(MetaData.CaseField.JURISDICTION.getDbColumnName())))
+            .thenReturn(true);
+        when(elasticsearchMappings.isDefaultTextMetadata(eq(MetaData.CaseField.LAST_MODIFIED_DATE.getDbColumnName())))
+            .thenReturn(false);
+        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(objectMapperES.readValue(QUERY_STRING,
+            ObjectNode.class));
 
         elasticsearchSortService.applyConfiguredSort(elasticsearchRequest, CASE_TYPE_A, SEARCH);
 
         assertAll(
-            () -> assertThat(elasticsearchRequest.getSearchRequest().toString(),
-                is("{\"query\":{},\"sort\":[{\"jurisdiction.keyword\":\"ASC\"},{\"last_modified\":\"DESC\"},\"created_date\"]}"))
+            () -> assertThat(elasticsearchRequest.getNativeSearchRequest().toString(),
+                is("{\"query\":{},\"sort\":[{\"jurisdiction.keyword\":\"ASC\"},{\"last_modified\":\"DESC\"},"
+                        + "\"created_date\"]}"))
         );
     }
 
@@ -120,33 +138,39 @@ class ElasticsearchSortServiceTest {
     void shouldApplyConfiguredSortForCaseDataFields() throws JsonProcessingException {
         sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(TEXT_FIELD_ID).direction(ASC).build());
         sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(DATE_FIELD_ID).direction(DESC).build());
-        sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(COLLECTION_TEXT_FIELD_ID).direction(DESC).build());
-        sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(COLLECTION_DATE_FIELD_ID).direction(ASC).build());
+        sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(COLLECTION_TEXT_FIELD_ID)
+            .direction(DESC).build());
+        sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(COLLECTION_DATE_FIELD_ID)
+            .direction(ASC).build());
         when(elasticsearchMappings.isDefaultTextCaseData(eq(TEXT_FIELD_TYPE))).thenReturn(true);
         when(elasticsearchMappings.isDefaultTextCaseData(eq(DATE_FIELD_TYPE))).thenReturn(false);
         when(elasticsearchMappings.isDefaultTextCaseData(eq(COLLECTION_TEXT_FIELD_TYPE))).thenReturn(true);
         when(elasticsearchMappings.isDefaultTextCaseData(eq(COLLECTION_DATE_FIELD_TYPE))).thenReturn(false);
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(objectMapperES.readValue(QUERY_STRING, ObjectNode.class));
+        ElasticsearchRequest elasticsearchRequest =
+            new ElasticsearchRequest(objectMapperES.readValue(QUERY_STRING, ObjectNode.class));
 
         elasticsearchSortService.applyConfiguredSort(elasticsearchRequest, CASE_TYPE_A, WORKBASKET);
 
         assertAll(
-            () -> assertThat(elasticsearchRequest.getSearchRequest().toString(),
+            () -> assertThat(elasticsearchRequest.getNativeSearchRequest().toString(),
                 is("{\"query\":{},\"sort\":[{\"data.TextField.keyword\":\"ASC\"},{\"data.DateField\":\"DESC\"},"
-                   + "{\"data.CollectionTextField.value.keyword\":\"DESC\"},{\"data.CollectionDateField.value\":\"ASC\"},\"created_date\"]}"))
+                   + "{\"data.CollectionTextField.value.keyword\":\"DESC\"},"
+                    + "{\"data.CollectionDateField.value\":\"ASC\"},\"created_date\"]}"))
         );
     }
 
     @Test
     void shouldNotApplyConfiguredSortWhenRequestContainsSortOverride() throws JsonProcessingException {
-        sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(JURISDICTION).metadata(true).direction(ASC).build());
+        sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId(JURISDICTION).metadata(true).direction(ASC)
+            .build());
         String searchRequest = "{\"query\":{},\"sort\":[{\"data.TextField.keyword\":\"ASC\"}]}";
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(objectMapperES.readValue(searchRequest, ObjectNode.class));
+        ElasticsearchRequest elasticsearchRequest =
+            new ElasticsearchRequest(objectMapperES.readValue(searchRequest, ObjectNode.class));
 
         elasticsearchSortService.applyConfiguredSort(elasticsearchRequest, CASE_TYPE_A, SEARCH);
 
         assertAll(
-            () -> assertThat(elasticsearchRequest.getSearchRequest().toString(),
+            () -> assertThat(elasticsearchRequest.getNativeSearchRequest().toString(),
                 is("{\"query\":{},\"sort\":[{\"data.TextField.keyword\":\"ASC\"},\"created_date\"]}"))
         );
     }
@@ -154,12 +178,13 @@ class ElasticsearchSortServiceTest {
     @Test
     void shouldApplyDefaultSortWhenNoSortsAreConfigured() throws JsonProcessingException {
         String searchRequest = "{\"query\":{}}";
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(objectMapperES.readValue(searchRequest, ObjectNode.class));
+        ElasticsearchRequest elasticsearchRequest =
+            new ElasticsearchRequest(objectMapperES.readValue(searchRequest, ObjectNode.class));
 
         elasticsearchSortService.applyConfiguredSort(elasticsearchRequest, CASE_TYPE_A, SEARCH);
 
         assertAll(
-            () -> assertThat(elasticsearchRequest.getSearchRequest().toString(),
+            () -> assertThat(elasticsearchRequest.getNativeSearchRequest().toString(),
                 is("{\"query\":{},\"sort\":[\"created_date\"]}"))
         );
     }
@@ -167,7 +192,8 @@ class ElasticsearchSortServiceTest {
     @Test
     void shouldThrowExceptionWhenSortOrderCaseFieldIsNotInCaseType() throws JsonProcessingException {
         sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId("UnknownCaseField").direction(ASC).build());
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(objectMapperES.readValue(QUERY_STRING, ObjectNode.class));
+        ElasticsearchRequest elasticsearchRequest =
+            new ElasticsearchRequest(objectMapperES.readValue(QUERY_STRING, ObjectNode.class));
 
         ServiceException exception = assertThrows(ServiceException.class,
             () -> elasticsearchSortService.applyConfiguredSort(elasticsearchRequest, CASE_TYPE_A, WORKBASKET));

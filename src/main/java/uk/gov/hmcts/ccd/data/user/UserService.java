@@ -31,7 +31,8 @@ public class UserService {
 
     @Inject
     public UserService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
-                       @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
+                       @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                           CaseDefinitionRepository caseDefinitionRepository,
                        JurisdictionMapper jurisdictionMapper,
                        @Qualifier(IdamJurisdictionsResolver.QUALIFIER) JurisdictionsResolver jurisdictionsResolver) {
         this.userRepository = userRepository;
@@ -59,7 +60,9 @@ public class UserService {
         return createUserProfile(idamProperties, userId, jurisdictionDefinitions);
     }
 
-    private UserProfile createUserProfile(IdamProperties idamProperties, String userId, List<JurisdictionDefinition> jurisdictionsDefinition) {
+    private UserProfile createUserProfile(IdamProperties idamProperties,
+                                          String userId,
+                                          List<JurisdictionDefinition> jurisdictionsDefinition) {
 
         JurisdictionDisplayProperties[] resultJurisdictions = toResponse(jurisdictionsDefinition);
 
@@ -74,7 +77,7 @@ public class UserService {
             workbasketDefault.setStateId(userDefault.getWorkBasketDefaultState());
             userProfile.getDefaultSettings().setWorkbasketDefault(workbasketDefault);
         } catch (ResourceNotFoundException ae) {
-            LOGGER.debug("User Profile not exists for userId {}", userId, ae);
+            LOGGER.debug("User Profile not exists for userId {}", idamProperties.getId(), ae);
         }
 
         return userProfile;
@@ -86,6 +89,6 @@ public class UserService {
     }
 
     public List<String> getUserRolesJurisdictions() {
-        return userRepository.getUserRolesJurisdictions();
+        return userRepository.getCaseworkerUserRolesJurisdictions();
     }
 }

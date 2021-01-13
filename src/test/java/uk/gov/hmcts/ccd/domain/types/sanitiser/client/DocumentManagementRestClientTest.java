@@ -33,8 +33,15 @@ import java.util.List;
 
 import static com.xebialabs.restito.builder.stub.StubHttp.whenHttp;
 import static com.xebialabs.restito.builder.verify.VerifyHttp.verifyHttp;
-import static com.xebialabs.restito.semantics.Action.*;
-import static com.xebialabs.restito.semantics.Condition.*;
+import static com.xebialabs.restito.semantics.Action.contentType;
+import static com.xebialabs.restito.semantics.Action.ok;
+import static com.xebialabs.restito.semantics.Action.stringContent;
+import static com.xebialabs.restito.semantics.Action.unauthorized;
+import static com.xebialabs.restito.semantics.Condition.get;
+import static com.xebialabs.restito.semantics.Condition.method;
+import static com.xebialabs.restito.semantics.Condition.uri;
+import static com.xebialabs.restito.semantics.Condition.withHeader;
+
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;

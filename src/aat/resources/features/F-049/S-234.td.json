@@ -1,7 +1,6 @@
 {
 	"_guid_": "S-234",
 	"_extends_": "F-049_Test_Data_Base",
-
 	"title": "must return 400 when request contains a malformed Case Type ID",
 
 	"specs": [
@@ -9,11 +8,13 @@
 		"contains a malformed Case Type ID",
 		"code is HTTP-400"
 	],
+
 	"request": {
 		"pathVariables": {
 			"ctid": "@@@@@"
 		}
 	},
+
 	"expectedResponse": {
 		"_extends_": "Common_400_Response"
 	}

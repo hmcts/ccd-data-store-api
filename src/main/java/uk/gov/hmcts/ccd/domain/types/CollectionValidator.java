@@ -1,15 +1,20 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.*;
-
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 
 @Named
 @Singleton
@@ -33,7 +38,8 @@ public class CollectionValidator implements BaseTypeValidator {
         }
 
         if (!dataValue.isArray()) {
-            return Collections.singletonList(new ValidationResult("Require value to be an array", dataFieldId));
+            return Collections.singletonList(new ValidationResult("Require value to be an array",
+                dataFieldId));
         }
 
         final ArrayNode arrayValue = (ArrayNode) dataValue;
@@ -74,19 +80,22 @@ public class CollectionValidator implements BaseTypeValidator {
             final JsonNode item = items.next();
 
             if (!item.hasNonNull(VALUE)) {
-                final ValidationResult result = new ValidationResult("`value` property missing for collection item", itemFieldId);
+                final ValidationResult result =
+                    new ValidationResult("`value` property missing for collection item", itemFieldId);
                 validationResults.add(result);
             }
 
             if (item.hasNonNull(ID)) {
                 final JsonNode itemId = item.get(ID);
                 if (!itemId.isTextual()) {
-                    final ValidationResult result = new ValidationResult("Collection item ID must be a string", itemFieldId);
+                    final ValidationResult result =
+                        new ValidationResult("Collection item ID must be a string", itemFieldId);
                     validationResults.add(result);
                 }
 
                 if (ids.contains(itemId.textValue())) {
-                    final ValidationResult result = new ValidationResult("Collection item ID must be unique", itemFieldId);
+                    final ValidationResult result =
+                        new ValidationResult("Collection item ID must be unique", itemFieldId);
                     validationResults.add(result);
                 }
 

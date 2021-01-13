@@ -1,9 +1,9 @@
 {
-   "_guid_": "S-000-Base-Success",
-   "_extends_": "S-000-Base-Root",
+	 "_guid_": "S-000-Base-Success",
+	 "_extends_": "S-000-Base-Root",
 
-   "expectedResponse": {
-      "responseCode": 200,
-      "responseMessage": "OK"
-   }
+	 "expectedResponse": {
+			"responseCode": 200,
+			"responseMessage": "OK"
+	 }
 }

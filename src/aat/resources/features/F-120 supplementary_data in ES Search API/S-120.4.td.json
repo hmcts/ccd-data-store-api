@@ -1,0 +1,147 @@
+{
+  "_guid_": "S-120.4",
+  "productName": "CCD Data Store Elastic Search API",
+  "operationName": "Internal Elastic Search Endpoint",
+  "method": "POST",
+  "uri": "/internal/searchCases",
+  "user" : {
+    "username": "[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
+    "password": "[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
+  },
+  "specs": [
+    "a valid profile",
+    "is configured to search for the previously created case",
+    "is configured to request supplementary_data",
+    "is using the query parameter use_case=orgcases",
+    "contains the previously created case",
+    "contains supplementary data"
+  ],
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "ctid": "AAT_PRIVATE",
+      "use_case": "ORGCASES"
+    },
+    "body": {
+      "native_es_query": {
+        "query": {
+          "match": {
+            "reference": "${[scenarioContext][childContexts][Private_Case_Creation_Autotest1_Data][testData][actualResponse][body][id]}"
+          }
+        }
+      },
+      "supplementary_data" : ["*"]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "headers": [
+        {
+          "metadata": {
+            "jurisdiction": "AUTOTEST1",
+            "case_type_id": "AAT_PRIVATE"
+          },
+          "fields": [
+            {
+              "__operator__": "equivalent",
+              "__ordering__": "unordered",
+              "__elementId__": "label"
+            },
+            {
+              "label": "`FixedList` orgcases",
+              "order": 1,
+              "metadata": false,
+              "case_field_id": "FixedListField",
+              "case_field_type": {
+                "id": "FixedList-FixedListType",
+                "type": "FixedList",
+                "min": null,
+                "max": null,
+                "regular_expression": null,
+                "fixed_list_items": [{
+                  "code" : "VALUE4",
+                  "label" : "Value 4",
+                  "order" : null
+                },
+                  {
+                    "code": "VALUE3",
+                    "label": "Value 3",
+                    "order": null
+                  },
+                  {
+                    "code": "VALUE2",
+                    "label": "Value 2",
+                    "order": null
+                  },
+                  {
+                    "code": "VALUE1",
+                    "label": "Value 1",
+                    "order": null
+                  }
+                ],
+                "complex_fields": [],
+                "collection_field_type": null
+              },
+              "display_context_parameter": null
+            },
+            {
+              "label": "`CaseReference` orgcases",
+              "order": 3,
+              "metadata": true,
+              "case_field_id": "[CASE_REFERENCE]",
+              "case_field_type": {
+                "id": "Number",
+                "type": "Number",
+                "min": null,
+                "max": null,
+                "regular_expression": null,
+                "fixed_list_items": [],
+                "complex_fields": [],
+                "collection_field_type": null
+              },
+              "display_context_parameter": null
+            }
+          ],
+          "cases": "[[ANYTHING_PRESENT]]"
+        }
+      ],
+      "cases": [
+        {
+          "fields": {
+            "FixedListField": "VALUE1",
+            "[JURISDICTION]": "AUTOTEST1",
+            "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
+            "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data]}",
+            "[STATE]": "TODO",
+            "[SECURITY_CLASSIFICATION]": "PRIVATE",
+            "[CASE_TYPE]": "AAT_PRIVATE",
+            "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
+          },
+          "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data]}",
+          "fields_formatted": {
+            "FixedListField": "VALUE1",
+            "[JURISDICTION]": "AUTOTEST1",
+            "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
+            "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data]}",
+            "[STATE]": "TODO",
+            "[SECURITY_CLASSIFICATION]": "PRIVATE",
+            "[CASE_TYPE]": "AAT_PRIVATE",
+            "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
+          },
+          "supplementary_data" : {
+            "orgs_assigned_users" : {
+              "OrgA" : 22,
+              "OrgB" : 1
+            }
+          }
+        }
+      ],
+      "total": 1
+    }
+
+  }
+}

@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component;
 @Qualifier("find")
 public class FindSupplementaryDataQueryBuilder implements SupplementaryDataQueryBuilder {
 
-    private static final String SUPPLEMENTARY_DATA_QUERY = "SELECT cd.supplementary_data FROM case_data cd WHERE cd.reference = :reference";
+    private static final String SUPPLEMENTARY_DATA_QUERY = "SELECT cd.supplementary_data FROM case_data cd WHERE "
+                                                         + "cd.reference = :reference";
 
     @Override
     public Query build(EntityManager entityManager,

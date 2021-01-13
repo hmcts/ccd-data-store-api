@@ -47,7 +47,8 @@ public class CollectionValidatorTest {
 
     @Test
     public void validate_emptyShouldBeValid() throws IOException {
-        final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree("[]"), caseFieldDefinition);
+        final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree("[]"),
+            caseFieldDefinition);
 
         assertThat(results, is(emptyCollectionOf(ValidationResult.class)));
     }
@@ -56,7 +57,8 @@ public class CollectionValidatorTest {
     public void validate_invalidMin() throws IOException {
         caseFieldDefinition.getFieldTypeDefinition().setMin(new BigDecimal(2));
 
-        final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"value\": \"V1\"} ]"), caseFieldDefinition);
+        final List<ValidationResult> results =
+            validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"value\": \"V1\"} ]"), caseFieldDefinition);
 
         assertThat(results, hasSize(1));
         assertThat(results.get(0).getErrorMessage(), equalTo("Add at least 2 values"));
@@ -79,14 +81,16 @@ public class CollectionValidatorTest {
         caseFieldDefinition.getFieldTypeDefinition().setMin(ONE);
         caseFieldDefinition.getFieldTypeDefinition().setMax(ONE);
 
-        final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"value\": \"V1\"} ]"), caseFieldDefinition);
+        final List<ValidationResult> results =
+            validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"value\": \"V1\"} ]"), caseFieldDefinition);
 
         assertThat(results, is(emptyCollectionOf(ValidationResult.class)));
     }
 
     @Test
     public void validate_shouldBeInvalidWhenValueNotArray() throws IOException {
-        final List<ValidationResult> results = validator.validate(CASE_FIELD_ID, MAPPER.readTree("\"Some text\""), caseFieldDefinition);
+        final List<ValidationResult> results =
+            validator.validate(CASE_FIELD_ID, MAPPER.readTree("\"Some text\""), caseFieldDefinition);
 
         assertThat(results, hasSize(1));
     }
@@ -114,7 +118,8 @@ public class CollectionValidatorTest {
     @Test
     public void validate_shouldBeInvalidWhenInvalidIDType() throws IOException {
         final List<ValidationResult> results =
-            validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"id\": 1, \"value\": \"V1\"} ]"), caseFieldDefinition);
+            validator.validate(CASE_FIELD_ID,
+                MAPPER.readTree("[ { \"id\": 1, \"value\": \"V1\"} ]"), caseFieldDefinition);
 
         assertThat(results, hasSize(1));
     }
@@ -122,7 +127,8 @@ public class CollectionValidatorTest {
     @Test
     public void validate_shouldBeInvalidWhenAnItemIsMissingValue() throws IOException {
         final List<ValidationResult> results =
-            validator.validate(CASE_FIELD_ID, MAPPER.readTree("[ { \"id\": \"1\", \"value\": \"V1\"}, { \"id\": \"2\"} ]"), caseFieldDefinition);
+            validator.validate(CASE_FIELD_ID,
+                MAPPER.readTree("[ { \"id\": \"1\", \"value\": \"V1\"}, { \"id\": \"2\"} ]"), caseFieldDefinition);
 
         assertThat(results, hasSize(1));
     }

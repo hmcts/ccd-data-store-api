@@ -1,25 +1,28 @@
 {
-  "title": "must start event creation process for appropriate inputs",
   "_guid_": "S-288",
   "_extends_": "F-056_Test_Data_Base",
+  "title": "must start event creation process for appropriate inputs",
+
   "specs": [
     "an active profile in CCD",
     "contains a token created as in Citizen_Token_Creation_Data_For_Case_Creation",
     "includes the case detail for the updated case, along with a HTTP 200 OK"
   ],
+
   "request": {
     "body": {
       "event_token": "${[scenarioContext][childContexts][Citizen_Token_Creation_Data_For_Case_Creation][testData][actualResponse][body][token]}"
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_201_Response",
-    "headers" : {
-      "Content-Length" : "[[ANYTHING_PRESENT]]",
-      "Content-Encoding" : "gzip",
-      "Vary" : "accept-encoding"
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip",
+      "Vary": "accept-encoding"
     },
-    "body" : {
+    "body": {
       "id": "[[ANYTHING_PRESENT]]",
       "jurisdiction": "BEFTA_JURISDICTION_3",
       "state": "TODO",
@@ -41,8 +44,8 @@
           "PostCode": "SW1H 9AJ",
           "Country": "UK"
         },
-        "FormattedDateTimeField" : "2019-01-21T00:05:00.000",
-        "FormattedDateField" : "1970-01-21",
+        "FormattedDateTimeField": "2019-01-21T00:05:00.000",
+        "FormattedDateField": "1970-01-21",
         "ComplexField": {
           "ComplexTextField": "Nested text",
           "ComplexFixedListField": "VALUE2"
@@ -85,8 +88,8 @@
             "Country": "PUBLIC"
           }
         },
-        "FormattedDateTimeField" : "PUBLIC",
-        "FormattedDateField" : "PUBLIC",
+        "FormattedDateTimeField": "PUBLIC",
+        "FormattedDateField": "PUBLIC",
         "ComplexField": {
           "classification": "PUBLIC",
           "value": {
@@ -117,6 +120,7 @@
           ]
         }
       },
+      "supplementary_data": null,
       "after_submit_callback_response": null,
       "callback_response_status_code": null,
       "callback_response_status": null,
@@ -137,8 +141,8 @@
             "Country": "PUBLIC"
           }
         },
-        "FormattedDateTimeField" : "PUBLIC",
-        "FormattedDateField" : "PUBLIC",
+        "FormattedDateTimeField": "PUBLIC",
+        "FormattedDateField": "PUBLIC",
         "ComplexField": {
           "classification": "PUBLIC",
           "value": {

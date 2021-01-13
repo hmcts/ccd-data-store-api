@@ -58,7 +58,8 @@ class DefaultCaseRoleDefinitionRepositoryTest {
 
         when(securityUtils.authorizationHeaders()).thenReturn(httpHeaders);
         when(applicationParams.caseRolesURL()).thenReturn("someURL");
-        doReturn(responseEntity).when(restTemplate).exchange(eq("someURL/caseTypeId/roles"), eq(GET), any(), eq(CaseRoleDefinition[].class));
+        doReturn(responseEntity).when(restTemplate).exchange(eq("someURL/caseTypeId/roles"), eq(GET), any(),
+            eq(CaseRoleDefinition[].class));
         when(responseEntity.getBody()).thenReturn(caseRoleDefinitions);
         Set<String> caseRoleSet = caseRoleRepository.getCaseRoles("caseTypeId");
 
@@ -71,7 +72,8 @@ class DefaultCaseRoleDefinitionRepositoryTest {
 
         when(securityUtils.userAuthorizationHeaders()).thenReturn(httpHeaders);
         when(applicationParams.caseRolesURL()).thenReturn("someURL");
-        doReturn(responseEntity).when(restTemplate).exchange(eq("someURL/caseTypeId/roles"), eq(GET), any(), eq(CaseRoleDefinition[].class));
+        doReturn(responseEntity).when(restTemplate).exchange(eq("someURL/caseTypeId/roles"), eq(GET), any(),
+            eq(CaseRoleDefinition[].class));
         when(responseEntity.getBody()).thenReturn(new CaseRoleDefinition[0]);
         Set<String> caseRoleSet = caseRoleRepository.getCaseRoles("caseTypeId");
 

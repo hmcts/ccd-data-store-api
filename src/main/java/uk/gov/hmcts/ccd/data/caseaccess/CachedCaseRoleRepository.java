@@ -19,7 +19,8 @@ public class CachedCaseRoleRepository implements CaseRoleRepository {
     private final CaseRoleRepository caseRoleRepository;
     private final Map<String, Set<String>> caseRoles = newHashMap();
 
-    public CachedCaseRoleRepository(@Qualifier(DefaultCaseRoleRepository.QUALIFIER) final CaseRoleRepository caseRoleRepository) {
+    public CachedCaseRoleRepository(@Qualifier(DefaultCaseRoleRepository.QUALIFIER)
+                                    final CaseRoleRepository caseRoleRepository) {
         this.caseRoleRepository = caseRoleRepository;
     }
 

@@ -9,7 +9,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -18,10 +24,14 @@ import static org.hamcrest.Matchers.not;
 // FIXME : RDM-7635 - has to mock opendId jwks responses with proper Key set (RS256 public / private key).
 public class IdamIT extends IntegrationTest {
 
-    private static final String CASE_URL = "/caseworkers/123/jurisdictions/TEST/case-types/TestAddressBook/cases/1234123412341238";
-    private static final String CASE_URL_CITIZEN = "/citizens/123/jurisdictions/TEST/case-types/TestAddressBook/cases/1234123412341238";
-    private static final String CASE_URL_WRONG_ID = "/caseworkers/456/jurisdictions/TEST/case-types/TestAddressBook/cases/1234123412341238";
-    private static final String CASE_URL_WRONG_ROLE = "/caseworkers/123/jurisdictions/PROBATE/case-types/TestAddressBook/cases/1234123412341238";
+    private static final String CASE_URL =
+        "/caseworkers/123/jurisdictions/TEST/case-types/TestAddressBook/cases/1234123412341238";
+    private static final String CASE_URL_CITIZEN =
+        "/citizens/123/jurisdictions/TEST/case-types/TestAddressBook/cases/1234123412341238";
+    private static final String CASE_URL_WRONG_ID =
+        "/caseworkers/456/jurisdictions/TEST/case-types/TestAddressBook/cases/1234123412341238";
+    private static final String CASE_URL_WRONG_ROLE =
+        "/caseworkers/123/jurisdictions/PROBATE/case-types/TestAddressBook/cases/1234123412341238";
 
     private static final String VALID_IDAM_TOKEN = "Bearer UserAuthToken";
     private static final String VALID_CITIZEN_TOKEN = "Bearer CitizenToken";

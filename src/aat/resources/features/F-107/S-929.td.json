@@ -1,0 +1,106 @@
+{
+	"title": "must return 200 for case creation with organisation policy",
+	"_guid_": "S-929",
+	"_extends_": "F-107_Test_Data_Base",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains some OrganisationPolicy fields with all correct values"
+	],
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip",
+      "Vary": "accept-encoding",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type_id": "FT_MasterCaseType",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "state": "CaseCreated",
+      "version": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
+      "security_classifications": "[[ANYTHING_PRESENT]]",
+      "case_data": {
+        "AddressField": {
+          "AddressLine1": "[[ANYTHING_PRESENT]]",
+          "AddressLine2": "[[ANYTHING_PRESENT]]",
+          "AddressLine3": "[[ANYTHING_PRESENT]]",
+          "Country": "[[ANYTHING_PRESENT]]"
+        },
+        "TextField": "[[ANYTHING_PRESENT]]",
+        "OrganisationPolicyField2": {
+          "OrgPolicyCaseAssignedRole": "[Defendant]",
+          "OrgPolicyReference": "ref",
+          "Organisation": {
+            "OrganisationID": "[[ANYTHING_PRESENT]]",
+            "OrganisationName": "[[ANYTHING_PRESENT]]"
+          }
+        },
+        "TextAreaField": "[[ANYTHING_PRESENT]]",
+        "OrganisationPolicyField1": {
+          "OrgPolicyCaseAssignedRole": "[Claimant]",
+          "OrgPolicyReference": "ref",
+          "Organisation": {
+            "OrganisationID": "[[ANYTHING_PRESENT]]",
+            "OrganisationName": "[[ANYTHING_PRESENT]]"
+          }
+        }
+      },
+      "data_classification": {
+        "AddressField": {
+          "classification": "PUBLIC",
+          "value": {
+            "AddressLine1": "PUBLIC",
+            "AddressLine2": "PUBLIC",
+            "AddressLine3": "PUBLIC",
+            "Country": "PUBLIC"
+          }
+        },
+        "TextField": "PUBLIC",
+        "OrganisationPolicyField2": {
+          "classification": "PUBLIC",
+          "value": {
+            "OrgPolicyCaseAssignedRole": "PUBLIC",
+            "OrgPolicyReference": "PUBLIC",
+            "Organisation": {
+              "classification": "PUBLIC",
+              "value": {
+                "OrganisationID": "PUBLIC",
+                "OrganisationName": "PUBLIC"
+              }
+            }
+          }
+        },
+        "TextAreaField": "PUBLIC",
+        "OrganisationPolicyField1": {
+          "classification": "PUBLIC",
+          "value": {
+            "OrgPolicyCaseAssignedRole": "PUBLIC",
+            "OrgPolicyReference": "PUBLIC",
+            "Organisation": {
+              "classification": "PUBLIC",
+              "value": {
+                "OrganisationID": "PUBLIC",
+                "OrganisationName": "PUBLIC"
+              }
+            }
+          }
+        }
+      },
+      "supplementary_data": null,
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}

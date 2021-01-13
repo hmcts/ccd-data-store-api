@@ -1,37 +1,41 @@
 {
-  "_guid_": "S-577_Response_Data_Common",
-  "MoneyGBPField": "111100",
-  "FixedListField": "VALUE3",
-  "AddressUKField": {
-    "County": null,
-    "Country": null,
-    "PostCode": null,
-    "PostTown": null,
-    "AddressLine1": null,
-    "AddressLine2": null,
-    "AddressLine3": null
-  },
-  "ComplexField": {
-    "ComplexTextField": null,
-    "ComplexNestedField": {
-      "NestedNumberField": null,
-      "NestedCollectionTextField": []
-    },
-    "ComplexFixedListField": null
-  },
-  "FixedRadioListField": "RADIOVALUE2",
-  "DateTimeField": null,
-  "PhoneUKField": null,
-  "NumberField": "111111222222",
-  "MultiSelectListField": [
-    "OPTION5",
-    "OPTION4",
-    "OPTION3"
-  ],
-  "YesOrNoField": "Yes",
-  "EmailField": "testemail@gmail.com",
-  "TextField": "sometextfield",
-  "DateField": "2222-01-02",
-  "TextAreaField": "textarea",
-  "CollectionField": []
+	"_guid_": "S-577_Response_Data_Common",
+
+	"MoneyGBPField": "111100",
+	"FixedListField": "VALUE3",
+
+	"AddressUKField": {
+		"County": null,
+		"Country": null,
+		"PostCode": null,
+		"PostTown": null,
+		"AddressLine1": null,
+		"AddressLine2": null,
+		"AddressLine3": null
+	},
+
+	"ComplexField": {
+		"ComplexTextField": null,
+		"ComplexNestedField": {
+			"NestedNumberField": null,
+			"NestedCollectionTextField": []
+		},
+		"ComplexFixedListField": null
+	},
+
+	"FixedRadioListField": "RADIOVALUE2",
+	"DateTimeField": null,
+	"PhoneUKField": null,
+	"NumberField": "111111222222",
+	"MultiSelectListField": [
+		"OPTION5",
+		"OPTION4",
+		"OPTION3"
+	],
+	"YesOrNoField": "Yes",
+	"EmailField": "testemail@gmail.com",
+	"TextField": "sometextfield",
+	"DateField": "2222-01-02",
+	"TextAreaField": "textarea",
+	"CollectionField": []
 }

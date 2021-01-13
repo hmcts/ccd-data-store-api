@@ -25,7 +25,8 @@ public class DynamicListValidator implements BaseTypeValidator {
     }
 
     @Override
-    public List<ValidationResult> validate(String dataFieldId, JsonNode dataValue, CaseFieldDefinition caseFieldDefinition) {
+    public List<ValidationResult> validate(String dataFieldId, JsonNode dataValue,
+                                           CaseFieldDefinition caseFieldDefinition) {
         if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }

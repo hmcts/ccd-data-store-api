@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/api/display/search-cases-result-fields/AAT?usecase=TEST&version=33"
+    "url": "/api/display/search-cases-result-fields/AAT?use_case=TEST&version=33"
   },
   "response": {
     "status": 200,

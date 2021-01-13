@@ -1,6 +1,36 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.google.common.collect.Lists;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway.DRAFT_STORE_DOWN_ERR_MESSAGE;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.NO_ERROR;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.SEARCH;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.searchResult;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,6 +40,13 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
+import com.google.common.collect.Lists;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
@@ -23,41 +60,6 @@ import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchInputProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.anyList;
-import static org.mockito.Mockito.anyObject;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway.DRAFT_STORE_DOWN_ERR_MESSAGE;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.NO_ERROR;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.SEARCH;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.SearchResultBuilder.searchResult;
-import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildSearchResultField;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
 public class SearchQueryOperationTest {
     private static final String CASE_TYPE_ID = "GrantOnly";
@@ -132,10 +134,13 @@ public class SearchQueryOperationTest {
         SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
             .build();
-        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET), any());
+        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET),
+            any());
         doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(SEARCH), any());
-        doAnswer(i -> i.getArgument(2)).when(dateTimeSearchInputProcessor).executeQueryParams(Mockito.any(), Mockito.any(), Mockito.any());
-        doAnswer(i -> i.getArgument(1)).when(dateTimeSearchInputProcessor).executeMetadata(Mockito.any(), Mockito.any());
+        doAnswer(i -> i.getArgument(2)).when(dateTimeSearchInputProcessor).executeQueryParams(Mockito.any(),
+            Mockito.any(), Mockito.any());
+        doAnswer(i -> i.getArgument(1)).when(dateTimeSearchInputProcessor).executeMetadata(Mockito.any(),
+            Mockito.any());
 
         metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
@@ -172,7 +177,8 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verify(getDraftsOperation).execute(metadata),
-            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), argument.capture(), eq(NO_ERROR)),
+            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), argument.capture(),
+                eq(NO_ERROR)),
             () -> assertThat(argument.getValue(), hasSize(2)),
             () -> assertThat(argument.getValue(), hasDraftItemInResults())
         );
@@ -191,7 +197,8 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verifyNoMoreInteractions(getDraftsOperation),
-            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), argument.capture(), eq(NO_ERROR)),
+            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), argument.capture(),
+                eq(NO_ERROR)),
             () -> assertThat(argument.getValue(), hasSize(1)),
             () -> assertThat(argument.getValue(), not(hasDraftItemInResults()))
         );
@@ -209,7 +216,8 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verifyNoMoreInteractions(getDraftsOperation),
-            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), argument.capture(), eq(NO_ERROR)),
+            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), argument.capture(),
+                eq(NO_ERROR)),
             () -> assertThat(argument.getValue(), hasSize(1)),
             () -> assertThat(argument.getValue(), not(hasDraftItemInResults()))
         );
@@ -227,7 +235,8 @@ public class SearchQueryOperationTest {
             () -> verify(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ),
             () -> verify(searchOperation).execute(metadata, criteria),
             () -> verify(getDraftsOperation).execute(metadata),
-            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), eq(cases), eq(DRAFT_STORE_DOWN_ERR_MESSAGE))
+            () -> verify(mergeDataToSearchResultOperation).execute(anyObject(), any(), eq(cases),
+                eq(DRAFT_STORE_DOWN_ERR_MESSAGE))
         );
     }
 
@@ -251,7 +260,8 @@ public class SearchQueryOperationTest {
         SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
             .build();
-        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET), any());
+        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET),
+            any());
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
@@ -286,7 +296,8 @@ public class SearchQueryOperationTest {
             .withSearchResultFields(nonSortField, sortField)
             .build();
 
-        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET), any());
+        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET),
+            any());
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
@@ -305,7 +316,8 @@ public class SearchQueryOperationTest {
             .withSearchResultFields(sortField1, sortField2)
             .build();
 
-        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET), any());
+        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET),
+            any());
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
@@ -325,13 +337,15 @@ public class SearchQueryOperationTest {
             .withSearchResultFields(sortField1, sortField2)
             .build();
 
-        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET), any());
+        doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET),
+            any());
         doReturn(true).when(userRepository).anyRoleEqualsTo(sortField2.getRole());
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
         assertThat(metadata.getSortOrderFields().size(), is(1));
-        assertThat(metadata.getSortOrderFields().get(0).getCaseFieldId(), is(CASE_FIELD_ID_1_2 + "." + CASE_FIELD_PATH));
+        assertThat(metadata.getSortOrderFields().get(0).getCaseFieldId(),
+            is(CASE_FIELD_ID_1_2 + "." + CASE_FIELD_PATH));
         assertThat(metadata.getSortOrderFields().get(0).getDirection(), is(DESC));
     }
 
@@ -340,7 +354,8 @@ public class SearchQueryOperationTest {
                                                           String role,
                                                           String sortDirection, Integer sortPriority) {
         SortOrder sortOrder = getSortOrder(sortDirection, sortPriority);
-        SearchResultField searchResultField = buildSearchResultField(CASE_TYPE_ID, caseFieldId, caseFieldPath, caseFieldId, "", "");
+        SearchResultField searchResultField =
+            buildSearchResultField(CASE_TYPE_ID, caseFieldId, caseFieldPath, caseFieldId, "", "");
         searchResultField.setSortOrder(sortOrder);
         searchResultField.setRole(role);
         return searchResultField;

@@ -8,7 +8,8 @@ import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("UserAuthorisation")
 class UserAuthorisationTest {

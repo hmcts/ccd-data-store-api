@@ -4,7 +4,7 @@
   "specs": [
     "a caseworker-autotest1-senior role",
     "is configured to search for the previously created case via exact match",
-    "is using the query parameter usecase=search",
+    "is using the query parameter use_case=search",
     "contains headers only for fields the user has role access to",
     "contains data only for fields the user has role access to"
   ],
@@ -14,7 +14,7 @@
   },
   "request": {
     "queryParams": {
-      "usecase": "SEARCH"
+      "use_case": "SEARCH"
     },
     "body": {
       "query": {

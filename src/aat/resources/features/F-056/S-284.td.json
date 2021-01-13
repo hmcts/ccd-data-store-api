@@ -1,31 +1,35 @@
 {
-  "title": "must return 401 when request does not provide valid authentication credentials",
   "_guid_": "S-284",
   "_extends_": "F-056_Test_Data_Base",
+  "title": "must return 401 when request does not provide valid authentication credentials",
+
   "specs": [
     "an active profile in CCD",
     "does not provide an authorized access to the operation",
     "contains a HTTP 403 Forbidden"
   ],
-  "request": {
-    "headers": {
-      "Authorization": "invalidAuthToken"
-    }
-  },
+
   "user": {
     "username": "auto.test.cnp_invalid@gmail.com",
     "password": "Pa55word12_wrong",
     "token": "fakeToken",
     "id": "dummyval"
   },
+
+  "request": {
+    "headers": {
+      "Authorization": "invalidAuthToken"
+    }
+  },
+
   "expectedResponse": {
     "_extends_": "Common_403_Response",
-    "headers" : {
-      "Content-Length" : "[[ANYTHING_PRESENT]]",
-      "Content-Encoding" : "gzip"
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
     },
     "body": {
-      "message" : "Access Denied"
+      "message": "Access Denied"
     }
   }
 }

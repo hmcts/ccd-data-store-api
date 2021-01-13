@@ -1,41 +1,47 @@
 {
-  "title": "should create an event token for correct inputs",
-  "_guid_": "S-579-Prerequisite_Solicitor_1_Token_For_Update_Case",
-  "productName": "CCD Data Store",
-  "operationName": "Retrieve a create token",
-  "method": "GET",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
-  "specs": [
-    "to get an update event token for the case just created"
-  ],
-  "users": {
-    "invokingUser": {
-      "username": "befta.caseworker.2.solicitor.1@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
-    }
-  },
-  "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers"
-    },
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_JURISDICTION_2",
-      "ctid": "BEFTA_CASETYPE_2_1",
-      "cid": "${[scenarioContext][parentContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
-      "etid": "UPDATE"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_200_Response",
-    "headers": {
-      "Content-Encoding": "gzip",
-      "Content-Length": "[[ANYTHING_PRESENT]]"
-    },
-    "body": {
-      "token": "[[ANYTHING_PRESENT]]",
-      "case_details": "[[ANYTHING_PRESENT]]",
-      "event_id": "UPDATE"
-    }
-  }
+	"_guid_": "S-579-Prerequisite_Solicitor_1_Token_For_Update_Case",
+	"title": "should create an event token for correct inputs",
+
+	"productName": "CCD Data Store",
+	"operationName": "Retrieve a create token",
+
+	"method": "GET",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+
+	"specs": [
+		"to get an update event token for the case just created"
+	],
+
+	"users": {
+		"invokingUser": {
+			"username": "befta.caseworker.2.solicitor.1@gmail.com",
+			"password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
+		}
+	},
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers"
+		},
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "BEFTA_JURISDICTION_2",
+			"ctid": "BEFTA_CASETYPE_2_1",
+			"cid": "${[scenarioContext][parentContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
+			"etid": "UPDATE"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		},
+		"body": {
+			"token": "[[ANYTHING_PRESENT]]",
+			"case_details": "[[ANYTHING_PRESENT]]",
+			"event_id": "UPDATE"
+		}
+	}
 }

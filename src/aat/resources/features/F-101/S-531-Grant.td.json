@@ -2,27 +2,27 @@
 	"title": "must return 204 if the grant is successful for a user to a valid case ID",
 	"_guid_": "S-531-Grant",
 	"_extends_": "F-101_Test_Data_Base",
-  "productName": "CCD Data Store",
-  "operationName": "Grant Case",
+	"productName": "CCD Data Store",
+	"operationName": "Grant Case",
 
-  "specs": [
-    "to grant access to a case",
+	"specs": [
+		"to grant access to a case",
 		"has the 204 return code"
 	],
-  "request": {
-    "pathVariables": {
-      "cid": "${[scenarioContext][parentContext][childContexts][F101_Case_Data_Solicitor][testData][actualResponse][body][id]}"
-    },
-    "body": {
-      "case_roles": [
-        "[DEFENDANT]"
-      ]
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_204_Response",
-    "headers": {
-      "Content-Type": "[[ANY_STRING_NULLABLE]]"
-    }
-  }
+	"request": {
+		"pathVariables": {
+			"cid": "${[scenarioContext][parentContext][childContexts][F101_Case_Data_Solicitor][testData][actualResponse][body][id]}"
+		},
+		"body": {
+			"case_roles": [
+				"[DEFENDANT]"
+			]
+		}
+	},
+	"expectedResponse": {
+		"_extends_": "Common_204_Response",
+		"headers": {
+			"Content-Type": "[[ANY_STRING_NULLABLE]]"
+		}
+	}
 }

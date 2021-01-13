@@ -1,0 +1,14 @@
+{
+  "_guid_": "S-111.1_Get_Case_Roles_for_Case_C1_After_Remove",
+  "_extends_": "F-111_Get_Case_Roles_for_Case_C1_Base",
+
+  "specs": [
+    "to verify Olawale's eventual loss of the role CR-1 over the case C1"
+  ],
+
+  "expectedResponse": {
+    "body": {
+      "case_users": []
+    }
+  }
+}

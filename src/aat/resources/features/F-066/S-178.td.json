@@ -1,31 +1,33 @@
 {
+  "_guid_": "S-178",
+  "_extends_": "F-066_Test_Data_Base",
   "title": "must return negative response when request contains a non-existing case reference",
-	"_guid_": "S-178",
-	"_extends_": "F-066_Test_Data_Base",
 
-	"specs": [
-		"an active profile in CCD",
-		"contains a non-existing case reference",
-		"includes a HTTP 404 'Not Found'"
-	],
+  "specs": [
+    "an active profile in CCD",
+    "contains a non-existing case reference",
+    "includes a HTTP 404 'Not Found'"
+  ],
+
   "request": {
     "pathVariables": {
       "cid": "1234123412341238"
     }
   },
-	"expectedResponse": {
+
+  "expectedResponse": {
     "_extends_": "Common_404_Response",
-		"headers": {
-      "Content-Length" : "[[ANYTHING_PRESENT]]",
-      "Content-Encoding" : "gzip"
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
     },
-    "body" : {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message" : "No case exist with id=1234123412341238",
-      "path" : "/internal/cases/1234123412341238/event-triggers/START_PROGRESS",
-      "details" : null,
-      "callbackErrors" : null,
-      "callbackWarnings" : null
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "No case exist with id=1234123412341238",
+      "path": "/internal/cases/1234123412341238/event-triggers/START_PROGRESS",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
     }
   }
 }

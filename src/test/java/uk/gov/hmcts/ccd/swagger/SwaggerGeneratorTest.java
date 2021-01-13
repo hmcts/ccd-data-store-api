@@ -31,28 +31,24 @@ public class SwaggerGeneratorTest extends WireMockBaseTest {
 
     @DisplayName("Generate swagger documentation for v1 external APIs")
     @Test
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     public void generateV1ExternalSpecsDocument() throws Exception {
         generateSpecsFor("v1_external");
     }
 
     @DisplayName("Generate swagger documentation for v2 external APIs")
     @Test
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     public void generateV2ExternalSpecsDocument() throws Exception {
         generateSpecsFor("v2_external");
     }
 
     @DisplayName("Generate swagger documentation for v1 internal APIs")
     @Test
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     public void generateV1InternalSpecsDocument() throws Exception {
         generateSpecsFor("v1_internal");
     }
 
     @DisplayName("Generate swagger documentation for v2 internal APIs")
     @Test
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     public void generateV2InternalSpecsDocument() throws Exception {
         generateSpecsFor("v2_internal");
     }

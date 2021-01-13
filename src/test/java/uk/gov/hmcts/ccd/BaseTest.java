@@ -76,7 +76,8 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:test.properties")
-@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+@SuppressWarnings("checkstyle:OperatorWrap")
 public abstract class BaseTest {
     protected static final ObjectMapper mapper = JacksonUtils.MAPPER;
     protected static final Slf4jNotifier slf4jNotifier = new Slf4jNotifier(true);
@@ -209,7 +210,8 @@ public abstract class BaseTest {
         caseDetails.setId(String.valueOf(resultSet.getLong("id")));
         caseDetails.setReference(resultSet.getLong("reference"));
         caseDetails.setState(resultSet.getString("state"));
-        caseDetails.setSecurityClassification(SecurityClassification.valueOf(resultSet.getString("security_classification")));
+        caseDetails.setSecurityClassification(SecurityClassification.valueOf(resultSet
+            .getString("security_classification")));
         caseDetails.setCaseTypeId(resultSet.getString("case_type_id"));
         final Timestamp createdAt = resultSet.getTimestamp("created_date");
         if (null != createdAt) {
@@ -219,7 +221,8 @@ public abstract class BaseTest {
         if (null != modifiedAt) {
             caseDetails.setLastModified(modifiedAt.toLocalDateTime());
         }
-        final Timestamp lastStateModified = resultSet.getTimestamp(CaseDetailsEntity.LAST_STATE_MODIFIED_DATE_FIELD_COL);
+        final Timestamp lastStateModified =
+            resultSet.getTimestamp(CaseDetailsEntity.LAST_STATE_MODIFIED_DATE_FIELD_COL);
         if (null != lastStateModified) {
             caseDetails.setLastStateModifiedDate(lastStateModified.toLocalDateTime());
         }
@@ -268,7 +271,8 @@ public abstract class BaseTest {
         auditEvent.setEventName(resultSet.getString("event_name"));
         auditEvent.setDescription(resultSet.getString("description"));
         auditEvent.setSummary(resultSet.getString("summary"));
-        auditEvent.setSecurityClassification(SecurityClassification.valueOf(resultSet.getString("security_classification")));
+        auditEvent.setSecurityClassification(SecurityClassification.valueOf(resultSet
+            .getString("security_classification")));
 
         try {
             auditEvent.setData(JacksonUtils.convertValue(mapper.readTree(resultSet.getString("data"))));
@@ -288,11 +292,13 @@ public abstract class BaseTest {
         return auditEvent;
     }
 
-    protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId, String caseReference, String eventId) {
+    protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId,
+                                        String caseReference, String eventId) {
         return generateEventToken(template, userId, jurisdictionId, caseTypeId, new Long(caseReference), eventId);
     }
 
-    protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId, Long caseReference, String eventId) {
+    protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId,
+                                        Long caseReference, String eventId) {
         final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setId(jurisdictionId);
 
@@ -302,10 +308,12 @@ public abstract class BaseTest {
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setId(eventId);
 
-        return eventTokenService.generateToken(userId, getCase(template, caseReference), caseEventDefinition, jurisdictionDefinition, caseTypeDefinition);
+        return eventTokenService.generateToken(userId, getCase(template, caseReference), caseEventDefinition,
+            jurisdictionDefinition, caseTypeDefinition);
     }
 
-    protected String generateEventTokenNewCase(String userId, String jurisdictionId, String caseTypeId, String eventId) {
+    protected String generateEventTokenNewCase(String userId, String jurisdictionId,
+                                               String caseTypeId, String eventId) {
         final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setId(jurisdictionId);
 
@@ -337,6 +345,7 @@ public abstract class BaseTest {
     }
 
     public static List<CaseFieldDefinition> getCaseFieldsFromJson(String json) throws IOException {
-        return mapper.readValue(json, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseFieldDefinition.class));
+        return mapper.readValue(json, TypeFactory.defaultInstance().constructCollectionType(List.class,
+            CaseFieldDefinition.class));
     }
 }

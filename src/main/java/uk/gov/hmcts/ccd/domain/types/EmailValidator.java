@@ -35,17 +35,18 @@ public class EmailValidator implements BaseTypeValidator {
         final String value = dataValue.textValue();
 
         if (null == value) {
-            return Collections.singletonList(new ValidationResult(dataValue + " is not a valid email", dataFieldId));
+            return Collections.singletonList(new ValidationResult(dataValue + " is not a valid email",
+                dataFieldId));
         }
 
         if (!checkMax(caseFieldDefinition.getFieldTypeDefinition().getMax(), value)) {
-            return Collections.singletonList(new ValidationResult("Email '" + value + "' exceeds maximum length "
-                + caseFieldDefinition.getFieldTypeDefinition().getMax(), dataFieldId));
+            return Collections.singletonList(new ValidationResult("Email '" + value
+                + "' exceeds maximum length " + caseFieldDefinition.getFieldTypeDefinition().getMax(), dataFieldId));
         }
 
         if (!checkMin(caseFieldDefinition.getFieldTypeDefinition().getMin(), value)) {
-            return Collections.singletonList(new ValidationResult("Email '" + value + "' requires minimum length "
-                + caseFieldDefinition.getFieldTypeDefinition().getMin(), dataFieldId));
+            return Collections.singletonList(new ValidationResult("Email '" + value
+                + "' requires minimum length " + caseFieldDefinition.getFieldTypeDefinition().getMin(), dataFieldId));
         }
 
         if (!checkRegex(caseFieldDefinition.getFieldTypeDefinition().getRegularExpression(), value)) {
@@ -61,7 +62,8 @@ public class EmailValidator implements BaseTypeValidator {
         }
 
         if (!isValidEmailAddress(value)) {
-            return Collections.singletonList(new ValidationResult(value + " is not a valid Email address", dataFieldId));
+            return Collections.singletonList(new ValidationResult(value + " is not a valid Email address",
+                dataFieldId));
         }
 
         return Collections.emptyList();

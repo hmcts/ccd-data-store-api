@@ -16,7 +16,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.*;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
 class DefaultGetCaseTypesOperationTestDefinition {
@@ -31,7 +33,7 @@ class DefaultGetCaseTypesOperationTestDefinition {
     private CaseTypeDefinition testCaseTypeDefinition3;
     private List<CaseTypeDefinition> testCaseTypeDefinitions;
 
-    private DefaultGetCaseTypesOperation defaultGetCaseTypesOperation;
+    private uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCaseTypesOperation defaultGetCaseTypesOperation;
 
     @BeforeEach
     void setUp() {
@@ -39,16 +41,21 @@ class DefaultGetCaseTypesOperationTestDefinition {
         testCaseTypeDefinition1 = newCaseType().build();
         testCaseTypeDefinition2 = newCaseType().build();
         testCaseTypeDefinition3 = newCaseType().build();
-        defaultGetCaseTypesOperation = new DefaultGetCaseTypesOperation(caseTypeService);
-        testCaseTypeDefinitions = Lists.newArrayList(testCaseTypeDefinition1, testCaseTypeDefinition2, testCaseTypeDefinition3);
+        defaultGetCaseTypesOperation =
+                new uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCaseTypesOperation(caseTypeService);
+        testCaseTypeDefinitions = Lists.newArrayList(testCaseTypeDefinition1, testCaseTypeDefinition2,
+            testCaseTypeDefinition3);
         doReturn(testCaseTypeDefinitions).when(caseTypeService).getCaseTypesForJurisdiction(JURISDICTION_ID);
     }
 
     @Test
     void shouldReturnCaseTypesRegardlessOfAccessParam() {
-        List<CaseTypeDefinition> createCaseTypeDefinitions = defaultGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_CREATE);
-        List<CaseTypeDefinition> readCaseTypeDefinitions = defaultGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_READ);
-        List<CaseTypeDefinition> updateCaseTypeDefinitions = defaultGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_UPDATE);
+        List<CaseTypeDefinition> createCaseTypeDefinitions =
+            defaultGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_CREATE);
+        List<CaseTypeDefinition> readCaseTypeDefinitions =
+            defaultGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_READ);
+        List<CaseTypeDefinition> updateCaseTypeDefinitions =
+            defaultGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_UPDATE);
 
         assertAll(
             () -> assertThat(createCaseTypeDefinitions, is(equalTo(readCaseTypeDefinitions))),

@@ -27,7 +27,8 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
 
     public AuthorisedGetUserProfileOperation(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                                              AccessControlService accessControlService,
-                                             @Qualifier(DefaultGetUserProfileOperation.QUALIFIER) GetUserProfileOperation getUserProfileOperation) {
+                                             @Qualifier(DefaultGetUserProfileOperation.QUALIFIER)
+                                                 GetUserProfileOperation getUserProfileOperation) {
         this.accessControlService = accessControlService;
         this.getUserProfileOperation = getUserProfileOperation;
         this.userRepository = userRepository;
@@ -57,13 +58,16 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
         return userRepository.getUserRoles();
     }
 
-    private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles, Predicate<AccessControlList> access) {
+    private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles,
+                                                      Predicate<AccessControlList> access) {
         if (caseTypeDefinition == null || CollectionUtils.isEmpty(userRoles)
             || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, access)) {
             return Optional.empty();
         }
-        caseTypeDefinition.setStates(accessControlService.filterCaseStatesByAccess(caseTypeDefinition.getStates(), userRoles, access));
-        caseTypeDefinition.setEvents(accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(), userRoles, access));
+        caseTypeDefinition.setStates(accessControlService.filterCaseStatesByAccess(caseTypeDefinition.getStates(),
+            userRoles, access));
+        caseTypeDefinition.setEvents(accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
+            userRoles, access));
 
         return Optional.of(caseTypeDefinition);
     }

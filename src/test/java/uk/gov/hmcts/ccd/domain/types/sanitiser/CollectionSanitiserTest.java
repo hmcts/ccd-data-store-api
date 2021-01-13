@@ -7,7 +7,11 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -88,7 +92,8 @@ public class CollectionSanitiserTest {
 
         assertThat(sanitisedData.get(0).get(CollectionSanitiser.ID), is(notNullValue()));
         assertThat(sanitisedData.get(1).get(CollectionSanitiser.ID), is(notNullValue()));
-        assertThat(sanitisedData.get(1).get(CollectionSanitiser.ID), not(equalTo(sanitisedData.get(0).get(CollectionSanitiser.ID))));
+        assertThat(sanitisedData.get(1).get(CollectionSanitiser.ID), not(equalTo(sanitisedData.get(0)
+                .get(CollectionSanitiser.ID))));
     }
 
     @Test

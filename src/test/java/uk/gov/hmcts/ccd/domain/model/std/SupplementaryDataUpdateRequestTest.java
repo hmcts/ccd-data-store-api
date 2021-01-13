@@ -23,7 +23,8 @@ class SupplementaryDataUpdateRequestTest {
         childMap.put("testc1.testchild2", "Test Value c2");
         rootMap.put("$set", childMap);
 
-        SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest(rootMap);
+        uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest updateRequest =
+                new uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest(rootMap);
 
         Map<String, Object> leafNodes = updateRequest.getOperationProperties(SupplementaryDataOperation.SET);
 
@@ -47,12 +48,14 @@ class SupplementaryDataUpdateRequestTest {
         childMap2.put("testc4.testchild4", "Test Value c4");
         rootMap.put("$inc", childMap2);
 
-        SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest(rootMap);
+        uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest updateRequest =
+                new uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest(rootMap);
 
         Set<String> propertiesNames = updateRequest.getPropertiesNames();
 
         assertThat(propertiesNames, hasSize(4));
-        assertThat(propertiesNames, containsInAnyOrder("testc1.testchild1", "testc1.testchild2", "testc3", "testc4.testchild4"));
+        assertThat(propertiesNames, containsInAnyOrder("testc1.testchild1", "testc1.testchild2", "testc3",
+                "testc4.testchild4"));
     }
 
     @Test
@@ -67,7 +70,8 @@ class SupplementaryDataUpdateRequestTest {
         childMap2.put("testc3", "Test Value c3");
         rootMap.put("$inc", childMap2);
 
-        SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest(rootMap);
+        uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest updateRequest =
+                new uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest(rootMap);
 
         Set<String> propertiesNames = updateRequest.getOperations();
 
@@ -79,7 +83,8 @@ class SupplementaryDataUpdateRequestTest {
     void shouldReturnEmptyWhenRequestDataEmpty() {
         Map<String, Map<String, Object>> rootMap = new HashMap<>();
 
-        SupplementaryDataUpdateRequest updateRequest = new SupplementaryDataUpdateRequest(rootMap);
+        uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest updateRequest =
+                new uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest(rootMap);
         Map<String, Object> leafNodes = updateRequest.getOperationProperties(SupplementaryDataOperation.SET);
         assertTrue(leafNodes.size() == 0);
     }

@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparingInt;
+import static java.util.function.Predicate.not;
 import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -45,21 +46,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static java.util.Comparator.comparingInt;
-import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
-
 @Repository
 @Qualifier(DefaultUserRepository.QUALIFIER)
 public class DefaultUserRepository implements UserRepository {
@@ -68,6 +54,7 @@ public class DefaultUserRepository implements UserRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultUserRepository.class);
     private static final String RELEVANT_ROLES = "caseworker-%s";
+    private static final int JURISDICTION_INDEX = 1;
 
     private final ApplicationParams applicationParams;
     private final CaseDefinitionRepository caseDefinitionRepository;
@@ -77,7 +64,8 @@ public class DefaultUserRepository implements UserRepository {
 
     @Autowired
     public DefaultUserRepository(ApplicationParams applicationParams,
-                                 @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
+                                 @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                     CaseDefinitionRepository caseDefinitionRepository,
                                  SecurityUtils securityUtils,
                                  @Qualifier("restTemplate") RestTemplate restTemplate,
                                  AuthCheckerConfiguration authCheckerConfiguration) {
@@ -102,15 +90,16 @@ public class DefaultUserRepository implements UserRepository {
 
     @Override
     public Set<String> getUserRoles() {
-        LOG.debug("retrieving user roles");
+        LOG.debug("Getting user roles from security context.");
 
-        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        Collection<? extends GrantedAuthority> authorities =
+            SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         Set<String> userRoles = authorities.stream()
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.toSet());
 
-        String email = getUser().getEmail();
-        LOG.info("Retrieved roles for user={} roles={}", email, userRoles);
+        String userId = getUser().getId();
+        LOG.info("User id from idam: {}. User roles in the security context: {}.", userId, userRoles);
 
         return userRoles;
     }
@@ -133,7 +122,6 @@ public class DefaultUserRepository implements UserRepository {
     @Override
     public UserDefault getUserDefaultSettings(final String userId) {
         try {
-            LOG.debug("retrieving default user settings for user {}", userId);
             final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
             final Map<String, String> queryParams = new HashMap<>();
             queryParams.put("uid", ApplicationParams.encode(userId.toLowerCase()));
@@ -176,12 +164,15 @@ public class DefaultUserRepository implements UserRepository {
     }
 
     @Override
-    public List<String> getUserRolesJurisdictions() {
+    public List<String> getCaseworkerUserRolesJurisdictions() {
         String[] roles = this.getUserDetails().getRoles();
 
-        return Arrays.stream(roles).map(role ->  role.split("-"))
-            .filter(array -> array.length >= 2)
-            .map(element -> element[1])
+        return Arrays.stream(roles)
+            .filter(this::isCaseworkerRole)
+            .filter(not(this::isCrossJurisdictionRole))
+            .map(this::extractJurisdiction)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
             .distinct()
             .collect(Collectors.toList());
     }
@@ -201,6 +192,11 @@ public class DefaultUserRepository implements UserRepository {
         return getUserRoles().stream().anyMatch(role -> rolesPattern.matcher(role).matches());
     }
 
+    @Override
+    public boolean isCrossJurisdictionRole(String role) {
+        return applicationParams.getCcdAccessControlCrossJurisdictionRoles().contains(role);
+    }
+
     private Set<SecurityClassification> getClassificationsForUserRoles(List<String> roles) {
         return caseDefinitionRepository.getClassificationsForUserRoleList(roles).stream()
             .filter(Objects::nonNull)
@@ -212,7 +208,7 @@ public class DefaultUserRepository implements UserRepository {
     private boolean filterRole(final String jurisdictionId, final String role) {
         return startsWithIgnoreCase(role, String.format(RELEVANT_ROLES, jurisdictionId))
                 || ArrayUtils.contains(authCheckerConfiguration.getCitizenRoles(), role)
-                || applicationParams.getCcdAccessControlCrossJurisdictionRoles().contains(role);
+                || isCrossJurisdictionRole(role);
     }
 
     private IdamProperties toIdamProperties(UserInfo userInfo) {
@@ -234,4 +230,12 @@ public class DefaultUserRepository implements UserRepository {
         return idamUser;
     }
 
+    private Optional<String> extractJurisdiction(String caseworkerRole) {
+        String[] parts = caseworkerRole.split("-");
+        return parts.length < 2 ? Optional.empty() : Optional.of(parts[JURISDICTION_INDEX]);
+    }
+
+    private boolean isCaseworkerRole(String role) {
+        return role.matches(applicationParams.getCcdAccessControlCaseworkerRoleRegex());
+    }
 }

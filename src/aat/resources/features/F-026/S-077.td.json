@@ -1,29 +1,32 @@
 {
-  "title": "must return an empty SearchResultView envelope and status code 200 if case type has no associated cases",
-  "_guid_": "S-077",
-  "_extends_": "F-026_Test_Data_Base",
+	"_guid_": "S-077",
+	"_extends_": "F-026_Test_Data_Base",
+	"title": "must return an empty SearchResultView envelope and status code 200 if case type has no associated cases",
 
-  "specs": [
-    "an active profile in CCD",
-    "uses an existing case-type which doesn't have any associated cases",
-    "contains an empty SearchResultView, along with an HTTP-200 OK"
-  ],
-  "user": {
-    "username": "befta.caseworker.1@gmail.com",
-    "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
-  },
-  "request": {
-    "pathVariables": {
-      "jid": "BEFTA_JURISDICTION_1",
-      "ctid": "CASE_TYPE_WITH_NO_CASES"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_200_Response",
-    "body": {
-      "columns": "[[ANYTHING_PRESENT]]",
-      "results": [],
-      "result_error": null
-    }
-  }
+	"specs": [
+		"an active profile in CCD",
+		"uses an existing case-type which doesn't have any associated cases",
+		"contains an empty SearchResultView, along with an HTTP-200 OK"
+	],
+
+	"user": {
+		"username": "befta.caseworker.1@gmail.com",
+		"password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
+	},
+
+	"request": {
+		"pathVariables": {
+			"jid": "BEFTA_JURISDICTION_1",
+			"ctid": "CASE_TYPE_WITH_NO_CASES"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"body": {
+			"columns": "[[ANYTHING_PRESENT]]",
+			"results": [],
+			"result_error": null
+		}
+	}
 }

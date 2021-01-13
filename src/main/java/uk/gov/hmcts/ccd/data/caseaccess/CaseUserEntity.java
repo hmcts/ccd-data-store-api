@@ -14,9 +14,11 @@ import javax.persistence.Table;
     @NamedQuery(name = CaseUserEntity.GET_ALL_CASES_USER_HAS_ACCESS_TO,
         query = "SELECT casePrimaryKey.caseDataId from CaseUserEntity where casePrimaryKey.userId = :userId"),
     @NamedQuery(name = CaseUserEntity.GET_ALL_CASE_ROLES_USER_HAS_ACCESS_FOR_A_CASE,
-        query = "SELECT casePrimaryKey.caseRole from CaseUserEntity where casePrimaryKey.userId = :userId and casePrimaryKey.caseDataId = :caseDataId"),
+        query = "SELECT casePrimaryKey.caseRole from CaseUserEntity where casePrimaryKey.userId = :userId "
+            + "and casePrimaryKey.caseDataId = :caseDataId"),
     @NamedQuery(name = CaseUserEntity.GET_ALL_CASE_ROLES_USERS_HAS_ACCESS_TO_CASES,
-        query = "SELECT cue FROM CaseUserEntity cue WHERE casePrimaryKey.caseDataId IN :case_data_ids AND casePrimaryKey.userId IN :user_ids"),
+        query = "SELECT cue FROM CaseUserEntity cue WHERE casePrimaryKey.caseDataId IN :case_data_ids "
+            + "AND casePrimaryKey.userId IN :user_ids"),
     @NamedQuery(name = CaseUserEntity.GET_ALL_CASE_ROLES_BY_CASE_IDS,
         query = "SELECT cue FROM CaseUserEntity cue WHERE casePrimaryKey.caseDataId IN :case_data_ids")
 })
@@ -24,7 +26,8 @@ public class CaseUserEntity implements Serializable {
 
     protected static final String GET_ALL_CASES_USER_HAS_ACCESS_TO = "GET_ALL_CASES";
     protected static final String GET_ALL_CASE_ROLES_USER_HAS_ACCESS_FOR_A_CASE = "GET_ALL_CASES_ROLES_FOR_A_CASE";
-    protected static final String GET_ALL_CASE_ROLES_USERS_HAS_ACCESS_TO_CASES = "GET_ALL_CASE_ROLES_USERS_HAS_ACCESS_TO_CASES";
+    protected static final String GET_ALL_CASE_ROLES_USERS_HAS_ACCESS_TO_CASES =
+                                                                    "GET_ALL_CASE_ROLES_USERS_HAS_ACCESS_TO_CASES";
     protected static final String GET_ALL_CASE_ROLES_BY_CASE_IDS = "GET_ALL_CASE_ROLES_BY_CASE_IDS";
     public static final String PARAM_CASE_DATA_IDS = "case_data_ids";
     public static final String PARAM_USER_IDS = "user_ids";

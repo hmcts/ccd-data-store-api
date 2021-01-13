@@ -45,9 +45,10 @@ public class DocumentManagementRestClient {
             document = restTemplate.exchange(url, HttpMethod.GET, requestEntity, Document.class).getBody();
 
         } catch (Exception e) {
-            LOG.error("Cannot sanitize document for the Case Field Type:{}, Case Field Type Id:{} because of unreachable url",
-                fieldTypeDefinition.getType(), fieldTypeDefinition.getId(), e);
-            throw new ApiException(String.format("Cannot sanitize document for the Case Field Type:%s, Case Field Type Id:%s because of %s",
+            LOG.error("Cannot sanitize document for the Case Field Type:{}, Case Field Type Id:{} because of "
+                    + "unreachable url", fieldTypeDefinition.getType(), fieldTypeDefinition.getId(), e);
+            throw new ApiException(String.format("Cannot sanitize document for the Case Field Type:%s, Case Field Type"
+                    + " Id:%s because of %s",
                 fieldTypeDefinition.getType(), fieldTypeDefinition.getId(), e));
         }
 

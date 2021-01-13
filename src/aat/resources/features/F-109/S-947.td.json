@@ -1,0 +1,177 @@
+{
+  "_guid_": "S-947",
+  "_extends_": "F-109_test_Data_Base_ES_internal",
+  "specs": [
+    "with access to create cases for various jurisdictions Befta_Jurisdiction1 & Befta_Jurisdiction2",
+    "with only the 'caseworker-caa' role is not configured with the required CRUD permissions for Befta_Jurisdiction3_Case_Type1",
+    "is made to query the previously created case Befta_Jurisdiction3_Case_Type1",
+    "contains no results",
+    "to create a full case"
+  ],
+  "request": {
+    "queryParams": {
+      "ctid": "BEFTA_CASETYPE_3_1"
+    },
+    "body": {
+      "query": {
+        "match": {
+          "reference": "${[scenarioContext][childContexts][F-109-Befta_Jurisdiction3_Case_Type1_Creation][testData][actualResponse][body][id]}"
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "body" : {
+      "headers" : [ {
+        "metadata" : {
+          "jurisdiction" : "BEFTA_JURISDICTION_3",
+          "case_type_id" : "BEFTA_CASETYPE_3_1"
+        },
+        "fields" : [ {
+          "label" : "State",
+          "order" : null,
+          "metadata" : true,
+          "case_field_id" : "[STATE]",
+          "case_field_type" : {
+            "id" : "FixedList-BEFTA_CASETYPE_3_1[STATE]",
+            "type" : "FixedList",
+            "min" : null,
+            "max" : null,
+            "regular_expression" : null,
+            "fixed_list_items" : [ {
+              "code" : "DONE",
+              "label" : "Done",
+              "order" : null
+            }, {
+              "code" : "IN_PROGRESS",
+              "label" : "In progress",
+              "order" : null
+            }, {
+              "code" : "TODO",
+              "label" : "To do",
+              "order" : null
+            } ],
+            "complex_fields" : [ ],
+            "collection_field_type" : null
+          },
+          "display_context_parameter" : null
+        }, {
+          "label" : "Last State Modified Date",
+          "order" : null,
+          "metadata" : true,
+          "case_field_id" : "[LAST_STATE_MODIFIED_DATE]",
+          "case_field_type" : {
+            "id" : "DateTime",
+            "type" : "DateTime",
+            "min" : null,
+            "max" : null,
+            "regular_expression" : null,
+            "fixed_list_items" : [ ],
+            "complex_fields" : [ ],
+            "collection_field_type" : null
+          },
+          "display_context_parameter" : null
+        }, {
+          "label" : "Last Modified Date",
+          "order" : null,
+          "metadata" : true,
+          "case_field_id" : "[LAST_MODIFIED_DATE]",
+          "case_field_type" : {
+            "id" : "DateTime",
+            "type" : "DateTime",
+            "min" : null,
+            "max" : null,
+            "regular_expression" : null,
+            "fixed_list_items" : [ ],
+            "complex_fields" : [ ],
+            "collection_field_type" : null
+          },
+          "display_context_parameter" : null
+        }, {
+          "label" : "Created Date",
+          "order" : null,
+          "metadata" : true,
+          "case_field_id" : "[CREATED_DATE]",
+          "case_field_type" : {
+            "id" : "DateTime",
+            "type" : "DateTime",
+            "min" : null,
+            "max" : null,
+            "regular_expression" : null,
+            "fixed_list_items" : [ ],
+            "complex_fields" : [ ],
+            "collection_field_type" : null
+          },
+          "display_context_parameter" : null
+        }, {
+          "label" : "Jurisdiction",
+          "order" : null,
+          "metadata" : true,
+          "case_field_id" : "[JURISDICTION]",
+          "case_field_type" : {
+            "id" : "Text",
+            "type" : "Text",
+            "min" : null,
+            "max" : null,
+            "regular_expression" : null,
+            "fixed_list_items" : [ ],
+            "complex_fields" : [ ],
+            "collection_field_type" : null
+          },
+          "display_context_parameter" : null
+        }, {
+          "label" : "Case Type",
+          "order" : null,
+          "metadata" : true,
+          "case_field_id" : "[CASE_TYPE]",
+          "case_field_type" : {
+            "id" : "Text",
+            "type" : "Text",
+            "min" : null,
+            "max" : null,
+            "regular_expression" : null,
+            "fixed_list_items" : [ ],
+            "complex_fields" : [ ],
+            "collection_field_type" : null
+          },
+          "display_context_parameter" : null
+        }, {
+          "label" : "Security Classification",
+          "order" : null,
+          "metadata" : true,
+          "case_field_id" : "[SECURITY_CLASSIFICATION]",
+          "case_field_type" : {
+            "id" : "Text",
+            "type" : "Text",
+            "min" : null,
+            "max" : null,
+            "regular_expression" : null,
+            "fixed_list_items" : [ ],
+            "complex_fields" : [ ],
+            "collection_field_type" : null
+          },
+          "display_context_parameter" : null
+        }, {
+          "label" : "Case Reference",
+          "order" : null,
+          "metadata" : true,
+          "case_field_id" : "[CASE_REFERENCE]",
+          "case_field_type" : {
+            "id" : "Number",
+            "type" : "Number",
+            "min" : null,
+            "max" : null,
+            "regular_expression" : null,
+            "fixed_list_items" : [ ],
+            "complex_fields" : [ ],
+            "collection_field_type" : null
+          },
+          "display_context_parameter" : null
+        } ],
+        "cases" : [ ]
+      } ],
+      "cases" : [ ],
+      "total" : 0
+    }
+  }
+}

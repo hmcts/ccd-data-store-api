@@ -1,9 +1,12 @@
 {
   "_guid_": "S-584_Get_Case_For_Case_Worker_Data_Base",
+
   "productName": "CCD Data Store",
   "operationName": "Get Case for Citizen",
+
   "method": "GET",
   "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}",
+
   "users": {
     "invokingUser": {
       "username": "befta.citizen.2@gmail.com",
@@ -24,7 +27,7 @@
       "_extends_": "Common_200_Response",
       "headers": {
         "Content-Encoding": "gzip"
-        },
+      },
       "body": {
         "id": "[[ANYTHING_PRESENT]]",
         "jurisdiction": "BEFTA_JURISDICTION_2",

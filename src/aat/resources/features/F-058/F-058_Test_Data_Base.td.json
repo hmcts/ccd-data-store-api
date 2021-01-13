@@ -1,9 +1,10 @@
 {
-	"_guid_": "F-058_Test_Data_Base",
+  "_guid_": "F-058_Test_Data_Base",
 
-	"productName": "CCD Data Store",
-	"operationName": "start case creation as citizen",
-	"method": "GET",
+  "productName": "CCD Data Store",
+  "operationName": "start case creation as citizen",
+
+  "method": "GET",
   "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
 
   "users": {
@@ -12,19 +13,21 @@
       "password": "[[$CCD_BEFTA_CITIZEN_3_PWD]]"
     }
   },
-	"request": {
-		"_extends_": "Common_Request",
-		"pathVariables": {
-			"uid": "[[DEFAULT_AUTO_VALUE]]",
-			"jid": "AUTOTEST1",
-			"ctid": "AAT",
-			"etid": "CREATE"
-		}
-	},
-	"expectedResponse": {
-		"headers": {
-			"Content-Length": "[[ANYTHING_PRESENT]]",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "AUTOTEST1",
+      "ctid": "AAT",
+      "etid": "CREATE"
+    }
+  },
+
+  "expectedResponse": {
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "gzip"
     }
-	}
+  }
 }

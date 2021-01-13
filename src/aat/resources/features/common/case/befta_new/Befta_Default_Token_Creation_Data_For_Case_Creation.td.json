@@ -2,9 +2,10 @@
 	"_guid_": "Befta_Default_Token_Creation_Data_For_Case_Creation",
 
 	"productName": "CCD Data Store",
-    "operationName": "Start event creation as Case worker",
-    "method": "GET",
-    "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+	"operationName": "Start event creation as Case worker",
+
+	"method": "GET",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
 
 	"specs": [
 		"to create a token for case creation"
@@ -31,33 +32,33 @@
 
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
-    "headers" : {
-      "Content-Encoding" : "gzip",
-      "Content-Length": "[[ANYTHING_PRESENT]]"
-    },
-    "body" : {
-      "token" : "[[ANYTHING_PRESENT]]",
-      "case_details" : {
-        "id" : null,
-        "jurisdiction" : "BEFTA_JURISDICTION_1",
-        "state" : null,
-        "version" : null,
-        "case_type_id" : "BEFTA_CASETYPE_1_1",
-        "created_date" : null,
-        "last_modified" : null,
-        "last_state_modified_date" : null,
-        "security_classification" : null,
-        "case_data" : { },
-        "data_classification" : { },
-        "after_submit_callback_response" : null,
-        "callback_response_status_code" : null,
-        "callback_response_status" : null,
-        "delete_draft_response_status_code" : null,
-        "delete_draft_response_status" : null,
-        "security_classifications" : { }
-      },
-      "event_id" : "CREATE"
-    }
-  }
-
+		"headers" : {
+			"Content-Encoding" : "gzip",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		},
+		"body" : {
+			"token" : "[[ANYTHING_PRESENT]]",
+			"case_details" : {
+				"id" : null,
+				"jurisdiction" : "BEFTA_JURISDICTION_1",
+				"state" : null,
+				"version" : null,
+				"case_type_id" : "BEFTA_CASETYPE_1_1",
+				"created_date" : null,
+				"last_modified" : null,
+				"last_state_modified_date" : null,
+				"security_classification" : null,
+				"case_data" : { },
+				"data_classification" : { },
+				"supplementary_data": null,
+				"after_submit_callback_response" : null,
+				"callback_response_status_code" : null,
+				"callback_response_status" : null,
+				"delete_draft_response_status_code" : null,
+				"delete_draft_response_status" : null,
+				"security_classifications" : { }
+			},
+			"event_id" : "CREATE"
+		}
+	}
 }

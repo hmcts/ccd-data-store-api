@@ -24,19 +24,31 @@ import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
 
 import javax.inject.Inject;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ccd.v2.DCPTestHelper.*;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COLLECTION_COMPLEX_DATE_TIME;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COLLECTION_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COMPLEX_DATE_TIME_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COMPLEX_NESTED_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.DATE_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.DATE_TIME_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.NESTED_COMPLEX;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.NESTED_NUMBER_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.STANDARD_DATE;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.STANDARD_DATE_TIME;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.TEXT_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.arrayOf;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.mapOf;
 
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public class UICaseControllerDCPIT extends WireMockBaseTest {
@@ -97,31 +109,39 @@ public class UICaseControllerDCPIT extends WireMockBaseTest {
         CaseViewField complexField = tabs[2].getFields()[1];
 
         assertAll(
-            () -> assertSimpleField(textField, TEXT_FIELD, null, "Case 1 Text", "Case 1 Text"),
-            () -> assertSimpleField(dateField, DATE_FIELD, "#DATETIMEDISPLAY(dd, MMM yyyy)", "2000-10-20", "20, Oct 2000"),
-            () -> assertSimpleField(dateTimeField, DATE_TIME_FIELD, null, "1987-11-15T12:30:00.000", "1987-11-15T12:30:00.000"),
+            () -> assertSimpleField(textField, TEXT_FIELD, null, "Case 1 Text",
+                "Case 1 Text"),
+            () -> assertSimpleField(dateField, DATE_FIELD, "#DATETIMEDISPLAY(dd, MMM yyyy)",
+                "2000-10-20", "20, Oct 2000"),
+            () -> assertSimpleField(dateTimeField, DATE_TIME_FIELD, null,
+                "1987-11-15T12:30:00.000", "1987-11-15T12:30:00.000"),
 
-            () -> assertCollectionField(collectionField, COLLECTION_FIELD, "#DATETIMEDISPLAY(dd/MM/yyyy)",
+            () -> assertCollectionField(collectionField, COLLECTION_FIELD,
+                "#DATETIMEDISPLAY(dd/MM/yyyy)",
                 new String[]{"2004-03-02T05:06:07.000", "2010-09-08T11:12:13.000"},
                 new String[]{"02/03/2004", "08/09/2010"}),
 
-            () -> assertThat(complexField.getFieldTypeDefinition().getChildren().get(0).getId(), is(COMPLEX_DATE_TIME_FIELD)),
+            () -> assertThat(complexField.getFieldTypeDefinition().getChildren().get(0).getId(),
+                is(COMPLEX_DATE_TIME_FIELD)),
             () -> assertThat(complexField.getFieldTypeDefinition().getChildren().get(0).getDisplayContextParameter(),
                 is("#DATETIMEDISPLAY(yyyy),#DATETIMEENTRY(MM-yyyy)")),
-            () -> assertThat(mapOf(complexField.getValue()).get(COMPLEX_DATE_TIME_FIELD), is("2005-03-28T07:45:30.000")),
+            () -> assertThat(mapOf(complexField.getValue()).get(COMPLEX_DATE_TIME_FIELD),
+                is("2005-03-28T07:45:30.000")),
             () -> assertThat(mapOf(complexField.getFormattedValue()).get(COMPLEX_DATE_TIME_FIELD), is("2005")),
 
-            () -> assertThat(complexField.getFieldTypeDefinition().getChildren().get(1).getFieldTypeDefinition().getChildren().get(0)
-                .getId(), is(NESTED_NUMBER_FIELD)),
-            () -> assertThat(complexField.getFieldTypeDefinition().getChildren().get(1).getFieldTypeDefinition().getChildren().get(0)
-                .getDisplayContextParameter(), is("#DATETIMEDISPLAY(dd MM yyyy),#DATETIMEENTRY(HHmm)")),
+            () -> assertThat(complexField.getFieldTypeDefinition().getChildren().get(1).getFieldTypeDefinition()
+                .getChildren().get(0).getId(), is(NESTED_NUMBER_FIELD)),
+            () -> assertThat(complexField.getFieldTypeDefinition().getChildren().get(1).getFieldTypeDefinition()
+                .getChildren().get(0).getDisplayContextParameter(),
+                is("#DATETIMEDISPLAY(dd MM yyyy),#DATETIMEENTRY(HHmm)")),
             () -> assertThat(mapOf(mapOf(complexField.getValue()).get(COMPLEX_NESTED_FIELD))
                 .get(NESTED_NUMBER_FIELD), is(nullValue())),
             () -> assertThat(mapOf(mapOf(complexField.getFormattedValue()).get(COMPLEX_NESTED_FIELD))
                 .get(NESTED_NUMBER_FIELD), is(nullValue())),
 
             () -> assertThat(complexCollectionField.getId(), is(COLLECTION_COMPLEX_DATE_TIME)),
-            () -> assertComplexCollectionDCP(complexCollectionField, "#DATETIMEENTRY(dd-MM-yyyy),#DATETIMEDISPLAY(dd-MM-yyyy)",
+            () -> assertComplexCollectionDCP(complexCollectionField,
+                "#DATETIMEENTRY(dd-MM-yyyy),#DATETIMEDISPLAY(dd-MM-yyyy)",
                 null, "#DATETIMEENTRY(yyyy-MM-dd'T'HH:mm),#DATETIMEDISPLAY(yyyy-MM-dd'T'HH:mm)", null,
                 "#DATETIMEENTRY(MM-yyyy),#DATETIMEDISPLAY(MM-yyyy)", null,
                 "#DATETIMEENTRY(yyyy-MM-dd),#DATETIMEDISPLAY(yyyy-MM-dd)", null),
@@ -146,22 +166,30 @@ public class UICaseControllerDCPIT extends WireMockBaseTest {
                                             String nestedDateTimeFieldValue,
                                             String nestedStandardDateTimeFieldValue) {
         assertAll(
-            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(0).getDisplayContextParameter(),
+            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren()
+                    .get(0).getDisplayContextParameter(),
                 is(dateFieldValue)),
-            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(1).getDisplayContextParameter(),
+            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren()
+                    .get(1).getDisplayContextParameter(),
                 is(dateTimeFieldValue)),
-            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(2).getDisplayContextParameter(),
+            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren()
+                    .get(2).getDisplayContextParameter(),
                 is(standardDateFieldValue)),
-            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(3).getDisplayContextParameter(),
+            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren()
+                    .get(3).getDisplayContextParameter(),
                 is(standardDateTimeFieldValue)),
-            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(4).getFieldTypeDefinition()
-                .getChildren().get(0).getDisplayContextParameter(), is(nestedDateFieldValue)),
-            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(4).getFieldTypeDefinition()
-                .getChildren().get(1).getDisplayContextParameter(), is(nestedDateTimeFieldValue)),
-            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(4).getFieldTypeDefinition()
-                .getChildren().get(2).getDisplayContextParameter(), is(nestedStandardDateFieldValue)),
-            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren().get(4).getFieldTypeDefinition()
-                .getChildren().get(3).getDisplayContextParameter(), is(nestedStandardDateTimeFieldValue))
+            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren()
+                .get(4).getFieldTypeDefinition().getChildren().get(0).getDisplayContextParameter(),
+                is(nestedDateFieldValue)),
+            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren()
+                .get(4).getFieldTypeDefinition().getChildren().get(1).getDisplayContextParameter(),
+                is(nestedDateTimeFieldValue)),
+            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren()
+                .get(4).getFieldTypeDefinition().getChildren().get(2).getDisplayContextParameter(),
+                is(nestedStandardDateFieldValue)),
+            () -> assertThat(caseViewField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getChildren()
+                .get(4).getFieldTypeDefinition().getChildren().get(3).getDisplayContextParameter(),
+                is(nestedStandardDateTimeFieldValue))
         );
     }
 

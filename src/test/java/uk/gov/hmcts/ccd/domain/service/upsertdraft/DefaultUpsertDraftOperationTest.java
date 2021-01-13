@@ -71,7 +71,8 @@ class DefaultUpsertDraftOperationTest {
 
     private UpsertDraftOperation upsertDraftOperation;
 
-    private CaseDataContent caseDataContent = newCaseDataContent().withData(DATA).withEvent(newEvent().withEventId(ETID).build()).build();
+    private CaseDataContent caseDataContent =
+        newCaseDataContent().withData(DATA).withEvent(newEvent().withEventId(ETID).build()).build();
     private CaseDraft caseDraft;
     private DraftResponse draftResponse = newDraftResponse().build();
 
@@ -83,7 +84,8 @@ class DefaultUpsertDraftOperationTest {
         given(caseSanitiser.sanitise(CASE_TYPE, DATA)).willReturn(SANITISED_DATA);
         given(userAuthorisation.getUserId()).willReturn(UID);
 
-        upsertDraftOperation = new DefaultUpsertDraftOperation(draftGateway, caseDefinitionRepository, caseSanitiser, userAuthorisation, applicationParams);
+        upsertDraftOperation = new DefaultUpsertDraftOperation(draftGateway, caseDefinitionRepository, caseSanitiser,
+            userAuthorisation, applicationParams);
         caseDraft = newCaseDraft()
             .withUserId(UID)
             .withJurisdictionId(JID)
@@ -106,11 +108,14 @@ class DefaultUpsertDraftOperationTest {
             () -> verify(caseDefinitionRepository).getCaseType(CTID),
             () -> verify(caseSanitiser).sanitise(CASE_TYPE, DATA),
             () -> assertThat(captor.getValue().getDocument(), hasProperty("userId", is(caseDraft.getUserId()))),
-            () -> assertThat(captor.getValue().getDocument(), hasProperty("jurisdictionId", is(caseDraft.getJurisdictionId()))),
-            () -> assertThat(captor.getValue().getDocument(), hasProperty("caseTypeId", is(caseDraft.getCaseTypeId()))),
+            () -> assertThat(captor.getValue().getDocument(), hasProperty("jurisdictionId",
+                is(caseDraft.getJurisdictionId()))),
+            () -> assertThat(captor.getValue().getDocument(), hasProperty("caseTypeId",
+                is(caseDraft.getCaseTypeId()))),
             () -> assertThat(captor.getValue().getDocument(), hasProperty("eventId", is(caseDraft.getEventId()))),
             () -> assertThat(captor.getValue().getDocument(), hasProperty("caseDataContent", is(caseDataContent))),
-            () -> assertThat(captor.getValue().getDocument(), hasProperty("caseDataContent", hasProperty("data", is(SANITISED_DATA)))),
+            () -> assertThat(captor.getValue().getDocument(), hasProperty("caseDataContent",
+                hasProperty("data", is(SANITISED_DATA)))),
             () -> assertThat(captor.getValue().getMaxTTLDays(), is(DRAFT_MAX_STALE_DAYS)),
             () -> assertThat(captor.getValue().getType(), is(CASE_DATA_CONTENT)),
             () -> assertThat(result, samePropertyValuesAs(draftResponse))
@@ -120,7 +125,8 @@ class DefaultUpsertDraftOperationTest {
     @Test
     void shouldSuccessfullyUpdateDraft() {
         final ArgumentCaptor<String> draftIdCaptor = ArgumentCaptor.forClass(String.class);
-        final ArgumentCaptor<UpdateCaseDraftRequest> caseDataContentCaptor = ArgumentCaptor.forClass(UpdateCaseDraftRequest.class);
+        final ArgumentCaptor<UpdateCaseDraftRequest> caseDataContentCaptor =
+            ArgumentCaptor.forClass(UpdateCaseDraftRequest.class);
         doReturn(draftResponse).when(draftGateway).update(any(UpdateCaseDraftRequest.class), any(String.class));
 
 
@@ -131,12 +137,18 @@ class DefaultUpsertDraftOperationTest {
             () -> verify(caseDefinitionRepository).getCaseType(CTID),
             () -> verify(caseSanitiser).sanitise(CASE_TYPE, DATA),
             () -> assertThat(draftIdCaptor.getValue(), is("5")),
-            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("userId", is(caseDraft.getUserId()))),
-            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("jurisdictionId", is(caseDraft.getJurisdictionId()))),
-            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("caseTypeId", is(caseDraft.getCaseTypeId()))),
-            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("eventId", is(caseDraft.getEventId()))),
-            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("caseDataContent", is(caseDataContent))),
-            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("caseDataContent", hasProperty("data", is(SANITISED_DATA)))),
+            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("userId",
+                is(caseDraft.getUserId()))),
+            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("jurisdictionId",
+                is(caseDraft.getJurisdictionId()))),
+            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("caseTypeId",
+                is(caseDraft.getCaseTypeId()))),
+            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("eventId",
+                is(caseDraft.getEventId()))),
+            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("caseDataContent",
+                is(caseDataContent))),
+            () -> assertThat(caseDataContentCaptor.getValue().getDocument(), hasProperty("caseDataContent",
+                hasProperty("data", is(SANITISED_DATA)))),
             () -> assertThat(caseDataContentCaptor.getValue().getType(), is(CASE_DATA_CONTENT)),
             () -> assertThat(result, is(draftResponse))
         );

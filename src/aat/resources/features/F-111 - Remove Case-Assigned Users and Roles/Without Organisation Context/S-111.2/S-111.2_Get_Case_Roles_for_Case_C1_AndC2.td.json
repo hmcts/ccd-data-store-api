@@ -1,0 +1,35 @@
+{
+  "title": "Get Case-Assigned Users and Roles",
+
+  "_guid_": "S-111.2_Get_Case_Roles_for_Case_C1_And_C2",
+
+  "productName": "CCD Data Store",
+  "operationName": "Get Case-Assigned Users and Roles",
+
+  "method": "GET",
+  "uri": "/case-users",
+
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.caa@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_CAA_PWD]]"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "case_ids": "${[scenarioContext][siblingContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]},${[scenarioContext][siblingContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment_C2][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

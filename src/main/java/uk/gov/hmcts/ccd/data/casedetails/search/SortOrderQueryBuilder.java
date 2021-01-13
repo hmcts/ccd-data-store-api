@@ -29,12 +29,14 @@ public class SortOrderQueryBuilder {
             sb.append(COMMA);
             sb.append(SPACE);
         });
-        // always sort with creation_date as a last order so that it supports cases where no values at all for the configured fields and also default fallback.
+        // always sort with creation_date as a last order so that it supports cases where
+        // no values at all for the configured fields and also default fallback.
         return sb.append(CREATED_DATE + SPACE + fromOptionalString(metaData.getSortDirection())).toString();
     }
 
     private String getMataFieldName(String fieldName) {
-        String metaFieldName = fieldName.startsWith("[") ? StringUtils.substringBetween(fieldName, "[", "]") : fieldName;
+        String metaFieldName = fieldName.startsWith("[")
+            ? StringUtils.substringBetween(fieldName, "[", "]") : fieldName;
         return CaseField.valueOf(metaFieldName).getDbColumnName();
     }
 

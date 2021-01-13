@@ -2,9 +2,10 @@
 	"_guid_": "Standard_Token_Creation_Data_For_Case_Creation",
 
 	"productName": "CCD Data Store",
-    "operationName": "Start event creation as Case worker",
-    "method": "GET",
-    "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+	"operationName": "Start event creation as Case worker",
+
+	"method": "GET",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
 
 	"specs": [
 		"to create a token for case creation"
@@ -18,7 +19,7 @@
 	},
 
 	"request": {
-		"headers":{
+		"headers": {
 			"_extends_": "Common_Request_Headers"
 		},
 		"pathVariables": {
@@ -31,33 +32,33 @@
 
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
-    "headers" : {
-      "Content-Encoding" : "gzip",
-      "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
-    },
-    "body" : {
-      "token" : "[[ANY_STRING_NOT_NULLABLE]]",
-      "case_details" : {
-        "id": null,
-        "jurisdiction": "[[ANYTHING_PRESENT]]",
-        "state": null,
-        "version": null,
-        "case_type_id": "[[ANYTHING_PRESENT]]",
-        "created_date": null,
-        "last_modified": null,
-        "last_state_modified_date": null,
-        "security_classification": null,
-        "case_data": {},
-        "data_classification": {},
-        "after_submit_callback_response": null,
-        "callback_response_status_code": null,
-        "callback_response_status": null,
-        "delete_draft_response_status_code": null,
-        "delete_draft_response_status": null,
-        "security_classifications": {}
-      },
-      "event_id" : "CREATE"
-    }
-  }
-
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
+		},
+		"body": {
+			"token": "[[ANY_STRING_NOT_NULLABLE]]",
+			"case_details": {
+				"id": null,
+				"jurisdiction": "[[ANYTHING_PRESENT]]",
+				"state": null,
+				"version": null,
+				"case_type_id": "[[ANYTHING_PRESENT]]",
+				"created_date": null,
+				"last_modified": null,
+				"last_state_modified_date": null,
+				"security_classification": null,
+				"case_data": {},
+				"data_classification": {},
+				"supplementary_data": null,
+				"after_submit_callback_response": null,
+				"callback_response_status_code": null,
+				"callback_response_status": null,
+				"delete_draft_response_status_code": null,
+				"delete_draft_response_status": null,
+				"security_classifications": {}
+			},
+			"event_id": "CREATE"
+		}
+	}
 }

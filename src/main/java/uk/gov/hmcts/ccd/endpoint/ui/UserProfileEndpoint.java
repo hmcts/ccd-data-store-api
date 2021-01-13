@@ -19,7 +19,8 @@ public class UserProfileEndpoint {
     private final GetUserProfileOperation getUserProfileOperation;
 
     @Inject
-    public UserProfileEndpoint(@Qualifier(AuthorisedGetUserProfileOperation.QUALIFIER) final GetUserProfileOperation getUserProfileOperation) {
+    public UserProfileEndpoint(@Qualifier(AuthorisedGetUserProfileOperation.QUALIFIER)
+                                   final GetUserProfileOperation getUserProfileOperation) {
         this.getUserProfileOperation = getUserProfileOperation;
     }
 

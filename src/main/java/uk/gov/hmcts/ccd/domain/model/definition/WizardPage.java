@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -8,6 +9,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @ApiModel(description = "")
 public class WizardPage implements Serializable {
@@ -87,5 +90,21 @@ public class WizardPage implements Serializable {
 
     public void setShowCondition(String showCondition) {
         this.showCondition = showCondition;
+    }
+
+    @JsonIgnore
+    public Set<String> getWizardPageFieldNames() {
+        Set<String> wizardPageFields = this.getWizardPageFields()
+            .stream()
+            .map(WizardPageField::getCaseFieldId)
+            .collect(Collectors.toSet());
+
+        Set<String> complexFieldOverRides = this.getWizardPageFields().stream()
+            .map(WizardPageField::getComplexFieldOverrides)
+            .flatMap(List::stream)
+            .map(WizardPageComplexFieldOverride::getComplexFieldElementId)
+            .collect(Collectors.toSet());
+        wizardPageFields.addAll(complexFieldOverRides);
+        return wizardPageFields;
     }
 }

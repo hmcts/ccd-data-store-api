@@ -1,0 +1,45 @@
+{
+  "title": "Must return an error response for a malformed Case ID",
+
+  "_guid_": "S-111.4",
+  "_extends_": "F-111_Remove_Case_Assigned_User_Roles_Base",
+
+  "specs": [
+    "Richard - who can create a case",
+    "Dil - who is to add and remove some case role assignment for a case",
+    "Olawale - with an active solicitor profile",
+    "is made by Dil for 2 assignments each containing Olawale's User ID and a proper Case Role CR-1",
+    "contains the Case ID of C1 in one entry and a empty case ID in the other"
+  ],
+
+  "users": {
+    "_extends_": "F-111_Users"
+  },
+
+  "request": {
+    "headers": {
+      "Authorization": "Bearer ${[scenarioContext][testData][users][userDil][accessToken]}"
+    },
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][childContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
+          "case_role": "[CR-1]"
+        },
+        {
+          "case_id": "12346657",
+          "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
+          "case_role": "[CR-1]"
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "F-111_Remove_Case_Assigned_User_Roles_400_response",
+    "body": {
+      "message": "Invalid data provided for the following inputs to the request:\nCase ID is not valid"
+    }
+  }
+}

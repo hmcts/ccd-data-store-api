@@ -34,8 +34,10 @@ public class AuthorisedGetCaseTypesOperation implements GetCaseTypesOperation {
 
     @Autowired
     public AuthorisedGetCaseTypesOperation(final AccessControlService accessControlService,
-                                           @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                           @Qualifier(DefaultGetCaseTypesOperation.QUALIFIER) final GetCaseTypesOperation getCaseTypesOperation) {
+                                           @Qualifier(CachedUserRepository.QUALIFIER)
+                                               final UserRepository userRepository,
+                                           @Qualifier(DefaultGetCaseTypesOperation.QUALIFIER)
+                                               final GetCaseTypesOperation getCaseTypesOperation) {
         this.accessControlService = accessControlService;
         this.userRepository = userRepository;
         this.getCaseTypesOperation = getCaseTypesOperation;
@@ -59,7 +61,9 @@ public class AuthorisedGetCaseTypesOperation implements GetCaseTypesOperation {
         return userRoles;
     }
 
-    private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles, Predicate<AccessControlList> access) {
+    private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition,
+                                                      Set<String> userRoles,
+                                                      Predicate<AccessControlList> access) {
 
         if (caseTypeDefinition == null || CollectionUtils.isEmpty(userRoles)) {
             return Optional.empty();
@@ -76,9 +80,10 @@ public class AuthorisedGetCaseTypesOperation implements GetCaseTypesOperation {
                                                                          userRoles,
                                                                          access));
 
-        caseTypeDefinition.setCaseFieldDefinitions(accessControlService.filterCaseFieldsByAccess(caseTypeDefinition.getCaseFieldDefinitions(),
-                                                                             userRoles,
-                                                                             access));
+        caseTypeDefinition.setCaseFieldDefinitions(accessControlService.filterCaseFieldsByAccess(
+                                                                        caseTypeDefinition.getCaseFieldDefinitions(),
+                                                                        userRoles,
+                                                                        access));
 
 
         return Optional.of(caseTypeDefinition);

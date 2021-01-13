@@ -98,7 +98,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
 
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CASE_ACCESSED.getLabel()));
         assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
-        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getIdamId(), is(UID));
         assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(200));
         assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
@@ -139,7 +139,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
 
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.UPDATE_CASE.getLabel()));
         assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
-        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getIdamId(), is(UID));
         assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(201));
         assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
@@ -182,7 +182,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
 
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CREATE_CASE.getLabel()));
         assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
-        assertThat(captor.getValue().getIdamId(), is("Cloud.Strife@test.com"));
+        assertThat(captor.getValue().getIdamId(), is(UID));
         assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(201));
         assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
@@ -237,7 +237,8 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldSetSupplementaryData() throws Exception {
         String caseId = "1504259907353529";
         final String URL =  "/cases/" + caseId + "/supplementary-data";
@@ -251,7 +252,8 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = mvcResult.getResponse().getContentAsString();
-        SupplementaryDataResource supplementaryDataResource = mapper.readValue(content, SupplementaryDataResource.class);
+        SupplementaryDataResource supplementaryDataResource =
+            mapper.readValue(content, SupplementaryDataResource.class);
         assertNotNull(supplementaryDataResource);
         assertNotNull(supplementaryDataResource.getResponse());
         Map<String, Object> response = supplementaryDataResource.getResponse();
@@ -261,7 +263,8 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldSetSupplementaryDataMultipleUpdate() throws Exception {
         String caseId = "1504259907353529";
         final String URL =  "/cases/" + caseId + "/supplementary-data";
@@ -275,7 +278,8 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = mvcResult.getResponse().getContentAsString();
-        SupplementaryDataResource supplementaryDataResource = mapper.readValue(content, SupplementaryDataResource.class);
+        SupplementaryDataResource supplementaryDataResource =
+            mapper.readValue(content, SupplementaryDataResource.class);
         assertNotNull(supplementaryDataResource);
         assertNotNull(supplementaryDataResource.getResponse());
         assertNotNull(supplementaryDataResource.getResponse());
@@ -288,7 +292,8 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldIncrementSupplementaryData() throws Exception {
         String caseId = "1504259907353529";
         final String URL =  "/cases/" + caseId + "/supplementary-data";
@@ -302,12 +307,14 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = mvcResult.getResponse().getContentAsString();
-        SupplementaryDataResource supplementaryDataResource = mapper.readValue(content, SupplementaryDataResource.class);
+        SupplementaryDataResource supplementaryDataResource =
+            mapper.readValue(content, SupplementaryDataResource.class);
         assertNotNull("updated supplementary data resource", supplementaryDataResource);
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldCreateSupplementaryDataWhenNotExists() throws Exception {
         String caseId = "1504259907353545";
         final String URL =  "/cases/" + caseId + "/supplementary-data";
@@ -321,14 +328,16 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = mvcResult.getResponse().getContentAsString();
-        SupplementaryDataResource supplementaryDataResource = mapper.readValue(content, SupplementaryDataResource.class);
+        SupplementaryDataResource supplementaryDataResource =
+            mapper.readValue(content, SupplementaryDataResource.class);
         assertNotNull(supplementaryDataResource);
         assertNotNull(supplementaryDataResource.getResponse());
         assertEquals(1, supplementaryDataResource.getResponse().size());
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldThrowExceptionWhenCaseNotFound() throws Exception {
         String caseId = "1504259907353586";
         final String URL =  "/cases/" + caseId + "/supplementary-data";
@@ -344,7 +353,8 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldThrowExceptionWhenCaseIsNotValid() throws Exception {
         String caseId = "12233";
         final String URL =  "/cases/" + caseId + "/supplementary-data";
@@ -379,7 +389,8 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         }
 
         @Test
-        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
         public void shouldThrowExceptionWhenSolicitorRoleWithNoCasesAssignedToTheUser() throws Exception {
 
             MockUtils.setSecurityAuthorities(authentication, ROLE_PROBATE_SOLICITOR);

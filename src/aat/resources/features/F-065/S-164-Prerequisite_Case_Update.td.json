@@ -1,11 +1,11 @@
 {
-  "title": "should update an existing case with correct inputs",
   "_guid_": "S-164-Prerequisite_Case_Update",
+  "title": "should update an existing case with correct inputs",
 
   "productName": "CCD Data Store",
   "operationName": "Submit update case event",
-  "method": "POST",
 
+  "method": "POST",
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
 
   "specs": [
@@ -75,6 +75,7 @@
       "ignore_warning": false
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_201_Response",
     "headers": {
@@ -82,122 +83,135 @@
       "Content-Length": "[[ANYTHING_PRESENT]]",
       "Content-Encoding": "gzip"
     },
-    "body" : {
-      "id" : "[[ANYTHING_PRESENT]]",
-      "jurisdiction" : "AUTOTEST1",
-      "state" : "TODO",
-      "version" : 1,
-      "case_type_id" : "AAT_AUTH_15",
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "AUTOTEST1",
+      "state": "TODO",
+      "version": 1,
+      "case_type_id": "AAT_AUTH_15",
       "last_state_modified_date": "[[ANYTHING_PRESENT]]",
-      "created_date" : "[[ANYTHING_PRESENT]]",
-      "last_modified" : "[[ANYTHING_PRESENT]]",
-      "security_classification" : "PUBLIC",
-      "case_data" : {
-        "MoneyGBPField" : "[[ANYTHING_PRESENT]]",
-        "FixedListField" : "VALUE3",
-        "AddressUKField" : {
-          "County" : "Greater London",
-          "Country" : "UK",
-          "PostCode" : "SW1H 9AJ",
-          "PostTown" : "Westminster",
-          "AddressLine1" : "102 Petty France",
-          "AddressLine2" : "CCD",
-          "AddressLine3" : "c/o HMCTS Reform"
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
+      "case_data": {
+        "MoneyGBPField": "[[ANYTHING_PRESENT]]",
+        "FixedListField": "VALUE3",
+        "AddressUKField": {
+          "County": "Greater London",
+          "Country": "UK",
+          "PostCode": "SW1H 9AJ",
+          "PostTown": "Westminster",
+          "AddressLine1": "102 Petty France",
+          "AddressLine2": "CCD",
+          "AddressLine3": "c/o HMCTS Reform"
         },
-        "ComplexField" : {
-          "ComplexTextField" : "Nested text",
-          "ComplexFixedListField" : "VALUE2"
+        "ComplexField": {
+          "ComplexTextField": "Nested text",
+          "ComplexFixedListField": "VALUE2"
         },
-        "DateTimeField" : "[[ANYTHING_PRESENT]]",
-        "PhoneUKField" : "07123456789",
-        "NumberField" : "164528",
-        "MultiSelectListField" : [ "OPTION2", "OPTION4" ],
-        "YesOrNoField" : "Yes",
-        "EmailField" : "ccd@hmcts.net",
-        "TextField" : "Some Text",
-        "DateField" : "2017-02-13",
-        "TextAreaField" : "Line1\nLine2",
-        "CollectionField" : [ {
-          "value" : "Alias 1",
-          "id" : "[[ANYTHING_PRESENT]]"
-        }, {
-          "value" : "Alias 2",
-          "id" : "[[ANYTHING_PRESENT]]"
-        } ]
+        "DateTimeField": "[[ANYTHING_PRESENT]]",
+        "PhoneUKField": "07123456789",
+        "NumberField": "164528",
+        "MultiSelectListField": [
+          "OPTION2",
+          "OPTION4"
+        ],
+        "YesOrNoField": "Yes",
+        "EmailField": "ccd@hmcts.net",
+        "TextField": "Some Text",
+        "DateField": "2017-02-13",
+        "TextAreaField": "Line1\nLine2",
+        "CollectionField": [
+          {
+            "value": "Alias 1",
+            "id": "[[ANYTHING_PRESENT]]"
+          },
+          {
+            "value": "Alias 2",
+            "id": "[[ANYTHING_PRESENT]]"
+          }
+        ]
       },
-      "data_classification" : {
-        "MoneyGBPField" : "PUBLIC",
-        "FixedListField" : "PUBLIC",
-        "AddressUKField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "County" : "PUBLIC",
-            "Country" : "PUBLIC",
-            "PostCode" : "PUBLIC",
-            "PostTown" : "PUBLIC",
-            "AddressLine1" : "PUBLIC",
-            "AddressLine2" : "PUBLIC",
-            "AddressLine3" : "PUBLIC"
+      "data_classification": {
+        "MoneyGBPField": "PUBLIC",
+        "FixedListField": "PUBLIC",
+        "AddressUKField": {
+          "classification": "PUBLIC",
+          "value": {
+            "County": "PUBLIC",
+            "Country": "PUBLIC",
+            "PostCode": "PUBLIC",
+            "PostTown": "PUBLIC",
+            "AddressLine1": "PUBLIC",
+            "AddressLine2": "PUBLIC",
+            "AddressLine3": "PUBLIC"
           }
         },
-        "DateTimeField" : "PUBLIC",
-        "PhoneUKField" : "PUBLIC",
-        "NumberField" : "PUBLIC",
-        "MultiSelectListField" : "PUBLIC",
-        "YesOrNoField" : "PUBLIC",
-        "EmailField" : "PUBLIC",
-        "TextField" : "PUBLIC",
-        "DateField" : "PUBLIC",
-        "TextAreaField" : "PUBLIC",
-        "CollectionField" : {
-          "classification" : "PUBLIC",
-          "value" : [ {
-            "id" : "[[ANYTHING_PRESENT]]",
-            "classification" : "PUBLIC"
-          }, {
-            "id" : "[[ANYTHING_PRESENT]]",
-            "classification" : "PUBLIC"
-          } ]
+        "DateTimeField": "PUBLIC",
+        "PhoneUKField": "PUBLIC",
+        "NumberField": "PUBLIC",
+        "MultiSelectListField": "PUBLIC",
+        "YesOrNoField": "PUBLIC",
+        "EmailField": "PUBLIC",
+        "TextField": "PUBLIC",
+        "DateField": "PUBLIC",
+        "TextAreaField": "PUBLIC",
+        "CollectionField": {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "id": "[[ANYTHING_PRESENT]]",
+              "classification": "PUBLIC"
+            },
+            {
+              "id": "[[ANYTHING_PRESENT]]",
+              "classification": "PUBLIC"
+            }
+          ]
         }
       },
-      "after_submit_callback_response" : null,
-      "callback_response_status_code" : null,
-      "callback_response_status" : null,
-      "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null,
-      "security_classifications" : {
-        "MoneyGBPField" : "PUBLIC",
-        "FixedListField" : "PUBLIC",
-        "AddressUKField" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "County" : "PUBLIC",
-            "Country" : "PUBLIC",
-            "PostCode" : "PUBLIC",
-            "PostTown" : "PUBLIC",
-            "AddressLine1" : "PUBLIC",
-            "AddressLine2" : "PUBLIC",
-            "AddressLine3" : "PUBLIC"
+      "supplementary_data": null,
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null,
+      "security_classifications": {
+        "MoneyGBPField": "PUBLIC",
+        "FixedListField": "PUBLIC",
+        "AddressUKField": {
+          "classification": "PUBLIC",
+          "value": {
+            "County": "PUBLIC",
+            "Country": "PUBLIC",
+            "PostCode": "PUBLIC",
+            "PostTown": "PUBLIC",
+            "AddressLine1": "PUBLIC",
+            "AddressLine2": "PUBLIC",
+            "AddressLine3": "PUBLIC"
           }
         },
-        "DateTimeField" : "PUBLIC",
-        "PhoneUKField" : "PUBLIC",
-        "NumberField" : "PUBLIC",
-        "MultiSelectListField" : "PUBLIC",
-        "YesOrNoField" : "PUBLIC",
-        "EmailField" : "PUBLIC",
-        "TextField" : "PUBLIC",
-        "DateField" : "PUBLIC",
-        "TextAreaField" : "PUBLIC",
-        "CollectionField" : {
-          "classification" : "PUBLIC",
-          "value" : [ {
-            "id" : "[[ANYTHING_PRESENT]]",
-            "classification" : "PUBLIC"
-          }, {
-            "id" : "[[ANYTHING_PRESENT]]",
-            "classification" : "PUBLIC"
-          } ]
+        "DateTimeField": "PUBLIC",
+        "PhoneUKField": "PUBLIC",
+        "NumberField": "PUBLIC",
+        "MultiSelectListField": "PUBLIC",
+        "YesOrNoField": "PUBLIC",
+        "EmailField": "PUBLIC",
+        "TextField": "PUBLIC",
+        "DateField": "PUBLIC",
+        "TextAreaField": "PUBLIC",
+        "CollectionField": {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "id": "[[ANYTHING_PRESENT]]",
+              "classification": "PUBLIC"
+            },
+            {
+              "id": "[[ANYTHING_PRESENT]]",
+              "classification": "PUBLIC"
+            }
+          ]
         }
       }
     }

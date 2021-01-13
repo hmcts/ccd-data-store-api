@@ -1,15 +1,23 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.Cacheable;
+import uk.gov.hmcts.ccd.domain.model.definition.BannersResult;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.annotation.Cacheable;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
+
+import java.util.List;
 
 @Named
 @Qualifier("Cache")
@@ -54,7 +62,8 @@ public class CachedUIDefinitionGateway implements UIDefinitionGateway {
 
     @Override
     @Cacheable("workbasketInputDefinitionCache")
-    public WorkbasketInputFieldsDefinition getWorkbasketInputFieldsDefinitions(final int version, final String caseTypeId) {
+    public WorkbasketInputFieldsDefinition getWorkbasketInputFieldsDefinitions(final int version,
+                                                                               final String caseTypeId) {
         LOG.debug("remote retrieving version {} of workbasket input definitions for {}", version, caseTypeId);
         return httpUiDefinitionGateway.getWorkbasketInputFieldsDefinitions(version, caseTypeId);
     }

@@ -21,7 +21,8 @@ import static org.mockito.Mockito.verify;
 @Transactional
 public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
 
-    private static final String COUNT_CASE_USERS = "select count(*) from case_users where case_data_id = ? and user_id = ? and case_role = ?";
+    private static final String COUNT_CASE_USERS =
+        "select count(*) from case_users where case_data_id = ? and user_id = ? and case_role = ?";
 
     private static final Long CASE_ID = 1L;
     private static final Long CASE_ID_GRANTED = 2L;
@@ -126,7 +127,8 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
         "classpath:sql/insert_case_users.sql",
     })
     public void shouldFindCaseAssignedCaseUserRolesForCaseAndUserList() {
-        List<CaseUserEntity> caseUserEn = repository.findCaseUserRoles(Lists.newArrayList(CASE_ID), Lists.newArrayList(USER_ID));
+        List<CaseUserEntity> caseUserEn =
+            repository.findCaseUserRoles(Lists.newArrayList(CASE_ID), Lists.newArrayList(USER_ID));
 
         assertThat(caseUserEn.size(), equalTo(1));
         assertThat(caseUserEn.get(0).getCasePrimaryKey().getCaseRole(), equalTo(CASE_ROLE_CREATOR));

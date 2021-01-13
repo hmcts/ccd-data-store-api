@@ -1,168 +1,178 @@
 {
 	"_guid_": "S-050.1",
 	"_extends_": "F-050_Test_Data_Base",
-
 	"title": "must validate date in a right format",
 
 	"specs": [
 		"an active profile in CCD",
-    "contains valid value for a formatted Date field",
+		"contains valid value for a formatted Date field",
 		"has the 200 return code"
 	],
-  "user": {
-    "username": "master.caseworker@gmail.com",
-    "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
-  },
-  "request": {
-    "_extends_": "Common_Request",
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_MASTER",
-      "ctid": "FT_DateTimeFormats"
-    },
-    "body": {
-      "data": {
-        "DateField": "23",
-        "DateTimeField": "2000-23-01",
-        "StandardDate": "2016-12-01",
-        "StandardDateTime": "1998-09-01T16:01",
-        "CollectionDate": [
-          {
-            "id": null,
-            "value": "03"
-          },
-          {
-            "id": null,
-            "value": ""
-          }
-        ],
-        "CollectionDateTime": [
-          {
-            "id": null,
-            "value": "2002-01"
-          }
-        ],
-        "ComplexDateTime": {
-          "DateField": "11-02",
-          "DateTimeField": "04-30T01:01",
-          "StandardDate": "2010-02-02",
-          "StandardDateTime": "2019-12-20T01:01:01.000",
-          "NestedComplex": {
-            "DateField": "01-2019",
-            "DateTimeField": "2019-01-01",
-            "StandardDate": "2019-01-01",
-            "StandardDateTime": "2019-01-01T01:01:01.000"
-          }
-        },
-        "CollectionComplexDateTime": [
-          {
-            "id": null,
-            "value": {
-              "DateField": "01-02",
-              "DateTimeField": "10-01T01:01",
-              "StandardDate": "2019-01-01",
-              "StandardDateTime": "2019-01-01T01:01:01.000",
-              "NestedComplex": {
-                "DateField": "2019-01-01",
-                "DateTimeField": "2019-01-01T01:01:01.000",
-                "StandardDate": "2019-01-01",
-                "StandardDateTime": "2019-01-01T01:01:01.000"
-              }
-            }
-          },
-          {
-            "id": null,
-            "value": {
-              "DateField": "",
-              "DateTimeField": null,
-              "StandardDate": null,
-              "StandardDateTime": null,
-              "NestedComplex": {
-                "DateField": null,
-                "DateTimeField": null,
-                "StandardDate": null,
-                "StandardDateTime": null
-              }
-            }
-          }
-        ]
-      },
-      "event": {
-        "id": "CREATE",
-        "summary": "",
-        "description": ""
-      }
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_200_Response",
-    "headers": {
-      "Content-Encoding": "gzip",
-      "Content-Type": "application/json",
-      "Connection": "[[ANYTHING_PRESENT]]",
-      "Keep-Alive" : "[[ANYTHING_PRESENT]]",
-      "Transfer-Encoding" : "[[ANYTHING_PRESENT]]",
-      "Strict-Transport-Security": "[[ANYTHING_NULLABLE]]"
-    },
-    "body": {
-      "data" : {
-        "CollectionComplexDateTime" : [ {
-          "id" : null,
-          "value" : {
-            "DateField" : "1970-02-01",
-            "DateTimeField" : "1970-10-01T01:01:00.000",
-            "StandardDate" : "2019-01-01",
-            "StandardDateTime" : "2019-01-01T01:01:01.000",
-            "NestedComplex" : {
-              "DateField" : "2019-01-01",
-              "DateTimeField" : "2019-01-01T01:01:01.000",
-              "StandardDate" : "2019-01-01",
-              "StandardDateTime" : "2019-01-01T01:01:01.000"
-            }
-          }
-        }, {
-          "id" : null,
-          "value" : {
-            "DateField" : "",
-            "DateTimeField" : null,
-            "StandardDate" : null,
-            "StandardDateTime" : null,
-            "NestedComplex" : {
-              "DateField" : null,
-              "DateTimeField" : null,
-              "StandardDate" : null,
-              "StandardDateTime" : null
-            }
-          }
-        } ],
-        "ComplexDateTime" : {
-          "DateField" : "1970-02-11",
-          "DateTimeField" : "1970-04-30T01:01:00.000",
-          "StandardDate" : "2010-02-02",
-          "StandardDateTime" : "2019-12-20T01:01:01.000",
-          "NestedComplex" : {
-            "DateField" : "2019-01-01",
-            "DateTimeField" : "2019-01-01T00:00:00.000",
-            "StandardDate" : "2019-01-01",
-            "StandardDateTime" : "2019-01-01T01:01:01.000"
-          }
-        },
-        "CollectionDate" : [ {
-          "id" : null,
-          "value" : "1970-03-01"
-        }, {
-          "id" : null,
-          "value" : ""
-        } ],
-        "CollectionDateTime" : [ {
-          "id" : null,
-          "value" : "2002-01-01T00:00:00.000"
-        } ],
-        "StandardDateTime" : "1998-09-01T16:01",
-        "StandardDate" : "2016-12-01",
-        "DateField" : "1970-01-23",
-        "DateTimeField" : "2000-01-01T00:23:00.000"
-      }
-    }
-  }
+
+	"user": {
+		"username": "master.caseworker@gmail.com",
+		"password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
+	},
+
+	"request": {
+		"_extends_": "Common_Request",
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "BEFTA_MASTER",
+			"ctid": "FT_DateTimeFormats"
+		},
+		"body": {
+			"data": {
+				"DateField": "23",
+				"DateTimeField": "2000-23-01",
+				"StandardDate": "2016-12-01",
+				"StandardDateTime": "1998-09-01T16:01",
+				"CollectionDate": [
+					{
+						"id": null,
+						"value": "03"
+					},
+					{
+						"id": null,
+						"value": ""
+					}
+				],
+				"CollectionDateTime": [
+					{
+						"id": null,
+						"value": "2002-01"
+					}
+				],
+				"ComplexDateTime": {
+					"DateField": "11-02",
+					"DateTimeField": "04-30T01:01",
+					"StandardDate": "2010-02-02",
+					"StandardDateTime": "2019-12-20T01:01:01.000",
+					"NestedComplex": {
+						"DateField": "01-2019",
+						"DateTimeField": "2019-01-01",
+						"StandardDate": "2019-01-01",
+						"StandardDateTime": "2019-01-01T01:01:01.000"
+					}
+				},
+				"CollectionComplexDateTime": [
+					{
+						"id": null,
+						"value": {
+							"DateField": "01-02",
+							"DateTimeField": "10-01T01:01",
+							"StandardDate": "2019-01-01",
+							"StandardDateTime": "2019-01-01T01:01:01.000",
+							"NestedComplex": {
+								"DateField": "2019-01-01",
+								"DateTimeField": "2019-01-01T01:01:01.000",
+								"StandardDate": "2019-01-01",
+								"StandardDateTime": "2019-01-01T01:01:01.000"
+							}
+						}
+					},
+					{
+						"id": null,
+						"value": {
+							"DateField": "",
+							"DateTimeField": null,
+							"StandardDate": null,
+							"StandardDateTime": null,
+							"NestedComplex": {
+								"DateField": null,
+								"DateTimeField": null,
+								"StandardDate": null,
+								"StandardDateTime": null
+							}
+						}
+					}
+				]
+			},
+			"event": {
+				"id": "CREATE",
+				"summary": "",
+				"description": ""
+			}
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Type": "application/json",
+			"Connection": "[[ANYTHING_PRESENT]]",
+			"Keep-Alive": "[[ANYTHING_PRESENT]]",
+			"Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+			"Strict-Transport-Security": "[[ANYTHING_NULLABLE]]"
+		},
+		"body": {
+			"data": {
+				"CollectionComplexDateTime": [
+					{
+						"id": null,
+						"value": {
+							"DateField": "1970-02-01",
+							"DateTimeField": "1970-10-01T01:01:00.000",
+							"StandardDate": "2019-01-01",
+							"StandardDateTime": "2019-01-01T01:01:01.000",
+							"NestedComplex": {
+								"DateField": "2019-01-01",
+								"DateTimeField": "2019-01-01T01:01:01.000",
+								"StandardDate": "2019-01-01",
+								"StandardDateTime": "2019-01-01T01:01:01.000"
+							}
+						}
+					},
+					{
+						"id": null,
+						"value": {
+							"DateField": "",
+							"DateTimeField": null,
+							"StandardDate": null,
+							"StandardDateTime": null,
+							"NestedComplex": {
+								"DateField": null,
+								"DateTimeField": null,
+								"StandardDate": null,
+								"StandardDateTime": null
+							}
+						}
+					}
+				],
+				"ComplexDateTime": {
+					"DateField": "1970-02-11",
+					"DateTimeField": "1970-04-30T01:01:00.000",
+					"StandardDate": "2010-02-02",
+					"StandardDateTime": "2019-12-20T01:01:01.000",
+					"NestedComplex": {
+						"DateField": "2019-01-01",
+						"DateTimeField": "2019-01-01T00:00:00.000",
+						"StandardDate": "2019-01-01",
+						"StandardDateTime": "2019-01-01T01:01:01.000"
+					}
+				},
+				"CollectionDate": [
+					{
+						"id": null,
+						"value": "1970-03-01"
+					},
+					{
+						"id": null,
+						"value": ""
+					}
+				],
+				"CollectionDateTime": [
+					{
+						"id": null,
+						"value": "2002-01-01T00:00:00.000"
+					}
+				],
+				"StandardDateTime": "1998-09-01T16:01",
+				"StandardDate": "2016-12-01",
+				"DateField": "1970-01-23",
+				"DateTimeField": "2000-01-01T00:23:00.000"
+			}
+		}
+	}
 }

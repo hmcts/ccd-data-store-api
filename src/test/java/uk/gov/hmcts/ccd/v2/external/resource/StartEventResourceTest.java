@@ -21,9 +21,11 @@ class StartEventResourceTest {
     private static final String EVENT_ID = "createCase";
     private static final CaseDetails CASE_DETAILS = new CaseDetails();
 
-    private static final String LINK_SELF_FOR_CASE = String.format("/case-types/%s/event-triggers/%s?ignore-warning=true", CASE_TYPE_ID, EVENT_ID);
+    private static final String LINK_SELF_FOR_CASE =
+            String.format("/case-types/%s/event-triggers/%s?ignore-warning=true", CASE_TYPE_ID, EVENT_ID);
     private static final Long CASE_REFERENCE = 1111222233334444L;
-    private static final String LINK_SELF_FOR_EVENT = String.format("/cases/%s/event-triggers/%s?ignore-warning=true", CASE_REFERENCE, EVENT_ID);
+    private static final String LINK_SELF_FOR_EVENT =
+            String.format("/cases/%s/event-triggers/%s?ignore-warning=true", CASE_REFERENCE, EVENT_ID);
 
     private StartEventResult startEventResult;
     private boolean ignoreWarning;
@@ -52,7 +54,9 @@ class StartEventResourceTest {
         @Test
         @DisplayName("should copy case details")
         void shouldCopyCaseDetails() {
-            final StartEventResource startEventResource = new StartEventResource(startEventResult, ignoreWarning, false);
+            final uk.gov.hmcts.ccd.v2.external.resource.StartEventResource startEventResource =
+                    new uk.gov.hmcts.ccd.v2.external.resource.StartEventResource(startEventResult, ignoreWarning,
+                            false);
 
             assertAll(
                 () -> assertThat(startEventResource.getEventId(), equalTo(EVENT_ID.toString())),
@@ -64,7 +68,9 @@ class StartEventResourceTest {
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final StartEventResource startEventResource = new StartEventResource(startEventResult, ignoreWarning, false);
+            final uk.gov.hmcts.ccd.v2.external.resource.StartEventResource startEventResource =
+                    new uk.gov.hmcts.ccd.v2.external.resource.StartEventResource(startEventResult, ignoreWarning,
+                            false);
 
             Optional<Link> self = startEventResource.getLink("self");
             assertThat(self.get().getHref(), equalTo(LINK_SELF_FOR_CASE));
@@ -87,7 +93,8 @@ class StartEventResourceTest {
         @Test
         @DisplayName("should copy case details")
         void shouldCopyCaseDetails() {
-            final StartEventResource startEventResource = new StartEventResource(startEventResult, ignoreWarning, true);
+            final uk.gov.hmcts.ccd.v2.external.resource.StartEventResource startEventResource =
+                    new uk.gov.hmcts.ccd.v2.external.resource.StartEventResource(startEventResult, ignoreWarning, true);
 
             assertAll(
                 () -> assertThat(startEventResource.getEventId(), equalTo(EVENT_ID.toString())),
@@ -99,7 +106,8 @@ class StartEventResourceTest {
         @Test
         @DisplayName("should link to itself")
         void shouldLinkToSelf() {
-            final StartEventResource startEventResource = new StartEventResource(startEventResult, ignoreWarning, true);
+            final uk.gov.hmcts.ccd.v2.external.resource.StartEventResource startEventResource =
+                    new uk.gov.hmcts.ccd.v2.external.resource.StartEventResource(startEventResult, ignoreWarning, true);
 
             Optional<Link> self = startEventResource.getLink("self");
             assertThat(self.get().getHref(), equalTo(LINK_SELF_FOR_EVENT));

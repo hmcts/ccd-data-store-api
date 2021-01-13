@@ -1,26 +1,29 @@
 {
-  "title": "must return negative response when request contains a non-existing case-reference",
-  "_guid_": "S-026",
-  "_extends_": "F-037_Test_Data_Base",
-  "specs": [
-    "an active profile in CCD",
-    "contains a non-existing case-reference",
-    "contains a HTTP 404 'Not Found'"
-  ],
-  "request": {
-    "pathVariables": {
-      "cid": "1234123412341238"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_404_Response",
-    "body": {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message" : "No case found",
-      "path" : "/cases/1234123412341238/events",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
-    }
-  }
+	"_guid_": "S-026",
+	"_extends_": "F-037_Test_Data_Base",
+	"title": "must return negative response when request contains a non-existing case-reference",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains a non-existing case-reference",
+		"contains a HTTP 404 'Not Found'"
+	],
+
+	"request": {
+		"pathVariables": {
+			"cid": "1234123412341238"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_404_Response",
+		"body": {
+			"exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+			"message" : "No case found",
+			"path" : "/cases/1234123412341238/events",
+			"details": null,
+			"callbackErrors": null,
+			"callbackWarnings": null
+		}
+	}
 }

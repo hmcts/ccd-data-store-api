@@ -1,15 +1,18 @@
 {
-	"title": "Update the case by Citizen",
-	"_extends_": "S-578_Update_Case_For_Citizen_Data_Base",
 	"_guid_": "S-578_Later_Case_Update_By_Citizen",
+	"_extends_": "S-578_Update_Case_For_Citizen_Data_Base",
+	"title": "Update the case by Citizen",
+
 	"specs": [
 		"to update the DocumentField4 of same case by Citizen who doesn't have privilege to update DocumentField4",
 		"has an HTTP-404 code"
 	],
+
 	"user": {
 		"username": "befta.citizen.2@gmail.com",
 		"password": "[[$CCD_BEFTA_CITIZEN_2_PWD]]"
 	},
+
 	"request": {
 		"pathVariables": {
 			"cid": "${[scenarioContext][parentContext][childContexts][Befta_Jurisdiction2_Default_Citizen_Case_Creation_Data][testData][actualResponse][body][id]}"
@@ -25,6 +28,7 @@
 			"event_token": "${[scenarioContext][parentContext][childContexts][S-578-Prerequisite_Citizen_Token_For_Update_Case][testData][actualResponse][body][token]}"
 		}
 	},
+
 	"expectedResponse": {
 		"_extends_": "Common_404_Response",
 		"headers": {

@@ -39,7 +39,11 @@
           "pre_states": [
             "some-state"
           ],
-          "post_state": "state3",
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "state3"
+          }],
           "acls": [
             {
               "role": "caseworker-probate-public",
@@ -57,7 +61,11 @@
           ],
           "pre_states": [
           ],
-          "post_state": "state3",
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "state3"
+          }],
           "acls": [
             {
               "role": "caseworker-probate-public",

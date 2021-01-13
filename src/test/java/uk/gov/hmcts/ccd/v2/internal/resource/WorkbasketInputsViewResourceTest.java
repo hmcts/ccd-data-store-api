@@ -32,7 +32,8 @@ class WorkbasketInputsViewResourceTest {
     void shouldCopyWorkbasketInputs() {
         final WorkbasketInputsViewResource resource = new WorkbasketInputsViewResource(workbasketInputs, CASE_TYPE_ID);
 
-        List<WorkbasketInputsViewResource.WorkbasketInputView> workbasketInputs = Lists.newArrayList(resource.getWorkbasketInputs());
+        List<WorkbasketInputsViewResource.WorkbasketInputView> workbasketInputs =
+                Lists.newArrayList(resource.getWorkbasketInputs());
         assertAll(
             () -> assertThat(resource.getWorkbasketInputs(), not(sameInstance(this.workbasketInputs))),
             () -> assertThat(workbasketInputs, hasItems(hasProperty("field", hasProperty("id", is("field1"))),

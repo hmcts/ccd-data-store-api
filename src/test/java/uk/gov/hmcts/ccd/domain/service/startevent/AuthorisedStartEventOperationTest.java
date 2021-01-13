@@ -118,7 +118,8 @@ class AuthorisedStartEventOperationTest {
 
         classifiedCaseDetails = new CaseDetails();
         classifiedCaseDetails.setData(JacksonUtils.convertValue(classifiedCaseDetailsNode));
-        classifiedCaseDetails.setDataClassification(JacksonUtils.convertValue(classifiedCaseDetailsClassificationNode));
+        classifiedCaseDetails.setDataClassification(JacksonUtils.convertValue(
+            classifiedCaseDetailsClassificationNode));
         classifiedStartEvent = new StartEventResult();
         classifiedStartEvent.setCaseDetails(classifiedCaseDetails);
 
@@ -134,7 +135,8 @@ class AuthorisedStartEventOperationTest {
         caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(caseAccessService.getUserRoles()).thenReturn(userRoles);
-        when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ)).thenReturn(true);
+        when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ))
+            .thenReturn(true);
         when(accessControlService.filterCaseFieldsByAccess(eq(classifiedCaseDetailsNode),
             eq(caseFieldDefinitions),
             eq(userRoles),
@@ -183,7 +185,8 @@ class AuthorisedStartEventOperationTest {
         @DisplayName("should filter out data when no case type read access")
         void shouldFilterOutDataWhenNoCaseTypeReadAccess() {
 
-            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ)).thenReturn(false);
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ))
+                .thenReturn(false);
 
             final StartEventResult output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                 EVENT_TRIGGER_ID,
@@ -235,7 +238,8 @@ class AuthorisedStartEventOperationTest {
         @DisplayName("should filter out data when no case type read access")
         void shouldFilterOutDataWhenNoCaseTypeReadAccess() {
 
-            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ)).thenReturn(false);
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ))
+                .thenReturn(false);
 
             final StartEventResult output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
                 EVENT_TRIGGER_ID,
@@ -332,7 +336,8 @@ class AuthorisedStartEventOperationTest {
                     eq(userRoles),
                     eq(CAN_READ),
                     anyBoolean()),
-                () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(classifiedCaseDetailsClassificationNode),
+                () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(
+                    classifiedCaseDetailsClassificationNode),
                     eq(caseFieldDefinitions),
                     eq(userRoles),
                     eq(CAN_READ),
@@ -346,7 +351,8 @@ class AuthorisedStartEventOperationTest {
 
             doReturn(null).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
 
-            assertThrows(ValidationException.class, () -> authorisedStartEventOperation.triggerStartForCase(CASE_REFERENCE,
+            assertThrows(ValidationException.class, () -> authorisedStartEventOperation.triggerStartForCase(
+                CASE_REFERENCE,
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING));
         }

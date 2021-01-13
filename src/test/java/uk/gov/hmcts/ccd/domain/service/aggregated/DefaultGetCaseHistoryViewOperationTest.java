@@ -130,7 +130,8 @@ class DefaultGetCaseHistoryViewOperationTest {
         assertAll(
             () -> verify(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
             () -> assertThat(caseHistoryView.getTabs()[0].getFields(), arrayWithSize(1)),
-            () -> assertThat(caseHistoryView.getTabs()[0].getFields(), hasItemInArray(hasProperty("id", equalTo("dataTestField2")))),
+            () -> assertThat(caseHistoryView.getTabs()[0].getFields(), hasItemInArray(hasProperty("id",
+                    equalTo("dataTestField2")))),
             () -> assertThat(caseHistoryView.getEvent(), hasProperty("summary", equalTo(EVENT_SUMMARY_1))),
             () -> assertThat(caseHistoryView.getCaseType().getJurisdiction().getName(), equalTo(JURISDICTION_ID))
         );

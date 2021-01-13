@@ -28,7 +28,8 @@ public class CaseUpdateViewEventBuilder {
     private final CaseViewFieldBuilder caseViewFieldBuilder;
     private final FieldProcessorService fieldProcessorService;
 
-    public CaseUpdateViewEventBuilder(@Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
+    public CaseUpdateViewEventBuilder(@Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                      final CaseDefinitionRepository caseDefinitionRepository,
                                       final UIDefinitionRepository uiDefinitionRepository,
                                       final EventTriggerService eventTriggerService,
                                       final CaseViewFieldBuilder caseViewFieldBuilder,
@@ -40,7 +41,10 @@ public class CaseUpdateViewEventBuilder {
         this.fieldProcessorService = fieldProcessorService;
     }
 
-    public CaseUpdateViewEvent build(StartEventResult startEventResult, String caseTypeId, String eventId, String caseReference) {
+    public CaseUpdateViewEvent build(StartEventResult startEventResult,
+                                     String caseTypeId,
+                                     String eventId,
+                                     String caseReference) {
         if (startEventResult.getCaseDetails() == null) {
             throw new ResourceNotFoundException("Case not found");
         }
@@ -51,7 +55,8 @@ public class CaseUpdateViewEventBuilder {
         caseUpdateViewEvent.setCaseId(caseReference);
         caseUpdateViewEvent.setCaseFields(
             fieldProcessorService.processCaseViewFields(
-                mergeEventFields(startEventResult.getCaseDetails(), caseTypeDefinition, caseEventDefinition), caseTypeDefinition, caseEventDefinition)
+                mergeEventFields(startEventResult.getCaseDetails(), caseTypeDefinition, caseEventDefinition),
+                caseTypeDefinition, caseEventDefinition)
         );
         caseUpdateViewEvent.setEventToken(startEventResult.getToken());
         final List<WizardPage> wizardPageCollection = uiDefinitionRepository.getWizardPageCollection(caseTypeId,
@@ -73,7 +78,8 @@ public class CaseUpdateViewEventBuilder {
         final CaseEventDefinition caseEventDefinition = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
 
         if (null == caseEventDefinition) {
-            throw new ResourceNotFoundException(eventId + " is not a known event ID for the specified case type: " + caseTypeDefinition.getId());
+            throw new ResourceNotFoundException(eventId + " is not a known event ID for the specified case type: "
+                                                + caseTypeDefinition.getId());
         }
         return caseEventDefinition;
     }
@@ -91,11 +97,14 @@ public class CaseUpdateViewEventBuilder {
         return caseUpdateViewEvent;
     }
 
-    private List<CaseViewField> mergeEventFields(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition, CaseEventDefinition caseEventDefinition) {
+    private List<CaseViewField> mergeEventFields(CaseDetails caseDetails,
+                                                 CaseTypeDefinition caseTypeDefinition,
+                                                 CaseEventDefinition caseEventDefinition) {
         final List<CaseEventFieldDefinition> eventFields = caseEventDefinition.getCaseFields();
         final List<CaseFieldDefinition> caseFieldDefinitions = caseTypeDefinition.getCaseFieldDefinitions();
 
-        return caseViewFieldBuilder.build(caseFieldDefinitions, eventFields, caseDetails != null ? caseDetails.getCaseDataAndMetadata() : null);
+        return caseViewFieldBuilder.build(caseFieldDefinitions, eventFields,
+                                          caseDetails != null ? caseDetails.getCaseDataAndMetadata() : null);
     }
 
 }

@@ -1,16 +1,19 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
+import io.cucumber.java.Before;
+import org.junit.AssumptionViolatedException;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
-import uk.gov.hmcts.ccd.datastore.tests.helper.elastic.ElasticsearchTestDataLoaderExtension;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static java.util.Optional.ofNullable;
 
@@ -18,11 +21,17 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     private TestDataLoaderToDefinitionStore loader = new TestDataLoaderToDefinitionStore(this);
 
+    private static Map<String, String> uniqueStringsPerTestData = new ConcurrentHashMap<>();
+
+    @Before("@elasticsearch")
+    public void skipElasticSearchTestsIfNotEnabled() {
+        if (!ofNullable(System.getenv("ELASTIC_SEARCH_FTA_ENABLED")).map(Boolean::valueOf).orElse(false)) {
+            throw new AssumptionViolatedException("Elastic Search not Enabled");
+        }
+    }
+
     @Override
     public void doLoadTestData() {
-        if (elasticSearchEnabled()) {
-            new ElasticsearchTestDataLoaderExtension().deleteIndexesIfPresent();
-        }
         loader.addCcdRoles();
         loader.importDefinitions();
     }
@@ -32,7 +41,8 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         if (key.toString().startsWith("caseIdAsIntegerFrom")) {
             String childContext = key.toString().replace("caseIdAsIntegerFrom_","");
             try {
-                return (long) ReflectionUtils.deepGetFieldInObject(scenarioContext,"childContexts." + childContext + ".testData.actualResponse.body.id");
+                return (long) ReflectionUtils.deepGetFieldInObject(scenarioContext,"childContexts." + childContext
+                                                                  + ".testData.actualResponse.body.id");
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem getting case id as long", e);
             }
@@ -60,7 +70,38 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                                                                         previousValueContextPath,
                                                                         incrementBy);
         } else if (key.toString().equals("UniqueString")) {
-            return ScenarioData.getUniqueString();
+            return uniqueStringsPerTestData
+                    .computeIfAbsent(scenarioContext.getContextId(), k ->
+                    UUID.randomUUID().toString());
+        } else if (key.toString().startsWith("approximately ")) {
+            try {
+                String actualSizeFromHeaderStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
+                        "testData.actualResponse.headers.Content-Length");
+                String expectedSizeStr = key.toString().replace("approximately ", "");
+
+                int actualSize =  Integer.parseInt(actualSizeFromHeaderStr);
+                int expectedSize = Integer.parseInt(expectedSizeStr);
+
+                if (Math.abs(actualSize - expectedSize) < (actualSize * 10 / 100)) {
+                    return actualSizeFromHeaderStr;
+                }
+                return expectedSize;
+            } catch (Exception e) {
+                throw new FunctionalTestException("Problem checking acceptable response payload: ", e);
+            }
+        } else if (key.toString().startsWith("contains ")) {
+            try {
+                String actualValueStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
+                    "testData.actualResponse.body.__plainTextValue__");
+                String expectedValueStr = key.toString().replace("contains ", "");
+
+                if (actualValueStr.contains(expectedValueStr)) {
+                    return actualValueStr;
+                }
+                return "expectedValueStr " + expectedValueStr + " not present in response ";
+            } catch (Exception e) {
+                throw new FunctionalTestException("Problem checking acceptable response payload: ", e);
+            }
         }
         return super.calculateCustomValue(scenarioContext, key);
     }
@@ -69,32 +110,38 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         return ofNullable(System.getenv("ELASTIC_SEARCH_ENABLED")).map(Boolean::valueOf).orElse(false);
     }
 
-    private Map<String, Object> calculateOrganisationsAssignedUsersPropertyWithValue(BackEndFunctionalTestScenarioContext scenarioContext,
-                                                                                     String organisationIdentifierContextPath,
-                                                                                     String previousValueContextPath,
-                                                                                     int incrementBy) {
-        String organisationIdentifierFieldPath = organisationIdentifierContextPath + ".testData.actualResponse.body.organisationIdentifier";
+    private Map<String, Object> calculateOrganisationsAssignedUsersPropertyWithValue(
+                                                    BackEndFunctionalTestScenarioContext scenarioContext,
+                                                    String organisationIdentifierContextPath,
+                                                    String previousValueContextPath,
+                                                    int incrementBy) {
+        String organisationIdentifierFieldPath = organisationIdentifierContextPath
+            + ".testData.actualResponse.body.organisationIdentifier";
 
         try {
-            String organisationIdentifier = ReflectionUtils.deepGetFieldInObject(scenarioContext, organisationIdentifierFieldPath).toString();
+            String organisationIdentifier = ReflectionUtils.deepGetFieldInObject(scenarioContext,
+                organisationIdentifierFieldPath).toString();
             String propertyName = "orgs_assigned_users." + organisationIdentifier;
 
             int value = 0; // default
 
             // if path to previous value supplied : read it
             if (previousValueContextPath != null) {
-                String previousValueFieldPath = previousValueContextPath + ".testData.actualResponse.body.supplementary_data."
-                                                                         + propertyName.replace(".", "\\.");
+                String previousValueFieldPath = previousValueContextPath
+                                                + ".testData.actualResponse.body.supplementary_data."
+                                                + propertyName.replace(".", "\\.");
                 Object previousValue = ReflectionUtils.deepGetFieldInObject(scenarioContext, previousValueFieldPath);
                 if (previousValue != null) {
                     value = Integer.parseInt(previousValue.toString())  + incrementBy; // and increment
                 }  else {
-                    throw new FunctionalTestException("Cannot find previous supplementary data property: '" + previousValueFieldPath + "'");
+                    throw new FunctionalTestException("Cannot find previous supplementary data property: '"
+                                                        + previousValueFieldPath + "'");
                 }
             }
             return Collections.singletonMap(propertyName, value);
         } catch (Exception e) {
-            throw new FunctionalTestException("Problem generating 'orgs_assigned_users' supplementary data property.", e);
+            throw new FunctionalTestException("Problem generating 'orgs_assigned_users' supplementary data property.",
+                                                                                                                    e);
         }
     }
 }

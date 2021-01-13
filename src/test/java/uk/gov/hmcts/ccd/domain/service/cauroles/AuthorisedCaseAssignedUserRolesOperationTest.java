@@ -33,7 +33,8 @@ class AuthorisedCaseAssignedUserRolesOperationTest {
         authorisedCaseAssignedUserRolesOperation = new AuthorisedCaseAssignedUserRolesOperation(
             defaultCaseAssignedUserRolesOperation,
             caseAssignedUserRoleValidator);
-        when(defaultCaseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList())).thenReturn(createCaseAssignedUserRoles());
+        when(defaultCaseAssignedUserRolesOperation.findCaseUserRoles(anyList(), anyList()))
+                .thenReturn(createCaseAssignedUserRoles());
     }
 
     @Test
@@ -78,6 +79,18 @@ class AuthorisedCaseAssignedUserRolesOperationTest {
             CaseRoleAccessException.class, () -> authorisedCaseAssignedUserRolesOperation
                 .findCaseUserRoles(caseIds, userIds)
         );
+    }
+
+    @Test
+    void shouldCallDefaultremoveCaseUserRoles() {
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRolesRequests = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(),
+                new CaseAssignedUserRoleWithOrganisation()
+        );
+
+        authorisedCaseAssignedUserRolesOperation.removeCaseUserRoles(caseUserRolesRequests);
+
+        verify(defaultCaseAssignedUserRolesOperation).removeCaseUserRoles(caseUserRolesRequests);
     }
 
     private List<CaseAssignedUserRole> createCaseAssignedUserRoles() {

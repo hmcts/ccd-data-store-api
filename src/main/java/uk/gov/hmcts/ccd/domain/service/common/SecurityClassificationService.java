@@ -59,10 +59,12 @@ public class SecurityClassificationService {
         Optional<CaseDetails> result = Optional.of(caseDetails);
 
         return userClassificationOpt
-            .flatMap(securityClassification -> result.filter(caseHasClassificationEqualOrLowerThan(securityClassification))
+            .flatMap(securityClassification ->
+                result.filter(caseHasClassificationEqualOrLowerThan(securityClassification))
                 .map(cd -> {
                     if (cd.getDataClassification() == null) {
-                        LOG.warn("No data classification for case with reference={}, all fields removed", cd.getReference());
+                        LOG.warn("No data classification for case with reference={},"
+                            + " all fields removed", cd.getReference());
                         cd.setDataClassification(Maps.newHashMap());
                     }
 
@@ -92,7 +94,8 @@ public class SecurityClassificationService {
         return classifiedEvents;
     }
 
-    public SecurityClassification getClassificationForEvent(CaseTypeDefinition caseTypeDefinition, CaseEventDefinition caseEventDefinition) {
+    public SecurityClassification getClassificationForEvent(CaseTypeDefinition caseTypeDefinition,
+                                                            CaseEventDefinition caseEventDefinition) {
         return caseTypeDefinition
             .getEvents()
             .stream()
@@ -102,13 +105,16 @@ public class SecurityClassificationService {
             .getSecurityClassification();
     }
 
-    public boolean userHasEnoughSecurityClassificationForField(String jurisdictionId, CaseTypeDefinition caseTypeDefinition, String fieldId) {
+    public boolean userHasEnoughSecurityClassificationForField(String jurisdictionId,
+                                                               CaseTypeDefinition caseTypeDefinition, String fieldId) {
         final Optional<SecurityClassification> userClassification = getUserClassification(jurisdictionId);
         return userClassification.map(securityClassification ->
-            securityClassification.higherOrEqualTo(caseTypeDefinition.getClassificationForField(fieldId))).orElse(false);
+            securityClassification.higherOrEqualTo(caseTypeDefinition.getClassificationForField(fieldId)))
+            .orElse(false);
     }
 
-    private JsonNode filterNestedObject(JsonNode data, JsonNode dataClassification, SecurityClassification userClassification) {
+    private JsonNode filterNestedObject(JsonNode data, JsonNode dataClassification,
+                                        SecurityClassification userClassification) {
         if (isAnyNull(data, dataClassification)) {
             return EMPTY_NODE;
         }
@@ -165,7 +171,8 @@ public class SecurityClassificationService {
                         relevantDataClassificationValue,
                         userClassification);
                 } else {
-                    LOG.warn("Invalid security classification structure for collection item: {}", relevantDataClassificationValue.toString());
+                    LOG.warn("Invalid security classification structure for collection item: {}",
+                        relevantDataClassificationValue.toString());
                     dataCollectionIterator.remove();
                 }
             } else {
@@ -200,7 +207,8 @@ public class SecurityClassificationService {
         }
     }
 
-    private void filterSimpleField(SecurityClassification userClassification, Iterator iterator, JsonNode dataClassificationValue) {
+    private void filterSimpleField(SecurityClassification userClassification, Iterator iterator,
+                                   JsonNode dataClassificationValue) {
         Optional<SecurityClassification> securityClassification = getSecurityClassification(dataClassificationValue);
         if (!securityClassification.isPresent() || !userClassification.higherOrEqualTo(securityClassification.get())) {
             iterator.remove();

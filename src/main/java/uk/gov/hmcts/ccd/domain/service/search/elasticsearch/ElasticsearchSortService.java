@@ -65,12 +65,14 @@ public class ElasticsearchSortService {
 
     private void addCaseTypeSorts(String caseTypeId, String useCase, ArrayNode sortNode) {
         CaseTypeDefinition caseType = caseTypeService.getCaseType(caseTypeId);
-        searchQueryOperation.getSortOrders(caseType, useCase).forEach(field -> sortNode.add(buildSortOrderFieldNode(caseType, field)));
+        searchQueryOperation.getSortOrders(caseType, useCase).forEach(field ->
+            sortNode.add(buildSortOrderFieldNode(caseType, field)));
     }
 
     private ObjectNode buildSortOrderFieldNode(CaseTypeDefinition caseTypeDefinition, SortOrderField sortOrderField) {
         ObjectNode objectNode = objectMapper.createObjectNode();
-        CommonField commonField = caseTypeDefinition.getComplexSubfieldDefinitionByPath(sortOrderField.getCaseFieldId()).orElseThrow(() ->
+        CommonField commonField =
+            caseTypeDefinition.getComplexSubfieldDefinitionByPath(sortOrderField.getCaseFieldId()).orElseThrow(() ->
             new ServiceException(String.format("Case field '%s' does not exist in configuration for case type '%s'.",
                 sortOrderField.getCaseFieldId(), caseTypeDefinition.getId()))
         );

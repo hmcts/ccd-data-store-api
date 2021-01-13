@@ -41,7 +41,8 @@ public class MultiSelectListValidator implements BaseTypeValidator {
 
         final List<ValidationResult> results = new ArrayList<>();
 
-        final List<FixedListItemDefinition> validValues = caseFieldDefinition.getFieldTypeDefinition().getFixedListItemDefinitions();
+        final List<FixedListItemDefinition> validValues =
+            caseFieldDefinition.getFieldTypeDefinition().getFixedListItemDefinitions();
 
         final HashSet<String> uniqueValues = new HashSet<>();
 

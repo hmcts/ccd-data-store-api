@@ -1,0 +1,43 @@
+{
+  "title": "should create an event token for correct inputs",
+  "_guid_": "S-930-Prerequisite",
+  "productName": "CCD Data Store",
+  "operationName": "Retrieve a create token",
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+  "specs": [
+    "to get an event token for the case just created"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.caa@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "cid": "${[scenarioContext][siblingContexts][S-930_Create_Case_Data][testData][actualResponse][body][id]}",
+      "etid": "updateCase"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "token": "[[ANYTHING_PRESENT]]",
+      "case_details": "[[ANYTHING_PRESENT]]",
+      "event_id": "updateCase"
+    }
+  }
+}

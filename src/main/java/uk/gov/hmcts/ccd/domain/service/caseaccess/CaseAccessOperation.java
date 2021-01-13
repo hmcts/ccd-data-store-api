@@ -36,13 +36,17 @@ import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 @Service
 public class CaseAccessOperation {
 
+    public static final String ORGS_ASSIGNED_USERS_PATH = "orgs_assigned_users.";
+
     private final CaseUserRepository caseUserRepository;
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseRoleRepository caseRoleRepository;
     private final SupplementaryDataRepository supplementaryDataRepository;
 
-    public CaseAccessOperation(final @Qualifier(CachedCaseUserRepository.QUALIFIER)  CaseUserRepository caseUserRepository,
-                               @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+    public CaseAccessOperation(final @Qualifier(CachedCaseUserRepository.QUALIFIER)
+                                   CaseUserRepository caseUserRepository,
+                               @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                   final CaseDetailsRepository caseDetailsRepository,
                                @Qualifier(CachedCaseRoleRepository.QUALIFIER) CaseRoleRepository caseRoleRepository,
                                @Qualifier("default") SupplementaryDataRepository supplementaryDataRepository) {
         this.caseUserRepository = caseUserRepository;
@@ -54,7 +58,7 @@ public class CaseAccessOperation {
     @Transactional
     public void grantAccess(final String jurisdictionId, final String caseReference, final String userId) {
         final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(jurisdictionId,
-                                                                                      Long.valueOf(caseReference));
+            Long.valueOf(caseReference));
 
         final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
         caseUserRepository.grantAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
@@ -63,16 +67,16 @@ public class CaseAccessOperation {
     @Transactional
     public void revokeAccess(final String jurisdictionId, final String caseReference, final String userId) {
         final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(jurisdictionId,
-                                                                                      Long.valueOf(caseReference));
+            Long.valueOf(caseReference));
         final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
         caseUserRepository.revokeAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
     }
 
     public List<String> findCasesUserIdHasAccessTo(final String userId) {
         return caseUserRepository.findCasesUserIdHasAccessTo(userId)
-                                 .stream()
-                                 .map(databaseId -> caseDetailsRepository.findById(databaseId).getReference() + "")
-                                 .collect(Collectors.toList());
+            .stream()
+            .map(databaseId -> caseDetailsRepository.findById(databaseId).getReference() + "")
+            .collect(Collectors.toList());
     }
 
     @Transactional
@@ -94,21 +98,93 @@ public class CaseAccessOperation {
     @Transactional
     public void addCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
 
-        Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId = getMapOfCaseAssignedUserRolesByCaseId(caseUserRoles);
+        Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId =
+            getMapOfCaseAssignedUserRolesByCaseId(caseUserRoles);
 
-        Map<String, Map<String, Object>> newUserCounts = getNewUserCountByCaseAndOrganisation(cauRolesByCaseId);
+        Map<String, Map<String, Long>> newUserCounts = getUserCountByCaseAndOrganisation(cauRolesByCaseId);
 
         cauRolesByCaseId.forEach((caseId, requestedAssignments) ->
             requestedAssignments.forEach(requestedAssignment ->
-                caseUserRepository.grantAccess(caseId, requestedAssignment.getUserId(), requestedAssignment.getCaseRole())
+                caseUserRepository.grantAccess(caseId, requestedAssignment.getUserId(),
+                                               requestedAssignment.getCaseRole())
             )
         );
 
         newUserCounts.forEach((caseReference, orgNewUserCountMap) ->
             orgNewUserCountMap.forEach((organisationId, newUserCount) ->
-                supplementaryDataRepository.incrementSupplementaryData(caseReference, "orgs_assigned_users." + organisationId, newUserCount)
+                supplementaryDataRepository.incrementSupplementaryData(caseReference,
+                    ORGS_ASSIGNED_USERS_PATH + organisationId, newUserCount)
             )
         );
+    }
+
+    @Transactional
+    public void removeCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
+
+        Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId =
+            getMapOfCaseAssignedUserRolesByCaseId(caseUserRoles);
+
+        // Ignore case user role mappings that are NOT exist in the database silently.
+        // Also they shouldn't effect counters.
+        Map<Long, List<CaseAssignedUserRoleWithOrganisation>> filteredCauRolesByCaseId =
+            filterExistingCauRoles(cauRolesByCaseId);
+
+        filteredCauRolesByCaseId.forEach((caseId, requestedAssignments) ->
+            requestedAssignments.forEach(requestedAssignment ->
+                caseUserRepository.revokeAccess(caseId, requestedAssignment.getUserId(),
+                    requestedAssignment.getCaseRole())
+            )
+        );
+
+        // determine counters after removal of requested mappings so that same function can be re-used
+        // (i.e user still has an association to a case).
+        Map<String, Map<String, Long>> removeUserCounts = getUserCountByCaseAndOrganisation(filteredCauRolesByCaseId);
+
+        removeUserCounts.forEach((caseReference, orgNewUserCountMap) ->
+            orgNewUserCountMap.forEach((organisationId, removeUserCount) ->
+                supplementaryDataRepository.incrementSupplementaryData(caseReference,
+                    ORGS_ASSIGNED_USERS_PATH + organisationId, Math.negateExact(removeUserCount))
+            )
+        );
+    }
+
+    private Map<Long, List<CaseAssignedUserRoleWithOrganisation>> filterExistingCauRoles(
+        Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId) {
+
+        List<Long> caseIds = new ArrayList<>(cauRolesByCaseId.keySet());
+        List<String> userIds = getUserIds(cauRolesByCaseId);
+
+        // find existing Case-User relationships for all the cases + users found
+        Map<Long, List<CaseUserEntity>> existingCaseUserRolesByCaseId =
+            caseUserRepository.findCaseUserRoles(caseIds, userIds).stream()
+                .collect(Collectors.groupingBy(
+                    caseUserEntity -> caseUserEntity.getCasePrimaryKey().getCaseDataId(),
+                    Collectors.toList()
+                ));
+
+        return cauRolesByCaseId.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey,
+                entry -> filterExistingCauRoles(entry.getValue(),
+                    existingCaseUserRolesByCaseId.getOrDefault(entry.getKey(), new ArrayList<>()))));
+    }
+
+    private List<CaseAssignedUserRoleWithOrganisation> filterExistingCauRoles(
+        List<CaseAssignedUserRoleWithOrganisation> inputCauRoles,
+        List<CaseUserEntity> existingCauRoles) {
+        return inputCauRoles.stream()
+            .filter(cauRole -> existingCauRoles.stream()
+                .anyMatch(entity -> entity.getCasePrimaryKey().getCaseRole().equalsIgnoreCase(cauRole.getCaseRole())
+                    && entity.getCasePrimaryKey().getUserId().equalsIgnoreCase(cauRole.getUserId())))
+            .collect(Collectors.toList());
+    }
+
+    private List<String> getUserIds(Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId) {
+        return cauRolesByCaseId.values().stream()
+            .map(requestedAssignments -> requestedAssignments.stream()
+                .map(CaseAssignedUserRoleWithOrganisation::getUserId).collect(Collectors.toList()))
+            .flatMap(List::stream)
+            .distinct()
+            .collect(Collectors.toList());
     }
 
     private Map<Long, List<CaseAssignedUserRoleWithOrganisation>> getMapOfCaseAssignedUserRolesByCaseId(
@@ -145,10 +221,12 @@ public class CaseAccessOperation {
         return cauRolesByCaseId;
     }
 
-    private Map<String, Map<String, Object>> getNewUserCountByCaseAndOrganisation(Map<Long, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId) {
-        Map<String, Map<String, Object>> result = new HashMap<>();
+    private Map<String, Map<String, Long>> getUserCountByCaseAndOrganisation(Map<Long,
+        List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseId) {
+        Map<String, Map<String, Long>> result = new HashMap<>();
 
-        Map<Long, List<CaseAssignedUserRoleWithOrganisation>> caseUserRolesWhichHaveAnOrgId = cauRolesByCaseId.entrySet().stream()
+        Map<Long, List<CaseAssignedUserRoleWithOrganisation>> caseUserRolesWhichHaveAnOrgId =
+            cauRolesByCaseId.entrySet().stream()
             .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
                 // filter out no organisation_id
                 .filter(caseUserRole -> StringUtils.isNoneBlank(caseUserRole.getOrganisationId()))
@@ -166,12 +244,7 @@ public class CaseAccessOperation {
         List<Long> caseIds = new ArrayList<>(caseUserRolesWhichHaveAnOrgId.keySet());
 
         // get distinct list of user ids
-        List<String> userIds = caseUserRolesWhichHaveAnOrgId.values().stream()
-            .map(requestedAssignments -> requestedAssignments.stream()
-                .map(CaseAssignedUserRoleWithOrganisation::getUserId).collect(Collectors.toList()))
-            .flatMap(List::stream)
-            .distinct()
-            .collect(Collectors.toList());
+        List<String> userIds = getUserIds(cauRolesByCaseId);
 
         // find existing Case-User relationships for all the relevant cases + users found
         Map<Long, List<String>> existingCaseUserRelationships =
@@ -189,7 +262,7 @@ public class CaseAccessOperation {
         caseUserRolesWhichHaveAnOrgId.forEach((caseId, requestedAssignments) -> {
             List<String> existingUsersForCase = existingCaseUserRelationships.getOrDefault(caseId, new ArrayList<>());
 
-            Map<String, Object> newRelationshipCounts = requestedAssignments.stream()
+            Map<String, Long> relationshipCounts = requestedAssignments.stream()
                 // filter out any existing relationships
                 .filter(cauRole -> !existingUsersForCase.contains(cauRole.getUserId()))
                 // count unique users for each organisation
@@ -200,9 +273,9 @@ public class CaseAccessOperation {
                         cauRolesForOrganisation -> cauRolesForOrganisation.stream()
                             .map(CaseAssignedUserRoleWithOrganisation::getUserId).distinct().count())));
 
-            // skip if no organisations have any new relationships
-            if (!newRelationshipCounts.isEmpty()) {
-                result.put(requestedAssignments.get(0).getCaseDataId(), newRelationshipCounts);
+            // skip if no organisations have any relationships
+            if (!relationshipCounts.isEmpty()) {
+                result.put(requestedAssignments.get(0).getCaseDataId(), relationshipCounts);
             }
         });
 
@@ -237,11 +310,11 @@ public class CaseAccessOperation {
 
     private void validateCaseRoles(Set<String> validCaseRoles, Set<String> targetCaseRoles) {
         targetCaseRoles.stream()
-                       .filter(role -> !validCaseRoles.contains(role))
-                       .findFirst()
-                       .ifPresent(role -> {
-                           throw new InvalidCaseRoleException(role);
-                       });
+            .filter(role -> !validCaseRoles.contains(role))
+            .findFirst()
+            .ifPresent(role -> {
+                throw new InvalidCaseRoleException(role);
+            });
     }
 
     private void grantAddedCaseRoles(String userId,
@@ -249,8 +322,8 @@ public class CaseAccessOperation {
                                      List<String> currentCaseRoles,
                                      Set<String> targetCaseRoles) {
         targetCaseRoles.stream()
-                       .filter(targetRole -> !currentCaseRoles.contains(targetRole))
-                       .forEach(targetRole -> caseUserRepository.grantAccess(caseId, userId, targetRole));
+            .filter(targetRole -> !currentCaseRoles.contains(targetRole))
+            .forEach(targetRole -> caseUserRepository.grantAccess(caseId, userId, targetRole));
     }
 
     private void revokeRemovedCaseRoles(String userId,
@@ -258,9 +331,9 @@ public class CaseAccessOperation {
                                         List<String> currentCaseRoles,
                                         Set<String> targetCaseRoles) {
         currentCaseRoles.stream()
-                        .filter(currentRole -> !targetCaseRoles.contains(currentRole))
-                        .forEach(currentRole -> caseUserRepository.revokeAccess(caseId,
-                                                                                userId,
-                                                                                currentRole));
+            .filter(currentRole -> !targetCaseRoles.contains(currentRole))
+            .forEach(currentRole -> caseUserRepository.revokeAccess(caseId,
+                userId,
+                currentRole));
     }
 }

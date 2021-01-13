@@ -7,8 +7,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
@@ -34,7 +37,8 @@ public class MergeDataToSearchResultOperation {
     private final UserRepository userRepository;
     private final DateTimeSearchResultProcessor dateTimeSearchResultProcessor;
 
-    public MergeDataToSearchResultOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
+    public MergeDataToSearchResultOperation(@Qualifier(CachedUserRepository.QUALIFIER)
+                                            final UserRepository userRepository,
                                             final DateTimeSearchResultProcessor dateTimeSearchResultProcessor) {
         this.userRepository = userRepository;
         this.dateTimeSearchResultProcessor = dateTimeSearchResultProcessor;
@@ -71,7 +75,8 @@ public class MergeDataToSearchResultOperation {
             .collect(Collectors.toList());
     }
 
-    private SearchResultViewColumn createSearchResultViewColumn(final SearchResultField searchResultField, final CaseFieldDefinition caseFieldDefinition) {
+    private SearchResultViewColumn createSearchResultViewColumn(final SearchResultField searchResultField,
+                                                                final CaseFieldDefinition caseFieldDefinition) {
         CommonField commonField = commonField(searchResultField, caseFieldDefinition);
         return new SearchResultViewColumn(
             searchResultField.buildCaseFieldId(),

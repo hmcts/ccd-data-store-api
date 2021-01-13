@@ -50,7 +50,8 @@ public class StartEventControllerIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        final StartEventResource startEventResource = mapper.readValue(result.getResponse().getContentAsString(), StartEventResource.class);
+        final StartEventResource startEventResource = mapper.readValue(result.getResponse().getContentAsString(),
+                StartEventResource.class);
         assertNotNull("UI Start Trigger Resource is null", startEventResource);
     }
 
@@ -72,7 +73,8 @@ public class StartEventControllerIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        final StartEventResource startEventResource = mapper.readValue(result.getResponse().getContentAsString(), StartEventResource.class);
+        final StartEventResource startEventResource = mapper.readValue(result.getResponse().getContentAsString(),
+                StartEventResource.class);
         assertNotNull("UI Start Trigger Resource is null", startEventResource);
     }
 }

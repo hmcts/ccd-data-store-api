@@ -1,269 +1,292 @@
 {
-  "title": "must submit the event creation successfully for formatted date inputs",
-  "_guid_": "S-044.1",
-  "productName": "CCD data store",
-  "operationName": "submit event with date having formatted value",
-  "method": "POST",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
-  "specs": [
-    "an active profile in CCD",
-    "contains a case Id that has just been created",
-    "contains Update token created as in S-044-1_GetToken_Update"
-  ],
-  "user": {
-    "username": "master.caseworker@gmail.com",
-    "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
-  },
-  "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers"
-    },
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_MASTER",
-      "ctid": "FT_DateTimeFormats",
-      "cid": "${[scenarioContext][childContexts][S-044-TEMP_CreateCase][testData][actualResponse][body][id]}"
-    },
-      "body": {
-        "data": {
-          "DateField": "1970-01-23",
-          "DateTimeField": "2000-01-01T00:23:00.000",
-          "StandardDate": "2016-12-01",
-          "StandardDateTime": "1998-09-01T16:01",
-          "CollectionDate": [
-            {
-              "id": "e03f606a-2ec4-4817-9a25-bbdad16c4423",
-              "value": "1970-03-01"
-            },
-            {
-              "id": "aaad9118-f9a2-4281-afe6-018fd6cbc314",
-              "value": ""
-            }
-          ],
-          "CollectionDateTime": [
-            {
-              "id": "19142a70-a32e-46a3-9e16-345d10ae91dc",
-              "value": "2002-01-01T00:00:00.000"
-            }
-          ],
-          "ComplexDateTime": {
-            "DateField": "1970-02-11",
-            "DateTimeField": "1970-04-30T01:01:00.000",
-            "StandardDate": "2010-02-02",
-            "StandardDateTime": "2019-12-20T01:01:01.000",
-            "NestedComplex": {
-              "DateField": "2019-01-01",
-              "DateTimeField": "2019-01-01T00:00:00.000",
-              "StandardDate": "2019-01-01",
-              "StandardDateTime": "2019-01-01T01:01:01.000"
-            }
-          },
-          "CollectionComplexDateTime": [
-            {
-              "id": "c2c9be29-77dd-4d02-9f07-0a5cf501eefe",
-              "value": {
-                "DateField": "1970-02-01",
-                "DateTimeField": "1970-10-01T01:01:00.000",
-                "StandardDate": "2019-01-01",
-                "StandardDateTime": "2019-01-01T01:01:01.000",
-                "NestedComplex": {
-                  "DateField": "2019-01-01",
-                  "DateTimeField": "2019-01-01T01:01:01.000",
-                  "StandardDate": "2019-01-01",
-                  "StandardDateTime": "2019-01-01T01:01:01.000"
-                }
-              }
-            },
-            {
-              "id": "9b934116-932e-4b81-9a24-84c5f784a421",
-              "value": {
-                "DateField": null,
-                "DateTimeField": null,
-                "StandardDate": null,
-                "StandardDateTime": null,
-                "NestedComplex": {
-                  "DateField": null,
-                  "DateTimeField": null,
-                  "StandardDate": null,
-                  "StandardDateTime": null
-                }
-              }
-            }
-          ]
-        },
-        "event": {
-          "id": "UPDATE",
-          "summary": "",
-          "description": ""
-        },
-        "security_classification": "PUBLIC",
-        "event_token" : "${[scenarioContext][childContexts][S-044-1_GetToken_Update][testData][actualResponse][body][token]}",
-        "ignore_warning": true
-    }
-  },
-  "expectedResponse": {
-    "responseCode": 201,
-    "responseMessage": "OK",
-    "headers": {
-      "_extends_": "Common_Response_Headers",
-      "Vary" : "Accept-Encoding"
-    },
-    "body": {
-      "_links": {
-        "self": {
-          "href": "[[ANYTHING_PRESENT]]"
-        }
-      },
-      "id": "[[ANYTHING_PRESENT]]",
-      "jurisdiction": "[[ANYTHING_PRESENT]]",
-      "case_type": "[[ANYTHING_PRESENT]]",
-      "created_on": "[[ANYTHING_PRESENT]]",
-      "last_modified_on": "[[ANYTHING_PRESENT]]",
-      "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-      "state": "[[ANYTHING_PRESENT]]",
-      "security_classification": "[[ANYTHING_PRESENT]]",
-      "data" : {
-        "CollectionComplexDateTime" : [ {
-          "value" : {
-            "DateField" : "1970-02-01",
-            "DateTimeField" : "1970-10-01T01:01:00.000",
-            "StandardDate" : "2019-01-01",
-            "StandardDateTime" : "2019-01-01T01:01:01.000",
-            "NestedComplex" : {
-              "DateField" : "2019-01-01",
-              "DateTimeField" : "2019-01-01T01:01:01.000",
-              "StandardDate" : "2019-01-01",
-              "StandardDateTime" : "2019-01-01T01:01:01.000"
-            }
-          },
-          "id" : "[[ANY_STRING_NOT_NULLABLE]]"
-        }, {
-          "value" : {
-            "DateField" : null,
-            "DateTimeField" : null,
-            "StandardDate" : null,
-            "StandardDateTime" : null,
-            "NestedComplex" : {
-              "DateField" : null,
-              "DateTimeField" : null,
-              "StandardDate" : null,
-              "StandardDateTime" : null
-            }
-          },
-          "id" : "[[ANY_STRING_NOT_NULLABLE]]"
-        } ],
-        "ComplexDateTime" : {
-          "DateField" : "1970-02-11",
-          "DateTimeField" : "1970-04-30T01:01:00.000",
-          "StandardDate" : "2010-02-02",
-          "StandardDateTime" : "2019-12-20T01:01:01.000",
-          "NestedComplex" : {
-            "DateField" : "2019-01-01",
-            "DateTimeField" : "2019-01-01T00:00:00.000",
-            "StandardDate" : "2019-01-01",
-            "StandardDateTime" : "2019-01-01T01:01:01.000"
-          }
-        },
-        "CollectionDate" : [ {
-          "value" : "1970-03-01",
-          "id" : "[[ANY_STRING_NOT_NULLABLE]]"
-        }, {
-          "value" : "",
-          "id" : "[[ANY_STRING_NOT_NULLABLE]]"
-        } ],
-        "CollectionDateTime" : [ {
-          "value" : "2002-01-01T00:00:00.000",
-          "id" : "[[ANY_STRING_NOT_NULLABLE]]"
-        } ],
-        "StandardDateTime" : "1998-09-01T16:01",
-        "StandardDate" : "2016-12-01",
-        "DateField" : "1970-01-23",
-        "DateTimeField" : "2000-01-01T00:23:00.000"
-      },
-      "data_classification" : {
-        "CollectionComplexDateTime" : {
-          "classification" : "PUBLIC",
-          "value" : [ {
-            "value" : {
-              "DateField" : "PUBLIC",
-              "DateTimeField" : "PUBLIC",
-              "StandardDate" : "PUBLIC",
-              "StandardDateTime" : "PUBLIC",
-              "NestedComplex" : {
-                "classification" : "PUBLIC",
-                "value" : {
-                  "DateField" : "PUBLIC",
-                  "DateTimeField" : "PUBLIC",
-                  "StandardDate" : "PUBLIC",
-                  "StandardDateTime" : "PUBLIC"
-                }
-              }
-            },
-            "id" : "[[ANY_STRING_NOT_NULLABLE]]"
-          }, {
-            "value" : {
-              "DateField" : "PUBLIC",
-              "DateTimeField" : "PUBLIC",
-              "StandardDate" : "PUBLIC",
-              "StandardDateTime" : "PUBLIC",
-              "NestedComplex" : {
-                "classification" : "PUBLIC",
-                "value" : {
-                  "DateField" : "PUBLIC",
-                  "DateTimeField" : "PUBLIC",
-                  "StandardDate" : "PUBLIC",
-                  "StandardDateTime" : "PUBLIC"
-                }
-              }
-            },
-            "id" : "[[ANY_STRING_NOT_NULLABLE]]"
-          } ]
-        },
-        "ComplexDateTime" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "DateField" : "PUBLIC",
-            "DateTimeField" : "PUBLIC",
-            "StandardDate" : "PUBLIC",
-            "StandardDateTime" : "PUBLIC",
-            "NestedComplex" : {
-              "classification" : "PUBLIC",
-              "value" : {
-                "DateField" : "PUBLIC",
-                "DateTimeField" : "PUBLIC",
-                "StandardDate" : "PUBLIC",
-                "StandardDateTime" : "PUBLIC"
-              }
-            }
-          }
-        },
-        "CollectionDate" : {
-          "classification" : "PUBLIC",
-          "value" : [ {
-            "id" : "[[ANY_STRING_NOT_NULLABLE]]",
-            "classification" : "PUBLIC"
-          }, {
-            "id" : "[[ANY_STRING_NOT_NULLABLE]]",
-            "classification" : "PUBLIC"
-          } ]
-        },
-        "CollectionDateTime" : {
-          "classification" : "PUBLIC",
-          "value" : [ {
-            "id" : "[[ANY_STRING_NOT_NULLABLE]]",
-            "classification" : "PUBLIC"
-          } ]
-        },
-        "StandardDateTime" : "PUBLIC",
-        "StandardDate" : "PUBLIC",
-        "DateField" : "PUBLIC",
-        "DateTimeField" : "PUBLIC"
-      },
-      "after_submit_callback_response": null,
-      "callback_response_status_code": null,
-      "callback_response_status": null,
-      "delete_draft_response_status_code": null,
-      "delete_draft_response_status": null
-    }
-  }
+	"_guid_": "S-044.1",
+	"title": "must submit the event creation successfully for formatted date inputs",
+
+	"productName": "CCD data store",
+	"operationName": "submit event with date having formatted value",
+
+	"method": "POST",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains a case Id that has just been created",
+		"contains Update token created as in S-044-1_GetToken_Update"
+	],
+
+	"user": {
+		"username": "master.caseworker@gmail.com",
+		"password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
+	},
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers"
+		},
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "BEFTA_MASTER",
+			"ctid": "FT_DateTimeFormats",
+			"cid": "${[scenarioContext][childContexts][S-044-TEMP_CreateCase][testData][actualResponse][body][id]}"
+		},
+		"body": {
+			"data": {
+				"DateField": "1970-01-23",
+				"DateTimeField": "2000-01-01T00:23:00.000",
+				"StandardDate": "2016-12-01",
+				"StandardDateTime": "1998-09-01T16:01",
+				"CollectionDate": [
+					{
+						"id": "e03f606a-2ec4-4817-9a25-bbdad16c4423",
+						"value": "1970-03-01"
+					},
+					{
+						"id": "aaad9118-f9a2-4281-afe6-018fd6cbc314",
+						"value": ""
+					}
+				],
+				"CollectionDateTime": [
+					{
+						"id": "19142a70-a32e-46a3-9e16-345d10ae91dc",
+						"value": "2002-01-01T00:00:00.000"
+					}
+				],
+				"ComplexDateTime": {
+					"DateField": "1970-02-11",
+					"DateTimeField": "1970-04-30T01:01:00.000",
+					"StandardDate": "2010-02-02",
+					"StandardDateTime": "2019-12-20T01:01:01.000",
+					"NestedComplex": {
+						"DateField": "2019-01-01",
+						"DateTimeField": "2019-01-01T00:00:00.000",
+						"StandardDate": "2019-01-01",
+						"StandardDateTime": "2019-01-01T01:01:01.000"
+					}
+				},
+				"CollectionComplexDateTime": [
+					{
+						"id": "c2c9be29-77dd-4d02-9f07-0a5cf501eefe",
+						"value": {
+							"DateField": "1970-02-01",
+							"DateTimeField": "1970-10-01T01:01:00.000",
+							"StandardDate": "2019-01-01",
+							"StandardDateTime": "2019-01-01T01:01:01.000",
+							"NestedComplex": {
+								"DateField": "2019-01-01",
+								"DateTimeField": "2019-01-01T01:01:01.000",
+								"StandardDate": "2019-01-01",
+								"StandardDateTime": "2019-01-01T01:01:01.000"
+							}
+						}
+					},
+					{
+						"id": "9b934116-932e-4b81-9a24-84c5f784a421",
+						"value": {
+							"DateField": null,
+							"DateTimeField": null,
+							"StandardDate": null,
+							"StandardDateTime": null,
+							"NestedComplex": {
+								"DateField": null,
+								"DateTimeField": null,
+								"StandardDate": null,
+								"StandardDateTime": null
+							}
+						}
+					}
+				]
+			},
+			"event": {
+				"id": "UPDATE",
+				"summary": "",
+				"description": ""
+			},
+			"security_classification": "PUBLIC",
+			"event_token": "${[scenarioContext][childContexts][S-044-1_GetToken_Update][testData][actualResponse][body][token]}",
+			"ignore_warning": true
+		}
+	},
+
+	"expectedResponse": {
+		"responseCode": 201,
+		"responseMessage": "OK",
+		"headers": {
+			"_extends_": "Common_Response_Headers",
+			"Vary": "Accept-Encoding"
+		},
+		"body": {
+			"_links": {
+				"self": {
+					"href": "[[ANYTHING_PRESENT]]"
+				}
+			},
+			"id": "[[ANYTHING_PRESENT]]",
+			"jurisdiction": "[[ANYTHING_PRESENT]]",
+			"case_type": "[[ANYTHING_PRESENT]]",
+			"created_on": "[[ANYTHING_PRESENT]]",
+			"last_modified_on": "[[ANYTHING_PRESENT]]",
+			"last_state_modified_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+			"state": "[[ANYTHING_PRESENT]]",
+			"security_classification": "[[ANYTHING_PRESENT]]",
+			"data": {
+				"CollectionComplexDateTime": [
+					{
+						"value": {
+							"DateField": "1970-02-01",
+							"DateTimeField": "1970-10-01T01:01:00.000",
+							"StandardDate": "2019-01-01",
+							"StandardDateTime": "2019-01-01T01:01:01.000",
+							"NestedComplex": {
+								"DateField": "2019-01-01",
+								"DateTimeField": "2019-01-01T01:01:01.000",
+								"StandardDate": "2019-01-01",
+								"StandardDateTime": "2019-01-01T01:01:01.000"
+							}
+						},
+						"id": "[[ANY_STRING_NOT_NULLABLE]]"
+					},
+					{
+						"value": {
+							"DateField": null,
+							"DateTimeField": null,
+							"StandardDate": null,
+							"StandardDateTime": null,
+							"NestedComplex": {
+								"DateField": null,
+								"DateTimeField": null,
+								"StandardDate": null,
+								"StandardDateTime": null
+							}
+						},
+						"id": "[[ANY_STRING_NOT_NULLABLE]]"
+					}
+				],
+				"ComplexDateTime": {
+					"DateField": "1970-02-11",
+					"DateTimeField": "1970-04-30T01:01:00.000",
+					"StandardDate": "2010-02-02",
+					"StandardDateTime": "2019-12-20T01:01:01.000",
+					"NestedComplex": {
+						"DateField": "2019-01-01",
+						"DateTimeField": "2019-01-01T00:00:00.000",
+						"StandardDate": "2019-01-01",
+						"StandardDateTime": "2019-01-01T01:01:01.000"
+					}
+				},
+				"CollectionDate": [
+					{
+						"value": "1970-03-01",
+						"id": "[[ANY_STRING_NOT_NULLABLE]]"
+					},
+					{
+						"value": "",
+						"id": "[[ANY_STRING_NOT_NULLABLE]]"
+					}
+				],
+				"CollectionDateTime": [
+					{
+						"value": "2002-01-01T00:00:00.000",
+						"id": "[[ANY_STRING_NOT_NULLABLE]]"
+					}
+				],
+				"StandardDateTime": "1998-09-01T16:01",
+				"StandardDate": "2016-12-01",
+				"DateField": "1970-01-23",
+				"DateTimeField": "2000-01-01T00:23:00.000"
+			},
+			"data_classification": {
+				"CollectionComplexDateTime": {
+					"classification": "PUBLIC",
+					"value": [
+						{
+							"value": {
+								"DateField": "PUBLIC",
+								"DateTimeField": "PUBLIC",
+								"StandardDate": "PUBLIC",
+								"StandardDateTime": "PUBLIC",
+								"NestedComplex": {
+									"classification": "PUBLIC",
+									"value": {
+										"DateField": "PUBLIC",
+										"DateTimeField": "PUBLIC",
+										"StandardDate": "PUBLIC",
+										"StandardDateTime": "PUBLIC"
+									}
+								}
+							},
+							"id": "[[ANY_STRING_NOT_NULLABLE]]"
+						},
+						{
+							"value": {
+								"DateField": "PUBLIC",
+								"DateTimeField": "PUBLIC",
+								"StandardDate": "PUBLIC",
+								"StandardDateTime": "PUBLIC",
+								"NestedComplex": {
+									"classification": "PUBLIC",
+									"value": {
+										"DateField": "PUBLIC",
+										"DateTimeField": "PUBLIC",
+										"StandardDate": "PUBLIC",
+										"StandardDateTime": "PUBLIC"
+									}
+								}
+							},
+							"id": "[[ANY_STRING_NOT_NULLABLE]]"
+						}
+					]
+				},
+				"ComplexDateTime": {
+					"classification": "PUBLIC",
+					"value": {
+						"DateField": "PUBLIC",
+						"DateTimeField": "PUBLIC",
+						"StandardDate": "PUBLIC",
+						"StandardDateTime": "PUBLIC",
+						"NestedComplex": {
+							"classification": "PUBLIC",
+							"value": {
+								"DateField": "PUBLIC",
+								"DateTimeField": "PUBLIC",
+								"StandardDate": "PUBLIC",
+								"StandardDateTime": "PUBLIC"
+							}
+						}
+					}
+				},
+				"CollectionDate": {
+					"classification": "PUBLIC",
+					"value": [
+						{
+							"id": "[[ANY_STRING_NOT_NULLABLE]]",
+							"classification": "PUBLIC"
+						},
+						{
+							"id": "[[ANY_STRING_NOT_NULLABLE]]",
+							"classification": "PUBLIC"
+						}
+					]
+				},
+				"CollectionDateTime": {
+					"classification": "PUBLIC",
+					"value": [
+						{
+							"id": "[[ANY_STRING_NOT_NULLABLE]]",
+							"classification": "PUBLIC"
+						}
+					]
+				},
+				"StandardDateTime": "PUBLIC",
+				"StandardDate": "PUBLIC",
+				"DateField": "PUBLIC",
+				"DateTimeField": "PUBLIC"
+			},
+			"supplementary_data": null,
+			"after_submit_callback_response": null,
+			"callback_response_status_code": null,
+			"callback_response_status": null,
+			"delete_draft_response_status_code": null,
+			"delete_draft_response_status": null
+		}
+	}
 }

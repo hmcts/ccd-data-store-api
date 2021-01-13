@@ -39,10 +39,14 @@ class ClassifiedGetCriteriaOperationTest {
     private static final String CASE_FIELD_ID_1_2 = "CASE_FIELD_1_2";
     private static final String CASE_FIELD_ID_1_3 = "CASE_FIELD_1_3";
     private static final String CASE_FIELD_ID_1_4 = "CASE_FIELD_1_4";
-    private static final CaseFieldDefinition CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1).withSC(PUBLIC).build();
-    private static final CaseFieldDefinition CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2).withSC(PUBLIC).build();
-    private static final CaseFieldDefinition CASE_FIELD_1_3 = newCaseField().withId(CASE_FIELD_ID_1_3).withSC(PUBLIC).build();
-    private static final CaseFieldDefinition CASE_FIELD_1_4 = newCaseField().withId(CASE_FIELD_ID_1_4).withSC(PUBLIC).build();
+    private static final CaseFieldDefinition CASE_FIELD_1_1 = newCaseField().withId(CASE_FIELD_ID_1_1).withSC(PUBLIC)
+        .build();
+    private static final CaseFieldDefinition CASE_FIELD_1_2 = newCaseField().withId(CASE_FIELD_ID_1_2).withSC(PUBLIC)
+        .build();
+    private static final CaseFieldDefinition CASE_FIELD_1_3 = newCaseField().withId(CASE_FIELD_ID_1_3).withSC(PUBLIC)
+        .build();
+    private static final CaseFieldDefinition CASE_FIELD_1_4 = newCaseField().withId(CASE_FIELD_ID_1_4).withSC(PUBLIC)
+        .build();
     private static List<WorkbasketInput> testWorkbasketInputs;
     private static List<SearchInput> testSearchInputs;
 
@@ -85,7 +89,8 @@ class ClassifiedGetCriteriaOperationTest {
 
         doReturn(testCaseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ONE);
 
-        classUnderTest = new ClassifiedGetCriteriaOperation(getCriteriaOperation, caseDefinitionRepository, classificationService);
+        classUnderTest =
+            new ClassifiedGetCriteriaOperation(getCriteriaOperation, caseDefinitionRepository, classificationService);
 
     }
 
@@ -104,7 +109,8 @@ class ClassifiedGetCriteriaOperationTest {
             testCaseTypeDefinition, CASE_FIELD_ID_1_4);
 
 
-        final List<? extends CriteriaInput> workbasketInputs = classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+        final List<? extends CriteriaInput> workbasketInputs =
+            classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(3)),
             () -> assertThat(workbasketInputs.get(0), is(testWorkbasketInputs.get(0))),
@@ -119,7 +125,8 @@ class ClassifiedGetCriteriaOperationTest {
         doReturn(new ArrayList<>()).when(getCriteriaOperation).execute(CASE_TYPE_ONE,
             CAN_READ, WORKBASKET);
 
-        final List<? extends CriteriaInput> workbasketInputs = classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
+        final List<? extends CriteriaInput> workbasketInputs =
+            classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
 
         assertAll(
             () -> assertThat(workbasketInputs.size(), is(0))

@@ -18,14 +18,17 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
     private final UIDService uidService;
 
     @Autowired
-    public DefaultGetCaseOperation(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+    public DefaultGetCaseOperation(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                       final CaseDetailsRepository caseDetailsRepository,
                                    final UIDService uidService) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.uidService = uidService;
     }
 
     @Override
-    public Optional<CaseDetails> execute(final String jurisdictionId, final String caseTypeId, final String caseReference) {
+    public Optional<CaseDetails> execute(final String jurisdictionId,
+                                         final String caseTypeId,
+                                         final String caseReference) {
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
         }

@@ -10,7 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
@@ -63,7 +71,8 @@ public class UIDraftsController {
     )
     @ApiResponses(value = {
         @ApiResponse(code = 201, message = "Draft created"),
-        @ApiResponse(code = 422, message = "One of: cannot find event in requested case type or unable to sanitize document for case field"),
+        @ApiResponse(code = 422, message = "One of: cannot find event in requested case type or unable to sanitize "
+            + "document for case field"),
         @ApiResponse(code = 500, message = "Draft store is down.")
     })
     public ResponseEntity<DraftViewResource> saveDraft(
@@ -72,7 +81,8 @@ public class UIDraftsController {
         @RequestBody final CaseDataContent caseDataContent) {
 
         ResponseEntity.BodyBuilder builder = status(HttpStatus.CREATED);
-        return builder.body(new DraftViewResource(upsertDraftOperation.executeSave(caseTypeId, caseDataContent), caseTypeId));
+        return builder.body(new DraftViewResource(upsertDraftOperation.executeSave(caseTypeId, caseDataContent),
+            caseTypeId));
     }
 
     @PutMapping(
@@ -90,7 +100,8 @@ public class UIDraftsController {
     )
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Draft updated"),
-        @ApiResponse(code = 422, message = "One of: cannot find event in requested case type or unable to sanitize document for case field"),
+        @ApiResponse(code = 422, message = "One of: cannot find event in requested case type or unable to sanitize "
+            + "document for case field"),
         @ApiResponse(code = 500, message = "Draft store is down.")
     })
     public ResponseEntity<DraftViewResource> updateDraft(
@@ -98,7 +109,8 @@ public class UIDraftsController {
         @PathVariable("did") final String draftId,
         @RequestBody final CaseDataContent caseDataContent) {
 
-        return ResponseEntity.ok(new DraftViewResource(upsertDraftOperation.executeUpdate(caseTypeId, draftId, caseDataContent), caseTypeId));
+        return ResponseEntity.ok(new DraftViewResource(upsertDraftOperation.executeUpdate(caseTypeId, draftId,
+            caseDataContent), caseTypeId));
     }
 
     @Transactional

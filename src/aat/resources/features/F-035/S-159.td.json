@@ -1,79 +1,78 @@
 {
-  "title": "should retrieve case when the case reference exists",
+	"_guid_": "S-159",
+	"_extends_": "F-035_Base_Test_Data",
+	"title": "should retrieve case when the case reference exists",
 
-  "_guid_": "S-159",
-  "_extends_": "F-035_Base_Test_Data",
+	"specs": [
+		"an active profile in CCD",
+		"contains the case reference of the case just created",
+		"contains the details of the case just created, along with an HTTP-200 OK"
+	],
 
-  "specs": [
-    "an active profile in CCD",
-    "contains the case reference of the case just created",
-    "contains the details of the case just created, along with an HTTP-200 OK"
-  ],
-
-  "expectedResponse": {
-    "_extends_": "Common_200_Response",
-    "headers": {
-      "Content-Encoding" : "gzip",
-      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8",
-      "Vary" : "Accept-Encoding"
-    },
-    "body" : {
-      "_links" : {
-        "self" : {
-          "href" : "[[ANYTHING_PRESENT]]"
-        }
-      },
-      "id" : "[[ANYTHING_PRESENT]]",
-      "jurisdiction" : "AUTOTEST1",
-      "case_type" : "AAT_AUTH_15",
-      "created_on" : "[[ANYTHING_PRESENT]]",
-      "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-      "last_modified_on" : "[[ANYTHING_PRESENT]]",
-      "state" : "TODO",
-      "security_classification" : "PUBLIC",
-      "data" : {
-        "_extends_": "Standard_Full_Case_Data"
-      },
-      "data_classification" : {
-        "MoneyGBPField" : "PUBLIC",
-        "FixedListField" : "PUBLIC",
-        "AddressUKField" : {
-          "value" : {
-            "County" : "PUBLIC",
-            "Country" : "PUBLIC",
-            "PostCode" : "PUBLIC",
-            "PostTown" : "PUBLIC",
-            "AddressLine1" : "PUBLIC",
-            "AddressLine2" : "PUBLIC",
-            "AddressLine3" : "PUBLIC"
-          },
-          "classification" : "PUBLIC"
-        },
-        "DateTimeField" : "PUBLIC",
-        "PhoneUKField" : "PUBLIC",
-        "NumberField" : "PUBLIC",
-        "MultiSelectListField" : "PUBLIC",
-        "YesOrNoField" : "PUBLIC",
-        "EmailField" : "PUBLIC",
-        "TextField" : "PUBLIC",
-        "DateField" : "PUBLIC",
-        "TextAreaField" : "PUBLIC",
-        "CollectionField" : {
-          "value" : [ {
-            "id" : "[[ANYTHING_PRESENT]]",
-            "classification" : "PUBLIC"
-          }, {
-            "id" : "[[ANYTHING_PRESENT]]",
-            "classification" : "PUBLIC"
-          } ],
-          "classification" : "PUBLIC"
-        }
-      },
-      "after_submit_callback_response" : null,
-      "callback_response_status_code" : null,
-      "callback_response_status" : null,
-      "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null
-    }
-  }
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Encoding" : "gzip",
+			"Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8",
+			"Vary" : "Accept-Encoding"
+		},
+		"body" : {
+			"_links" : {
+				"self" : {
+					"href" : "[[ANYTHING_PRESENT]]"
+				}
+			},
+			"id" : "[[ANYTHING_PRESENT]]",
+			"jurisdiction" : "AUTOTEST1",
+			"case_type" : "AAT_AUTH_15",
+			"created_on" : "[[ANYTHING_PRESENT]]",
+			"last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+			"last_modified_on" : "[[ANYTHING_PRESENT]]",
+			"state" : "TODO",
+			"security_classification" : "PUBLIC",
+			"data" : {
+				"_extends_": "Standard_Full_Case_Data"
+			},
+			"data_classification" : {
+				"MoneyGBPField" : "PUBLIC",
+				"FixedListField" : "PUBLIC",
+				"AddressUKField" : {
+					"value" : {
+						"County" : "PUBLIC",
+						"Country" : "PUBLIC",
+						"PostCode" : "PUBLIC",
+						"PostTown" : "PUBLIC",
+						"AddressLine1" : "PUBLIC",
+						"AddressLine2" : "PUBLIC",
+						"AddressLine3" : "PUBLIC"
+					},
+					"classification" : "PUBLIC"
+				},
+				"DateTimeField" : "PUBLIC",
+				"PhoneUKField" : "PUBLIC",
+				"NumberField" : "PUBLIC",
+				"MultiSelectListField" : "PUBLIC",
+				"YesOrNoField" : "PUBLIC",
+				"EmailField" : "PUBLIC",
+				"TextField" : "PUBLIC",
+				"DateField" : "PUBLIC",
+				"TextAreaField" : "PUBLIC",
+				"CollectionField" : {
+					"value" : [ {
+						"id" : "[[ANYTHING_PRESENT]]",
+						"classification" : "PUBLIC"
+					}, {
+						"id" : "[[ANYTHING_PRESENT]]",
+						"classification" : "PUBLIC"
+					} ],
+					"classification" : "PUBLIC"
+				}
+			},
+			"after_submit_callback_response" : null,
+			"callback_response_status_code" : null,
+			"callback_response_status" : null,
+			"delete_draft_response_status_code" : null,
+			"delete_draft_response_status" : null
+		}
+	}
 }

@@ -1,0 +1,45 @@
+{
+  "title": "Must return an error response for a malformed Case Role",
+
+  "_guid_": "S-111.8",
+  "_extends_": "F-111_Remove_Case_Assigned_User_Roles_Base",
+
+  "specs": [
+    "Richard - who can create a case",
+    "Dil - who is to add and remove some case role assignment for a case",
+    "Olawale - with an active solicitor profile",
+    "is made from an authorised application by Dil, for 2 assignments each containing the Case ID of C1 and User ID of Olawale",
+    "contains a proper Case Role CR-1 in one entry and a malformed Case Role in the other"
+  ],
+
+  "users": {
+    "_extends_": "F-111_Users"
+  },
+
+  "request": {
+    "headers": {
+      "Authorization": "Bearer ${[scenarioContext][testData][users][userDil][accessToken]}"
+    },
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][childContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
+          "case_role": "[CR-1]"
+        },
+        {
+          "case_id": "${[scenarioContext][childContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
+          "case_role": ""
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "F-111_Remove_Case_Assigned_User_Roles_400_response",
+    "body": {
+      "message": "Invalid data provided for the following inputs to the request:\nCase role name format is invalid"
+    }
+  }
+}

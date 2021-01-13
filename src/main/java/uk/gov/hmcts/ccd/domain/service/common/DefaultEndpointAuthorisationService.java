@@ -17,7 +17,8 @@ public class DefaultEndpointAuthorisationService implements EndpointAuthorisatio
     private final ApplicationParams applicationParams;
 
     @Autowired
-    public DefaultEndpointAuthorisationService(final @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
+    public DefaultEndpointAuthorisationService(final @Qualifier(CachedUserRepository.QUALIFIER)
+                                                       UserRepository userRepository,
                                                final CaseAccessService caseAccessService,
                                                final ApplicationParams applicationParams) {
         this.userRepository = userRepository;

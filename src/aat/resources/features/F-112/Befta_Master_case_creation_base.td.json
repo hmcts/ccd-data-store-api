@@ -1,0 +1,52 @@
+{
+  "_guid_": "Befta_Master_Case_Creation_Base_Data",
+
+  "productName": "CCD Data Store",
+  "operationName": "Submit case creation as Case worker",
+  "method": "POST",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+
+  "specs": [
+    "by a privileged user with full ACL to create a case of this case type",
+    "to create a full case",
+    "with a searchable collection of Child complex but a non searchable 'ChildFullName' field",
+    "with a searchable collection of Child complex containing a searchable 'ChildFullName' field"
+
+  ],
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]"
+    },
+    "body": {
+      "ignore_warning": false,
+      "draft_id": null
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "vary": "accept-encoding",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "state": "[[ANYTHING_PRESENT]]",
+      "version": 0,
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "_guid_": "Befta_Master_ComplexCollectionComplex_Case_Creation_Token_Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation as Case worker",
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+
+  "specs": [
+    "to create a token for case creation"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "username": "master.caseworker@gmail.com",
+      "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
+    }
+  },
+
+  "request": {
+    "headers":{
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_ComplexCollectionComplex",
+      "etid": "createCase"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers" : {
+      "Content-Encoding" : "gzip",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body" : {
+      "token" : "[[ANYTHING_PRESENT]]",
+      "case_details" : {
+        "id" : null,
+        "jurisdiction" : "BEFTA_MASTER",
+        "state" : null,
+        "version" : null,
+        "case_type_id" : "FT_ComplexCollectionComplex",
+        "created_date" : null,
+        "last_modified" : null,
+        "last_state_modified_date" : null,
+        "security_classification" : null,
+        "case_data" : { },
+        "data_classification" : { },
+        "after_submit_callback_response" : null,
+        "callback_response_status_code" : null,
+        "callback_response_status" : null,
+        "delete_draft_response_status_code" : null,
+        "delete_draft_response_status" : null,
+        "security_classifications" : { }
+      },
+      "event_id" : "createCase"
+    }
+  }
+
+}

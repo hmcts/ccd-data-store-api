@@ -13,7 +13,10 @@ import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
+import uk.gov.hmcts.ccd.domain.model.definition.SortOrder;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.service.getdraft.DefaultGetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
@@ -22,7 +25,12 @@ import uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -45,7 +53,8 @@ public class SearchQueryOperation {
     @Autowired
     public SearchQueryOperation(@Qualifier(AuthorisedSearchOperation.QUALIFIER) final SearchOperation searchOperation,
                                 final MergeDataToSearchResultOperation mergeDataToSearchResultOperation,
-                                @Qualifier(AuthorisedGetCaseTypeOperation.QUALIFIER) final GetCaseTypeOperation getCaseTypeOperation,
+                                @Qualifier(AuthorisedGetCaseTypeOperation.QUALIFIER)
+                                    final GetCaseTypeOperation getCaseTypeOperation,
                                 @Qualifier(DefaultGetDraftsOperation.QUALIFIER) GetDraftsOperation getDraftsOperation,
                                 SearchResultDefinitionService searchResultDefinitionService,
                                 @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -69,7 +78,8 @@ public class SearchQueryOperation {
             return new SearchResultView(Collections.emptyList(), Collections.emptyList(), NO_ERROR);
         }
 
-        final SearchResultDefinition searchResult = searchResultDefinitionService.getSearchResultDefinition(caseType.get(),
+        final SearchResultDefinition searchResult =
+            searchResultDefinitionService.getSearchResultDefinition(caseType.get(),
             Strings.isNullOrEmpty(view) ? SEARCH : view, Collections.emptyList());
 
         addSortOrderFields(metadata, searchResult);
@@ -93,7 +103,8 @@ public class SearchQueryOperation {
     }
 
     public List<SortOrderField> getSortOrders(CaseTypeDefinition caseType, String useCase) {
-        return getSortOrders(searchResultDefinitionService.getSearchResultDefinition(caseType, useCase, Collections.emptyList()));
+        return getSortOrders(searchResultDefinitionService.getSearchResultDefinition(caseType,
+            useCase, Collections.emptyList()));
     }
 
     private List<SortOrderField> getSortOrders(SearchResultDefinition searchResult) {

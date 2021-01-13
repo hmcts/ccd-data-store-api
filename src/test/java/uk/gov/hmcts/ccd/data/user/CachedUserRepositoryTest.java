@@ -30,14 +30,14 @@ class CachedUserRepositoryTest {
 
     private static final String JURISDICTION_ID = "DIVORCE";
     @Mock
-    private UserRepository userRepository;
-    private CachedUserRepository cachedUserRepository;
+    private uk.gov.hmcts.ccd.data.user.UserRepository userRepository;
+    private uk.gov.hmcts.ccd.data.user.CachedUserRepository cachedUserRepository;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        cachedUserRepository = new CachedUserRepository(userRepository);
+        cachedUserRepository = new uk.gov.hmcts.ccd.data.user.CachedUserRepository(userRepository);
     }
 
     @Nested
@@ -201,7 +201,8 @@ class CachedUserRepositoryTest {
     @DisplayName("getHighestUserClassification()")
     class GetHighestUserClassification {
         @Test
-        @DisplayName("should initially retrieve highest security classification from repository and from cache for subsequent calls")
+        @DisplayName("should initially retrieve highest security classification from repository and from cache for "
+                + "subsequent calls")
         void shouldRetrieveUserRolesFromDecorated() {
             when(userRepository.getHighestUserClassification(JURISDICTION_ID)).thenReturn(PRIVATE);
 

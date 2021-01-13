@@ -15,7 +15,8 @@ public class PaginatedSearchMetaDataOperation {
     private final CaseDetailsRepository caseDetailsRepository;
 
     @Autowired
-    public PaginatedSearchMetaDataOperation(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository) {
+    public PaginatedSearchMetaDataOperation(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                                final CaseDetailsRepository caseDetailsRepository) {
         this.caseDetailsRepository = caseDetailsRepository;
     }
 

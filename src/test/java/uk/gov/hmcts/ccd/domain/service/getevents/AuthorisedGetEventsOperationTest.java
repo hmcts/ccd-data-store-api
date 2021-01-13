@@ -72,9 +72,11 @@ class AuthorisedGetEventsOperationTest {
     private static final String CASEWORKER_PROBATE_LOA1 = "caseworker-probate-loa1";
     private static final String CASEWORKER_PROBATE_LOA3 = "caseworker-probate-loa3";
     private static final String CASEWORKER_DIVORCE = "caseworker-divorce-loa3";
-    private static final Set<String> USER_ROLES = Sets.newHashSet(CASEWORKER_DIVORCE, CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA3);
+    private static final Set<String> USER_ROLES = Sets.newHashSet(CASEWORKER_DIVORCE, CASEWORKER_PROBATE_LOA1,
+        CASEWORKER_PROBATE_LOA3);
     private static final Set<String> CASE_ROLES = Sets.newHashSet("[LASOLICITOR]");
-    private static final Set<String> CASE_USER_ROLES = Sets.union(USER_ROLES, CASE_ROLES.stream().collect(Collectors.toSet()));
+    private static final Set<String> CASE_USER_ROLES =
+        Sets.union(USER_ROLES, CASE_ROLES.stream().collect(Collectors.toSet()));
 
 
     @BeforeEach
@@ -109,7 +111,8 @@ class AuthorisedGetEventsOperationTest {
         authorisedEvents = newArrayList(new AuditEvent());
 
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES, CAN_READ);
-        doReturn(authorisedEvents).when(accessControlService).filterCaseAuditEventsByReadAccess(classifiedEvents, eventsDefinition, CASE_USER_ROLES);
+        doReturn(authorisedEvents).when(accessControlService).filterCaseAuditEventsByReadAccess(classifiedEvents,
+            eventsDefinition, CASE_USER_ROLES);
 
         authorisedOperation = new AuthorisedGetEventsOperation(getEventsOperation, caseDefinitionRepository,
             accessControlService, caseAccessService);
@@ -170,12 +173,15 @@ class AuthorisedGetEventsOperationTest {
 
         final List<AuditEvent> outputs = authorisedOperation.getEvents(caseDetails);
 
-        InOrder inOrder = inOrder(caseDefinitionRepository, getEventsOperation, accessControlService, caseAccessService);
+        InOrder inOrder =
+            inOrder(caseDefinitionRepository, getEventsOperation, accessControlService, caseAccessService);
         assertAll(() -> inOrder.verify(getEventsOperation).getEvents(caseDetails),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
             () -> inOrder.verify(caseAccessService).getAccessRoles(CASE_ID),
-            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES, CAN_READ),
-            () -> inOrder.verify(accessControlService, never()).filterCaseAuditEventsByReadAccess(classifiedEvents, caseType.getEvents(), USER_ROLES),
+            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES,
+                CAN_READ),
+            () -> inOrder.verify(accessControlService, never()).filterCaseAuditEventsByReadAccess(classifiedEvents,
+                caseType.getEvents(), USER_ROLES),
             () -> assertThat(outputs, is(notNullValue())),
             () -> assertThat(outputs, hasSize(0))
         );
@@ -186,12 +192,15 @@ class AuthorisedGetEventsOperationTest {
     void shouldApplyAuthorisationForCaseDetails() {
         final List<AuditEvent> outputs = authorisedOperation.getEvents(caseDetails);
 
-        InOrder inOrder = inOrder(caseDefinitionRepository, getEventsOperation, accessControlService, caseAccessService);
+        InOrder inOrder =
+            inOrder(caseDefinitionRepository, getEventsOperation, accessControlService, caseAccessService);
         assertAll(() -> inOrder.verify(getEventsOperation).getEvents(caseDetails),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
             () -> inOrder.verify(caseAccessService).getAccessRoles(CASE_ID),
-            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES, CAN_READ),
-            () -> inOrder.verify(accessControlService).filterCaseAuditEventsByReadAccess(classifiedEvents, caseType.getEvents(), CASE_USER_ROLES),
+            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES,
+                CAN_READ),
+            () -> inOrder.verify(accessControlService).filterCaseAuditEventsByReadAccess(classifiedEvents,
+                caseType.getEvents(), CASE_USER_ROLES),
             () -> assertThat(outputs, is(authorisedEvents))
         );
     }
@@ -201,12 +210,15 @@ class AuthorisedGetEventsOperationTest {
     void shouldApplyAuthorisationForJurisdictionCaseTypeIdAndCaseReference() {
         final List<AuditEvent> outputs = authorisedOperation.getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
 
-        InOrder inOrder = inOrder(caseDefinitionRepository, getEventsOperation, accessControlService, caseAccessService);
+        InOrder inOrder =
+            inOrder(caseDefinitionRepository, getEventsOperation, accessControlService, caseAccessService);
         assertAll(() -> inOrder.verify(getEventsOperation).getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
             () -> inOrder.verify(caseAccessService).getAccessRoles(CASE_ID),
-            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES, CAN_READ),
-            () -> inOrder.verify(accessControlService).filterCaseAuditEventsByReadAccess(classifiedEvents, caseType.getEvents(), CASE_USER_ROLES),
+            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES,
+                CAN_READ),
+            () -> inOrder.verify(accessControlService).filterCaseAuditEventsByReadAccess(classifiedEvents,
+                caseType.getEvents(), CASE_USER_ROLES),
             () -> assertThat(outputs, is(authorisedEvents))
         );
     }
@@ -216,12 +228,15 @@ class AuthorisedGetEventsOperationTest {
     void shouldApplyAuthorisationForCaseReference() {
         final List<AuditEvent> outputs = authorisedOperation.getEvents(CASE_REFERENCE);
 
-        InOrder inOrder = inOrder(caseDefinitionRepository, getEventsOperation, accessControlService, caseAccessService);
+        InOrder inOrder =
+            inOrder(caseDefinitionRepository, getEventsOperation, accessControlService, caseAccessService);
         assertAll(() -> inOrder.verify(getEventsOperation).getEvents(CASE_REFERENCE),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
             () -> inOrder.verify(caseAccessService).getAccessRoles(CASE_ID),
-            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES, CAN_READ),
-            () -> inOrder.verify(accessControlService).filterCaseAuditEventsByReadAccess(classifiedEvents, caseType.getEvents(), CASE_USER_ROLES),
+            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES,
+                CAN_READ),
+            () -> inOrder.verify(accessControlService).filterCaseAuditEventsByReadAccess(classifiedEvents,
+                caseType.getEvents(), CASE_USER_ROLES),
             () -> assertThat(outputs, is(authorisedEvents))
         );
     }
@@ -253,20 +268,25 @@ class AuthorisedGetEventsOperationTest {
     void shouldApplyAuthorisationForJurisdictionCaseTypeIdAndEvent() {
         doReturn(Optional.of(event)).when(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
         doReturn(singletonList(event)).when(accessControlService)
-            .filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), anyListOf(CaseEventDefinition.class), eq(CASE_USER_ROLES));
+            .filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), anyListOf(CaseEventDefinition.class),
+                eq(CASE_USER_ROLES));
 
-        Optional<AuditEvent> optionalAuditEvent = authorisedOperation.getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        Optional<AuditEvent> optionalAuditEvent =
+            authorisedOperation.getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
 
         assertThat(optionalAuditEvent.isPresent(), is(true));
         AuditEvent output = optionalAuditEvent.get();
-        InOrder inOrder = inOrder(caseDefinitionRepository, getEventsOperation, accessControlService, caseAccessService);
+        InOrder inOrder =
+            inOrder(caseDefinitionRepository, getEventsOperation, accessControlService, caseAccessService);
         assertAll(
             () -> inOrder.verify(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
             () -> inOrder.verify(caseAccessService).getAccessRoles(CASE_ID),
-            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES, CAN_READ),
+            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES,
+                CAN_READ),
             () -> inOrder.verify(accessControlService)
-                .filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), eq(caseType.getEvents()), eq(CASE_USER_ROLES)),
+                .filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), eq(caseType.getEvents()),
+                    eq(CASE_USER_ROLES)),
             () -> assertThat(output, is(event))
         );
     }

@@ -1,0 +1,182 @@
+{
+  "_guid_": "S-943",
+  "_extends_": "F-109_test_Data_Base_ES_external",
+  "specs": [
+    "with access to create cases for various jurisdictions Befta_Jurisdiction1 & Befta_Jurisdiction2",
+    "with only the 'caseworker-caa' role which is configured with the required CRUD permissions for the case types of both previously created cases",
+    "is made to query the previously created case from Jurisdiction Befta_Jurisdiction2",
+    "contains the case type of Jurisdiction Befta_Jurisdiction2"
+  ],
+  "request": {
+    "queryParams": {
+      "ctid": "BEFTA_CASETYPE_2_1"
+    },
+    "body": {
+      "query": {
+        "match": {
+          "reference": "${[scenarioContext][childContexts][F-109-Befta_Jurisdiction2_Case_Type1_Creation][testData][actualResponse][body][id]}"
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "total": 1,
+      "cases": [
+        {
+          "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_F-109-Befta_Jurisdiction2_Case_Type1_Creation]}",
+          "jurisdiction": "BEFTA_JURISDICTION_2",
+          "state": "TODO",
+          "version": null,
+          "case_type_id": "BEFTA_CASETYPE_2_1",
+          "created_date": "[[ANYTHING_PRESENT]]",
+          "last_modified": "[[ANYTHING_PRESENT]]",
+          "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+          "security_classification": "PUBLIC",
+          "case_data": {
+            "FixedListField": null,
+            "MoneyGBPField": null,
+            "AddressUKField": {
+              "Country": null,
+              "PostTown": null,
+              "PostCode": null,
+              "County": null,
+              "AddressLine3": null,
+              "AddressLine1": null,
+              "AddressLine2": null
+            },
+            "ComplexField": {
+              "ComplexNestedField": {
+                "NestedCollectionTextField": [],
+                "NestedNumberField": null
+              },
+              "ComplexTextField": null,
+              "ComplexFixedListField": null
+            },
+            "FixedRadioListField": null,
+            "DateTimeField": null,
+            "PhoneUKField": null,
+            "NumberField": null,
+            "MultiSelectListField": [],
+            "YesOrNoField": null,
+            "EmailField": null,
+            "TextField": "text",
+            "DateField": null,
+            "TextAreaField": null,
+            "CollectionField": []
+          },
+          "data_classification": {
+            "FixedListField": "PUBLIC",
+            "MoneyGBPField": "PUBLIC",
+            "AddressUKField": {
+              "value": {
+                "Country": "PUBLIC",
+                "PostTown": "PUBLIC",
+                "PostCode": "PUBLIC",
+                "County": "PUBLIC",
+                "AddressLine3": "PUBLIC",
+                "AddressLine1": "PUBLIC",
+                "AddressLine2": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "ComplexField": {
+              "value": {
+                "ComplexNestedField": {
+                  "value": {
+                    "NestedCollectionTextField": {
+                      "value": [],
+                      "classification": "PUBLIC"
+                    },
+                    "NestedNumberField": "PUBLIC"
+                  },
+                  "classification": "PUBLIC"
+                },
+                "ComplexTextField": "PUBLIC",
+                "ComplexFixedListField": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "FixedRadioListField": "PUBLIC",
+            "DateTimeField": "PUBLIC",
+            "PhoneUKField": "PUBLIC",
+            "NumberField": "PUBLIC",
+            "MultiSelectListField": "PUBLIC",
+            "YesOrNoField": "PUBLIC",
+            "EmailField": "PUBLIC",
+            "TextField": "PUBLIC",
+            "DateField": "PUBLIC",
+            "TextAreaField": "PUBLIC",
+            "CollectionField": {
+              "value": [],
+              "classification": "PUBLIC"
+            }
+          },
+          "supplementary_data": null,
+          "after_submit_callback_response": null,
+          "callback_response_status_code": null,
+          "callback_response_status": null,
+          "delete_draft_response_status_code": null,
+          "delete_draft_response_status": null,
+          "security_classifications": {
+            "FixedListField": "PUBLIC",
+            "MoneyGBPField": "PUBLIC",
+            "AddressUKField": {
+              "value": {
+                "Country": "PUBLIC",
+                "PostTown": "PUBLIC",
+                "PostCode": "PUBLIC",
+                "County": "PUBLIC",
+                "AddressLine3": "PUBLIC",
+                "AddressLine1": "PUBLIC",
+                "AddressLine2": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "ComplexField": {
+              "value": {
+                "ComplexNestedField": {
+                  "value": {
+                    "NestedCollectionTextField": {
+                      "value": [],
+                      "classification": "PUBLIC"
+                    },
+                    "NestedNumberField": "PUBLIC"
+                  },
+                  "classification": "PUBLIC"
+                },
+                "ComplexTextField": "PUBLIC",
+                "ComplexFixedListField": "PUBLIC"
+              },
+              "classification": "PUBLIC"
+            },
+            "FixedRadioListField": "PUBLIC",
+            "DateTimeField": "PUBLIC",
+            "PhoneUKField": "PUBLIC",
+            "NumberField": "PUBLIC",
+            "MultiSelectListField": "PUBLIC",
+            "YesOrNoField": "PUBLIC",
+            "EmailField": "PUBLIC",
+            "TextField": "PUBLIC",
+            "DateField": "PUBLIC",
+            "TextAreaField": "PUBLIC",
+            "CollectionField": {
+              "value": [],
+              "classification": "PUBLIC"
+            }
+          }
+        }
+      ],
+      "case_types_results" : [ {
+        "total" : 1,
+        "case_type_id" : "BEFTA_CASETYPE_2_1"
+      } ]
+    }
+  }
+}

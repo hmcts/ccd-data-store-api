@@ -2,25 +2,31 @@
 	"_guid_": "S-000",
 	"_extends_": "S-000-Base-Success",
 	"title": "must return default user setting successfully for a user having a profile in CCD",
+
 	"productName": "CCD Data Store",
-	"operationName": "Get default settings for user",
+	"operationName": "Get Default Settings for User",
+
 	"method": "GET",
 	"uri": "/caseworkers/{uid}/profile",
+
 	"specs": [
 		"a detailed profile in CCD",
 		"uses a uid that exists in IDAM"
 	],
+
 	"users": {
 		"invokingUser": {
 			"username": "befta.caseworker.1@gmail.com",
 			"password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
 		}
 	},
+
 	"request": {
 		"pathVariables": {
 			"uid": "[[DEFAULT_AUTO_VALUE]]"
 		}
 	},
+
 	"expectedResponse": {
 		"responseCode": 200,
 		"headers": {

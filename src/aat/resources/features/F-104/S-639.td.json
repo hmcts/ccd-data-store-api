@@ -4,14 +4,14 @@
   "specs": [
     "a valid user profile",
     "is configured to search for a case that doesn't exist",
-    "is using the query parameter usecase=orgcases",
+    "is using the query parameter use_case=orgcases",
     "contains the header fields for that case type as per definition configuration",
     "contains no case data",
     "lists total cases as 0"
   ],
   "request": {
     "queryParams": {
-      "usecase": "ORGCASES"
+      "use_case": "ORGCASES"
     },
     "body": {
       "query": {
@@ -47,7 +47,11 @@
                 "min": null,
                 "max": null,
                 "regular_expression": null,
-                "fixed_list_items": [
+                "fixed_list_items": [{
+                  "code" : "VALUE4",
+                  "label" : "Value 4",
+                  "order" : null
+                },
                   {
                     "code": "VALUE3",
                     "label": "Value 3",

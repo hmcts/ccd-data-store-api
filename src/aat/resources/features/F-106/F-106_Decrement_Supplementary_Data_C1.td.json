@@ -1,0 +1,33 @@
+{
+	"_guid_": "F-106_Decrement_Supplementary_Data_C1",
+  "_extends_": "F-106_Update_Supplementary_Data_Base",
+  "specs": [
+    "by Dil to decrement supplementary_data"
+  ],
+	"request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "caseId": "${[scenarioContext][siblingContexts][F106_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "supplementary_data_updates": {
+        "$inc": {
+          "orgs_assigned_users.OrgZ": -1
+        }
+      }
+    }
+	},
+	"expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
+    },
+    "body": {
+      "supplementary_data": {
+        "orgs_assigned_users.OrgZ": 2499
+      }
+    }
+	}
+}

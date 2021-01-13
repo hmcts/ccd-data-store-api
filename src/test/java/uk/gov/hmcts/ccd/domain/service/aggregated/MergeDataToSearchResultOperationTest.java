@@ -49,7 +49,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
-@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+@SuppressWarnings("checkstyle:OperatorWrap")
 class MergeDataToSearchResultOperationTest {
     private static final String CASE_TYPE_ID = "CASE_TYPE";
     private static final String CASE_FIELD_1 = "Case field 1";
@@ -125,14 +126,18 @@ class MergeDataToSearchResultOperationTest {
 
         caseDetailsList = Arrays.asList(caseDetails1, caseDetails2);
 
-        final CaseFieldDefinition fatherName = newCaseField().withId(FATHER_NAME).withFieldType(textFieldType()).build();
-        final CaseFieldDefinition motherName = newCaseField().withId(MOTHER_NAME).withFieldType(textFieldType()).build();
+        final CaseFieldDefinition fatherName =
+            newCaseField().withId(FATHER_NAME).withFieldType(textFieldType()).build();
+        final CaseFieldDefinition motherName =
+            newCaseField().withId(MOTHER_NAME).withFieldType(textFieldType()).build();
 
-        final CaseFieldDefinition addressLine1 = newCaseField().withId(ADDRESS_LINE_1).withFieldType(textFieldType()).build();
+        final CaseFieldDefinition addressLine1 =
+            newCaseField().withId(ADDRESS_LINE_1).withFieldType(textFieldType()).build();
         final CaseFieldDefinition postCode = newCaseField().withId(POSTCODE).withFieldType(textFieldType()).build();
         final FieldTypeDefinition addressFieldTypeDefinition = aFieldType().withId(FAMILY_ADDRESS).withType(COMPLEX)
             .withComplexField(addressLine1).withComplexField(postCode).build();
-        final CaseFieldDefinition familyAddress = newCaseField().withId(FAMILY_ADDRESS).withFieldType(addressFieldTypeDefinition).build();
+        final CaseFieldDefinition familyAddress =
+            newCaseField().withId(FAMILY_ADDRESS).withFieldType(addressFieldTypeDefinition).build();
 
         final FieldTypeDefinition familyDetailsFieldTypeDefinition =
             aFieldType().withId(FAMILY).withType(COMPLEX)
@@ -160,7 +165,8 @@ class MergeDataToSearchResultOperationTest {
             .withField(labelField)
             .build();
         doReturn(Collections.emptySet()).when(userRepository).getUserRoles();
-        doAnswer(i -> i.getArgument(1)).when(dateTimeSearchResultProcessor).execute(Mockito.any(), Mockito.any());
+        doAnswer(i -> i.getArgument(1)).when(dateTimeSearchResultProcessor).execute(Mockito.any(),
+            Mockito.any());
 
         classUnderTest = new MergeDataToSearchResultOperation(userRepository, dateTimeSearchResultProcessor);
     }
@@ -170,11 +176,14 @@ class MergeDataToSearchResultOperationTest {
     void getWorkbasketView() {
         SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(
-                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, "", CASE_FIELD_1, "", ""),
-                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, "", CASE_FIELD_1,
+                    "", ""),
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2,
+                    "", ""))
             .build();
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, NO_ERROR);
+        final SearchResultView searchResultView =
+            classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, NO_ERROR);
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(2)),
@@ -182,10 +191,14 @@ class MergeDataToSearchResultOperationTest {
                 is(not(sameInstance(searchResultView.getSearchResultViewItems().get(0).getFieldsFormatted())))),
             () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getFields(),
                 is(not(sameInstance(searchResultView.getSearchResultViewItems().get(1).getFieldsFormatted())))),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getFields().get(STATE.getReference()), is("state1")),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getFields().get(STATE.getReference()), is("state2")),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getFieldsFormatted().get(STATE.getReference()), is("state1")),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getFieldsFormatted().get(STATE.getReference()), is("state2")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getFields().get(STATE.getReference()),
+                is("state1")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getFields().get(STATE.getReference()),
+                is("state2")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getFieldsFormatted()
+                .get(STATE.getReference()), is("state1")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getFieldsFormatted()
+                .get(STATE.getReference()), is("state2")),
             () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getFields().get(STATE.getReference()),
                 is(searchResultView.getSearchResultViewItems().get(1).getFieldsFormatted().get(STATE.getReference()))),
             () -> assertThat(searchResultView.getResultError(), is(NO_ERROR))
@@ -197,12 +210,16 @@ class MergeDataToSearchResultOperationTest {
     void getWorkbasketViewWithComplexFields() {
         SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(
-                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, "", CASE_FIELD_1, "", ""),
-                buildSearchResultField(CASE_TYPE_ID, FAMILY_DETAILS, FATHER_NAME, FATHER_NAME, "", ""),
-                buildSearchResultField(CASE_TYPE_ID, FAMILY_DETAILS, MOTHER_NAME, MOTHER_NAME, "", ""))
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, "", CASE_FIELD_1,
+                    "", ""),
+                buildSearchResultField(CASE_TYPE_ID, FAMILY_DETAILS, FATHER_NAME, FATHER_NAME,
+                    "", ""),
+                buildSearchResultField(CASE_TYPE_ID, FAMILY_DETAILS, MOTHER_NAME, MOTHER_NAME,
+                    "", ""))
             .build();
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, NO_ERROR);
+        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult,
+            caseDetailsList, NO_ERROR);
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(3)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(0).getLabel(), is(CASE_FIELD_1)),
@@ -215,26 +232,33 @@ class MergeDataToSearchResultOperationTest {
     @Test
     @DisplayName("should get Workbasket Results with defined columns and allowed roles")
     void getWorkbasketViewWithValidRoles() {
-        SearchResultField searchResultFieldWithValidRole = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_4, "",   CASE_FIELD_4, "", "");
+        SearchResultField searchResultFieldWithValidRole = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_4,
+            "",   CASE_FIELD_4, "", "");
         searchResultFieldWithValidRole.setRole(ROLE_IN_USER_ROLE_1);
-        SearchResultField searchResultFieldWithInvalidRole = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_5, "", CASE_FIELD_5, "", "");
+        SearchResultField searchResultFieldWithInvalidRole = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_5,
+            "", CASE_FIELD_5, "", "");
         searchResultFieldWithInvalidRole.setRole(ROLE_NOT_IN_USER_ROLE);
         SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(
-                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, "", CASE_FIELD_1, "", ""),
-                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""),
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, "", CASE_FIELD_1,
+                    "", ""),
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2,
+                    "", ""),
                 searchResultFieldWithValidRole,
                 searchResultFieldWithInvalidRole)
             .build();
 
         doReturn(true).when(userRepository).anyRoleEqualsTo(searchResultFieldWithValidRole.getRole());
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, NO_ERROR);
+        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult,
+            caseDetailsList, NO_ERROR);
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(3)),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getFields().get(STATE.getReference()), is("state1")),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getFields().get(STATE.getReference()), is("state2")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getFields().get(STATE.getReference()),
+                is("state1")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getFields().get(STATE.getReference()),
+                is("state2")),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(0).getCaseFieldId(), is(CASE_FIELD_1)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(1).getCaseFieldId(), is(CASE_FIELD_2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(2).getCaseFieldId(), is(CASE_FIELD_4)),
@@ -245,19 +269,27 @@ class MergeDataToSearchResultOperationTest {
     @Test
     @DisplayName("should get Workbasket Results with defined columns for allowed roles and no duplicate columns")
     void getWorkbasketViewWithValidRolesAndNoDuplicateColumns() {
-        SearchResultField searchResultFieldWithValidRole = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_4, "", CASE_FIELD_4, "", "");
+        SearchResultField searchResultFieldWithValidRole = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_4,
+            "", CASE_FIELD_4, "", "");
         searchResultFieldWithValidRole.setRole(ROLE_IN_USER_ROLE_1);
-        SearchResultField searchResultFieldWithValidRole2 = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_4, "", CASE_FIELD_4, "", "");
+        SearchResultField searchResultFieldWithValidRole2 = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_4,
+            "", CASE_FIELD_4, "", "");
         searchResultFieldWithValidRole2.setRole(ROLE_IN_USER_ROLE_2);
-        SearchResultField searchResultFieldWithInvalidRole = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_5, "", CASE_FIELD_5, "", "");
+        SearchResultField searchResultFieldWithInvalidRole = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_5,
+            "", CASE_FIELD_5, "", "");
         searchResultFieldWithInvalidRole.setRole(ROLE_NOT_IN_USER_ROLE);
         SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(
-                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, "", CASE_FIELD_1, "", ""),
-                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, "", CASE_FIELD_1, "", ""),
-                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, "", CASE_FIELD_1, "", ""),
-                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""),
-                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""),
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, "", CASE_FIELD_1,
+                    "", ""),
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, "", CASE_FIELD_1,
+                    "", ""),
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, "", CASE_FIELD_1,
+                    "", ""),
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2,
+                    "", ""),
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2,
+                    "", ""),
                 searchResultFieldWithValidRole,
                 searchResultFieldWithValidRole2,
                 searchResultFieldWithInvalidRole)
@@ -266,12 +298,15 @@ class MergeDataToSearchResultOperationTest {
         doReturn(true).when(userRepository).anyRoleEqualsTo(searchResultFieldWithValidRole.getRole());
         doReturn(true).when(userRepository).anyRoleEqualsTo(searchResultFieldWithValidRole2.getRole());
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, NO_ERROR);
+        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult,
+            caseDetailsList, NO_ERROR);
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(3)),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getFields().get(STATE.getReference()), is("state1")),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getFields().get(STATE.getReference()), is("state2")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getFields().get(STATE.getReference()),
+                is("state1")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getFields().get(STATE.getReference()),
+                is("state2")),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(0).getCaseFieldId(), is(CASE_FIELD_1)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(1).getCaseFieldId(), is(CASE_FIELD_2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(2).getCaseFieldId(), is(CASE_FIELD_4)),
@@ -282,17 +317,23 @@ class MergeDataToSearchResultOperationTest {
     @Test
     @DisplayName("should process result fields with valid and invalid roles correctly")
     void getWorkbasketViewWithValidRolesAndInvalidRoles() {
-        SearchResultField searchResultFieldWithInvalidRole1 = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_4, "", CASE_FIELD_4, "", "");
+        SearchResultField searchResultFieldWithInvalidRole1 = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_4,
+            "", CASE_FIELD_4, "", "");
         searchResultFieldWithInvalidRole1.setRole(ROLE_NOT_IN_USER_ROLE);
-        SearchResultField searchResultFieldWithValidRole = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_4, "", CASE_FIELD_4, "", "");
+        SearchResultField searchResultFieldWithValidRole = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_4,
+            "", CASE_FIELD_4, "", "");
         searchResultFieldWithValidRole.setRole(ROLE_IN_USER_ROLE_2);
-        SearchResultField searchResultFieldWithInvalidRole2 = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_5, "", CASE_FIELD_5, "", "");
+        SearchResultField searchResultFieldWithInvalidRole2 = buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_5,
+            "", CASE_FIELD_5, "", "");
         searchResultFieldWithInvalidRole2.setRole(ROLE_NOT_IN_USER_ROLE);
         SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(
-                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, "", CASE_FIELD_1, "", ""),
-                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, "", CASE_FIELD_1, "", ""),
-                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""),
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, "", CASE_FIELD_1,
+                    "", ""),
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, "", CASE_FIELD_1,
+                    "", ""),
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2,
+                    "", ""),
                 searchResultFieldWithInvalidRole1,
                 searchResultFieldWithInvalidRole2,
                 searchResultFieldWithValidRole)
@@ -301,12 +342,15 @@ class MergeDataToSearchResultOperationTest {
         doReturn(true).when(userRepository).anyRoleEqualsTo(searchResultFieldWithValidRole.getRole());
 
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, NO_ERROR);
+        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult,
+            caseDetailsList, NO_ERROR);
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(3)),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getFields().get(STATE.getReference()), is("state1")),
-            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getFields().get(STATE.getReference()), is("state2")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getFields().get(STATE.getReference()),
+                is("state1")),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(1).getFields().get(STATE.getReference()),
+                is("state2")),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(0).getCaseFieldId(), is(CASE_FIELD_1)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(1).getCaseFieldId(), is(CASE_FIELD_2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(2).getCaseFieldId(), is(CASE_FIELD_4)),
@@ -320,8 +364,10 @@ class MergeDataToSearchResultOperationTest {
 
         SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(
-                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, "", CASE_FIELD_1, "", ""),
-                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_1, "", CASE_FIELD_1,
+                    "", ""),
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2,
+                    "", ""))
             .build();
 
         final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinitionWithLabels,
@@ -342,10 +388,12 @@ class MergeDataToSearchResultOperationTest {
     @DisplayName("should get Search Results with defined columns")
     void getSearchView() {
         SearchResultDefinition searchResult = searchResult()
-            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
+            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2,
+                "", ""))
             .build();
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, TIMEOUT_ERROR);
+        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult,
+            caseDetailsList, TIMEOUT_ERROR);
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(1)),
@@ -358,12 +406,16 @@ class MergeDataToSearchResultOperationTest {
     void getSearchViewWithComplexFields() {
         SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(
-                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""),
-                buildSearchResultField(CASE_TYPE_ID, FAMILY_DETAILS, FATHER_NAME, FATHER_NAME, "", ""),
-                buildSearchResultField(CASE_TYPE_ID, FAMILY_DETAILS, MOTHER_NAME, MOTHER_NAME, "", ""))
+                buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2,
+                    "", ""),
+                buildSearchResultField(CASE_TYPE_ID, FAMILY_DETAILS, FATHER_NAME, FATHER_NAME, "",
+                    ""),
+                buildSearchResultField(CASE_TYPE_ID, FAMILY_DETAILS, MOTHER_NAME, MOTHER_NAME, "",
+                    ""))
             .build();
 
-        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult, caseDetailsList, NO_ERROR);
+        final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult,
+            caseDetailsList, NO_ERROR);
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(3)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(0).getLabel(), is(CASE_FIELD_2)),
@@ -378,7 +430,8 @@ class MergeDataToSearchResultOperationTest {
     void getSearchViewAndLabels() {
 
         SearchResultDefinition searchResult = searchResult()
-            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
+            .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2,
+                "", ""))
             .build();
 
         final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinitionWithLabels,
@@ -419,7 +472,8 @@ class MergeDataToSearchResultOperationTest {
     }
 
     @Test
-    @DisplayName("should get Results when SearchResultDefinition elements have caseFieldPath with nesting level of two")
+    @DisplayName("should get Results when SearchResultDefinition elements have caseFieldPath with nesting level "
+        + "of two")
     void getSearchViewWhenCaseFieldPathDefinedWithNestingLevelOfTwo() {
 
         SearchResultDefinition searchResult = searchResult()

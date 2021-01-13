@@ -18,8 +18,10 @@ public class AuthorisedCaseAssignedUserRolesOperation implements CaseAssignedUse
     private CaseAssignedUserRoleValidator cauRoleValidator;
 
     @Autowired
-    public AuthorisedCaseAssignedUserRolesOperation(final @Qualifier("default") CaseAssignedUserRolesOperation cauRolesOperation,
-                                                    @Qualifier("default") final CaseAssignedUserRoleValidator cauRoleValidator) {
+    public AuthorisedCaseAssignedUserRolesOperation(final @Qualifier("default")
+                                                            CaseAssignedUserRolesOperation cauRolesOperation,
+                                                    @Qualifier("default")
+                                                            final CaseAssignedUserRoleValidator cauRoleValidator) {
         this.cauRolesOperation = cauRolesOperation;
         this.cauRoleValidator = cauRoleValidator;
     }
@@ -28,6 +30,11 @@ public class AuthorisedCaseAssignedUserRolesOperation implements CaseAssignedUse
         // NB: Although there are no user based authorisation steps performed here ...
         // ... there are additional s2s authorisation steps performed in the controller.
         this.cauRolesOperation.addCaseUserRoles(caseUserRoles);
+    }
+
+    @Override
+    public void removeCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
+        this.cauRolesOperation.removeCaseUserRoles(caseUserRoles);
     }
 
     public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseIds, List<String> userIds) {

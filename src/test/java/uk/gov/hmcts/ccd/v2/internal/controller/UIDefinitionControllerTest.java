@@ -54,7 +54,8 @@ class UIDefinitionControllerTest {
     private static final String CASE_TYPE_ID = "caseTypeId";
     private static final String SHOW_CONDITION = "aShowCondition";
 
-    private WorkbasketInput workbasketInput1 = aWorkbasketInput().withFieldId("field1").withShowCondition(SHOW_CONDITION).build();
+    private WorkbasketInput workbasketInput1 =
+        aWorkbasketInput().withFieldId("field1").withShowCondition(SHOW_CONDITION).build();
     private WorkbasketInput workbasketInput2 = aWorkbasketInput().withFieldId("field2").build();
     private SearchInput searchInput1 = aSearchInput().withFieldId("field1").build();
     private SearchInput searchInput2 = aSearchInput().withFieldId("field2").withShowCondition(SHOW_CONDITION).build();
@@ -119,15 +120,19 @@ class UIDefinitionControllerTest {
         @Test
         @DisplayName("should return 200 when case found")
         void caseFound() {
-            final ResponseEntity<WorkbasketInputsViewResource> response = uiDefinitionController.getWorkbasketInputsDetails(CASE_TYPE_ID);
+            final ResponseEntity<WorkbasketInputsViewResource> response =
+                uiDefinitionController.getWorkbasketInputsDetails(CASE_TYPE_ID);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
                 () -> {
-                    WorkbasketInputsViewResource.WorkbasketInputView[] workbasketInputs = response.getBody().getWorkbasketInputs();
-                    assertThat(Lists.newArrayList(workbasketInputs), hasItems(hasProperty("field", hasProperty("id", is("field1"))),
+                    WorkbasketInputsViewResource.WorkbasketInputView[] workbasketInputs =
+                        response.getBody().getWorkbasketInputs();
+                    assertThat(Lists.newArrayList(workbasketInputs), hasItems(hasProperty("field",
+                        hasProperty("id", is("field1"))),
                         hasProperty("field", hasProperty("id", is("field2"))),
-                            hasProperty("field", hasProperty("showCondition", is(SHOW_CONDITION)))));
+                            hasProperty("field", hasProperty("showCondition",
+                                is(SHOW_CONDITION)))));
                 }
             );
         }
@@ -149,15 +154,20 @@ class UIDefinitionControllerTest {
         @Test
         @DisplayName("should return 200 when case found")
         void caseFound() {
-            final ResponseEntity<SearchInputsViewResource> response = uiDefinitionController.getSearchInputsDetails(CASE_TYPE_ID);
+            final ResponseEntity<SearchInputsViewResource> response =
+                uiDefinitionController.getSearchInputsDetails(CASE_TYPE_ID);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
                 () -> {
                     SearchInputsViewResource.SearchInputView[] searchInputs = response.getBody().getSearchInputs();
-                    assertThat(Lists.newArrayList(searchInputs), hasItems(hasProperty("field", hasProperty("id", is("field1"))),
-                                                                          hasProperty("field", hasProperty("id", is("field2"))),
-                                                                          hasProperty("field", hasProperty("showCondition", is(SHOW_CONDITION)))));
+                    assertThat(Lists.newArrayList(searchInputs), hasItems(hasProperty("field",
+                                                                          hasProperty("id", is("field1"))),
+                                                                          hasProperty("field",
+                                                                          hasProperty("id", is("field2"))),
+                                                                          hasProperty("field",
+                                                                          hasProperty("showCondition",
+                                                                          is(SHOW_CONDITION)))));
                 }
             );
         }
@@ -178,13 +188,15 @@ class UIDefinitionControllerTest {
         @Test
         @DisplayName("should return 200 when banners found")
         void bannerFound() {
-            final ResponseEntity<BannerViewResource> response = uiDefinitionController.getBanners(Optional.of(jurisdictionReferenes));
+            final ResponseEntity<BannerViewResource> response =
+                uiDefinitionController.getBanners(Optional.of(jurisdictionReferenes));
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
                 () -> {
                     BannerViewResource bannerResource = response.getBody();
-                    assertThat(Lists.newArrayList(bannerResource.getBanners()), hasItems(hasProperty("bannerDescription", is("Test Description1")),
+                    assertThat(Lists.newArrayList(bannerResource.getBanners()), hasItems(hasProperty(
+                        "bannerDescription", is("Test Description1")),
                         hasProperty("bannerDescription", is("Test Description2"))));
                 }
             );
@@ -269,7 +281,8 @@ class UIDefinitionControllerTest {
             when(userProfile.getJurisdictions()).thenReturn(jurisdictionDisplayProperties);
             when(getUserProfileOperation.execute(ArgumentMatchers.any())).thenReturn(userProfile);
 
-            ResponseEntity<JurisdictionViewResource> response = uiDefinitionController.getJurisdictions("create");
+            ResponseEntity<JurisdictionViewResource> response =
+                uiDefinitionController.getJurisdictions("create");
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
@@ -285,7 +298,8 @@ class UIDefinitionControllerTest {
         @Test
         @DisplayName("should return 200 when jurisdiction UI configs found")
         void caseFound() {
-            final ResponseEntity<JurisdictionConfigViewResource> response = uiDefinitionController.getJurisdictionUiConfigs(Optional.of(jurisdictionReferenes));
+            final ResponseEntity<JurisdictionConfigViewResource> response =
+                uiDefinitionController.getJurisdictionUiConfigs(Optional.of(jurisdictionReferenes));
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),

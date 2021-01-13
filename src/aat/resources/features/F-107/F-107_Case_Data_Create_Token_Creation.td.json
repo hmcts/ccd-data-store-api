@@ -1,0 +1,73 @@
+{
+  "_guid_": "F-107_Case_Data_Create_Token_Creation",
+  "_extends_": "Standard_Token_Creation_Data_For_Case_Creation",
+  "specs": [
+    "to create a token for case creation"
+  ],
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.caa@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
+  },
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "etid": "createCase"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "case_details": {
+        "case_data": {
+          "DynamicList": {
+            "value": {
+              "code": "List1",
+              "label": " List 1"
+            },
+            "list_items": [
+              {
+                "code": "List1",
+                "label": " List 1"
+              },
+              {
+                "code": "List2",
+                "label": " List 2"
+              },
+              {
+                "code": "List3",
+                "label": " List 3"
+              },
+              {
+                "code": "List4",
+                "label": " List 4"
+              },
+              {
+                "code": "List5",
+                "label": " List 5"
+              },
+              {
+                "code": "List6",
+                "label": " List 6"
+              },
+              {
+                "code": "List7",
+                "label": " List 7"
+              }
+            ]
+          }
+        },
+        "data_classification": {
+          "DynamicList": "PUBLIC"
+        },
+        "supplementary_data": null,
+        "security_classifications": {
+          "DynamicList": "PUBLIC"
+        }
+      },
+      "event_id": "createCase"
+    }
+  }
+}

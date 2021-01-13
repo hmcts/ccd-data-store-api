@@ -29,7 +29,8 @@ public class DefaultGetEventTriggerOperation implements GetEventTriggerOperation
     private final CaseUpdateViewEventBuilder caseUpdateViewEventBuilder;
 
     @Autowired
-    public DefaultGetEventTriggerOperation(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+    public DefaultGetEventTriggerOperation(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                               final CaseDetailsRepository caseDetailsRepository,
                                            final UIDService uidService,
                                            @Qualifier("authorised") final StartEventOperation startEventOperation,
                                            @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,

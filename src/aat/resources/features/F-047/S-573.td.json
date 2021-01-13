@@ -1,18 +1,21 @@
 {
-  "title": "must return negative response HTTP-400 when request contains a non-existing jurisdiction ID",
-  "_guid_": "S-573",
-  "_extends_": "F-047_Test_Data_Base",
-  "specs": [
-    "an active profile in CCD",
-    "contains a non-existing jurisdiction ID",
-    "code is HTTP-400"
-  ],
-  "request": {
-    "pathVariables": {
-      "jid": "non-existing jurisdiction ID"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_400_Response"
-  }
+	"_guid_": "S-573",
+	"_extends_": "F-047_Test_Data_Base",
+	"title": "must return negative response HTTP-400 when request contains a non-existing jurisdiction ID",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains a non-existing jurisdiction ID",
+		"code is HTTP-400"
+	],
+
+	"request": {
+		"pathVariables": {
+			"jid": "non-existing jurisdiction ID"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_400_Response"
+	}
 }

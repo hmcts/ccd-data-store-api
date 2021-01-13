@@ -2,7 +2,9 @@ package uk.gov.hmcts.ccd.domain.model.callbacks;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import lombok.ToString;
 
+@ToString
 public class CallbackRequest {
 
     @JsonProperty("case_details")

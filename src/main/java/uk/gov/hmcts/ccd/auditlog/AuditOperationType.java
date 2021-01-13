@@ -8,6 +8,7 @@ public enum AuditOperationType {
     UPDATE_CASE_ACCESS("Update case access permissions"),
     GRANT_CASE_ACCESS("Grant case access permissions"),
     ADD_CASE_ASSIGNED_USER_ROLES("Add Case-Assigned Users and Roles"),
+    REMOVE_CASE_ASSIGNED_USER_ROLES("Remove Case-Assigned Users and Roles"),
     GET_CASE_ASSIGNED_USER_ROLES("Get Case-Assigned Users and Roles"),
     REVOKE_CASE_ACCESS("Revoke case access permissions"),
     VIEW_CASE_HISTORY("View case history");

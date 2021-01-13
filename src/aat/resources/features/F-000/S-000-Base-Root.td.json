@@ -7,6 +7,7 @@
 			"password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
 		}
 	},
+
 	"request": {
 		"headers": {
 			"Authorization": "[[DEFAULT_AUTO_VALUE]]",

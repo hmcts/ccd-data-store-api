@@ -1,6 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,18 +13,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.EventPostStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.validator.EventValidator;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.is;
@@ -27,7 +33,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
@@ -79,7 +88,8 @@ class DefaultCreateEventOperationTest {
 
         event = buildEvent();
         data = buildJsonNodeData();
-        caseDataContent = newCaseDataContent().withEvent(event).withData(data).withToken(TOKEN).withIgnoreWarning(IGNORE_WARNING).build();
+        caseDataContent = newCaseDataContent().withEvent(event).withData(data).withToken(TOKEN)
+            .withIgnoreWarning(IGNORE_WARNING).build();
         final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setId(JURISDICTION_ID);
         final Version version = new Version();
@@ -90,7 +100,7 @@ class DefaultCreateEventOperationTest {
         caseTypeDefinition.setVersion(version);
 
         caseEventDefinition = new CaseEventDefinition();
-        caseEventDefinition.setPostState(POST_STATE);
+        caseEventDefinition.setPostStates(getEventPostStates(POST_STATE));
 
         caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
@@ -110,6 +120,18 @@ class DefaultCreateEventOperationTest {
 
     }
 
+    private List<EventPostStateDefinition> getEventPostStates(String... postStateReferences) {
+        List<EventPostStateDefinition> postStates = new ArrayList<>();
+        int i = 0;
+        for (String reference : postStateReferences) {
+            EventPostStateDefinition definition = new EventPostStateDefinition();
+            definition.setPostStateReference(reference);
+            definition.setPriority(++i);
+            postStates.add(definition);
+        }
+        return postStates;
+    }
+
     @Test
     @DisplayName("should invoke after submit callback")
     void shouldInvokeAfterSubmitCallback() {
@@ -125,7 +147,8 @@ class DefaultCreateEventOperationTest {
         final CaseDetails caseDetails = createEventOperation.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
         assertAll(
-            () -> verify(callbackInvoker).invokeSubmittedCallback(caseEventDefinition, caseDetailsBefore, this.caseDetails),
+            () -> verify(callbackInvoker).invokeSubmittedCallback(caseEventDefinition, caseDetailsBefore,
+                this.caseDetails),
             () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationHeader(), is("Header")),
             () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationBody(), is("Body")),
             () -> assertThat(caseDetails.getCallbackResponseStatusCode(), is(SC_OK)),

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
@@ -17,7 +16,6 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.CaseTypeResults;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.CaseSearchRequestSecurity;
@@ -84,15 +82,15 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     private MultiSearch secureAndTransformSearchRequest(CrossCaseTypeSearchRequest request) {
         Collection<Search> securedSearches = request.getCaseTypeIds()
             .stream()
-            .map(caseTypeId -> createSecuredSearch(caseTypeId, request.getSearchRequestJsonNode()))
+            .map(caseTypeId -> createSecuredSearch(caseTypeId, request))
             .collect(toList());
 
         return new MultiSearch.Builder(securedSearches).build();
     }
 
-    private Search createSecuredSearch(String caseTypeId, JsonNode searchRequestJsonNode) {
+    private Search createSecuredSearch(String caseTypeId, CrossCaseTypeSearchRequest request) {
         CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(
-            new CaseSearchRequest(caseTypeId, new ElasticsearchRequest(searchRequestJsonNode)));
+            new CaseSearchRequest(caseTypeId, request.getElasticSearchRequest()));
         return new Search.Builder(securedSearchRequest.toJsonString())
             .addIndex(getCaseIndexName(caseTypeId))
             .addType(getCaseIndexType())
@@ -141,7 +139,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     private String getIndexName(MultiSearchResult.MultiSearchResponse response) {
         String quotedIndexName =  response.searchResult.getJsonObject().getAsJsonObject(HITS).get(HITS)
             .getAsJsonArray().get(0).getAsJsonObject().get("_index").toString();
-        String unquotedIndexName = quotedIndexName.replace("\"", "");
+        String unquotedIndexName = quotedIndexName.replaceAll("\"", "");
         return unquotedIndexName;
     }
 
@@ -158,13 +156,17 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             return caseTypeIds.stream().filter(
                 caseTypeId -> caseTypeId.equalsIgnoreCase(m.group(caseTypeIdGroupPosition))
             ).findFirst().orElseThrow(() -> {
-                log.error("Cannot match any known case type id from index '{}' extracted case type id : {}", index, m.group(caseTypeIdGroupPosition));
-                throw new ServiceException("Cannot determine case type id from ES index name - unknown extracted case type id");
+                log.error("Cannot match any known case type id from index '{}' extracted case type id : {}",
+                           index, m.group(caseTypeIdGroupPosition));
+                throw new ServiceException("Cannot determine case type id from ES index name - unknown "
+                    + "extracted case type id");
             });
         } else {
-            log.error("Cannot determine case type id from index name: '{}'. No capturing group configured or capturing group not matching: '{}'.",
+            log.error("Cannot determine case type id from index name: '{}'. No capturing group configured or capturing"
+                + " group not matching: '{}'.",
                 index, caseTypeIdGroupRegex);
-            throw new ServiceException("Cannot determine case type id from ES index name - cannot extract case type id");
+            throw new ServiceException("Cannot determine case type id from ES index name - cannot extract"
+                + " case type id");
         }
     }
 
@@ -177,7 +179,8 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     private List<ElasticSearchCaseDetailsDTO> toElasticSearchCasesDTO(List<String> cases) {
         return cases
             .stream()
-            .map(Unchecked.function(caseDetail -> objectMapper.readValue(caseDetail, ElasticSearchCaseDetailsDTO.class)))
+            .map(Unchecked.function(caseDetail
+                -> objectMapper.readValue(caseDetail, ElasticSearchCaseDetailsDTO.class)))
             .collect(toList());
     }
 

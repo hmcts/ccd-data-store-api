@@ -87,9 +87,11 @@ class DateTimeSearchInputProcessorTest {
         queryParams.put(DATETIME_FIELD, "30/01/1990");
         queryParams.put(TEXT_FIELD, "Text Value");
         when(dateTimeFormatParser.convertDateToIso8601("yyyy", "2020")).thenReturn("2020-10-10");
-        when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "30/01/1990")).thenReturn("1990-01-30");
+        when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "30/01/1990"))
+            .thenReturn("1990-01-30");
 
-        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
+        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData,
+            queryParams);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.WORKBASKET));
         assertAll(
@@ -107,9 +109,11 @@ class DateTimeSearchInputProcessorTest {
         queryParams.put(DATETIME_FIELD, "30/01/1990");
         queryParams.put(TEXT_FIELD, "Text Value");
         when(dateTimeFormatParser.convertDateToIso8601("yyyy", "2020")).thenReturn("2020-10-10");
-        when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "30/01/1990")).thenReturn("1990-01-30");
+        when(dateTimeFormatParser.convertDateTimeToIso8601("dd/MM/yyyy", "30/01/1990"))
+            .thenReturn("1990-01-30");
 
-        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(DEFAULT_VIEW, metaData, queryParams);
+        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(DEFAULT_VIEW, metaData,
+            queryParams);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.SEARCH));
         assertAll(
@@ -123,8 +127,10 @@ class DateTimeSearchInputProcessorTest {
     @Test
     void shouldConvertWorkbasketComplexQueryParamUsingDisplayContextParameter() {
         CriteriaInput criteriaInput = new CriteriaInput();
-        FieldTypeDefinition complexFieldType = aFieldType().withId(COMPLEX_FIELD).withType(FieldTypeDefinition.COMPLEX).withComplexField(
-            newCaseField().withId(NESTED_FIELD).withFieldType(fieldType("Date")).withDisplayContextParameter("#DATETIMEENTRY(yyyy)").build()
+        FieldTypeDefinition complexFieldType = aFieldType().withId(COMPLEX_FIELD).withType(FieldTypeDefinition.COMPLEX)
+            .withComplexField(
+            newCaseField().withId(NESTED_FIELD).withFieldType(fieldType("Date"))
+                .withDisplayContextParameter("#DATETIMEENTRY(yyyy)").build()
         ).build();
         criteriaInput.setField(field(COMPLEX_FIELD, complexFieldType));
         criteriaInputs.add(criteriaInput);
@@ -132,7 +138,8 @@ class DateTimeSearchInputProcessorTest {
         queryParams.put("ComplexField.NestedField", "2020");
         when(dateTimeFormatParser.convertDateToIso8601("yyyy", "2020")).thenReturn("2020-01-01");
 
-        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
+        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData,
+            queryParams);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.WORKBASKET));
         assertAll(
@@ -144,8 +151,10 @@ class DateTimeSearchInputProcessorTest {
     @Test
     void shouldConvertSearchComplexQueryParamUsingDisplayContextParameter() {
         CriteriaInput criteriaInput = new CriteriaInput();
-        FieldTypeDefinition complexFieldType = aFieldType().withId(COMPLEX_FIELD).withType(FieldTypeDefinition.COMPLEX).withComplexField(
-            newCaseField().withId(NESTED_FIELD).withFieldType(fieldType("Date")).withDisplayContextParameter("#DATETIMEENTRY(yyyy)").build()
+        FieldTypeDefinition complexFieldType = aFieldType().withId(COMPLEX_FIELD).withType(FieldTypeDefinition.COMPLEX)
+            .withComplexField(
+            newCaseField().withId(NESTED_FIELD).withFieldType(fieldType("Date"))
+                .withDisplayContextParameter("#DATETIMEENTRY(yyyy)").build()
         ).build();
         criteriaInput.setField(field(COMPLEX_FIELD, complexFieldType));
         criteriaInputs.add(criteriaInput);
@@ -153,7 +162,8 @@ class DateTimeSearchInputProcessorTest {
         queryParams.put("ComplexField.NestedField", "2020");
         when(dateTimeFormatParser.convertDateToIso8601("yyyy", "2020")).thenReturn("2020-01-01");
 
-        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(DEFAULT_VIEW, metaData, queryParams);
+        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(DEFAULT_VIEW, metaData,
+            queryParams);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.SEARCH));
         assertAll(
@@ -170,9 +180,11 @@ class DateTimeSearchInputProcessorTest {
         criteriaInputs.add(criteriaInput);
         Map<String, String> queryParams = new HashMap<>();
         queryParams.put("ComplexField.NestedField", "2020");
-        when(dateTimeFormatParser.convertDateTimeToIso8601("yyyy", "2020")).thenReturn("2020-01-01T00:00:00.000");
+        when(dateTimeFormatParser.convertDateTimeToIso8601("yyyy", "2020"))
+            .thenReturn("2020-01-01T00:00:00.000");
 
-        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
+        Map<String, String> result =
+                dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.WORKBASKET));
         assertAll(
@@ -189,9 +201,11 @@ class DateTimeSearchInputProcessorTest {
         criteriaInputs.add(criteriaInput);
         Map<String, String> queryParams = new HashMap<>();
         queryParams.put("ComplexField.NestedField", "2020");
-        when(dateTimeFormatParser.convertDateTimeToIso8601("yyyy", "2020")).thenReturn("2020-01-01T00:00:00.000");
+        when(dateTimeFormatParser.convertDateTimeToIso8601("yyyy", "2020"))
+            .thenReturn("2020-01-01T00:00:00.000");
 
-        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(DEFAULT_VIEW, metaData, queryParams);
+        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(DEFAULT_VIEW, metaData,
+            queryParams);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.SEARCH));
         assertAll(
@@ -204,7 +218,8 @@ class DateTimeSearchInputProcessorTest {
     void shouldConvertWorkbasketCollectionQueryParamUsingDisplayContextParameter() {
         CriteriaInput criteriaInput = new CriteriaInput();
         criteriaInput.setField(field(COLLECTION_FIELD,
-            aFieldType().withId(FieldTypeDefinition.COLLECTION).withType(FieldTypeDefinition.COLLECTION).withCollectionFieldType(fieldType("Date")).build())
+            aFieldType().withId(FieldTypeDefinition.COLLECTION).withType(FieldTypeDefinition.COLLECTION)
+                .withCollectionFieldType(fieldType("Date")).build())
         );
         criteriaInput.setDisplayContextParameter("#DATETIMEENTRY(yyyy)");
         criteriaInputs.add(criteriaInput);
@@ -212,7 +227,8 @@ class DateTimeSearchInputProcessorTest {
         queryParams.put("CollectionField.0.value", "2020");
         when(dateTimeFormatParser.convertDateToIso8601("yyyy", "2020")).thenReturn("2020-01-01");
 
-        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
+        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData,
+            queryParams);
 
         verify(getCriteriaOperation).execute(eq("Case Type"), eq(null), eq(CriteriaType.WORKBASKET));
         assertAll(
@@ -226,7 +242,8 @@ class DateTimeSearchInputProcessorTest {
         Map<String, String> queryParams = new HashMap<>();
         queryParams.put("New Id", "New Value");
 
-        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(DEFAULT_VIEW, metaData, queryParams);
+        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(DEFAULT_VIEW, metaData,
+            queryParams);
 
         assertAll(
             () -> assertThat(result.size(), is(1)),
@@ -261,15 +278,18 @@ class DateTimeSearchInputProcessorTest {
         criteriaInput3.setField(field(TEXT_FIELD, fieldType("Text")));
         CriteriaInput criteriaInput4 = new CriteriaInput();
         criteriaInput4.setField(field(COLLECTION_FIELD,
-            aFieldType().withId(FieldTypeDefinition.COLLECTION).withType(FieldTypeDefinition.COLLECTION).withCollectionFieldType(fieldType("Date")).build())
+            aFieldType().withId(FieldTypeDefinition.COLLECTION).withType(FieldTypeDefinition.COLLECTION)
+                .withCollectionFieldType(fieldType("Date")).build())
         );
         CriteriaInput criteriaInput5 = new CriteriaInput();
         criteriaInput5.setField(field(COMPLEX_FIELD, NESTED_FIELD, fieldType("DateTime")));
         CriteriaInput criteriaInput6 = new CriteriaInput();
-        criteriaInput6.setField(field(COMPLEX_FIELD, aFieldType().withId(COMPLEX_FIELD).withType(FieldTypeDefinition.COMPLEX).withComplexField(
+        criteriaInput6.setField(field(COMPLEX_FIELD, aFieldType().withId(COMPLEX_FIELD)
+            .withType(FieldTypeDefinition.COMPLEX).withComplexField(
             newCaseField().withId("OtherNestedField").withFieldType(fieldType("Date")).build()
         ).build()));
-        criteriaInputs = Arrays.asList(criteriaInput1, criteriaInput2, criteriaInput3, criteriaInput4, criteriaInput5, criteriaInput6);
+        criteriaInputs = Arrays.asList(criteriaInput1, criteriaInput2, criteriaInput3, criteriaInput4, criteriaInput5,
+            criteriaInput6);
         doReturn(criteriaInputs).when(getCriteriaOperation).execute(Mockito.any(), Mockito.any(), Mockito.any());
 
         Map<String, String> queryParams = new HashMap<>();
@@ -280,7 +300,8 @@ class DateTimeSearchInputProcessorTest {
         queryParams.put("ComplexField.OtherNestedField", "2005-05-05");
         queryParams.put("CollectionField.0.value", "2006-06-06");
 
-        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
+        Map<String, String> result =
+                dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
 
         verifyNoMoreInteractions(dateTimeFormatParser);
         assertAll(
@@ -304,7 +325,8 @@ class DateTimeSearchInputProcessorTest {
         criteriaInputs.add(criteriaInput);
         doReturn(criteriaInputs).when(getCriteriaOperation).execute(Mockito.any(), Mockito.any(), Mockito.any());
         metaData.setCreatedDate(Optional.of("2020"));
-        when(dateTimeFormatParser.convertDateTimeToIso8601("yyyy", "2020")).thenReturn("2020-01-01");
+        when(dateTimeFormatParser.convertDateTimeToIso8601("yyyy", "2020"))
+            .thenReturn("2020-01-01");
 
         MetaData result = dateTimeSearchInputProcessor.executeMetadata(WORKBASKET_VIEW, metaData);
 
@@ -325,7 +347,8 @@ class DateTimeSearchInputProcessorTest {
         criteriaInputs.add(criteriaInput);
         doReturn(criteriaInputs).when(getCriteriaOperation).execute(Mockito.any(), Mockito.any(), Mockito.any());
         metaData.setCreatedDate(Optional.of("2020"));
-        when(dateTimeFormatParser.convertDateTimeToIso8601("yyyy", "2020")).thenReturn("2020-01-01");
+        when(dateTimeFormatParser.convertDateTimeToIso8601("yyyy", "2020"))
+            .thenReturn("2020-01-01");
 
         MetaData result = dateTimeSearchInputProcessor.executeMetadata(DEFAULT_VIEW, metaData);
 
@@ -443,7 +466,8 @@ class DateTimeSearchInputProcessorTest {
         criteriaInputs.add(criteriaInput);
         doReturn(criteriaInputs).when(getCriteriaOperation).execute(Mockito.any(), Mockito.any(), Mockito.any());
         metaData.setCreatedDate(Optional.of("abc"));
-        when(dateTimeFormatParser.convertDateTimeToIso8601("yyyy", "abc")).thenThrow(DateTimeException.class);
+        when(dateTimeFormatParser.convertDateTimeToIso8601("yyyy", "abc"))
+            .thenThrow(DateTimeException.class);
 
         DataProcessingException exception = assertThrows(DataProcessingException.class,
             () -> dateTimeSearchInputProcessor.executeMetadata(WORKBASKET_VIEW, metaData)
@@ -451,7 +475,8 @@ class DateTimeSearchInputProcessorTest {
 
         assertAll(
             () -> assertThat(exception.getMessage(), is("Processing of data failed")),
-            () -> assertThat(exception.getDetails(), is("Unable to process search input [CREATED_DATE] with value abc. Expected format: yyyy"))
+            () -> assertThat(exception.getDetails(), is("Unable to process search input [CREATED_DATE] with value abc."
+                + " Expected format: yyyy"))
         );
     }
 
@@ -459,7 +484,8 @@ class DateTimeSearchInputProcessorTest {
     void shouldThrowDataProcessingException() {
         Map<String, String> queryParams = new HashMap<>();
 
-        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData, queryParams);
+        Map<String, String> result = dateTimeSearchInputProcessor.executeQueryParams(WORKBASKET_VIEW, metaData,
+            queryParams);
 
         assertAll(
             () -> assertThat(result.size(), is(0))
@@ -479,7 +505,8 @@ class DateTimeSearchInputProcessorTest {
         return field;
     }
 
-    private FieldTypeDefinition fieldType(String id, String type, List<CaseFieldDefinition> complexFields, FieldTypeDefinition collectionFieldType) {
+    private FieldTypeDefinition fieldType(String id, String type, List<CaseFieldDefinition> complexFields,
+                                          FieldTypeDefinition collectionFieldType) {
         FieldTypeDefinition fieldType = new FieldTypeDefinition();
         fieldType.setId(id);
         fieldType.setType(type);

@@ -1,33 +1,33 @@
 {
-  "_guid_": "F-032_Case_Read_By_Solicitor_3",
-  "_extends_": "S-123_Test_Data_Base",
+	"_guid_": "F-032_Case_Read_By_Solicitor_3",
+	"_extends_": "S-123_Test_Data_Base",
 
-  "specs": [
-    "to get the same case by solicitor 3"
-  ],
+	"specs": [
+		"to get the same case by solicitor 3"
+	],
 
-  "users": {
-    "invokingUser": {
-      "username": "befta.caseworker.2.solicitor.3@gmail.com"
-    }
-  },
+	"users": {
+		"invokingUser": {
+			"username": "befta.caseworker.2.solicitor.3@gmail.com"
+		}
+	},
 
-  "request": {
-    "body": {
-      "id": "${[scenarioContext][parentContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
-    }
-  },
+	"request": {
+		"body": {
+			"id": "${[scenarioContext][parentContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+		}
+	},
 
-  "expectedResponse": {
-    "body": {
-      "arrayInMap": [
-        {
-          "url": "[[ANYTHING_PRESENT]]",
-          "name": "CCD Print",
-          "type": "CCD Print Type",
-          "description": "Printing for CCD"
-        }
-      ]
-    }
-  }
+	"expectedResponse": {
+		"body": {
+			"arrayInMap": [
+				{
+					"url": "[[ANYTHING_PRESENT]]",
+					"name": "CCD Print",
+					"type": "CCD Print Type",
+					"description": "Printing for CCD"
+				}
+			]
+		}
+	}
 }

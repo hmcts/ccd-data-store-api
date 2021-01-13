@@ -35,7 +35,8 @@ import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
 public class DateTimeValueFormatter extends CaseViewFieldProcessor {
 
     private static final List<String> SUPPORTED_TYPES = Arrays.asList(DATETIME, DATE);
-    private static final Map<DisplayContext, DisplayContextParameterType> DISPLAY_CONTEXT_DCP_MAPPING = new EnumMap<>(DisplayContext.class);
+    private static final Map<DisplayContext, DisplayContextParameterType> DISPLAY_CONTEXT_DCP_MAPPING =
+        new EnumMap<>(DisplayContext.class);
 
     private final DateTimeFormatParser dateTimeFormatParser;
 
@@ -56,7 +57,8 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
     protected CaseViewField executeSimple(CaseViewField caseViewField, BaseType baseType) {
         caseViewField.setFormattedValue(
             caseViewField.getValue() instanceof TextNode
-                ? executeSimple((TextNode) caseViewField.getValue(), caseViewField, baseType, caseViewField.getId(), null, caseViewField)
+                ? executeSimple((TextNode) caseViewField.getValue(), caseViewField, baseType, caseViewField.getId(),
+                null, caseViewField)
                 : caseViewField.getValue()
         );
 
@@ -82,7 +84,8 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
     protected CaseViewField executeCollection(CaseViewField caseViewField) {
         caseViewField.setFormattedValue(
             caseViewField.getValue() instanceof ArrayNode
-                ? executeCollection((ArrayNode) caseViewField.getValue(), caseViewField, caseViewField.getId(), null, caseViewField)
+                ? executeCollection((ArrayNode) caseViewField.getValue(), caseViewField, caseViewField.getId(),
+                null, caseViewField)
                 : caseViewField.getValue()
         );
 
@@ -94,10 +97,12 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
                                          String fieldPath,
                                          WizardPageComplexFieldOverride override,
                                          CommonField topLevelField) {
-        final BaseType collectionFieldType = BaseType.get(field.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getType());
+        final BaseType collectionFieldType =
+            BaseType.get(field.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getType());
         final DisplayContext displayContext = displayContext(topLevelField, override);
 
-        if (shouldExecuteCollection(collectionNode, field, DISPLAY_CONTEXT_DCP_MAPPING.get(displayContext), collectionFieldType, SUPPORTED_TYPES)) {
+        if (shouldExecuteCollection(collectionNode, field, DISPLAY_CONTEXT_DCP_MAPPING.get(displayContext),
+            collectionFieldType, SUPPORTED_TYPES)) {
             ArrayNode newNode = MAPPER.createArrayNode();
             collectionNode.forEach(item -> {
                 JsonNode newItem = item.deepCopy();
@@ -124,7 +129,8 @@ public class DateTimeValueFormatter extends CaseViewFieldProcessor {
         return collectionNode;
     }
 
-    private TextNode createNode(CommonDCPModel field, String valueToConvert, BaseType baseType, String fieldPath, DisplayContext displayContext) {
+    private TextNode createNode(CommonDCPModel field, String valueToConvert, BaseType baseType, String fieldPath,
+                                DisplayContext displayContext) {
         if (Strings.isNullOrEmpty(valueToConvert)) {
             return new TextNode(valueToConvert);
         }

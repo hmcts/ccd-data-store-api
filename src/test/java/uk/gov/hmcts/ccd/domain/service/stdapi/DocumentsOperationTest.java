@@ -59,7 +59,8 @@ public class DocumentsOperationTest extends WireMockBaseTest {
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setPrintableDocumentsUrl("http://localhost:" + wiremockPort + TEST_URL);
         final CaseTypeService mockCaseTypeService = Mockito.mock(CaseTypeService.class);
-        Mockito.when(mockCaseTypeService.getCaseTypeForJurisdiction(TEST_CASE_TYPE, TEST_JURISDICTION)).thenReturn(caseTypeDefinition);
+        Mockito.when(mockCaseTypeService.getCaseTypeForJurisdiction(TEST_CASE_TYPE, TEST_JURISDICTION))
+                .thenReturn(caseTypeDefinition);
         ReflectionTestUtils.setField(documentsOperation, "caseTypeService", mockCaseTypeService);
     }
 
@@ -96,7 +97,8 @@ public class DocumentsOperationTest extends WireMockBaseTest {
         assertEquals("Incorrect number of documents", testDocuments.size(), results.size());
 
         for (int i = 0; i < results.size(); i++) {
-            assertEquals("Incorrect description", results.get(i).getDescription(), testDocuments.get(i).getDescription());
+            assertEquals("Incorrect description", results.get(i).getDescription(), testDocuments.get(i)
+                    .getDescription());
             assertEquals("Incorrect name",results.get(i).getName(), testDocuments.get(i).getName());
             assertEquals("Incorrect url",results.get(i).getUrl(), testDocuments.get(i).getUrl());
             assertEquals("Incorrect type",results.get(i).getType(), testDocuments.get(i).getType());

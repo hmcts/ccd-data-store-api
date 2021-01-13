@@ -1,0 +1,17 @@
+{
+  "_guid_": "S-111.15_Check_Orgs_assigned_Users_Base",
+  "_extends_": "F-111_Check_Orgs_Assigned_Users_Base",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${}${[scenarioContext][siblingContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "supplementary_data_updates": {
+        "$inc": "${[scenarioContext][customValues][orgsAssignedUsers_siblingContexts.S-111\\.15_Add_Case_Assigned_User_Roles_for_Case_C1_With_Organisation.childContexts.F-111_Prerequisite_Counter_Check_Call.childContexts.F-111_Get_Organisation_Identifier_Dil]}"
+      }
+    }
+  }
+
+}

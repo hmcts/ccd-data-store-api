@@ -1,0 +1,89 @@
+{
+  "title": "should create a case with CaseLink",
+	"_guid_": "F-113_Test_Data_Base",
+	"productName": "CCD Data Store",
+	"operationName": "Submit Case Creation as Caseworker",
+	"method": "POST",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+  "specs": [
+    "to create a full case"
+  ],
+  "users": {
+    "invokingUser": {
+      "username": "master.caseworker@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
+  },
+	"user": {
+		"username": "master.caseworker@gmail.com",
+		"password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+	},
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers"
+		},
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "BEFTA_MASTER",
+			"ctid": "FT_MasterCaseType"
+		},
+		"body": {
+      "data": {
+        "TextField": null,
+        "TextAreaField": null,
+        "DateField": null,
+        "PhoneField": null,
+        "NumberField": null,
+        "YesNoField": null,
+        "CollectionField": [],
+        "AddressUKField": {
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "PostTown": null,
+          "County": null,
+          "PostCode": null,
+          "Country": null
+        },
+        "MarritalStatus": null,
+        "MoneyField": "008",
+        "EmailField": null,
+        "MultiSelectField": [],
+        "OrganisationPolicyField1": {
+          "OrgPolicyCaseAssignedRole": "[Claimant]",
+          "OrgPolicyReference": null,
+          "Organisation": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        },
+        "OrganisationPolicyField2": {
+          "OrgPolicyCaseAssignedRole": "[Defendant]",
+          "OrgPolicyReference": null,
+          "Organisation": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        },
+        "CaseLinkField": {
+          "CaseReference": null
+        },
+        "AddressField": {
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "Country": null
+        }
+      },
+			"event": {
+				"id": "createCase",
+				"summary": "",
+				"description": ""
+			},
+			"event_token": "${[scenarioContext][childContexts][F-113_Case_Data_Create_Token_Creation][testData][actualResponse][body][token]}",
+			"ignore_warning": false,
+			"draft_id": null
+		}
+	}
+}

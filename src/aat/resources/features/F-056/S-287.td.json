@@ -1,13 +1,15 @@
 {
-  "title": "must start event creation process for appropriate inputs",
   "_guid_": "S-287",
   "_extends_": "F-056_Test_Data_Base",
+  "title": "must start event creation process for appropriate inputs",
+
   "specs": [
     "an active profile in CCD",
     "contains a token created as in Citizen_Token_Creation_Data_For_Case_Creation",
     "contains the token just generated and invalid case creation data",
     "contains a HTTP 422 Unprocessable Entity"
   ],
+
   "request": {
     "body": {
       "data": {
@@ -16,13 +18,14 @@
       "event_token": "${[scenarioContext][childContexts][Citizen_Token_Creation_Data_For_Case_Creation][testData][actualResponse][body][token]}"
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_422_Response",
-    "headers" : {
-      "Content-Encoding" : "gzip",
-      "Content-Length" : "[[ANYTHING_PRESENT]]"
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
     },
-    "body" : {
+    "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
       "timestamp": "[[ANYTHING_PRESENT]]",
       "message": "Case data validation failed",

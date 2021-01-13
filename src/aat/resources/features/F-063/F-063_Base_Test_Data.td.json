@@ -3,6 +3,7 @@
 
 	"productName": "CCD Data Store",
 	"operationName": "Retrieve search input details for dynamic display",
+
 	"method": "GET",
 	"uri": "/internal/case-types/{ctid}/search-inputs",
 

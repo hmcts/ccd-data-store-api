@@ -38,7 +38,8 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder.must(QueryBuilders.wrapperQuery(caseSearchRequest.getQueryValue()));
 
-        caseSearchFilters.forEach(filter -> filter.getFilter(caseSearchRequest.getCaseTypeId()).ifPresent(boolQueryBuilder::filter));
+        caseSearchFilters.forEach(filter ->
+            filter.getFilter(caseSearchRequest.getCaseTypeId()).ifPresent(boolQueryBuilder::filter));
 
         return createQueryString(boolQueryBuilder);
     }
@@ -51,10 +52,12 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
     }
 
     private CaseSearchRequest createNewCaseSearchRequest(CaseSearchRequest caseSearchRequest, String queryWithFilters) {
-        ObjectNode searchRequestJsonNode = objectMapperService.convertStringToObject(caseSearchRequest.toJsonString(), ObjectNode.class);
+        ObjectNode searchRequestJsonNode =
+            objectMapperService.convertStringToObject(caseSearchRequest.toJsonString(), ObjectNode.class);
         ObjectNode queryNode = objectMapperService.convertStringToObject(queryWithFilters, ObjectNode.class);
         searchRequestJsonNode.set(QUERY, queryNode.get(QUERY));
 
-        return new CaseSearchRequest(caseSearchRequest.getCaseTypeId(), new ElasticsearchRequest(searchRequestJsonNode));
+        return new CaseSearchRequest(caseSearchRequest.getCaseTypeId(),
+            new ElasticsearchRequest(searchRequestJsonNode));
     }
 }

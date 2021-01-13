@@ -1,13 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import java.util.Map;
-import java.util.Optional;
-
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,6 +25,8 @@ import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 @Service
 public class MidEventCallback {
 
@@ -39,7 +40,8 @@ public class MidEventCallback {
     public MidEventCallback(CallbackInvoker callbackInvoker,
                             UIDefinitionRepository uiDefinitionRepository,
                             EventTriggerService eventTriggerService,
-                            @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
+                            @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                    CaseDefinitionRepository caseDefinitionRepository,
                             CaseService caseService) {
         this.callbackInvoker = callbackInvoker;
         this.uiDefinitionRepository = uiDefinitionRepository;
@@ -67,17 +69,21 @@ public class MidEventCallback {
                 CaseDetails caseDetailsBefore = null;
                 CaseDetails currentOrNewCaseDetails;
                 if (StringUtils.isNotEmpty(content.getCaseReference())) {
-                    CaseDetails caseDetails = caseService.getCaseDetails(caseTypeDefinition.getJurisdictionId(), content.getCaseReference());
+                    CaseDetails caseDetails =
+                        caseService.getCaseDetails(caseTypeDefinition.getJurisdictionId(), content.getCaseReference());
                     caseDetailsBefore = caseService.clone(caseDetails);
-                    currentOrNewCaseDetails = caseService.populateCurrentCaseDetailsWithEventFields(content,
-                        caseDetails);
-
+                    currentOrNewCaseDetails =
+                        caseService.populateCurrentCaseDetailsWithEventFields(content, caseDetails);
                 } else {
-                    currentOrNewCaseDetails = caseService.createNewCaseDetails(caseTypeId, caseTypeDefinition.getJurisdictionId(),
+                    currentOrNewCaseDetails =
+                        caseService.createNewCaseDetails(caseTypeId, caseTypeDefinition.getJurisdictionId(),
                         content.getEventData() == null ? content.getData() : content.getEventData());
                 }
+                removeNextPageFieldData(currentOrNewCaseDetails, wizardPageOptional.get().getOrder(), caseTypeId,
+                    event.getEventId());
 
-                CaseDetails caseDetailsFromMidEventCallback = callbackInvoker.invokeMidEventCallback(wizardPageOptional.get(),
+                CaseDetails caseDetailsFromMidEventCallback =
+                    callbackInvoker.invokeMidEventCallback(wizardPageOptional.get(),
                     caseTypeDefinition,
                         caseEventDefinition,
                     caseDetailsBefore,
@@ -88,6 +94,20 @@ public class MidEventCallback {
             }
         }
         return dataJsonNode(content.getData());
+    }
+
+    private void removeNextPageFieldData(CaseDetails currentCaseDetails, Integer order,
+                                         String caseTypeId, String eventId) {
+        if (order != null) {
+            Set<String> wizardPageFields = uiDefinitionRepository
+                .getWizardPageCollection(caseTypeId, eventId)
+                .stream()
+                .filter(wizardPage -> wizardPage.getOrder() > order)
+                .map(WizardPage::getWizardPageFieldNames)
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
+            currentCaseDetails.getData().entrySet().removeIf(entry -> wizardPageFields.contains(entry.getKey()));
+        }
     }
 
     private JsonNode dataJsonNode(Map<String, JsonNode> data) {
@@ -106,9 +126,11 @@ public class MidEventCallback {
     }
 
     private CaseEventDefinition getCaseEvent(Event event, CaseTypeDefinition caseTypeDefinition) {
-        final CaseEventDefinition caseEventDefinition = eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
+        final CaseEventDefinition caseEventDefinition =
+            eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
         if (caseEventDefinition == null) {
-            throw new ValidationException(event.getEventId() + " is not a known event ID for the specified case type " + caseTypeDefinition.getId());
+            throw new ValidationException(event.getEventId() + " is not a known event ID for the specified case type "
+                + caseTypeDefinition.getId());
         }
         return caseEventDefinition;
     }

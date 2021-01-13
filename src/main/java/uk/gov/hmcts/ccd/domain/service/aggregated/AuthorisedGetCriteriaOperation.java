@@ -40,7 +40,9 @@ public class AuthorisedGetCriteriaOperation implements GetCriteriaOperation {
         this.userRepository = userRepository;
     }
 
-    public <T> List<? extends CriteriaInput> execute(final String caseTypeId, Predicate<AccessControlList> access, CriteriaType criteriaType) {
+    public <T> List<? extends CriteriaInput> execute(final String caseTypeId,
+                                                     Predicate<AccessControlList> access,
+                                                     CriteriaType criteriaType) {
         Optional<CaseTypeDefinition> caseType = this.getCaseTypeOperation.execute(caseTypeId, access);
 
         if (!caseType.isPresent()) {
@@ -62,7 +64,9 @@ public class AuthorisedGetCriteriaOperation implements GetCriteriaOperation {
             .anyMatch(caseField -> caseField.getId().equalsIgnoreCase(criteriaInput.getField().getId()));
     }
 
-    private boolean filterDistinctFieldsByRole(final Set<String> addedFields, final CriteriaInput criteriaInput, final Set<String> userRoles) {
+    private boolean filterDistinctFieldsByRole(final Set<String> addedFields,
+                                               final CriteriaInput criteriaInput,
+                                               final Set<String> userRoles) {
         String id = criteriaInput.buildCaseFieldId();
         if (addedFields.contains(id)) {
             return false;

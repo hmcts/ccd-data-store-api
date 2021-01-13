@@ -1,0 +1,25 @@
+{
+  "_guid_": "F-112.3-Befta_Master_ComplexCollectionComplex_Case_Creation",
+  "_extends_": "F-112-Befta_Master_ComplexCollectionComplex_Case_Creation",
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][parentContext][childContexts][F-112.3-Befta_Master_ComplexCollectionComplex_Case_Creation_Token_Creation][testData][actualResponse][body][token]}",
+      "data": {
+        "FamilyDetails": {
+          "FatherFullName": "Ted"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data": {
+        "FamilyDetails": {
+          "FatherFullName": "Ted"
+              }
+            }
+    }
+  }
+}
+

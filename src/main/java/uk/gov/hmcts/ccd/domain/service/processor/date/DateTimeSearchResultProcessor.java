@@ -40,7 +40,8 @@ public class DateTimeSearchResultProcessor {
         this.dateTimeFormatParser = dateTimeFormatParser;
     }
 
-    public <T extends CommonViewHeader, U extends CommonViewItem> List<U> execute(List<T> viewHeaders, List<U> viewItems) {
+    public <T extends CommonViewHeader, U extends CommonViewItem> List<U> execute(List<T> viewHeaders,
+                                                                                  List<U> viewItems) {
         for (T viewHeader : viewHeaders) {
             viewItems = viewItems.stream()
                 .map(viewItem -> processViewItem(viewItem, viewHeader))
@@ -97,7 +98,8 @@ public class DateTimeSearchResultProcessor {
                     createArrayNodeFrom((ArrayNode) caseFieldNode, viewHeader, fieldPath));
             } else if (complexCaseField.isComplexFieldType()) {
                 Optional.ofNullable(
-                    createObjectNodeFrom((ObjectNode) caseFieldNode, viewHeader, complexCaseField.getFieldTypeDefinition().getComplexFields(), fieldPath))
+                    createObjectNodeFrom((ObjectNode) caseFieldNode, viewHeader,
+                        complexCaseField.getFieldTypeDefinition().getComplexFields(), fieldPath))
                     .ifPresent(result -> newNode.set(fieldId, result));
             } else {
                 newNode.set(fieldId, createTextNodeFrom((TextNode) caseFieldNode, viewHeader, fieldPath));
@@ -114,7 +116,8 @@ public class DateTimeSearchResultProcessor {
             return new TextNode(originalNode.asText());
         }
 
-        Optional<CommonField> nestedField = viewHeader.getCaseFieldTypeDefinition().getNestedField(fieldPath, true);
+        Optional<CommonField> nestedField =
+            viewHeader.getCaseFieldTypeDefinition().getNestedField(fieldPath, true);
         CommonDCPModel dcpObject = nestedField.map(CommonDCPModel.class::cast).orElse(viewHeader);
 
         return dcpObject.getDisplayContextParameter(DATETIMEDISPLAY)
@@ -123,13 +126,17 @@ public class DateTimeSearchResultProcessor {
                     .map(CommonField::getFieldTypeDefinition)
                     .map(FieldTypeDefinition::getType)
                     .orElseGet(() -> {
-                        FieldTypeDefinition collectionFieldType = viewHeader.getCaseFieldTypeDefinition().getCollectionFieldTypeDefinition();
-                        return collectionFieldType == null ? viewHeader.getCaseFieldTypeDefinition().getType() : collectionFieldType.getType();
+                        FieldTypeDefinition collectionFieldType =
+                            viewHeader.getCaseFieldTypeDefinition().getCollectionFieldTypeDefinition();
+                        return collectionFieldType == null ? viewHeader.getCaseFieldTypeDefinition().getType()
+                            : collectionFieldType.getType();
                     });
                 if (fieldType.equals(DATETIME) || viewHeader.isMetadata()) {
-                    return new TextNode(dateTimeFormatParser.convertIso8601ToDateTime(dcp.getValue(), originalNode.asText()));
+                    return new TextNode(dateTimeFormatParser.convertIso8601ToDateTime(dcp.getValue(),
+                        originalNode.asText()));
                 } else {
-                    return new TextNode(dateTimeFormatParser.convertIso8601ToDate(dcp.getValue(), originalNode.asText()));
+                    return new TextNode(dateTimeFormatParser.convertIso8601ToDate(dcp.getValue(),
+                        originalNode.asText()));
                 }
             }).orElse(new TextNode(originalNode.asText()));
     }

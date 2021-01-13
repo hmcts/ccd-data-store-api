@@ -1,70 +1,74 @@
 {
-  "title": "must create and update successfully the respective fields with ACL permissions for a Citizen",
-  "_extends_": "S-578_Update_Case_For_Citizen_Data_Base",
-  "_guid_": "S-578",
-  "specs": [
-    "an active Citizen profile in CCD",
-    "an active citizen profile with another specific variation of ACLs on the same case type",
-    "contains updated values for DocumentField2, along with an HTTP-201 Created"
-  ],
-  "user": {
-    "username": "befta.citizen.2@gmail.com",
-    "password": "[[$CCD_BEFTA_CITIZEN_2_PWD]]"
-  },
-  "request": {
-    "body": {
-      "data": {
-        "DocumentField2":{
-          "document_url":"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
-          "document_binary_url":"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
-          "document_filename":"Elastic Search test Case.png --> updated by Citizen"
-        }
-      }
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_201_Response",
-    "headers": {
-      "_extends_": "Common_Response_Headers",
-      "Content-Encoding" : "gzip",
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json;charset=UTF-8",
-      "Vary" : "Accept-Encoding"
-    },
-    "body" : {
-      "_links" : {
-        "self" : {
-          "href" : "[[ANYTHING_PRESENT]]"
-        }
-      },
-      "id" : "[[ANYTHING_PRESENT]]",
-      "jurisdiction" : "BEFTA_JURISDICTION_2",
-      "case_type" : "BEFTA_CASETYPE_2_1",
-      "created_on" : "[[ANYTHING_PRESENT]]",
-      "last_modified_on" : "[[ANYTHING_PRESENT]]",
-      "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-      "state" : "TODO",
-      "security_classification" : "PUBLIC",
-      "data" : {
-        "_extends_": "Befta_Citizen_Case_Data",
-        "DocumentField4" : {
-          "document_url" : "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870",
-          "document_filename" : "Screenshot 2019-11-14 at 1.57.32 pm.png",
-          "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870/binary"
-        },
-        "DocumentField2" : {
-          "document_url" : "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
-          "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
-          "document_filename" : "Elastic Search test Case.png --> updated by Citizen"
-        }
-      },
-      "data_classification" : {
-        "_extends_": "Befta_Citizen_Data_Securities_Classification"
-      },
-      "after_submit_callback_response" : null,
-      "callback_response_status_code" : null,
-      "callback_response_status" : null,
-      "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null
-    }
-  }
+	"title": "must create and update successfully the respective fields with ACL permissions for a Citizen",
+	"_extends_": "S-578_Update_Case_For_Citizen_Data_Base",
+	"_guid_": "S-578",
+
+	"specs": [
+		"an active Citizen profile in CCD",
+		"an active citizen profile with another specific variation of ACLs on the same case type",
+		"contains updated values for DocumentField2, along with an HTTP-201 Created"
+	],
+
+	"user": {
+		"username": "befta.citizen.2@gmail.com",
+		"password": "[[$CCD_BEFTA_CITIZEN_2_PWD]]"
+	},
+
+	"request": {
+		"body": {
+			"data": {
+				"DocumentField2":{
+					"document_url":"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
+					"document_binary_url":"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+					"document_filename":"Elastic Search test Case.png --> updated by Citizen"
+				}
+			}
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_201_Response",
+		"headers": {
+			"_extends_": "Common_Response_Headers",
+			"Content-Encoding" : "gzip",
+			"Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json;charset=UTF-8",
+			"Vary" : "Accept-Encoding"
+		},
+		"body" : {
+			"_links" : {
+				"self" : {
+					"href" : "[[ANYTHING_PRESENT]]"
+				}
+			},
+			"id" : "[[ANYTHING_PRESENT]]",
+			"jurisdiction" : "BEFTA_JURISDICTION_2",
+			"case_type" : "BEFTA_CASETYPE_2_1",
+			"created_on" : "[[ANYTHING_PRESENT]]",
+			"last_modified_on" : "[[ANYTHING_PRESENT]]",
+			"last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+			"state" : "TODO",
+			"security_classification" : "PUBLIC",
+			"data" : {
+				"_extends_": "Befta_Citizen_Case_Data",
+				"DocumentField4" : {
+					"document_url" : "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870",
+					"document_filename" : "Screenshot 2019-11-14 at 1.57.32 pm.png",
+					"document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870/binary"
+				},
+				"DocumentField2" : {
+					"document_url" : "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
+					"document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+					"document_filename" : "Elastic Search test Case.png --> updated by Citizen"
+				}
+			},
+			"data_classification" : {
+				"_extends_": "Befta_Citizen_Data_Securities_Classification"
+			},
+			"after_submit_callback_response" : null,
+			"callback_response_status_code" : null,
+			"callback_response_status" : null,
+			"delete_draft_response_status_code" : null,
+			"delete_draft_response_status" : null
+		}
+	}
 }

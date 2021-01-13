@@ -77,8 +77,8 @@ public class UserRepositoryTest {
         doReturn(authentication).when(securityContext).getAuthentication();
         SecurityContextHolder.setContext(securityContext);
 
-        userRepository = spy(new DefaultUserRepository(applicationParams,
-                                                       caseDefinitionRepository, securityUtils, restTemplate, authCheckerConfiguration));
+        userRepository = spy(new DefaultUserRepository(applicationParams, caseDefinitionRepository, securityUtils,
+            restTemplate, authCheckerConfiguration));
     }
 
     @Nested
@@ -88,7 +88,8 @@ public class UserRepositoryTest {
         @Test
         @DisplayName("should retrieve roles from security principals")
         void shouldRetrieveRolesFromPrincipal() {
-            MockUtils.setSecurityAuthorities(authentication, CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA2, CASEWORKER_DIVORCE);
+            MockUtils.setSecurityAuthorities(authentication, CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA2,
+                CASEWORKER_DIVORCE);
             mockUserInfo("userId");
 
             Set<String> userRoles = userRepository.getUserRoles();
@@ -142,7 +143,8 @@ public class UserRepositoryTest {
             when(caseDefinitionRepository.getClassificationsForUserRoleList(roles)).thenReturn(userRoleList);
             doReturn(newHashSet(CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA2)).when(userRepository).getUserRoles();
 
-            final Set<SecurityClassification> userClassifications = userRepository.getUserClassifications("PROBATE");
+            final Set<SecurityClassification> userClassifications =
+                userRepository.getUserClassifications("PROBATE");
 
             assertThat(userClassifications, hasSize(2));
             assertThat(userClassifications, hasItems(PUBLIC, PRIVATE));
@@ -165,7 +167,8 @@ public class UserRepositoryTest {
         }
 
         @Test
-        @DisplayName("should retrieve no security classification if empty list of roles returned from case definition store")
+        @DisplayName("should retrieve no security classification if empty list of roles returned from case definition"
+            + " store")
         public void shouldRetrieveNoSecurityClassificationIfEmptyListOfRolesFromCaseDefinition() {
             doReturn(newHashSet()).when(userRepository).getUserRoles();
 
@@ -176,14 +179,16 @@ public class UserRepositoryTest {
         @DisplayName("should fail to retrieve security classifications if unable to talk to definition store")
         public void shouldFailIfExceptionWhileRetrievingUserRoleFromCaseDefinition() {
             doReturn(newHashSet(CASEWORKER_PROBATE_LOA1)).when(userRepository).getUserRoles();
-            doThrow(ServiceException.class).when(caseDefinitionRepository).getClassificationsForUserRoleList(Arrays.asList(CASEWORKER_PROBATE_LOA1));
+            doThrow(ServiceException.class).when(caseDefinitionRepository).getClassificationsForUserRoleList(Arrays
+                .asList(CASEWORKER_PROBATE_LOA1));
 
             assertThrows(ServiceException.class, () -> userRepository.getUserClassifications("PROBATE"),
                          "Classification retrieval should have failed");
         }
 
         private void assertNoClassifications() {
-            final Set<SecurityClassification> userClassifications = userRepository.getUserClassifications("PROBATE");
+            final Set<SecurityClassification> userClassifications =
+                userRepository.getUserClassifications("PROBATE");
 
             assertThat(userClassifications, hasSize(0));
         }

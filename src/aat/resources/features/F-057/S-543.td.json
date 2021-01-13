@@ -1,27 +1,29 @@
 {
-  "title": "must return appropriate negative response when request does not provide a invalid security classification",
   "_guid_": "S-543",
   "_extends_": "F-057_Test_Data_Base",
+  "title": "must return appropriate negative response when request does not provide a invalid security classification",
 
   "specs": [
     "an active profile in CCD",
     "does not provide a valid security classification",
     "has the 400 return code"
   ],
+
   "request": {
     "queryParams": {
       "security_classification": "someInvalidSecurityClassification"
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_400_Response",
-    "headers" : {
-      "Content-Length" : "[[ANYTHING_PRESENT]]",
-      "Content-Encoding" : "gzip"
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
     },
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-      "message" : "unknown security classification 'someInvalidSecurityClassification'",
+      "message": "unknown security classification 'someInvalidSecurityClassification'",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null

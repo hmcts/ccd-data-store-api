@@ -2,7 +2,8 @@ package uk.gov.hmcts.ccd.auditlog.aop;
 
 public class AuditContextHolder {
 
-    private AuditContextHolder() {}
+    private AuditContextHolder() {
+    }
 
     private static final InheritableThreadLocal<AuditContext> threadLocal = new InheritableThreadLocal<>();
 

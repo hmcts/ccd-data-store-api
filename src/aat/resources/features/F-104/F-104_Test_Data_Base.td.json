@@ -1,22 +1,22 @@
 {
-  "_guid_": "F-104_Test_Data_Base",
-  "title": "External Elastic Search Endpoint",
-  "productName": "CCD Data Store Elastic Search API",
-  "operationName": "external search query",
-  "method": "POST",
-  "uri": "/internal/searchCases",
-  "user" : {
-    "username": "[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
-    "password": "[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
-  },
-  "request": {
-    "_extends_": "Common_Request",
-    "queryParams": {
-      "ctid": "AAT_PRIVATE"
-    }
-  },
+	"_guid_": "F-104_Test_Data_Base",
+	"title": "External Elastic Search Endpoint",
+	"productName": "CCD Data Store Elastic Search API",
+	"operationName": "external search query",
+	"method": "POST",
+	"uri": "/internal/searchCases",
+	"user" : {
+		"username": "[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
+		"password": "[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
+	},
+	"request": {
+		"_extends_": "Common_Request",
+		"queryParams": {
+			"ctid": "AAT_PRIVATE"
+		}
+	},
 
-  "expectedResponse": {
-    "_extends_": "Common_200_Response"
-  }
+	"expectedResponse": {
+		"_extends_": "Common_200_Response"
+	}
 }

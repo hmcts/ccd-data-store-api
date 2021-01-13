@@ -2,16 +2,19 @@
   "_guid_": "S-519",
   "_extends_": "F-058_Test_Data_Base",
   "title": "must return 404 when request contains a non-existing Event ID",
+
   "specs": [
     "an active profile in CCD",
     "contains a non-existing Event ID",
     "code is HTTP-404"
   ],
+
   "request": {
     "pathVariables": {
       "etid": "eyJhbGciOiJIUzUxMiJ9"
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_404_Response",
     "body": {

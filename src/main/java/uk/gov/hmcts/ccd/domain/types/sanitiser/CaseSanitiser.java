@@ -25,7 +25,8 @@ public class CaseSanitiser {
         });
     }
 
-    public Map<String, JsonNode> sanitise(final CaseTypeDefinition caseTypeDefinition, final Map<String, JsonNode> caseData) {
+    public Map<String, JsonNode> sanitise(final CaseTypeDefinition caseTypeDefinition,
+                                          final Map<String, JsonNode> caseData) {
 
         final Map<String, JsonNode> sanitisedData = new HashMap<>();
 

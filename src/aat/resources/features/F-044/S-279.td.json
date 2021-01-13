@@ -1,7 +1,6 @@
 {
 	"_guid_": "S-279",
 	"_extends_": "F-044_Test_Data_Base",
-
 	"title": "must return negative response when request does not provide valid authentication credentials",
 
 	"specs": [
@@ -9,11 +8,13 @@
 		"does not provide valid authentication credentials",
 		"contains an HTTP 401 Forbidden"
 	],
-  "request": {
-    "headers": {
-      "Authorization": "eyJhbGciOiJIUzI1NiJ9"
-    }
-  },
+
+	"request": {
+		"headers": {
+			"Authorization": "eyJhbGciOiJIUzI1NiJ9"
+		}
+	},
+
 	"expectedResponse": {
 		"_extends_": "Common_401_Response"
 	}

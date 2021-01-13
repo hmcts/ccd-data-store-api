@@ -22,11 +22,17 @@
 		"_extends_": "Common_200_Response",
 		"body": {
 			"arrayInMap": [
+        {
+          "__ordering__": "unordered"
+        },
 				{
 					"id": "BEFTA_JURISDICTION_1",
 					"name": "BEFTA_JURISDICTION_1",
 					"description": "Content for the Test Jurisdiction.",
 					"caseTypes": [
+						{
+							"__ordering__": "unordered"
+						},
 						{
 							"id": "BEFTA_CASETYPE_1_1",
 							"description": "Create a case of type BEFTA_CASETYPE_1_1",
@@ -46,7 +52,7 @@
 									"pre_states": [
 										"*"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -88,7 +94,7 @@
 									"pre_states": [
 										"*"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -130,7 +136,7 @@
 									"pre_states": [
 										"IN_PROGRESS"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -172,7 +178,7 @@
 									"pre_states": [
 										"IN_PROGRESS"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -214,7 +220,7 @@
 									"pre_states": [
 										"TODO"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -254,7 +260,7 @@
 									"order": null,
 									"case_fields": [],
 									"pre_states": [],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -415,7 +421,7 @@
 									"pre_states": [
 										"*"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -446,7 +452,7 @@
 									"pre_states": [
 										"*"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -477,7 +483,7 @@
 									"pre_states": [
 										"IN_PROGRESS"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -508,7 +514,7 @@
 									"pre_states": [
 										"IN_PROGRESS"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -539,7 +545,7 @@
 									"pre_states": [
 										"TODO"
 									],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -568,7 +574,7 @@
 									"order": null,
 									"case_fields": [],
 									"pre_states": [],
-									"post_state": null,
+									"post_states": [],
 									"callback_url_about_to_start_event": null,
 									"retries_timeout_about_to_start_event": null,
 									"callback_url_about_to_submit_event": null,
@@ -592,6 +598,9 @@
 								}
 							],
 							"states": [
+                {
+                  "__ordering__": "unordered"
+                },
 								{
 									"id": "TODO",
 									"name": "To do",

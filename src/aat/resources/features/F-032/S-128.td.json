@@ -1,22 +1,22 @@
 {
-  "title": "must return 404 for non-existing jurisdiction id",
+	"title": "must return 404 for non-existing jurisdiction id",
 
-  "_guid_": "S-128",
-  "_extends_": "F-032_Base_Test_Data",
+	"_guid_": "S-128",
+	"_extends_": "F-032_Base_Test_Data",
 
-  "specs": [
-    "an active profile in CCD",
-    "contains a non-existing jurisdiction id",
-    "contains a HTTP 404 Not Found"
-  ],
+	"specs": [
+		"an active profile in CCD",
+		"contains a non-existing jurisdiction id",
+		"contains a HTTP 404 Not Found"
+	],
 
-  "request": {
-    "pathVariables": {
-      "ctid": "abc"
-    }
-  },
+	"request": {
+		"pathVariables": {
+			"ctid": "abc"
+		}
+	},
 
-  "expectedResponse": {
-    "_extends_": "Common_404_Response"
-  }
+	"expectedResponse": {
+		"_extends_": "Common_404_Response"
+	}
 }

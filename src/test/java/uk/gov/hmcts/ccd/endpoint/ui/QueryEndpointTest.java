@@ -157,7 +157,8 @@ class QueryEndpointTest {
             Map<String, String> sanitised = new HashMap<>();
             SearchResultView searchResultView = new SearchResultView();
             when(fieldMapSanitizerOperation.execute(params)).thenReturn(sanitised);
-            when(searchQueryOperation.execute(eq(null), any(MetaData.class), eq(sanitised))).thenReturn(searchResultView);
+            when(searchQueryOperation.execute(eq(null), any(MetaData.class), eq(sanitised)))
+                    .thenReturn(searchResultView);
 
             SearchResultView result = queryEndpoint.searchNew("DIVORCE", "DIVORCE", params);
 

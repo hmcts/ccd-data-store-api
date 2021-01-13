@@ -64,61 +64,89 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
-import static uk.gov.hmcts.ccd.v2.DCPTestHelper.*;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COLLECTION_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COMPLEX_DATE_TIME_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.COMPLEX_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.DATE_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.DATE_TIME_FIELD;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.arrayOf;
+import static uk.gov.hmcts.ccd.v2.DCPTestHelper.mapOf;
 
 public class QueryEndpointIT extends WireMockBaseTest {
-    private static final String GET_CASES = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases";
+    private static final String GET_CASES = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/"
+        + "TestAddressBookCase/cases";
     private static final String GET_CASES_NO_READ_CASE_FIELD_ACCESS =
         "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCaseNoReadFieldAccess/cases";
-    private static final String GET_CASES_NO_READ_CASE_TYPE_ACCESS = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase4/cases";
-    private static final String GET_DRAFT = "/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/drafts/5";
-    private static final String GET_CASE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529";
+    private static final String GET_CASES_NO_READ_CASE_TYPE_ACCESS = "/aggregated/caseworkers/0/jurisdictions/PROBATE/"
+        + "case-types/TestAddressBookCase4/cases";
+    private static final String GET_DRAFT = "/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/"
+        + "drafts/4444333322221111";
+    private static final String GET_CASE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/"
+        + "TestAddressBookCase/cases/1504259907353529";
     private static final String GET_CASE_NO_EVENT_READ_ACCESS =
-        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCaseNoReadEventAccess/cases/1504259907353636";
-    private static final String GET_PRIVATE_CASE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353545";
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCaseNoReadEventAccess/cases/"
+            + "1504259907353636";
+    private static final String GET_PRIVATE_CASE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/"
+        + "TestAddressBookCase/cases/1504259907353545";
     private static final String GET_COMPLEX_CASE =
         "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestComplexAddressBookCase/cases/1504259907353537";
     private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_VALID =
-        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/event-triggers/NO_PRE_STATES_EVENT";
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/event-triggers/"
+            + "NO_PRE_STATES_EVENT";
     private static final String GET_EVENT_TRIGGER_FOR_CASE_VALID =
-        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353545/event-triggers/HAS_PRE_STATES_EVENT";
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353545/"
+            + "event-triggers/HAS_PRE_STATES_EVENT";
     private static final String GET_EVENT_TRIGGER_FOR_CASE_PRIVATE =
-        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353545/event-triggers/HAS_PRE_STATES_EVENT";
-    private static final String GET_CASE_TYPES_READ_ACCESS = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types?access=read";
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353545/"
+            + "event-triggers/HAS_PRE_STATES_EVENT";
+    private static final String GET_CASE_TYPES_READ_ACCESS = "/aggregated/caseworkers/0/jurisdictions/PROBATE/"
+        + "case-types?access=read";
     private static final String GET_JURISDICTIONS_READ_ACCESS = "/aggregated/caseworkers/0/jurisdictions?access=read";
 
 
-    private static final String GET_CASE_TYPES_NO_ACCESS_PARAM = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types";
-    private static final String GET_CASE_TYPES_MISNAMED_ACCESS_PARAM = "/aggregated/caseworkers/0/jurisdictions/PROBATE/invalid=read";
-    private static final String GET_CASE_TYPES_INVALID_ACCESS_PARAM = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types?access=INVALID";
-    private static final String GET_NULL_CASE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestComplexAddressBookCase/cases/9999999999999995";
+    private static final String GET_CASE_TYPES_NO_ACCESS_PARAM = "/aggregated/caseworkers/0/jurisdictions/PROBATE/"
+        + "case-types";
+    private static final String GET_CASE_TYPES_MISNAMED_ACCESS_PARAM = "/aggregated/caseworkers/0/jurisdictions/"
+        + "PROBATE/invalid=read";
+    private static final String GET_CASE_TYPES_INVALID_ACCESS_PARAM = "/aggregated/caseworkers/0/jurisdictions/"
+        + "PROBATE/case-types?access=INVALID";
+    private static final String GET_NULL_CASE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/"
+        + "TestComplexAddressBookCase/cases/9999999999999995";
     private static final String GET_CASE_INVALID_STATE =
         "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestComplexAddressBookCase/cases/1504259907352539";
     private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_INVALID_PRE_STATES =
-        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/event-triggers/HAS_PRE_STATES_EVENT";
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/event-triggers/"
+            + "HAS_PRE_STATES_EVENT";
     private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_INVALID_EVENT =
         "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/event-triggers/NOT_AN_EVENT";
     private static final String GET_EVENT_TRIGGER_FOR_CASE_INVALID_STATE =
-        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353552/event-triggers/TEST_EVENT";
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353552/"
+            + "event-triggers/TEST_EVENT";
     private static final String GET_EVENT_TRIGGER_FOR_CASE_INVALID_CASE =
-        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/9999999999999995/event-triggers/HAS_PRE_STATES_EVENT";
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/9999999999999995/"
+            + "event-triggers/HAS_PRE_STATES_EVENT";
     private static final String GET_EVENT_TRIGGER_FOR_CASE_INVALID_EVENT =
-        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353552/event-triggers/NOT_AN_EVENT";
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353552/"
+            + "event-triggers/NOT_AN_EVENT";
     private static final String GET_CASE_INVALID_REFERENCE =
         "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/invalidReference";
     private static final String GET_EVENT_TRIGGER_FOR_CASE_INVALID_CASE_REFERENCE =
-        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/xxx/event-triggers/HAS_PRE_STATES_EVENT";
-    private static final String GET_CASES_INVALID_JURISDICTION = "/aggregated/caseworkers/0/jurisdictions/XYZ/case-types/TestAddressBookCase/cases";
-    private static final String GET_CASES_INVALID_CASE_TYPE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/XYZAddressBookCase/cases";
-    private static final String GET_CASES_DCP = "/aggregated/caseworkers/0/jurisdictions/DCPTest1/case-types/DCP/cases";
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/xxx/event-triggers/"
+            + "HAS_PRE_STATES_EVENT";
+    private static final String GET_CASES_INVALID_JURISDICTION = "/aggregated/caseworkers/0/jurisdictions/XYZ/"
+        + "case-types/TestAddressBookCase/cases";
+    private static final String GET_CASES_INVALID_CASE_TYPE = "/aggregated/caseworkers/0/jurisdictions/PROBATE/"
+        + "case-types/XYZAddressBookCase/cases";
+    private static final String GET_CASES_DCP =
+        "/aggregated/caseworkers/0/jurisdictions/DCPTest1/case-types/DCP/cases";
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String TEST_CASE_TYPE = "TestAddressBookCase";
     private static final String TEST_JURISDICTION = "PROBATE";
 
     private static final String GET_CASE_HISTORY_FOR_EVENT =
-        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529/events/%d/case-history";
-    public static final int NUMBER_OF_CASES = 18;
+        "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529/"
+            + "events/%d/case-history";
 
 
     @Inject
@@ -218,7 +246,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.SEARCH_CASE.getLabel()));
         assertThat(captor.getValue().getJurisdiction(), is(TEST_JURISDICTION));
         assertThat(captor.getValue().getCaseType(), is(TEST_CASE_TYPE));
-        assertThat(captor.getValue().getCaseId(), is("DRAFT5,1504259907353529,1504259907353545"));
+        assertThat(captor.getValue().getCaseId(), is("DRAFT4444333322221111,1504259907353529,1504259907353545"));
     }
 
     @Test
@@ -281,7 +309,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
     private SearchResultViewItem getFindItemByLastName(List<SearchResultViewItem> searchResultViewItems,
                                                        String lastName) {
-        return searchResultViewItems.stream().filter(e -> e.getFields().get("PersonLastName").equals(lastName)).findFirst().get();
+        return searchResultViewItems.stream().filter(e -> e.getFields().get("PersonLastName").equals(lastName))
+            .findFirst().get();
     }
 
     @Test
@@ -808,7 +837,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertNotNull("Case View Jurisdiction is null", caseViewJurisdiction);
         assertEquals("Unexpected Jurisdiction Id", TEST_JURISDICTION, caseViewJurisdiction.getId());
         assertEquals("Unexpected Jurisdiction name", "Test", caseViewJurisdiction.getName());
-        assertEquals("Unexpected Jurisdiction description", "Test Jurisdiction", caseViewJurisdiction.getDescription());
+        assertEquals("Unexpected Jurisdiction description", "Test Jurisdiction", caseViewJurisdiction
+            .getDescription());
 
         final ProfileCaseState profileCaseState = caseView.getState();
         assertNotNull("Profile Case State is null", profileCaseState);
@@ -938,7 +968,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("User Last name", "Smith", event2.getUserLastName());
         assertEquals("Summary", "The summary", event2.getSummary());
         assertEquals("Comment", "Some comment", event2.getComment());
-        assertEquals("Timestamp", "2017-05-09T14:31:43", event2.getTimestamp().format(DateTimeFormatter.ISO_DATE_TIME));
+        assertEquals("Timestamp", "2017-05-09T14:31:43", event2.getTimestamp()
+            .format(DateTimeFormatter.ISO_DATE_TIME));
 
         final CaseViewActionableEvent[] actionableEvents = caseView.getActionableEvents();
         assertNotNull("Triggers are null", actionableEvents);
@@ -947,7 +978,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
         // checks Trigger 1 content
         assertEquals("Trigger ID", "HAS_PRE_STATES_EVENT", actionableEvents[0].getId());
         assertEquals("Trigger Name", "HAS PRE STATES EVENT", actionableEvents[0].getName());
-        assertEquals("Trigger Description", "Test event for non null pre-states", actionableEvents[0].getDescription());
+        assertEquals("Trigger Description", "Test event for non null pre-states", actionableEvents[0]
+            .getDescription());
         assertEquals("Trigger Order", Integer.valueOf(1), actionableEvents[0].getOrder());
 
         // audit-log assertions
@@ -1078,7 +1110,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertNotNull("Case View Jurisdiction is null", caseViewJurisdiction);
         assertEquals("Unexpected Jurisdiction Id", TEST_JURISDICTION, caseViewJurisdiction.getId());
         assertEquals("Unexpected Jurisdiction name", "Test", caseViewJurisdiction.getName());
-        assertEquals("Unexpected Jurisdiction description", "Test Jurisdiction", caseViewJurisdiction.getDescription());
+        assertEquals("Unexpected Jurisdiction description", "Test Jurisdiction", caseViewJurisdiction
+            .getDescription());
 
         final CaseViewTab[] caseViewTabs = caseView.getTabs();
         assertNotNull("Tabs are null", caseViewTabs);
@@ -1103,7 +1136,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field field type", "Complex", companyField.getFieldTypeDefinition().getType());
 
         // Check complex fields are mapped correctly
-        final List<CaseFieldDefinition> companyComplexFields = companyField.getFieldTypeDefinition().getComplexFields();
+        final List<CaseFieldDefinition> companyComplexFields =
+            companyField.getFieldTypeDefinition().getComplexFields();
         assertEquals("Unexpected number of Complex Fields", 2, companyComplexFields.size());
 
         // Get the Address complex field from the Company
@@ -1112,7 +1146,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field label", "Postal Address", addressField.getLabel());
         assertEquals("Unexpected Field type", "Address", addressField.getFieldTypeDefinition().getId());
         assertEquals("Unexpected Field type", "Complex", addressField.getFieldTypeDefinition().getType());
-        assertEquals("Unexpected number of complex fields", 6, addressField.getFieldTypeDefinition().getComplexFields().size());
+        assertEquals("Unexpected number of complex fields", 6, addressField.getFieldTypeDefinition().getComplexFields()
+            .size());
 
         // Get the Occupant complex field from the Address
         final CaseFieldDefinition occupantField = addressField.getFieldTypeDefinition().getComplexFields().get(5);
@@ -1120,7 +1155,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field label", "Occupant", occupantField.getLabel());
         assertEquals("Unexpected Field type", "Person", occupantField.getFieldTypeDefinition().getId());
         assertEquals("Unexpected Field type", "Complex", occupantField.getFieldTypeDefinition().getType());
-        assertEquals("Unexpected number of complex fields", 7, occupantField.getFieldTypeDefinition().getComplexFields().size());
+        assertEquals("Unexpected number of complex fields", 7, occupantField.getFieldTypeDefinition()
+            .getComplexFields().size());
 
         // Check all field values are mapped correctly
         Map companyNode = (Map) companyField.getValue();
@@ -1212,7 +1248,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Event ID", "NO_PRE_STATES_EVENT", caseUpdateViewEvent.getId());
         assertEquals("Unexpected Event Name", "NO PRE STATES EVENT", caseUpdateViewEvent.getName());
         assertEquals("Unexpected Event Show Event Notes", true, caseUpdateViewEvent.getShowEventNotes());
-        assertEquals("Unexpected Event Description", "Test event for null pre-states", caseUpdateViewEvent.getDescription());
+        assertEquals("Unexpected Event Description", "Test event for null pre-states", caseUpdateViewEvent
+            .getDescription());
         assertEquals("Unexpected Case Fields", 2, caseUpdateViewEvent.getCaseFields().size());
 
         final CaseViewField field1 = caseUpdateViewEvent.getCaseFields().get(0);
@@ -1392,30 +1429,38 @@ public class QueryEndpointIT extends WireMockBaseTest {
                                         .andExpect(status().is(200))
                                         .andReturn();
 
-        final CaseTypeDefinition[] caseTypeDefinitions = mapper.readValue(result.getResponse().getContentAsString(), CaseTypeDefinition[].class);
+        final CaseTypeDefinition[] caseTypeDefinitions = mapper.readValue(result.getResponse().getContentAsString(),
+            CaseTypeDefinition[].class);
 
         assertAll(
             () -> assertThat(caseTypeDefinitions.length, is(equalTo(3))),
-            () -> assertThat(caseTypeDefinitions[0], hasProperty("id", equalTo("TestAddressBookCase"))),
+            () -> assertThat(caseTypeDefinitions[0], hasProperty("id",
+                equalTo("TestAddressBookCase"))),
             () -> assertThat(caseTypeDefinitions[0].getEvents(), hasSize(1)),
             // added a create event with read access for testing drafts properly
             () -> assertThat(caseTypeDefinitions[0].getCaseFieldDefinitions(), hasSize(3)),
-            () -> assertThat(caseTypeDefinitions[0].getCaseFieldDefinitions(), hasItems(hasProperty("id", equalTo("PersonFirstName")),
-                                                                    hasProperty("id", equalTo("PersonLastName")),
-                                                                    hasProperty("id", equalTo("PersonAddress")))),
-            () -> assertThat(caseTypeDefinitions[1], hasProperty("id", equalTo("TestAddressBookCase3"))),
+            () -> assertThat(caseTypeDefinitions[0].getCaseFieldDefinitions(),
+                        hasItems(hasProperty("id", equalTo("PersonFirstName")),
+                        hasProperty("id", equalTo("PersonLastName")),
+                        hasProperty("id", equalTo("PersonAddress")))),
+            () -> assertThat(caseTypeDefinitions[1],
+                        hasProperty("id", equalTo("TestAddressBookCase3"))),
             () -> assertThat(caseTypeDefinitions[1].getEvents(), hasSize(1)),
-            () -> assertThat(caseTypeDefinitions[1].getEvents(), hasItems(hasProperty("id", equalTo("TEST_EVENT_3")))),
+            () -> assertThat(caseTypeDefinitions[1].getEvents(),
+                        hasItems(hasProperty("id", equalTo("TEST_EVENT_3")))),
             () -> assertThat(caseTypeDefinitions[1].getCaseFieldDefinitions(), hasSize(2)),
-            () -> assertThat(caseTypeDefinitions[1].getCaseFieldDefinitions(), hasItems(hasProperty("id", equalTo("PersonLastName")),
-                                                                    hasProperty("id", equalTo("PersonAddress")))),
-            () -> assertThat(caseTypeDefinitions[2], hasProperty("id", equalTo("TestAddressBookCaseNoReadFieldAccess"))),
+            () -> assertThat(caseTypeDefinitions[1].getCaseFieldDefinitions(),
+                        hasItems(hasProperty("id", equalTo("PersonLastName")),
+                                 hasProperty("id", equalTo("PersonAddress")))),
+            () -> assertThat(caseTypeDefinitions[2],
+                        hasProperty("id", equalTo("TestAddressBookCaseNoReadFieldAccess"))),
             () -> assertThat(caseTypeDefinitions[2].getEvents(), hasSize(1)),
             () -> assertThat(caseTypeDefinitions[2].getEvents(),
-                             hasItems(hasProperty("id", equalTo("TEST_EVENT_NO_READ_FIELD_ACCESS")))),
+                        hasItems(hasProperty("id", equalTo("TEST_EVENT_NO_READ_FIELD_ACCESS")))),
             () -> assertThat(caseTypeDefinitions[2].getCaseFieldDefinitions(), hasSize(2)),
-            () -> assertThat(caseTypeDefinitions[2].getCaseFieldDefinitions(), hasItems(hasProperty("id", equalTo("PersonLastName")),
-                                                                    hasProperty("id", equalTo("PersonAddress"))))
+            () -> assertThat(caseTypeDefinitions[2].getCaseFieldDefinitions(),
+                hasItems(hasProperty("id", equalTo("PersonLastName")),
+                         hasProperty("id", equalTo("PersonAddress"))))
         );
     }
 
@@ -1435,13 +1480,16 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertAll(
             () -> assertThat(jurisdictions.length, is(equalTo(3))),
             () -> assertThat(jurisdictions[0].getCaseTypeDefinitions().size(), is(equalTo(1))),
-            () -> assertThat(jurisdictions[0].getCaseTypeDefinitions().get(0).getStates().size(), is(equalTo(2))),
-            () -> assertThat(jurisdictions[0].getCaseTypeDefinitions().get(0).getEvents().size(), is(equalTo(2)))
+            () -> assertThat(jurisdictions[0].getCaseTypeDefinitions().get(0).getStates().size(),
+                is(equalTo(2))),
+            () -> assertThat(jurisdictions[0].getCaseTypeDefinitions().get(0).getEvents().size(),
+                is(equalTo(2)))
         );
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_case_event_history.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_case_event_history.sql"})
     public void shouldGetCaseHistoryForEvent() throws Exception {
 
         // Check that we have the expected test data set size
@@ -1472,7 +1520,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertNotNull("Case View Jurisdiction is null", caseViewJurisdiction);
         assertEquals("Unexpected Jurisdiction Id", TEST_JURISDICTION, caseViewJurisdiction.getId());
         assertEquals("Unexpected Jurisdiction name", "Test", caseViewJurisdiction.getName());
-        assertEquals("Unexpected Jurisdiction description", "Test Jurisdiction", caseViewJurisdiction.getDescription());
+        assertEquals("Unexpected Jurisdiction description", "Test Jurisdiction", caseViewJurisdiction
+            .getDescription());
 
         final CaseViewTab[] caseViewTabs = caseHistoryView.getTabs();
         assertNotNull("Tabs are null", caseViewTabs);
@@ -1580,7 +1629,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_case_event_history.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_case_event_history.sql"})
     public void shouldReturn404WhenEventClassificationDoesNotMatchUserRole() throws Exception {
 
         // Check that we have the expected test data set size

@@ -36,5 +36,15 @@
     <include file="db/changelog/db.changelog-RDM-6916.xml"/>
     <include file="db/changelog/db.changelog-RDM-8747.xml"/>
     <include file="db/changelog/db.changelog-RDM-8958.xml"/>
-  
+    <include file="db/changelog/db.changelog-RDM-8463.xml"/>
+    <include file="db/changelog/db.changelog-RDM-9287.xml"/>
+    <include file="db/changelog/db.changelog-RDM-9505.xml"/>
+    <include file="db/changelog/db.changelog-RDM-10141-1.xml"/>
+    <include file="db/changelog/db.changelog-RDM-10141-2.xml"/>
+    <include file="db/changelog/db.changelog-RDM-10141-3.xml"/>
+    <include file="db/changelog/db.changelog-RDM-10340.xml"/>
+    <include file="db/changelog/db.changelog-RDM-10519.xml"/>
+    <include file="db/changelog/db.changelog-RDM-10167.xml"/>
+    <include file="db/changelog/db.changelog-RDM-9910.xml"/>
+    <include file="db/changelog/db.changelog-RDM-9696.xml"/>
 </databaseChangeLog>

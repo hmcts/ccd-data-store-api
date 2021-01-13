@@ -1,0 +1,35 @@
+{
+  "_guid_": "S-911",
+  "_extends_": "F-108_Test_Data_Base",
+  "specs": [
+    "public security classification access",
+    "is configured to search for both the previously created cases",
+    "contains no cases"
+  ],
+
+  "user" : {
+    "username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
+    "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+  },
+
+  "request": {
+    "queryParams": {
+      "ctid": "AAT_PRIVATE,AAT_PRIVATE2"
+    },
+    "body": {
+      "query": {
+        "match": {
+          "alias.NumberFieldAlias": 1
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "total": 0,
+      "cases": [],
+      "case_types_results" : "[[ANY_NULLABLE]]"
+    }
+  }
+}

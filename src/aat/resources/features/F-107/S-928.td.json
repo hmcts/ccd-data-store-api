@@ -1,0 +1,41 @@
+{
+  "title": "must return 422 for case update with invalid organisation policy",
+  "_guid_": "S-928",
+  "_extends_": "F-107_Test_Data_Update",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains OrganisationPolicy case roles which are different from the default case roles"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][S-930_Create_Case_Data][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "OrganisationPolicyField1": {
+          "OrgPolicyCaseAssignedRole": "[Invalid]"
+          },
+        "OrganisationPolicyField2": {
+          "OrgPolicyCaseAssignedRole": "[Invalid]"
+          }
+        },
+      "event_token": "${[scenarioContext][childContexts][S-930-Prerequisite][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_422_Response",
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "status" : 422,
+      "error" : "Unprocessable Entity",
+      "message" : "[[ANYTHING_PRESENT]]",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : "[[ANYTHING_PRESENT]]",
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

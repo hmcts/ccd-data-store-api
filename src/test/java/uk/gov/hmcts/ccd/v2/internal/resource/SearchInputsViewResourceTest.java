@@ -32,7 +32,8 @@ class SearchInputsViewResourceTest {
     void shouldCopySearchInputs() {
         final SearchInputsViewResource resource = new SearchInputsViewResource(searchInputs, CASE_TYPE_ID);
 
-        List<SearchInputsViewResource.SearchInputView> workbasketInputs = Lists.newArrayList(resource.getSearchInputs());
+        List<SearchInputsViewResource.SearchInputView> workbasketInputs =
+                Lists.newArrayList(resource.getSearchInputs());
         assertAll(
             () -> assertThat(resource.getSearchInputs(), not(sameInstance(this.searchInputs))),
             () -> assertThat(workbasketInputs, hasItems(hasProperty("field", hasProperty("id", is("field1"))),

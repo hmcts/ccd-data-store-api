@@ -1,34 +1,35 @@
 {
-  "_guid_": "F-032_Base_Test_Data",
+	"_guid_": "F-032_Base_Test_Data",
 
-  "users": {
-    "invokingUser": {
-      "username":"[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
-      "password":"[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
-    }
-  },
+	"productName": "CCD Data Store",
+	"operationName": "get printable documents",
 
-  "productName": "CCD Data Store",
-  "operationName": "get printable documents",
-  "method": "POST",
-  "uri": "/callback/jurisdictions/{jid}/case-types/{ctid}/documents",
+	"method": "POST",
+	"uri": "/callback/jurisdictions/{jid}/case-types/{ctid}/documents",
 
-  "request": {
-    "_extends_": "Common_Request",
-    "pathVariables": {
-      "jid": "AUTOTEST1",
-      "ctid": "AAT_AUTH_15"
-    },
-    "body": {
-      "id": "${[scenarioContext][childContexts][F-032_Case_Creation_Data_With_Document][testData][actualResponse][body][id]}"
-    }
-  },
+	"users": {
+		"invokingUser": {
+			"username":"[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
+			"password":"[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
+		}
+	},
 
-  "expectedResponse": {
-    "_extends_": "Common_Response",
-    "headers": {
-      "Content-Encoding": "gzip",
-      "Content-Length": "[[ANYTHING_PRESENT]]"
-    }
-  }
+	"request": {
+		"_extends_": "Common_Request",
+		"pathVariables": {
+			"jid": "AUTOTEST1",
+			"ctid": "AAT_AUTH_15"
+		},
+		"body": {
+			"id": "${[scenarioContext][childContexts][F-032_Case_Creation_Data_With_Document][testData][actualResponse][body][id]}"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_Response",
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		}
+	}
 }

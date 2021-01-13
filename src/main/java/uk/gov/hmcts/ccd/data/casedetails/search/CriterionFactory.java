@@ -54,10 +54,12 @@ public class CriterionFactory {
                 result.add(new MetaDataCriterion("date(" + CaseDetailsEntity.LAST_MODIFIED_FIELD_COL + ")", lm)));
 
         ifPresentAndNotBlank(metadata.getLastStateModifiedDate(), lsm ->
-            result.add(new MetaDataCriterion("date(" + CaseDetailsEntity.LAST_STATE_MODIFIED_DATE_FIELD_COL + ")", lsm)));
+            result.add(new MetaDataCriterion(
+                "date(" + CaseDetailsEntity.LAST_STATE_MODIFIED_DATE_FIELD_COL + ")", lsm)));
 
         ifPresentAndNotBlank(metadata.getSecurityClassification(), sc ->
-                result.add(new MetaDataCriterion(CaseDetailsEntity.SECURITY_CLASSIFICATION_FIELD_COL, sc.toUpperCase())));
+                result.add(new MetaDataCriterion(
+                    CaseDetailsEntity.SECURITY_CLASSIFICATION_FIELD_COL, sc.toUpperCase())));
 
         return result;
     }

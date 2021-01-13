@@ -34,7 +34,9 @@ public class ClassifiedGetCriteriaOperation implements GetCriteriaOperation {
     }
 
     @Override
-    public <T> List<? extends CriteriaInput> execute(String caseTypeId, Predicate<AccessControlList> access, CriteriaType criteriaType) {
+    public <T> List<? extends CriteriaInput> execute(String caseTypeId,
+                                                     Predicate<AccessControlList> access,
+                                                     CriteriaType criteriaType) {
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         return getCriteriaOperation.execute(caseTypeId, access, criteriaType).stream()
             .filter(workbasketInput -> classificationService.userHasEnoughSecurityClassificationForField(

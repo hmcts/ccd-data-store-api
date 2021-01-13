@@ -25,11 +25,20 @@ public interface UserRepository {
 
     String getUserId();
 
-    List<String> getUserRolesJurisdictions();
+    /**
+     * Get caseworker user's jurisdictions based on their roles.
+     * Note that for cross-jurisdiction roles, this method will NOT return every jurisdiction - it only
+     * takes into account jurisdiction-specific caseworker roles.
+     * If a user is cross-jurisdiction, the jurisdictions should be obtained from the CaseDefinitionRepository.
+     * @return The jurisdictions the user has access to based on their caseworker roles.
+     */
+    List<String> getCaseworkerUserRolesJurisdictions();
 
     boolean anyRoleEqualsAnyOf(List<String> userRoles);
 
     boolean anyRoleEqualsTo(String userRole);
 
     boolean anyRoleMatches(Pattern rolesPattern);
+
+    boolean isCrossJurisdictionRole(String role);
 }

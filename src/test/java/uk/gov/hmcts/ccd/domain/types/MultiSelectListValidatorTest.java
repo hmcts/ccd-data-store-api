@@ -17,7 +17,10 @@ import java.util.List;
 
 import static java.math.BigDecimal.ONE;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.emptyCollectionOf;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
 @DisplayName("MultiSelectListValidator")
@@ -65,7 +68,8 @@ class MultiSelectListValidatorTest {
 
     @Test
     void validate_shouldBeValidWhenNullNode() {
-        final List<ValidationResult> results = validator.validate(FIELD_ID, NODE_FACTORY.nullNode(), caseFieldDefinition);
+        final List<ValidationResult> results =
+                validator.validate(FIELD_ID, NODE_FACTORY.nullNode(), caseFieldDefinition);
 
         assertThat(results, is(emptyCollectionOf(ValidationResult.class)));
     }

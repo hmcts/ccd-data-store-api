@@ -41,8 +41,8 @@ import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 
-
-@SuppressWarnings("checkstyle:OperatorWrap") // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+@SuppressWarnings("checkstyle:OperatorWrap")
 public class CallbackTest extends WireMockBaseTest {
 
     private static JsonNode CALLBACK_DATA = null;
@@ -147,8 +147,10 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
-        final CaseUpdateViewEvent caseUpdateViewEvent = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseUpdateViewEvent.class);
-        assertThat(caseUpdateViewEvent.getCaseFields(), hasIds(new String[] {"PersonFirstName", "PersonLastName", "PersonAddress"}));
+        final CaseUpdateViewEvent caseUpdateViewEvent = mapper.readValue(mvcResult.getResponse().getContentAsString(),
+            CaseUpdateViewEvent.class);
+        assertThat(caseUpdateViewEvent.getCaseFields(),
+                hasIds(new String[] {"PersonFirstName", "PersonLastName", "PersonAddress"}));
         assertThat(caseUpdateViewEvent.getCaseFields(), hasSize(3));
         assertTrue("No token", !caseUpdateViewEvent.getEventToken().isEmpty());
     }
@@ -170,13 +172,16 @@ public class CallbackTest extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals("Callback errors should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
+        assertEquals("Callback errors should have caused UNPROCESSABLE_ENTITY response", 422,
+            mvcResult.getResponse().getStatus());
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
-    public void shouldReturn422WhenGetEventTriggerForCaseTypeWithCallbackDataWithWarningsAndIgnoreWarningFalse() throws Exception {
-        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/event-triggers/%s?ignore-warning=false",
+    public void shouldReturn422WhenGetEventTriggerForCaseTypeWithCallbackDataWithWarningsAndIgnoreWarningFalse()
+                                                                                                    throws Exception {
+        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/event-triggers/%s"
+                + "?ignore-warning=false",
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
@@ -190,13 +195,16 @@ public class CallbackTest extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals("Callback warnings should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
+        assertEquals("Callback warnings should have caused UNPROCESSABLE_ENTITY response", 422,
+            mvcResult.getResponse().getStatus());
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
-    public void shouldReturn200WhenGetEventTriggerForCaseTypeWithCallbackDataWithWarningsAndIgnoreWarningTrue() throws Exception {
-        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/event-triggers/%s?ignore-warning=true",
+    public void shouldReturn200WhenGetEventTriggerForCaseTypeWithCallbackDataWithWarningsAndIgnoreWarningTrue()
+                                                                                                    throws Exception {
+        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/event-triggers/%s?"
+                + "ignore-warning=true",
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
@@ -212,8 +220,10 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
-        final CaseUpdateViewEvent caseUpdateViewEvent = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseUpdateViewEvent.class);
-        assertThat(caseUpdateViewEvent.getCaseFields(), hasIds(new String[] {"PersonFirstName", "PersonLastName", "PersonAddress"}));
+        final CaseUpdateViewEvent caseUpdateViewEvent = mapper.readValue(mvcResult.getResponse().getContentAsString(),
+            CaseUpdateViewEvent.class);
+        assertThat(caseUpdateViewEvent.getCaseFields(), hasIds(new String[] {"PersonFirstName", "PersonLastName",
+            "PersonAddress"}));
         assertThat(caseUpdateViewEvent.getCaseFields(), hasSize(3));
         assertTrue("No token", !caseUpdateViewEvent.getEventToken().isEmpty());
     }
@@ -221,7 +231,8 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn422WhenGetEventTriggerForCaseTypeWithCallbackDataWithValidationErrors() throws Exception {
-        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/event-triggers/%s?ignore-warning=false",
+        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/event-triggers/%s?"
+                + "ignore-warning=false",
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
@@ -235,12 +246,14 @@ public class CallbackTest extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals("Invalid callback data should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
+        assertEquals("Invalid callback data should have caused UNPROCESSABLE_ENTITY response", 422,
+            mvcResult.getResponse().getStatus());
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
-    public void shouldReturn422WhenGetEventTriggerForCaseTypeWithInvalidEventTriggerHavingNonEmptyPreStates() throws Exception {
+    public void shouldReturn422WhenGetEventTriggerForCaseTypeWithInvalidEventTriggerHavingNonEmptyPreStates()
+                                                                                                    throws Exception {
         final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/event-triggers/%s",
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, UPDATE_EVENT_TRIGGER_ID);
 
@@ -255,7 +268,8 @@ public class CallbackTest extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals("Non empty pre states should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
+        assertEquals("Non empty pre states should have caused UNPROCESSABLE_ENTITY response", 422,
+            mvcResult.getResponse().getStatus());
     }
 
     @Test
@@ -287,7 +301,8 @@ public class CallbackTest extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
-    public void shouldReturn422WhenGetEventTriggerForCaseTypeWithInvalidEventTriggerHavingNullPreStates() throws Exception {
+    public void shouldReturn422WhenGetEventTriggerForCaseTypeWithInvalidEventTriggerHavingNullPreStates()
+                                                                                                    throws Exception {
         final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/event-triggers/%s",
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, NULL_PRE_STATES_CREATE_CASE_EVENT_TRIGGER_ID);
 
@@ -302,13 +317,15 @@ public class CallbackTest extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals("Null pre states should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
+        assertEquals("Null pre states should have caused UNPROCESSABLE_ENTITY response", 422,
+            mvcResult.getResponse().getStatus());
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn200WhenGetEventTriggerForCaseWithValidCallbackData() throws Exception {
-        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/event-triggers/%s",
+        final String URL =
+                String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/event-triggers/%s",
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
@@ -326,8 +343,10 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
-        final CaseUpdateViewEvent caseUpdateViewEvent = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseUpdateViewEvent.class);
-        assertThat(caseUpdateViewEvent.getCaseFields(), hasIds(new String[] {"PersonFirstName", "PersonLastName", "PersonAddress"}));
+        final CaseUpdateViewEvent caseUpdateViewEvent = mapper.readValue(mvcResult.getResponse().getContentAsString(),
+            CaseUpdateViewEvent.class);
+        assertThat(caseUpdateViewEvent.getCaseFields(), hasIds(new String[] {"PersonFirstName", "PersonLastName",
+            "PersonAddress"}));
         assertThat(caseUpdateViewEvent.getCaseFields(), hasSize(3));
         assertTrue("No token", !caseUpdateViewEvent.getEventToken().isEmpty());
     }
@@ -335,7 +354,8 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn422WhenGetEventTriggerForCaseWithCallbackDataWithErrors() throws Exception {
-        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/event-triggers/%s",
+        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/"
+                + "event-triggers/%s",
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
@@ -349,13 +369,16 @@ public class CallbackTest extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals("Callback errors should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
+        assertEquals("Callback errors should have caused UNPROCESSABLE_ENTITY response", 422,
+            mvcResult.getResponse().getStatus());
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
-    public void shouldReturn422WhenGetEventTriggerForCaseWithCallbackDataWithWarningsAndIgnoreWarningFalse() throws Exception {
-        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/event-triggers/%s?ignore-warning=false",
+    public void shouldReturn422WhenGetEventTriggerForCaseWithCallbackDataWithWarningsAndIgnoreWarningFalse()
+                                                                                                    throws Exception {
+        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/"
+                + "event-triggers/%s?ignore-warning=false",
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
@@ -369,13 +392,16 @@ public class CallbackTest extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals("Callback warnings should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
+        assertEquals("Callback warnings should have caused UNPROCESSABLE_ENTITY response", 422,
+            mvcResult.getResponse().getStatus());
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
-    public void shouldReturn200WhenGetEventTriggerForCaseWithCallbackDataWithWarningsAndIgnoreWarningTrue() throws Exception {
-        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/event-triggers/%s?ignore-warning=true",
+    public void shouldReturn200WhenGetEventTriggerForCaseWithCallbackDataWithWarningsAndIgnoreWarningTrue()
+                                                                                                    throws Exception {
+        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/"
+                + "event-triggers/%s?ignore-warning=true",
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
@@ -391,8 +417,10 @@ public class CallbackTest extends WireMockBaseTest {
 
         assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
 
-        final CaseUpdateViewEvent caseUpdateViewEvent = mapper.readValue(mvcResult.getResponse().getContentAsString(), CaseUpdateViewEvent.class);
-        assertThat(caseUpdateViewEvent.getCaseFields(), hasIds(new String[] {"PersonFirstName", "PersonLastName", "PersonAddress"}));
+        final CaseUpdateViewEvent caseUpdateViewEvent = mapper.readValue(mvcResult.getResponse().getContentAsString(),
+            CaseUpdateViewEvent.class);
+        assertThat(caseUpdateViewEvent.getCaseFields(), hasIds(new String[] {"PersonFirstName", "PersonLastName",
+            "PersonAddress"}));
         assertThat(caseUpdateViewEvent.getCaseFields(), hasSize(3));
         assertTrue("No token", !caseUpdateViewEvent.getEventToken().isEmpty());
     }
@@ -400,7 +428,8 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn422WhenGetEventTriggerForCaseWithCallbackDataWithValidationErrors() throws Exception {
-        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/event-triggers/%s?ignore-warning=false",
+        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/"
+               + "event-triggers/%s?ignore-warning=false",
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
@@ -414,13 +443,15 @@ public class CallbackTest extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals("Invalid callback data should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
+        assertEquals("Invalid callback data should have caused UNPROCESSABLE_ENTITY response", 422,
+            mvcResult.getResponse().getStatus());
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn422WhenGetEventTriggerForCaseWithInvalidEventTriggerHavingNoPreStates() throws Exception {
-        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/event-triggers/%s",
+        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/"
+                + "event-triggers/%s",
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
@@ -434,14 +465,18 @@ public class CallbackTest extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals("Empty pre states should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
+        assertEquals("Empty pre states should have caused UNPROCESSABLE_ENTITY response", 422,
+            mvcResult.getResponse().getStatus());
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
-    public void shouldReturn422WhenGetEventTriggerForCaseWithInvalidEventTriggerHavingNonMatchingPreStates() throws Exception {
-        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/event-triggers/%s",
-            USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, NON_MATCHING_PRE_STATES_UPDATE_CASE_EVENT_TRIGGER_ID);
+    public void shouldReturn422WhenGetEventTriggerForCaseWithInvalidEventTriggerHavingNonMatchingPreStates()
+                                                                                                    throws Exception {
+        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/"
+                + "event-triggers/%s",
+            USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE,
+            NON_MATCHING_PRE_STATES_UPDATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
         callbackResponse.setData(JacksonUtils.convertValue(CALLBACK_DATA));
@@ -454,13 +489,16 @@ public class CallbackTest extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals("Non matching pre states should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
+        assertEquals("Non matching pre states should have caused UNPROCESSABLE_ENTITY response", 422,
+            mvcResult.getResponse().getStatus());
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
-    public void shouldReturn422WhenGetEventTriggerForCaseWithInvalidEventTriggerHavingNullPreStates() throws Exception {
-        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/event-triggers/%s",
+    public void shouldReturn422WhenGetEventTriggerForCaseWithInvalidEventTriggerHavingNullPreStates()
+                                                                                                    throws Exception {
+        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/"
+                + "event-triggers/%s",
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, NULL_PRE_STATES_CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
@@ -474,13 +512,16 @@ public class CallbackTest extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals("Null pre states should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
+        assertEquals("Null pre states should have caused UNPROCESSABLE_ENTITY response", 422,
+            mvcResult.getResponse().getStatus());
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
-    public void shouldReturn422WhenGetEventTriggerForCaseWithInvalidEventTriggerHavingEmptyPreStates() throws Exception {
-        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/event-triggers/%s",
+    public void shouldReturn422WhenGetEventTriggerForCaseWithInvalidEventTriggerHavingEmptyPreStates()
+                                                                                                    throws Exception {
+        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/"
+                + "event-triggers/%s",
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE, CREATE_CASE_EVENT_TRIGGER_ID);
 
         final CallbackResponse callbackResponse = new CallbackResponse();
@@ -494,13 +535,15 @@ public class CallbackTest extends WireMockBaseTest {
                 .contentType(JSON_CONTENT_TYPE))
             .andReturn();
 
-        assertEquals("Empty pre states should have caused UNPROCESSABLE_ENTITY response", 422, mvcResult.getResponse().getStatus());
+        assertEquals("Empty pre states should have caused UNPROCESSABLE_ENTITY response", 422,
+            mvcResult.getResponse().getStatus());
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn404WhenGetEventTriggerForCaseWithNonExistentCaseId() throws Exception {
-        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/event-triggers/%s",
+        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/"
+                + "event-triggers/%s",
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, NON_EXISTENT_CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
 
         final MvcResult mvcResult = mockMvc
@@ -515,7 +558,8 @@ public class CallbackTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_callback_cases.sql"})
     public void shouldReturn404WhenGetEventTriggerForCaseWithInvalidCaseId() throws Exception {
-        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/event-triggers/%s",
+        final String URL = String.format("/aggregated/caseworkers/%d/jurisdictions/%s/case-types/%s/cases/%s/"
+                + "event-triggers/%s",
             USER_ID, JURISDICTION_ID, CASE_TYPE_ID, INVALID_CASE_REFERENCE, UPDATE_EVENT_TRIGGER_ID);
 
         final MvcResult mvcResult = mockMvc

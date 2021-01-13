@@ -31,9 +31,11 @@ public class StartEventResource extends RepresentationModel<RepresentationModel<
         copyProperties(startEventResult);
 
         if (withCase) {
-            add(linkTo(methodOn(StartEventController.class).getStartEventTrigger(startEventResult.getCaseReference(), eventId, ignoreWarning)).withSelfRel());
+            add(linkTo(methodOn(StartEventController.class).getStartEventTrigger(startEventResult.getCaseReference(),
+                eventId, ignoreWarning)).withSelfRel());
         } else {
-            add(linkTo(methodOn(StartEventController.class).getStartCaseEvent(startEventResult.getCaseTypeId(), eventId, ignoreWarning)).withSelfRel());
+            add(linkTo(methodOn(StartEventController.class).getStartCaseEvent(startEventResult.getCaseTypeId(),
+                eventId, ignoreWarning)).withSelfRel());
         }
     }
 

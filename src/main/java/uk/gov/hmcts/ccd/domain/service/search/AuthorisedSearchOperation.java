@@ -36,9 +36,11 @@ public class AuthorisedSearchOperation implements SearchOperation {
 
     @Autowired
     public AuthorisedSearchOperation(@Qualifier("classified") final SearchOperation searchOperation,
-                                     @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
+                                     @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                         final CaseDefinitionRepository caseDefinitionRepository,
                                      final AccessControlService accessControlService,
-                                     @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final UserRepository userRepository) {
+                                     @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                         final UserRepository userRepository) {
         this.searchOperation = searchOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlService = accessControlService;
@@ -52,14 +54,17 @@ public class AuthorisedSearchOperation implements SearchOperation {
         CaseTypeDefinition caseTypeDefinition = getCaseType(metaData.getCaseTypeId());
         Set<String> userRoles = getUserRoles();
 
-        return (null == results || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ))
+        return (null == results || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles,
+            CAN_READ))
             ? Lists.newArrayList() : filterByReadAccess(results, caseTypeDefinition, userRoles);
     }
 
-    private List<CaseDetails> filterByReadAccess(List<CaseDetails> results, CaseTypeDefinition caseTypeDefinition, Set<String> userRoles) {
+    private List<CaseDetails> filterByReadAccess(List<CaseDetails> results, CaseTypeDefinition caseTypeDefinition,
+                                                 Set<String> userRoles) {
 
         return results.stream()
-            .filter(caseDetails -> accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(), caseTypeDefinition, userRoles, CAN_READ))
+            .filter(caseDetails -> accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(),
+                caseTypeDefinition, userRoles, CAN_READ))
             .collect(Collectors.toList())
             .stream()
             .map(caseDetails -> verifyFieldReadAccess(caseTypeDefinition, userRoles, caseDetails))
@@ -85,7 +90,9 @@ public class AuthorisedSearchOperation implements SearchOperation {
         return userRoles;
     }
 
-    private Optional<CaseDetails> verifyFieldReadAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles, CaseDetails caseDetails) {
+    private Optional<CaseDetails> verifyFieldReadAccess(CaseTypeDefinition caseTypeDefinition,
+                                                        Set<String> userRoles,
+                                                        CaseDetails caseDetails) {
 
         if (caseTypeDefinition == null || caseDetails == null || CollectionUtils.isEmpty(userRoles)) {
             return Optional.empty();

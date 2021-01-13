@@ -43,7 +43,8 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
 
     @Override
     public List<AuditEvent> getEvents(String jurisdiction, String caseTypeId, String caseReference) {
-        return getEvents(caseReference, () -> String.format(RESOURCE_NOT_FOUND, jurisdiction, caseTypeId, caseReference));
+        return getEvents(caseReference, () ->
+            String.format(RESOURCE_NOT_FOUND, jurisdiction, caseTypeId, caseReference));
     }
 
     private List<AuditEvent> getEvents(String caseReference, Supplier<String> errorMessageSupplier) {

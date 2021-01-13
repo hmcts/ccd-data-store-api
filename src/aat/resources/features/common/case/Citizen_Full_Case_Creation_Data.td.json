@@ -1,77 +1,79 @@
 {
-  "_guid_": "Citizen_Full_Case_Creation_Data",
+	"_guid_": "Citizen_Full_Case_Creation_Data",
 
-  "productName": "CCD Data Store",
-  "operationName": "Submit case creation as Citizen",
-  "method": "POST",
-  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+	"productName": "CCD Data Store",
+	"operationName": "Submit case creation as Citizen",
 
-  "specs": [
-    "to create a full case as a citizen"
-  ],
+	"method": "POST",
+	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
 
-  "users": {
-    "invokingUser": {
-      "username": "befta.citizen.3@gmail.com",
-      "password": "[[$CCD_BEFTA_CITIZEN_3_PWD]]"
-    }
-  },
+	"specs": [
+		"to create a full case as a citizen"
+	],
 
-  "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers"
-    },
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_JURISDICTION_3",
-      "ctid": "BEFTA_CASETYPE_3_2"
-    },
-    "body": {
-      "data": {
-        "_extends_": "Standard_Full_Case_Data"
-      },
-      "event": {
-        "id": "CREATE",
-        "summary": "",
-        "description": ""
-      },
-      "event_token": "${[scenarioContext][parentContext][childContexts][Citizen_Token_Creation_Data_For_Case_Creation][testData][actualResponse][body][token]}",
-      "ignore_warning": false,
-      "draft_id": null
-    }
-  },
+	"users": {
+		"invokingUser": {
+			"username": "befta.citizen.3@gmail.com",
+			"password": "[[$CCD_BEFTA_CITIZEN_3_PWD]]"
+		}
+	},
 
-  "expectedResponse": {
-    "_extends_": "Common_201_Response",
-    "headers": {
-      "Content-Encoding": "gzip",
-      "vary": "accept-encoding",
-      "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
-    },
-    "body": {
-      "id": "[[ANYTHING_PRESENT]]",
-      "jurisdiction": "BEFTA_JURISDICTION_3",
-      "state": "TODO",
-      "version": 0,
-      "case_type_id": "BEFTA_CASETYPE_3_2",
-      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
-      "created_date": "[[ANYTHING_PRESENT]]",
-      "last_modified": "[[ANYTHING_PRESENT]]",
-      "security_classification": "PUBLIC",
-      "case_data": {
-        "_extends_": "Standard_Full_Case_Data"
-      },
-      "data_classification": {
-        "_extends_": "Standard_Full_Case_Data_Classification"
-      },
-      "after_submit_callback_response": null,
-      "callback_response_status_code": null,
-      "callback_response_status": null,
-      "delete_draft_response_status_code": null,
-      "delete_draft_response_status": null,
-      "security_classifications": {
-        "_extends_": "Standard_Full_Case_Data_Classification"
-      }
-    }
-  }
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers"
+		},
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "BEFTA_JURISDICTION_3",
+			"ctid": "BEFTA_CASETYPE_3_2"
+		},
+		"body": {
+			"data": {
+				"_extends_": "Standard_Full_Case_Data"
+			},
+			"event": {
+				"id": "CREATE",
+				"summary": "",
+				"description": ""
+			},
+			"event_token": "${[scenarioContext][parentContext][childContexts][Citizen_Token_Creation_Data_For_Case_Creation][testData][actualResponse][body][token]}",
+			"ignore_warning": false,
+			"draft_id": null
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_201_Response",
+		"headers": {
+			"Content-Encoding": "gzip",
+			"vary": "accept-encoding",
+			"Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
+		},
+		"body": {
+			"id": "[[ANYTHING_PRESENT]]",
+			"jurisdiction": "BEFTA_JURISDICTION_3",
+			"state": "TODO",
+			"version": 0,
+			"case_type_id": "BEFTA_CASETYPE_3_2",
+			"last_state_modified_date": "[[ANYTHING_PRESENT]]",
+			"created_date": "[[ANYTHING_PRESENT]]",
+			"last_modified": "[[ANYTHING_PRESENT]]",
+			"security_classification": "PUBLIC",
+			"case_data": {
+				"_extends_": "Standard_Full_Case_Data"
+			},
+			"data_classification": {
+				"_extends_": "Standard_Full_Case_Data_Classification"
+			},
+			"supplementary_data": null,
+			"after_submit_callback_response": null,
+			"callback_response_status_code": null,
+			"callback_response_status": null,
+			"delete_draft_response_status_code": null,
+			"delete_draft_response_status": null,
+			"security_classifications": {
+				"_extends_": "Standard_Full_Case_Data_Classification"
+			}
+		}
+	}
 }

@@ -102,7 +102,8 @@ public abstract class CaseDetailsQueryBuilder<T> {
     }
 
     public CaseDetailsQueryBuilder whereSecurityClassification(String rawClassification) {
-        final SecurityClassification securityClassification = SecurityClassification.valueOf(rawClassification.toUpperCase());
+        final SecurityClassification securityClassification =
+            SecurityClassification.valueOf(rawClassification.toUpperCase());
         predicates.add(cb.equal(root.get("securityClassification"), securityClassification));
 
         return this;

@@ -26,11 +26,40 @@ import java.util.Map;
 
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
-import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.*;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.ADDRESS_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.ADDRESS_LINE_1;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST1_PRIVATE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST1_PUBLIC;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST1_RESTRICTED;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST1_SOLICITOR;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST2_PUBLIC;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST_1;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST_2;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CASE_TYPE_A;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CASE_TYPE_B;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CASE_TYPE_C;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CASE_TYPE_D;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COLLECTION_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COMPLEX_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COMPLEX_NESTED_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.COMPLEX_TEXT_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.CREATED_DATE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.DATE_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.EMAIL_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.IN_PROGRESS_STATE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.MULTI_SELECT_LIST_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.NESTED_COLLECTION_TEXT_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.PHONE_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.POST_CODE_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.STATE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.STATE_VALUE;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.YES_OR_NO_FIELD;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.caseTypesParam;
+import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.createPostRequest;
 
 class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
 
@@ -189,7 +218,8 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
             CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC);
 
             assertAll(
-                () -> assertThat(getFirstCaseData(caseSearchResult).get(COMPLEX_FIELD).has(COMPLEX_TEXT_FIELD), is(true))
+                () -> assertThat(getFirstCaseData(caseSearchResult).get(COMPLEX_FIELD).has(COMPLEX_TEXT_FIELD),
+                    is(true))
             );
         }
 
@@ -200,7 +230,8 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
             CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_RESTRICTED);
 
             assertAll(
-                () -> assertThat(getFirstCaseData(caseSearchResult).get(COMPLEX_FIELD).has(COMPLEX_TEXT_FIELD), is(false))
+                () -> assertThat(getFirstCaseData(caseSearchResult).get(COMPLEX_FIELD).has(COMPLEX_TEXT_FIELD),
+                    is(false))
             );
         }
 
@@ -211,7 +242,8 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
             CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PRIVATE);
 
             assertAll(
-                () -> assertThat(getFirstCaseData(caseSearchResult).get(COMPLEX_FIELD).has(COMPLEX_TEXT_FIELD), is(true))
+                () -> assertThat(getFirstCaseData(caseSearchResult).get(COMPLEX_FIELD).has(COMPLEX_TEXT_FIELD),
+                    is(true))
             );
         }
     }
@@ -232,8 +264,10 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
 
             assertAll(
                 () -> assertThat(caseSearchResult.getTotal(), is(2L)),
-                () -> assertThat(caseSearchResult.getCases().get(0).getSecurityClassification(), is(SecurityClassification.PRIVATE)),
-                () -> assertThat(caseSearchResult.getCases().get(1).getSecurityClassification(), is(SecurityClassification.PUBLIC))
+                () -> assertThat(caseSearchResult.getCases().get(0).getSecurityClassification(),
+                    is(SecurityClassification.PRIVATE)),
+                () -> assertThat(caseSearchResult.getCases().get(1).getSecurityClassification(),
+                    is(SecurityClassification.PUBLIC))
             );
         }
 
@@ -245,7 +279,8 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
 
             assertAll(
                 () -> assertThat(caseSearchResult.getTotal(), is(1L)),
-                () -> assertThat(caseSearchResult.getCases().get(0).getSecurityClassification(), is(SecurityClassification.PUBLIC))
+                () -> assertThat(caseSearchResult.getCases().get(0).getSecurityClassification(),
+                    is(SecurityClassification.PUBLIC))
             );
         }
 
@@ -285,7 +320,8 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
         void shouldReturnCasesWithLowerCaseTypeSC() throws Exception {
             ElasticsearchTestRequest searchRequest = matchAllRequest();
 
-            CaseSearchResult caseSearchResult = executeRequest(searchRequest, caseTypesParam(CASE_TYPE_C, CASE_TYPE_D), AUTOTEST1_RESTRICTED);
+            CaseSearchResult caseSearchResult =
+                executeRequest(searchRequest, caseTypesParam(CASE_TYPE_C, CASE_TYPE_D), AUTOTEST1_RESTRICTED);
 
             assertAll(
                 () -> assertThat(caseSearchResult.getCases().get(0).getCaseTypeId(), is(CASE_TYPE_C)), // PUBLIC
@@ -297,7 +333,8 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
         void shouldNotReturnCasesWithHigherCaseTypeSC() throws Exception {
             ElasticsearchTestRequest searchRequest = matchAllRequest();
 
-            CaseSearchResult caseSearchResult = executeRequest(searchRequest, caseTypesParam(CASE_TYPE_C, CASE_TYPE_D), AUTOTEST1_PUBLIC);
+            CaseSearchResult caseSearchResult =
+                executeRequest(searchRequest, caseTypesParam(CASE_TYPE_C, CASE_TYPE_D), AUTOTEST1_PUBLIC);
 
             assertAll(
                 () -> assertThat(caseSearchResult.getTotal(), is(1L)),
@@ -315,7 +352,8 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
 
             Map<String, JsonNode> data = getFirstCaseData(caseSearchResult);
             assertAll(
-                () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD).has(NESTED_COLLECTION_TEXT_FIELD), is(true)), // RESTRICTED
+                () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD).has(NESTED_COLLECTION_TEXT_FIELD),
+                    is(true)), // RESTRICTED
                 () -> assertThat(data.get(ADDRESS_FIELD).has(POST_CODE_FIELD), is(true)), // PRIVATE
                 () -> assertThat(data.get(ADDRESS_FIELD).has(ADDRESS_LINE_1), is(true)) // PUBLIC
             );
@@ -329,7 +367,8 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
 
             Map<String, JsonNode> data = getFirstCaseData(caseSearchResult);
             assertAll(
-                () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD).has(NESTED_COLLECTION_TEXT_FIELD), is(false)), // RESTRICTED
+                () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD).has(NESTED_COLLECTION_TEXT_FIELD),
+                    is(false)), // RESTRICTED
                 () -> assertThat(data.get(COMPLEX_FIELD).has(POST_CODE_FIELD), is(false)), // PRIVATE
                 () -> assertThat(data.get(COMPLEX_FIELD).has(COMPLEX_TEXT_FIELD), is(true)) // PUBLIC
             );
@@ -343,7 +382,8 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
         void shouldOnlyReturnCasesFromCaseTypesWithJurisdictionRole() throws Exception {
             ElasticsearchTestRequest searchRequest = matchAllRequest();
 
-            CaseSearchResult caseSearchResult = executeRequest(searchRequest, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B, CASE_TYPE_C), AUTOTEST2_PUBLIC);
+            CaseSearchResult caseSearchResult =
+                executeRequest(searchRequest, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B, CASE_TYPE_C), AUTOTEST2_PUBLIC);
 
             assertAll(
                 () -> assertThat(caseSearchResult.getTotal(), is(1L)),
@@ -358,11 +398,13 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
                 .sort(CREATED_DATE)
                 .build();
 
-            CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC, AUTOTEST1_PRIVATE, AUTOTEST1_RESTRICTED);
+            CaseSearchResult caseSearchResult =
+                executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC, AUTOTEST1_PRIVATE, AUTOTEST1_RESTRICTED);
 
             Map<String, JsonNode> data = getFirstCaseData(caseSearchResult);
-            // Comments for assertions below describe some example scenarios for which a given role would usually NOT allow
-            // data/cases to be returned if a user conducting the search ONLY had that role - expressed in the form "<Scenario> (<role>)"
+            // Comments for assertions below describe some example scenarios for which a given role would usually NOT
+            // allow data/cases to be returned if a user conducting the search ONLY had that role - expressed in the
+            // form "<Scenario> (<role>)"
             assertAll(
                 () -> assertThat(caseSearchResult.getTotal(), is(3L)),
                 () -> assertThat(caseSearchResult.getCases().get(0).getSecurityClassification(),
@@ -385,7 +427,8 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
                 .sort(CREATED_DATE)
                 .build();
 
-            CaseSearchResult caseSearchResult = executeRequest(searchRequest, caseTypesParam(CASE_TYPE_B, CASE_TYPE_C), AUTOTEST1_PUBLIC, AUTOTEST2_PUBLIC);
+            CaseSearchResult caseSearchResult = executeRequest(searchRequest, caseTypesParam(CASE_TYPE_B, CASE_TYPE_C),
+                AUTOTEST1_PUBLIC, AUTOTEST2_PUBLIC);
 
             assertAll(
                 () -> assertThat(caseSearchResult.getTotal(), is(2L)),
@@ -400,7 +443,8 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
     // The following tests require the Spring @SQL annotation, which does not work in @Nested classes (see SPR-15366)
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
     void shouldOnlyReturnCasesSolicitorHasBeenGrantedAccessTo() throws Exception {
         ElasticsearchTestRequest searchRequest = matchAllRequest();
 
@@ -413,7 +457,8 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
     void shouldReturnAllCasesForCaseworker() throws Exception {
         ElasticsearchTestRequest searchRequest = matchAllRequest();
 
@@ -424,11 +469,14 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
         );
     }
 
-    private CaseSearchResult executeRequest(ElasticsearchTestRequest searchRequest, String caseTypeParam, String... roles) throws Exception {
+    private CaseSearchResult executeRequest(ElasticsearchTestRequest searchRequest,
+                                            String caseTypeParam, String... roles) throws Exception {
         MockUtils.setSecurityAuthorities(authentication, roles);
-        MockHttpServletRequestBuilder postRequest = createPostRequest(POST_SEARCH_CASES, searchRequest, caseTypeParam, null);
+        MockHttpServletRequestBuilder postRequest = createPostRequest(POST_SEARCH_CASES, searchRequest, caseTypeParam,
+            null);
 
-        return ElasticsearchTestHelper.executeRequest(postRequest, 200, mapper, mockMvc, CaseSearchResult.class);
+        return ElasticsearchTestHelper.executeRequest(postRequest, 200, mapper, mockMvc,
+            CaseSearchResult.class);
     }
 
     private Map<String, JsonNode> getFirstCaseData(CaseSearchResult caseSearchResult) {

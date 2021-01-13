@@ -47,13 +47,17 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     private final DraftGateway draftGateway;
 
     @Autowired
-    public AuthorisedGetEventTriggerOperation(@Qualifier("default") final GetEventTriggerOperation getEventTriggerOperation,
-                                              @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
-                                              @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+    public AuthorisedGetEventTriggerOperation(@Qualifier("default")
+                                                  final GetEventTriggerOperation getEventTriggerOperation,
+                                              @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                                  final CaseDefinitionRepository caseDefinitionRepository,
+                                              @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                                  final CaseDetailsRepository caseDetailsRepository,
                                               CaseAccessService caseAccessService,
                                               final AccessControlService accessControlService,
                                               final EventTriggerService eventTriggerService,
-                                              @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
+                                              @Qualifier(CachedDraftGateway.QUALIFIER)
+                                                  final DraftGateway draftGateway) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAccessService = caseAccessService;
@@ -85,12 +89,15 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
                                               String eventId,
                                               Boolean ignoreWarning) {
         final CaseDetails caseDetails = getCaseDetails(caseReference);
-        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
+        final CaseTypeDefinition caseTypeDefinition =
+            caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
         final CaseEventDefinition caseEventDefinition = getCaseEventDefinition(eventId, caseTypeDefinition);
 
-        validateEventDefinition(() -> !eventTriggerService.isPreStateValid(caseDetails.getState(), caseEventDefinition));
+        validateEventDefinition(() -> !eventTriggerService.isPreStateValid(
+            caseDetails.getState(), caseEventDefinition));
 
-        Set<String> userRoles = Sets.union(caseAccessService.getUserRoles(), caseAccessService.getCaseRoles(caseDetails.getId()));
+        Set<String> userRoles = Sets.union(caseAccessService.getUserRoles(),
+            caseAccessService.getCaseRoles(caseDetails.getId()));
 
         verifyMandatoryAccessForCase(eventId, caseDetails, caseTypeDefinition, userRoles);
 
@@ -103,7 +110,8 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     public CaseUpdateViewEvent executeForDraft(String draftReference, Boolean ignoreWarning) {
         final DraftResponse draftResponse = draftGateway.get(Draft.stripId(draftReference));
         final CaseDetails caseDetails = draftGateway.getCaseDetails(Draft.stripId(draftReference));
-        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
+        final CaseTypeDefinition caseTypeDefinition =
+            caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
 
         Set<String> userRoles = caseAccessService.getUserRoles();
 
@@ -196,7 +204,8 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     private CaseEventDefinition getCaseEventDefinition(String eventId, CaseTypeDefinition caseTypeDefinition) {
         final CaseEventDefinition caseEventDefinition = eventTriggerService.findCaseEvent(caseTypeDefinition, eventId);
         if (caseEventDefinition == null) {
-            throw new ResourceNotFoundException("Cannot find event " + eventId + " for case type " + caseTypeDefinition.getId());
+            throw new ResourceNotFoundException(
+                "Cannot find event " + eventId + " for case type " + caseTypeDefinition.getId());
         }
         return caseEventDefinition;
     }

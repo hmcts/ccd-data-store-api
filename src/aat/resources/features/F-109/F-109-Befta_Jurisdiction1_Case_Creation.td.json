@@ -1,0 +1,11 @@
+{
+  "_guid_": "F-109-Befta_Jurisdiction1_Case_Creation",
+  "_extends_": "Case_Creation_Using_Caseworker1_Role",
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][parentContext][childContexts][F-109-Befta_Jurisdiction1_Case_Creation_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+}
+
+

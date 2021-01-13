@@ -1,0 +1,217 @@
+{
+  "_guid_": "S-112.5",
+  "_extends_": "F-112-TestData_Base",
+  "specs": [
+    "an active profile in CCD",
+    "with a searchable collection of Child complex containing a searchable 'ChildFullName' field",
+    "is searching for the previously created case by the 'ChildFullName' field",
+    "contains the previously created case",
+    "with a searchable collection of Child complex containing a searchable 'ChildFullName' field"
+  ],
+  "request": {
+    "body": {
+      "query" : {
+        "match" : {
+          "data.Children.value.ChildGender" : "FEMALE"
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 200,
+    "responseMessage": "OK",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Vary": "Accept-Encoding"
+    },
+    "body": {
+      "total": 1,
+      "cases": [
+        {
+          "id": "[[ANYTHING_PRESENT]]",
+          "jurisdiction": "BEFTA_MASTER",
+          "state": "CaseCreated",
+          "version": null,
+          "case_type_id": "FT_ComplexCollectionComplex",
+          "created_date": "[[ANYTHING_PRESENT]]",
+          "last_modified": "[[ANYTHING_PRESENT]]",
+          "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+          "security_classification": "PUBLIC",
+          "case_data": {
+            "Homeless": "Yes",
+            "Children":  [
+              {
+                "value": {
+                  "ChildFullName": "child1",
+                  "ChildGender": "FEMALE",
+                  "ChildDOB": null,
+                  "ChildAddress": {
+                    "AddressLine1": null,
+                    "AddressLine2": null,
+                    "AddressLine3": null,
+                    "PostTown": null,
+                    "County": null,
+                    "PostCode": null,
+                    "Country": null
+                  },
+                  "IsAutistic": null,
+                  "NeedsSupport": null,
+                  "AutisticChildCaseNumber": {
+                    "CaseReference": ""
+                  }
+                },
+                "id" : "[[ANYTHING_PRESENT]]"
+              }
+            ],
+            "FamilyDetails": {
+              "FamilyAddress": {
+                "Country": null,
+                "PostCode": null,
+                "AddressLine3": null,
+                "AddressLine1": null,
+                "AddressLine2": null,
+                "County": null,
+                "PostTown": null
+              },
+              "MotherFullName": "Mother Teresa",
+              "Children": [],
+              "MotherAge": "21",
+              "FatherFullName": "Father Brown",
+              "FatherFullName": "Father Brown",
+              "FatherAge": "82"
+            }
+          },
+          "data_classification": {
+            "Homeless": "PUBLIC",
+            "Children" : {
+              "classification" : "PUBLIC",
+              "value" : [ {
+                "value" : {
+                  "ChildFullName" : "PUBLIC",
+                  "NeedsSupport" : "PUBLIC",
+                  "IsAutistic" : "PUBLIC",
+                  "ChildDOB" : "PUBLIC",
+                  "ChildGender" : "PUBLIC",
+                  "AutisticChildCaseNumber" : {
+                    "classification" : "PUBLIC",
+                    "value" : {
+                      "CaseReference" : "PUBLIC"
+                    }
+                  },
+                  "ChildAddress" : {
+                    "classification" : "PUBLIC",
+                    "value" : {
+                      "PostTown" : "PUBLIC",
+                      "AddressLine1" : "PUBLIC",
+                      "County" : "PUBLIC",
+                      "Country" : "PUBLIC",
+                      "AddressLine2" : "PUBLIC",
+                      "AddressLine3" : "PUBLIC",
+                      "PostCode" : "PUBLIC"
+                    }
+                  }
+                },
+                "id" : "[[ANYTHING_PRESENT]]"
+              } ]
+            },
+            "FamilyDetails": {
+              "classification": "PUBLIC",
+              "value": {
+                "FamilyAddress": {
+                  "classification": "PUBLIC",
+                  "value": {
+                    "Country": "PUBLIC",
+                    "PostCode": "PUBLIC",
+                    "AddressLine3": "PUBLIC",
+                    "AddressLine1": "PUBLIC",
+                    "AddressLine2": "PUBLIC",
+                    "County": "PUBLIC",
+                    "PostTown": "PUBLIC"
+                  }
+                },
+                "MotherFullName": "PUBLIC",
+                "Children": {
+                  "classification": "PUBLIC",
+                  "value": []
+                },
+                "MotherAge": "PUBLIC",
+                "FatherFullName": "PUBLIC",
+                "FatherAge": "PUBLIC"
+              }
+            }
+          },
+          "after_submit_callback_response": null,
+          "callback_response_status_code": null,
+          "callback_response_status": null,
+          "delete_draft_response_status_code": null,
+          "delete_draft_response_status": null,
+          "security_classifications": {
+            "Homeless": "PUBLIC",
+            "Children" : {
+              "classification" : "PUBLIC",
+              "value" : [ {
+                "value" : {
+                  "ChildFullName" : "PUBLIC",
+                  "ChildGender" : "PUBLIC",
+                  "ChildDOB" : "PUBLIC",
+                  "ChildAddress" : {
+                    "classification" : "PUBLIC",
+                    "value" : {
+                      "AddressLine1" : "PUBLIC",
+                      "AddressLine2" : "PUBLIC",
+                      "AddressLine3" : "PUBLIC",
+                      "PostTown" : "PUBLIC",
+                      "County" : "PUBLIC",
+                      "PostCode" : "PUBLIC",
+                      "Country" : "PUBLIC"
+                    }
+                  },
+                  "IsAutistic" : "PUBLIC",
+                  "NeedsSupport" : "PUBLIC",
+                  "AutisticChildCaseNumber" : {
+                    "classification" : "PUBLIC",
+                    "value" : {
+                      "CaseReference" : "PUBLIC"
+                    }
+                  }
+                },
+                "id" : "[[ANYTHING_PRESENT]]"
+              } ]
+            },
+            "FamilyDetails": {
+              "classification": "PUBLIC",
+              "value": {
+                "FamilyAddress": {
+                  "classification": "PUBLIC",
+                  "value": {
+                    "Country": "PUBLIC",
+                    "PostCode": "PUBLIC",
+                    "AddressLine3": "PUBLIC",
+                    "AddressLine1": "PUBLIC",
+                    "AddressLine2": "PUBLIC",
+                    "County": "PUBLIC",
+                    "PostTown": "PUBLIC"
+                  }
+                },
+                "MotherFullName": "PUBLIC",
+                "Children": {
+                  "classification": "PUBLIC",
+                  "value": []
+                },
+                "MotherAge": "PUBLIC",
+                "FatherFullName": "PUBLIC",
+                "FatherAge": "PUBLIC"
+              }
+            }
+          }
+        }
+      ],
+      "case_types_results": [
+        {
+          "total": 1,
+          "case_type_id": "FT_ComplexCollectionComplex"
+        }
+      ]
+    }
+  }
+}

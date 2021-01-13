@@ -13,7 +13,11 @@ public class CaseViewType {
         // default constructor
     }
 
-    private CaseViewType(String id, String name, String description, CaseViewJurisdiction jurisdiction, boolean isPrintEnabled) {
+    private CaseViewType(String id,
+                         String name,
+                         String description,
+                         CaseViewJurisdiction jurisdiction,
+                         boolean isPrintEnabled) {
         this.id = id;
         this.name = name;
         this.description = description;

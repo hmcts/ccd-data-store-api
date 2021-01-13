@@ -121,13 +121,19 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null,
-                    "default_value" : null
+                    "formatted_value": null
                   },
                   {
                     "id": "AddressLine2",
@@ -172,13 +178,19 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null,
-                    "default_value" : null
+                    "formatted_value": null
                   },
                   {
                     "id": "AddressLine3",
@@ -223,13 +235,19 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null,
-                    "default_value" : null
+                    "formatted_value": null
                   },
                   {
                     "id": "PostTown",
@@ -274,13 +292,19 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null,
-                    "default_value" : null
+                    "formatted_value": null
                   },
                   {
                     "id": "County",
@@ -325,13 +349,19 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null,
-                    "default_value" : null
+                    "formatted_value": null
                   },
                   {
                     "id": "PostCode",
@@ -376,13 +406,19 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null,
-                    "default_value" : null
+                    "formatted_value": null
                   },
                   {
                     "id": "Country",
@@ -427,13 +463,19 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null,
-                    "default_value" : null
+                    "formatted_value": null
                   }
                 ],
                 "collection_field_type": null
@@ -496,13 +538,19 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null,
-                    "default_value" : null
+                    "formatted_value": null
                   },
                   {
                     "id": "ComplexFixedListField",
@@ -518,7 +566,11 @@
                       "min": null,
                       "max": null,
                       "regular_expression": null,
-                      "fixed_list_items": [
+                      "fixed_list_items": [{
+                        "code" : "VALUE4",
+                        "label" : "Value 4",
+                        "order" : null
+                      },
                         {
                           "code": "VALUE3",
                           "label": "Value 3",
@@ -563,13 +615,19 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null,
-                    "default_value" : null
+                    "formatted_value": null
                   },
                   {
                     "id": "ComplexNestedField",
@@ -630,13 +688,19 @@
                               "read": true,
                               "update": true,
                               "delete": false
+                            },
+                            {
+                              "role" : "[DEFENDANT]",
+                              "create" : true,
+                              "read" : true,
+                              "update" : true,
+                              "delete" : false
                             }
                           ],
                           "complexACLs": [],
                           "display_context": null,
                           "display_context_parameter": null,
-                          "formatted_value": null,
-                          "default_value" : null
+                          "formatted_value": null
                         },
                         {
                           "id": "NestedCollectionTextField",
@@ -690,13 +754,19 @@
                               "read": true,
                               "update": true,
                               "delete": false
+                            },
+                            {
+                              "role" : "[DEFENDANT]",
+                              "create" : true,
+                              "read" : true,
+                              "update" : true,
+                              "delete" : false
                             }
                           ],
                           "complexACLs": [],
                           "display_context": null,
                           "display_context_parameter": null,
-                          "formatted_value": null,
-                          "default_value" : null
+                          "formatted_value": null
                         }
                       ],
                       "collection_field_type": null
@@ -726,13 +796,19 @@
                         "read": true,
                         "update": true,
                         "delete": false
+                      },
+                      {
+                        "role" : "[DEFENDANT]",
+                        "create" : true,
+                        "read" : true,
+                        "update" : true,
+                        "delete" : false
                       }
                     ],
                     "complexACLs": [],
                     "display_context": null,
                     "display_context_parameter": null,
-                    "formatted_value": null,
-                    "default_value" : null
+                    "formatted_value": null
                   }
                 ],
                 "collection_field_type": null
@@ -819,7 +895,11 @@
                 "min": null,
                 "max": null,
                 "regular_expression": null,
-                "fixed_list_items": [
+                "fixed_list_items": [{
+                  "code" : "VALUE4",
+                  "label" : "Value 4",
+                  "order" : null
+                },
                   {
                     "code": "VALUE3",
                     "label": "Value 3",

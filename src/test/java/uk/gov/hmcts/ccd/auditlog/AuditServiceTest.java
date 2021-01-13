@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 @DisplayName("audit log specific calls")
 class AuditServiceTest {
 
-    private static final String EMAIL = "ssss@mail.com";
+    private static final String IDAM_ID = "52e06ea8-b80f-41cf-b245-79775c87717a";
     private static final String TARGET_IDAM_ID = "target@mail.com";
     private static final String SERVICE_NAME = "ccd_api_gateway";
     private static final String REQUEST_ID_VALUE = "30f14c6c1fc85cba12bfd093aa8f90e3";
@@ -59,7 +59,7 @@ class AuditServiceTest {
         MockitoAnnotations.initMocks(this);
         auditService = new AuditService(fixedClock, userRepository, securityUtils, auditRepository);
         IdamUser user = new IdamUser();
-        user.setEmail(EMAIL);
+        user.setId(IDAM_ID);
 
         doReturn(user).when(userRepository).getUser();
         doReturn(SERVICE_NAME).when(securityUtils).getServiceName();
@@ -90,7 +90,7 @@ class AuditServiceTest {
         assertThat(captor.getValue().getHttpStatus(), is(equalTo(200)));
         assertThat(captor.getValue().getHttpMethod(), is(equalTo(HTTP_METHOD)));
         assertThat(captor.getValue().getPath(), is(equalTo((PATH))));
-        assertThat(captor.getValue().getIdamId(), is(equalTo((EMAIL))));
+        assertThat(captor.getValue().getIdamId(), is(equalTo((IDAM_ID))));
         assertThat(captor.getValue().getInvokingService(), is(equalTo((SERVICE_NAME))));
         assertThat(captor.getValue().getRequestId(), is(equalTo((REQUEST_ID_VALUE))));
 

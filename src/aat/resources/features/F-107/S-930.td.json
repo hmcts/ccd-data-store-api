@@ -1,0 +1,67 @@
+{
+  "title": "should create event successfully for an existing case",
+  "_guid_": "S-930",
+  "_extends_": "F-107_Test_Data_Update",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains some OrganisationPolicy fields with all correct values"
+  ],
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][S-930_Create_Case_Data][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "event_token": "${[scenarioContext][childContexts][S-930-Prerequisite][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_MASTER",
+      "case_type": "FT_MasterCaseType",
+      "created_on": "[[ANYTHING_PRESENT]]",
+      "last_modified_on": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "state": "CaseUpdated",
+      "security_classification": "[[ANYTHING_PRESENT]]",
+      "data": {
+        "AddressField": {
+          "Country": "UK",
+          "AddressLine1": "102 Petty France",
+          "AddressLine2": "CCD",
+          "AddressLine3": "c/o HMCTS Reform"
+        },
+        "TextField": "textField1",
+        "OrganisationPolicyField2": {
+          "OrgPolicyCaseAssignedRole": "[Claimant]",
+          "OrgPolicyReference": "ref",
+          "Organisation": {
+            "OrganisationID": "orgID2",
+            "OrganisationName": "orgName2"
+          }
+        },
+        "TextAreaField": "textAreaField1",
+        "OrganisationPolicyField1": {
+          "OrgPolicyCaseAssignedRole": "[Defendant]",
+          "OrgPolicyReference": "ref",
+          "Organisation": {
+            "OrganisationID": "orgID1",
+            "OrganisationName": "orgName1"
+          }
+        }
+      },
+      "data_classification": "[[ANYTHING_PRESENT]]",
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}

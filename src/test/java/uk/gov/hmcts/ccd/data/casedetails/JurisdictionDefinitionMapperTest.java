@@ -15,7 +15,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBu
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 
 class JurisdictionDefinitionMapperTest {
-    JurisdictionMapper jurisdictionMapper = new JurisdictionMapper();
+    uk.gov.hmcts.ccd.data.casedetails.JurisdictionMapper jurisdictionMapper =
+            new uk.gov.hmcts.ccd.data.casedetails.JurisdictionMapper();
 
     CaseStateDefinition caseStateDefinition1 = newState()
         .withId("ST1")
@@ -51,7 +52,8 @@ class JurisdictionDefinitionMapperTest {
             () -> assertThat(response.getDescription(), is(equalTo(jurisdictionDefinition.getDescription()))),
             () -> assertThat(response.getCaseTypeDefinitions().size(), is(2)),
             () -> assertThat(response.getCaseTypeDefinitions().get(0).getStates().size(), is(1)),
-            () -> assertThat(response.getCaseTypeDefinitions().get(1).getStates().get(0).getId(), is(caseStateDefinition2.getId()))
+            () -> assertThat(response.getCaseTypeDefinitions().get(1).getStates().get(0).getId(),
+                    is(caseStateDefinition2.getId()))
         );
     }
 }

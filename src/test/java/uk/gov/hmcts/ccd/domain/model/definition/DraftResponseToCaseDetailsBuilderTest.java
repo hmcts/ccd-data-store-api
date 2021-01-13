@@ -69,7 +69,8 @@ class DraftResponseToCaseDetailsBuilderTest {
                           .build())
         .build();
 
-    private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder = new DraftResponseToCaseDetailsBuilder();
+    private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder =
+        new DraftResponseToCaseDetailsBuilder();
 
     @Test
     public void shouldBuildCaseDetailsFromDraftResponse() {

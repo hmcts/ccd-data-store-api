@@ -31,7 +31,8 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_
 
 @Service
 @Qualifier(DefaultGetCaseViewFromDraftOperation.QUALIFIER)
-public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCaseViewOperation implements GetCaseViewOperation {
+public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCaseViewOperation
+                                                  implements GetCaseViewOperation {
 
     public static final String QUALIFIER = "defaultDraft";
     protected static final String DELETE = "DELETE";
@@ -47,16 +48,19 @@ public class DefaultGetCaseViewFromDraftOperation extends AbstractDefaultGetCase
     private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
 
     @Autowired
-    public DefaultGetCaseViewFromDraftOperation(@Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
-                                                final UIDefinitionRepository uiDefinitionRepository,
-                                                final CaseTypeService caseTypeService,
-                                                final UIDService uidService,
-                                                @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
-                                                final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder,
-                                                final ObjectMapperService objectMapperService,
-                                                final CompoundFieldOrderService compoundFieldOrderService,
-                                                final FieldProcessorService fieldProcessorService) {
-        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService, compoundFieldOrderService, fieldProcessorService);
+    public DefaultGetCaseViewFromDraftOperation(
+                                  @Qualifier(CreatorGetCaseOperation.QUALIFIER)
+                                  final GetCaseOperation getCaseOperation,
+                                  final UIDefinitionRepository uiDefinitionRepository,
+                                  final CaseTypeService caseTypeService,
+                                  final UIDService uidService,
+                                  @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
+                                  final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder,
+                                  final ObjectMapperService objectMapperService,
+                                  final CompoundFieldOrderService compoundFieldOrderService,
+                                  final FieldProcessorService fieldProcessorService) {
+        super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService,
+              compoundFieldOrderService, fieldProcessorService);
         this.draftGateway = draftGateway;
         this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
     }

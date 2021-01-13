@@ -1,0 +1,18 @@
+{
+  "title": "Retrieve user's in Olawale's organisation (+ organisationIdentifier)",
+
+  "_guid_": "F-111_Get_Organisation_Identifier_Olawale",
+  "_extends_": "F-111_Get_Organisation_Identifier_Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "F-111_User_Olawale"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "organisationIdentifier": "${[scenarioContext][siblingContexts][F-111_Get_Organisation_Identifier_Dil][testData][actualResponse][body][organisationIdentifier]}"
+    }
+  }
+}

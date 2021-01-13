@@ -47,7 +47,8 @@ public class DefaultCaseUserRepository implements CaseUserRepository {
     }
 
     public List<String> findCaseRoles(final Long caseId, final String userId) {
-        TypedQuery<String> namedQuery = em.createNamedQuery(CaseUserEntity.GET_ALL_CASE_ROLES_USER_HAS_ACCESS_FOR_A_CASE, String.class);
+        TypedQuery<String> namedQuery =
+            em.createNamedQuery(CaseUserEntity.GET_ALL_CASE_ROLES_USER_HAS_ACCESS_FOR_A_CASE, String.class);
         namedQuery.setParameter("userId", userId);
         namedQuery.setParameter("caseDataId", caseId);
 
@@ -59,7 +60,8 @@ public class DefaultCaseUserRepository implements CaseUserRepository {
         if (userIds.size() == 0) {
             namedQuery = em.createNamedQuery(CaseUserEntity.GET_ALL_CASE_ROLES_BY_CASE_IDS, CaseUserEntity.class);
         } else {
-            namedQuery = em.createNamedQuery(CaseUserEntity.GET_ALL_CASE_ROLES_USERS_HAS_ACCESS_TO_CASES, CaseUserEntity.class);
+            namedQuery =
+                em.createNamedQuery(CaseUserEntity.GET_ALL_CASE_ROLES_USERS_HAS_ACCESS_TO_CASES, CaseUserEntity.class);
             namedQuery.setParameter(CaseUserEntity.PARAM_USER_IDS, userIds);
         }
         namedQuery.setParameter(CaseUserEntity.PARAM_CASE_DATA_IDS, caseIds);

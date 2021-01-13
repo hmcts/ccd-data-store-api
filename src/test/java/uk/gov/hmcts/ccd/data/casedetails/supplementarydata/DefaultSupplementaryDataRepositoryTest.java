@@ -24,7 +24,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
 
     @Inject
     @Qualifier("default")
-    private SupplementaryDataRepository supplementaryDataRepository;
+    private uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository supplementaryDataRepository;
 
     @BeforeEach
     void setUp() {
@@ -32,7 +32,8 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldReplaceExistingSupplementaryData() {
         assumeDataInitialised();
         supplementaryDataRepository.setSupplementaryData("1504259907353529",
@@ -47,14 +48,16 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+        {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldSetSupplementaryDataWhenSupplementaryDataColumnEmpty() {
         assumeDataInitialised();
         supplementaryDataRepository.setSupplementaryData("1504259907353545",
             "orgs_assigned_users.organisationB",
             3);
 
-        SupplementaryData supplementaryData = supplementaryDataRepository.findSupplementaryData("1504259907353545",
+        SupplementaryData supplementaryData =
+            supplementaryDataRepository.findSupplementaryData("1504259907353545",
             Sets.newHashSet("orgs_assigned_users.organisationB"));
         assertNotNull(supplementaryData);
         Map<String, Object> response = supplementaryData.getResponse();
@@ -63,14 +66,16 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+        {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldSetNewSupplementaryDataWhenSupplementaryDataHasSameParent() {
         assumeDataInitialised();
         supplementaryDataRepository.setSupplementaryData("1504259907353529",
             "orgs_assigned_users.organisationB",
             3);
 
-        SupplementaryData supplementaryData = supplementaryDataRepository.findSupplementaryData("1504259907353529",
+        SupplementaryData supplementaryData =
+            supplementaryDataRepository.findSupplementaryData("1504259907353529",
             Sets.newHashSet("orgs_assigned_users.organisationB"));
         assertNotNull(supplementaryData);
         Map<String, Object> response = supplementaryData.getResponse();
@@ -79,14 +84,16 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+        {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldSetMultipleEntrySupplementaryDataWhenSupplementaryDataHasSameParent() {
         assumeDataInitialised();
         supplementaryDataRepository.setSupplementaryData("1504259907353529",
             "orgs_assigned_users.organisationC",
             23);
 
-        SupplementaryData supplementaryData = supplementaryDataRepository.findSupplementaryData("1504259907353529",
+        SupplementaryData supplementaryData =
+            supplementaryDataRepository.findSupplementaryData("1504259907353529",
             Sets.newHashSet("orgs_assigned_users.organisationC"));
         assertNotNull(supplementaryData);
         Map<String, Object> response = supplementaryData.getResponse();
@@ -95,7 +102,8 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+        {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void incrementSupplementaryData() {
         assumeDataInitialised();
 
@@ -112,7 +120,8 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+        {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void decrementSupplementaryData() {
         assumeDataInitialised();
 
@@ -130,7 +139,8 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
 
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+        {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldAddDataWhenIncrementCalledWhenSupplementaryDataEmpty() {
         assumeDataInitialised();
 
@@ -147,7 +157,8 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+        {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldAddNewDataWhenIncrementCalledWhenParentPathExists() {
         assumeDataInitialised();
         supplementaryDataRepository.incrementSupplementaryData("1504259907353529",
@@ -163,10 +174,12 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+        {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void findSupplementaryData() {
         assumeDataInitialised();
-        final SupplementaryData supplementaryData = supplementaryDataRepository.findSupplementaryData("1504259907353529", null);
+        final SupplementaryData supplementaryData =
+            supplementaryDataRepository.findSupplementaryData("1504259907353529", null);
         assertNotNull(supplementaryData);
         Map<String, Object> responseMap = supplementaryData.getResponse();
         assertTrue(responseMap.keySet().contains("orgs_assigned_users"));

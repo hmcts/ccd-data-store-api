@@ -17,8 +17,8 @@ import static java.util.stream.Collectors.toList;
 @Singleton
 public class ApplicationParams {
 
-    @Value("#{'${ccd.s2s-authorised.services.add_case_user_roles}'.split(',')}")
-    private List<String> authorisedServicesForAddUserCaseRoles;
+    @Value("#{'${ccd.s2s-authorised.services.case_user_roles}'.split(',')}")
+    private List<String> authorisedServicesForCaseUserRoles;
 
     @Value("#{'${ccd.am.write.to_ccd_only}'.split(',')}")
     private List<String> writeToCCDCaseTypesOnly;
@@ -37,6 +37,9 @@ public class ApplicationParams {
 
     @Value("#{'${ccd.callback.retries}'.split(',')}")
     private List<Integer> callbackRetries;
+
+    @Value("#{'${ccd.callback.log.control}'.split(',')}")
+    private List<String> ccdCallbackLogControl;
 
     @Value("${ccd.token.secret}")
     private String tokenSecret;
@@ -140,6 +143,9 @@ public class ApplicationParams {
     @Value("#{'${ccd.access-control.citizen-roles}'.split(',')}")
     private List<String> ccdAccessControlCitizenRoles;
 
+    @Value("${ccd.access-control.caseworker.role.regex}")
+    private String ccdAccessControlCaseworkerRoleRegex;
+
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
 
@@ -159,8 +165,8 @@ public class ApplicationParams {
         }
     }
 
-    public List<String> getAuthorisedServicesForAddUserCaseRoles() {
-        return authorisedServicesForAddUserCaseRoles;
+    public List<String> getAuthorisedServicesForCaseUserRoles() {
+        return authorisedServicesForCaseUserRoles;
     }
 
     public boolean isWildcardSearchAllowed() {
@@ -212,7 +218,8 @@ public class ApplicationParams {
     }
 
     public String displaySearchCasesResultDefURL(final String caseTypeId, final String useCase) {
-        return uiDefinitionHost + "/api/display/search-cases-result-fields/" + encode(caseTypeId) + "?usecase=" + useCase;
+        return uiDefinitionHost + "/api/display/search-cases-result-fields/" + encode(caseTypeId)
+            + "?use_case=" + useCase;
     }
 
     public String displayCaseTabCollection(final String caseTypeId) {
@@ -220,7 +227,8 @@ public class ApplicationParams {
     }
 
     public String displayWizardPageCollection(final String caseTypeId, final String eventId) {
-        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId) + "/event-triggers/" + eventId;
+        return uiDefinitionHost + "/api/display/wizard-page-structure/case-types/" + encode(caseTypeId)
+            + "/event-triggers/" + eventId;
     }
 
     public String jurisdictionDefURL() {
@@ -363,6 +371,10 @@ public class ApplicationParams {
         return readFromAMCaseTypes;
     }
 
+    public List<String> getCcdCallbackLogControl() {
+        return ccdCallbackLogControl;
+    }
+
     public Integer getElasticSearchRequestTimeout() {
         return elasticSearchRequestTimeout;
     }
@@ -377,6 +389,10 @@ public class ApplicationParams {
 
     public List<String> getCcdAccessControlCrossJurisdictionRoles() {
         return ccdAccessControlCrossJurisdictionRoles;
+    }
+
+    public String getCcdAccessControlCaseworkerRoleRegex() {
+        return ccdAccessControlCaseworkerRoleRegex;
     }
 
     public List<String> getCcdAccessControlCitizenRoles() {

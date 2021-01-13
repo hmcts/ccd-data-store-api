@@ -61,7 +61,8 @@ class UIDraftsControllerTest {
         @Test
         @DisplayName("should return 201 and draft response as body when draft saved")
         void shouldReturn201AndDraftResponseAsBodyWhenDraftSaved() {
-            ResponseEntity<DraftViewResource> draftResponse = draftsController.saveDraft(CASE_TYPE_ID, CASE_DATA_CONTENT);
+            ResponseEntity<DraftViewResource> draftResponse =
+                draftsController.saveDraft(CASE_TYPE_ID, CASE_DATA_CONTENT);
 
             assertAll(
                 () -> assertThat(draftResponse.getStatusCode(), is(HttpStatus.CREATED)),
@@ -85,7 +86,8 @@ class UIDraftsControllerTest {
         @Test
         @DisplayName("should return 200 when draft updated")
         void shouldReturn200WhenDraftUpdated() {
-            ResponseEntity<DraftViewResource> draftResponse = draftsController.updateDraft(CASE_TYPE_ID, DRAFT_ID, CASE_DATA_CONTENT);
+            ResponseEntity<DraftViewResource> draftResponse =
+                draftsController.updateDraft(CASE_TYPE_ID, DRAFT_ID, CASE_DATA_CONTENT);
 
             assertAll(
                 () -> assertThat(draftResponse.getStatusCode(), is(HttpStatus.OK)),
@@ -96,9 +98,11 @@ class UIDraftsControllerTest {
         @Test
         @DisplayName("should propagate exception")
         void shouldPropagateExceptionWhenThrown() {
-            when(upsertDraftOperation.executeUpdate(CASE_TYPE_ID, DRAFT_ID, CASE_DATA_CONTENT)).thenThrow(RuntimeException.class);
+            when(upsertDraftOperation.executeUpdate(CASE_TYPE_ID, DRAFT_ID, CASE_DATA_CONTENT))
+                .thenThrow(RuntimeException.class);
 
-            assertThrows(Exception.class, () -> draftsController.updateDraft(CASE_TYPE_ID, DRAFT_ID, CASE_DATA_CONTENT));
+            assertThrows(Exception.class, () ->
+                    draftsController.updateDraft(CASE_TYPE_ID, DRAFT_ID, CASE_DATA_CONTENT));
         }
     }
 
