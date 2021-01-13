@@ -16,7 +16,7 @@ public class DynamicListValidator implements BaseTypeValidator {
     protected static final String TYPE_ID = "DynamicList";
     private static final String LIST_ITEMS = "list_items";
     private static final String CODE = "code";
-    private static final String VALUE = "value";
+    protected static final String VALUE = "value";
     private static final String LABEL = "label";
 
     @Override
@@ -34,14 +34,19 @@ public class DynamicListValidator implements BaseTypeValidator {
 
         dataValue.get(LIST_ITEMS).elements().forEachRemaining(node -> validateLength(results, node, dataFieldId));
         JsonNode value = dataValue.get(VALUE);
-        if (value != null) {
-            validateLength(results, value, dataFieldId);
-        }
-
+        validateValueField(value, dataFieldId, results);
         return results;
     }
 
-    private void validateLength(List<ValidationResult> results, JsonNode node, String dataFieldId) {
+    protected void validateValueField(JsonNode value,
+                                      String dataFieldId,
+                                      List<ValidationResult> results) {
+        if (value != null) {
+            validateLength(results, value, dataFieldId);
+        }
+    }
+
+    protected void validateLength(List<ValidationResult> results, JsonNode node, String dataFieldId) {
         final String code = node.get(CODE).textValue();
         final String value = node.get(LABEL).textValue();
         if (StringUtils.isNotEmpty(code) && code.length() > 150) {
