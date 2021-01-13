@@ -2,14 +2,15 @@ package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
 
 import static java.util.Collections.emptyList;
 
@@ -19,11 +20,17 @@ public class FieldTypeDefinition implements Serializable {
     public static final String COMPLEX = "Complex";
     public static final String MULTI_SELECT_LIST = "MultiSelectList";
     public static final String FIXED_LIST = "FixedList";
+    public static final String DYNAMIC_FIXED_LIST = "DynamicFixedList";
+    public static final String NUMBER = "Number";
+    public static final String MONEY_GBP = "MoneyGBP";
+    public static final String YES_OR_NO = "YesOrNo";
     public static final String FIXED_RADIO_LIST = "FixedRadioList";
     public static final String LABEL = "Label";
     public static final String CASE_PAYMENT_HISTORY_VIEWER = "CasePaymentHistoryViewer";
     public static final String CASE_HISTORY_VIEWER = "CaseHistoryViewer";
     public static final String PREDEFINED_COMPLEX_ADDRESS_GLOBAL = "AddressGlobal";
+    public static final String PREDEFINED_COMPLEX_ORGANISATION_POLICY = "OrganisationPolicy";
+    public static final String PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST = "ChangeOrganisationRequest";
     public static final String PREDEFINED_COMPLEX_ADDRESS_GLOBAL_UK = "AddressGlobalUK";
     public static final String PREDEFINED_COMPLEX_ADDRESS_UK = "AddressUK";
     public static final String PREDEFINED_COMPLEX_ORDER_SUMMARY = "OrderSummary";
