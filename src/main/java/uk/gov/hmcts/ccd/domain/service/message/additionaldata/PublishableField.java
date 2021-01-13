@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplexDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -27,22 +28,23 @@ public class PublishableField {
 
     private String key;
     private String path;
+    private String value;
     private CommonField caseField;
     private DisplayContext displayContext;
     private boolean publishTopLevel;
 
     public PublishableField(CaseTypeDefinition caseTypeDefinition,
                             CaseEventFieldComplexDefinition caseEventFieldComplex,
-                            String path) {
+                            String path, CaseDetails caseDetails) {
         setCommonFields(caseTypeDefinition, path,
-            caseEventFieldComplex.getReference(), caseEventFieldComplex.getPublishAs());
+            caseEventFieldComplex.getReference(), caseEventFieldComplex.getPublishAs(), caseDetails);
         this.publishTopLevel = !isNullOrEmpty(caseEventFieldComplex.getPublishAs());
     }
 
     public PublishableField(CaseTypeDefinition caseTypeDefinition,
-                            CaseEventFieldDefinition caseEventField) {
+                            CaseEventFieldDefinition caseEventField, CaseDetails caseDetails) {
         setCommonFields(caseTypeDefinition, caseEventField.getCaseFieldId(),
-            caseEventField.getCaseFieldId(), caseEventField.getPublishAs());
+            caseEventField.getCaseFieldId(), caseEventField.getPublishAs(), caseDetails);
         this.publishTopLevel = true;
         this.displayContext = caseEventField.getDisplayContextEnum();
     }
@@ -72,14 +74,24 @@ public class PublishableField {
     private void setCommonFields(CaseTypeDefinition caseTypeDefinition,
                                  String path,
                                  String originalId,
-                                 String publishAs) {
+                                 String publishAs,
+                                 CaseDetails caseDetails) {
         this.path = path;
         this.key = getKey(publishAs, originalId);
         this.caseField = getCommonField(caseTypeDefinition, path);
+        this.value = getValue(path, caseDetails);
     }
 
     private String getKey(String publishAs, String originalId) {
         return isNullOrEmpty(publishAs) ? originalId : publishAs;
+    }
+
+    private String getValue(String path, CaseDetails caseDetails) {
+        if (!caseDetails.getData().keySet().contains(path)) {
+            return null;
+        } else {
+            return caseDetails.getData().get(path).textValue();
+        }
     }
 
     /**
