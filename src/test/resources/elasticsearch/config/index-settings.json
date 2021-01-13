@@ -5,7 +5,7 @@
         "type": "custom",
         "tokenizer": "keyword",
         "filter": [
-          "custom_shingle",
+          "shingle_filter",
           "whitespace_remove"
         ]
       },
@@ -18,7 +18,7 @@
       }
     },
     "filter": {
-      "custom_shingle": {
+      "shingle_filter": {
         "type": "shingle",
         "min_shingle_size": 2,
         "max_shingle_size": 3,

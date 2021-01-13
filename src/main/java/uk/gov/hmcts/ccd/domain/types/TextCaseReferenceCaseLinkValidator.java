@@ -17,9 +17,9 @@ import java.util.List;
 
 import static uk.gov.hmcts.ccd.domain.model.common.CaseReferenceUtils.formatCaseReference;
 
-@Named("TextCaseReferenceCaseLinkValidator")
+@Named
 @Singleton
-public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeFieldValidator {
+public class TextCaseReferenceCaseLinkValidator implements CustomTypeValidator {
 
     private static final Logger LOG = LoggerFactory.getLogger(TextCaseReferenceCaseLinkValidator.class);
     private CaseService caseService;
@@ -33,11 +33,14 @@ public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeFieldVa
     }
 
     @Override
-    public List<ValidationResult> validate(final String dataFieldId,
-                                           final JsonNode dataValue,
-                                           final CaseFieldDefinition caseFieldDefinition) {
+    public List<ValidationResult> validate(ValidationContext validationContext) {
 
-        List<ValidationResult> validationResults = textValidator.validate(dataFieldId, dataValue, caseFieldDefinition);
+        final String dataFieldId = validationContext.getFieldId();
+        final JsonNode dataValue = validationContext.getFieldValue();
+        final CaseFieldDefinition caseFieldDefinition = validationContext.getFieldDefinition();
+        final List<ValidationResult> validationResults =
+            textValidator.validate(dataFieldId, dataValue, caseFieldDefinition);
+
         if (validationResults.isEmpty() && !textValidator.isNullOrEmpty(dataValue)) {
             final String value = dataValue.textValue();
             return isAnExistingCase(value, dataFieldId);
@@ -63,7 +66,7 @@ public class TextCaseReferenceCaseLinkValidator implements PredefinedTypeFieldVa
     }
 
     @Override
-    public String getPredefinedFieldId() {
-        return PredefinedFields.CASE_LINK_TEXT_CASE_REFERENCE.getFieldID();
+    public String getCustomTypeId() {
+        return CustomTypes.CASE_LINK_TEXT_CASE_REFERENCE.getId();
     }
 }
