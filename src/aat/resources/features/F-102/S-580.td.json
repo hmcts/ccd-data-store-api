@@ -64,6 +64,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "event_enabling_condition": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -98,6 +99,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "event_enabling_condition": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -132,6 +134,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "event_enabling_condition": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -166,6 +169,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "event_enabling_condition": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -200,6 +204,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "event_enabling_condition": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -232,6 +237,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "event_enabling_condition": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -353,6 +359,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "event_enabling_condition": null,
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
@@ -380,6 +387,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "event_enabling_condition": null,
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
@@ -407,6 +415,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "event_enabling_condition": null,
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
@@ -434,6 +443,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "event_enabling_condition": null,
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
@@ -461,6 +471,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "event_enabling_condition": null,
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
@@ -486,6 +497,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "event_enabling_condition": null,
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"

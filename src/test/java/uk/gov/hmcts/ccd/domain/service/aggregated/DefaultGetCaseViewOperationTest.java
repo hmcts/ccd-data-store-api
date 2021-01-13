@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.collect.Lists;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -26,6 +28,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.service.common.CaseEventEnablingService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
@@ -45,6 +48,9 @@ import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
@@ -93,6 +99,9 @@ class DefaultGetCaseViewOperationTest {
 
     @Mock
     private FieldProcessorService fieldProcessorService;
+
+    @Mock
+    private CaseEventEnablingService caseEventEnablingService;
 
     @Spy
     @InjectMocks
@@ -238,6 +247,39 @@ class DefaultGetCaseViewOperationTest {
                 () -> assertThat(caseView.getEvents(), hasItemInArray(hasProperty("summary",
                     equalTo(EVENT_SUMMARY_2))))
             );
+        }
+    }
+
+    @Nested
+    @DisplayName("Event Enabling condition test")
+    class CaseEventEnablingCondition {
+
+        @Test
+        @DisplayName("should not filter event when enabling condition is valid")
+        void shouldNotFilterEventWhenEnablingConditionIsValid() {
+            CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+            caseEventDefinition.setEndButtonLabel("dataTestField1=\"dataTestField1\"");
+            caseTypeDefinition.setEvents(Lists.newArrayList(caseEventDefinition));
+            doReturn(true).when(eventTriggerService).isPreStateValid(anyString(), any());
+            doReturn(true).when(caseEventEnablingService).isEventEnabled(any(), any());
+
+            CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
+            assertNotNull(caseView);
+            assertEquals(1, caseView.getActionableEvents().length);
+        }
+
+        @Test
+        @DisplayName("should  filter event when enabling condition is not valid")
+        void shouldFilterEventWhenEnablingConditionIsNotValid() {
+            CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+            caseEventDefinition.setEndButtonLabel("dataTestField1=\"dataTestField1\" AND dataTestField2=\"Test\"");
+            caseTypeDefinition.setEvents(Lists.newArrayList(caseEventDefinition));
+            doReturn(true).when(eventTriggerService).isPreStateValid(anyString(), any());
+            doReturn(false).when(caseEventEnablingService).isEventEnabled(any(), any());
+
+            CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
+            assertNotNull(caseView);
+            assertEquals(0, caseView.getActionableEvents().length);
         }
     }
 
