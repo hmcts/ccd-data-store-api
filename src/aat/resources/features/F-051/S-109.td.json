@@ -101,18 +101,10 @@
 											"__elementId__": "role"
 										},
 										{
-											"role": "caseworker-befta_jurisdiction_1",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										},
 										{
-											"role": "caseworker-caa",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerCaaAccessControlList"
 										}
 									]
 								},
@@ -144,19 +136,11 @@
 											"__elementId__": "role"
 										},
 										{
-											"role": "caseworker-befta_jurisdiction_1",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										},
 										{
-											"role": "caseworker-caa",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
-										}
+                      "_extends_": "CaseworkerCaaAccessControlList"
+                    }
 									]
 								},
 								{
@@ -187,19 +171,11 @@
 											"__elementId__": "role"
 										},
 										{
-											"role": "caseworker-befta_jurisdiction_1",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										},
 										{
-											"role": "caseworker-caa",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
-										}
+                      "_extends_": "CaseworkerCaaAccessControlList"
+                    }
 									]
 								},
 								{
@@ -230,19 +206,11 @@
 											"__elementId__": "role"
 										},
 										{
-											"role": "caseworker-befta_jurisdiction_1",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										},
 										{
-											"role": "caseworker-caa",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
-										}
+                      "_extends_": "CaseworkerCaaAccessControlList"
+                    }
 									]
 								},
 								{
@@ -273,19 +241,11 @@
 											"__elementId__": "role"
 										},
 										{
-											"role": "caseworker-befta_jurisdiction_1",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										},
 										{
-											"role": "caseworker-caa",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
-										}
+                      "_extends_": "CaseworkerCaaAccessControlList"
+                    }
 									]
 								},
 								{
@@ -314,19 +274,11 @@
 											"__elementId__": "role"
 										},
 										{
-											"role": "caseworker-befta_jurisdiction_1",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										},
 										{
-											"role": "caseworker-caa",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
-										}
+                      "_extends_": "CaseworkerCaaAccessControlList"
+                    }
 									]
 								}
 							],
@@ -343,19 +295,11 @@
 											"__elementId__": "role"
 										},
 										{
-											"role": "caseworker-befta_jurisdiction_1",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										},
 										{
-											"role": "caseworker-caa",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
-										}
+                      "_extends_": "CaseworkerCaaAccessControlList"
+                    }
 									]
 								},
 								{
@@ -370,19 +314,11 @@
 											"__elementId__": "role"
 										},
 										{
-											"role": "caseworker-befta_jurisdiction_1",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										},
 										{
-											"role": "caseworker-caa",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
-										}
+                      "_extends_": "CaseworkerCaaAccessControlList"
+                    }
 									]
 								},
 								{
@@ -397,19 +333,11 @@
 											"__elementId__": "role"
 										},
 										{
-											"role": "caseworker-befta_jurisdiction_1",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										},
 										{
-											"role": "caseworker-caa",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
-										}
+                      "_extends_": "CaseworkerCaaAccessControlList"
+                    }
 									]
 								}
 							],
@@ -423,18 +351,10 @@
 									"__elementId__": "role"
 								},
 								{
-									"role": "caseworker-befta_jurisdiction_1",
-									"create": true,
-									"read": true,
-									"update": true,
-									"delete": false
+                  "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 								},
 								{
-									"role": "caseworker-caa",
-									"create": true,
-									"read": true,
-									"update": true,
-									"delete": false
+                  "_extends_": "CaseworkerCaaAccessControlList"
 								}
 							]
 						},
@@ -472,11 +392,7 @@
                   "event_enabling_condition": null,
 									"acls": [
 										{
-											"role": "caseworker-befta_jurisdiction_1",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										}
 									]
 								},
@@ -504,11 +420,7 @@
                   "event_enabling_condition": null,
 									"acls": [
 										{
-											"role": "caseworker-befta_jurisdiction_1",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										}
 									]
 								},
@@ -536,11 +448,7 @@
                   "event_enabling_condition": null,
 									"acls": [
 										{
-											"role": "caseworker-befta_jurisdiction_1",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										}
 									]
 								},
@@ -568,11 +476,7 @@
                   "event_enabling_condition": null,
 									"acls": [
 										{
-											"role": "caseworker-befta_jurisdiction_1",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										}
 									]
 								},
@@ -600,11 +504,7 @@
                   "event_enabling_condition": null,
 									"acls": [
 										{
-											"role": "caseworker-befta_jurisdiction_1",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										}
 									]
 								},
@@ -630,11 +530,7 @@
                   "event_enabling_condition": null,
 									"acls": [
 										{
-											"role": "caseworker-befta_jurisdiction_1",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										}
 									]
 								}
@@ -651,11 +547,7 @@
 									"title_display": null,
 									"acls": [
 										{
-											"role": "caseworker-befta_jurisdiction_1",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										}
 									]
 								},
@@ -667,11 +559,7 @@
 									"title_display": null,
 									"acls": [
 										{
-											"role": "caseworker-befta_jurisdiction_1",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										}
 									]
 								},
@@ -683,11 +571,7 @@
 									"title_display": null,
 									"acls": [
 										{
-											"role": "caseworker-befta_jurisdiction_1",
-											"create": true,
-											"read": true,
-											"update": true,
-											"delete": false
+                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										}
 									]
 								}
@@ -698,11 +582,7 @@
 							"printable_document_url": null,
 							"acls": [
 								{
-									"role": "caseworker-befta_jurisdiction_1",
-									"create": true,
-									"read": true,
-									"update": true,
-									"delete": false
+                  "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 								}
 							]
 						}
