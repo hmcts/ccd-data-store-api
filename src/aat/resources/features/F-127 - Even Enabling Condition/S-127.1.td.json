@@ -1,7 +1,7 @@
 {
 	"_guid_": "S-127.1",
   "_extends_": "F-127_Get_Case_View_Base",
-  "title": "Get Case event view to validate the events returned in the response when event enabling conditions are not valid",
+  "title": "Get Case event view to validate the events returned in the response when event enabling conditions are valid",
 
   "specs": [
     "an active profile in CCD",
