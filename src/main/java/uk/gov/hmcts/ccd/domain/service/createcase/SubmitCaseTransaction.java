@@ -148,6 +148,7 @@ class SubmitCaseTransaction {
 
         messageService.handleMessage(MessageContext.builder()
             .caseDetails(savedCaseDetails)
+            .caseTypeDefinition(caseTypeDefinition)
             .caseEventDefinition(caseEventDefinition)
             .oldState(null).build());
         return savedCaseDetails;

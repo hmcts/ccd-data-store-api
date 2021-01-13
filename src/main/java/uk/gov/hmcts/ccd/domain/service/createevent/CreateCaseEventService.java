@@ -285,6 +285,7 @@ public class CreateCaseEventService {
         caseAuditEventRepository.set(auditEvent);
         messageService.handleMessage(MessageContext.builder()
             .caseDetails(caseDetails)
+            .caseTypeDefinition(caseTypeDefinition)
             .caseEventDefinition(caseEventDefinition)
             .oldState(oldState).build());
     }
