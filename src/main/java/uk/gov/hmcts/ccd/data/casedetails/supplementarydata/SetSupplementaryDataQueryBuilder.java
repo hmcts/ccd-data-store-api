@@ -19,8 +19,7 @@ public class SetSupplementaryDataQueryBuilder implements SupplementaryDataQueryB
         + "        THEN jsonb_set(COALESCE(supplementary_data, '{}'), :leaf_node_key, :value\\:\\:TEXT\\:\\:jsonb)"
         + "        WHEN jsonb_extract_path_text(COALESCE(supplementary_data, '{}'), :parent_path) IS NULL"
         + "        THEN jsonb_insert(COALESCE(supplementary_data, '{}'), :parent_key, :json_value_insert\\:\\:jsonb)"
-        + "    END), "
-        + "supplementary_data_last_modified = :current_time "
+        + "    END) "
         + "WHERE reference = :reference";
 
     @Override

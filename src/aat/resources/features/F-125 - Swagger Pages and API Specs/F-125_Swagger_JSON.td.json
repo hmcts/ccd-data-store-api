@@ -1,0 +1,22 @@
+{
+  "_guid_": "F-125_Swagger_JSON",
+  "title": "Verify swagger JSON Content",
+
+  "productName": "CCD Data Store",
+  "operationName": "Get Swagger JSON",
+
+  "method": "GET",
+  "uri": "https://hmcts.github.io/reform-api-docs/specs/{ccd-data-store-api-version}",
+
+  "expectedResponse": {
+    "headers" : {
+      "Content-Encoding" : "gzip",
+      "Content-Length" : "${[scenarioContext][customValues][approximately 5838]}",
+      "Content-Type" : "application/json; charset=utf-8",
+      "Date" : "[[ANYTHING_PRESENT]]",
+      "Expires" : "[[ANYTHING_PRESENT]]",
+      "Last-Modified" : "[[ANYTHING_PRESENT]]",
+      "Server" : "GitHub.com"
+    }
+  }
+}
