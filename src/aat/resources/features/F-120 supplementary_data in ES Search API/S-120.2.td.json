@@ -6,8 +6,7 @@
   "method": "POST",
   "uri": "/internal/searchCases",
   "user" : {
-    "username": "[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
-    "password": "[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
+    "_extends_": "PrivateCaseworker"
   },
   "specs": [
     "a valid profile",
@@ -110,29 +109,13 @@
                   "live_until" : null,
                   "show_condition" : null,
                   "acls" : [ {
-                    "role" : "caseworker-autotest1-private",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1PrivateAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-senior",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SeniorAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -162,29 +145,13 @@
                   "live_until" : null,
                   "show_condition" : null,
                   "acls" : [ {
-                    "role" : "caseworker-autotest1-private",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1PrivateAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-senior",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SeniorAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -214,29 +181,13 @@
                   "live_until" : null,
                   "show_condition" : null,
                   "acls" : [ {
-                    "role" : "caseworker-autotest1-private",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1PrivateAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-senior",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SeniorAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -266,29 +217,13 @@
                   "live_until" : null,
                   "show_condition" : null,
                   "acls" : [ {
-                    "role" : "caseworker-autotest1-private",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1PrivateAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-senior",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SeniorAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   }],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -318,29 +253,13 @@
                   "live_until" : null,
                   "show_condition" : null,
                   "acls" : [ {
-                    "role" : "caseworker-autotest1-private",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1PrivateAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-senior",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SeniorAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -370,29 +289,13 @@
                   "live_until" : null,
                   "show_condition" : null,
                   "acls" : [ {
-                    "role" : "caseworker-autotest1-private",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1PrivateAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-senior",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SeniorAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -422,29 +325,13 @@
                   "live_until" : null,
                   "show_condition" : null,
                   "acls" : [ {
-                    "role" : "caseworker-autotest1-private",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1PrivateAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-senior",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SeniorAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -491,29 +378,13 @@
                   "live_until" : null,
                   "show_condition" : null,
                   "acls" : [ {
-                    "role" : "caseworker-autotest1-private",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1PrivateAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-senior",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SeniorAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -559,29 +430,13 @@
                   "live_until" : null,
                   "show_condition" : null,
                   "acls" : [ {
-                    "role" : "caseworker-autotest1-private",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1PrivateAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-senior",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SeniorAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,
@@ -626,29 +481,13 @@
                       "live_until" : null,
                       "show_condition" : null,
                       "acls" : [ {
-                        "role" : "caseworker-autotest1-private",
-                        "create" : true,
-                        "read" : true,
-                        "update" : true,
-                        "delete" : false
+                        "_extends_": "CaseworkerAutotest1PrivateAccessControlList"
                       }, {
-                        "role" : "caseworker-autotest1-senior",
-                        "create" : true,
-                        "read" : true,
-                        "update" : true,
-                        "delete" : false
+                        "_extends_": "CaseworkerAutotest1SeniorAccessControlList"
                       }, {
-                        "role" : "caseworker-autotest1-solicitor",
-                        "create" : true,
-                        "read" : true,
-                        "update" : true,
-                        "delete" : false
+                        "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                       },{
-                        "role" : "[DEFENDANT]",
-                        "create" : true,
-                        "read" : true,
-                        "update" : true,
-                        "delete" : false
+                        "_extends_": "DefendantAccessControlList"
                       } ],
                       "complexACLs" : [ ],
                       "display_context" : null,
@@ -687,29 +526,13 @@
                       "live_until" : null,
                       "show_condition" : null,
                       "acls" : [ {
-                        "role" : "caseworker-autotest1-private",
-                        "create" : true,
-                        "read" : true,
-                        "update" : true,
-                        "delete" : false
+                        "_extends_": "CaseworkerAutotest1PrivateAccessControlList"
                       }, {
-                        "role" : "caseworker-autotest1-senior",
-                        "create" : true,
-                        "read" : true,
-                        "update" : true,
-                        "delete" : false
+                        "_extends_": "CaseworkerAutotest1SeniorAccessControlList"
                       }, {
-                        "role" : "caseworker-autotest1-solicitor",
-                        "create" : true,
-                        "read" : true,
-                        "update" : true,
-                        "delete" : false
+                        "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                       },{
-                        "role" : "[DEFENDANT]",
-                        "create" : true,
-                        "read" : true,
-                        "update" : true,
-                        "delete" : false
+                        "_extends_": "DefendantAccessControlList"
                       } ],
                       "complexACLs" : [ ],
                       "display_context" : null,
@@ -724,29 +547,13 @@
                   "live_until" : null,
                   "show_condition" : null,
                   "acls" : [ {
-                    "role" : "caseworker-autotest1-private",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1PrivateAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-senior",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SeniorAccessControlList"
                   }, {
-                    "role" : "caseworker-autotest1-solicitor",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "CaseworkerAutotest1SolicitorAccessControlList"
                   },{
-                    "role" : "[DEFENDANT]",
-                    "create" : true,
-                    "read" : true,
-                    "update" : true,
-                    "delete" : false
+                    "_extends_": "DefendantAccessControlList"
                   } ],
                   "complexACLs" : [ ],
                   "display_context" : null,

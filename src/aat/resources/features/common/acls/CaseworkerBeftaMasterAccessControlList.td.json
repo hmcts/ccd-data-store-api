@@ -1,0 +1,6 @@
+{
+"_guid_": "CaseworkerBeftaMasterAccessControlList",
+"_extends_": "AllGrantedAccessControlList",
+
+  "role": "caseworker-befta_master"
+}
