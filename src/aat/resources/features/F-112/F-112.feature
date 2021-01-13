@@ -1,4 +1,4 @@
-@F-112 @elasticsearch @Ignore
+@F-112 @elasticsearch
 Feature: Allow ignoring fields in ES by declaring them non searchable
 
   Background: Load test data for the scenario
