@@ -95,6 +95,7 @@ public class PublishableField {
     }
 
     /**
+     * summary
      * @return If > 0, then the provided argument has MORE nested levels than this
      */
     private int pathSizeDifferenceTo(PublishableField publishableField) {

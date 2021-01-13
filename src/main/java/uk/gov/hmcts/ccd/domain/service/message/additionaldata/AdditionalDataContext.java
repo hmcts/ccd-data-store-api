@@ -54,7 +54,8 @@ public class AdditionalDataContext {
                     caseEventField.getCaseEventFieldComplexDefinitions().forEach(caseEventFieldComplex -> {
                         if (Boolean.TRUE.equals(caseEventFieldComplex.getPublish())) {
                             String path = caseEventField.getCaseFieldId() + "." + caseEventFieldComplex.getReference();
-                            fields.add(new PublishableField(caseTypeDefinition, caseEventFieldComplex, path, caseDetails));
+                            fields.add(new PublishableField(caseTypeDefinition,
+                                caseEventFieldComplex, path, caseDetails));
                         }
                     });
                 }
