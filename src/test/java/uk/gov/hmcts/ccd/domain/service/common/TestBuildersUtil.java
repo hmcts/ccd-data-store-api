@@ -37,6 +37,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.ComplexACL;
+import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FixedListItemDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
@@ -853,6 +854,21 @@ public class TestBuildersUtil {
         public CaseEventFieldDefinitionBuilder addCaseEventFieldComplexDefinitions(
             CaseEventFieldComplexDefinition complexFieldDefinition) {
             complexFieldDefinitions.add(complexFieldDefinition);
+            return this;
+        }
+
+        public CaseEventFieldDefinitionBuilder withDisplayContext(DisplayContext displayContext) {
+            caseField.setDisplayContext(displayContext.toString());
+            return this;
+        }
+
+        public CaseEventFieldDefinitionBuilder withPublish(boolean publish) {
+            caseField.setPublish(publish);
+            return this;
+        }
+
+        public CaseEventFieldDefinitionBuilder withPublishAs(String publishAs) {
+            caseField.setPublishAs(publishAs);
             return this;
         }
 
