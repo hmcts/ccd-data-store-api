@@ -3,13 +3,16 @@ package uk.gov.hmcts.ccd.domain.service.message.additionaldata;
 import lombok.Getter;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static uk.gov.hmcts.ccd.domain.service.message.additionaldata.PublishableField.FIELD_SEPARATOR;
 
 @Getter
 public class AdditionalDataContext {
@@ -44,23 +47,38 @@ public class AdditionalDataContext {
     private List<PublishableField> findPublishableFields(CaseEventDefinition caseEventDefinition,
                                                          CaseTypeDefinition caseTypeDefinition,
                                                          CaseDetails caseDetails) {
-
         List<PublishableField> fields = newArrayList();
-        caseEventDefinition.getCaseFields().forEach(caseEventField -> {
-            if (Boolean.TRUE.equals(caseEventField.getPublish())) {
-                fields.add(new PublishableField(caseTypeDefinition, caseEventField, caseDetails));
 
-                if (caseEventField.getDisplayContextEnum() == DisplayContext.COMPLEX) {
-                    caseEventField.getCaseEventFieldComplexDefinitions().forEach(caseEventFieldComplex -> {
-                        if (Boolean.TRUE.equals(caseEventFieldComplex.getPublish())) {
-                            String path = caseEventField.getCaseFieldId() + "." + caseEventFieldComplex.getReference();
-                            fields.add(new PublishableField(caseTypeDefinition,
-                                caseEventFieldComplex, path, caseDetails));
-                        }
-                    });
-                }
+        caseEventDefinition.getCaseFields().forEach(caseEventField -> {
+            if (caseEventField.getDisplayContextEnum() == DisplayContext.COMPLEX) {
+                fields.addAll(findPublishableNestedFields(caseTypeDefinition, caseEventField));
+            } else if (Boolean.TRUE.equals(caseEventField.getPublish())) {
+                fields.add(new PublishableField(caseTypeDefinition, caseEventField, caseDetails));
             }
         });
+
+        return fields;
+    }
+
+    private List<PublishableField> findPublishableNestedFields(CaseTypeDefinition caseTypeDefinition,
+                                                               CaseEventFieldDefinition caseEventField) {
+        List<PublishableField> fields = newArrayList();
+
+        caseEventField.getCaseEventFieldComplexDefinitions().forEach(caseEventFieldComplex -> {
+            if (Boolean.TRUE.equals(caseEventFieldComplex.getPublish())) {
+                Optional<PublishableField> existingTopLevelField = fields.stream()
+                    .filter(field -> field.getCaseField().getId().equals(caseEventField.getCaseFieldId()))
+                    .findFirst();
+
+                if (existingTopLevelField.isEmpty()) {
+                    fields.add(new PublishableField(caseTypeDefinition, caseEventField, caseDetails));
+                }
+
+                String path = caseEventField.getCaseFieldId() + FIELD_SEPARATOR + caseEventFieldComplex.getReference();
+                fields.add(new PublishableField(caseTypeDefinition, caseEventFieldComplex, path, caseDetails));
+            }
+        });
+
         return fields;
     }
 }

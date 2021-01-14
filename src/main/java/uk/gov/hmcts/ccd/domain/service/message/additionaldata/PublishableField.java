@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplexDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -24,11 +25,12 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 @NoArgsConstructor
 public class PublishableField {
 
-    private static final String FIELD_SEPARATOR = ".";
+    public static final String FIELD_SEPARATOR = ".";
 
     private String key;
     private String path;
     private String value;
+    private String originalId;
     private CommonField caseField;
     private DisplayContext displayContext;
     private boolean publishTopLevel;
@@ -47,6 +49,10 @@ public class PublishableField {
             caseEventField.getCaseFieldId(), caseEventField.getPublishAs(), caseDetails);
         this.publishTopLevel = true;
         this.displayContext = caseEventField.getDisplayContextEnum();
+    }
+
+    public FieldTypeDefinition getFieldType() {
+        return caseField.getFieldTypeDefinition();
     }
 
     public boolean isNested() {
@@ -78,6 +84,7 @@ public class PublishableField {
                                  CaseDetails caseDetails) {
         this.path = path;
         this.key = getKey(publishAs, originalId);
+        this.originalId = originalId;
         this.caseField = getCommonField(caseTypeDefinition, path);
         this.value = getValue(path, caseDetails);
     }
@@ -95,7 +102,7 @@ public class PublishableField {
     }
 
     /**
-     * summary
+     * Get the difference in path size (i.e. the difference in how nested two fields are).
      * @return If > 0, then the provided argument has MORE nested levels than this
      */
     private int pathSizeDifferenceTo(PublishableField publishableField) {
