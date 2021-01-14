@@ -1,0 +1,49 @@
+{
+	"_guid_": "S-127.2",
+  "_extends_": "F-127_Get_Case_View_Base",
+  "title": "Get Case event view to validate the events returned in the response when event enabling conditions are not valid",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a case Id that has just been created"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][FT_Create_Case_EventEnablingCondition_NotMatch][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "user": {
+    "username": "master.caseworker@gmail.com",
+    "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Transfer-Encoding": "chunked"
+    },
+    "body": {
+      "tabs": "[[ANYTHING_PRESENT]]",
+      "metadataFields": "[[ANYTHING_PRESENT]]",
+      "state": "[[ANYTHING_PRESENT]]",
+      "channels": "[[ANYTHING_PRESENT]]",
+      "triggers": [],
+      "events": "[[ANYTHING_PRESENT]]",
+      "case_id": "[[ANYTHING_PRESENT]]",
+      "case_type": {
+        "id": "[[ANYTHING_PRESENT]]",
+        "name": "[[ANYTHING_PRESENT]]",
+        "description": "[[ANYTHING_PRESENT]]",
+        "jurisdiction": {
+          "id": "[[ANYTHING_PRESENT]]",
+          "name": "[[ANYTHING_PRESENT]]",
+          "description": "[[ANYTHING_PRESENT]]"
+        },
+        "printEnabled": false
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "_guid_": "DefendantAccessControlList",
+  "_extends_": "AllGrantedAccessControlList",
+
+  "role" : "[DEFENDANT]",
+  "delete" : false
+}

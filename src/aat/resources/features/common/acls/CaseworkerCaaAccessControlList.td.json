@@ -1,0 +1,7 @@
+{
+  "_guid_": "CaseworkerCaaAccessControlList",
+  "_extends_": "AllGrantedAccessControlList",
+
+  "role": "caseworker-caa",
+  "delete": false
+}

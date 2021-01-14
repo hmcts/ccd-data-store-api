@@ -1,0 +1,7 @@
+{
+  "_guid_": "CaseworkerAutotest1SolicitorAccessControlList",
+  "_extends_": "AllGrantedAccessControlList",
+
+  "role": "caseworker-autotest1-solicitor",
+  "delete": false
+}
