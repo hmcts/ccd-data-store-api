@@ -729,6 +729,43 @@ class DefinitionBlockGeneratorTest {
         );
     }
 
+    @Test
+    void shouldDefaultFieldTypeForTypesWithoutMappings() {
+        String fieldType = "NewType";
+
+        caseEventDefinition = newCaseEvent()
+            .withCaseFields(List.of(
+                newCaseEventField()
+                    .withCaseFieldId(FIELD_ID)
+                    .withDisplayContext(DisplayContext.MANDATORY)
+                    .withPublish(true)
+                    .build()
+            ))
+            .build();
+
+        caseTypeDefinition = newCaseType()
+            .withCaseFields(List.of(
+                newCaseField()
+                    .withId(FIELD_ID)
+                    .withFieldType(fieldType(fieldType))
+                    .build()
+            ))
+            .build();
+
+        AdditionalDataContext context =
+            new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
+
+        Map<String, DefinitionBlock> result = definitionBlockGenerator.generateDefinition(context);
+
+        assertAll(
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(result.get(FIELD_ID).getOriginalId(), is(FIELD_ID)),
+            () -> assertThat(result.get(FIELD_ID).getType(), is(fieldType)),
+            () -> assertThat(result.get(FIELD_ID).getSubtype(), is(fieldType)),
+            () -> assertThat(result.get(FIELD_ID).getTypeDef(), is(nullValue()))
+        );
+    }
+
     private CaseFieldDefinition complexField(String id, String type) {
         return newCaseField()
             .withId(id)
