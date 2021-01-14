@@ -232,7 +232,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.3.0'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.17.0'
 }
 // end::dependencies[]
 
@@ -635,6 +635,7 @@ jacocoTestReport {
 }
 
 test {
+    timeout = Duration.ofMinutes(30)
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     generateCucumberReports.enabled = false
     systemProperty 'java.locale.providers', 'COMPAT'
