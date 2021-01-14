@@ -6,6 +6,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
+import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,8 +25,15 @@ public class AdditionalDataContext {
     private List<PublishableField> topLevelPublishables;
     private List<PublishableField> nestedPublishables;
 
+    public AdditionalDataContext(MessageContext messageContext) {
+        this(messageContext.getCaseEventDefinition(),
+            messageContext.getCaseTypeDefinition(),
+            messageContext.getCaseDetails());
+    }
+
     public AdditionalDataContext(CaseEventDefinition caseEventDefinition,
-                                 CaseTypeDefinition caseTypeDefinition, CaseDetails caseDetails) {
+                                 CaseTypeDefinition caseTypeDefinition,
+                                 CaseDetails caseDetails) {
         this.caseEventDefinition = caseEventDefinition;
         this.caseTypeDefinition = caseTypeDefinition;
         this.caseDetails = caseDetails;
