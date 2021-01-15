@@ -12,6 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -37,14 +38,16 @@ public class PublishableField {
 
     public PublishableField(CaseTypeDefinition caseTypeDefinition,
                             CaseEventFieldComplexDefinition caseEventFieldComplex,
-                            String path, CaseDetails caseDetails) {
+                            String path,
+                            CaseDetails caseDetails) {
         setCommonFields(caseTypeDefinition, path,
             caseEventFieldComplex.getReference(), caseEventFieldComplex.getPublishAs(), caseDetails);
         this.publishTopLevel = !isNullOrEmpty(caseEventFieldComplex.getPublishAs());
     }
 
     public PublishableField(CaseTypeDefinition caseTypeDefinition,
-                            CaseEventFieldDefinition caseEventField, CaseDetails caseDetails) {
+                            CaseEventFieldDefinition caseEventField,
+                            CaseDetails caseDetails) {
         setCommonFields(caseTypeDefinition, caseEventField.getCaseFieldId(),
             caseEventField.getCaseFieldId(), caseEventField.getPublishAs(), caseDetails);
         this.publishTopLevel = true;
@@ -60,7 +63,8 @@ public class PublishableField {
     }
 
     public String getFieldId() {
-        return StringUtils.substringAfterLast(path, FIELD_SEPARATOR);
+        String fieldIdFromPath = StringUtils.substringAfterLast(path, FIELD_SEPARATOR);
+        return isNullOrEmpty(fieldIdFromPath) ? caseField.getId() : fieldIdFromPath;
     }
 
     public String[] splitPath() {
@@ -110,7 +114,8 @@ public class PublishableField {
     }
 
     private CommonField getCommonField(CaseTypeDefinition caseTypeDefinition, String path) {
-        // TODO: Throw more useful exception!
-        return caseTypeDefinition.getComplexSubfieldDefinitionByPath(path).orElseThrow();
+        return caseTypeDefinition.getComplexSubfieldDefinitionByPath(path)
+            .orElseThrow(() -> new ServiceException(String.format("Case event field '%s' cannot be found "
+                    + "in configuration for case type '%s'.", path, caseTypeDefinition.getId())));
     }
 }

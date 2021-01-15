@@ -37,6 +37,7 @@ public class FieldTypeDefinition implements Serializable {
     public static final String PREDEFINED_COMPLEX_CASELINK = "CaseLink";
     public static final String DATETIME = "DateTime";
     public static final String DATE = "Date";
+    public static final String TEXT = "Text";
 
     private String id = null;
     private String type = null;
