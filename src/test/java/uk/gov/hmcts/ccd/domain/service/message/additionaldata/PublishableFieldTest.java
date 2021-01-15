@@ -17,10 +17,7 @@ import static com.google.common.collect.Maps.newHashMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
@@ -250,7 +247,7 @@ class PublishableFieldTest {
 
             boolean result = publishableField.isNested();
 
-            assertTrue(result);
+            assertThat(result, is(true));
         }
 
         @Test
@@ -259,7 +256,7 @@ class PublishableFieldTest {
 
             boolean result = publishableField.isNested();
 
-            assertFalse(result);
+            assertThat(result, is(false));
         }
     }
 
@@ -272,7 +269,7 @@ class PublishableFieldTest {
 
             String result = publishableField.getFieldId();
 
-            assertEquals("SubNestedLevel", result);
+            assertThat(result, is("SubNestedLevel"));
         }
 
         @Test
@@ -282,7 +279,7 @@ class PublishableFieldTest {
 
             String result = publishableField.getFieldId();
 
-            assertEquals("TopLevel", result);
+            assertThat(result, is("TopLevel"));
         }
     }
 
@@ -295,10 +292,12 @@ class PublishableFieldTest {
 
             String[] result = publishableField.splitPath();
 
-            assertEquals(3, result.length);
-            assertEquals("TopLevel", result[0]);
-            assertEquals("NestedLevel", result[1]);
-            assertEquals("SubNestedLevel", result[2]);
+            assertAll(
+                () -> assertThat(result.length, is(3)),
+                () -> assertThat(result[0], is("TopLevel")),
+                () -> assertThat(result[1], is("NestedLevel")),
+                () -> assertThat(result[2], is("SubNestedLevel"))
+            );
         }
 
         @Test
@@ -307,8 +306,10 @@ class PublishableFieldTest {
 
             String[] result = publishableField.splitPath();
 
-            assertEquals(1, result.length);
-            assertEquals("TopLevel", result[0]);
+            assertAll(
+                () -> assertThat(result.length, is(1)),
+                () -> assertThat(result[0], is("TopLevel"))
+            );
         }
     }
 
@@ -329,7 +330,7 @@ class PublishableFieldTest {
 
             boolean result = publishableField.isSubFieldOf(comparisonField);
 
-            assertTrue(result);
+            assertThat(result, is(true));
         }
 
         @Test
@@ -339,7 +340,7 @@ class PublishableFieldTest {
 
             boolean result = publishableField.isSubFieldOf(comparisonField);
 
-            assertTrue(result);
+            assertThat(result, is(true));
         }
 
         @Test
@@ -349,7 +350,7 @@ class PublishableFieldTest {
 
             boolean result = publishableField.isSubFieldOf(comparisonField);
 
-            assertFalse(result);
+            assertThat(result, is(false));
         }
 
         @Test
@@ -359,7 +360,7 @@ class PublishableFieldTest {
 
             boolean result = publishableField.isSubFieldOf(comparisonField);
 
-            assertFalse(result);
+            assertThat(result, is(false));
         }
 
         @Test
@@ -369,7 +370,7 @@ class PublishableFieldTest {
 
             boolean result = publishableField.isSubFieldOf(comparisonField);
 
-            assertFalse(result);
+            assertThat(result, is(false));
         }
     }
 
@@ -391,9 +392,11 @@ class PublishableFieldTest {
                 field1, field2, field3, field4, field5, field6
             ));
 
-            assertEquals(2, result.size());
-            assertEquals(field1, result.get(0));
-            assertEquals(field3, result.get(1));
+            assertAll(
+                () -> assertThat(result.size(), is(2)),
+                () -> assertThat(result.get(0), is(field1)),
+                () -> assertThat(result.get(1), is(field3))
+            );
         }
     }
 }
