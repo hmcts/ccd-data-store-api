@@ -10,9 +10,9 @@ import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.domain.service.message.additionaldata.PublishableField.FIELD_SEPARATOR;
 
 @Getter
@@ -46,10 +46,10 @@ public class AdditionalDataContext {
         this.publishableFields = findPublishableFields(caseEventDefinition, caseTypeDefinition, caseDetails);
         this.topLevelPublishables = publishableFields.stream()
             .filter(PublishableField::isPublishTopLevel)
-            .collect(Collectors.toList());
+            .collect(toList());
         this.nestedPublishables = publishableFields.stream()
             .filter(PublishableField::isNested)
-            .collect(Collectors.toList());
+            .collect(toList());
     }
 
     private List<PublishableField> findPublishableFields(CaseEventDefinition caseEventDefinition,
@@ -74,11 +74,11 @@ public class AdditionalDataContext {
 
         caseEventField.getCaseEventFieldComplexDefinitions().forEach(caseEventFieldComplex -> {
             if (Boolean.TRUE.equals(caseEventFieldComplex.getPublish())) {
-                Optional<PublishableField> existingTopLevelField = fields.stream()
+                Optional<PublishableField> existingParentField = fields.stream()
                     .filter(field -> field.getCaseField().getId().equals(caseEventField.getCaseFieldId()))
                     .findFirst();
 
-                if (existingTopLevelField.isEmpty()) {
+                if (existingParentField.isEmpty()) {
                     fields.add(new PublishableField(caseTypeDefinition, caseEventField, caseDetails));
                 }
 
