@@ -636,9 +636,6 @@ jacocoTestReport {
 
 test {
     maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
-    exclude '**/CaseSearchEndpointESIT.class'
-    exclude '**/CaseSearchEndpointESSecurityIT.class'
-    exclude '**/UICaseSearchControllerIT.class'
 
     timeout = Duration.ofMinutes(30)
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
@@ -677,19 +674,6 @@ test {
         '--add-opens', 'jdk.management/com.sun.management.internal=ALL-UNNAMED'
     ]
 }
-
-task testElasticSearch(type: Test) {
-
-    useJUnitPlatform()
-    maxParallelForks = 1
-    include '**/CaseSearchEndpointESIT.class'
-    include '**/CaseSearchEndpointESSecurityIT.class'
-    include '**/UICaseSearchControllerIT.class'
-
-    shouldRunAfter test
-}
-
-check.dependsOn testElasticSearch
 
 sourceSets {
     aat {
