@@ -79,11 +79,8 @@ class DefinitionBlockGeneratorTest {
         mappings.put(TEXT, SIMPLE_TEXT_TYPE);
         mappings.put(DATETIME, SIMPLE_DATE_TIME_TYPE);
         mappings.put(NUMBER, SIMPLE_NUMBER_TYPE);
-        mappings.put(COMPLEX, COMPLEX);
         mappings.put(DOCUMENT, COMPLEX);
-        mappings.put(COLLECTION, COLLECTION);
-        mappings.put(DYNAMIC_LIST, DYNAMIC_LIST);
-
+        
         Mockito.when(messagingProperties.getTypeMappings()).thenReturn(mappings);
 
         caseDetails = new CaseDetails();
