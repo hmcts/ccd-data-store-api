@@ -641,8 +641,6 @@ test {
         logger.quiet('Running test stage with {} maxParallelForks', maxParallelForks)
     }
 
-    exclude('**/*DefinitionsCachingIT.class')
-
     timeout = Duration.ofMinutes(30)
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     generateCucumberReports.enabled = false
