@@ -637,6 +637,9 @@ jacocoTestReport {
 test {
     maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
 
+    print "Running test stage with ${maxParallelForks} maxParallelForks"
+    exclude('**/*DefinitionsCachingIT.class')
+
     timeout = Duration.ofMinutes(30)
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     generateCucumberReports.enabled = false
