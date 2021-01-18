@@ -637,7 +637,9 @@ jacocoTestReport {
 test {
     maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
 
-    logger.quiet('Running test stage with {} maxParallelForks', maxParallelForks)
+    doFirst{
+        logger.quiet('Running test stage with {} maxParallelForks', maxParallelForks)
+    }
 
     exclude('**/*DefinitionsCachingIT.class')
 
