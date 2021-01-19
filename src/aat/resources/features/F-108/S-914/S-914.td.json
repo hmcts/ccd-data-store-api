@@ -48,6 +48,7 @@
           "EmailFieldAlias": "fuctional@test.com"
         },
         "data_classification": "[[ANYTHING_PRESENT]]",
+        "supplementary_data" : null,
         "after_submit_callback_response": null,
         "callback_response_status_code": null,
         "callback_response_status": null,
@@ -69,6 +70,7 @@
           "EmailFieldAlias": "fuctional@test.com"
         },
         "data_classification": "[[ANYTHING_PRESENT]]",
+        "supplementary_data" : null,
         "after_submit_callback_response": null,
         "callback_response_status_code": null,
         "callback_response_status": null,

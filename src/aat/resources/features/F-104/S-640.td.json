@@ -124,7 +124,8 @@
             "[SECURITY_CLASSIFICATION]": "PRIVATE",
             "[CASE_TYPE]": "AAT_PRIVATE",
             "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
-          }
+          },
+          "supplementary_data" : null
         },
         {
           "fields": {
@@ -149,7 +150,8 @@
             "[SECURITY_CLASSIFICATION]": "PRIVATE",
             "[CASE_TYPE]": "AAT_PRIVATE",
             "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
-          }
+          },
+          "supplementary_data" : null
         }
       ],
       "total": 4

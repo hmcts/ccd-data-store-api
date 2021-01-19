@@ -116,7 +116,8 @@
 					"[CASE_TYPE]" : "AAT_PRIVATE",
 					"TextField" : "${[scenarioContext][customValues][UniqueString]}",
 					"[LAST_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]"
-				}
+				},
+          "supplementary_data" : null
 			},
 				{
 					"fields" : {
@@ -143,7 +144,8 @@
 						"[CASE_TYPE]" : "AAT_PRIVATE",
 						"TextField" : "${[scenarioContext][customValues][UniqueString]}",
 						"[LAST_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]"
-					}
+					},
+          "supplementary_data" : null
 				},
 				{
 					"fields" : {
@@ -170,7 +172,8 @@
 						"[CASE_TYPE]" : "AAT_PRIVATE",
 						"TextField" : "${[scenarioContext][customValues][UniqueString]}",
 						"[LAST_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]"
-					}
+					},
+          "supplementary_data" : null
 				}
 			],
 			"total" : 3

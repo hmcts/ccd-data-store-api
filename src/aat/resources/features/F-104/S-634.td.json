@@ -100,7 +100,8 @@
 						"[CASE_TYPE]": "AAT_PRIVATE",
 						"[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data]}",
 						"[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
-					}
+					},
+          "supplementary_data" : null
 				}
 			],
 			"total": 1

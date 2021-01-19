@@ -164,7 +164,7 @@ Feature: F-104: External Search API
     And the response has all other details as expected.
 
 
-  @S-635
+  @S-635 @esuniquevalues
   Scenario: Usecase request will return cases ordered as per relevant definition configuration
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering1_2],
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering1_1],
@@ -180,7 +180,7 @@ Feature: F-104: External Search API
     And the response has all other details as expected.
 
 
-  @S-636
+  @S-636 @esuniquevalues
   Scenario: Usecase request default ordering can be overridden in the request
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering2_2],
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering2_1],
@@ -197,7 +197,7 @@ Feature: F-104: External Search API
     And the response has all other details as expected.
 
 
-  @S-637 # oldest case first normally - we want to order by newest case created first
+  @S-637 # oldest case first normally - we want to order by newest case created first @esuniquevalues
   Scenario: Standard request can be ordered by metadata field
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering3_2],
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering3_1],
@@ -237,7 +237,7 @@ Feature: F-104: External Search API
     And the request [lists total cases as 0],
     And the response has all other details as expected.
 
-  @S-640
+  @S-640 @esuniquevalues
   Scenario: Request can be sent with paginated search criteria
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Pagination1],
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Pagination2],

@@ -11,7 +11,7 @@
     "body": {
       "query": {
         "match": {
-          "data.TextField": "BEFTA"
+          "data.TextField.keyword": "${[scenarioContext][customValues][UniqueString]}"
         }
       }
     }
@@ -63,7 +63,7 @@
             "OPTION1"
           ],
           "YesOrNoField": "Yes",
-          "TextField": "BEFTA",
+          "TextField": "${[scenarioContext][customValues][UniqueString]}",
           "DateField": "1989-09-19",
           "TextAreaField": "text area",
           "CollectionField": [
@@ -74,6 +74,7 @@
           ]
         },
         "data_classification": "[[ANYTHING_PRESENT]]",
+        "supplementary_data" : null,
         "after_submit_callback_response": null,
         "callback_response_status_code": null,
         "callback_response_status": null,

@@ -77,7 +77,8 @@
             "[CASE_TYPE]": "AAT_PRIVATE",
             "TextField": "text",
             "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
-          }
+          },
+          "supplementary_data" : null
         }
       ],
       "total": 1
