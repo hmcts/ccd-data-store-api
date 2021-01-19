@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +27,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.MONEY_GBP;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
@@ -335,10 +335,16 @@ class DataBlockGeneratorTest {
             new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
 
         Map<String, Object> result = dataBlockGenerator.generateData(context);
+        ObjectNode nestedFieldTwo = mapper.valueToTree(result.get(FIELD_ID));
+
         assertAll(
-            () -> assertThat(result.size(), is(1))
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(nestedFieldTwo.get(NESTED_FIELD_2).size(), is(2)),
+            () -> assertThat(nestedFieldTwo.findValue(SUB_NESTED_FIELD_1).asText(), is("valueTwo")),
+            () -> assertThat(nestedFieldTwo.findValue(SUB_NESTED_FIELD_2).asText(), is("valueThree"))
         );
     }
+
 
     @Test
     void shouldBuildDataForComplexWithComplexOverridesWithAlias() throws JsonProcessingException {
@@ -409,8 +415,13 @@ class DataBlockGeneratorTest {
             new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
 
         Map<String, Object> result = dataBlockGenerator.generateData(context);
+        ObjectNode nestedFieldTwo = mapper.valueToTree(result.get(FIELD_ID));
+
         assertAll(
-            () -> assertThat(result.size(), is(1))
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(nestedFieldTwo.get(FIELD_ALIAS).size(), is(2)),
+            () -> assertThat(nestedFieldTwo.findValue(SUB_NESTED_FIELD_1).asText(), is("valueTwo")),
+            () -> assertThat(nestedFieldTwo.findValue(SUB_NESTED_FIELD_2).asText(), is("valueThree"))
         );
     }
 
@@ -483,10 +494,11 @@ class DataBlockGeneratorTest {
             new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
 
         Map<String, Object> result = dataBlockGenerator.generateData(context);
-        Object nestedField = result.get(FIELD_ID);
+        ObjectNode nestedField = mapper.valueToTree(result.get(FIELD_ID));
+
         assertAll(
             () -> assertThat(result.size(), is(1)),
-            () -> assertTrue(((HashMap) nestedField).values().contains(12.71))
+            () -> assertThat(nestedField.findValue(NESTED_FIELD_1).asDouble(), is(12.71))
         );
     }
 
@@ -559,10 +571,11 @@ class DataBlockGeneratorTest {
             new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
 
         Map<String, Object> result = dataBlockGenerator.generateData(context);
-        Object nestedField = result.get(FIELD_ID);
+        ObjectNode nestedField = mapper.valueToTree(result.get(FIELD_ID));
+
         assertAll(
             () -> assertThat(result.size(), is(1)),
-            () -> assertTrue(((HashMap) nestedField).values().contains(false))
+            () -> assertThat(nestedField.findValue(NESTED_FIELD_1).asBoolean(), is(false))
         );
     }
 
