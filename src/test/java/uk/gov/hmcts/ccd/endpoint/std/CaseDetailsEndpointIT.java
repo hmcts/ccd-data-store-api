@@ -439,6 +439,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 "  \"ComplexCollectionField\": null\n" +
                 "}"));
     }
+
     @Test
     public void shouldReturn201WhenPostCreateCaseWithEmptyDataClassificationForCitizen() throws Exception {
 

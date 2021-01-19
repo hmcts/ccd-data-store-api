@@ -1,17 +1,18 @@
 package uk.gov.hmcts.ccd.domain.service.message.additionaldata;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedCaseFieldByPath;
+import static uk.gov.hmcts.ccd.domain.service.message.additionaldata.PublishableField.FIELD_SEPARATOR;
 
 @Component
 public class DataBlockGenerator {
@@ -34,7 +35,7 @@ public class DataBlockGenerator {
         } else if (publishableField.getFieldType().getType().equals(FieldTypeDefinition.NUMBER)
             || publishableField.getFieldType().getType().equals(FieldTypeDefinition.MONEY_GBP)) {
             dataBlock.put(publishableField.getKey(),
-                (publishableField.getValue() != null) ? Integer.valueOf(publishableField.getValue()) : null);
+                (publishableField.getValue() != null) ? Double.parseDouble(publishableField.getValue()) : null);
         } else if (publishableField.getDisplayContext() != null) {
             if (publishableField.getDisplayContext().equals(DisplayContext.COMPLEX)) {
                 buildNestedLevelDataBlock(publishableField, dataBlock, nestedPublishable, caseDetails);
@@ -61,19 +62,16 @@ public class DataBlockGenerator {
     private Map<String, Object> buildNestedDataBlock(PublishableField publishableField,
                                                      Map<String, Object> nestedDataBlock, CaseDetails caseDetails) {
 
+        JsonNode node = getNestedCaseFieldByPath(caseDetails.getData().get(publishableField.splitPath()[0]),
+            StringUtils.substringAfter(publishableField.getPath(), FIELD_SEPARATOR));
+
         if (publishableField.getFieldType().getType().equals(FieldTypeDefinition.YES_OR_NO)) {
-            nestedDataBlock.put(publishableField.getOriginalId(), Boolean.valueOf(publishableField.getValue()));
+            nestedDataBlock.put(publishableField.getKey(), node.booleanValue());
         } else if (publishableField.getFieldType().getType().equals(FieldTypeDefinition.NUMBER)
             || publishableField.getFieldType().getType().equals(FieldTypeDefinition.MONEY_GBP)) {
-            nestedDataBlock.put(publishableField.getOriginalId(),
-                (publishableField.getValue() != null) ? Integer.valueOf(publishableField.getValue()) : null);
+            nestedDataBlock.put(publishableField.getKey(), node.asDouble());
         } else {
-            List<String> splitPath = Arrays.asList(publishableField.getPath().split("\\."));
-            JsonNode node = getNestedCaseFieldByPath(caseDetails.getData().get(splitPath.get(0)), splitPath.get(1));
-
-            splitPath.forEach(System.out::println);
-            System.out.println(node);
-            nestedDataBlock.put(publishableField.getOriginalId(), "");
+            nestedDataBlock.put(publishableField.getKey(), node);
         }
         return nestedDataBlock;
     }
