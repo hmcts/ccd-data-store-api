@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.std;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.domain.service.message.additionaldata.DefinitionBlock;
 
 import java.util.Map;
