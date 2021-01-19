@@ -9,7 +9,11 @@ import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Optional.ofNullable;
@@ -35,7 +39,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         System.out.println(uniqueStringsPerTestData);
     }
 
-    private synchronized String getDataFileTag(Scenario scenario){
+    private synchronized String getDataFileTag(Scenario scenario) {
         return scenario.getSourceTagNames().stream()
             .filter(t -> t.startsWith("@S-")).findFirst()
             .map(t -> t.substring(1))
@@ -87,7 +91,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             String scenarioTag;
             try {
                 scenarioTag = scenarioContext.getParentContext().getCurrentScenarioTag();
-            } catch (NullPointerException e){
+            } catch (NullPointerException e) {
                 scenarioTag = scenarioContext.getCurrentScenarioTag();
             }
             return uniqueStringsPerTestData.get(scenarioTag);
