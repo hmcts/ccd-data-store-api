@@ -30,10 +30,9 @@ public class DataBlockGenerator {
                                                        Map<String, Object> dataBlock,
                                                        List<PublishableField> nestedPublishable,
                                                        CaseDetails caseDetails) {
-        if (publishableField.getFieldType().getType().equals(FieldTypeDefinition.YES_OR_NO)) {
+        if (isBoolean(publishableField.getFieldType().getType())) {
             dataBlock.put(publishableField.getKey(), Boolean.valueOf(publishableField.getValue()));
-        } else if (publishableField.getFieldType().getType().equals(FieldTypeDefinition.NUMBER)
-            || publishableField.getFieldType().getType().equals(FieldTypeDefinition.MONEY_GBP)) {
+        } else if (isNumber(publishableField.getFieldType().getType())) {
             dataBlock.put(publishableField.getKey(),
                 (publishableField.getValue() != null) ? Double.parseDouble(publishableField.getValue()) : null);
         } else if (publishableField.getDisplayContext() != null) {
@@ -53,9 +52,34 @@ public class DataBlockGenerator {
         Map<String, Object> nestedDataBlock = newHashMap();
         List<PublishableField> fields = publishableField.filterDirectChildrenFrom(nestedPublishable);
         fields.forEach(field -> {
-            buildNestedDataBlock(field, nestedDataBlock, caseDetails);
+            JsonNode node = getNestedCaseFieldByPath(caseDetails.getData().get(field.splitPath()[0]),
+                StringUtils.substringAfter(field.getPath(), FIELD_SEPARATOR));
+            if (!field.getOriginalId().equals(field.getKey())) {
+                populateDataBlockForComplex(dataBlock, field, node, field.getKey(), node.asBoolean());
+                buildNestedDataBlock(field, nestedDataBlock, caseDetails);
+            } else {
+                dataBlock.put(publishableField.getKey(),
+                    populateDataBlockForComplex(nestedDataBlock, field, node, field.getKey(), node.asBoolean()));
+            }
         });
-        dataBlock.put(publishableField.getKey(), nestedDataBlock);
+        if (nestedDataBlock.size() > 0) {
+            dataBlock.put(publishableField.getKey(), nestedDataBlock);
+        }
+        return dataBlock;
+    }
+
+    private Map<String, Object> populateDataBlockForComplex(Map<String, Object> dataBlock,
+                                                            PublishableField field,
+                                                            JsonNode node,
+                                                            String key,
+                                                            boolean b) {
+        if (isBoolean(field.getFieldType().getType())) {
+            dataBlock.put(key, b);
+        } else if (isNumber(field.getFieldType().getType())) {
+            dataBlock.put(key, node.asDouble());
+        } else {
+            dataBlock.put(key, node);
+        }
         return dataBlock;
     }
 
@@ -65,14 +89,15 @@ public class DataBlockGenerator {
         JsonNode node = getNestedCaseFieldByPath(caseDetails.getData().get(publishableField.splitPath()[0]),
             StringUtils.substringAfter(publishableField.getPath(), FIELD_SEPARATOR));
 
-        if (publishableField.getFieldType().getType().equals(FieldTypeDefinition.YES_OR_NO)) {
-            nestedDataBlock.put(publishableField.getKey(), node.booleanValue());
-        } else if (publishableField.getFieldType().getType().equals(FieldTypeDefinition.NUMBER)
-            || publishableField.getFieldType().getType().equals(FieldTypeDefinition.MONEY_GBP)) {
-            nestedDataBlock.put(publishableField.getKey(), node.asDouble());
-        } else {
-            nestedDataBlock.put(publishableField.getKey(), node);
-        }
+        populateDataBlockForComplex(nestedDataBlock, publishableField, node, publishableField.getOriginalId(), node.booleanValue());
         return nestedDataBlock;
+    }
+
+    private boolean isBoolean(String fieldType) {
+        return fieldType.equals(FieldTypeDefinition.YES_OR_NO);
+    }
+
+    private boolean isNumber(String fieldType) {
+        return fieldType.equals(FieldTypeDefinition.NUMBER) || fieldType.equals(FieldTypeDefinition.MONEY_GBP);
     }
 }
