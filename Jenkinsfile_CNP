@@ -99,7 +99,7 @@ withPipeline(type, product, component) {
     }
     if (env.BRANCH_NAME.equalsIgnoreCase(dataStoreApiDevelopPr)) {
         enableSlackNotifications('#ccd-develop-builds')
-        env.ELASTIC_SEARCH_FTA_ENABLED = "false"
+        env.ELASTIC_SEARCH_FTA_ENABLED = "true"
     }
     onDemo {
         enableSlackNotifications('#ccd-demo-builds')

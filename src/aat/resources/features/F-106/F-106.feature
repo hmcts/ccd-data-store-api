@@ -14,7 +14,7 @@ Feature: F-106: Update Supplementary Data
     Then a positive response is received,
     And the response has all the details as expected.
 
-  @S-606 @Ignore
+  @S-606
   Scenario: Need to be able to increment an existing property
     Given an appropriate test context as detailed in the test data source,
     And a user [Dil - who can create a case],
