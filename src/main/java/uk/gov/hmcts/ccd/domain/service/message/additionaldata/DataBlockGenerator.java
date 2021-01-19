@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.message.additionaldata;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
@@ -20,14 +19,16 @@ public class DataBlockGenerator {
     public Map<String, Object> generateData(AdditionalDataContext context) {
         Map<String, Object> dataBlock = newHashMap();
 
-        context.getTopLevelPublishables().forEach(publishableField -> buildTopLevelDataBlock(publishableField, dataBlock, context.getNestedPublishables(), context.getCaseDetails()));
+        context.getTopLevelPublishables().forEach(publishableField -> buildTopLevelDataBlock(publishableField,
+            dataBlock, context.getNestedPublishables(), context.getCaseDetails()));
 
         return dataBlock;
     }
 
     private Map<String, Object> buildTopLevelDataBlock(PublishableField publishableField,
                                                        Map<String, Object> dataBlock,
-                                                       List<PublishableField> nestedPublishable, CaseDetails caseDetails) {
+                                                       List<PublishableField> nestedPublishable,
+                                                       CaseDetails caseDetails) {
         if (publishableField.getFieldType().getType().equals(FieldTypeDefinition.YES_OR_NO)) {
             dataBlock.put(publishableField.getKey(), Boolean.valueOf(publishableField.getValue()));
         } else if (publishableField.getFieldType().getType().equals(FieldTypeDefinition.NUMBER)
@@ -44,14 +45,16 @@ public class DataBlockGenerator {
         return dataBlock;
     }
 
-    private Map<String, Object> buildNestedLevelDataBlock(PublishableField publishableField, Map<String, Object> dataBlock,
-                                                     List<PublishableField> nestedPublishable, CaseDetails caseDetails) {
+    private Map<String, Object> buildNestedLevelDataBlock(PublishableField publishableField,
+                                                          Map<String, Object> dataBlock,
+                                                          List<PublishableField> nestedPublishable,
+                                                          CaseDetails caseDetails) {
         Map<String, Object> nestedDataBlock = newHashMap();
-        List<PublishableField> fields =  publishableField.filterDirectChildrenFrom(nestedPublishable);
-        fields.forEach(field ->{
+        List<PublishableField> fields = publishableField.filterDirectChildrenFrom(nestedPublishable);
+        fields.forEach(field -> {
             buildNestedDataBlock(field, nestedDataBlock, caseDetails);
         });
-        dataBlock.put(publishableField.getKey(),nestedDataBlock);
+        dataBlock.put(publishableField.getKey(), nestedDataBlock);
         return dataBlock;
     }
 
@@ -70,14 +73,6 @@ public class DataBlockGenerator {
 
             splitPath.forEach(System.out::println);
             System.out.println(node);
-            ObjectNode hasKey = (ObjectNode)node.findParent(publishableField.getOriginalId());
-                //node.has(publishableField.getOriginalId());
-
-//            if (splitPath.size()> 1){
-//                for (int i = 1; i < splitPath.size(); i++) {
-//                    JsonNode newNode = node.get(splitPath.get(i));
-//                }
-//            }
             nestedDataBlock.put(publishableField.getOriginalId(), "");
         }
         return nestedDataBlock;

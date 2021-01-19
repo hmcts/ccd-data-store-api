@@ -16,7 +16,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -111,10 +110,6 @@ public class PublishableField {
 
     private JsonNode getComplexValue(String path, CaseDetails caseDetails) {
         return caseDetails.getData().get(path);
-    }
-
-    public JsonNode getNestedComplexValue(String path, CaseDetails caseDetails, String subPath,  Map<String, JsonNode> data ) {
-        return data.get(subPath);
     }
 
     /**

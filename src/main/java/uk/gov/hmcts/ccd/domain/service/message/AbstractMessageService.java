@@ -43,7 +43,8 @@ public abstract class AbstractMessageService implements MessageService {
         messageInformation.setNewStateId(messageContext.getCaseDetails().getState());
 
         AdditionalMessageInformation additionalMessageInformation = new AdditionalMessageInformation();
-        additionalMessageInformation.setData(dataBlockGenerator.generateData(new AdditionalDataContext(messageContext)));
+        additionalMessageInformation.setData(dataBlockGenerator
+            .generateData(new AdditionalDataContext(messageContext)));
         messageInformation.setData(additionalMessageInformation);
 
         return messageInformation;
