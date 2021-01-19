@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.model.std;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import uk.gov.hmcts.ccd.domain.service.message.additionaldata.DefinitionBlock;
 
 import java.util.Map;
 
@@ -11,7 +12,7 @@ public class AdditionalMessageInformation {
     private Map<String, Object> data;
 
     @JsonProperty("Definition")
-    private Map<String, JsonNode> definition;
+    private Map<String, DefinitionBlock> definition;
 
     public Map<String, Object> getData() {
         return data;
@@ -21,11 +22,11 @@ public class AdditionalMessageInformation {
         this.data = data;
     }
 
-    public Map<String, JsonNode> getDefinition() {
+    public Map<String, DefinitionBlock> getDefinition() {
         return definition;
     }
 
-    public void setDefinition(Map<String, JsonNode> definition) {
+    public void setDefinition(Map<String, DefinitionBlock> definition) {
         this.definition = definition;
     }
 
