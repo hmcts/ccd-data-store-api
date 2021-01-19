@@ -62,9 +62,8 @@ public class DataBlockGenerator {
                     populateDataBlockForComplex(nestedDataBlock, field, node, field.getKey(), node.asBoolean()));
             }
         });
-        if (nestedDataBlock.size() > 0) {
-            dataBlock.put(publishableField.getKey(), nestedDataBlock);
-        }
+
+        dataBlock.put(publishableField.getKey(), nestedDataBlock);
         return dataBlock;
     }
 
@@ -89,7 +88,10 @@ public class DataBlockGenerator {
         JsonNode node = getNestedCaseFieldByPath(caseDetails.getData().get(publishableField.splitPath()[0]),
             StringUtils.substringAfter(publishableField.getPath(), FIELD_SEPARATOR));
 
-        populateDataBlockForComplex(nestedDataBlock, publishableField, node, publishableField.getOriginalId(), node.booleanValue());
+        populateDataBlockForComplex(nestedDataBlock,
+            publishableField, node,
+            publishableField.getOriginalId(),
+            node.booleanValue());
         return nestedDataBlock;
     }
 
