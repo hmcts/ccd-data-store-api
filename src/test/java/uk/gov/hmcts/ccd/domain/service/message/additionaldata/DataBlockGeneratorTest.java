@@ -321,13 +321,13 @@ class DataBlockGeneratorTest {
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, JsonNode> data = new HashMap<>();
-        data.put(FIELD_ID, mapper.readTree("{\n" +
-            "      \"NestedField1\": \"valueOne\",\n" +
-            "      \"NestedField2\": {\n" +
-            "        \"SubNestedField1\": \"valueTwo\",\n" +
-            "        \"SubNestedField2\": \"valueThree\"\n" +
-            "      }\n" +
-            "  }"));
+        data.put(FIELD_ID, mapper.readTree("{\n"
+            + "      \"NestedField1\": \"valueOne\",\n"
+            + "      \"NestedField2\": {\n"
+            + "        \"SubNestedField1\": \"valueTwo\",\n"
+            + "        \"SubNestedField2\": \"valueThree\"\n"
+            + "      }\n"
+            + "  }"));
 
         caseDetails = newCaseDetails().withData(data).build();
 
@@ -400,13 +400,13 @@ class DataBlockGeneratorTest {
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, JsonNode> data = new HashMap<>();
-        data.put(FIELD_ID, mapper.readTree("{\n" +
-            "      \"NestedField1\": \"valueOne\",\n" +
-            "      \"NestedField2\": {\n" +
-            "        \"SubNestedField1\": \"valueTwo\",\n" +
-            "        \"SubNestedField2\": \"valueThree\"\n" +
-            "      }\n" +
-            "  }"));
+        data.put(FIELD_ID, mapper.readTree("{\n"
+            + "      \"NestedField1\": \"valueOne\",\n"
+            + "      \"NestedField2\": {\n"
+            + "        \"SubNestedField1\": \"valueTwo\",\n"
+            + "        \"SubNestedField2\": \"valueThree\"\n"
+            + "      }\n"
+            + "  }"));
 
         caseDetails = newCaseDetails().withData(data).build();
 
@@ -479,13 +479,13 @@ class DataBlockGeneratorTest {
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, JsonNode> data = new HashMap<>();
-        data.put(FIELD_ID, mapper.readTree("{\n" +
-            "      \"NestedField1\": \"12.71\",\n" +
-            "      \"NestedField2\": {\n" +
-            "        \"SubNestedField1\": \"valueTwo\",\n" +
-            "        \"SubNestedField2\": \"valueThree\"\n" +
-            "      }\n" +
-            "  }"));
+        data.put(FIELD_ID, mapper.readTree("{\n"
+            + "      \"NestedField1\": \"12.71\",\n"
+            + "      \"NestedField2\": {\n"
+            + "        \"SubNestedField1\": \"valueTwo\",\n"
+            + "        \"SubNestedField2\": \"valueThree\"\n"
+            + "      }\n"
+            + "  }"));
 
         caseDetails = newCaseDetails().withData(data).build();
 
@@ -556,13 +556,13 @@ class DataBlockGeneratorTest {
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, JsonNode> data = new HashMap<>();
-        data.put(FIELD_ID, mapper.readTree("{\n" +
-            "      \"NestedField1\": \"No\",\n" +
-            "      \"NestedField2\": {\n" +
-            "        \"SubNestedField1\": \"valueTwo\",\n" +
-            "        \"SubNestedField2\": \"valueThree\"\n" +
-            "      }\n" +
-            "  }"));
+        data.put(FIELD_ID, mapper.readTree("{\n"
+            + "      \"NestedField1\": \"No\",\n"
+            + "      \"NestedField2\": {\n"
+            + "        \"SubNestedField1\": \"valueTwo\",\n"
+            + "        \"SubNestedField2\": \"valueThree\"\n"
+            + "      }\n"
+            + "  }"));
 
         caseDetails = newCaseDetails().withData(data).build();
 
