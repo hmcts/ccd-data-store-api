@@ -53,6 +53,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -399,6 +400,45 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("CASE_EVENT", messageQueueList.get(0).getMessageType());
     }
 
+    @Test
+    public void shouldGenerateCaseEventDataMessagingDefinition() throws Exception {
+        String caseType = "MessagePublishing";
+        String eventId = "CREATE";
+        String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseType + "/cases";
+        CaseDataContent caseDetailsToSave = newCaseDataContent()
+            .withEvent(anEvent().withEventId(eventId).build())
+            .withData(newHashMap())
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, caseType, eventId))
+            .build();
+
+        MvcResult mvcResult = mockMvc.perform(post(url)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andReturn();
+        assertEquals("Incorrect Response Status Code", 201, mvcResult.getResponse().getStatus());
+
+        List<MessageQueueCandidate> messageQueueList =
+            template.query("SELECT * FROM message_queue_candidates", this::mapMessageCandidate);
+        assertEquals("Incorrect number of rows in messageQueue", 1, messageQueueList.size());
+
+        assertEquals(messageQueueList.get(0).getMessageInformation().get("additional_data").get("Data"),
+            mapper.readTree("{\n" +
+                "  \"OtherAlias\": null,\n" +
+                "  \"NumberField\": null,\n" +
+                "  \"ComplexField\": {\n" +
+                "    \"ComplexTextField\": null,\n" +
+                "    \"ComplexNestedField\": null\n" +
+                "  },\n" +
+                "  \"YesOrNoField\": false,\n" +
+                "  \"DateTimeField\": null,\n" +
+                "  \"DocumentField\": null,\n" +
+                "  \"AddressUKField\": null,\n" +
+                "  \"CollectionField\": null,\n" +
+                "  \"TopLevelPublish\": null,\n" +
+                "  \"AliasForTextField\": null,\n" +
+                "  \"ComplexCollectionField\": null\n" +
+                "}"));
+    }
     @Test
     public void shouldReturn201WhenPostCreateCaseWithEmptyDataClassificationForCitizen() throws Exception {
 

@@ -5,19 +5,25 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
+import uk.gov.hmcts.ccd.domain.model.std.AdditionalMessageInformation;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.MessageInformation;
+import uk.gov.hmcts.ccd.domain.service.message.additionaldata.AdditionalDataContext;
+import uk.gov.hmcts.ccd.domain.service.message.additionaldata.DataBlockGenerator;
 
 import java.util.List;
 
 public abstract class AbstractMessageService implements MessageService {
     private final UserRepository userRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
+    private final DataBlockGenerator dataBlockGenerator;
 
     protected AbstractMessageService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                     CaseAuditEventRepository caseAuditEventRepository) {
+                                     CaseAuditEventRepository caseAuditEventRepository,
+                                     DataBlockGenerator dataBlockGenerator) {
         this.userRepository = userRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
+        this.dataBlockGenerator = dataBlockGenerator;
     }
 
     MessageInformation populateMessageInformation(MessageContext messageContext) {
@@ -35,6 +41,10 @@ public abstract class AbstractMessageService implements MessageService {
         messageInformation.setUserId(user.getId());
         messageInformation.setPreviousStateId(messageContext.getOldState());
         messageInformation.setNewStateId(messageContext.getCaseDetails().getState());
+
+        AdditionalMessageInformation additionalMessageInformation = new AdditionalMessageInformation();
+        additionalMessageInformation.setData(dataBlockGenerator.generateData(new AdditionalDataContext(messageContext)));
+        messageInformation.setData(additionalMessageInformation);
 
         return messageInformation;
     }

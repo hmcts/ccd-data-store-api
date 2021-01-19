@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.message.additionaldata;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -32,6 +34,7 @@ public class PublishableField {
     private String path;
     private String value;
     private String originalId;
+    private JsonNode complexValue;
     private CommonField caseField;
     private DisplayContext displayContext;
     private boolean publishTopLevel;
@@ -91,6 +94,7 @@ public class PublishableField {
         this.originalId = originalId;
         this.caseField = getCommonField(caseTypeDefinition, path);
         this.value = getValue(path, caseDetails);
+        this.complexValue = getComplexValue(path, caseDetails);
     }
 
     private String getKey(String publishAs, String originalId) {
@@ -103,6 +107,14 @@ public class PublishableField {
         } else {
             return caseDetails.getData().get(path).textValue();
         }
+    }
+
+    private JsonNode getComplexValue(String path, CaseDetails caseDetails) {
+        return caseDetails.getData().get(path);
+    }
+
+    public JsonNode getNestedComplexValue(String path, CaseDetails caseDetails, String subPath,  Map<String, JsonNode> data ) {
+        return data.get(subPath);
     }
 
     /**
