@@ -5,8 +5,6 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 import uk.gov.hmcts.ccd.datastore.tests.Env;
 
-import static org.hamcrest.Matchers.equalTo;
-
 public class ElasticSearchUtils {
 
     private static final String AAT_PRIVATE_INDEX_NAME = "aat_private_cases-000001";
