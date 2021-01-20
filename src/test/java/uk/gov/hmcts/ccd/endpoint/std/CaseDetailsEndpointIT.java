@@ -723,7 +723,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "    \"AddressLine3\": null\n"
                 + "  },\n"
                 + "  \"CollectionField\": null,\n"
-                + "  \"TopLevelPublish\": null,\n"
+                + "  \"TopLevelPublish\": \"text field\",\n"
                 + "  \"AliasForTextField\": \"text\",\n"
                 + "  \"ComplexCollectionField\": null\n"
                 + "}"));

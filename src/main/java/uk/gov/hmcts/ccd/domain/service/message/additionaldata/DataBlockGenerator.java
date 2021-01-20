@@ -39,11 +39,11 @@ public class DataBlockGenerator {
         } else if (publishableField.getDisplayContext() != null) {
             if (publishableField.getDisplayContext().equals(DisplayContext.COMPLEX)) {
                 buildNestedLevelDataBlock(publishableField, dataBlock, nestedPublishable, caseDetails);
-            } else {
+            } else if (isComplex(publishableField.getFieldType().getType())) {
                 dataBlock.put(publishableField.getKey(), (publishableField.getComplexValue()));
+            } else {
+                dataBlock.put(publishableField.getKey(), (publishableField.getValue()));
             }
-        } else {
-            dataBlock.put(publishableField.getKey(), (publishableField.getComplexValue()));
         }
         return dataBlock;
     }
@@ -104,5 +104,14 @@ public class DataBlockGenerator {
 
     private boolean isNumber(String fieldType) {
         return fieldType.equals(FieldTypeDefinition.NUMBER) || fieldType.equals(FieldTypeDefinition.MONEY_GBP);
+    }
+
+    private boolean isComplex(String fieldType) {
+        return fieldType.equals(FieldTypeDefinition.COMPLEX)
+            || fieldType.equals(FieldTypeDefinition.COLLECTION)
+            || fieldType.equals(FieldTypeDefinition.MULTI_SELECT_LIST)
+            || fieldType.equals(FieldTypeDefinition.PREDEFINED_COMPLEX_ADDRESS_GLOBAL_UK)
+            || fieldType.equals(FieldTypeDefinition.PREDEFINED_COMPLEX_ADDRESS_GLOBAL)
+            || fieldType.equals(FieldTypeDefinition.PREDEFINED_COMPLEX_ADDRESS_UK);
     }
 }

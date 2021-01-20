@@ -242,12 +242,14 @@ class DataBlockGeneratorTest {
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, JsonNode> data = new HashMap<>();
-        data.put(FIELD_ID, mapper.convertValue("\"AddressField\" : {\n"
+        final JsonNode DATA =  mapper.convertValue("\"AddressField\" : {\n"
             + "    \"AddressLine1\" : \"lin 1\",\n"
             + "    \"AddressLine2\" : \"line 2\",\n"
             + "    \"AddressLine3\" : \"line 3\",\n"
             + "    \"Country\" : \"country\"\n"
-            + "  }", JsonNode.class));
+            + "  }", JsonNode.class);
+
+        data.put(FIELD_ID, DATA);
 
         caseDetails = newCaseDetails().withData(data).build();
 
@@ -257,12 +259,7 @@ class DataBlockGeneratorTest {
         Map<String, Object> result = dataBlockGenerator.generateData(context);
 
         assertAll(
-            () -> assertEquals(result.get(FIELD_ALIAS), "\"AddressField\" : {\n"
-                + "    \"AddressLine1\" : \"lin 1\",\n"
-                + "    \"AddressLine2\" : \"line 2\",\n"
-                + "    \"AddressLine3\" : \"line 3\",\n"
-                + "    \"Country\" : \"country\"\n"
-                + "  }"),
+            () -> assertEquals(DATA, result.get(FIELD_ALIAS)),
             () -> MatcherAssert.assertThat(result.size(), Matchers.is(1))
         );
     }
