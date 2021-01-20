@@ -93,6 +93,7 @@ public class PublishableField {
         this.originalId = originalId;
         this.caseField = getCommonField(caseTypeDefinition, path);
         this.value = getValue(path, caseDetails);
+        this.complexValue = getComplexValue(path, caseDetails);
     }
 
     private String getKey(String publishAs, String originalId) {
@@ -105,6 +106,10 @@ public class PublishableField {
         } else {
             return caseDetails.getData().get(path).textValue();
         }
+    }
+
+    private JsonNode getComplexValue(String path, CaseDetails caseDetails) {
+        return caseDetails.getData().get(path);
     }
 
     /**

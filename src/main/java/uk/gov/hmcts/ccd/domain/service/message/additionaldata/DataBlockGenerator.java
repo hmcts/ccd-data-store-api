@@ -39,8 +39,10 @@ public class DataBlockGenerator {
             if (publishableField.getDisplayContext().equals(DisplayContext.COMPLEX)) {
                 buildNestedLevelDataBlock(publishableField, dataBlock, nestedPublishable, caseDetails);
             } else {
-                dataBlock.put(publishableField.getKey(), (publishableField.getValue()));
+                dataBlock.put(publishableField.getKey(), (publishableField.getComplexValue()));
             }
+        }else {
+            dataBlock.put(publishableField.getKey(), (publishableField.getComplexValue()));
         }
         return dataBlock;
     }
