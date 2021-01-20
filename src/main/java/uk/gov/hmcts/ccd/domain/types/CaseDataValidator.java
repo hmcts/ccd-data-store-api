@@ -222,10 +222,10 @@ public class CaseDataValidator {
     private boolean shouldTreatAsValueNode(FieldTypeDefinition fieldTypeDefinition, JsonNode itemValue) {
         return itemValue.isValueNode()
             || fieldTypeDefinition.getType().equalsIgnoreCase(DocumentValidator.TYPE_ID)
-            || isDynamicListNode(fieldTypeDefinition, itemValue);
+            || isDynamicListNode(fieldTypeDefinition);
     }
 
-    private boolean isDynamicListNode(FieldTypeDefinition fieldTypeDefinition, JsonNode itemValue) {
+    private boolean isDynamicListNode(FieldTypeDefinition fieldTypeDefinition) {
         return fieldTypeDefinition.getType().equalsIgnoreCase(DynamicRadioListValidator.TYPE_ID)
             || fieldTypeDefinition.getType().equalsIgnoreCase(DynamicMultiSelectListValidator.TYPE_ID)
             || fieldTypeDefinition.getType().equalsIgnoreCase(DynamicRadioListValidator.TYPE_ID);
