@@ -41,7 +41,7 @@ public class DataBlockGenerator {
             } else {
                 dataBlock.put(publishableField.getKey(), (publishableField.getComplexValue()));
             }
-        }else {
+        } else {
             dataBlock.put(publishableField.getKey(), (publishableField.getComplexValue()));
         }
         return dataBlock;
