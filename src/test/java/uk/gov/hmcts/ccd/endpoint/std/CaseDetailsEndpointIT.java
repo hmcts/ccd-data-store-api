@@ -404,39 +404,39 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         String caseType = "MessagePublishing";
         String eventId = "CREATE";
         String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseType + "/cases";
-        final JsonNode DATA = mapper.readTree("{\n" +
-            "  \"MoneyGBPField\": \"1000\",\n" +
-            "  \"FixedListField\": \"VALUE3\",\n" +
-            "  \"AddressUKField\": {\n" +
-            "    \"AddressLine1\": null,\n" +
-            "    \"AddressLine2\": null,\n" +
-            "    \"AddressLine3\": null,\n" +
-            "    \"PostTown\": null,\n" +
-            "    \"County\": null,\n" +
-            "    \"PostCode\": null,\n" +
-            "    \"Country\": null\n" +
-            "  },\n" +
-            "  \"ComplexField\": {\n" +
-            "  \"ComplexTextField\": \"text field\",\n" +
-            "   \"ComplexFixedListField\": null,\n" +
-            "    \"ComplexNestedField\": {\n" +
-            "      \"NestedNumberField\": null,\n" +
-            "      \"NestedCollectionTextField\": []\n" +
-            "    }\n" +
-            "  },\n" +
-            "  \"DateTimeField\": \"2000-01-01T11:11:11.000\",\n" +
-            "  \"PhoneUKField\": \"09876528531\",\n" +
-            "  \"NumberField\": 90,\n" +
-            "  \"MultiSelectListField\": [\n" +
-            "    \"OPTION4\",\n" +
-            "    \"OPTION2\"\n" +
-            "  ],\n" +
-            "  \"YesOrNoField\": \"No\",\n" +
-            "  \"EmailField\": \"test@test.com\",\n" +
-            "  \"TextField\": \"text\",\n" +
-            "  \"DateField\": \"2000-01-01\",\n" +
-            "  \"TextAreaField\": \"text areas\"\n" +
-            "}");
+        final JsonNode DATA = mapper.readTree("{\n"
+            + "  \"MoneyGBPField\": \"1000\",\n"
+            + "  \"FixedListField\": \"VALUE3\",\n"
+            + "  \"AddressUKField\": {\n"
+            + "    \"AddressLine1\": null,\n"
+            + "    \"AddressLine2\": null,\n"
+            + "    \"AddressLine3\": null,\n"
+            + "    \"PostTown\": null,\n"
+            + "    \"County\": null,\n"
+            + "    \"PostCode\": null,\n"
+            + "    \"Country\": null\n"
+            + "  },\n"
+            + "  \"ComplexField\": {\n"
+            + "  \"ComplexTextField\": \"text field\",\n"
+            + "   \"ComplexFixedListField\": null,\n"
+            + "    \"ComplexNestedField\": {\n"
+            + "      \"NestedNumberField\": null,\n"
+            + "      \"NestedCollectionTextField\": []\n"
+            + "    }\n"
+            + "  },\n"
+            + "  \"DateTimeField\": \"2000-01-01T11:11:11.000\",\n"
+            + "  \"PhoneUKField\": \"09876528531\",\n"
+            + "  \"NumberField\": 90,\n"
+            + "  \"MultiSelectListField\": [\n"
+            + "    \"OPTION4\",\n"
+            + "    \"OPTION2\"\n"
+            + "  ],\n"
+            + "  \"YesOrNoField\": \"No\",\n"
+            + "  \"EmailField\": \"test@test.com\",\n"
+            + "  \"TextField\": \"text\",\n"
+            + "  \"DateField\": \"2000-01-01\",\n"
+            + "  \"TextAreaField\": \"text areas\"\n"
+            + "}");
 
 
         Map data = JacksonUtils.convertValue(DATA);
@@ -647,39 +647,39 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         String eventId = "CREATE";
         String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseType + "/cases";
 
-        final JsonNode DATA = mapper.readTree("{\n" +
-            "  \"MoneyGBPField\": \"1000\",\n" +
-            "  \"FixedListField\": \"VALUE3\",\n" +
-            "  \"AddressUKField\": {\n" +
-            "    \"AddressLine1\": null,\n" +
-            "    \"AddressLine2\": null,\n" +
-            "    \"AddressLine3\": null,\n" +
-            "    \"PostTown\": null,\n" +
-            "    \"County\": null,\n" +
-            "    \"PostCode\": null,\n" +
-            "    \"Country\": null\n" +
-            "  },\n" +
-            "  \"ComplexField\": {\n" +
-            "  \"ComplexTextField\": \"text field\",\n" +
-            "   \"ComplexFixedListField\": null,\n" +
-            "    \"ComplexNestedField\": {\n" +
-            "      \"NestedNumberField\": null,\n" +
-            "      \"NestedCollectionTextField\": []\n" +
-            "    }\n" +
-            "  },\n" +
-            "  \"DateTimeField\": \"2000-01-01T11:11:11.000\",\n" +
-            "  \"PhoneUKField\": \"09876528531\",\n" +
-            "  \"NumberField\": 90,\n" +
-            "  \"MultiSelectListField\": [\n" +
-            "    \"OPTION4\",\n" +
-            "    \"OPTION2\"\n" +
-            "  ],\n" +
-            "  \"YesOrNoField\": \"No\",\n" +
-            "  \"EmailField\": \"test@test.com\",\n" +
-            "  \"TextField\": \"text\",\n" +
-            "  \"DateField\": \"2000-01-01\",\n" +
-            "  \"TextAreaField\": \"text areas\"\n" +
-            "}");
+        final JsonNode DATA = mapper.readTree("{\n"
+            + "  \"MoneyGBPField\": \"1000\",\n"
+            + "  \"FixedListField\": \"VALUE3\",\n"
+            + "  \"AddressUKField\": {\n"
+            + "    \"AddressLine1\": null,\n"
+            + "    \"AddressLine2\": null,\n"
+            + "    \"AddressLine3\": null,\n"
+            + "    \"PostTown\": null,\n"
+            + "    \"County\": null,\n"
+            + "    \"PostCode\": null,\n"
+            + "    \"Country\": null\n"
+            + "  },\n"
+            + "  \"ComplexField\": {\n"
+            + "  \"ComplexTextField\": \"text field\",\n"
+            + "   \"ComplexFixedListField\": null,\n"
+            + "    \"ComplexNestedField\": {\n"
+            + "      \"NestedNumberField\": null,\n"
+            + "      \"NestedCollectionTextField\": []\n"
+            + "    }\n"
+            + "  },\n"
+            + "  \"DateTimeField\": \"2000-01-01T11:11:11.000\",\n"
+            + "  \"PhoneUKField\": \"09876528531\",\n"
+            + "  \"NumberField\": 90,\n"
+            + "  \"MultiSelectListField\": [\n"
+            + "    \"OPTION4\",\n"
+            + "    \"OPTION2\"\n"
+            + "  ],\n"
+            + "  \"YesOrNoField\": \"No\",\n"
+            + "  \"EmailField\": \"test@test.com\",\n"
+            + "  \"TextField\": \"text\",\n"
+            + "  \"DateField\": \"2000-01-01\",\n"
+            + "  \"TextAreaField\": \"text areas\"\n"
+            + "}");
 
 
         Map data = JacksonUtils.convertValue(DATA);
@@ -700,33 +700,33 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect number of rows in messageQueue", 1, messageQueueList.size());
 
         assertEquals(messageQueueList.get(0).getMessageInformation().get("additional_data").get("Data"),
-            mapper.readTree("{\n" +
-                "  \"OtherAlias\": null,\n" +
-                "  \"NumberField\": null,\n" +
-                "  \"ComplexField\": {\n" +
-                "    \"ComplexTextField\": \"text field\",\n" +
-                "    \"ComplexNestedField\": {\n" +
-                "      \"NestedNumberField\": null,\n" +
-                "      \"NestedCollectionTextField\": []\n" +
-                "    }\n" +
-                "  },\n" +
-                "  \"YesOrNoField\": false,\n" +
-                "  \"DateTimeField\": \"2000-01-01T11:11:11.000\",\n" +
-                "  \"DocumentField\": null,\n" +
-                "  \"AddressUKField\": {\n" +
-                "    \"County\": null,\n" +
-                "    \"Country\": null,\n" +
-                "    \"PostCode\": null,\n" +
-                "    \"PostTown\": null,\n" +
-                "    \"AddressLine1\": null,\n" +
-                "    \"AddressLine2\": null,\n" +
-                "    \"AddressLine3\": null\n" +
-                "  },\n" +
-                "  \"CollectionField\": null,\n" +
-                "  \"TopLevelPublish\": null,\n" +
-                "  \"AliasForTextField\": \"text\",\n" +
-                "  \"ComplexCollectionField\": null\n" +
-                "}"));
+            mapper.readTree("{\n"
+                + "  \"OtherAlias\": null,\n"
+                + "  \"NumberField\": null,\n"
+                + "  \"ComplexField\": {\n"
+                + "    \"ComplexTextField\": \"text field\",\n"
+                + "    \"ComplexNestedField\": {\n"
+                + "      \"NestedNumberField\": null,\n"
+                + "      \"NestedCollectionTextField\": []\n"
+                + "    }\n"
+                + "  },\n"
+                + "  \"YesOrNoField\": false,\n"
+                + "  \"DateTimeField\": \"2000-01-01T11:11:11.000\",\n"
+                + "  \"DocumentField\": null,\n"
+                + "  \"AddressUKField\": {\n"
+                + "    \"County\": null,\n"
+                + "    \"Country\": null,\n"
+                + "    \"PostCode\": null,\n"
+                + "    \"PostTown\": null,\n"
+                + "    \"AddressLine1\": null,\n"
+                + "    \"AddressLine2\": null,\n"
+                + "    \"AddressLine3\": null\n"
+                + "  },\n"
+                + "  \"CollectionField\": null,\n"
+                + "  \"TopLevelPublish\": null,\n"
+                + "  \"AliasForTextField\": \"text\",\n"
+                + "  \"ComplexCollectionField\": null\n"
+                + "}"));
     }
 
     @Test
