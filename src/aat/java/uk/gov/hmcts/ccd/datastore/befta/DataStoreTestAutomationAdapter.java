@@ -40,7 +40,8 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     private synchronized String getDataFileTag(Scenario scenario) {
         return scenario.getSourceTagNames().stream()
-            .filter(t -> t.startsWith("@S-")).findFirst()
+            .filter(t -> t.startsWith("@S-"))
+            .findFirst()
             .map(t -> t.substring(1))
             .map(Object::toString)
             .orElse("error cant find tag");
