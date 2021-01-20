@@ -31,7 +31,8 @@ public class DataBlockGenerator {
                                                        List<PublishableField> nestedPublishable,
                                                        CaseDetails caseDetails) {
         if (isBoolean(publishableField.getFieldType().getType())) {
-            dataBlock.put(publishableField.getKey(), Boolean.valueOf(publishableField.getValue()));
+            dataBlock.put(publishableField.getKey(),
+                (publishableField.getValue() == null)? null : Boolean.valueOf(publishableField.getValue()));
         } else if (isNumber(publishableField.getFieldType().getType())) {
             dataBlock.put(publishableField.getKey(),
                 (publishableField.getValue() != null) ? Double.parseDouble(publishableField.getValue()) : null);
