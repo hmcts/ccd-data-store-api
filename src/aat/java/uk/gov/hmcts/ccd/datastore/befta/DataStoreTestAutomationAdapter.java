@@ -3,8 +3,6 @@ package uk.gov.hmcts.ccd.datastore.befta;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import org.junit.AssumptionViolatedException;
-import uk.gov.hmcts.befta.BeftaTestDataLoader;
-import uk.gov.hmcts.befta.DefaultBeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
@@ -28,7 +26,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     @Before("@elasticsearch")
     public void skipElasticSearchTestsIfNotEnabled() {
-        if (!ofNullable(System.getenv("ELASTIC_SEARCH_FTA_ENABLED")).map(Boolean::valueOf).orElse(false)) {
+        if (!elasticSearchEnabled()) {
             throw new AssumptionViolatedException("Elastic Search not Enabled");
         }
     }
@@ -49,14 +47,12 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
     }
 
     @Override
-    protected BeftaTestDataLoader buildTestDataLoader() {
-        return new DefaultBeftaTestDataLoader() {
-            @Override
-            public void doLoadTestData() {
-                DataStoreTestAutomationAdapter.this.loader.addCcdRoles();
-                DataStoreTestAutomationAdapter.this.loader.importDefinitions();
-            }
-        };
+    public void doLoadTestData() {
+        if (elasticSearchEnabled()){
+            new ElasticSearchUtils().deleteIndexesIfPresent();
+        }
+        loader.addCcdRoles();
+        loader.importDefinitions();
     }
 
     @Override
