@@ -738,7 +738,7 @@ task functional() {
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
             args = [
                      '--threads', '10',
-                     '--plugin', 'json:${rootDir}/target/cucumber.json',
+                     '--plugin', "json:${rootDir}/target/cucumber.json",
                      '--tags', 'not @Ignore',
                      '--glue', 'uk.gov.hmcts.befta.player',
                      '--glue', 'uk.gov.hmcts.ccd.datastore.befta', 'src/aat/resources/features'
