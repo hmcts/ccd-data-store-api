@@ -242,7 +242,7 @@ class DataBlockGeneratorTest {
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, JsonNode> data = new HashMap<>();
-        final JsonNode DATA =  mapper.convertValue("\"AddressField\" : {\n"
+        final JsonNode DATA = mapper.convertValue("\"AddressField\" : {\n"
             + "    \"AddressLine1\" : \"lin 1\",\n"
             + "    \"AddressLine2\" : \"line 2\",\n"
             + "    \"AddressLine3\" : \"line 3\",\n"
