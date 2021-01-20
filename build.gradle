@@ -233,7 +233,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.17.0'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.5.2'
 }
 // end::dependencies[]
 
@@ -750,8 +750,11 @@ task functional() {
     finalizedBy {
         generateCucumberReports {
             doLast{
+                delete "${rootDir}/BEFTA Report for Functional Tests/"
                 new File("${rootDir}/BEFTA Report for Functional Tests").mkdirs()
                 file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Functional Tests"))
+
+                logger.quiet("Functional test report moved to ---> file://${rootDir}/BEFTA%20Report%20for%20Functional%20Tests/overview-features.html")
             }
         }
     }

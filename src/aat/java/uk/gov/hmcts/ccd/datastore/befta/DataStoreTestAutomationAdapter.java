@@ -3,6 +3,8 @@ package uk.gov.hmcts.ccd.datastore.befta;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import org.junit.AssumptionViolatedException;
+import uk.gov.hmcts.befta.BeftaTestDataLoader;
+import uk.gov.hmcts.befta.DefaultBeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
@@ -36,7 +38,6 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         String tag = getDataFileTag(scenario);
         String uid = tag + UUID.randomUUID().toString();
         uniqueStringsPerTestData.put(tag,uid);
-        System.out.println(uniqueStringsPerTestData);
     }
 
     private synchronized String getDataFileTag(Scenario scenario) {
@@ -48,9 +49,14 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
     }
 
     @Override
-    public void doLoadTestData() {
-        loader.addCcdRoles();
-        loader.importDefinitions();
+    protected BeftaTestDataLoader buildTestDataLoader() {
+        return new DefaultBeftaTestDataLoader() {
+            @Override
+            public void doLoadTestData() {
+                DataStoreTestAutomationAdapter.this.loader.addCcdRoles();
+                DataStoreTestAutomationAdapter.this.loader.importDefinitions();
+            }
+        };
     }
 
     @Override
