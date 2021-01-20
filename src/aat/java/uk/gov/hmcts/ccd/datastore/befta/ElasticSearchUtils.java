@@ -34,9 +34,11 @@ public class ElasticSearchUtils {
         asElasticsearchApiUser().when().delete(AAT_PRIVATE_INDEX_NAME);
         asElasticsearchApiUser().when().delete(getCaseIndexAliasApi(AAT_PRIVATE2_INDEX_NAME, AAT_PRIVATE2_INDEX_ALIAS));
         asElasticsearchApiUser().when().delete(AAT_PRIVATE2_INDEX_NAME);
-        asElasticsearchApiUser().when().delete(getCaseIndexAliasApi(BEFTA_JURISDICTION_2_CASETYPE_1_NAME, BEFTA_JURISDICTION_2_CASETYPE_1_ALIAS));
+        asElasticsearchApiUser().when().delete(getCaseIndexAliasApi(BEFTA_JURISDICTION_2_CASETYPE_1_NAME,
+            BEFTA_JURISDICTION_2_CASETYPE_1_ALIAS));
         asElasticsearchApiUser().when().delete(BEFTA_JURISDICTION_2_CASETYPE_1_NAME);
-        asElasticsearchApiUser().when().delete(getCaseIndexAliasApi(FT_COMPLEXCOLLECTIONCOMPLEX_INDEX_NAME, FT_COMPLEXCOLLECTIONCOMPLEX_INDEX_ALIAS));
+        asElasticsearchApiUser().when().delete(getCaseIndexAliasApi(FT_COMPLEXCOLLECTIONCOMPLEX_INDEX_NAME,
+            FT_COMPLEXCOLLECTIONCOMPLEX_INDEX_ALIAS));
         asElasticsearchApiUser().when().delete(FT_COMPLEXCOLLECTIONCOMPLEX_INDEX_NAME);
     }
 
