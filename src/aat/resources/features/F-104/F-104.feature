@@ -5,7 +5,7 @@ Feature: F-104: External Search API
     Given an appropriate test context as detailed in the test data source
 
     #possitive request scenario of each type
-  @S-625 @estest
+  @S-625
   Scenario: Usecase request using SearchResultsFields useCase returns correct fields
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
@@ -164,7 +164,7 @@ Feature: F-104: External Search API
     And the response has all other details as expected.
 
 
-  @S-635 @esuniquevalues
+  @S-635
   Scenario: Usecase request will return cases ordered as per relevant definition configuration
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering1_2],
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering1_1],
@@ -180,7 +180,7 @@ Feature: F-104: External Search API
     And the response has all other details as expected.
 
 
-  @S-636 @esuniquevalues
+  @S-636
   Scenario: Usecase request default ordering can be overridden in the request
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering2_2],
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering2_1],
@@ -237,7 +237,7 @@ Feature: F-104: External Search API
     And the request [lists total cases as 0],
     And the response has all other details as expected.
 
-  @S-640 @esuniquevalues
+  @S-640
   Scenario: Request can be sent with paginated search criteria
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Pagination1],
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Pagination2],
