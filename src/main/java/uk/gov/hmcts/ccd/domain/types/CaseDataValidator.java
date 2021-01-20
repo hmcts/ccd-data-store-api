@@ -226,7 +226,7 @@ public class CaseDataValidator {
     }
 
     private boolean isDynamicListNode(FieldTypeDefinition fieldTypeDefinition) {
-        return fieldTypeDefinition.getType().equalsIgnoreCase(DynamicRadioListValidator.TYPE_ID)
+        return fieldTypeDefinition.getType().equalsIgnoreCase(DynamicListValidator.TYPE_ID)
             || fieldTypeDefinition.getType().equalsIgnoreCase(DynamicMultiSelectListValidator.TYPE_ID)
             || fieldTypeDefinition.getType().equalsIgnoreCase(DynamicRadioListValidator.TYPE_ID);
     }
