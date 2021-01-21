@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.datastore.befta;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
-import org.junit.AssumptionViolatedException;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
@@ -24,13 +23,6 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     private static Map<String, String> uniqueStringsPerTestData = new ConcurrentHashMap<>();
 
-    @Before("@elasticsearch")
-    public void skipElasticSearchTestsIfNotEnabled() {
-    //        if (!elasticSearchFunctionalTestsEnabled()) {
-    //            throw new AssumptionViolatedException("Elastic Search not Enabled");
-    //        }
-    }
-
     @Before
     public void createUID(Scenario scenario) {
         String tag = getDataFileTag(scenario);
@@ -49,9 +41,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     @Override
     public void doLoadTestData() {
-    //        if (elasticSearchFunctionalTestsEnabled()) {
-            new ElasticSearchUtils().deleteIndexesIfPresent();
-    //        }
+        new ElasticSearchUtils().deleteIndexesIfPresent();
         loader.addCcdRoles();
         loader.importDefinitions();
     }
