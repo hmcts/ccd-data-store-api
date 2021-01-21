@@ -16,7 +16,7 @@ java:
     DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
     DATA_STORE_DB_OPTIONS: "?stringtype=unspecified"
     DATA_STORE_DB_MAX_POOL_SIZE: 10
-    DEFINITION_STORE_HOST: http://ccd-definition-store-api-pr-902.service.core-compute-preview.internal/
+    DEFINITION_STORE_HOST: http://ccd-definition-store-api-pr-575.service.core-compute-preview.internal/
     USER_PROFILE_HOST: http://ccd-user-profile-api-pr-335.service.core-compute-preview.internal/
     ENABLE_DB_MIGRATE: true
 
@@ -51,7 +51,7 @@ logstash:
   image:
     repository: hmctspublic.azurecr.io/ccd/logstash
     tag: latest
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   logstashJavaOpts: -Xmx1g -Xms512M
   persistence:
     enabled: false
