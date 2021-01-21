@@ -26,9 +26,9 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     @Before("@elasticsearch")
     public void skipElasticSearchTestsIfNotEnabled() {
-        if (!elasticSearchFunctionalTestsEnabled()) {
-            throw new AssumptionViolatedException("Elastic Search not Enabled");
-        }
+    //        if (!elasticSearchFunctionalTestsEnabled()) {
+    //            throw new AssumptionViolatedException("Elastic Search not Enabled");
+    //        }
     }
 
     @Before
@@ -49,9 +49,9 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     @Override
     public void doLoadTestData() {
-        if (elasticSearchFunctionalTestsEnabled()) {
+    //        if (elasticSearchFunctionalTestsEnabled()) {
             new ElasticSearchUtils().deleteIndexesIfPresent();
-        }
+    //        }
         loader.addCcdRoles();
         loader.importDefinitions();
     }
