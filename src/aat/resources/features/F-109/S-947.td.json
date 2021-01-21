@@ -28,7 +28,9 @@
           "case_type_id" : "BEFTA_CASETYPE_3_1"
         },
         "fields" : [
-          "__ordering__" : "unordered",
+          {
+            "__ordering__": "unordered"
+          },
           {
           "label" : "State",
           "order" : null,
