@@ -1,11 +1,11 @@
-@F-105
+@F-105 @Ignore
 Feature: F-105: Add Case-Assigned Users and Roles
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
   # RDM-8606/8806 AC-1
-  @S-105.1
+  @S-105.1 @Ignore
   Scenario: Must successfully assign a user and case role for a specific case by a user calling through/from an authorised application
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
@@ -20,7 +20,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a call [to verify Olawale's reception of the role CR-1 over the case C1] will get the expected response as in [S-105.1_Get_Case_Roles_for_Case_C1].
 
   # RDM-8606/8806 AC-2
-  @S-105.2
+  @S-105.2 @Ignore
   Scenario: Must return an error response for a missing Case ID
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
@@ -36,7 +36,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.2_Get_Case_Roles_for_Case_C1].
 
   # RDM-8606/8806 AC-3
-  @S-105.3
+  @S-105.3 @Ignore
   Scenario: Must return an error response for a malformed Case ID
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
@@ -52,7 +52,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.3_Get_Case_Roles_for_Case_C1].
 
   # RDM-8606/8806 AC-4
-  @S-105.4
+  @S-105.4 @Ignore
   Scenario: Must return an error response for a missing User ID
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
@@ -68,7 +68,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.4_Get_Case_Roles_for_Case_C1].
 
   # RDM-8606/8806 AC-5
-  @S-105.5
+  @S-105.5 @Ignore
   Scenario: Must return an error response for a malformed User ID Provided
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
@@ -84,7 +84,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.5_Get_Case_Roles_for_Case_C1].
 
   # RDM-8606/8806 AC-6
-  @S-105.6
+  @S-105.6 @Ignore
   Scenario: Must return an error response when the request is made from an un-authorised application
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
@@ -99,7 +99,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a call [to verify that Dil hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.6_Get_Case_Roles_for_Case_C1].
 
   # RDM-8606/8806 AC-7
-  @S-105.7
+  @S-105.7 @Ignore
   Scenario: Must return an error response for a malformed Case Role provided
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
@@ -115,7 +115,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.7_Get_Case_Roles_for_Case_C1].
 
   # RDM-8606/8806 AC-8
-  @S-105.8
+  @S-105.8 @Ignore
   Scenario: Must return an error response for a missing Case Role
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
@@ -131,7 +131,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.8_Get_Case_Roles_for_Case_C1].
 
   # RDM-8606 no list
-  @S-105.9
+  @S-105.9 @Ignore
   Scenario: Must return an error response for missing case_users list
     Given an appropriate test context as detailed in the test data source,
     And a user [Dil - who is to add some case role assignment for a case],
@@ -142,7 +142,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And the response has all the details as expected.
 
   # RDM-8606 empty list
-  @S-105.10
+  @S-105.10 @Ignore
   Scenario: Must return an error response for empty case_users list
     Given an appropriate test context as detailed in the test data source,
     And a user [Dil - who is to add some case role assignment for a case],
@@ -153,7 +153,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And the response has all the details as expected.
 
   # RDM-8606 case not found
-  @S-105.11
+  @S-105.11 @Ignore
   Scenario: Must return an error response when the case does not exist
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
@@ -170,7 +170,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
 
 
   # RDM-8606 duplicate
-  @S-105.12
+  @S-105.12 @Ignore
   Scenario: Must not create duplicate case-user-roles
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
@@ -185,7 +185,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a call [to verify Olawale's reception of the role CR-1 over the case C1] will get the expected response as in [S-105.12_Get_Case_Roles_for_Case_C1].
 
   # RDM-8606 multiple
-  @S-105.13
+  @S-105.13 @Ignore
   Scenario: Must successfully assign multiple user and case roles for a specific case by a user calling through/from an authorised application
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
@@ -201,7 +201,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a call [to verify Olawale's reception of the role CR-1 and CR-2 over the case C1] will get the expected response as in [S-105.13_Get_Case_Roles_for_Case_C1].
 
   # RDM-8842 AC-1
-  @S-105.14
+  @S-105.14 @Ignore
   Scenario: Must successfully increment Assigned User Count when assigning a user and case role for a specific case (by a user calling through/from an authorised application)
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
@@ -223,7 +223,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a call [to verify the count of users assigned to a case has increased by 1] will get the expected response as in [S-105.14_Verify_Counter_3].
 
    # RDM-8842 AC-2
-   @S-105.15
+   @S-105.15 @Ignore
    Scenario: Must not increment Assigned User Count when assigning a user and case role for a specific case if there was already a case user role assignment with the respective values in the request (by a user calling through/from an authorised application)
      Given an appropriate test context as detailed in the test data source,
      And a user [Richard - who can create a case],
@@ -241,7 +241,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
      And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
 
    # RDM-8842 AC-3
-   @S-105.16
+   @S-105.16 @Ignore
    Scenario: No organisation ID is provided by the user so Assigned User Count remains unchanged
      Given an appropriate test context as detailed in the test data source,
      And a user [Richard - who can create a case],
@@ -258,7 +258,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
      And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
 
    # RDM-8842 AC-4
-   @S-105.17
+   @S-105.17 @Ignore
    Scenario: Invalid Organisation ID provided
      Given an appropriate test context as detailed in the test data source,
      And a user [Richard - who can create a case],
