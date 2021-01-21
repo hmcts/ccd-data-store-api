@@ -22,15 +22,8 @@
     "body": {
       "total": 1,
       "cases": [{
+        "_extends_" : "F-108_Base_Case_Fields_expected",
         "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-917_Create_Case_Private_Autotest1]}",
-        "jurisdiction": "AUTOTEST1",
-        "state": "TODO",
-        "version": null,
-        "case_type_id": "AAT_PRIVATE",
-        "created_date": "[[ANYTHING_PRESENT]]",
-        "last_modified": "[[ANYTHING_PRESENT]]",
-        "last_state_modified_date": "[[ANYTHING_PRESENT]]",
-        "security_classification": "PRIVATE",
         "case_data": {
           "FixedListField": "VALUE1",
           "MoneyGBPField": "1000",
@@ -72,15 +65,7 @@
               "id": "[[ANYTHING_PRESENT]]"
             }
           ]
-        },
-        "data_classification": "[[ANYTHING_PRESENT]]",
-        "supplementary_data" : null,
-        "after_submit_callback_response": null,
-        "callback_response_status_code": null,
-        "callback_response_status": null,
-        "delete_draft_response_status_code": null,
-        "delete_draft_response_status": null,
-        "security_classifications": "[[ANYTHING_PRESENT]]"
+        }
       }],
       "case_types_results" : [{
         "total" : 1,

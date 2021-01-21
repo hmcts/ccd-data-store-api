@@ -293,40 +293,26 @@
       ],
       "cases": [
         {
+          "_extends_" : "F-109_Base_Case_Fields_internal_expected",
           "fields": {
             "MoneyGBPField": "4200",
-            "[JURISDICTION]": "BEFTA_JURISDICTION_1",
-            "[LAST_STATE_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
-            "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
             "PhoneUKField": "07123456789",
             "NumberField": "164528",
             "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_F-109-Befta_Jurisdiction1_Case_Creation]}",
-            "[STATE]": "TODO",
-            "[SECURITY_CLASSIFICATION]": "PUBLIC",
             "YesOrNoField": "Yes",
-            "[CASE_TYPE]": "BEFTA_CASETYPE_1_1",
             "EmailField": "ccd@hmcts.net",
-            "TextField": "Some Text",
-            "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
+            "TextField": "Some Text"
           },
           "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_F-109-Befta_Jurisdiction1_Case_Creation]}",
           "fields_formatted": {
             "MoneyGBPField": "4200",
-            "[JURISDICTION]": "BEFTA_JURISDICTION_1",
-            "[LAST_STATE_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
-            "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
             "PhoneUKField": "07123456789",
             "NumberField": "164528",
             "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_F-109-Befta_Jurisdiction1_Case_Creation]}",
-            "[STATE]": "TODO",
-            "[SECURITY_CLASSIFICATION]": "PUBLIC",
             "YesOrNoField": "Yes",
-            "[CASE_TYPE]": "BEFTA_CASETYPE_1_1",
             "EmailField": "ccd@hmcts.net",
-            "TextField": "Some Text",
-            "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
-          },
-          "supplementary_data" : null
+            "TextField": "Some Text"
+          }
         }
       ],
       "total": 1

@@ -1348,6 +1348,7 @@
         "cases" : "[[ANYTHING_PRESENT]]"
       } ],
       "cases" : [ {
+        "_extends_" : "F-109_Base_Case_Fields_internal_expected",
         "fields" : {
           "MoneyGBPField" : null,
           "FixedListField" : null,
@@ -1361,8 +1362,6 @@
             "PostCode" : null
           },
           "[JURISDICTION]" : "BEFTA_JURISDICTION_2",
-          "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
-          "[CREATED_DATE]" : "[[ANYTHING_PRESENT]]",
           "ComplexField" : {
             "ComplexNestedField" : {
               "NestedCollectionTextField" : [ ],
@@ -1376,8 +1375,6 @@
           "PhoneUKField" : null,
           "NumberField" : null,
           "[CASE_REFERENCE]" : "${[scenarioContext][customValues][caseIdAsIntegerFrom_F-109-Befta_Jurisdiction2_Case_Type1_Creation]}",
-          "[STATE]" : "TODO",
-          "[SECURITY_CLASSIFICATION]" : "PUBLIC",
           "MultiSelectListField" : [ ],
           "YesOrNoField" : null,
           "[CASE_TYPE]" : "BEFTA_CASETYPE_2_1",
@@ -1385,7 +1382,6 @@
           "TextField" : "text",
           "DateField" : null,
           "TextAreaField" : null,
-          "[LAST_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
           "CollectionField" : [ ]
         },
         "case_id" : "${[scenarioContext][customValues][caseIdAsStringFrom_F-109-Befta_Jurisdiction2_Case_Type1_Creation]}",
@@ -1402,8 +1398,6 @@
             "PostCode" : null
           },
           "[JURISDICTION]" : "BEFTA_JURISDICTION_2",
-          "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
-          "[CREATED_DATE]" : "[[ANYTHING_PRESENT]]",
           "ComplexField" : {
             "ComplexNestedField" : {
               "NestedCollectionTextField" : [ ],
@@ -1417,8 +1411,6 @@
           "PhoneUKField" : null,
           "NumberField" : null,
           "[CASE_REFERENCE]" : "${[scenarioContext][customValues][caseIdAsIntegerFrom_F-109-Befta_Jurisdiction2_Case_Type1_Creation]}",
-          "[STATE]" : "TODO",
-          "[SECURITY_CLASSIFICATION]" : "PUBLIC",
           "MultiSelectListField" : [ ],
           "YesOrNoField" : null,
           "[CASE_TYPE]" : "BEFTA_CASETYPE_2_1",
@@ -1426,10 +1418,8 @@
           "TextField" : "text",
           "DateField" : null,
           "TextAreaField" : null,
-          "[LAST_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
           "CollectionField" : [ ]
-        },
-        "supplementary_data" : null
+        }
       } ],
       "total" : 1
     }

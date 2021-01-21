@@ -1080,6 +1080,7 @@
             "cases" : "[[ANYTHING_PRESENT]]"
             } ],
           "cases" : [ {
+            "_extends_": "104_Base_Case_Fields_expected",
             "fields" : {
               "MoneyGBPField" : "1000",
               "FixedListField" : "VALUE1",
@@ -1092,9 +1093,6 @@
                 "PostCode" : "SW1H 9AJ",
                 "County" : ""
               },
-              "[JURISDICTION]" : "AUTOTEST1",
-              "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
-              "[CREATED_DATE]" : "[[ANYTHING_PRESENT]]",
               "ComplexField" : {
                 "ComplexTextField" : "text inside complex",
                 "ComplexFixedListField" : "VALUE2",
@@ -1109,16 +1107,11 @@
               "DateTimeField" : "[[ANYTHING_PRESENT]]",
               "PhoneUKField" : "02033343555",
               "NumberField" : "1",
-              "[CASE_REFERENCE]" : "[[ANYTHING_PRESENT]]",
-              "[STATE]" : "TODO",
-              "[SECURITY_CLASSIFICATION]" : "PRIVATE",
               "MultiSelectListField" : [ "OPTION1" ],
               "YesOrNoField" : "Yes",
-              "[CASE_TYPE]" : "AAT_PRIVATE",
               "TextField" : "text",
               "DateField" : "1989-09-19",
               "TextAreaField" : "text area",
-              "[LAST_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
               "CollectionField" : [ {
                 "id" : "[[ANYTHING_PRESENT]]",
                 "value" : "collection text"
@@ -1137,9 +1130,6 @@
                 "PostCode" : "SW1H 9AJ",
                 "County" : ""
               },
-              "[JURISDICTION]" : "AUTOTEST1",
-              "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
-              "[CREATED_DATE]" : "[[ANYTHING_PRESENT]]",
               "ComplexField" : {
                 "ComplexTextField" : "text inside complex",
                 "ComplexFixedListField" : "VALUE2",
@@ -1155,21 +1145,16 @@
               "PhoneUKField" : "02033343555",
               "NumberField" : "1",
               "[CASE_REFERENCE]" : "[[ANYTHING_PRESENT]]",
-              "[STATE]" : "TODO",
-              "[SECURITY_CLASSIFICATION]" : "PRIVATE",
               "MultiSelectListField" : [ "OPTION1" ],
               "YesOrNoField" : "Yes",
-              "[CASE_TYPE]" : "AAT_PRIVATE",
               "TextField" : "text",
               "DateField" : "1989-09-19",
               "TextAreaField" : "text area",
-              "[LAST_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
               "CollectionField" : [ {
                 "id" : "[[ANYTHING_PRESENT]]",
                 "value" : "collection text"
               } ]
-            },
-            "supplementary_data" : null
+            }
           } ],
           "total" : 1
         }
