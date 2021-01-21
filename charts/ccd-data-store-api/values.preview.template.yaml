@@ -51,7 +51,7 @@ logstash:
   image:
     repository: hmctspublic.azurecr.io/ccd/logstash
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   logstashJavaOpts: -Xmx1g -Xms512M
   persistence:
     enabled: false
