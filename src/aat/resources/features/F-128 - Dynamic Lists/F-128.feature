@@ -1,4 +1,4 @@
-@F-128 @currentrun
+@F-128
 Feature: F-128: Dynamic Radio List ad Dynamic Multi Select List
 
   Background: Load test data for the scenario
