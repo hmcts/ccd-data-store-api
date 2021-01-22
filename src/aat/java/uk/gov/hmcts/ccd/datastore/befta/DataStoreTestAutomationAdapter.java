@@ -42,7 +42,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
     @Override
     public void doLoadTestData() {
         printEnvVars();
-        new ElasticSearchUtils().deleteIndexesIfPresent();
+        //new ElasticSearchUtils().deleteIndexesIfPresent();
         loader.addCcdRoles();
         loader.importDefinitions();
     }
