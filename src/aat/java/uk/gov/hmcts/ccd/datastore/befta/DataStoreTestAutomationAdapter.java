@@ -79,6 +79,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         }
 
     }
+
     @Override
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {
         if (key.toString().startsWith("caseIdAsIntegerFrom")) {
