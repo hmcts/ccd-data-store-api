@@ -20,6 +20,7 @@ def component = "data-store-api"
 def definitionStoreDevelopPr = "PR-894" // This doesn't change frequently, but when it does, only change this value.
 def dataStoreApiDevelopPr    = "PR-1260" // This doesn't change frequently, but when it does, only change this value.
 def prsToUseAat              = "PR-1193,PR-1219,PR-1248,PR-131" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
+def testStubServicePr        = "PR-71" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
 
 def secrets = [
     'ccd-${env}': [
@@ -92,6 +93,7 @@ env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
 env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 env.ELASTIC_SEARCH_FTA_ENABLED = "false"
+env.TEST_STUB_SERVICE_BASE_URL = "https://ccd-test-stubs-service-${testStubServicePr}.service.core-compute-preview.internal".toLowerCase()
 
 withPipeline(type, product, component) {
     onMaster {
