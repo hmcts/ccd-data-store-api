@@ -29,7 +29,8 @@
         },
         "fields" : [
           {
-            "__ordering__": "unordered"
+            "__ordering__": "unordered",
+            "__elementId__": "label"
           },
           {
           "label" : "State",
