@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
-import com.sun.xml.bind.v2.runtime.output.SAXOutput;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
@@ -42,12 +41,13 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     @Override
     public void doLoadTestData() {
+        printEnvVars();
         new ElasticSearchUtils().deleteIndexesIfPresent();
         loader.addCcdRoles();
         loader.importDefinitions();
     }
 
-    private void printEnvVars(){
+    private void printEnvVars() {
         System.out.println("----------");
         System.out.println("printing env vars");
         System.out.print("ELASTIC_SEARCH_ENABLED:");
