@@ -2,7 +2,7 @@
   "_guid_": "F-128_Case_Data_Create_Token_Creation",
   "_extends_": "Standard_Token_Creation_Data_For_Case_Creation",
   "specs": [
-    "to create a token for case creation"
+    "to create a token for case creation with about start event callback"
   ],
   "users": {
     "invokingUser": {
@@ -30,15 +30,308 @@
         "last_modified": null,
         "last_state_modified_date": null,
         "security_classification": null,
-        "case_data": {},
-        "data_classification": {},
+        "case_data": {
+          "DynamicMultiSelectList": {
+            "value": [
+              {
+                "code": "MONDAYFIRSTOFMAY",
+                "label": "Monday, May 1st"
+              },
+              {
+                "code": "THURSDAYFOURTHOFMAY",
+                "label": "Thursday, May 4th"
+              }
+            ],
+            "list_items": [
+              {
+                "code": "MONDAYFIRSTOFMAY",
+                "label": "Monday, May 1st"
+              },
+              {
+                "code": "TUESDAYSECONDOFMAY",
+                "label": "Tuesday, May 2nd"
+              },
+              {
+                "code": "WEDNESDAYTHIRDOFMAY",
+                "label": "Wednesday, May 3rd"
+              },
+              {
+                "code": "THURSDAYFOURTHOFMAY",
+                "label": "Thursday, May 4th"
+              }
+            ]
+          },
+          "CollectionDynamicRadioList": [
+            {
+              "value": {
+                "value": {
+                  "code": "JUDGESMITH",
+                  "label": "Judge Smith"
+                },
+                "list_items": [
+                  {
+                    "code": "JUDGEJUDY",
+                    "label": "Judge Judy"
+                  },
+                  {
+                    "code": "JUDGERINDER",
+                    "label": "Judge Rinder"
+                  },
+                  {
+                    "code": "JUDGESMITH",
+                    "label": "Judge Smith"
+                  },
+                  {
+                    "code": "JUDGEDREDD",
+                    "label": "Judge Dredd"
+                  }
+                ]
+              },
+              "id": "RadioList1"
+            },
+            {
+              "value": {
+                "value": {
+                  "code": "JUDGESMITH",
+                  "label": "Judge Smith"
+                },
+                "list_items": [
+                  {
+                    "code": "JUDGEJUDY",
+                    "label": "Judge Judy"
+                  },
+                  {
+                    "code": "JUDGERINDER",
+                    "label": "Judge Rinder"
+                  },
+                  {
+                    "code": "JUDGESMITH",
+                    "label": "Judge Smith"
+                  },
+                  {
+                    "code": "JUDGEDREDD",
+                    "label": "Judge Dredd"
+                  }
+                ]
+              },
+              "id": "RadioList2"
+            }
+          ],
+          "CollectionDynamicMultiSelectList": [
+            {
+              "value": {
+                "value": [
+                  {
+                    "code": "MONDAYFIRSTOFMAY",
+                    "label": "Monday, May 1st"
+                  },
+                  {
+                    "code": "THURSDAYFOURTHOFMAY",
+                    "label": "Thursday, May 4th"
+                  }
+                ],
+                "list_items": [
+                  {
+                    "code": "MONDAYFIRSTOFMAY",
+                    "label": "Monday, May 1st"
+                  },
+                  {
+                    "code": "TUESDAYSECONDOFMAY",
+                    "label": "Tuesday, May 2nd"
+                  },
+                  {
+                    "code": "WEDNESDAYTHIRDOFMAY",
+                    "label": "Wednesday, May 3rd"
+                  },
+                  {
+                    "code": "THURSDAYFOURTHOFMAY",
+                    "label": "Thursday, May 4th"
+                  }
+                ]
+              },
+              "id": "MultiSelect1"
+            },
+            {
+              "value": {
+                "value": [
+                  {
+                    "code": "TUESDAYSECONDOFMAY",
+                    "label": "Tuesday, May 2nd"
+                  },
+                  {
+                    "code": "WEDNESDAYTHIRDOFMAY",
+                    "label": "Wednesday, May 3rd"
+                  }
+                ],
+                "list_items": [
+                  {
+                    "code": "MONDAYFIRSTOFMAY",
+                    "label": "Monday, May 1st"
+                  },
+                  {
+                    "code": "TUESDAYSECONDOFMAY",
+                    "label": "Tuesday, May 2nd"
+                  },
+                  {
+                    "code": "WEDNESDAYTHIRDOFMAY",
+                    "label": "Wednesday, May 3rd"
+                  },
+                  {
+                    "code": "THURSDAYFOURTHOFMAY",
+                    "label": "Thursday, May 4th"
+                  }
+                ]
+              },
+              "id": "MultiSelect2"
+            }
+          ],
+          "DynamicListsComplexField": {
+            "DynamicRadioListComplex": {
+              "value": {
+                "code": "JUDGESMITH",
+                "label": "Judge Smith"
+              },
+              "list_items": [
+                {
+                  "code": "JUDGEJUDY",
+                  "label": "Judge Judy"
+                },
+                {
+                  "code": "JUDGERINDER",
+                  "label": "Judge Rinder"
+                },
+                {
+                  "code": "JUDGESMITH",
+                  "label": "Judge Smith"
+                },
+                {
+                  "code": "JUDGEDREDD",
+                  "label": "Judge Dredd"
+                }
+              ]
+            },
+            "DynamicMultiSelectComplex": {
+              "value": [
+                {
+                  "code": "MONDAYFIRSTOFMAY",
+                  "label": "Monday, May 1st"
+                },
+                {
+                  "code": "THURSDAYFOURTHOFMAY",
+                  "label": "Thursday, May 4th"
+                }
+              ],
+              "list_items": [
+                {
+                  "code": "MONDAYFIRSTOFMAY",
+                  "label": "Monday, May 1st"
+                },
+                {
+                  "code": "TUESDAYSECONDOFMAY",
+                  "label": "Tuesday, May 2nd"
+                },
+                {
+                  "code": "WEDNESDAYTHIRDOFMAY",
+                  "label": "Wednesday, May 3rd"
+                },
+                {
+                  "code": "THURSDAYFOURTHOFMAY",
+                  "label": "Thursday, May 4th"
+                }
+              ]
+            }
+          },
+          "DynamicRadioList": {
+            "value": {
+              "code": "JUDGESMITH",
+              "label": "Judge Smith"
+            },
+            "list_items": [
+              {
+                "code": "JUDGEJUDY",
+                "label": "Judge Judy"
+              },
+              {
+                "code": "JUDGERINDER",
+                "label": "Judge Rinder"
+              },
+              {
+                "code": "JUDGESMITH",
+                "label": "Judge Smith"
+              },
+              {
+                "code": "JUDGEDREDD",
+                "label": "Judge Dredd"
+              }
+            ]
+          }
+        },
+        "data_classification": {
+          "DynamicMultiSelectList": "PUBLIC",
+          "CollectionDynamicRadioList": {
+            "classification": "PUBLIC",
+            "value": [
+              {
+                "id": "RadioList1",
+                "classification": "PUBLIC"
+              },
+              {
+                "id": "RadioList2",
+                "classification": "PUBLIC"
+              }
+            ]
+          },
+          "CollectionDynamicMultiSelectList": {
+            "classification": "PUBLIC",
+            "value": [
+              {
+                "id": "MultiSelect1",
+                "classification": "PUBLIC"
+              },
+              {
+                "id": "MultiSelect2",
+                "classification": "PUBLIC"
+              }
+            ]
+          },
+          "DynamicRadioList": "PUBLIC"
+        },
         "supplementary_data": null,
         "after_submit_callback_response": null,
         "callback_response_status_code": null,
         "callback_response_status": null,
         "delete_draft_response_status_code": null,
         "delete_draft_response_status": null,
-        "security_classifications": {}
+        "security_classifications": {
+          "DynamicMultiSelectList": "PUBLIC",
+          "CollectionDynamicRadioList": {
+            "classification": "PUBLIC",
+            "value": [
+              {
+                "id": "RadioList1",
+                "classification": "PUBLIC"
+              },
+              {
+                "id": "RadioList2",
+                "classification": "PUBLIC"
+              }
+            ]
+          },
+          "CollectionDynamicMultiSelectList": {
+            "classification": "PUBLIC",
+            "value": [
+              {
+                "id": "MultiSelect1",
+                "classification": "PUBLIC"
+              },
+              {
+                "id": "MultiSelect2",
+                "classification": "PUBLIC"
+              }
+            ]
+          },
+          "DynamicRadioList": "PUBLIC"
+        }
       },
       "event_id": "createCase"
     }
