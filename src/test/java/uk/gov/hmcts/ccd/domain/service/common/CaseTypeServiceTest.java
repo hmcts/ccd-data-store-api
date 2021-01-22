@@ -1,5 +1,23 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.types.CaseDataValidator;
+import uk.gov.hmcts.ccd.domain.types.ValidationContext;
+import uk.gov.hmcts.ccd.domain.types.ValidationResult;
+import uk.gov.hmcts.ccd.domain.types.ValidationResultBuilder;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,23 +31,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.types.CaseDataValidator;
-import uk.gov.hmcts.ccd.domain.types.ValidationResult;
-import uk.gov.hmcts.ccd.domain.types.ValidationResultBuilder;
-import uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 class CaseTypeServiceTest {
 
@@ -72,7 +73,7 @@ class CaseTypeServiceTest {
             final ResourceNotFoundException
                 exception = assertThrows(ResourceNotFoundException.class, () -> subject.findState(c, "ngitb"));
             assertThat(exception.getMessage(),
-                       is("No state found with id 'ngitb' for case type 'nOonEhaStimEtodomYcodEreview'"));
+                is("No state found with id 'ngitb' for case type 'nOonEhaStimEtodomYcodEreview'"));
         }
 
         private CaseStateDefinition buildCaseState(final String name) {
@@ -116,7 +117,7 @@ class CaseTypeServiceTest {
         void shouldCallCaseDataValidator() {
 
             // ARRANGE
-            when(caseDataValidator.validate(any(), any())).thenReturn(new ArrayList<>()); // i.e. no errors
+            when(caseDataValidator.validate(any())).thenReturn(new ArrayList<>()); // i.e. no errors
 
             Map<String, JsonNode> data = new HashMap<>();
             List<CaseFieldDefinition> caseFieldDefinitions = new ArrayList<>();
@@ -127,7 +128,8 @@ class CaseTypeServiceTest {
             subject.validateData(data, caseTypeDefinition);
 
             // ASSERT
-            verify(caseDataValidator, times(1)).validate(data, caseFieldDefinitions);
+            verify(caseDataValidator,
+                times(1)).validate(any(ValidationContext.class));
         }
 
         @Test
@@ -137,11 +139,11 @@ class CaseTypeServiceTest {
             // ARRANGE
             List<ValidationResult> validationResults = new ArrayList<>();
             validationResults.add(new ValidationResultBuilder().setErrorMessage("message 1").setFieldId("field 1")
-                    .build());
+                .build());
             validationResults.add(new ValidationResultBuilder().setErrorMessage("message 2").setFieldId("field 2")
-                    .build());
+                .build());
 
-            when(caseDataValidator.validate(any(), any())).thenReturn(validationResults); // i.e. two errors
+            when(caseDataValidator.validate(any())).thenReturn(validationResults); // i.e. two errors
 
             Map<String, JsonNode> data = new HashMap<>();
             List<CaseFieldDefinition> caseFieldDefinitions = new ArrayList<>();
@@ -151,6 +153,14 @@ class CaseTypeServiceTest {
             // ASSERT (() -> ACT))
             assertThrows(CaseValidationException.class, () -> subject.validateData(data, caseTypeDefinition));
         }
+    }
+
+    private ValidationContext getValidationContext(
+        Map<String, JsonNode> values, List<CaseFieldDefinition> caseFieldDefinitions) {
+
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
+        return new ValidationContext(caseTypeDefinition, values);
     }
 }
 
