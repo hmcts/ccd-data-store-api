@@ -1,12 +1,11 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import com.fasterxml.jackson.databind.JsonNode;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
@@ -42,6 +41,10 @@ public class DynamicListValidator implements BaseTypeValidator {
                                       String dataFieldId,
                                       List<ValidationResult> results) {
         if (value != null) {
+            if (value.isArray()) {
+                results.add(new ValidationResult(
+                    String.format("Array values are not supported for '%s' type", getType()), dataFieldId));
+            }
             validateLength(results, value, dataFieldId);
         }
     }
