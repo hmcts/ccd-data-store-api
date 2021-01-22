@@ -93,6 +93,9 @@ env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-aat.service.core-
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 env.ELASTIC_SEARCH_FTA_ENABLED = "true"
 
+env.ELASTIC_SEARCH_FTA_ENABLED = "true"
+env.ELASTIC_SEARCH_HOSTS = "{{ .Release.Name }}-es-master:9200"
+
 withPipeline(type, product, component) {
     onMaster {
         enableSlackNotifications('#ccd-master-builds')
