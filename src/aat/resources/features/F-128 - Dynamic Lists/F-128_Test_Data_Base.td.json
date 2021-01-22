@@ -1,5 +1,5 @@
 {
-  "title": "should create a case with organisation policy",
+  "title": "should create a case with dynamic lists",
   "_guid_": "F-128_Test_Data_Base",
   "productName": "CCD Data Store",
   "operationName": "Submit Case Creation as Caseworker",
@@ -30,34 +30,185 @@
     },
     "body": {
       "data": {
-        "OrganisationField": {
-          "OrganisationID": null,
-          "OrganisationName": null
-        },
-        "OrganisationPolicyField": {
-          "OrgPolicyCaseAssignedRole": "[Claimant]",
-          "OrgPolicyReference": null,
-          "Organisation": {
-            "OrganisationID": null,
-            "OrganisationName": null
-          }
-        },
-        "ChangeOrganisationRequestField": {
-          "CaseRoleId": null,
-          "Reason": null,
-          "RequestTimestamp": null,
-          "ApprovalStatus": "1",
-          "ApprovalRejectionTimestamp": null,
-          "NotesReason": null,
-          "OrganisationToAdd": {
-            "OrganisationID": null,
-            "OrganisationName": null
+        "TextAreaField": "textAreaField1",
+        "TextField": "textField1",
+        "EmailField": "test@hmcts.net",
+        "DynamicMultiSelectList" : {
+        "value" : [ {
+          "code" : "MONDAYFIRSTOFMAY",
+          "label" : "Monday, May 1st"
+        }, {
+          "code" : "THURSDAYFOURTHOFMAY",
+          "label" : "Thursday, May 4th"
+        } ],
+        "list_items" : [ {
+          "code" : "MONDAYFIRSTOFMAY",
+          "label" : "Monday, May 1st"
+        }, {
+          "code" : "TUESDAYSECONDOFMAY",
+          "label" : "Tuesday, May 2nd"
+        }, {
+          "code" : "WEDNESDAYTHIRDOFMAY",
+          "label" : "Wednesday, May 3rd"
+        }, {
+          "code" : "THURSDAYFOURTHOFMAY",
+          "label" : "Thursday, May 4th"
+        } ]
+      },
+      "CollectionDynamicRadioList" : [ {
+        "value" : {
+          "value" : {
+            "code" : "JUDGESMITH",
+            "label" : "Judge Smith"
           },
-          "OrganisationToRemove": {
-            "OrganisationID": null,
-            "OrganisationName": null
-          }
+          "list_items" : [ {
+            "code" : "JUDGEJUDY",
+            "label" : "Judge Judy"
+          }, {
+            "code" : "JUDGERINDER",
+            "label" : "Judge Rinder"
+          }, {
+            "code" : "JUDGESMITH",
+            "label" : "Judge Smith"
+          }, {
+            "code" : "JUDGEDREDD",
+            "label" : "Judge Dredd"
+          } ]
+        },
+        "id" : "RadioList1"
+      }, {
+        "value" : {
+          "value" : {
+            "code" : "JUDGESMITH",
+            "label" : "Judge Smith"
+          },
+          "list_items" : [ {
+            "code" : "JUDGEJUDY",
+            "label" : "Judge Judy"
+          }, {
+            "code" : "JUDGERINDER",
+            "label" : "Judge Rinder"
+          }, {
+            "code" : "JUDGESMITH",
+            "label" : "Judge Smith"
+          }, {
+            "code" : "JUDGEDREDD",
+            "label" : "Judge Dredd"
+          } ]
+        },
+        "id" : "RadioList2"
+      } ],
+      "CollectionDynamicMultiSelectList" : [ {
+        "value" : {
+          "value" : [ {
+            "code" : "MONDAYFIRSTOFMAY",
+            "label" : "Monday, May 1st"
+          }, {
+            "code" : "THURSDAYFOURTHOFMAY",
+            "label" : "Thursday, May 4th"
+          } ],
+          "list_items" : [ {
+            "code" : "MONDAYFIRSTOFMAY",
+            "label" : "Monday, May 1st"
+          }, {
+            "code" : "TUESDAYSECONDOFMAY",
+            "label" : "Tuesday, May 2nd"
+          }, {
+            "code" : "WEDNESDAYTHIRDOFMAY",
+            "label" : "Wednesday, May 3rd"
+          }, {
+            "code" : "THURSDAYFOURTHOFMAY",
+            "label" : "Thursday, May 4th"
+          } ]
+        },
+        "id" : "MultiSelect1"
+      }, {
+        "value" : {
+          "value" : [ {
+            "code" : "TUESDAYSECONDOFMAY",
+            "label" : "Tuesday, May 2nd"
+          }, {
+            "code" : "WEDNESDAYTHIRDOFMAY",
+            "label" : "Wednesday, May 3rd"
+          } ],
+          "list_items" : [ {
+            "code" : "MONDAYFIRSTOFMAY",
+            "label" : "Monday, May 1st"
+          }, {
+            "code" : "TUESDAYSECONDOFMAY",
+            "label" : "Tuesday, May 2nd"
+          }, {
+            "code" : "WEDNESDAYTHIRDOFMAY",
+            "label" : "Wednesday, May 3rd"
+          }, {
+            "code" : "THURSDAYFOURTHOFMAY",
+            "label" : "Thursday, May 4th"
+          } ]
+        },
+        "id" : "MultiSelect2"
+      } ],
+      "DynamicListsComplexField" : {
+        "DynamicRadioListComplex" : {
+          "value" : {
+            "code" : "JUDGESMITH",
+            "label" : "Judge Smith"
+          },
+          "list_items" : [ {
+            "code" : "JUDGEJUDY",
+            "label" : "Judge Judy"
+          }, {
+            "code" : "JUDGERINDER",
+            "label" : "Judge Rinder"
+          }, {
+            "code" : "JUDGESMITH",
+            "label" : "Judge Smith"
+          }, {
+            "code" : "JUDGEDREDD",
+            "label" : "Judge Dredd"
+          } ]
+        },
+        "DynamicMultiSelectComplex" : {
+          "value" : [ {
+            "code" : "MONDAYFIRSTOFMAY",
+            "label" : "Monday, May 1st"
+          }, {
+            "code" : "THURSDAYFOURTHOFMAY",
+            "label" : "Thursday, May 4th"
+          } ],
+          "list_items" : [ {
+            "code" : "MONDAYFIRSTOFMAY",
+            "label" : "Monday, May 1st"
+          }, {
+            "code" : "TUESDAYSECONDOFMAY",
+            "label" : "Tuesday, May 2nd"
+          }, {
+            "code" : "WEDNESDAYTHIRDOFMAY",
+            "label" : "Wednesday, May 3rd"
+          }, {
+            "code" : "THURSDAYFOURTHOFMAY",
+            "label" : "Thursday, May 4th"
+          } ]
         }
+      },
+      "DynamicRadioList" : {
+        "value" : {
+          "code" : "JUDGESMITH",
+          "label" : "Judge Smith"
+        },
+        "list_items" : [ {
+          "code" : "JUDGEJUDY",
+          "label" : "Judge Judy"
+        }, {
+          "code" : "JUDGERINDER",
+          "label" : "Judge Rinder"
+        }, {
+          "code" : "JUDGESMITH",
+          "label" : "Judge Smith"
+        }, {
+          "code" : "JUDGEDREDD",
+          "label" : "Judge Dredd"
+        } ]
+      }
       },
       "event": {
         "id": "createCase",

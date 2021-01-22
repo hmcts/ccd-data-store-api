@@ -232,7 +232,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.3.0'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.6.0-RDM-7165-1'
 }
 // end::dependencies[]
 
@@ -738,7 +738,7 @@ task functional() {
             args = [
                      '--threads', '10',
                      '--plugin', 'json:${rootDir}/target/cucumber.json',
-                     '--tags', 'not @Ignore',
+                     '--tags', '@currentrun',
                      '--glue', 'uk.gov.hmcts.befta.player',
                      '--glue', 'uk.gov.hmcts.ccd.datastore.befta', 'src/aat/resources/features'
                    ]
