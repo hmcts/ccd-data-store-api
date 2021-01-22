@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
+import com.sun.xml.bind.v2.runtime.output.SAXOutput;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
@@ -46,6 +47,38 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         loader.importDefinitions();
     }
 
+    private void printEnvVars(){
+        System.out.println("----------");
+        System.out.println("printing env vars");
+        System.out.print("ELASTIC_SEARCH_ENABLED:");
+        try {
+            System.out.println(System.getenv("ELASTIC_SEARCH_ENABLED"));
+        } catch (NullPointerException e) {
+            System.out.println("NULL");
+        }
+
+        System.out.print("ELASTIC_SEARCH_HOSTS:");
+        try {
+            System.out.println(System.getenv("ELASTIC_SEARCH_HOSTS"));
+        } catch (NullPointerException e) {
+            System.out.println("NULL");
+        }
+
+        System.out.print("ELASTIC_SEARCH_FTA_ENABLED:");
+        try {
+            System.out.println(System.getenv("ELASTIC_SEARCH_FTA_ENABLED"));
+        } catch (NullPointerException e) {
+            System.out.println("NULL");
+        }
+
+        System.out.print("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY:");
+        try {
+            System.out.println(System.getenv("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY"));
+        } catch (NullPointerException e) {
+            System.out.println("NULL");
+        }
+
+    }
     @Override
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {
         if (key.toString().startsWith("caseIdAsIntegerFrom")) {
