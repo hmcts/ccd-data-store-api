@@ -592,7 +592,6 @@
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-								"retain_hidden_value": null,
                   "show_condition": null
                 },
                 {
@@ -600,7 +599,6 @@
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-								"retain_hidden_value": null,
                   "show_condition": null
                 },
                 {
@@ -608,7 +606,6 @@
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-								"retain_hidden_value": null,
                   "show_condition": null
                 },
                 {
@@ -616,7 +613,6 @@
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-								"retain_hidden_value": null,
                   "show_condition": null
                 },
                 {
@@ -624,7 +620,6 @@
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-								"retain_hidden_value": null,
                   "show_condition": null
                 },
                 {
@@ -632,7 +627,6 @@
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-								"retain_hidden_value": null,
                   "show_condition": null
                 },
                 {
@@ -640,7 +634,6 @@
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-								"retain_hidden_value": null,
                   "show_condition": null
                 }
               ]
@@ -659,7 +652,6 @@
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-								"retain_hidden_value": null,
                   "show_condition": null
                 },
                 {
@@ -667,7 +659,6 @@
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-								"retain_hidden_value": null,
                   "show_condition": null
                 },
                 {
@@ -675,7 +666,6 @@
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-								"retain_hidden_value": null,
                   "show_condition": null
                 },
                 {
@@ -683,7 +673,6 @@
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-								"retain_hidden_value": null,
                   "show_condition": null
                 },
                 {
@@ -691,7 +680,6 @@
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-								"retain_hidden_value": null,
                   "show_condition": null
                 },
                 {
@@ -699,7 +687,6 @@
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-								"retain_hidden_value": null,
                   "show_condition": null
                 },
                 {
@@ -707,7 +694,6 @@
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-								"retain_hidden_value": null,
                   "show_condition": null
                 }
               ]
