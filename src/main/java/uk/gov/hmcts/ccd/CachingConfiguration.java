@@ -1,14 +1,13 @@
 package uk.gov.hmcts.ccd;
 
+import com.hazelcast.config.Config;
+import com.hazelcast.config.EvictionConfig;
+import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.MaxSizePolicy;
+import com.hazelcast.config.NetworkConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.hazelcast.config.Config;
-import com.hazelcast.config.MapConfig;
-import com.hazelcast.config.EvictionConfig;
-import com.hazelcast.config.MaxSizePolicy;
-import com.hazelcast.config.NetworkConfig;
 
 @Configuration
 public class CachingConfiguration {

@@ -5,13 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,11 +37,17 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 
+import javax.inject.Inject;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
@@ -4368,8 +4367,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .content(mapper.writeValueAsBytes(caseDetailsToValidate))
         ).andExpect(status().is(200)).andReturn();
 
-        WireMock.verify(exactly(1), postRequestedFor(urlMatching(MID_EVENT_CALL_BACK)));
-        WireMock.verify(exactly(1), postRequestedFor(urlMatching(MID_EVENT_CALL_BACK))
+        verifyWireMock(1, postRequestedFor(urlMatching(MID_EVENT_CALL_BACK)));
+        verifyWireMock(1, postRequestedFor(urlMatching(MID_EVENT_CALL_BACK))
                                               .withRequestBody(equalToJson(requestBodyJson())));
 
         final JsonNode expectedResponse = MAPPER.readTree("{\"data\": " + expectedCaseData() + "}");
@@ -4420,8 +4419,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .content(mapper.writeValueAsBytes(caseDetailsToValidate))
         ).andExpect(status().is(200)).andReturn();
 
-        WireMock.verify(exactly(1), postRequestedFor(urlMatching(MID_EVENT_CALL_BACK_MULTI_PAGE)));
-        WireMock.verify(exactly(1), postRequestedFor(urlMatching(MID_EVENT_CALL_BACK_MULTI_PAGE))
+        verifyWireMock(1, postRequestedFor(urlMatching(MID_EVENT_CALL_BACK_MULTI_PAGE)));
+        verifyWireMock(1, postRequestedFor(urlMatching(MID_EVENT_CALL_BACK_MULTI_PAGE))
             .withRequestBody(equalToJson(requestBodyJsonMultiPage())));
 
         final JsonNode expectedResponse = MAPPER.readTree("{\"data\": " + expectedCaseDataMultiPage() + "}");
