@@ -723,8 +723,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "retain_hidden_value": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress3.AddressLine2",
@@ -732,8 +731,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "retain_hidden_value": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespName",
@@ -741,8 +739,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "retain_hidden_value": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress4.PostCode",
@@ -750,8 +747,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "retain_hidden_value": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress4.Country",
@@ -759,8 +755,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "retain_hidden_value": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress3.AddressLine3",
@@ -768,8 +763,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "retain_hidden_value": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress3.PostTown",
@@ -777,8 +771,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "retain_hidden_value": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress3.County",
@@ -786,8 +779,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "retain_hidden_value": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress3.PostCode",
@@ -795,8 +787,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "retain_hidden_value": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress3.Country",
@@ -804,8 +795,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "retain_hidden_value": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress4.AddressLine1",
@@ -813,8 +803,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "retain_hidden_value": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress4.AddressLine2",
@@ -822,8 +811,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "retain_hidden_value": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress4.AddressLine3",
@@ -831,8 +819,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "retain_hidden_value": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress4.PostTown",
@@ -840,8 +827,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "retain_hidden_value": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress4.County",
@@ -849,8 +835,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "retain_hidden_value": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 }
               ]
             }
