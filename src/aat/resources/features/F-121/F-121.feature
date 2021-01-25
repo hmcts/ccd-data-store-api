@@ -1,6 +1,6 @@
 #======================================================
 @F-121
-Feature: F-121: Order Complex fields in start event
+Feature: F-121: Order Complex Fields in Start Event
 #======================================================
 
 Background: Load test data for the scenario
