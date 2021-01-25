@@ -16,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
@@ -126,13 +125,9 @@ public abstract class BaseTest {
     @Mock
     protected SecurityContext securityContext;
 
-    @Inject
-    private CacheManager cacheManager;
-
     @Before
     @BeforeEach
     public void initMock() throws IOException {
-        cacheManager.getCacheNames().stream().forEach(cacheName -> cacheManager.getCache(cacheName).clear());
         MockitoAnnotations.initMocks(this);
         ReflectionTestUtils.setField(caseRoleRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(caseDefinitionRepository, "securityUtils", securityUtils);
