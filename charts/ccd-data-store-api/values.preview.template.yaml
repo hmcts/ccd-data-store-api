@@ -29,7 +29,7 @@ java:
     enabled: true
 
 elastic:
-  enabled: true # enable whenever required on a particular PR
+  enabled: false # enable whenever required on a particular PR
 
 elasticsearch:
   clusterName: "es"
