@@ -1,15 +1,17 @@
 {
   "_guid_": "F-107_Case_Data_Create_Token_Creation",
   "_extends_": "Standard_Token_Creation_Data_For_Case_Creation",
+
   "specs": [
     "to create a token for case creation"
   ],
+
   "users": {
     "invokingUser": {
-      "username": "befta.caseworker.caa@gmail.com",
-      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+      "_extends_": "F-107_User"
     }
   },
+
   "request": {
     "pathVariables": {
       "uid": "[[DEFAULT_AUTO_VALUE]]",
@@ -18,6 +20,7 @@
       "etid": "createCase"
     }
   },
+
   "expectedResponse": {
     "body": {
       "case_details": {

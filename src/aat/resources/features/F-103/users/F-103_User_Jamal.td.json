@@ -1,0 +1,8 @@
+{
+  "_guid_": "F-103_User_Jamal",
+  "_extends_": "BeftaCaseworkerCaa",
+
+  "specs": [
+    "Jamal - who is a privileged user with permissions to access the case assignments of other users"
+  ]
+}
