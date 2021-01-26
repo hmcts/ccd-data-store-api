@@ -44,6 +44,7 @@ public class DynamicListValidator implements BaseTypeValidator {
             if (value.isArray()) {
                 results.add(new ValidationResult(
                     String.format("Array values are not supported for '%s' type", getType()), dataFieldId));
+                return;
             }
             validateLength(results, value, dataFieldId);
         }
