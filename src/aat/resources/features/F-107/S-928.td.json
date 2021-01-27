@@ -24,6 +24,7 @@
       "event_token": "${[scenarioContext][childContexts][S-930-Prerequisite][testData][actualResponse][body][token]}"
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_422_Response",
     "body" : {

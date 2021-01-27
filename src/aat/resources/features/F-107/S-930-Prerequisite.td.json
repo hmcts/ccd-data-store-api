@@ -11,8 +11,7 @@
 
   "users": {
     "invokingUser": {
-      "username": "befta.caseworker.caa@gmail.com",
-      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+      "_extends_": "F-107_User"
     }
   },
 
@@ -28,6 +27,7 @@
       "etid": "updateCase"
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
