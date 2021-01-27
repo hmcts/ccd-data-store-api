@@ -1,5 +1,6 @@
 {
   "_guid_": "F-107_Test_Data_Update",
+
   "productName": "CCD data store",
   "operationName": "submit event for an existing case (V2)",
   "method": "POST",
@@ -7,10 +8,10 @@
 
   "users": {
     "invokingUser": {
-      "username": "befta.caseworker.caa@gmail.com",
-      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+      "_extends_": "F-107_User"
     }
   },
+
   "request": {
     "headers": {
       "_extends_": "Common_Request_Headers",
@@ -18,7 +19,7 @@
       "experimental": true
     },
     "pathVariables": {
-      "cid": "1234567890123456"
+      "cid": "OVERRIDE CID"
     },
     "body": {
       "data": {
@@ -44,10 +45,11 @@
         "summary": "",
         "description": ""
       },
-      "event_token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJrNHZpNHZwMGhyNmk4MTNoZmZnYWpncmJrdiIsInN1YiI6IjdmNTRmZTQ1LTM2NDMtNDc1OC05YjIwLWNhZGIyMWRmZGRiZiIsImlhdCI6MTU3NTYzMTQ5MiwiY2FzZS1pZCI6IjI0NTEiLCJldmVudC1pZCI6IlNUQVJUX1BST0dSRVNTIiwiY2FzZS10eXBlLWlkIjoiQUFUX0FVVEhfMTUiLCJqdXJpc2RpY3Rpb24taWQiOiJBVVRPVEVTVDEiLCJjYXNlLXN0YXRlIjoiVE9ETyIsImNhc2UtdmVyc2lvbiI6IjE1NDQ1NGIxYTJmNzczYTg0NjU5YmVjYzc3ZjYyODdjNDVlYTE4MzgiLCJlbnRpdHktdmVyc2lvbiI6MH0.gwKtIzJ-JGp-luGbTDXBBlbQ6iqbHY-dcAJaubhrBRM",
+      "event_token": "OVERRIDE EVENT TOKEN",
       "ignore_warning": false
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_201_Response"
   }
