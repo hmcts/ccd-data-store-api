@@ -43,7 +43,7 @@ Feature: Allow ignoring fields in ES by declaring them non searchable
     And the response [contains no cases]
     And the response has all the details as expected
 
-  @S-112.3
+  @S-112.3 @Ignore #wait for RDM-10885 ro run this
   Scenario: results returned when searching by searchable complex child field
     Given a user with [an active profile in CCD]
     And a case that has just been created as in [F-112.3-Befta_Master_ComplexCollectionComplex_Case_Creation]
@@ -56,7 +56,7 @@ Feature: Allow ignoring fields in ES by declaring them non searchable
     And the response [contains the previously created case]
     And the response has all the details as expected
 
-  @S-112.5
+  @S-112.5 @Ignore #wait for RDM-10885 ro run this
   Scenario: results returned when searching by searchable field within a collection
     Given a user with [an active profile in CCD]
     And a case that has just been created as in [F-112.5-Befta_Master_ComplexCollectionComplex_Case_Creation]
