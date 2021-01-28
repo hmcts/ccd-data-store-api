@@ -72,12 +72,19 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         }
 
         System.out.print("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY:");
+        System.out.print("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY:");
         try {
             System.out.println(System.getenv("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY"));
         } catch (NullPointerException e) {
             System.out.println("NULL");
         }
 
+        System.out.print("PRINT_ENV_FROM_JENKINSFILE: ");
+        try {
+            System.out.println(System.getenv("PRINT_ENV_FROM_JENKINSFILE"));
+        } catch (NullPointerException e) {
+            System.out.println("NULL");
+        }
     }
 
     @Override
