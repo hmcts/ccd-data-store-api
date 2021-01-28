@@ -713,8 +713,10 @@ task smoke() {
     finalizedBy {
         generateCucumberReports {
             doLast{
+                delete "${rootDir}/BEFTA Report for Smoke Tests/"
                 new File("${rootDir}/BEFTA Report for Smoke Tests").mkdirs()
                 file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Smoke Tests"))
+                logger.quiet("Smoke test report moved to ---> file://${rootDir}/BEFTA%20Report%20for%20Smoke%20Tests/overview-features.html")
             }
         }
     }
@@ -724,7 +726,7 @@ task smoke() {
 
 task functional() {
     description = 'Executes functional tests against an the CCD Data Store API instance just deployed'
-
+    dependsOn aatClasses
     new File("$buildDir/test-results/test").mkdirs()
     copy {
         from "src/aat/resources/DummyTest.xml"
@@ -753,7 +755,6 @@ task functional() {
                 delete "${rootDir}/BEFTA Report for Functional Tests/"
                 new File("${rootDir}/BEFTA Report for Functional Tests").mkdirs()
                 file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Functional Tests"))
-
                 logger.quiet("Functional test report moved to ---> file://${rootDir}/BEFTA%20Report%20for%20Functional%20Tests/overview-features.html")
             }
         }

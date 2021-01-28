@@ -1025,6 +1025,12 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public WizardPageComplexFieldOverrideBuilder withRetainHiddenvalue(Boolean retainHiddenvalue) {
+            this.wizardPageComplexFieldOverride.setRetainHiddenValue(retainHiddenvalue);
+            return this;
+        }
+
+
         public WizardPageComplexFieldOverride build() {
             return this.wizardPageComplexFieldOverride;
         }
