@@ -54,7 +54,7 @@ public class DataBlockGenerator {
                     dataBlock.put(publishableField.getKey(), node);
                     break;
                 default:
-                    dataBlock.put(publishableField.getKey(), TextNode.valueOf(node.asText()));
+                    dataBlock.put(publishableField.getKey(), textNodeOf(node));
             }
         }
         return dataBlock;
@@ -75,6 +75,14 @@ public class DataBlockGenerator {
         }
 
         return IntNode.valueOf(node.intValue());
+    }
+
+    private JsonNode textNodeOf(JsonNode node) {
+        if (node == null || node.isNull()) {
+            return mapper.nullNode();
+        }
+
+        return TextNode.valueOf(node.asText());
     }
 
     private Map<String, JsonNode> buildNestedLevelDataBlock(PublishableField publishableField,
