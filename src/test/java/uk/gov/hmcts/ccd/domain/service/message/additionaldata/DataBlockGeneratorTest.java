@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.hamcrest.MatcherAssert;
@@ -157,7 +158,7 @@ class DataBlockGeneratorTest {
         ObjectMapper mapper = new ObjectMapper();
 
         Map<String, JsonNode> data = new HashMap<>();
-        data.put(FIELD_ID, mapper.readTree("6080"));
+        data.put(FIELD_ID, IntNode.valueOf(6080));
 
         caseDetails = newCaseDetails().withData(data).build();
 

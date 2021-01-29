@@ -78,7 +78,11 @@ public class DataBlockGenerator {
             return mapper.nullNode();
         }
 
-        return IntNode.valueOf(node.intValue());
+        if (node.isNumber()) {
+            return node;
+        }
+
+        return IntNode.valueOf(Integer.parseInt(node.textValue()));
     }
 
     private JsonNode textNodeOf(JsonNode node) {
