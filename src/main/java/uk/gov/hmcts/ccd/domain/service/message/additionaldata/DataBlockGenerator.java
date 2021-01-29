@@ -38,7 +38,8 @@ public class DataBlockGenerator {
                                                          Map<String, JsonNode> dataBlock,
                                                          List<PublishableField> nestedPublishable,
                                                          CaseDetails caseDetails) {
-        if (publishableField.getDisplayContext().equals(DisplayContext.COMPLEX)) {
+        if (publishableField.getDisplayContext() != null &&
+            publishableField.getDisplayContext().equals(DisplayContext.COMPLEX)) {
             JsonNode subNode = buildNestedLevelDataBlock(publishableField, nestedPublishable, dataBlock, caseDetails);
             dataBlock.put(publishableField.getKey(), subNode);
         } else {
@@ -53,7 +54,8 @@ public class DataBlockGenerator {
                     break;
                 case FieldTypeDefinition.COMPLEX:
                 case FieldTypeDefinition.COLLECTION:
-                    dataBlock.put(publishableField.getKey(), node);
+                    JsonNode subNode = buildNestedLevelDataBlock(publishableField, nestedPublishable, dataBlock, caseDetails);
+                    dataBlock.put(publishableField.getKey(), subNode);
                     break;
                 default:
                     dataBlock.put(publishableField.getKey(), textNodeOf(node));
@@ -98,12 +100,7 @@ public class DataBlockGenerator {
         fields.forEach(field -> {
             JsonNode node = getNestedCaseFieldByPath(caseDetails.getData().get(field.splitPath()[0]),
                 StringUtils.substringAfter(field.getPath(), FIELD_SEPARATOR));
-            if (!field.getOriginalId().equals(field.getKey())) {
-                dataBlock.put(field.getKey(), populateDataBlockForComplex(field, node, nestedPublishable, caseDetails, dataBlock));
-                array.put(field.getCaseField().getId(), populateDataBlockForComplex(field, node, nestedPublishable, caseDetails, dataBlock));
-            } else {
-                array.put(field.getCaseField().getId(), populateDataBlockForComplex(field, node, nestedPublishable, caseDetails, dataBlock));
-            }
+            array.put(field.getCaseField().getId(), populateDataBlockForComplex(field, node, nestedPublishable, caseDetails, dataBlock));
         });
 
         return array;

@@ -415,12 +415,10 @@ class DataBlockGeneratorTest {
 
         assertAll(
             () -> assertThat(result.size(), is(2)),
-            () -> assertThat(nestedFieldTwo.get(NESTED_FIELD_2).size(), is(2)),
+            () -> assertThat(nestedFieldTwo.get(NESTED_FIELD_2).size(), is(1)),
             () -> assertThat(nestedFieldTwo.findValue(SUB_NESTED_FIELD_1).asText(), is("valueTwo")),
-            () -> assertThat(nestedFieldTwo.findValue(SUB_NESTED_FIELD_2).asText(), is("valueThree")),
-            () -> assertThat(nestedFieldTwoAlias.size(), is(2)),
-            () -> assertThat(nestedFieldTwoAlias.findValue(SUB_NESTED_FIELD_1).asText(), is("valueTwo")),
-            () -> assertThat(nestedFieldTwoAlias.findValue(SUB_NESTED_FIELD_2).asText(), is("valueThree"))
+            () -> assertThat(nestedFieldTwoAlias.size(), is(1)),
+            () -> assertThat(nestedFieldTwoAlias.findValue(SUB_NESTED_FIELD_1).asText(), is("valueTwo"))
         );
     }
 
