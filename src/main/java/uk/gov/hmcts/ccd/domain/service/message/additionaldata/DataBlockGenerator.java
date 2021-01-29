@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.collect.Maps.newHashMap;
 import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedCaseFieldByPath;
 import static uk.gov.hmcts.ccd.domain.service.message.additionaldata.PublishableField.FIELD_SEPARATOR;
@@ -42,19 +43,38 @@ public class DataBlockGenerator {
             JsonNode node = getNestedCaseFieldByPath(mapper.valueToTree(caseDetails.getData()), publishableField.getOriginalId());
             switch (publishableField.getCaseField().getFieldTypeDefinition().getType()) {
                 case FieldTypeDefinition.YES_OR_NO:
-                    dataBlock.put(publishableField.getKey(), (node == null || node.isNull()) ? null : BooleanNode.valueOf(node.asBoolean()));
+                    dataBlock.put(publishableField.getKey(), booleanNodeOf(node));
+                    break;
                 case FieldTypeDefinition.NUMBER:
                 case FieldTypeDefinition.MONEY_GBP:
-                    dataBlock.put(publishableField.getKey(), (node == null || node.isNull()) ? null : IntNode.valueOf(node.intValue()));
+                    dataBlock.put(publishableField.getKey(), intNodeOf(node));
+                    break;
                 case FieldTypeDefinition.COMPLEX:
                 case FieldTypeDefinition.COLLECTION:
                     dataBlock.put(publishableField.getKey(), node);
+                    break;
                 default:
                     dataBlock.put(publishableField.getKey(), TextNode.valueOf(node.asText()));
             }
         }
         return dataBlock;
 
+    }
+
+    private JsonNode booleanNodeOf(JsonNode node) {
+        if (node == null || node.isNull() || isNullOrEmpty(node.textValue())) {
+            return mapper.nullNode();
+        }
+
+        return node.textValue().equalsIgnoreCase("Yes") ? BooleanNode.TRUE : BooleanNode.FALSE;
+    }
+
+    private JsonNode intNodeOf(JsonNode node) {
+        if (node == null || node.isNull()) {
+            return mapper.nullNode();
+        }
+
+        return IntNode.valueOf(node.intValue());
     }
 
     private Map<String, JsonNode> buildNestedLevelDataBlock(PublishableField publishableField,
@@ -83,10 +103,10 @@ public class DataBlockGenerator {
                                                             JsonNode node) {
         switch (field.getCaseField().getFieldTypeDefinition().getType()) {
             case FieldTypeDefinition.YES_OR_NO:
-                return (node == null || node.isNull()) ? null : BooleanNode.valueOf(node.asBoolean());
+                return booleanNodeOf(node);
             case FieldTypeDefinition.NUMBER:
             case FieldTypeDefinition.MONEY_GBP:
-                return (node == null || node.isNull()) ? null : IntNode.valueOf(node.intValue());
+                return intNodeOf(node);
             case FieldTypeDefinition.COMPLEX:
             case FieldTypeDefinition.COLLECTION:
                 return node;

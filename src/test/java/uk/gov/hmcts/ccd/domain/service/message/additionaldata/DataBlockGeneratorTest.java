@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,8 +28,7 @@ import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.MONEY_GBP;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
@@ -103,10 +103,8 @@ class DataBlockGeneratorTest {
             ))
             .build();
 
-        ObjectMapper mapper = new ObjectMapper();
-
         Map<String, JsonNode> data = new HashMap<>();
-        data.put(FIELD_ID, mapper.readTree("No"));
+        data.put(FIELD_ID, new TextNode("Yes"));
 
         caseDetails = newCaseDetails().withData(data).build();
 
@@ -114,10 +112,9 @@ class DataBlockGeneratorTest {
             new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
 
         Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
-        BooleanNode node = BooleanNode.FALSE;
 
         assertAll(
-            () -> assertEquals(result.get(FIELD_ID), node),
+            () -> assertTrue(result.get(FIELD_ID).booleanValue()),
             () -> MatcherAssert.assertThat(result.size(), Matchers.is(1))
         );
     }
@@ -168,9 +165,8 @@ class DataBlockGeneratorTest {
             new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
 
         Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
-            IntNode node = IntNode.valueOf(6080);
         assertAll(
-            () -> assertEquals(6080, result.get(FIELD_ID)),
+            () -> assertEquals(6080, result.get(FIELD_ID).intValue()),
             () -> MatcherAssert.assertThat(result.size(), Matchers.is(1))
         );
     }
