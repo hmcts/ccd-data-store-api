@@ -656,49 +656,56 @@
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address1.AddressLine2",
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address1.AddressLine3",
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address1.PostTown",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address1.County",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address1.PostCode",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address1.Country",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 }
               ]
             },
@@ -716,49 +723,56 @@
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address2.AddressLine1",
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address2.AddressLine2",
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address2.PostTown",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address2.County",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address2.PostCode",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address2.Country",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 }
               ]
             }
