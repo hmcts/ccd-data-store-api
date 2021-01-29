@@ -709,23 +709,23 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "      \"NestedCollectionTextField\": []\n"
                 + "    }\n"
                 + "  },\n"
-                + "  \"YesOrNoField\": false,\n" +
-                "  \"DateTimeField\": \"2000-01-01T11:11:11.000\",\n" +
-                "  \"DocumentField\": null,\n" +
-                "  \"AddressUKField\": {\n" +
-                "    \"County\": \"null\",\n" +
-                "    \"Country\": \"null\",\n" +
-                "    \"PostCode\": \"null\",\n" +
-                "    \"PostTown\": \"null\",\n" +
-                "    \"AddressLine1\": \"null\",\n" +
-                "    \"AddressLine2\": \"null\",\n" +
-                "    \"AddressLine3\": \"null\"\n" +
-                "  },\n" +
-                "  \"CollectionField\": null,\n" +
-                "  \"TopLevelPublish\": \"text field\",\n" +
-                "  \"AliasForTextField\": \"text\",\n" +
-                "  \"ComplexCollectionField\": null\n" +
-                "}"),
+                + "  \"YesOrNoField\": false,\n"
+                + "  \"DateTimeField\": \"2000-01-01T11:11:11.000\",\n"
+                + "  \"DocumentField\": null,\n"
+                + "  \"AddressUKField\": {\n"
+                + "    \"County\": \"null\",\n"
+                + "    \"Country\": \"null\",\n"
+                + "    \"PostCode\": \"null\",\n"
+                + "    \"PostTown\": \"null\",\n"
+                + "    \"AddressLine1\": \"null\",\n"
+                + "    \"AddressLine2\": \"null\",\n"
+                + "    \"AddressLine3\": \"null\"\n"
+                + "  },\n"
+                + "  \"CollectionField\": null,\n"
+                + "  \"TopLevelPublish\": \"text field\",\n"
+                + "  \"AliasForTextField\": \"text\",\n"
+                + "  \"ComplexCollectionField\": null\n"
+                + "}"),
             messageQueueList.get(0).getMessageInformation().get("additional_data").get("Data"));
     }
 
