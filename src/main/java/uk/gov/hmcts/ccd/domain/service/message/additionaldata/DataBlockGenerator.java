@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.IntNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
@@ -34,11 +35,12 @@ public class DataBlockGenerator {
     }
 
     private Map<String, JsonNode> buildTopLevelDataBlock(PublishableField publishableField,
-                                                       Map<String, JsonNode> dataBlock,
-                                                       List<PublishableField> nestedPublishable,
-                                                       CaseDetails caseDetails) {
+                                                         Map<String, JsonNode> dataBlock,
+                                                         List<PublishableField> nestedPublishable,
+                                                         CaseDetails caseDetails) {
         if (publishableField.getDisplayContext().equals(DisplayContext.COMPLEX)) {
-            buildNestedLevelDataBlock(publishableField, dataBlock, nestedPublishable, caseDetails);
+            JsonNode subNode = buildNestedLevelDataBlock(publishableField, nestedPublishable, dataBlock, caseDetails);
+            dataBlock.put(publishableField.getKey(), subNode);
         } else {
             JsonNode node = getNestedCaseFieldByPath(mapper.valueToTree(caseDetails.getData()), publishableField.getOriginalId());
             switch (publishableField.getCaseField().getFieldTypeDefinition().getType()) {
@@ -85,30 +87,33 @@ public class DataBlockGenerator {
         return TextNode.valueOf(node.asText());
     }
 
-    private Map<String, JsonNode> buildNestedLevelDataBlock(PublishableField publishableField,
-                                                          Map<String, JsonNode> dataBlock,
-                                                          List<PublishableField> nestedPublishable,
-                                                          CaseDetails caseDetails) {
-        Map<String, Object> nestedDataBlock = newHashMap();
+    private JsonNode buildNestedLevelDataBlock(PublishableField publishableField,
+                                               List<PublishableField> nestedPublishable,
+                                               Map<String, JsonNode> dataBlock,
+                                               CaseDetails caseDetails) {
+
+        ObjectNode array = mapper.createObjectNode();
+
         List<PublishableField> fields = publishableField.filterDirectChildrenFrom(nestedPublishable);
         fields.forEach(field -> {
             JsonNode node = getNestedCaseFieldByPath(caseDetails.getData().get(field.splitPath()[0]),
                 StringUtils.substringAfter(field.getPath(), FIELD_SEPARATOR));
             if (!field.getOriginalId().equals(field.getKey())) {
-                populateDataBlockForComplex(field, node);
-//                buildNestedDataBlock(field, nestedDataBlock, caseDetails);
+                dataBlock.put(field.getKey(), populateDataBlockForComplex(field, node, nestedPublishable, caseDetails, dataBlock));
+                array.put(field.getCaseField().getId(), populateDataBlockForComplex(field, node, nestedPublishable, caseDetails, dataBlock));
             } else {
-                dataBlock.put(publishableField.getKey(),
-                    populateDataBlockForComplex(field, node));
+                array.put(field.getCaseField().getId(), populateDataBlockForComplex(field, node, nestedPublishable, caseDetails, dataBlock));
             }
         });
 
-       // dataBlock.put(publishableField.getKey(), nestedDataBlock);
-        return dataBlock;
+        return array;
     }
 
     private JsonNode populateDataBlockForComplex(PublishableField field,
-                                                            JsonNode node) {
+                                                 JsonNode node,
+                                                 List<PublishableField> nestedPublishable,
+                                                 CaseDetails caseDetails,
+                                                 Map<String, JsonNode> dataBlock) {
         switch (field.getCaseField().getFieldTypeDefinition().getType()) {
             case FieldTypeDefinition.YES_OR_NO:
                 return booleanNodeOf(node);
@@ -117,27 +122,10 @@ public class DataBlockGenerator {
                 return intNodeOf(node);
             case FieldTypeDefinition.COMPLEX:
             case FieldTypeDefinition.COLLECTION:
-                return node;
+                return buildNestedLevelDataBlock(field, nestedPublishable, dataBlock, caseDetails);
             default:
                 return TextNode.valueOf(node.asText());
         }
 
-    }
-
-    private boolean isBoolean(String fieldType) {
-        return fieldType.equals(FieldTypeDefinition.YES_OR_NO);
-    }
-
-    private boolean isNumber(String fieldType) {
-        return fieldType.equals(FieldTypeDefinition.NUMBER) || fieldType.equals(FieldTypeDefinition.MONEY_GBP);
-    }
-
-    private boolean isComplex(String fieldType) {
-        return fieldType.equals(FieldTypeDefinition.COMPLEX)
-            || fieldType.equals(FieldTypeDefinition.COLLECTION)
-            || fieldType.equals(FieldTypeDefinition.MULTI_SELECT_LIST)
-            || fieldType.equals(FieldTypeDefinition.PREDEFINED_COMPLEX_ADDRESS_GLOBAL_UK)
-            || fieldType.equals(FieldTypeDefinition.PREDEFINED_COMPLEX_ADDRESS_GLOBAL)
-            || fieldType.equals(FieldTypeDefinition.PREDEFINED_COMPLEX_ADDRESS_UK);
     }
 }

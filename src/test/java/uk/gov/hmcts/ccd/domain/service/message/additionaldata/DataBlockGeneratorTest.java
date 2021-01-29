@@ -335,9 +335,8 @@ class DataBlockGeneratorTest {
 
         assertAll(
             () -> assertThat(result.size(), is(1)),
-            () -> assertThat(nestedFieldTwo.get(NESTED_FIELD_2).size(), is(2)),
-            () -> assertThat(nestedFieldTwo.findValue(SUB_NESTED_FIELD_1).asText(), is("valueTwo")),
-            () -> assertThat(nestedFieldTwo.findValue(SUB_NESTED_FIELD_2).asText(), is("valueThree"))
+            () -> assertThat(nestedFieldTwo.get(NESTED_FIELD_2).size(), is(1)),
+            () -> assertThat(nestedFieldTwo.findValue(SUB_NESTED_FIELD_1).asText(), is("valueTwo"))
         );
     }
 
@@ -480,7 +479,7 @@ class DataBlockGeneratorTest {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, JsonNode> data = new HashMap<>();
         data.put(FIELD_ID, mapper.readTree("{\n"
-            + "      \"NestedField1\": \"12.71\",\n"
+            + "      \"NestedField1\": \"1271\",\n"
             + "      \"NestedField2\": {\n"
             + "        \"SubNestedField1\": \"valueTwo\",\n"
             + "        \"SubNestedField2\": \"valueThree\"\n"
@@ -498,7 +497,7 @@ class DataBlockGeneratorTest {
 
         assertAll(
             () -> assertThat(result.size(), is(1)),
-            () -> assertThat(nestedField.findValue(NESTED_FIELD_1).asDouble(), is(12.71))
+            () -> assertThat(nestedField.findValue(NESTED_FIELD_1).intValue(), is(1271))
         );
     }
 
