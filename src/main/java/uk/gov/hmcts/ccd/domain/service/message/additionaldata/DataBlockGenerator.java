@@ -1,6 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.message.additionaldata;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.BooleanNode;
+import com.fasterxml.jackson.databind.node.IntNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -17,8 +21,10 @@ import static uk.gov.hmcts.ccd.domain.service.message.additionaldata.Publishable
 @Component
 public class DataBlockGenerator {
 
-    public Map<String, Object> generateData(AdditionalDataContext context) {
-        Map<String, Object> dataBlock = newHashMap();
+    ObjectMapper mapper = new ObjectMapper();
+
+    public Map<String, JsonNode> generateData(AdditionalDataContext context) {
+        Map<String, JsonNode> dataBlock = newHashMap();
 
         context.getTopLevelPublishables().forEach(publishableField -> buildTopLevelDataBlock(publishableField,
             dataBlock, context.getNestedPublishables(), context.getCaseDetails()));
@@ -26,30 +32,33 @@ public class DataBlockGenerator {
         return dataBlock;
     }
 
-    private Map<String, Object> buildTopLevelDataBlock(PublishableField publishableField,
-                                                       Map<String, Object> dataBlock,
+    private Map<String, JsonNode> buildTopLevelDataBlock(PublishableField publishableField,
+                                                       Map<String, JsonNode> dataBlock,
                                                        List<PublishableField> nestedPublishable,
                                                        CaseDetails caseDetails) {
-        if (isBoolean(publishableField.getFieldType().getType())) {
-            dataBlock.put(publishableField.getKey(),
-                (publishableField.getValue() == null) ? null : Boolean.valueOf(publishableField.getValue()));
-        } else if (isNumber(publishableField.getFieldType().getType())) {
-            dataBlock.put(publishableField.getKey(),
-                (publishableField.getValue() != null) ? Double.parseDouble(publishableField.getValue()) : null);
-        } else if (publishableField.getDisplayContext() != null) {
-            if (publishableField.getDisplayContext().equals(DisplayContext.COMPLEX)) {
-                buildNestedLevelDataBlock(publishableField, dataBlock, nestedPublishable, caseDetails);
-            } else if (isComplex(publishableField.getFieldType().getType())) {
-                dataBlock.put(publishableField.getKey(), (publishableField.getComplexValue()));
-            } else {
-                dataBlock.put(publishableField.getKey(), (publishableField.getValue()));
+        if (publishableField.getDisplayContext().equals(DisplayContext.COMPLEX)) {
+            buildNestedLevelDataBlock(publishableField, dataBlock, nestedPublishable, caseDetails);
+        } else {
+            JsonNode node = getNestedCaseFieldByPath(mapper.valueToTree(caseDetails.getData()), publishableField.getOriginalId());
+            switch (publishableField.getCaseField().getFieldTypeDefinition().getType()) {
+                case FieldTypeDefinition.YES_OR_NO:
+                    dataBlock.put(publishableField.getKey(), (node == null || node.isNull()) ? null : BooleanNode.valueOf(node.asBoolean()));
+                case FieldTypeDefinition.NUMBER:
+                case FieldTypeDefinition.MONEY_GBP:
+                    dataBlock.put(publishableField.getKey(), (node == null || node.isNull()) ? null : IntNode.valueOf(node.intValue()));
+                case FieldTypeDefinition.COMPLEX:
+                case FieldTypeDefinition.COLLECTION:
+                    dataBlock.put(publishableField.getKey(), node);
+                default:
+                    dataBlock.put(publishableField.getKey(), TextNode.valueOf(node.asText()));
             }
         }
         return dataBlock;
+
     }
 
-    private Map<String, Object> buildNestedLevelDataBlock(PublishableField publishableField,
-                                                          Map<String, Object> dataBlock,
+    private Map<String, JsonNode> buildNestedLevelDataBlock(PublishableField publishableField,
+                                                          Map<String, JsonNode> dataBlock,
                                                           List<PublishableField> nestedPublishable,
                                                           CaseDetails caseDetails) {
         Map<String, Object> nestedDataBlock = newHashMap();
@@ -58,44 +67,33 @@ public class DataBlockGenerator {
             JsonNode node = getNestedCaseFieldByPath(caseDetails.getData().get(field.splitPath()[0]),
                 StringUtils.substringAfter(field.getPath(), FIELD_SEPARATOR));
             if (!field.getOriginalId().equals(field.getKey())) {
-                populateDataBlockForComplex(dataBlock, field, node, field.getKey(), node.asBoolean());
-                buildNestedDataBlock(field, nestedDataBlock, caseDetails);
+                populateDataBlockForComplex(field, node);
+//                buildNestedDataBlock(field, nestedDataBlock, caseDetails);
             } else {
                 dataBlock.put(publishableField.getKey(),
-                    populateDataBlockForComplex(nestedDataBlock, field, node, field.getKey(), node.asBoolean()));
+                    populateDataBlockForComplex(field, node));
             }
         });
 
-        dataBlock.put(publishableField.getKey(), nestedDataBlock);
+       // dataBlock.put(publishableField.getKey(), nestedDataBlock);
         return dataBlock;
     }
 
-    private Map<String, Object> populateDataBlockForComplex(Map<String, Object> dataBlock,
-                                                            PublishableField field,
-                                                            JsonNode node,
-                                                            String key,
-                                                            boolean b) {
-        if (isBoolean(field.getFieldType().getType())) {
-            dataBlock.put(key, b);
-        } else if (isNumber(field.getFieldType().getType())) {
-            dataBlock.put(key, node.asDouble());
-        } else {
-            dataBlock.put(key, node);
+    private JsonNode populateDataBlockForComplex(PublishableField field,
+                                                            JsonNode node) {
+        switch (field.getCaseField().getFieldTypeDefinition().getType()) {
+            case FieldTypeDefinition.YES_OR_NO:
+                return (node == null || node.isNull()) ? null : BooleanNode.valueOf(node.asBoolean());
+            case FieldTypeDefinition.NUMBER:
+            case FieldTypeDefinition.MONEY_GBP:
+                return (node == null || node.isNull()) ? null : IntNode.valueOf(node.intValue());
+            case FieldTypeDefinition.COMPLEX:
+            case FieldTypeDefinition.COLLECTION:
+                return node;
+            default:
+                return TextNode.valueOf(node.asText());
         }
-        return dataBlock;
-    }
 
-    private Map<String, Object> buildNestedDataBlock(PublishableField publishableField,
-                                                     Map<String, Object> nestedDataBlock, CaseDetails caseDetails) {
-
-        JsonNode node = getNestedCaseFieldByPath(caseDetails.getData().get(publishableField.splitPath()[0]),
-            StringUtils.substringAfter(publishableField.getPath(), FIELD_SEPARATOR));
-
-        populateDataBlockForComplex(nestedDataBlock,
-            publishableField, node,
-            publishableField.getOriginalId(),
-            node.booleanValue());
-        return nestedDataBlock;
     }
 
     private boolean isBoolean(String fieldType) {

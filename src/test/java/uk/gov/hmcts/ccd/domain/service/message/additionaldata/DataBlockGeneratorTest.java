@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.BooleanNode;
+import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -104,17 +106,18 @@ class DataBlockGeneratorTest {
         ObjectMapper mapper = new ObjectMapper();
 
         Map<String, JsonNode> data = new HashMap<>();
-        data.put(FIELD_ID, mapper.convertValue("No", JsonNode.class));
+        data.put(FIELD_ID, mapper.readTree("No"));
 
         caseDetails = newCaseDetails().withData(data).build();
 
         AdditionalDataContext context =
             new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
 
-        Map<String, Object> result = dataBlockGenerator.generateData(context);
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
+        BooleanNode node = BooleanNode.FALSE;
 
         assertAll(
-            () -> assertEquals(result.get(FIELD_ID), false),
+            () -> assertEquals(result.get(FIELD_ID), node),
             () -> MatcherAssert.assertThat(result.size(), Matchers.is(1))
         );
     }
@@ -157,17 +160,17 @@ class DataBlockGeneratorTest {
         ObjectMapper mapper = new ObjectMapper();
 
         Map<String, JsonNode> data = new HashMap<>();
-        data.put(FIELD_ID, mapper.convertValue("60.80", JsonNode.class));
+        data.put(FIELD_ID, mapper.readTree("6080"));
 
         caseDetails = newCaseDetails().withData(data).build();
 
         AdditionalDataContext context =
             new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
 
-        Map<String, Object> result = dataBlockGenerator.generateData(context);
-
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
+            IntNode node = IntNode.valueOf(6080);
         assertAll(
-            () -> assertEquals(result.get(FIELD_ID), 60.80),
+            () -> assertEquals(6080, result.get(FIELD_ID)),
             () -> MatcherAssert.assertThat(result.size(), Matchers.is(1))
         );
     }
@@ -207,7 +210,7 @@ class DataBlockGeneratorTest {
         AdditionalDataContext context =
             new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
 
-        Map<String, Object> result = dataBlockGenerator.generateData(context);
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
 
         assertAll(
             () -> assertEquals(result.get(FIELD_ALIAS), "TextValue"),
@@ -256,7 +259,7 @@ class DataBlockGeneratorTest {
         AdditionalDataContext context =
             new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
 
-        Map<String, Object> result = dataBlockGenerator.generateData(context);
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
 
         assertAll(
             () -> assertEquals(DATA, result.get(FIELD_ALIAS)),
@@ -331,7 +334,7 @@ class DataBlockGeneratorTest {
         AdditionalDataContext context =
             new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
 
-        Map<String, Object> result = dataBlockGenerator.generateData(context);
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
         ObjectNode nestedFieldTwo = mapper.valueToTree(result.get(FIELD_ID));
 
         assertAll(
@@ -411,7 +414,7 @@ class DataBlockGeneratorTest {
         AdditionalDataContext context =
             new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
 
-        Map<String, Object> result = dataBlockGenerator.generateData(context);
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
         ObjectNode nestedFieldTwo = mapper.valueToTree(result.get(FIELD_ID));
         ObjectNode nestedFieldTwoAlias = mapper.valueToTree(result.get(FIELD_ALIAS));
 
@@ -494,7 +497,7 @@ class DataBlockGeneratorTest {
         AdditionalDataContext context =
             new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
 
-        Map<String, Object> result = dataBlockGenerator.generateData(context);
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
         ObjectNode nestedField = mapper.valueToTree(result.get(FIELD_ID));
 
         assertAll(
@@ -571,7 +574,7 @@ class DataBlockGeneratorTest {
         AdditionalDataContext context =
             new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
 
-        Map<String, Object> result = dataBlockGenerator.generateData(context);
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
         ObjectNode nestedField = mapper.valueToTree(result.get(FIELD_ID));
 
         assertAll(

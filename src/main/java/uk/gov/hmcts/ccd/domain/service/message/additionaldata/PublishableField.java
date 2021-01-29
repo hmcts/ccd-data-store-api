@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.message.additionaldata;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,9 +30,7 @@ public class PublishableField {
 
     private String key;
     private String path;
-    private String value;
     private String originalId;
-    private JsonNode complexValue;
     private CommonField caseField;
     private DisplayContext displayContext;
     private boolean publishTopLevel;
@@ -92,24 +89,10 @@ public class PublishableField {
         this.key = getKey(publishAs, originalId);
         this.originalId = originalId;
         this.caseField = getCommonField(caseTypeDefinition, path);
-        this.value = getValue(path, caseDetails);
-        this.complexValue = getComplexValue(path, caseDetails);
     }
 
     private String getKey(String publishAs, String originalId) {
         return isNullOrEmpty(publishAs) ? originalId : publishAs;
-    }
-
-    private String getValue(String path, CaseDetails caseDetails) {
-        if (!caseDetails.getData().keySet().contains(path)) {
-            return null;
-        } else {
-            return caseDetails.getData().get(path).textValue();
-        }
-    }
-
-    private JsonNode getComplexValue(String path, CaseDetails caseDetails) {
-        return caseDetails.getData().get(path);
     }
 
     /**
