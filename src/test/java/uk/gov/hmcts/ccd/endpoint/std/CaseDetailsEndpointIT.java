@@ -699,34 +699,34 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             template.query("SELECT * FROM message_queue_candidates", this::mapMessageCandidate);
         assertEquals("Incorrect number of rows in messageQueue", 1, messageQueueList.size());
 
-        assertEquals(messageQueueList.get(0).getMessageInformation().get("additional_data").get("Data"),
-            mapper.readTree("{\n"
+        assertEquals(mapper.readTree("{\n"
                 + "  \"OtherAlias\": null,\n"
-                + "  \"NumberField\": null,\n"
-                + "  \"ComplexField\": {\n"
+                + "  \"NumberField\": 90,\n"
+                + " \"ComplexField\": {\n"
                 + "    \"ComplexTextField\": \"text field\",\n"
                 + "    \"ComplexNestedField\": {\n"
                 + "      \"NestedNumberField\": null,\n"
                 + "      \"NestedCollectionTextField\": []\n"
                 + "    }\n"
                 + "  },\n"
-                + "  \"YesOrNoField\": false,\n"
-                + "  \"DateTimeField\": \"2000-01-01T11:11:11.000\",\n"
-                + "  \"DocumentField\": null,\n"
-                + "  \"AddressUKField\": {\n"
-                + "    \"County\": null,\n"
-                + "    \"Country\": null,\n"
-                + "    \"PostCode\": null,\n"
-                + "    \"PostTown\": null,\n"
-                + "    \"AddressLine1\": null,\n"
-                + "    \"AddressLine2\": null,\n"
-                + "    \"AddressLine3\": null\n"
-                + "  },\n"
-                + "  \"CollectionField\": null,\n"
-                + "  \"TopLevelPublish\": \"text field\",\n"
-                + "  \"AliasForTextField\": \"text\",\n"
-                + "  \"ComplexCollectionField\": null\n"
-                + "}"));
+                + "  \"YesOrNoField\": false,\n" +
+                "  \"DateTimeField\": \"2000-01-01T11:11:11.000\",\n" +
+                "  \"DocumentField\": null,\n" +
+                "  \"AddressUKField\": {\n" +
+                "    \"County\": \"null\",\n" +
+                "    \"Country\": \"null\",\n" +
+                "    \"PostCode\": \"null\",\n" +
+                "    \"PostTown\": \"null\",\n" +
+                "    \"AddressLine1\": \"null\",\n" +
+                "    \"AddressLine2\": \"null\",\n" +
+                "    \"AddressLine3\": \"null\"\n" +
+                "  },\n" +
+                "  \"CollectionField\": null,\n" +
+                "  \"TopLevelPublish\": \"text field\",\n" +
+                "  \"AliasForTextField\": \"text\",\n" +
+                "  \"ComplexCollectionField\": null\n" +
+                "}"),
+            messageQueueList.get(0).getMessageInformation().get("additional_data").get("Data"));
     }
 
     @Test

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
@@ -43,8 +44,10 @@ public class DataBlockGenerator {
             JsonNode subNode = buildNestedLevelDataBlock(publishableField, nestedPublishable, dataBlock, caseDetails);
             dataBlock.put(publishableField.getKey(), subNode);
         } else {
-            JsonNode node = getNestedCaseFieldByPath(mapper.valueToTree(caseDetails.getData()), publishableField.getOriginalId());
-            switch (publishableField.getCaseField().getFieldTypeDefinition().getType()) {
+            JsonNode node = (!publishableField.getKey().equals(publishableField.getOriginalId()))
+                ? getNestedCaseFieldByPath(mapper.valueToTree(caseDetails.getData()), publishableField.getPath()) :
+                getNestedCaseFieldByPath(mapper.valueToTree(caseDetails.getData()), publishableField.getOriginalId());
+             switch (publishableField.getCaseField().getFieldTypeDefinition().getType()) {
                 case FieldTypeDefinition.YES_OR_NO:
                     dataBlock.put(publishableField.getKey(), booleanNodeOf(node));
                     break;
@@ -53,9 +56,13 @@ public class DataBlockGenerator {
                     dataBlock.put(publishableField.getKey(), intNodeOf(node));
                     break;
                 case FieldTypeDefinition.COMPLEX:
-                case FieldTypeDefinition.COLLECTION:
-                    JsonNode subNode = buildNestedLevelDataBlock(publishableField, nestedPublishable, dataBlock, caseDetails);
+                    JsonNode subNode = (!publishableField.getKey().equals(publishableField.getOriginalId()))
+                        ? buildNestedLevelDataBlock(publishableField, nestedPublishable, dataBlock, caseDetails)
+                        : complexDataBlock(publishableField, nestedPublishable, dataBlock, caseDetails);
                     dataBlock.put(publishableField.getKey(), subNode);
+                    break;
+                case FieldTypeDefinition.COLLECTION:
+                    dataBlock.put(publishableField.getKey(), node);
                     break;
                 default:
                     dataBlock.put(publishableField.getKey(), textNodeOf(node));
@@ -79,10 +86,10 @@ public class DataBlockGenerator {
         }
 
         if (node.isNumber()) {
-            return node;
+            return IntNode.valueOf(node.asInt());
+        } else {
+            return IntNode.valueOf(Integer.parseInt(node.textValue()));
         }
-
-        return IntNode.valueOf(Integer.parseInt(node.textValue()));
     }
 
     private JsonNode textNodeOf(JsonNode node) {
@@ -91,6 +98,22 @@ public class DataBlockGenerator {
         }
 
         return TextNode.valueOf(node.asText());
+    }
+
+    private JsonNode complexDataBlock(PublishableField publishableField,
+                                               List<PublishableField> nestedPublishable,
+                                               Map<String, JsonNode> dataBlock,
+                                               CaseDetails caseDetails) {
+
+        ObjectNode array = mapper.createObjectNode();
+
+        List<CaseFieldDefinition> fields = publishableField.getCaseField().getFieldTypeDefinition().getChildren();
+        fields.forEach(field -> {
+            JsonNode node = getNestedCaseFieldByPath(caseDetails.getData().get(publishableField.getKey()), field.getId());
+            array.set(field.getId(), populateDataBlockForComplex(publishableField, node, nestedPublishable, caseDetails, dataBlock, field.getFieldTypeDefinition().getType()));
+        });
+
+        return array;
     }
 
     private JsonNode buildNestedLevelDataBlock(PublishableField publishableField,
@@ -104,7 +127,7 @@ public class DataBlockGenerator {
         fields.forEach(field -> {
             JsonNode node = getNestedCaseFieldByPath(caseDetails.getData().get(field.splitPath()[0]),
                 StringUtils.substringAfter(field.getPath(), FIELD_SEPARATOR));
-            array.put(field.getCaseField().getId(), populateDataBlockForComplex(field, node, nestedPublishable, caseDetails, dataBlock));
+            array.set(field.getCaseField().getId(), populateDataBlockForComplex(field, node, nestedPublishable, caseDetails, dataBlock, field.getCaseField().getFieldTypeDefinition().getType()));
         });
 
         return array;
@@ -114,16 +137,18 @@ public class DataBlockGenerator {
                                                  JsonNode node,
                                                  List<PublishableField> nestedPublishable,
                                                  CaseDetails caseDetails,
-                                                 Map<String, JsonNode> dataBlock) {
-        switch (field.getCaseField().getFieldTypeDefinition().getType()) {
+                                                 Map<String, JsonNode> dataBlock,
+                                                 String fieldTypeDefinition) {
+        switch (fieldTypeDefinition) {
             case FieldTypeDefinition.YES_OR_NO:
                 return booleanNodeOf(node);
             case FieldTypeDefinition.NUMBER:
             case FieldTypeDefinition.MONEY_GBP:
                 return intNodeOf(node);
             case FieldTypeDefinition.COMPLEX:
-            case FieldTypeDefinition.COLLECTION:
                 return buildNestedLevelDataBlock(field, nestedPublishable, dataBlock, caseDetails);
+            case FieldTypeDefinition.COLLECTION:
+                return node;
             default:
                 return TextNode.valueOf(node.asText());
         }
