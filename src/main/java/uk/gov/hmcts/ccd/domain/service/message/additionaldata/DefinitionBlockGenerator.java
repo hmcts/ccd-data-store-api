@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DOCUMENT;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DYNAMIC_LIST;
 import static uk.gov.hmcts.ccd.domain.service.message.additionaldata.DefinitionBlock.DOCUMENT_TYPE_DEFINITION;
 
 @Component
@@ -26,7 +25,7 @@ public class DefinitionBlockGenerator {
     public DefinitionBlockGenerator(MessagingProperties messagingProperties) {
         this.messagingProperties = messagingProperties;
     }
-    
+
     public Map<String, DefinitionBlock> generateDefinition(AdditionalDataContext context) {
         Map<String, DefinitionBlock> definition = newHashMap();
 
@@ -118,7 +117,7 @@ public class DefinitionBlockGenerator {
     }
 
     private String getSubtype(FieldTypeDefinition fieldTypeDefinition) {
-        if (fieldTypeDefinition.getType().equals(DYNAMIC_LIST)) {
+        if (fieldTypeDefinition.isDynamicFieldType()) {
             return null;
         }
 
