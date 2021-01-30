@@ -61,7 +61,7 @@ public class AdditionalDataContext {
             if (caseEventField.getDisplayContextEnum() == DisplayContext.COMPLEX) {
                 fields.addAll(findPublishableNestedFields(caseTypeDefinition, caseEventField));
             } else if (Boolean.TRUE.equals(caseEventField.getPublish())) {
-                fields.add(new PublishableField(caseTypeDefinition, caseEventField, caseDetails));
+                fields.add(new PublishableField(caseTypeDefinition, caseEventField));
             }
         });
 
@@ -79,11 +79,11 @@ public class AdditionalDataContext {
                     .findFirst();
 
                 if (existingParentField.isEmpty()) {
-                    fields.add(new PublishableField(caseTypeDefinition, caseEventField, caseDetails));
+                    fields.add(new PublishableField(caseTypeDefinition, caseEventField));
                 }
 
                 String path = caseEventField.getCaseFieldId() + FIELD_SEPARATOR + caseEventFieldComplex.getReference();
-                fields.add(new PublishableField(caseTypeDefinition, caseEventFieldComplex, path, caseDetails));
+                fields.add(new PublishableField(caseTypeDefinition, caseEventFieldComplex, path));
             }
         });
 

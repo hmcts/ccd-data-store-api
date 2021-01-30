@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplexDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -42,18 +41,16 @@ public class PublishableField {
 
     public PublishableField(CaseTypeDefinition caseTypeDefinition,
                             CaseEventFieldComplexDefinition caseEventFieldComplex,
-                            String path,
-                            CaseDetails caseDetails) {
+                            String path) {
         setCommonFields(caseTypeDefinition, path,
-            caseEventFieldComplex.getReference(), caseEventFieldComplex.getPublishAs(), caseDetails);
+            caseEventFieldComplex.getReference(), caseEventFieldComplex.getPublishAs());
         this.publishTopLevel = !isNullOrEmpty(caseEventFieldComplex.getPublishAs());
     }
 
     public PublishableField(CaseTypeDefinition caseTypeDefinition,
-                            CaseEventFieldDefinition caseEventField,
-                            CaseDetails caseDetails) {
+                            CaseEventFieldDefinition caseEventField) {
         setCommonFields(caseTypeDefinition, caseEventField.getCaseFieldId(),
-            caseEventField.getCaseFieldId(), caseEventField.getPublishAs(), caseDetails);
+            caseEventField.getCaseFieldId(), caseEventField.getPublishAs());
         this.publishTopLevel = true;
         this.displayContext = caseEventField.getDisplayContextEnum();
     }
@@ -105,8 +102,7 @@ public class PublishableField {
     private void setCommonFields(CaseTypeDefinition caseTypeDefinition,
                                  String path,
                                  String originalId,
-                                 String publishAs,
-                                 CaseDetails caseDetails) {
+                                 String publishAs) {
         this.path = path;
         this.key = getKey(publishAs, originalId);
         this.originalId = originalId;
