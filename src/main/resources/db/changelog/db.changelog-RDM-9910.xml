@@ -1,0 +1,29 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet id="rdm-9910" runInTransaction="false" author="daniel.lysiak1@hmcts.net">
+        <sql dbms="postgresql"
+            endDelimiter="\nGO"
+            splitStatements="true"
+            stripComments="true">
+            ALTER TABLE case_data ADD marked_by_logstash boolean;
+            ALTER TABLE case_data ALTER COLUMN marked_by_logstash SET DEFAULT false;
+
+            CREATE INDEX CONCURRENTLY idx_case_data_marked_by_logstash ON case_data (marked_by_logstash);
+
+            CREATE OR REPLACE FUNCTION set_case_data_marked_by_logstash()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                NEW.marked_by_logstash := false;
+                RETURN NEW;
+            END
+            $$ LANGUAGE plpgsql;
+
+            CREATE TRIGGER trg_case_data_updated
+            BEFORE INSERT OR UPDATE OF data, data_classification, last_modified, last_state_modified_date, security_classification, state, supplementary_data ON case_data
+            FOR EACH ROW EXECUTE PROCEDURE set_case_data_marked_by_logstash();
+
+            ALTER TABLE case_data DROP COLUMN supplementary_data_last_modified;
+        </sql>
+    </changeSet>
+</databaseChangeLog>
