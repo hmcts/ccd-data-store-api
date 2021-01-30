@@ -1,5 +1,18 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.beans.factory.annotation.Qualifier;
+import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.std.CaseFieldValidationError;
+import uk.gov.hmcts.ccd.domain.types.CaseDataValidator;
+import uk.gov.hmcts.ccd.domain.types.ValidationContext;
+import uk.gov.hmcts.ccd.domain.types.ValidationResult;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -9,18 +22,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import org.springframework.beans.factory.annotation.Qualifier;
-import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.std.CaseFieldValidationError;
-import uk.gov.hmcts.ccd.domain.types.CaseDataValidator;
-import uk.gov.hmcts.ccd.domain.types.ValidationResult;
-import uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 @Named
 @Singleton
@@ -56,10 +57,8 @@ public class CaseTypeService {
                || caseTypeDefinition.getJurisdictionDefinition().getId().equalsIgnoreCase(jurisdictionId);
     }
 
-    public void validateData(final Map<String, JsonNode> data,
-                             final CaseTypeDefinition caseTypeDefinition) {
-        final List<ValidationResult> dataValidationResults =
-            caseDataValidator.validate(data, caseTypeDefinition.getCaseFieldDefinitions());
+    public void validateData(final ValidationContext validationContext) {
+        final List<ValidationResult> dataValidationResults = caseDataValidator.validate(validationContext);
         if (!dataValidationResults.isEmpty()) {
             final List<CaseFieldValidationError> fieldErrors = dataValidationResults.stream()
                 .map(validationResult ->
@@ -67,6 +66,10 @@ public class CaseTypeService {
                 .collect(Collectors.toList());
             throw new CaseValidationException(fieldErrors);
         }
+    }
+
+    public void validateData(final Map<String, JsonNode> data, final CaseTypeDefinition caseTypeDefinition) {
+        validateData(new ValidationContext(caseTypeDefinition, data));
     }
 
     public CaseTypeDefinition getCaseTypeForJurisdiction(final String caseTypeId,

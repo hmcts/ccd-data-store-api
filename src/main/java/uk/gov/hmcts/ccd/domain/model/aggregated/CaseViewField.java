@@ -52,8 +52,6 @@ public class CaseViewField implements CommonField {
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
     private boolean metadata;
-    @JsonProperty("default_value")
-    private String defaultValue;
 
     public String getId() {
         return id;
@@ -238,13 +236,5 @@ public class CaseViewField implements CommonField {
         caseViewField.setRetainHiddenValue(caseFieldDefinition.getRetainHiddenValue());
 
         return caseViewField;
-    }
-
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
     }
 }
