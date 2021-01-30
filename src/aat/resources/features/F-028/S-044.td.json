@@ -72,8 +72,7 @@
               "update": true,
               "delete": true
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "NumberField",
@@ -119,8 +118,7 @@
               "update": true,
               "delete": true
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "YesOrNoField",
@@ -166,8 +164,7 @@
               "update": true,
               "delete": true
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "PhoneUKField",
@@ -213,8 +210,7 @@
               "update": true,
               "delete": true
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "EmailField",
@@ -260,8 +256,7 @@
               "update": true,
               "delete": true
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "MoneyGBPField",
@@ -307,8 +302,7 @@
               "update": true,
               "delete": true
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "DateField",
@@ -354,8 +348,7 @@
               "update": true,
               "delete": true
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "DateTimeField",
@@ -401,8 +394,7 @@
               "update": true,
               "delete": true
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "TextAreaField",
@@ -448,8 +440,7 @@
               "update": true,
               "delete": true
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "FixedListField",
@@ -511,8 +502,7 @@
               "update": true,
               "delete": true
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "MultiSelectListField",
@@ -590,8 +580,7 @@
               "update": true,
               "delete": true
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "CollectionField",
@@ -664,8 +653,7 @@
               "update": true,
               "delete": true
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "ComplexField",
@@ -729,8 +717,7 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "ComplexFixedListField",
@@ -792,8 +779,7 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "ComplexNestedField",
@@ -853,8 +839,7 @@
                       "display_context": null,
                       "display_context_parameter": null,
                       "retain_hidden_value": null,
-                      "formatted_value": null,
-                      "default_value": null
+                      "formatted_value": null
                     },
                     {
                       "id": "[[ANYTHING_PRESENT]]",
@@ -907,8 +892,7 @@
                       "display_context": null,
                       "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)",
                       "retain_hidden_value": null,
-                      "formatted_value": null,
-                      "default_value": null
+                      "formatted_value": null
                     }
                   ],
                   "collection_field_type": null
@@ -939,8 +923,7 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               }
             ],
             "collection_field_type": null
@@ -975,8 +958,7 @@
               "update": true,
               "delete": true
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "AddressUKField",
@@ -1043,8 +1025,7 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "AddressLine2",
@@ -1088,8 +1069,7 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "AddressLine3",
@@ -1133,8 +1113,7 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "PostTown",
@@ -1178,8 +1157,7 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "County",
@@ -1223,8 +1201,7 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "PostCode",
@@ -1268,8 +1245,7 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "Country",
@@ -1313,8 +1289,7 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               }
             ],
             "collection_field_type": null
@@ -1354,8 +1329,7 @@
               "update": true,
               "delete": true
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "DocumentField",
@@ -1401,8 +1375,7 @@
               "update": true,
               "delete": true
             }
-          ],
-          "default_value": null
+          ]
         }
       ],
       "event_token": "[[ANYTHING_PRESENT]]",
@@ -1412,6 +1385,10 @@
           "label": "First page",
           "order": 1,
           "wizard_page_fields": [
+            {
+              "__ordering__": "unordered",
+              "__elementId__": "case_field_id"
+            },
             {
               "case_field_id": "TextField",
               "order": 1,
@@ -1452,6 +1429,10 @@
           "label": "Second page",
           "order": 2,
           "wizard_page_fields": [
+            {
+              "__ordering__": "unordered",
+              "__elementId__": "case_field_id"
+            },
             {
               "case_field_id": "MoneyGBPField",
               "order": 1,
@@ -1498,6 +1479,10 @@
           "label": "Third page",
           "order": 3,
           "wizard_page_fields": [
+            {
+              "__ordering__": "unordered",
+              "__elementId__": "case_field_id"
+            },
             {
               "case_field_id": "CollectionField",
               "order": 2,
