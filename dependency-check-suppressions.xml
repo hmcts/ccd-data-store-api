@@ -14,11 +14,6 @@
 		<notes>Analysis: No fix or work around available</notes>
 		<cve>CVE-2007-1652</cve>
 		<cve>CVE-2007-1651</cve>
-	</suppress>
-
-
-	<suppress>
-		<cve>CVE-2020-8908</cve>
 		<cve>CVE-2020-29242</cve>
 		<cve>CVE-2020-29243</cve>
 		<cve>CVE-2020-29244</cve>
