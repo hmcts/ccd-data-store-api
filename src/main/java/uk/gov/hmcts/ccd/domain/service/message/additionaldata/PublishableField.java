@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.message.additionaldata;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,11 +15,15 @@ import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedCaseFieldByPath;
+import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getPathElementsTailAsString;
 
 @Data
 @Builder
@@ -78,6 +83,23 @@ public class PublishableField {
         return publishableFields.stream()
             .filter(field -> field.isSubFieldOf(this) && pathSizeDifferenceTo(field) == 1)
             .collect(Collectors.toList());
+    }
+
+    /**
+     * Find the data associated *only* with this field from complete case data.
+     *
+     * @param data the original, complete case data for a case type which this publishable field belongs to
+     * @return the node where this publishable field starts
+     */
+    public JsonNode findFieldDataFromCaseData(Map<String, JsonNode> data) {
+        if (!getKey().equals(getPath())) {
+            List<String> path = Arrays.asList(splitPath());
+            if (path.size() == 1) {
+                return data.get(path.get(0));
+            }
+            return getNestedCaseFieldByPath(data.get(path.get(0)), getPathElementsTailAsString(path));
+        }
+        return data.get(getKey());
     }
 
     private void setCommonFields(CaseTypeDefinition caseTypeDefinition,

@@ -18,8 +18,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.MessageInformation;
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
-import uk.gov.hmcts.ccd.domain.service.message.additionaldata.DefinitionBlockGenerator;
 import uk.gov.hmcts.ccd.domain.service.message.additionaldata.DataBlockGenerator;
+import uk.gov.hmcts.ccd.domain.service.message.additionaldata.DefinitionBlockGenerator;
 
 import java.time.Clock;
 import java.time.Instant;
