@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.vladmihalcea.hibernate.type.json.JsonNodeBinaryType;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Properties;
 import java.util.regex.Pattern;
 import javax.persistence.EntityManager;
@@ -35,7 +33,6 @@ public interface SupplementaryDataQueryBuilder {
         String key = fieldPath.replaceAll(Pattern.quote("."), ",");
         query.setParameter("leaf_node_key", "{" + key + "}");
         query.setParameter("value", fieldValue);
-        query.setParameter("current_time",  LocalDateTime.now(ZoneOffset.UTC));
         query.setParameter("reference", caseReference);
         query.unwrap(NativeQuery.class)
             .addScalar("supplementary_data", JsonNodeBinaryType.INSTANCE);
