@@ -46,6 +46,9 @@ public class DataBlockGenerator {
         return dataBlock;
     }
 
+    /**
+     * Build a filtered data block with only publishable fields.
+     */
     private JsonNode buildDataBlock(JsonNode originalNode,
                                     PublishableField publishableField,
                                     List<PublishableField> nestedPublishables) {
@@ -69,6 +72,9 @@ public class DataBlockGenerator {
         }
     }
 
+    /**
+     * Build a non-filtered data block, including all subfields.
+     */
     private JsonNode buildDataBlock(JsonNode originalNode, FieldTypeDefinition fieldType) {
         if (originalNode == null || originalNode.isNull()) {
             return NullNode.getInstance();
@@ -93,7 +99,7 @@ public class DataBlockGenerator {
         return objectNode;
     }
 
-    private ObjectNode buildComplexNode(JsonNode originalNode, FieldTypeDefinition fieldType) {
+    private JsonNode buildComplexNode(JsonNode originalNode, FieldTypeDefinition fieldType) {
         ObjectNode objectNode = MAPPER.createObjectNode();
         fieldType.getChildren().forEach(caseFieldDefinition -> {
             String fieldId = caseFieldDefinition.getId();
