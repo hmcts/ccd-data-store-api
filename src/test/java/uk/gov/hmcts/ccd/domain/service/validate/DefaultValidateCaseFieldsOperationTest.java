@@ -17,10 +17,12 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.model.std.CaseFieldValidationError;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.domain.types.ValidationContext;
+import uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.io.IOException;
@@ -41,14 +43,17 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import static uk.gov.hmcts.ccd.domain.service.validate.DefaultValidateCaseFieldsOperation.ORGANISATION_POLICY_ROLE;
+import static uk.gov.hmcts.ccd.domain.types.PredefinedFieldsIDs.ORG_POLICY_CASE_ASSIGNED_ROLE;
 
 class DefaultValidateCaseFieldsOperationTest {
 
+
+    private static final String ORGANISATION_POLICY_ROLE = ORG_POLICY_CASE_ASSIGNED_ROLE.getId();
     private static final String CASE_TYPE_ID = "caseTypeId";
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
@@ -86,9 +91,8 @@ class DefaultValidateCaseFieldsOperationTest {
         doReturn(eventId).when(caseDataContent).getEventId();
 
         validateCaseFieldsOperation = new DefaultValidateCaseFieldsOperation(caseDefinitionRepository,
-                                                                             caseRoleRepository,
-                                                                             caseTypeService,
-                                                                             fieldProcessorService);
+            caseTypeService,
+            fieldProcessorService);
     }
 
     @Test
@@ -202,6 +206,11 @@ class DefaultValidateCaseFieldsOperationTest {
 
     @Test
     void should_fail_validate_when_organisation_has_null_role() throws Exception {
+        List<CaseFieldValidationError> fieldErrors = new ArrayList<>();
+        CaseValidationException caseValidationException = new CaseValidationException(fieldErrors);
+        doThrow(caseValidationException)
+            .when(caseTypeService)
+            .validateData(any(ValidationContext.class));
 
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(buildCaseType());
 
@@ -209,29 +218,36 @@ class DefaultValidateCaseFieldsOperationTest {
             buildJsonNodeDataWithOrganisationPolicyRole(null);
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
-        BadRequestException exception =
-            assertThrows(BadRequestException.class, () ->
-                validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
+        CaseValidationException caseValidationExceptionResult =
+            assertThrows(CaseValidationException.class,
+                () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
 
-        assertThat(exception.getMessage(),
-                   containsString("has an incorrect value"));
+        assertThat(caseValidationExceptionResult.getMessage(),
+            containsString("Case data validation failed"));
     }
 
     @Test
     void should_fail_validate_when_organisation_has_incorrect_role() throws Exception {
 
+        List<CaseFieldValidationError> fieldErrors = new ArrayList<>();
+        CaseValidationException caseValidationException = new CaseValidationException(fieldErrors);
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(buildCaseType());
+
+        doThrow(caseValidationException)
+            .when(caseTypeService)
+            .validateData(any(ValidationContext.class));
 
         final Map<String, JsonNode> organisationPolicyData =
             buildJsonNodeDataWithOrganisationPolicyRole("incorrect_role");
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
-        BadRequestException exception =
-            assertThrows(BadRequestException.class, () ->
-                validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
+        CaseValidationException caseValidationExceptionResult =
+            assertThrows(CaseValidationException.class,
+                () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
 
-        assertThat(exception.getMessage(),
-                   containsString("has an incorrect value"));
+
+        assertThat(caseValidationExceptionResult.getMessage(),
+            containsString("Case data validation failed"));
     }
 
     @Test
@@ -248,37 +264,47 @@ class DefaultValidateCaseFieldsOperationTest {
 
     @Test
     void should_fail_validateData_when_organisation_has_null_role() throws Exception {
+        List<CaseFieldValidationError> fieldErrors = new ArrayList<>();
+        CaseValidationException caseValidationException = new CaseValidationException(fieldErrors);
+        doThrow(caseValidationException)
+            .when(caseTypeService)
+            .validateData(any(ValidationContext.class));
+
         CaseTypeDefinition caseTypeDefinition = buildCaseType();
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(caseTypeDefinition);
 
         final Map<String, JsonNode> organisationPolicyData = buildJsonNodeDataWithOrganisationPolicyRole(null);
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
-        BadRequestException exception =
-            assertThrows(BadRequestException.class,
-                () -> validateCaseFieldsOperation.validateData(organisationPolicyData, caseTypeDefinition,
-                                                               caseDataContent));
+        CaseValidationException caseValidationExceptionResult =
+            assertThrows(CaseValidationException.class,
+                () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
 
-        assertThat(exception.getMessage(),
-                   containsString("has an incorrect value"));
+
+        assertThat(caseValidationExceptionResult.getMessage(),
+            containsString("Case data validation failed"));
     }
 
     @Test
     void should_fail_validateData_when_organisation_has_incorrect_role() throws Exception {
         CaseTypeDefinition caseTypeDefinition = buildCaseType();
         given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(caseTypeDefinition);
+        List<CaseFieldValidationError> fieldErrors = new ArrayList<>();
+        CaseValidationException caseValidationException = new CaseValidationException(fieldErrors);
+        doThrow(caseValidationException)
+            .when(caseTypeService)
+            .validateData(any(ValidationContext.class));
 
         final Map<String, JsonNode> organisationPolicyData =
             buildJsonNodeDataWithOrganisationPolicyRole("incorrect_role");
         doReturn(organisationPolicyData).when(caseDataContent).getData();
 
-        BadRequestException exception =
-            assertThrows(BadRequestException.class,
-                () -> validateCaseFieldsOperation.validateData(organisationPolicyData, caseTypeDefinition,
-                                                               caseDataContent));
+        CaseValidationException caseValidationExceptionResult =
+            assertThrows(CaseValidationException.class,
+                () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent));
 
-        assertThat(exception.getMessage(),
-                   containsString("has an incorrect value"));
+        assertThat(caseValidationExceptionResult.getMessage(),
+            containsString("Case data validation failed"));
     }
 
     @Test
@@ -286,8 +312,8 @@ class DefaultValidateCaseFieldsOperationTest {
         Map<String, JsonNode> result = validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, caseDataContent);
 
         assertAll(
-            () -> verify(caseDefinitionRepository, times(2)).getCaseType(CASE_TYPE_ID),
-            () -> verify(caseTypeService).validateData(data, caseTypeDefinition),
+            () -> verify(caseDefinitionRepository, times(1)).getCaseType(CASE_TYPE_ID),
+            () -> verify(caseTypeService).validateData(any(ValidationContext.class)),
             () -> assertThat(result, is(data))
         );
     }
@@ -356,7 +382,7 @@ class DefaultValidateCaseFieldsOperationTest {
     }
 
     private Map<String, JsonNode> buildJsonNodeDataWithOrganisationPolicyRole(String organisationPolicyRole)
-                                                                                                throws IOException {
+        throws IOException {
         final JsonNode node = new ObjectMapper().readTree("{\n"
             + "  \"OrgPolicyCaseAssignedRole\": \"" + organisationPolicyRole + "\",\n"
             + "  \"OrgPolicyReference\": \"" + organisationPolicyRole + "\",\n"
@@ -474,7 +500,7 @@ class DefaultValidateCaseFieldsOperationTest {
 
     private Map<String, JsonNode> buildJsonNodeDataWithTwoOrganisationPolicyRole(String organisationPolicyRole1,
                                                                                  String organisationPolicyRole2)
-                                                                                                 throws IOException {
+        throws IOException {
         final JsonNode node = new ObjectMapper().readTree("{\n"
             + "  \"OrgPolicyCaseAssignedRole\": \"" + organisationPolicyRole1 + "\",\n"
             + "  \"OrgPolicyReference\": \"" + organisationPolicyRole1 + "\",\n"

@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
@@ -53,30 +54,41 @@ class TextCaseReferenceCaseLinkValidatorTest {
         BaseType.register(textAreaBaseType);
         textValidator =  new TextValidator();
         validator = new TextCaseReferenceCaseLinkValidator(textValidator,caseService);
-
         caseFieldDefinition = caseField().build();
     }
 
     @Test
     void getType() {
-        assertThat(validator.getPredefinedFieldId(), is("TextCaseReference"));
+        assertThat(validator.getCustomTypeId(), is("TextCaseReference"));
     }
 
     @Test
     @DisplayName("should pass test against regular expression")
     void textRegexPass() {
+
         final CaseFieldDefinition caseFieldDefinition =
             caseField().withRegExp("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)").build();
         final JsonNode validValue = NODE_FACTORY.textNode("1596-1048-4059-0000");
-        final List<ValidationResult> validResult = validator.validate(FIELD_ID, validValue, caseFieldDefinition);
+        ValidationContext validationContext1 = createValidationContext(caseFieldDefinition, validValue);
+        final List<ValidationResult> validResult = validator.validate(validationContext1);
 
         final JsonNode invalidValue = NODE_FACTORY.textNode("1596104840593131");
-        final List<ValidationResult> invalidResult = validator.validate(FIELD_ID, invalidValue, caseFieldDefinition);
+        ValidationContext validationContext2 = createValidationContext(caseFieldDefinition, invalidValue);
+        final List<ValidationResult> invalidResult = validator.validate(validationContext2);
 
         assertAll(
             () -> assertThat("Expected input to be valid", validResult, hasSize(0)),
             () -> assertThat("Expected input NOT to be valid", invalidResult, hasSize(0))
         );
+    }
+
+    private ValidationContext createValidationContext(CaseFieldDefinition caseFieldDefinition, JsonNode validValue) {
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        final ValidationContext validationContext  = new ValidationContext(caseTypeDefinition,null);
+        validationContext.setFieldValue(validValue);
+        validationContext.setCaseFieldDefinition(caseFieldDefinition);
+        validationContext.setFieldId(FIELD_ID);
+        return validationContext;
     }
 
     @Test
@@ -85,10 +97,12 @@ class TextCaseReferenceCaseLinkValidatorTest {
         final CaseFieldDefinition caseFieldDefinition =
             caseField().withRegExp("(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)").build();
         final JsonNode validValue = NODE_FACTORY.textNode("15xxxx00");
-        final List<ValidationResult> validResult = validator.validate(FIELD_ID, validValue, caseFieldDefinition);
+        ValidationContext validationContext1 = createValidationContext(caseFieldDefinition, validValue);
+        final List<ValidationResult> validResult = validator.validate(validationContext1);
 
         final JsonNode invalidValue = NODE_FACTORY.textNode("15961077777774840593131");
-        final List<ValidationResult> invalidResult = validator.validate(FIELD_ID, invalidValue, caseFieldDefinition);
+        ValidationContext validationContext2 = createValidationContext(caseFieldDefinition, invalidValue);
+        final List<ValidationResult> invalidResult = validator.validate(validationContext2);
 
         assertAll(
             () -> assertThat("Expected input to be valid", validResult, hasSize(1)),
@@ -108,10 +122,13 @@ class TextCaseReferenceCaseLinkValidatorTest {
         when(caseService.getCaseDetailsByCaseReference("1596104840590000")).thenThrow(
             new ResourceNotFoundException("No case exist with id=" + caseReference)
         );
-        final List<ValidationResult> validResult = validator.validate(FIELD_ID, validValue, caseFieldDefinition);
+
+        ValidationContext validationContext1 = createValidationContext(caseFieldDefinition, validValue);
+        final List<ValidationResult> validResult = validator.validate(validationContext1);
 
         final JsonNode invalidValue = NODE_FACTORY.textNode("1596104840593131");
-        final List<ValidationResult> invalidResult = validator.validate(FIELD_ID, invalidValue, caseFieldDefinition);
+        ValidationContext validationContext2 = createValidationContext(caseFieldDefinition, invalidValue);
+        final List<ValidationResult> invalidResult = validator.validate(validationContext2);
 
         assertAll(
             () -> assertThat("Expected input to be valid", validResult, hasSize(1)),

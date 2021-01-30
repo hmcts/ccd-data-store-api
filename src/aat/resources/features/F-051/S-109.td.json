@@ -640,6 +640,9 @@
 								}
 							],
 							"states": [
+                {
+                  "__ordering__": "unordered"
+                },
 								{
 									"id": "TODO",
 									"name": "To do",
