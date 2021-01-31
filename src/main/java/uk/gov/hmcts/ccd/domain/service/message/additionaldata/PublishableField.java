@@ -14,7 +14,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.DisplayContext;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -86,11 +85,11 @@ public class PublishableField {
      * Find the data associated *only* with this field from complete case data.
      *
      * @param data the original, complete case data for a case type which this publishable field belongs to
-     * @return the node where this publishable field starts
+     * @return the node where this publishable field starts; null if not found
      */
     public JsonNode findFieldDataFromCaseData(Map<String, JsonNode> data) {
         if (!getKey().equals(getPath())) {
-            List<String> path = Arrays.asList(splitPath());
+            List<String> path = List.of(splitPath());
             if (path.size() == 1) {
                 return data.get(path.get(0));
             }

@@ -105,7 +105,7 @@ public class DataBlockGenerator {
             String fieldId = caseFieldDefinition.getId();
             if (originalNode.has(fieldId)) {
                 JsonNode childNode = originalNode.get(fieldId);
-                if (childNode.isNull()) {
+                if (childNode == null || childNode.isNull()) {
                     objectNode.set(fieldId, NullNode.getInstance());
                 } else {
                     objectNode.set(fieldId, buildDataBlock(childNode, caseFieldDefinition.getFieldTypeDefinition()));
@@ -161,7 +161,7 @@ public class DataBlockGenerator {
     }
 
     private JsonNode booleanNodeOf(JsonNode node) {
-        if (node == null || node.isNull() || isNullOrEmpty(node.textValue())) {
+        if (isNullOrEmpty(node.textValue())) {
             return MAPPER.nullNode();
         }
 
@@ -169,10 +169,6 @@ public class DataBlockGenerator {
     }
 
     private JsonNode numberNodeOf(JsonNode node) {
-        if (node == null || node.isNull()) {
-            return MAPPER.nullNode();
-        }
-
         return node.isNumber() ? LongNode.valueOf(node.asLong()) : LongNode.valueOf(Long.parseLong(node.textValue()));
     }
 }

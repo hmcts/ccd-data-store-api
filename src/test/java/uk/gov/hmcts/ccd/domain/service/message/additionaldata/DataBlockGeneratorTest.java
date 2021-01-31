@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.IntNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.hamcrest.MatcherAssert;
@@ -33,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.MONEY_GBP;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.NUMBER;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.YES_OR_NO;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
@@ -61,6 +63,7 @@ class DataBlockGeneratorTest {
     private static final String NESTED_FIELD_2 = "NestedField2";
     private static final String SUB_NESTED_FIELD_1 = "SubNestedField1";
     private static final String SUB_NESTED_FIELD_2 = "SubNestedField2";
+    private static final String SUB_NESTED_FIELD_3 = "SubNestedField2";
     private static final String COMPLEX_ID_1 = "ComplexType1";
     private static final String COMPLEX_ID_2 = "ComplexType2";
 
@@ -266,6 +269,197 @@ class DataBlockGeneratorTest {
         assertAll(
             () -> assertEquals(DATA, result.get(FIELD_ALIAS)),
             () -> MatcherAssert.assertThat(result.size(), Matchers.is(1))
+        );
+    }
+
+    @Test
+    void shouldBuildDataForPublishableSimpleCollectionField() throws JsonProcessingException {
+        caseEventDefinition = newCaseEvent()
+            .withCaseFields(List.of(
+                newCaseEventField()
+                    .withCaseFieldId(FIELD_ID)
+                    .withDisplayContext(DisplayContext.MANDATORY)
+                    .withPublish(true)
+                    .build()
+            ))
+            .build();
+
+        caseTypeDefinition = newCaseType()
+            .withCaseFields(List.of(
+                newCaseField()
+                    .withId(FIELD_ID)
+                    .withFieldType(aFieldType()
+                        .withId(COLLECTION)
+                        .withType(COLLECTION)
+                        .withCollectionFieldType(fieldType(TEXT))
+                        .build())
+                    .build()
+            ))
+            .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, JsonNode> data = new HashMap<>();
+        final JsonNode DATA = mapper.readTree("[\n" +
+            "    {\n" +
+            "        \"id\": \"111\",\n" +
+            "        \"value\": \"CollectionValue1\"\n" +
+            "    },\n" +
+            "    {\n" +
+            "        \"id\": \"222\",\n" +
+            "        \"value\": \"CollectionValue2\"\n" +
+            "    },\n" +
+            "    {\n" +
+            "        \"id\": \"333\",\n" +
+            "        \"value\": \"CollectionValue3\"\n" +
+            "    }\n" +
+            "]");
+
+        data.put(FIELD_ID, DATA);
+
+        caseDetails = newCaseDetails().withData(data).build();
+
+        AdditionalDataContext context =
+            new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
+
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
+
+        assertAll(
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(result.get(FIELD_ID), is(DATA))
+        );
+    }
+
+    @Test
+    void shouldBuildDataForPublishableComplexCollectionField() throws JsonProcessingException {
+        caseEventDefinition = newCaseEvent()
+            .withCaseFields(List.of(
+                newCaseEventField()
+                    .withCaseFieldId(FIELD_ID)
+                    .withDisplayContext(DisplayContext.MANDATORY)
+                    .withPublish(true)
+                    .build()
+            ))
+            .build();
+
+        caseTypeDefinition = newCaseType()
+            .withCaseFields(List.of(
+                newCaseField()
+                    .withId(FIELD_ID)
+                    .withFieldType(
+                        aFieldType()
+                            .withId(COLLECTION)
+                            .withType(COLLECTION)
+                            .withCollectionFieldType(
+                                aFieldType()
+                                    .withId(COMPLEX_ID_2)
+                                    .withType(COMPLEX)
+                                    .withComplexField(complexField(SUB_NESTED_FIELD_1, YES_OR_NO))
+                                    .withComplexField(complexField(SUB_NESTED_FIELD_2, NUMBER))
+                                    .build()
+                            )
+                            .build()
+                    )
+                    .build()
+            ))
+            .build();
+
+        Map<String, JsonNode> data = new HashMap<>();
+        JsonNode fieldData = objectMapper.readTree("[\n"
+            + "        {\n"
+            + "            \"id\": \"123\",\n"
+            + "            \"value\": {\n"
+            + "                \"SubNestedField1\": null,\n"
+            + "                \"SubNestedField2\": \"1111\"\n"
+            + "            }\n"
+            + "        },\n"
+            + "        {\n"
+            + "            \"id\": \"456\",\n"
+            + "            \"value\": {\n"
+            + "                \"SubNestedField1\": \"Yes\",\n"
+            + "                \"SubNestedField2\": null\n"
+            + "            }\n"
+            + "        }\n"
+            + "    ]");
+        data.put(FIELD_ID, fieldData);
+
+        caseDetails = newCaseDetails().withData(data).build();
+
+        AdditionalDataContext context =
+            new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
+
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
+
+        assertAll(
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(result.get(FIELD_ID).toString(), is("[{\"id\":\"123\",\"value\""
+                + ":{\"SubNestedField1\":null,\"SubNestedField2\":1111}},"
+                + "{\"id\":\"456\",\"value\":{\"SubNestedField1\":true,"
+                + "\"SubNestedField2\":null}}]"))
+        );
+    }
+
+    @Test
+    void shouldBuildDataForPublishableComplexField() throws JsonProcessingException {
+        caseEventDefinition = newCaseEvent()
+            .withCaseFields(List.of(
+                newCaseEventField()
+                    .withCaseFieldId(FIELD_ID)
+                    .withDisplayContext(DisplayContext.MANDATORY)
+                    .withPublish(true)
+                    .build()
+            ))
+            .build();
+
+        caseTypeDefinition = newCaseType()
+            .withCaseFields(List.of(
+                newCaseField()
+                    .withId(FIELD_ID)
+                    .withFieldType(
+                        aFieldType()
+                            .withId(COMPLEX_ID_1)
+                            .withType(COMPLEX)
+                            .withComplexField(complexField(NESTED_FIELD_1, TEXT))
+                            .withComplexField(
+                                newCaseField()
+                                    .withId(NESTED_FIELD_2)
+                                    .withFieldType(
+                                        aFieldType()
+                                            .withId(COMPLEX_ID_2)
+                                            .withType(COMPLEX)
+                                            .withComplexField(complexField(SUB_NESTED_FIELD_1, TEXT))
+                                            .withComplexField(complexField(SUB_NESTED_FIELD_2, TEXT))
+                                            .withComplexField(complexField(SUB_NESTED_FIELD_3, TEXT))
+                                            .build()
+                                    )
+                                    .build()
+                            )
+                            .build()
+                    )
+                    .build()
+            ))
+            .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, JsonNode> data = new HashMap<>();
+        JsonNode jsonData = mapper.readTree("{\n"
+            + "      \"NestedField1\": \"valueOne\",\n"
+            + "      \"NestedField2\": {\n"
+            + "        \"SubNestedField1\": \"valueTwo\",\n"
+            + "        \"SubNestedField2\": null\n"
+            + "      }\n"
+            + "  }");
+        data.put(FIELD_ID, jsonData);
+
+        caseDetails = newCaseDetails().withData(data).build();
+
+        AdditionalDataContext context =
+            new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
+
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
+
+        assertAll(
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(result.get(FIELD_ID), is(jsonData))
         );
     }
 
@@ -671,6 +865,282 @@ class DataBlockGeneratorTest {
         assertAll(
             () -> assertThat(result.size(), is(1)),
             () -> assertThat(nestedField.findValue(NESTED_FIELD_1).asBoolean(), is(false))
+        );
+    }
+
+    @Test
+    void shouldBuildDataForPublishableFieldWithNullValue() {
+        caseEventDefinition = newCaseEvent()
+            .withCaseFields(List.of(
+                newCaseEventField()
+                    .withCaseFieldId(FIELD_ID)
+                    .withDisplayContext(DisplayContext.MANDATORY)
+                    .withPublish(true)
+                    .build()
+            ))
+            .build();
+
+        caseTypeDefinition = newCaseType()
+            .withCaseFields(List.of(
+                newCaseField()
+                    .withId(FIELD_ID)
+                    .withFieldType(aFieldType()
+                        .withId(FieldTypeDefinition.TEXT)
+                        .withType(FieldTypeDefinition.TEXT)
+                        .build())
+                    .build()
+            ))
+            .build();
+
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put(FIELD_ID, NullNode.getInstance());
+
+        caseDetails = newCaseDetails().withData(data).build();
+
+        AdditionalDataContext context =
+            new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
+
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
+
+        assertAll(
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(result.get(FIELD_ID).isNull(), is(true))
+        );
+    }
+
+    @Test
+    void shouldBuildDataForPublishableFieldWithNoKey() {
+        caseEventDefinition = newCaseEvent()
+            .withCaseFields(List.of(
+                newCaseEventField()
+                    .withCaseFieldId(FIELD_ID)
+                    .withDisplayContext(DisplayContext.MANDATORY)
+                    .withPublish(true)
+                    .build()
+            ))
+            .build();
+
+        caseTypeDefinition = newCaseType()
+            .withCaseFields(List.of(
+                newCaseField()
+                    .withId(FIELD_ID)
+                    .withFieldType(aFieldType()
+                        .withId(FieldTypeDefinition.TEXT)
+                        .withType(FieldTypeDefinition.TEXT)
+                        .build())
+                    .build()
+            ))
+            .build();
+
+        Map<String, JsonNode> data = new HashMap<>();
+
+        caseDetails = newCaseDetails().withData(data).build();
+
+        AdditionalDataContext context =
+            new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
+
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
+
+        assertAll(
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(result.get(FIELD_ID).isNull(), is(true))
+        );
+    }
+
+    @Test
+    void shouldBuildDataForPublishableBooleanFieldWithNullValue() {
+        caseEventDefinition = newCaseEvent()
+            .withCaseFields(List.of(
+                newCaseEventField()
+                    .withCaseFieldId(FIELD_ID)
+                    .withDisplayContext(DisplayContext.MANDATORY)
+                    .withPublish(true)
+                    .build()
+            ))
+            .build();
+
+        caseTypeDefinition = newCaseType()
+            .withCaseFields(List.of(
+                newCaseField()
+                    .withId(FIELD_ID)
+                    .withFieldType(aFieldType()
+                        .withId(YES_OR_NO)
+                        .withType(YES_OR_NO)
+                        .build())
+                    .build()
+            ))
+            .build();
+
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put(FIELD_ID, NullNode.getInstance());
+
+        caseDetails = newCaseDetails().withData(data).build();
+
+        AdditionalDataContext context =
+            new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
+
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
+
+        assertAll(
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(result.get(FIELD_ID).isNull(), is(true))
+        );
+    }
+
+    @Test
+    void shouldBuildDataForPublishableBooleanFieldWithEmptyValue() {
+        caseEventDefinition = newCaseEvent()
+            .withCaseFields(List.of(
+                newCaseEventField()
+                    .withCaseFieldId(FIELD_ID)
+                    .withDisplayContext(DisplayContext.MANDATORY)
+                    .withPublish(true)
+                    .build()
+            ))
+            .build();
+
+        caseTypeDefinition = newCaseType()
+            .withCaseFields(List.of(
+                newCaseField()
+                    .withId(FIELD_ID)
+                    .withFieldType(aFieldType()
+                        .withId(YES_OR_NO)
+                        .withType(YES_OR_NO)
+                        .build())
+                    .build()
+            ))
+            .build();
+
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put(FIELD_ID, new TextNode(""));
+
+        caseDetails = newCaseDetails().withData(data).build();
+
+        AdditionalDataContext context =
+            new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
+
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
+
+        assertAll(
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(result.get(FIELD_ID).isNull(), is(true))
+        );
+    }
+
+    @Test
+    void shouldBuildDataForPublishableNumberFieldWithNullValue() {
+        caseEventDefinition = newCaseEvent()
+            .withCaseFields(List.of(
+                newCaseEventField()
+                    .withCaseFieldId(FIELD_ID)
+                    .withDisplayContext(DisplayContext.MANDATORY)
+                    .withPublish(true)
+                    .build()
+            ))
+            .build();
+
+        caseTypeDefinition = newCaseType()
+            .withCaseFields(List.of(
+                newCaseField()
+                    .withId(FIELD_ID)
+                    .withFieldType(aFieldType()
+                        .withId(NUMBER)
+                        .withType(NUMBER)
+                        .build())
+                    .build()
+            ))
+            .build();
+
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put(FIELD_ID, NullNode.getInstance());
+
+        caseDetails = newCaseDetails().withData(data).build();
+
+        AdditionalDataContext context =
+            new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
+
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
+
+        assertAll(
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(result.get(FIELD_ID).isNull(), is(true))
+        );
+    }
+
+    @Test
+    void shouldBuildDataForPublishableComplexOverrideFieldWithNullValue() throws JsonProcessingException {
+        caseEventDefinition = newCaseEvent()
+            .withCaseFields(List.of(
+                newCaseEventField()
+                    .withCaseFieldId(FIELD_ID)
+                    .withDisplayContext(DisplayContext.COMPLEX)
+                    .withPublish(true)
+                    .addCaseEventFieldComplexDefinitions(
+                        CaseEventFieldComplexDefinition.builder()
+                            .reference(NESTED_FIELD_1)
+                            .publish(true)
+                            .build()
+                    )
+                    .addCaseEventFieldComplexDefinitions(
+                        CaseEventFieldComplexDefinition.builder()
+                            .reference(NESTED_FIELD_2)
+                            .publish(true)
+                            .build()
+                    )
+                    .addCaseEventFieldComplexDefinitions(
+                        CaseEventFieldComplexDefinition.builder()
+                            .reference("NestedField2.SubNestedField1")
+                            .publish(true)
+                            .build()
+                    )
+                    .build()
+            ))
+            .build();
+
+        caseTypeDefinition = newCaseType()
+            .withCaseFields(List.of(
+                newCaseField()
+                    .withId(FIELD_ID)
+                    .withFieldType(
+                        aFieldType()
+                            .withId(COMPLEX_ID_1)
+                            .withType(COMPLEX)
+                            .withComplexField(complexField(NESTED_FIELD_1, TEXT))
+                            .withComplexField(
+                                newCaseField()
+                                    .withId(NESTED_FIELD_2)
+                                    .withFieldType(
+                                        aFieldType()
+                                            .withId(COMPLEX_ID_2)
+                                            .withType(COMPLEX)
+                                            .withComplexField(complexField(SUB_NESTED_FIELD_1, TEXT))
+                                            .withComplexField(complexField(SUB_NESTED_FIELD_2, TEXT))
+                                            .build()
+                                    )
+                                    .build()
+                            )
+                            .build()
+                    )
+                    .build()
+            ))
+            .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put(FIELD_ID, mapper.readTree("{\n"
+            + "      \"NestedField2\": null"
+            + "  }"));
+
+        caseDetails = newCaseDetails().withData(data).build();
+
+        AdditionalDataContext context =
+            new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
+
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
+
+        assertAll(
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(result.get(FIELD_ID).toString(), is("{\"NestedField1\":null,\"NestedField2\":null}"))
         );
     }
 
