@@ -299,20 +299,20 @@ class DataBlockGeneratorTest {
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, JsonNode> data = new HashMap<>();
-        final JsonNode DATA = mapper.readTree("[\n" +
-            "    {\n" +
-            "        \"id\": \"111\",\n" +
-            "        \"value\": \"CollectionValue1\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "        \"id\": \"222\",\n" +
-            "        \"value\": \"CollectionValue2\"\n" +
-            "    },\n" +
-            "    {\n" +
-            "        \"id\": \"333\",\n" +
-            "        \"value\": \"CollectionValue3\"\n" +
-            "    }\n" +
-            "]");
+        final JsonNode DATA = mapper.readTree("[\n"
+            + "    {\n"
+            + "        \"id\": \"111\",\n"
+            + "        \"value\": \"CollectionValue1\"\n"
+            + "    },\n"
+            + "    {\n"
+            + "        \"id\": \"222\",\n"
+            + "        \"value\": \"CollectionValue2\"\n"
+            + "    },\n"
+            + "    {\n"
+            + "        \"id\": \"333\",\n"
+            + "        \"value\": \"CollectionValue3\"\n"
+            + "    }\n"
+            + "]");
 
         data.put(FIELD_ID, DATA);
 
