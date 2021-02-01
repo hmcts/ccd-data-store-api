@@ -94,6 +94,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "publish": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -136,6 +137,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "publish": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -178,6 +180,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "publish": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -220,6 +223,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "publish": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -262,6 +266,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "publish": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -302,6 +307,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "publish": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -463,6 +469,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "publish": null,
 									"acls": [
 										{
 											"role": "caseworker-befta_jurisdiction_1",
@@ -494,6 +501,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "publish": null,
 									"acls": [
 										{
 											"role": "caseworker-befta_jurisdiction_1",
@@ -525,6 +533,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "publish": null,
 									"acls": [
 										{
 											"role": "caseworker-befta_jurisdiction_1",
@@ -556,6 +565,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "publish": null,
 									"acls": [
 										{
 											"role": "caseworker-befta_jurisdiction_1",
@@ -587,6 +597,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "publish": null,
 									"acls": [
 										{
 											"role": "caseworker-befta_jurisdiction_1",
@@ -616,6 +627,7 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
+                  "publish": null,
 									"acls": [
 										{
 											"role": "caseworker-befta_jurisdiction_1",

@@ -140,6 +140,7 @@
               "delete": false
             }],
           "show_event_notes": true,
+          "publish": true,
           "can_save_draft": true
         },
         {
