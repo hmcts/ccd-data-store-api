@@ -1,11 +1,9 @@
 package uk.gov.hmcts.ccd.data.definition;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.jupiter.api.AfterEach;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
@@ -18,9 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.removeStub;
 import static com.github.tomakehurst.wiremock.client.WireMock.serverError;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
@@ -41,21 +37,11 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
     @Inject
     private uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository caseDefinitionRepository;
 
-    private StubMapping stubMapping;
-
-    @AfterEach
-    public void tearDown() {
-        if (stubMapping != null) {
-            removeStub(stubMapping);
-        }
-    }
-
     @Test
     public void shouldGetCaseTypesForJurisdiction() {
         final List<CaseTypeDefinition> caseTypeDefinitions =
             caseDefinitionRepository.getCaseTypesForJurisdiction("probate");
         assertEquals("HTTP call results failed", 2, caseTypeDefinitions.size());
-
     }
 
     @Test
@@ -137,8 +123,7 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
 
     @Test
     public void shouldFailToGetCaseTypesForJurisdiction() {
-        stubMapping = stubFor(WireMock.get(urlMatching("/api/data/jurisdictions/server_error/case-type"))
-            .willReturn(serverError()));
+        stubFor(WireMock.get(urlMatching("/api/data/jurisdictions/server_error/case-type")).willReturn(serverError()));
         final ServiceException exception = assertThrows(ServiceException.class,
             () -> caseDefinitionRepository.getCaseTypesForJurisdiction("server_error"));
         assertThat(exception.getMessage(), startsWith("Problem getting case types for the Jurisdiction:server_error "
@@ -147,8 +132,7 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
 
     @Test
     public void shouldFailToGetCaseType() {
-        stubMapping =
-            stubFor(WireMock.get(urlMatching("/api/data/case-type/anything")).willReturn(serverError()));
+        stubFor(WireMock.get(urlMatching("/api/data/case-type/anything")).willReturn(serverError()));
         final ServiceException exception = assertThrows(ServiceException.class,
             () -> caseDefinitionRepository.getCaseType("anything"));
         assertThat(exception.getMessage(), startsWith("Problem getting case type definition for anything because of "));
@@ -157,7 +141,7 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
     @Test
     public void shouldFailToGetBaseTypes() {
         when(caseDefinitionRepository.getBaseTypes()).thenCallRealMethod();
-        stubMapping = stubFor(WireMock.get(urlMatching("/api/base-types")).willReturn(serverError()));
+        stubFor(WireMock.get(urlMatching("/api/base-types")).willReturn(serverError()));
         final ServiceException exception = assertThrows(ServiceException.class,
             () -> caseDefinitionRepository.getBaseTypes());
         assertThat(exception.getMessage(), startsWith("Problem getting base types definition from definition store "
@@ -167,7 +151,7 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
     @Test
     public void shouldFailToGetClassificationsForUserRoleList() {
         List<String> userRoles = Arrays.asList("neither_defined", "nor_defined");
-        stubMapping = stubFor(WireMock.get(urlMatching("/api/user-roles/neither_defined,nor_defined"))
+        stubFor(WireMock.get(urlMatching("/api/user-roles/neither_defined,nor_defined"))
             .willReturn(serverError()));
         final ServiceException exception = assertThrows(ServiceException.class,
             () -> caseDefinitionRepository.getClassificationsForUserRoleList(userRoles));
