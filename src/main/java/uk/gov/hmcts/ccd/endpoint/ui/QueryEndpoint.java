@@ -200,7 +200,8 @@ public class QueryEndpoint {
     }
 
     @Transactional
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid:^[a-zA-Z0-9_.]+$}/work-basket-inputs",
+    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid:^[a-zA-Z0-9_.]+$}/"
+        + "work-basket-inputs",
         method = RequestMethod.GET)
     @ApiOperation(value = "Get Workbasket Input details")
     @ApiResponses(value = {
@@ -239,7 +240,8 @@ public class QueryEndpoint {
     }
 
     @Transactional
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid:^[a-zA-Z0-9_.]+$}/event-triggers/{etid}",
+    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid:^[a-zA-Z0-9_.]+$}/"
+        + "event-triggers/{etid}",
         method = RequestMethod.GET)
     @ApiOperation(value = "Fetch an event trigger in the context of a case type")
     @ApiResponses(value = {
@@ -257,7 +259,8 @@ public class QueryEndpoint {
 
     @Transactional
     @RequestMapping(
-        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid:^[a-zA-Z0-9_.]+$}/cases/{cid}/event-triggers/{etid}",
+        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid:^[a-zA-Z0-9_.]+$}/cases/{cid}/"
+            + "event-triggers/{etid}",
         method = RequestMethod.GET)
     @ApiOperation(value = "Fetch an event trigger in the context of a case")
     @ApiResponses(value = {
@@ -275,7 +278,8 @@ public class QueryEndpoint {
 
     @Transactional
     @RequestMapping(
-        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid:^[a-zA-Z0-9_.]+$}/drafts/{did}/event-triggers/{etid}",
+        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid:^[a-zA-Z0-9_.]+$}/drafts/{did}/"
+            + "event-triggers/{etid}",
         method = RequestMethod.GET)
     @ApiOperation(value = "Fetch an event trigger in the context of a case")
     @ApiResponses(value = {
@@ -293,7 +297,8 @@ public class QueryEndpoint {
 
     @Transactional
     @RequestMapping(
-        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid:^[a-zA-Z0-9_.]+$}/cases/{cid}/events/{eventId}/case-history",
+        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid:^[a-zA-Z0-9_.]+$}/cases/{cid}/events/"
+            + "{eventId}/case-history",
         method = RequestMethod.GET)
     @ApiOperation(value = "Fetch case history for the event")
     @ApiResponses(value = {
