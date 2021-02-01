@@ -55,17 +55,11 @@
 							"show_summary_content_option": null,
 							"acls": [
 								{
-									"role": "caseworker-autotest1",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1AccessControlList",
 									"delete": true
 								},
 								{
-									"role": "caseworker-autotest1-private",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1PrivateAccessControlList",
 									"delete": true
 								}
 							]
@@ -97,17 +91,11 @@
 							"show_summary_content_option": null,
 							"acls": [
 								{
-									"role": "caseworker-autotest1",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1AccessControlList",
 									"delete": true
 								},
 								{
-									"role": "caseworker-autotest1-private",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1PrivateAccessControlList",
 									"delete": true
 								}
 							]
@@ -139,17 +127,11 @@
 							"show_summary_content_option": null,
 							"acls": [
 								{
-									"role": "caseworker-autotest1",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1AccessControlList",
 									"delete": true
 								},
 								{
-									"role": "caseworker-autotest1-private",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1PrivateAccessControlList",
 									"delete": true
 								}
 							]
@@ -181,17 +163,11 @@
 							"show_summary_content_option": null,
 							"acls": [
 								{
-									"role": "caseworker-autotest1",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1AccessControlList",
 									"delete": true
 								},
 								{
-									"role": "caseworker-autotest1-private",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1PrivateAccessControlList",
 									"delete": true
 								}
 							]
@@ -223,17 +199,11 @@
 							"show_summary_content_option": null,
 							"acls": [
 								{
-									"role": "caseworker-autotest1",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1AccessControlList",
 									"delete": true
 								},
 								{
-									"role": "caseworker-autotest1-private",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1PrivateAccessControlList",
 									"delete": true
 								}
 							]
@@ -289,17 +259,11 @@
 							"show_summary_content_option": null,
 							"acls": [
 								{
-									"role": "caseworker-autotest1",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1AccessControlList",
 									"delete": true
 								},
 								{
-									"role": "caseworker-autotest1-private",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1PrivateAccessControlList",
 									"delete": true
 								}
 							]
@@ -340,17 +304,11 @@
 							"show_summary_content_option": null,
 							"acls": [
 								{
-									"role": "caseworker-autotest1",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1AccessControlList",
 									"delete": true
 								},
 								{
-									"role": "caseworker-autotest1-private",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1PrivateAccessControlList",
 									"delete": true
 								}
 							]
@@ -382,17 +340,11 @@
 							"show_summary_content_option": null,
 							"acls": [
 								{
-									"role": "caseworker-autotest1",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1AccessControlList",
 									"delete": true
 								},
 								{
-									"role": "caseworker-autotest1-private",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1PrivateAccessControlList",
 									"delete": true
 								}
 							]
@@ -424,17 +376,11 @@
 							"show_summary_content_option": null,
 							"acls": [
 								{
-									"role": "caseworker-autotest1",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1AccessControlList",
 									"delete": true
 								},
 								{
-									"role": "caseworker-autotest1-private",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1PrivateAccessControlList",
 									"delete": true
 								}
 							]
@@ -466,17 +412,11 @@
 							"show_summary_content_option": null,
 							"acls": [
 								{
-									"role": "caseworker-autotest1",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1AccessControlList",
 									"delete": true
 								},
 								{
-									"role": "caseworker-autotest1-private",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1PrivateAccessControlList",
 									"delete": true
 								}
 							]
@@ -524,17 +464,11 @@
 							"show_summary_content_option": null,
 							"acls": [
 								{
-									"role": "caseworker-autotest1",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1AccessControlList",
 									"delete": true
 								},
 								{
-									"role": "caseworker-autotest1-private",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1PrivateAccessControlList",
 									"delete": true
 								}
 							]
@@ -595,17 +529,11 @@
 							"show_summary_content_option": null,
 							"acls": [
 								{
-									"role": "caseworker-autotest1",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1AccessControlList",
 									"delete": true
 								},
 								{
-									"role": "caseworker-autotest1-private",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1PrivateAccessControlList",
 									"delete": true
 								}
 							]
@@ -664,17 +592,11 @@
 							"show_summary_content_option": null,
 							"acls": [
 								{
-									"role": "caseworker-autotest1",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1AccessControlList",
 									"delete": true
 								},
 								{
-									"role": "caseworker-autotest1-private",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1PrivateAccessControlList",
 									"delete": true
 								}
 							]
@@ -861,17 +783,11 @@
 							"show_summary_content_option": null,
 							"acls": [
 								{
-									"role": "caseworker-autotest1",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1AccessControlList",
 									"delete": true
 								},
 								{
-									"role": "caseworker-autotest1-private",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1PrivateAccessControlList",
 									"delete": true
 								}
 							]
@@ -1087,17 +1003,11 @@
 							"show_summary_content_option": null,
 							"acls": [
 								{
-									"role": "caseworker-autotest1",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1AccessControlList",
 									"delete": true
 								},
 								{
-									"role": "caseworker-autotest1-private",
-									"create": true,
-									"read": true,
-									"update": true,
+                  "_extends_": "CaseworkerAutotest1PrivateAccessControlList",
 									"delete": true
 								}
 							]

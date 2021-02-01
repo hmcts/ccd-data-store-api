@@ -1,0 +1,7 @@
+{
+  "_guid_": "BaseAddressUKFieldType",
+  "_extends_": "CommonFieldType",
+
+  "id": "AddressUK",
+  "type": "Complex"
+}

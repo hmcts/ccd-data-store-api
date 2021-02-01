@@ -8,8 +8,7 @@
     "contains Last State Modified Date metadata field"
   ],
   "user": {
-    "username": "befta.caseworker.3@gmail.com",
-    "password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
+    "_extends_": "BeftaCaseworker3"
   },
   "request": {
     "pathVariables": {
@@ -35,7 +34,7 @@
           "__ordering__": "unordered"
         },
         {
-          "_extends_": "CaseViewField",
+          "_extends_": "CaseViewFieldMetadataTrue",
           "id": "[STATE]",
           "label": "State",
           "value": "TODO",
@@ -53,7 +52,9 @@
           "acls": []
         },
         {
-          "_extends_": "CaseViewField",
+          "_extends_": "CaseViewFieldMetadataTrue",
+          "id": "[LAST_STATE_MODIFIED_DATE]",
+          "label": "Last State Modified Date",
           "value": "[[ANY_DATE_NOT_NULLABLE]]",
           "metadata": true,
           "hint_text": null,
@@ -80,7 +81,7 @@
           "acls": []
         },
         {
-          "_extends_": "CaseViewField",
+          "_extends_": "CaseViewFieldMetadataTrue",
           "id": "[LAST_MODIFIED_DATE]",
           "label": "Last Modified Date",
           "value": "[[ANY_DATE_NOT_NULLABLE]]",
@@ -109,7 +110,7 @@
           "acls": []
         },
         {
-          "_extends_": "CaseViewField",
+          "_extends_": "CaseViewFieldMetadataTrue",
           "id": "[CREATED_DATE]",
           "label": "Created Date",
           "value": "[[ANY_DATE_NOT_NULLABLE]]",
@@ -138,7 +139,7 @@
           "acls": []
         },
         {
-          "_extends_": "CaseViewField",
+          "_extends_": "CaseViewFieldMetadataTrue",
           "id": "[JURISDICTION]",
           "label": "Jurisdiction",
           "value": "BEFTA_JURISDICTION_3",
@@ -158,7 +159,7 @@
           "acls": []
         },
         {
-          "_extends_": "CaseViewField",
+          "_extends_": "CaseViewFieldMetadataTrue",
           "id": "[CASE_TYPE]",
           "label": "Case Type",
           "value": "BEFTA_CASETYPE_3_4",
@@ -178,7 +179,7 @@
           "acls": []
         },
         {
-          "_extends_": "CaseViewField",
+          "_extends_": "CaseViewFieldMetadataTrue",
           "id": "[SECURITY_CLASSIFICATION]",
           "label": "Security Classification",
           "value": "PUBLIC",
@@ -198,7 +199,7 @@
           "acls": []
         },
         {
-          "_extends_": "CaseViewField",
+          "_extends_": "CaseViewFieldMetadataTrue",
           "id": "[CASE_REFERENCE]",
           "label": "Case Reference",
           "value": "[[ANY_NUMBER_NOT_NULLABLE]]",

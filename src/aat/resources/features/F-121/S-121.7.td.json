@@ -95,11 +95,7 @@
                       "show_condition": null,
                       "acls": [
                         {
-                          "role": "caseworker-befta_master",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
+                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
                         }
                       ],
                       "complexACLs": [],
@@ -132,11 +128,7 @@
                       "show_condition": null,
                       "acls": [
                         {
-                          "role": "caseworker-befta_master",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
+                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
                         }
                       ],
                       "complexACLs": [],
@@ -169,11 +161,7 @@
                       "show_condition": null,
                       "acls": [
                         {
-                          "role": "caseworker-befta_master",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
+                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
                         }
                       ],
                       "complexACLs": [],
@@ -206,11 +194,7 @@
                       "show_condition": null,
                       "acls": [
                         {
-                          "role": "caseworker-befta_master",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
+                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
                         }
                       ],
                       "complexACLs": [],
@@ -243,11 +227,7 @@
                       "show_condition": null,
                       "acls": [
                         {
-                          "role": "caseworker-befta_master",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
+                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
                         }
                       ],
                       "complexACLs": [],
@@ -280,11 +260,7 @@
                       "show_condition": null,
                       "acls": [
                         {
-                          "role": "caseworker-befta_master",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
+                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
                         }
                       ],
                       "complexACLs": [],
@@ -317,11 +293,7 @@
                       "show_condition": null,
                       "acls": [
                         {
-                          "role": "caseworker-befta_master",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
+                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
                         }
                       ],
                       "complexACLs": [],
@@ -339,11 +311,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
@@ -376,11 +344,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
@@ -432,11 +396,7 @@
                       "show_condition": null,
                       "acls": [
                         {
-                          "role": "caseworker-befta_master",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
+                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
                         }
                       ],
                       "complexACLs": [],
@@ -469,11 +429,7 @@
                       "show_condition": null,
                       "acls": [
                         {
-                          "role": "caseworker-befta_master",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
+                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
                         }
                       ],
                       "complexACLs": [],
@@ -506,11 +462,7 @@
                       "show_condition": null,
                       "acls": [
                         {
-                          "role": "caseworker-befta_master",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
+                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
                         }
                       ],
                       "complexACLs": [],
@@ -543,11 +495,7 @@
                       "show_condition": null,
                       "acls": [
                         {
-                          "role": "caseworker-befta_master",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
+                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
                         }
                       ],
                       "complexACLs": [],
@@ -580,11 +528,7 @@
                       "show_condition": null,
                       "acls": [
                         {
-                          "role": "caseworker-befta_master",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
+                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
                         }
                       ],
                       "complexACLs": [],
@@ -617,11 +561,7 @@
                       "show_condition": null,
                       "acls": [
                         {
-                          "role": "caseworker-befta_master",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
+                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
                         }
                       ],
                       "complexACLs": [],
@@ -654,11 +594,7 @@
                       "show_condition": null,
                       "acls": [
                         {
-                          "role": "caseworker-befta_master",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
+                          "_extends_": "CaseworkerBeftaMasterAccessControlList"
                         }
                       ],
                       "complexACLs": [],
@@ -676,11 +612,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
@@ -704,11 +636,7 @@
           "retain_hidden_value": null,
           "acls": [
             {
-              "role": "caseworker-befta_master",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
+              "_extends_": "CaseworkerBeftaMasterAccessControlList"
             }
           ]
         }
@@ -734,119 +662,136 @@
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress3.AddressLine1",
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress3.AddressLine2",
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespName",
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress4",
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress4.Country",
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress4.PostCode",
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress3.AddressLine3",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress3.PostTown",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress3.County",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress3.PostCode",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress3.Country",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress4.AddressLine1",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress4.AddressLine2",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress4.AddressLine3",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress4.PostTown",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "RespondentDetails.RespAddress4.County",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 }
               ]
             }

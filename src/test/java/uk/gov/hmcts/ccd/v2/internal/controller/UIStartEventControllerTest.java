@@ -76,6 +76,7 @@ class UIStartEventControllerTest {
                     .withLabel(FIELD_LABEL)
                     .withHintText(FIELD_HINT_TEXT)
                     .withShowCondition(null)
+                    .withRetainHiddenvalue(true)
                     .build()))
             .build())
         .withShowSummary(IS_SHOW_SUMMARY)
@@ -130,6 +131,9 @@ class UIStartEventControllerTest {
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0)
                         .getWizardPageFields().get(0).getComplexFieldOverrides().get(0),
                     hasProperty("hintText", CoreMatchers.is(FIELD_HINT_TEXT))),
+                () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0)
+                        .getWizardPageFields().get(0).getComplexFieldOverrides().get(0),
+                    hasProperty("retainHiddenValue", CoreMatchers.is(true))),
                 () -> assertThat(response.getBody().getCaseUpdateViewEvent().getWizardPages().get(0)
                         .getWizardPageFields().get(0).getComplexFieldOverrides().get(0),
                     hasProperty("showCondition", CoreMatchers.nullValue())),
