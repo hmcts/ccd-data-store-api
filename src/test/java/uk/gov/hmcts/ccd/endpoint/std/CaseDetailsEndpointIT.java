@@ -53,7 +53,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -405,9 +404,45 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         String caseType = "MessagePublishing";
         String eventId = "CREATE";
         String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseType + "/cases";
+        final JsonNode DATA = mapper.readTree("{\n"
+            + "  \"MoneyGBPField\": \"1000\",\n"
+            + "  \"FixedListField\": \"VALUE3\",\n"
+            + "  \"AddressUKField\": {\n"
+            + "    \"AddressLine1\": null,\n"
+            + "    \"AddressLine2\": null,\n"
+            + "    \"AddressLine3\": null,\n"
+            + "    \"PostTown\": null,\n"
+            + "    \"County\": null,\n"
+            + "    \"PostCode\": null,\n"
+            + "    \"Country\": null\n"
+            + "  },\n"
+            + "  \"ComplexField\": {\n"
+            + "  \"ComplexTextField\": \"text field\",\n"
+            + "   \"ComplexFixedListField\": null,\n"
+            + "    \"ComplexNestedField\": {\n"
+            + "      \"NestedNumberField\": null,\n"
+            + "      \"NestedCollectionTextField\": []\n"
+            + "    }\n"
+            + "  },\n"
+            + "  \"DateTimeField\": \"2000-01-01T11:11:11.000\",\n"
+            + "  \"PhoneUKField\": \"09876528531\",\n"
+            + "  \"NumberField\": 90,\n"
+            + "  \"MultiSelectListField\": [\n"
+            + "    \"OPTION4\",\n"
+            + "    \"OPTION2\"\n"
+            + "  ],\n"
+            + "  \"YesOrNoField\": \"No\",\n"
+            + "  \"EmailField\": \"test@test.com\",\n"
+            + "  \"TextField\": \"text\",\n"
+            + "  \"DateField\": \"2000-01-01\",\n"
+            + "  \"TextAreaField\": \"text areas\"\n"
+            + "}");
+
+
+        Map data = JacksonUtils.convertValue(DATA);
         CaseDataContent caseDetailsToSave = newCaseDataContent()
             .withEvent(anEvent().withEventId(eventId).build())
-            .withData(newHashMap())
+            .withData(data)
             .withToken(generateEventTokenNewCase(UID, JURISDICTION, caseType, eventId))
             .build();
 
@@ -604,6 +639,121 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "        \"originalId\": \"ComplexCollectionField\"\n"
                 + "    }\n"
                 + "}"));
+    }
+
+    @Test
+    public void shouldGenerateCaseEventDataMessagingDefinition() throws Exception {
+        String caseType = "MessagePublishing";
+        String eventId = "CREATE";
+        String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + caseType + "/cases";
+
+        final JsonNode DATA = mapper.readTree("{\n"
+            + "  \"MoneyGBPField\": \"1000\",\n"
+            + "  \"FixedListField\": \"VALUE3\",\n"
+            + "  \"AddressUKField\": {\n"
+            + "    \"AddressLine1\": \"123 street name\",\n"
+            + "    \"AddressLine2\": \"\",\n"
+            + "    \"AddressLine3\": \"\",\n"
+            + "    \"PostTown\": \"town\",\n"
+            + "    \"County\": \"county\",\n"
+            + "    \"PostCode\": \"postcode\",\n"
+            + "    \"Country\": \"\"\n"
+            + "  },\n"
+            + "  \"ComplexField\": {\n"
+            + "    \"ComplexTextField\": \"text in complex\",\n"
+            + "    \"ComplexFixedListField\": \"VALUE3\",\n"
+            + "    \"ComplexNestedField\": {\n"
+            + "      \"NestedNumberField\": \"1\",\n"
+            + "      \"NestedCollectionTextField\": [\n"
+            + "        {\n"
+            + "          \"value\": \"collection of text in nested complex 1\",\n"
+            + "          \"id\": \"62c18dd8-d6d2-4378-b940-8614ee1ab25a\"\n"
+            + "        },\n"
+            + "        {\n"
+            + "          \"value\": \"collection of text  in nested complex 2\",\n"
+            + "          \"id\": \"4acd46b4-f292-4e5d-a436-16dcca6b2cfe\"\n"
+            + "        }\n"
+            + "      ]\n"
+            + "    }\n"
+            + "  },\n"
+            + "  \"DateTimeField\": \"2000-12-12T11:11:11.000\",\n"
+            + "  \"PhoneUKField\": \"07986542987\",\n"
+            + "  \"NumberField\": \"2\",\n"
+            + "  \"MultiSelectListField\": [\n"
+            + "    \"OPTION4\",\n"
+            + "    \"OPTION3\"\n"
+            + "  ],\n"
+            + "  \"YesOrNoField\": \"Yes\",\n"
+            + "  \"EmailField\": \"test@test.com\",\n"
+            + "  \"TextField\": \"text field\",\n"
+            + "  \"DateField\": \"2000-12-12\",\n"
+            + "  \"TextAreaField\": \"text area\",\n"
+            + "  \"CollectionField\": [\n"
+            + "    {\n"
+            + "      \"value\": \"collection field\",\n"
+            + "      \"id\": \"9af355b6-19ef-4a19-b5db-ad873772b478\"\n"
+            + "    },\n"
+            + "    {\n"
+            + "      \"value\": \"collection field 2\",\n"
+            + "      \"id\": \"7bce938e-7400-424f-86c9-c896ecbabc1f\"\n"
+            + "    }\n"
+            + "  ]\n"
+            + "}");
+
+
+        Map data = JacksonUtils.convertValue(DATA);
+        CaseDataContent caseDetailsToSave = newCaseDataContent()
+            .withEvent(anEvent().withEventId(eventId).build())
+            .withData(data)
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, caseType, eventId))
+            .build();
+
+        MvcResult mvcResult = mockMvc.perform(post(url)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andReturn();
+        assertEquals("Incorrect Response Status Code", 201, mvcResult.getResponse().getStatus());
+
+        List<MessageQueueCandidate> messageQueueList =
+            template.query("SELECT * FROM message_queue_candidates", this::mapMessageCandidate);
+        assertEquals("Incorrect number of rows in messageQueue", 1, messageQueueList.size());
+
+        assertEquals(mapper.readTree("{\n"
+                + "  \"OtherAlias\": 1,\n"
+                + "  \"NumberField\": 2,\n"
+                + "  \"ComplexField\": {\n"
+                + "    \"ComplexTextField\": \"text in complex\",\n"
+                + "    \"ComplexNestedField\": {\n"
+                + "      \"NestedNumberField\": 1\n"
+                + "    }\n"
+                + "  },\n"
+                + "  \"YesOrNoField\": true,\n"
+                + "  \"DateTimeField\": \"2000-12-12T11:11:11.000\",\n"
+                + "  \"DocumentField\": null,\n"
+                + "  \"AddressUKField\": {\n"
+                + "    \"County\": \"county\",\n"
+                + "    \"Country\": \"\",\n"
+                + "    \"PostCode\": \"postcode\",\n"
+                + "    \"PostTown\": \"town\",\n"
+                + "    \"AddressLine1\": \"123 street name\",\n"
+                + "    \"AddressLine2\": \"\",\n"
+                + "    \"AddressLine3\": \"\"\n"
+                + "  },\n"
+                + "  \"CollectionField\": [\n"
+                + "    {\n"
+                + "      \"id\": \"9af355b6-19ef-4a19-b5db-ad873772b478\",\n"
+                + "      \"value\": \"collection field\"\n"
+                + "    },\n"
+                + "    {\n"
+                + "      \"id\": \"7bce938e-7400-424f-86c9-c896ecbabc1f\",\n"
+                + "      \"value\": \"collection field 2\"\n"
+                + "    }\n"
+                + "  ],\n"
+                + "  \"TopLevelPublish\": \"text in complex\",\n"
+                + "  \"AliasForTextField\": \"text field\",\n"
+                + "  \"ComplexCollectionField\": null\n"
+                + "}"),
+            messageQueueList.get(0).getMessageInformation().get("additional_data").get("Data"));
     }
 
     @Test

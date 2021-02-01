@@ -68,7 +68,7 @@ class PublishableFieldTest {
                 .withData(newHashMap())
                 .build();
 
-            PublishableField result = new PublishableField(caseTypeDefinition, caseEventFieldDefinition, caseDetails);
+            PublishableField result = new PublishableField(caseTypeDefinition, caseEventFieldDefinition);
 
             assertAll(
                 () -> assertThat(result.getKey(), is(FIELD_ID)),
@@ -102,7 +102,7 @@ class PublishableFieldTest {
                 .withData(newHashMap())
                 .build();
 
-            PublishableField result = new PublishableField(caseTypeDefinition, caseEventFieldDefinition, caseDetails);
+            PublishableField result = new PublishableField(caseTypeDefinition, caseEventFieldDefinition);
 
             assertAll(
                 () -> assertThat(result.getKey(), is(FIELD_ALIAS)),
@@ -146,7 +146,7 @@ class PublishableFieldTest {
                 .build();
 
             PublishableField result = new PublishableField(caseTypeDefinition, caseEventFieldComplexDefinition,
-                FULL_PATH, caseDetails);
+                FULL_PATH);
 
             assertAll(
                 () -> assertThat(result.getKey(), is(NESTED_FIELD)),
@@ -190,7 +190,7 @@ class PublishableFieldTest {
                 .build();
 
             PublishableField result = new PublishableField(caseTypeDefinition, caseEventFieldComplexDefinition,
-                FULL_PATH, caseDetails);
+                FULL_PATH);
 
             assertAll(
                 () -> assertThat(result.getKey(), is(FIELD_ALIAS)),
@@ -224,7 +224,7 @@ class PublishableFieldTest {
                 .build();
 
             ServiceException exception = assertThrows(ServiceException.class, () ->
-                new PublishableField(caseTypeDefinition, caseEventFieldDefinition, caseDetails));
+                new PublishableField(caseTypeDefinition, caseEventFieldDefinition));
 
             assertThat(exception.getMessage(),
                 is("Case event field 'UnknownId' cannot be found in configuration for case type 'CaseTypeId'."));

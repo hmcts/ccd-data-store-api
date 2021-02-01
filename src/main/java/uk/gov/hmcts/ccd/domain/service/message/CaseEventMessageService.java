@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.std.MessageInformation;
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 import uk.gov.hmcts.ccd.domain.service.message.additionaldata.DefinitionBlockGenerator;
+import uk.gov.hmcts.ccd.domain.service.message.additionaldata.DataBlockGenerator;
 
 import javax.inject.Inject;
 
@@ -27,8 +28,9 @@ public class CaseEventMessageService extends AbstractMessageService {
                                    final MessageCandidateRepository messageCandidateRepository,
                                    CaseAuditEventRepository caseAuditEventRepository,
                                    DefinitionBlockGenerator definitionBlockGenerator,
+                                   DataBlockGenerator dataBlockGenerator,
                                    @Qualifier("DefaultObjectMapper") ObjectMapper objectMapper) {
-        super(userRepository, caseAuditEventRepository, definitionBlockGenerator);
+        super(userRepository, caseAuditEventRepository, definitionBlockGenerator, dataBlockGenerator);
         this.messageCandidateRepository = messageCandidateRepository;
         this.objectMapper = objectMapper;
     }
