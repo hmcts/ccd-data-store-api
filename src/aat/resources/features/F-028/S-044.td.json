@@ -55,6 +55,8 @@
           "show_summary_change_option": true,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
+          "publish": null,
+          "publish_as": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -99,6 +101,8 @@
           "show_summary_change_option": true,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
+          "publish": null,
+          "publish_as": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -143,6 +147,8 @@
           "show_summary_change_option": true,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
+          "publish": null,
+          "publish_as": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -187,6 +193,8 @@
           "show_summary_change_option": true,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
+          "publish": null,
+          "publish_as": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -231,6 +239,8 @@
           "show_summary_change_option": true,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
+          "publish": null,
+          "publish_as": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -275,6 +285,8 @@
           "show_summary_change_option": true,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
+          "publish": null,
+          "publish_as": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -319,6 +331,8 @@
           "show_summary_change_option": true,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
+          "publish": null,
+          "publish_as": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -363,6 +377,8 @@
           "show_summary_change_option": true,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
+          "publish": null,
+          "publish_as": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -407,6 +423,8 @@
           "show_summary_change_option": true,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
+          "publish": null,
+          "publish_as": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -467,6 +485,8 @@
           "show_summary_change_option": true,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
+          "publish": null,
+          "publish_as": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -543,6 +563,8 @@
           "show_summary_change_option": true,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
+          "publish": null,
+          "publish_as": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -614,6 +636,8 @@
           "show_summary_change_option": false,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
+          "publish": null,
+          "publish_as": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -917,6 +941,8 @@
           "show_summary_change_option": false,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
+          "publish": null,
+          "publish_as": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -1286,6 +1312,8 @@
           "show_summary_change_option": false,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
+          "publish": null,
+          "publish_as": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
@@ -1330,6 +1358,8 @@
           "show_summary_change_option": true,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
+          "publish": null,
+          "publish_as": null,
           "acls": [
             {
               "role": "[[ANYTHING_PRESENT]]",
