@@ -25,6 +25,9 @@ public class FieldTypeDefinition implements Serializable {
     public static final String MONEY_GBP = "MoneyGBP";
     public static final String YES_OR_NO = "YesOrNo";
     public static final String FIXED_RADIO_LIST = "FixedRadioList";
+    public static final String DYNAMIC_LIST = "DynamicList";
+    public static final String DYNAMIC_RADIO_LIST = "DynamicRadioList";
+    public static final String DYNAMIC_MULTI_SELECT_LIST = "DynamicMultiSelectList";
     public static final String LABEL = "Label";
     public static final String CASE_PAYMENT_HISTORY_VIEWER = "CasePaymentHistoryViewer";
     public static final String CASE_HISTORY_VIEWER = "CaseHistoryViewer";
@@ -37,6 +40,7 @@ public class FieldTypeDefinition implements Serializable {
     public static final String PREDEFINED_COMPLEX_CASELINK = "CaseLink";
     public static final String DATETIME = "DateTime";
     public static final String DATE = "Date";
+    public static final String DOCUMENT = "Document";
     public static final String TEXT = "Text";
 
     private String id = null;
@@ -131,6 +135,13 @@ public class FieldTypeDefinition implements Serializable {
     @JsonIgnore
     public boolean isComplexFieldType() {
         return type.equalsIgnoreCase(COMPLEX);
+    }
+
+    @JsonIgnore
+    public boolean isDynamicFieldType() {
+        return type.equalsIgnoreCase(DYNAMIC_LIST)
+            || type.equalsIgnoreCase(DYNAMIC_RADIO_LIST)
+            || type.equalsIgnoreCase(DYNAMIC_MULTI_SELECT_LIST);
     }
 
     public String getId() {
