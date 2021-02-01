@@ -1,0 +1,24 @@
+{
+  "_guid_": "S-079",
+  "_extends_": "F-026_Test_Data_Base",
+  "title": "must return appropriate negative response when request does not provide valid caseType",
+
+  "specs": [
+    "an active profile in CCD",
+    "does not provide valid caseType",
+    "has an HTTP-404 return code"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "ctid": "BAT-100-$er"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "message": "No message available"
+    }
+  }
+}

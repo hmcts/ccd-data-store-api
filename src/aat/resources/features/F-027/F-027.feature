@@ -77,6 +77,20 @@ Scenario: must return appropriate negative response for a user not having a prof
     And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+@S-039
+Scenario: must return appropriate negative response for invalid caseType
+
+    Given a user with [an active profile in CCD],
+
+     When a request is prepared with appropriate values,
+      And the request [does not provide valid caseType],
+      And it is submitted to call the [Fetch a case for display for Case Worker] operation of [CCD Data Store],
+
+     Then a negative response is received,
+      And the response [has the 404 return code],
+      And the response has all other details as expected.
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-590
 Scenario: must return status 200 along with the case-view object successfully
 

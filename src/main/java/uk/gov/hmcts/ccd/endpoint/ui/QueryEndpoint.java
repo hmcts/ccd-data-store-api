@@ -152,7 +152,7 @@ public class QueryEndpoint {
     }
 
     @Transactional
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid:^[a-zA-Z0-9_.]+$}/cases",
         method = RequestMethod.GET)
     @ApiOperation(value = "Get case data with UI layout")
     @ApiResponses(value = {
@@ -184,7 +184,7 @@ public class QueryEndpoint {
     }
 
     @Transactional
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/inputs",
+    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid:^[a-zA-Z0-9_.]+$}/inputs",
         method = RequestMethod.GET)
     @ApiOperation(value = "Get Search Input details")
     @ApiResponses(value = {
@@ -200,7 +200,7 @@ public class QueryEndpoint {
     }
 
     @Transactional
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/work-basket-inputs",
+    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid:^[a-zA-Z0-9_.]+$}/work-basket-inputs",
         method = RequestMethod.GET)
     @ApiOperation(value = "Get Workbasket Input details")
     @ApiResponses(value = {
@@ -220,7 +220,7 @@ public class QueryEndpoint {
     }
 
     @Transactional
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}",
+    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid:^[a-zA-Z0-9_.]+$}/cases/{cid}",
         method = RequestMethod.GET)
     @ApiOperation(value = "Fetch a case for display")
     @ApiResponses(value = {
@@ -239,7 +239,7 @@ public class QueryEndpoint {
     }
 
     @Transactional
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}",
+    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid:^[a-zA-Z0-9_.]+$}/event-triggers/{etid}",
         method = RequestMethod.GET)
     @ApiOperation(value = "Fetch an event trigger in the context of a case type")
     @ApiResponses(value = {
@@ -257,7 +257,7 @@ public class QueryEndpoint {
 
     @Transactional
     @RequestMapping(
-        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}",
+        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid:^[a-zA-Z0-9_.]+$}/cases/{cid}/event-triggers/{etid}",
         method = RequestMethod.GET)
     @ApiOperation(value = "Fetch an event trigger in the context of a case")
     @ApiResponses(value = {
@@ -275,7 +275,7 @@ public class QueryEndpoint {
 
     @Transactional
     @RequestMapping(
-        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}/event-triggers/{etid}",
+        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid:^[a-zA-Z0-9_.]+$}/drafts/{did}/event-triggers/{etid}",
         method = RequestMethod.GET)
     @ApiOperation(value = "Fetch an event trigger in the context of a case")
     @ApiResponses(value = {
@@ -293,7 +293,7 @@ public class QueryEndpoint {
 
     @Transactional
     @RequestMapping(
-        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events/{eventId}/case-history",
+        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid:^[a-zA-Z0-9_.]+$}/cases/{cid}/events/{eventId}/case-history",
         method = RequestMethod.GET)
     @ApiOperation(value = "Fetch case history for the event")
     @ApiResponses(value = {
