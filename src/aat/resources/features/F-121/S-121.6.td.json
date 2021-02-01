@@ -740,8 +740,7 @@
 									"label": null,
 									"hint_text": null,
 									"show_condition": null,
-                  "retain_hidden_value": null,
-									"retain_hidden_value": null
+                  "retain_hidden_value": null
 								},
 								{
 									"complex_field_element_id": "RespondentDetails.RespAddress4.PostCode",
@@ -765,8 +764,7 @@
 									"label": null,
 									"hint_text": null,
 									"show_condition": null,
-                  "retain_hidden_value": null,
-									"retain_hidden_value": null
+                  "retain_hidden_value": null
 								},
 								{
 									"complex_field_element_id": "RespondentDetails.RespAddress3.PostTown",
@@ -774,16 +772,15 @@
 									"label": null,
 									"hint_text": null,
 									"show_condition": null,
-									"retain_hidden_value": null,
-								"retain_hidden_value": null},
+									"retain_hidden_value": null
+								},
 								{
 									"complex_field_element_id": "RespondentDetails.RespAddress3.County",
 									"display_context": "HIDDEN",
 									"label": null,
 									"hint_text": null,
 									"show_condition": null,
-                  "retain_hidden_value": null,
-									"retain_hidden_value": null
+                  "retain_hidden_value": null
 								},
 								{
 									"complex_field_element_id": "RespondentDetails.RespAddress3.PostCode",
@@ -815,16 +812,15 @@
 									"label": null,
 									"hint_text": null,
 									"show_condition": null,
-									"retain_hidden_value": null,
-								"retain_hidden_value": null},
+									"retain_hidden_value": null
+								},
 								{
 									"complex_field_element_id": "RespondentDetails.RespAddress4.AddressLine3",
 									"display_context": "HIDDEN",
 									"label": null,
 									"hint_text": null,
 									"show_condition": null,
-                  "retain_hidden_value": null,
-									"retain_hidden_value": null
+                  "retain_hidden_value": null
 								},
 								{
 									"complex_field_element_id": "RespondentDetails.RespAddress4.PostTown",
@@ -832,8 +828,8 @@
 									"label": null,
 									"hint_text": null,
 									"show_condition": null,
-									"retain_hidden_value": null,
-								"retain_hidden_value": null},
+									"retain_hidden_value": null
+								},
 								{
 									"complex_field_element_id": "RespondentDetails.RespAddress4.County",
 									"display_context": "HIDDEN",
