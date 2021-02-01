@@ -19,7 +19,7 @@ def component = "data-store-api"
 
 def definitionStoreDevelopPr = "PR-575" // This doesn't change frequently, but when it does, only change this value.
 def dataStoreApiDevelopPr    = "PR-1260" // This doesn't change frequently, but when it does, only change this value.
-def prsToUseAat              = "PR-1193,PR-1219,PR-1248" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
+def prsToUseAat             = "PR-1193,PR-1219,PR-1248,PR-1311,PR-1324" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
 
 def secrets = [
     'ccd-${env}': [
@@ -99,7 +99,7 @@ withPipeline(type, product, component) {
     }
     if (env.BRANCH_NAME.equalsIgnoreCase(dataStoreApiDevelopPr)) {
         enableSlackNotifications('#ccd-develop-builds')
-        env.ELASTIC_SEARCH_FTA_ENABLED = "false"
+        env.ELASTIC_SEARCH_FTA_ENABLED = "true"
     }
     onDemo {
         enableSlackNotifications('#ccd-demo-builds')

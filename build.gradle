@@ -165,10 +165,11 @@ dependencies {
     compile group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.1'
     compile group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '1.3.1'
-
+    compile "org.bouncycastle:bcprov-jdk15on:1.61", "org.bouncycastle:bcpkix-jdk15on:1.61"
     compile "org.springframework.boot:spring-boot-starter-oauth2-client"
     compile "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
     compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '7.9'
+
     implementation "io.github.openfeign:feign-httpclient:10.7.0"
 
     compile group: 'com.sun.mail', name: 'mailapi', version: '1.6.1'
@@ -232,7 +233,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.3.0'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.5.3'
 }
 // end::dependencies[]
 
@@ -242,8 +243,8 @@ dependencyManagement {
     }
 
     dependencies {
-        // Versions prior to 24.1.1 vulnerable to CVE-2018-10237
-        dependency 'com.google.guava:guava:24.1.1-jre'
+        // Versions prior to 30.0 vulnerable to CVE-2020-8908
+        dependency 'com.google.guava:guava:30.1-jre'
 
         // CVE-2019-0232 - Java and Command Line injections in Windows
         dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.40') {
@@ -712,8 +713,10 @@ task smoke() {
     finalizedBy {
         generateCucumberReports {
             doLast{
+                delete "${rootDir}/BEFTA Report for Smoke Tests/"
                 new File("${rootDir}/BEFTA Report for Smoke Tests").mkdirs()
                 file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Smoke Tests"))
+                logger.quiet("Smoke test report moved to ---> file://${rootDir}/BEFTA%20Report%20for%20Smoke%20Tests/overview-features.html")
             }
         }
     }
@@ -723,7 +726,7 @@ task smoke() {
 
 task functional() {
     description = 'Executes functional tests against an the CCD Data Store API instance just deployed'
-
+    dependsOn aatClasses
     new File("$buildDir/test-results/test").mkdirs()
     copy {
         from "src/aat/resources/DummyTest.xml"
@@ -737,7 +740,7 @@ task functional() {
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
             args = [
                      '--threads', '10',
-                     '--plugin', 'json:${rootDir}/target/cucumber.json',
+                     '--plugin', "json:${rootDir}/target/cucumber.json",
                      '--tags', 'not @Ignore',
                      '--glue', 'uk.gov.hmcts.befta.player',
                      '--glue', 'uk.gov.hmcts.ccd.datastore.befta', 'src/aat/resources/features'
@@ -750,8 +753,10 @@ task functional() {
     finalizedBy {
         generateCucumberReports {
             doLast{
+                delete "${rootDir}/BEFTA Report for Functional Tests/"
                 new File("${rootDir}/BEFTA Report for Functional Tests").mkdirs()
                 file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Functional Tests"))
+                logger.quiet("Functional test report moved to ---> file://${rootDir}/BEFTA%20Report%20for%20Functional%20Tests/overview-features.html")
             }
         }
     }

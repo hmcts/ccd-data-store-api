@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
@@ -20,7 +19,7 @@ public class CasePostStateEvaluationService {
     }
 
     public String evaluatePostStateCondition(List<EventPostStateDefinition> eventPostStateDefinitions,
-                                                       Map<String, JsonNode> caseEventData) {
+                                                       Map<String, ?> caseEventData) {
         for (EventPostStateDefinition eventPostStateDefinition : eventPostStateDefinitions) {
             if (!eventPostStateDefinition.isDefault()) {
                 Boolean conditionMatched = this.enablingConditionParser.evaluate(
