@@ -46,11 +46,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -4393,8 +4399,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .content(mapper.writeValueAsBytes(caseDetailsToValidate))
         ).andExpect(status().is(200)).andReturn();
 
-        WireMock.verify(exactly(1), postRequestedFor(urlMatching(MID_EVENT_CALL_BACK)));
-        WireMock.verify(exactly(1), postRequestedFor(urlMatching(MID_EVENT_CALL_BACK))
+        verifyWireMock(1, postRequestedFor(urlMatching(MID_EVENT_CALL_BACK)));
+        verifyWireMock(1, postRequestedFor(urlMatching(MID_EVENT_CALL_BACK))
                                               .withRequestBody(equalToJson(requestBodyJson())));
 
         final JsonNode expectedResponse = MAPPER.readTree("{\"data\": " + expectedCaseData() + "}");
@@ -4445,8 +4451,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .content(mapper.writeValueAsBytes(caseDetailsToValidate))
         ).andExpect(status().is(200)).andReturn();
 
-        WireMock.verify(exactly(1), postRequestedFor(urlMatching(MID_EVENT_CALL_BACK_MULTI_PAGE)));
-        WireMock.verify(exactly(1), postRequestedFor(urlMatching(MID_EVENT_CALL_BACK_MULTI_PAGE))
+        verifyWireMock(1, postRequestedFor(urlMatching(MID_EVENT_CALL_BACK_MULTI_PAGE)));
+        verifyWireMock(1, postRequestedFor(urlMatching(MID_EVENT_CALL_BACK_MULTI_PAGE))
             .withRequestBody(equalToJson(requestBodyJsonMultiPage())));
 
         final JsonNode expectedResponse = MAPPER.readTree("{\"data\": " + expectedCaseDataMultiPage() + "}");
