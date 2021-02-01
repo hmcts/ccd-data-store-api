@@ -62,13 +62,18 @@ public class DataBlockGenerator {
 
         List<PublishableField> directChildrenFields = publishableField.filterDirectChildrenFrom(allSubFields);
 
-        if (publishableField.getFieldType().isComplexFieldType()) {
-            return buildComplexNode(originalNode, allSubFields, directChildrenFields);
-        } else if (publishableField.getFieldType().isCollectionFieldType()) {
+        FieldTypeDefinition fieldType = publishableField.getFieldType();
+        if (fieldType.isComplexFieldType()) {
+            return allSubFields.isEmpty()
+                ? buildComplexNode(originalNode, fieldType)
+                : buildComplexNode(originalNode, allSubFields, directChildrenFields);
+        } else if (fieldType.isCollectionFieldType()) {
             return buildCollectionNode(originalNode, (originalValueNode) ->
-                buildComplexNode(originalValueNode, allSubFields, directChildrenFields));
+                fieldType.getCollectionFieldTypeDefinition().getChildren().isEmpty()
+                    ? buildSimpleNode(originalValueNode, fieldType.getCollectionFieldTypeDefinition().getType())
+                    : buildComplexNode(originalValueNode, allSubFields, directChildrenFields));
         } else {
-            return buildSimpleNode(originalNode, publishableField.getFieldType().getType());
+            return buildSimpleNode(originalNode, fieldType.getType());
         }
     }
 

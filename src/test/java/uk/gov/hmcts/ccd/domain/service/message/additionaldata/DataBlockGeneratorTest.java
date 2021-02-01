@@ -541,6 +541,76 @@ class DataBlockGeneratorTest {
     }
 
     @Test
+    void shouldBuildDataForComplexWithComplexOverrides2() throws JsonProcessingException {
+        caseEventDefinition = newCaseEvent()
+            .withCaseFields(List.of(
+                newCaseEventField()
+                    .withCaseFieldId(FIELD_ID)
+                    .withDisplayContext(DisplayContext.COMPLEX)
+                    .withPublish(true)
+                    .addCaseEventFieldComplexDefinitions(
+                        CaseEventFieldComplexDefinition.builder()
+                            .reference(NESTED_FIELD_2)
+                            .publish(true)
+                            .build()
+                    )
+                    .build()
+            ))
+            .build();
+
+        caseTypeDefinition = newCaseType()
+            .withCaseFields(List.of(
+                newCaseField()
+                    .withId(FIELD_ID)
+                    .withFieldType(
+                        aFieldType()
+                            .withId(COMPLEX_ID_1)
+                            .withType(COMPLEX)
+                            .withComplexField(complexField(NESTED_FIELD_1, TEXT))
+                            .withComplexField(
+                                newCaseField()
+                                    .withId(NESTED_FIELD_2)
+                                    .withFieldType(
+                                        aFieldType()
+                                            .withId(COMPLEX_ID_2)
+                                            .withType(COMPLEX)
+                                            .withComplexField(complexField(SUB_NESTED_FIELD_1, TEXT))
+                                            .withComplexField(complexField(SUB_NESTED_FIELD_2, TEXT))
+                                            .build()
+                                    )
+                                    .build()
+                            )
+                            .build()
+                    )
+                    .build()
+            ))
+            .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put(FIELD_ID, mapper.readTree("{\n"
+            + "      \"NestedField1\": \"valueOne\",\n"
+            + "      \"NestedField2\": {\n"
+            + "        \"SubNestedField1\": \"valueTwo\",\n"
+            + "        \"SubNestedField2\": \"valueThree\"\n"
+            + "      }\n"
+            + "  }"));
+
+        caseDetails = newCaseDetails().withData(data).build();
+
+        AdditionalDataContext context =
+            new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
+
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
+
+        assertAll(
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(result.get(FIELD_ID).toString(), is("{\"NestedField2\":{\"SubNestedField1\":"
+                + "\"valueTwo\",\"SubNestedField2\":\"valueThree\"}}"))
+        );
+    }
+
+    @Test
     void shouldBuildDataForComplexWithCollectionOverrides() throws JsonProcessingException {
         caseEventDefinition = newCaseEvent()
             .withCaseFields(List.of(
@@ -632,6 +702,156 @@ class DataBlockGeneratorTest {
             () -> assertThat(result.get(FIELD_ID).toString(), is("{\"NestedField2\":[{\"id\":\"123\",\"value\""
                 + ":{\"SubNestedField1\":\"CollectionValue1\"}},{\"id\":\"456\",\"value\":"
                 + "{\"SubNestedField1\":\"CollectionValue2\"}}]}"))
+        );
+    }
+
+    @Test
+    void shouldBuildDataForComplexWithCollectionOverrides2() throws JsonProcessingException {
+        caseEventDefinition = newCaseEvent()
+            .withCaseFields(List.of(
+                newCaseEventField()
+                    .withCaseFieldId(FIELD_ID)
+                    .withDisplayContext(DisplayContext.COMPLEX)
+                    .withPublish(true)
+                    .addCaseEventFieldComplexDefinitions(
+                        CaseEventFieldComplexDefinition.builder()
+                            .reference(NESTED_FIELD_2)
+                            .publish(true)
+                            .build()
+                    )
+                    .build()
+            ))
+            .build();
+
+        caseTypeDefinition = newCaseType()
+            .withCaseFields(List.of(
+                newCaseField()
+                    .withId(FIELD_ID)
+                    .withFieldType(
+                        aFieldType()
+                            .withId(COMPLEX_ID_1)
+                            .withType(COMPLEX)
+                            .withComplexField(complexField(NESTED_FIELD_1, TEXT))
+                            .withComplexField(
+                                newCaseField()
+                                    .withId(NESTED_FIELD_2)
+                                    .withFieldType(
+                                        aFieldType()
+                                            .withId(COMPLEX_ID_2)
+                                            .withType(COLLECTION)
+                                            .withCollectionFieldType(fieldType(TEXT))
+                                            .build()
+                                    )
+                                    .build()
+                            )
+                            .build()
+                    )
+                    .build()
+            ))
+            .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put(FIELD_ID, mapper.readTree("{\n"
+            + "    \"NestedField2\": [\n"
+            + "        {\n"
+            + "            \"id\": \"123\",\n"
+            + "            \"value\": \"Value1\"\n"
+            + "        },\n"
+            + "        {\n"
+            + "            \"id\": \"456\",\n"
+            + "            \"value\": \"Value2\"\n"
+            + "        }\n"
+            + "    ]\n"
+            + "}"));
+
+        caseDetails = newCaseDetails().withData(data).build();
+
+        AdditionalDataContext context =
+            new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
+
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
+
+        assertAll(
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(result.get(FIELD_ID).size(), is(1)),
+            () -> assertThat(result.get(FIELD_ID).toString(), is("{\"NestedField2\":[{\"id\":\"123\","
+                + "\"value\":\"Value1\"},{\"id\":\"456\",\"value\":\"Value2\"}]}"))
+        );
+    }
+
+    @Test
+    void shouldBuildDataForComplexWithCollectionOverrides3() throws JsonProcessingException {
+        caseEventDefinition = newCaseEvent()
+            .withCaseFields(List.of(
+                newCaseEventField()
+                    .withCaseFieldId(FIELD_ID)
+                    .withDisplayContext(DisplayContext.COMPLEX)
+                    .withPublish(true)
+                    .addCaseEventFieldComplexDefinitions(
+                        CaseEventFieldComplexDefinition.builder()
+                            .reference(NESTED_FIELD_2)
+                            .publish(true)
+                            .build()
+                    )
+                    .build()
+            ))
+            .build();
+
+        caseTypeDefinition = newCaseType()
+            .withCaseFields(List.of(
+                newCaseField()
+                    .withId(FIELD_ID)
+                    .withFieldType(
+                        aFieldType()
+                            .withId(COMPLEX_ID_1)
+                            .withType(COMPLEX)
+                            .withComplexField(complexField(NESTED_FIELD_1, TEXT))
+                            .withComplexField(
+                                newCaseField()
+                                    .withId(NESTED_FIELD_2)
+                                    .withFieldType(
+                                        aFieldType()
+                                            .withId(COMPLEX_ID_2)
+                                            .withType(COLLECTION)
+                                            .withCollectionFieldType(fieldType(TEXT))
+                                            .build()
+                                    )
+                                    .build()
+                            )
+                            .build()
+                    )
+                    .build()
+            ))
+            .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put(FIELD_ID, mapper.readTree("{\n"
+            + "    \"NestedField2\": [\n"
+            + "        {\n"
+            + "            \"id\": \"123\",\n"
+            + "            \"value\": \"CollectionValue1\"\n"
+            + "        },\n"
+            + "        {\n"
+            + "            \"id\": \"456\",\n"
+            + "            \"value\": \"CollectionValue2\"\n"
+            + "        }\n"
+            + "    ]\n"
+            + "}"));
+
+        caseDetails = newCaseDetails().withData(data).build();
+
+        AdditionalDataContext context =
+            new AdditionalDataContext(caseEventDefinition, caseTypeDefinition, caseDetails);
+
+        Map<String, JsonNode> result = dataBlockGenerator.generateData(context);
+
+        assertAll(
+            () -> assertThat(result.size(), is(1)),
+            () -> assertThat(result.get(FIELD_ID).size(), is(1)),
+            () -> assertThat(result.get(FIELD_ID).toString(), is("{\"NestedField2\":[{\"id\":\"123\",\"value\":"
+                + "\"CollectionValue1\"},{\"id\":\"456\",\"value\":\"CollectionValue2\"}]}"))
         );
     }
 
