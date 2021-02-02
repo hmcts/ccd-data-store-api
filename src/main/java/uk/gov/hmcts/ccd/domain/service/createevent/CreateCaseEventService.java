@@ -3,11 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Optional;
-import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -29,12 +24,14 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
+import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
@@ -44,6 +41,12 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+
+import javax.inject.Inject;
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
@@ -71,6 +74,7 @@ public class CreateCaseEventService {
     private final FieldProcessorService fieldProcessorService;
     private final Clock clock;
     private final CasePostStateService casePostStateService;
+    private final MessageService messageService;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -92,7 +96,8 @@ public class CreateCaseEventService {
                                   final UserAuthorisation userAuthorisation,
                                   final FieldProcessorService fieldProcessorService,
                                   final CasePostStateService casePostStateService,
-                                  @Qualifier("utcClock") final Clock clock) {
+                                  @Qualifier("utcClock") final Clock clock,
+                                  @Qualifier("caseEventMessageService") final MessageService messageService) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -111,6 +116,7 @@ public class CreateCaseEventService {
         this.fieldProcessorService = fieldProcessorService;
         this.casePostStateService = casePostStateService;
         this.clock = clock;
+        this.messageService = messageService;
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
@@ -133,6 +139,7 @@ public class CreateCaseEventService {
 
         validatePreState(caseDetails, caseEventDefinition);
         content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, caseEventDefinition));
+        String oldState = caseDetails.getState();
         mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, caseEventDefinition, caseTypeDefinition);
         AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse =
             callbackInvoker.invokeAboutToSubmitCallback(caseEventDefinition,
@@ -156,7 +163,7 @@ public class CreateCaseEventService {
             caseEventDefinition,
             savedCaseDetails,
             caseTypeDefinition,
-            timeNow);
+            timeNow, oldState);
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsBefore)
@@ -248,12 +255,14 @@ public class CreateCaseEventService {
                                               final Event event,
                                               final CaseEventDefinition caseEventDefinition,
                                               final CaseDetails caseDetails,
-                                              final CaseTypeDefinition caseTypeDefinition, LocalDateTime timeNow) {
+                                              final CaseTypeDefinition caseTypeDefinition,
+                                              LocalDateTime timeNow,
+                                              String oldState) {
+
         final IdamUser user = userRepository.getUser();
         final CaseStateDefinition caseStateDefinition =
             caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
         final AuditEvent auditEvent = new AuditEvent();
-
         auditEvent.setEventId(event.getEventId());
         auditEvent.setEventName(caseEventDefinition.getName());
         auditEvent.setSummary(event.getSummary());
@@ -274,5 +283,10 @@ public class CreateCaseEventService {
         auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
 
         caseAuditEventRepository.set(auditEvent);
+        messageService.handleMessage(MessageContext.builder()
+            .caseDetails(caseDetails)
+            .caseTypeDefinition(caseTypeDefinition)
+            .caseEventDefinition(caseEventDefinition)
+            .oldState(oldState).build());
     }
 }
