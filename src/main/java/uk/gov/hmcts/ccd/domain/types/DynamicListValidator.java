@@ -15,7 +15,7 @@ public class DynamicListValidator implements BaseTypeValidator {
     protected static final String TYPE_ID = "DynamicList";
     private static final String LIST_ITEMS = "list_items";
     private static final String CODE = "code";
-    protected static final String VALUE = "value";
+    private static final String VALUE = "value";
     private static final String LABEL = "label";
 
     @Override
