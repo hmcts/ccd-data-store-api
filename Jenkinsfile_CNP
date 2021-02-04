@@ -92,10 +92,6 @@ env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
 env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 env.ELASTIC_SEARCH_FTA_ENABLED = "true"
-env.PRINT_ENV_FROM_JENKINSFILE = "this-environemnt-is-${env}"
-
-env.ELASTIC_SEARCH_ENABLED = "true"
-env.ELASTIC_SEARCH_HOSTS = "{{ .Release.Name }}-es-master:9200"
 
 withPipeline(type, product, component) {
     onMaster {
@@ -118,7 +114,7 @@ withPipeline(type, product, component) {
         // use aat environment for dependencies of master and CI/CD builds.
         if (env.BRANCH_NAME.startsWith("PR") || env.BRANCH_NAME == 'master') {
             environmentOfDependencies = "aat"
-        }
+        }env.ELASTIC_SEARCH_HOSTS
         env.DEFINITION_STORE_HOST      = "http://ccd-definition-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
         env.ELASTIC_SEARCH_FTA_ENABLED = "true"
     }
