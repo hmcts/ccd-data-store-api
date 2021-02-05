@@ -87,7 +87,6 @@
             "_extends_": "BaseNumberFieldType"
           },
           "formatted_value": null,
-          "show_summary_change_option" : null,
           "acls": [
             {
               "_extends_": "CaseworkerBeftaMasterAccessControlList"
@@ -104,19 +103,19 @@
           "wizard_page_fields": [
             {
               "case_field_id": "TextField",
-              "order": 1,
+              "order": 2,
               "page_column_no": null,
               "complex_field_overrides": []
             },
             {
               "case_field_id": "TextAreaField",
-              "order": 1,
+              "order": 3,
               "page_column_no": null,
               "complex_field_overrides": []
             },
             {
               "case_field_id": "DateField",
-              "order": 1,
+              "order": 4,
               "page_column_no": null,
               "complex_field_overrides": []
             },
