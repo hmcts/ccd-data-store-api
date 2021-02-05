@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -163,7 +164,9 @@ public class CreateCaseEventService {
             caseEventDefinition,
             savedCaseDetails,
             caseTypeDefinition,
-            timeNow, oldState);
+            timeNow,
+            oldState,
+            content.getOnBehalfOfUserToken());
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsBefore)
@@ -256,10 +259,10 @@ public class CreateCaseEventService {
                                               final CaseEventDefinition caseEventDefinition,
                                               final CaseDetails caseDetails,
                                               final CaseTypeDefinition caseTypeDefinition,
-                                              LocalDateTime timeNow,
-                                              String oldState) {
+                                              final LocalDateTime timeNow,
+                                              final String oldState,
+                                              final String onBehalfOfUserToken) {
 
-        final IdamUser user = userRepository.getUser();
         final CaseStateDefinition caseStateDefinition =
             caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
         final AuditEvent auditEvent = new AuditEvent();
@@ -273,14 +276,12 @@ public class CreateCaseEventService {
         auditEvent.setStateName(caseStateDefinition.getName());
         auditEvent.setCaseTypeId(caseTypeDefinition.getId());
         auditEvent.setCaseTypeVersion(caseTypeDefinition.getVersion().getNumber());
-        auditEvent.setUserId(user.getId());
-        auditEvent.setUserLastName(user.getSurname());
-        auditEvent.setUserFirstName(user.getForename());
         auditEvent.setCreatedDate(timeNow);
         auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseTypeDefinition,
             caseEventDefinition));
         auditEvent.setDataClassification(caseDetails.getDataClassification());
         auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
+        saveUserDetails(onBehalfOfUserToken, auditEvent);
 
         caseAuditEventRepository.set(auditEvent);
         messageService.handleMessage(MessageContext.builder()
@@ -288,5 +289,21 @@ public class CreateCaseEventService {
             .caseTypeDefinition(caseTypeDefinition)
             .caseEventDefinition(caseEventDefinition)
             .oldState(oldState).build());
+    }
+
+    private void saveUserDetails(String onBehalfOfUserToken, AuditEvent auditEvent) {
+        boolean onBehalfOfUserTokenExists = !StringUtils.isEmpty(onBehalfOfUserToken);
+        IdamUser user = onBehalfOfUserTokenExists
+            ? userRepository.getUser(onBehalfOfUserToken)
+            : userRepository.getUser();
+        auditEvent.setUserId(user.getId());
+        auditEvent.setUserLastName(user.getSurname());
+        auditEvent.setUserFirstName(user.getForename());
+        if (onBehalfOfUserTokenExists) {
+            user = userRepository.getUser();
+            auditEvent.setProxiedBy(user.getId());
+            auditEvent.setProxiedByLastName(user.getSurname());
+            auditEvent.setProxiedByFirstName(user.getForename());
+        }
     }
 }
