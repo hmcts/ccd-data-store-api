@@ -36,6 +36,12 @@
           "name": "Update a case 2",
           "description": "[[ANYTHING_PRESENT]]",
           "order": "[[ANYTHING_PRESENT]]"
+        },
+        {
+          "id" : "updateCase",
+          "name" : "Update a case",
+          "description" : "Update a case",
+          "order" : 2
         }
       ],
       "events": "[[ANYTHING_PRESENT]]",
