@@ -7,9 +7,7 @@ Feature: F-New: Retain Hidden Value
     Given an appropriate test context as detailed in the test data source
 
 #-----------------------------------------------------------------------------------------------------------------------
-  @S-New.1 # 'retainHiddenValue' set to 'Yes' or 'Y' on the config for top Level field
-    # 'retainHiddenValue' set to 'No' or 'N' on the config for top Level field
-      # 'retainHiddenValue' set to null on the config for top Level field
+  @S-New.1 # 'retainHiddenValue' for top Level field
   Scenario: Must return status 200 along with successfully display the imported definition file containing a top level fields with the correct value for retainHiddenValue
 
     Given a user with [an active profile in CCD],
@@ -21,9 +19,7 @@ Feature: F-New: Retain Hidden Value
 
 
 #-----------------------------------------------------------------------------------------------------------------------
-  @S-New.2 # 'retainHiddenValue' set to 'Yes' or 'Y' on the config for complex field
-    # 'retainHiddenValue' set to 'No' or 'N' on the config for complex field
-      # 'retainHiddenValue' set to null on the config for complex field
+  @S-New.2 # 'retainHiddenValue' for complex field
   Scenario: Must return status 200 along with successfully display the imported definition file containing complex fields with the correct value for retainHiddenValue
 
     Given a user with [an active profile in CCD],
@@ -34,9 +30,7 @@ Feature: F-New: Retain Hidden Value
     And the response has all other details as expected.
 
 #-----------------------------------------------------------------------------------------------------------------------
-  @S-New.2 # 'retainHiddenValue' set to 'Yes' or 'Y' on the config for eventToComplex field
-    # 'retainHiddenValue' set to 'No' or 'N' on the config for eventToComplex field
-      # 'retainHiddenValue' set to null on the config for eventToComplex field
+  @S-New.2 # 'retainHiddenValue' for eventToComplex field
   Scenario: Must return status 200 along with successfully display the imported definition file containing eventToComplex fields with the correct value for retainHiddenValue
 
     Given a user with [an active profile in CCD],
