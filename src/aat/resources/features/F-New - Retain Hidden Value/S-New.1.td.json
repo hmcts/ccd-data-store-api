@@ -1,301 +1,43 @@
 {
-	"_guid_": "S-New.1",
-	"_extends_": "F-New_Test_Data_Base",
-	"title": "Must return status 200 along with successfully display the imported definition file containing a top level fields with the correct value for retainHiddenValue\n",
-
-	"specs": [
-		"an active profile in CCD",
-		"has the 200 return code"
-	],
-
-	"request": {
+  "_guid_": "S-New.1",
+  "_extends_": "F-New_Test_Data_Base",
+  "title": "Must return status 200 along with successfully display the imported definition file containing a top level fields with the correct value for retainHiddenValue\n",
+  "specs": [
+    "an active profile in CCD",
+    "has the 200 return code"
+  ],
+  "request": {
     "pathVariables": {
       "ctid": "FT_RetainHiddenValue",
       "etid": "CREATE1"
     }
   },
-
-	"expectedResponse": {
-		"_extends_": "Common_200_Response",
-		"headers": {
-			"Content-Encoding": "gzip",
-			"Content-Type": "application/json",
-			"Connection": "[[ANYTHING_PRESENT]]",
-			"Keep-Alive": "[[ANYTHING_PRESENT]]",
-			"Transfer-Encoding": "[[ANYTHING_PRESENT]]",
-			"Strict-Transport-Security": "[[ANYTHING_NULLABLE]]"
-		},
-		"body": {
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Type": "application/json",
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANYTHING_NULLABLE]]"
+    },
+    "body": {
       "id": "CREATE1",
       "name": "Create case 1",
-      "description": "[[ANYTHING_PRESENT]]",
+      "description": "Create case 1",
       "case_id": null,
       "case_fields": [
         {
-          "__ordering__": "UNORDERED"
-        },
-        {
-          "id": "Address1",
-          "label": "Address 1",
-          "hidden": false,
+          "_extends_": "CaseViewFieldMetadataFalse",
+          "id": "DateField",
+          "label": "Date Field",
           "value": null,
-          "metadata": false,
-          "hint_text": null,
           "field_type": {
-            "id": "AddressUK",
-            "type": "Complex",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
-            "fixed_list_items": [],
-            "complex_fields": [
-              {
-                "__ordering__": "UNORDERED"
-              },
-              {
-                "id": "AddressLine1",
-                "label": "Building and Street",
-                "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
-                "field_type": {
-                  "id": "TextMax150",
-                  "type": "Text",
-                  "min": null,
-                  "max": 150,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
-              },
-              {
-                "id": "AddressLine2",
-                "label": "Address Line 2",
-                "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
-                "field_type": {
-                  "id": "TextMax50",
-                  "type": "Text",
-                  "min": null,
-                  "max": 50,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
-              },
-              {
-                "id": "AddressLine3",
-                "label": "Address Line 3",
-                "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
-                "field_type": {
-                  "id": "TextMax50",
-                  "type": "Text",
-                  "min": null,
-                  "max": 50,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
-              },
-              {
-                "id": "PostTown",
-                "label": "Town or City",
-                "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
-                "field_type": {
-                  "id": "TextMax50",
-                  "type": "Text",
-                  "min": null,
-                  "max": 50,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
-              },
-              {
-                "id": "County",
-                "label": "County",
-                "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
-                "field_type": {
-                  "id": "TextMax50",
-                  "type": "Text",
-                  "min": null,
-                  "max": 50,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
-              },
-              {
-                "id": "PostCode",
-                "label": "Postcode/Zipcode",
-                "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
-                "field_type": {
-                  "id": "TextMax14",
-                  "type": "Text",
-                  "min": null,
-                  "max": 14,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
-              },
-              {
-                "id": "Country",
-                "label": "Country",
-                "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
-                "field_type": {
-                  "id": "TextMax50",
-                  "type": "Text",
-                  "min": null,
-                  "max": 50,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
-              }
-            ],
-            "collection_field_type": null
+            "_extends_": "BaseDateFieldType"
           },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
           "formatted_value": null,
-          "display_context": "OPTIONAL",
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": true,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
+          "show_condition": "NumberField!=\"0\"",
           "acls": [
             {
               "_extends_": "CaseworkerBeftaMasterAccessControlList"
@@ -303,267 +45,49 @@
           ]
         },
         {
-          "id": "Address2",
-          "label": "Address 2",
-          "hidden": false,
+          "_extends_": "CaseViewFieldMetadataFalse",
+          "id": "TextAreaField",
+          "label": "Text Area",
           "value": null,
-          "metadata": false,
-          "hint_text": null,
           "field_type": {
-            "id": "AddressUK",
-            "type": "Complex",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
-            "fixed_list_items": [],
-            "complex_fields": [
-              {
-                "__ordering__": "UNORDERED"
-              },
-              {
-                "id": "AddressLine1",
-                "label": "Building and Street",
-                "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
-                "field_type": {
-                  "id": "TextMax150",
-                  "type": "Text",
-                  "min": null,
-                  "max": 150,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
-              },
-              {
-                "id": "AddressLine2",
-                "label": "Address Line 2",
-                "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
-                "field_type": {
-                  "id": "TextMax50",
-                  "type": "Text",
-                  "min": null,
-                  "max": 50,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
-              },
-              {
-                "id": "AddressLine3",
-                "label": "Address Line 3",
-                "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
-                "field_type": {
-                  "id": "TextMax50",
-                  "type": "Text",
-                  "min": null,
-                  "max": 50,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
-              },
-              {
-                "id": "PostTown",
-                "label": "Town or City",
-                "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
-                "field_type": {
-                  "id": "TextMax50",
-                  "type": "Text",
-                  "min": null,
-                  "max": 50,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
-              },
-              {
-                "id": "County",
-                "label": "County",
-                "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
-                "field_type": {
-                  "id": "TextMax50",
-                  "type": "Text",
-                  "min": null,
-                  "max": 50,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
-              },
-              {
-                "id": "PostCode",
-                "label": "Postcode/Zipcode",
-                "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
-                "field_type": {
-                  "id": "TextMax14",
-                  "type": "Text",
-                  "min": null,
-                  "max": 14,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
-              },
-              {
-                "id": "Country",
-                "label": "Country",
-                "hidden": null,
-                "order": null,
-                "metadata": false,
-                "case_type_id": null,
-                "hint_text": null,
-                "field_type": {
-                  "id": "TextMax50",
-                  "type": "Text",
-                  "min": null,
-                  "max": 50,
-                  "regular_expression": null,
-                  "fixed_list_items": [],
-                  "complex_fields": [],
-                  "collection_field_type": null
-                },
-                "security_classification": "PUBLIC",
-                "live_from": null,
-                "live_until": null,
-                "show_condition": null,
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
-                  }
-                ],
-                "complexACLs": [],
-                "display_context": null,
-                "display_context_parameter": null,
-                "retain_hidden_value": null,
-                "formatted_value": null
-              }
-            ],
-            "collection_field_type": null
+            "_extends_": "BaseTextAreaFieldType"
           },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
           "formatted_value": null,
-          "display_context": "OPTIONAL",
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": true,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
+          "show_condition": "NumberField!=\"0\"",
+          "retain_hidden_value": false,
+          "acls": [
+            {
+              "_extends_": "CaseworkerBeftaMasterAccessControlList"
+            }
+          ]
+        },
+        {
+          "_extends_": "CaseViewFieldMetadataFalse",
+          "id": "TextField",
+          "label": "Text Field",
+          "value": null,
+          "field_type": {
+            "_extends_": "BaseTextFieldType"
+          },
+          "formatted_value": null,
+          "show_condition": "NumberField!=\"0\"",
+          "retain_hidden_value": true,
+          "acls": [
+            {
+              "_extends_": "CaseworkerBeftaMasterAccessControlList"
+            }
+          ]
+        },
+        {
+          "_extends_": "CaseViewFieldMetadataFalse",
+          "id": "NumberField",
+          "label": "Number Field",
+          "value": null,
+          "field_type": {
+            "_extends_": "BaseNumberFieldType"
+          },
+          "formatted_value": null,
+          "show_summary_change_option" : null,
           "acls": [
             {
               "_extends_": "CaseworkerBeftaMasterAccessControlList"
@@ -574,18 +98,30 @@
       "event_token": "[[ANYTHING_PRESENT]]",
       "wizard_pages": [
         {
-          "id": "CREATE1first",
-          "label": "First page",
+          "id": "CREATE1SingleFormPage",
+          "label": "Retain Hidden Value Page",
           "order": 1,
           "wizard_page_fields": [
             {
-              "case_field_id": "Address1",
-              "order": 2,
+              "case_field_id": "TextField",
+              "order": 1,
               "page_column_no": null,
               "complex_field_overrides": []
             },
             {
-              "case_field_id": "Address2",
+              "case_field_id": "TextAreaField",
+              "order": 1,
+              "page_column_no": null,
+              "complex_field_overrides": []
+            },
+            {
+              "case_field_id": "DateField",
+              "order": 1,
+              "page_column_no": null,
+              "complex_field_overrides": []
+            },
+            {
+              "case_field_id": "NumberField",
               "order": 1,
               "page_column_no": null,
               "complex_field_overrides": []
@@ -606,5 +142,5 @@
         }
       }
     }
-	}
+  }
 }
