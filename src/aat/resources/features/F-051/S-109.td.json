@@ -95,6 +95,7 @@
 									"end_button_label": null,
 									"can_save_draft": null,
                   "event_enabling_condition": null,
+                  "publish": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -129,7 +130,8 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
-                  "event_enabling_condition": null,
+				  "event_enabling_condition": null,
+				  "publish": null,
                   "acls": [
 										{
 											"__ordering__": "unordered",
@@ -164,7 +166,8 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
-                  "event_enabling_condition": null,
+				  "event_enabling_condition": null,
+				  "publish": null,
                   "acls": [
 										{
 											"__ordering__": "unordered",
@@ -199,7 +202,8 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
-                  "event_enabling_condition": null,
+				  "event_enabling_condition": null,
+				  "publish": null,
                   "acls": [
 										{
 											"__ordering__": "unordered",
@@ -234,7 +238,8 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
-                  "event_enabling_condition": null,
+				  "event_enabling_condition": null,
+				  "publish": null,
                   "acls": [
 										{
 											"__ordering__": "unordered",
@@ -267,7 +272,8 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
-                  "event_enabling_condition": null,
+				  "event_enabling_condition": null,
+				  "publish": null,
                   "acls": [
 										{
 											"__ordering__": "unordered",
@@ -390,6 +396,7 @@
 									"end_button_label": null,
 									"can_save_draft": null,
                   "event_enabling_condition": null,
+                  "publish": null,
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
@@ -418,6 +425,7 @@
 									"end_button_label": null,
 									"can_save_draft": null,
                   "event_enabling_condition": null,
+                  "publish": null,
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
@@ -446,6 +454,7 @@
 									"end_button_label": null,
 									"can_save_draft": null,
                   "event_enabling_condition": null,
+                  "publish": null,
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
@@ -474,6 +483,7 @@
 									"end_button_label": null,
 									"can_save_draft": null,
                   "event_enabling_condition": null,
+                  "publish": null,
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
@@ -502,6 +512,7 @@
 									"end_button_label": null,
 									"can_save_draft": null,
                   "event_enabling_condition": null,
+                  "publish": null,
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
@@ -528,6 +539,7 @@
 									"end_button_label": null,
 									"can_save_draft": null,
                   "event_enabling_condition": null,
+                  "publish": null,
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
