@@ -82,7 +82,7 @@ public class CreateCaseEventService {
                                   @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                   final CaseDetailsRepository caseDetailsRepository,
                                   @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                      final CaseDefinitionRepository caseDefinitionRepository,
+                                  final CaseDefinitionRepository caseDefinitionRepository,
                                   final CaseAuditEventRepository caseAuditEventRepository,
                                   final EventTriggerService eventTriggerService,
                                   final EventTokenService eventTokenService,
@@ -144,10 +144,10 @@ public class CreateCaseEventService {
         mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, caseEventDefinition, caseTypeDefinition);
         AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse =
             callbackInvoker.invokeAboutToSubmitCallback(caseEventDefinition,
-            caseDetailsBefore,
-            caseDetails,
-            caseTypeDefinition,
-            content.getIgnoreWarning());
+                caseDetailsBefore,
+                caseDetails,
+                caseTypeDefinition,
+                content.getIgnoreWarning());
 
         final Optional<String> newState = aboutToSubmitCallbackResponse.getState();
 
@@ -155,10 +155,10 @@ public class CreateCaseEventService {
         LocalDateTime timeNow = now();
         final CaseDetails savedCaseDetails =
             saveCaseDetails(caseDetailsBefore,
-            caseDetails,
-            caseEventDefinition,
-            newState,
-            timeNow);
+                caseDetails,
+                caseEventDefinition,
+                newState,
+                timeNow);
         saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse,
             content.getEvent(),
             caseEventDefinition,
