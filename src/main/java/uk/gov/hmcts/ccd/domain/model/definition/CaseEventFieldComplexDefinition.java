@@ -18,29 +18,42 @@ public class CaseEventFieldComplexDefinition implements Serializable, CommonDCPM
 
     private Boolean retainHiddenValue;
 
+    private Boolean publish;
+
+    private String publishAs;
+
     public CaseEventFieldComplexDefinition() {
     }
 
     public CaseEventFieldComplexDefinition(String reference,
                                            Integer order,
                                            String defaultValue,
-                                           Boolean retainHiddenValue) {
+                                           Boolean retainHiddenValue,
+                                           Boolean publish,
+                                           String publishAs) {
         this.reference = reference;
         this.order = order;
         this.defaultValue = defaultValue;
         this.retainHiddenValue = retainHiddenValue;
+        this.publish = publish;
+        this.publishAs = publishAs;
     }
 
     public CaseEventFieldComplexDefinition(String reference,
-                                 Integer order,
-                                 String displayContextParameter,
-                                 String defaultValue, Boolean retainHiddenValue) {
+                                           Integer order,
+                                           String displayContextParameter,
+                                           String defaultValue,
+                                           Boolean retainHiddenValue,
+                                           Boolean publish,
+                                           String publishAs) {
 
         this.reference = reference;
         this.order = order;
         this.displayContextParameter = displayContextParameter;
         this.defaultValue = defaultValue;
         this.retainHiddenValue = retainHiddenValue;
+        this.publish = publish;
+        this.publishAs = publishAs;
     }
 
     public String getReference() {
@@ -81,6 +94,22 @@ public class CaseEventFieldComplexDefinition implements Serializable, CommonDCPM
 
     public void setRetainHiddenValue(Boolean retainHiddenValue) {
         this.retainHiddenValue = retainHiddenValue;
+    }
+
+    public Boolean getPublish() {
+        return publish;
+    }
+
+    public void setPublish(Boolean publish) {
+        this.publish = publish;
+    }
+
+    public String getPublishAs() {
+        return publishAs;
+    }
+
+    public void setPublishAs(String publishAs) {
+        this.publishAs = publishAs;
     }
 
 }
