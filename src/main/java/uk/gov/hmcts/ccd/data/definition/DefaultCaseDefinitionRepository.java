@@ -5,7 +5,6 @@ import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -14,8 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import javax.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,13 +46,10 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
-    @Qualifier("restTemplate")
-    @Autowired
     private final RestTemplate restTemplate;
 
-    @Inject
     public DefaultCaseDefinitionRepository(final ApplicationParams applicationParams, final SecurityUtils securityUtils,
-            final RestTemplate restTemplate) {
+                                           @Qualifier("restTemplate") final RestTemplate restTemplate) {
         this.applicationParams = applicationParams;
         this.securityUtils = securityUtils;
         this.restTemplate = restTemplate;

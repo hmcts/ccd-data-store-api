@@ -65,7 +65,7 @@ public class DefaultUserRepository implements UserRepository {
     @Autowired
     public DefaultUserRepository(ApplicationParams applicationParams,
                                  @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                     CaseDefinitionRepository caseDefinitionRepository,
+                                         CaseDefinitionRepository caseDefinitionRepository,
                                  SecurityUtils securityUtils,
                                  @Qualifier("restTemplate") RestTemplate restTemplate,
                                  AuthCheckerConfiguration authCheckerConfiguration) {

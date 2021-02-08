@@ -7,10 +7,13 @@ import lombok.ToString;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
+import java.io.Serializable;
 import java.util.Map;
 
 @ToString
-public class CaseDraft {
+public class CaseDraft implements Serializable {
+
+    private static final long serialVersionUID = 5638906962357719300L;
 
     private String userId;
     private String jurisdictionId;

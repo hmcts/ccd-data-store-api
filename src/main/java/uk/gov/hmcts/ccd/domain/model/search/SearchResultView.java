@@ -2,9 +2,11 @@ package uk.gov.hmcts.ccd.domain.model.search;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class SearchResultView {
+public class SearchResultView implements Serializable {
+    private static final long serialVersionUID = 217062515213288864L;
     @JsonProperty("columns")
     private List<SearchResultViewColumn> searchResultViewColumns;
     @JsonProperty("results")

@@ -16,7 +16,6 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 class CachedCaseUserRepositoryTest {
 
@@ -30,7 +29,6 @@ class CachedCaseUserRepositoryTest {
 
     private CachedCaseUserRepository classUnderTest;
 
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -38,41 +36,6 @@ class CachedCaseUserRepositoryTest {
         doReturn(caseUserRoles).when(caseUserRepository).findCaseRoles(caseId, userId);
         doReturn(caseIds).when(caseUserRepository).findCasesUserIdHasAccessTo(userId);
         classUnderTest = new CachedCaseUserRepository(caseUserRepository);
-    }
-
-    @Test
-    @DisplayName("should initially retrieve case user roles from decorated repository")
-    void shouldGetUserCaseRolesFromDefaultRepository() {
-        List<String> returned = classUnderTest.findCaseRoles(caseId, userId);
-
-        assertAll(
-            () -> assertThat(returned, is(caseUserRoles)),
-            () -> verify(caseUserRepository, times(1)).findCaseRoles(caseId, userId)
-        );
-
-        List<String> returned2 = classUnderTest.findCaseRoles(caseId, userId);
-
-        assertAll(
-            () -> assertThat(returned2, is(caseUserRoles)),
-            () -> verifyNoMoreInteractions(caseUserRepository)
-        );
-    }
-
-    @Test
-    @DisplayName("should initially retrieve case ids user has access")
-    void shouldGetCaseIdsUserHasAccess() {
-        List<Long> returned = classUnderTest.findCasesUserIdHasAccessTo(userId);
-
-        assertAll(
-            () -> assertThat(returned, is(caseIds)),
-            () -> verify(caseUserRepository, times(1)).findCasesUserIdHasAccessTo(userId)
-        );
-        List<Long> returned2 = classUnderTest.findCasesUserIdHasAccessTo(userId);
-
-        assertAll(
-            () -> assertThat(returned2, is(caseIds)),
-            () -> verifyNoMoreInteractions(caseUserRepository)
-        );
     }
 
     @Test

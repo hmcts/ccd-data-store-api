@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 class CachedCaseRoleDefinitionRepositoryTest {
 
@@ -44,23 +43,6 @@ class CachedCaseRoleDefinitionRepositoryTest {
         assertAll(
             () -> assertThat(returned, is(caseRoles)),
             () -> verify(caseRoleRepository, times(1)).getCaseRoles(caseType1)
-        );
-    }
-
-    @Test
-    @DisplayName("should initially retrieve case roles from decorated repository")
-    void shouldGetCaseRolesFromCache() {
-        Set<String> returned = classUnderTest.getCaseRoles(caseType1);
-
-        assertAll(
-            () -> assertThat(returned, is(caseRoles)),
-            () -> verify(caseRoleRepository, times(1)).getCaseRoles(caseType1)
-        );
-        Set<String> returned2 = classUnderTest.getCaseRoles(caseType1);
-
-        assertAll(
-            () -> assertThat(returned2, is(caseRoles)),
-            () -> verifyNoMoreInteractions(caseRoleRepository)
         );
     }
 }

@@ -28,6 +28,10 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     private final CaseDefinitionRepository caseDefinitionRepository;
 
     @Autowired
+    @SuppressWarnings("checkstyle:MemberName")
+    private CachedCaseDefinitionRepository _this;
+
+    @Autowired
     public CachedCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
                                               final CaseDefinitionRepository caseDefinitionRepository) {
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -41,8 +45,8 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
 
     @Override
     public CaseTypeDefinition getCaseType(final String caseTypeId) {
-        CaseTypeDefinitionVersion latestVersion = this.getLatestVersion(caseTypeId);
-        return getCaseType(latestVersion.getVersion(), caseTypeId);
+        CaseTypeDefinitionVersion latestVersion = _this.getLatestVersion(caseTypeId);
+        return _this.getCaseType(latestVersion.getVersion(), caseTypeId);
     }
 
     @Override
@@ -52,7 +56,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
-    @Cacheable("userRolesCache")
+    @Cacheable("userRoleClassificationsCache")
     public UserRole getUserRoleClassifications(String userRole) {
         return caseDefinitionRepository.getUserRoleClassifications(userRole);
     }
@@ -60,7 +64,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     @Override
     public List<UserRole> getClassificationsForUserRoleList(List<String> userRoles) {
         return userRoles.stream()
-            .map(role -> getUserRoleClassifications(role))
+            .map(role -> _this.getUserRoleClassifications(role))
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
@@ -84,7 +88,6 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
-    @Cacheable("allCaseTypesCache")
     public List<String> getAllCaseTypesIDs() {
         return caseDefinitionRepository.getAllCaseTypesIDs();
     }

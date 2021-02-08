@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.data.user;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -26,39 +27,36 @@ public class CachedUserRepository implements UserRepository {
     public static final String QUALIFIER = "cached";
 
     private final UserRepository userRepository;
+    
+    private Optional<String> userName = Optional.empty();
 
     @Autowired
     public CachedUserRepository(@Qualifier(DefaultUserRepository.QUALIFIER)
-                                    final UserRepository userRepository) {
+                                final UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
-    @Cacheable("userDetailsCache")
     public IdamProperties getUserDetails() {
         return userRepository.getUserDetails();
     }
 
     @Override
-    @Cacheable("userCache")
     public IdamUser getUser() {
         return userRepository.getUser();
     }
 
     @Override
-    @Cacheable("userByTokenCache")
     public IdamUser getUser(String userToken) {
         return userRepository.getUser(userToken);
     }
 
     @Override
-    @Cacheable("userDefaultSettingsCache")
     public UserDefault getUserDefaultSettings(String userId) {
         return userRepository.getUserDefaultSettings(userId);
     }
 
     @Override
-    @Cacheable("userRolesCache")
     public Set<String> getUserRoles() {
         return userRepository.getUserRoles();
     }
@@ -72,37 +70,38 @@ public class CachedUserRepository implements UserRepository {
     @Override
     @Cacheable("highestUserClassificationCache")
     public SecurityClassification getHighestUserClassification(String jurisdictionId) {
-        return getUserClassifications(jurisdictionId)
+        return this.getUserClassifications(jurisdictionId)
             .stream()
             .max(comparingInt(SecurityClassification::getRank))
             .orElseThrow(() -> new ServiceException("No security classification found for user"));
     }
 
     @Override
-    @Cacheable("userIDCache")
     public String getUserId() {
-        return userRepository.getUserId();
+        return userName.orElseGet(() -> {
+            userName = Optional.of(userRepository.getUserId());
+            return userName.get();
+        });
     }
 
     @Override
-    @Cacheable("caseworkerUserRolesJurisdictionsCache")
     public List<String> getCaseworkerUserRolesJurisdictions() {
         return userRepository.getCaseworkerUserRolesJurisdictions();
     }
 
     @Override
     public boolean anyRoleEqualsAnyOf(List<String> userRoles) {
-        return getUserRoles().stream().anyMatch(userRoles::contains);
+        return userRepository.anyRoleEqualsAnyOf(userRoles);
     }
 
     @Override
     public boolean anyRoleEqualsTo(String userRole) {
-        return getUserRoles().contains(userRole);
+        return userRepository.anyRoleEqualsTo(userRole);
     }
 
     @Override
     public boolean anyRoleMatches(Pattern rolesPattern) {
-        return getUserRoles().stream().anyMatch(role -> rolesPattern.matcher(role).matches());
+        return userRepository.anyRoleMatches(rolesPattern);
     }
 
     @Override

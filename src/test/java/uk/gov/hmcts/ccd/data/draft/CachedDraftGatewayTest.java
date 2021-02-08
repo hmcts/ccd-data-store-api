@@ -4,7 +4,6 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
@@ -97,24 +96,6 @@ class CachedDraftGatewayTest {
                 () -> verify(defaultDraftGateway).get(draftIdS)
             );
         }
-
-        @Test
-        @DisplayName("should cache drafts for subsequent calls")
-        void shouldCacheDraftsForSubsequentCalls() {
-            cachedDraftGateway.get(draftIdS);
-
-            verify(defaultDraftGateway).get(draftIdS);
-
-            doReturn(newDraftResponse().build()).when(defaultDraftGateway).get(draftIdS);
-
-            DraftResponse result = cachedDraftGateway.get(draftIdS);
-
-            assertAll(
-                () -> assertThat(result, is(draftResponse)),
-                () -> verifyNoMoreInteractions(defaultDraftGateway)
-            );
-
-        }
     }
 
     @Nested
@@ -134,25 +115,6 @@ class CachedDraftGatewayTest {
                 () -> inOrder.verify(draftResponseToCaseDetailsBuilder).build(draftResponse),
                 () -> inOrder.verifyNoMoreInteractions()
             );
-        }
-
-        @Test
-        @DisplayName("should cache drafts for subsequent calls")
-        void shouldCacheDraftsForSubsequentCalls() {
-            cachedDraftGateway.getCaseDetails(draftIdS);
-
-            verify(defaultDraftGateway).get(draftIdS);
-            verify(draftResponseToCaseDetailsBuilder).build(draftResponse);
-
-            doReturn(newDraftResponse().build()).when(defaultDraftGateway).get(draftIdS);
-            CaseDetails result = cachedDraftGateway.getCaseDetails(draftIdS);
-
-            assertAll(
-                () -> assertThat(result, is(caseDetails)),
-                () -> verify(draftResponseToCaseDetailsBuilder, times(2)).build(draftResponse),
-                () -> verifyNoMoreInteractions(defaultDraftGateway)
-            );
-
         }
     }
 

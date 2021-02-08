@@ -90,7 +90,7 @@ public class ApplicationParams {
     private Integer latestVersionTTLSecs;
 
     @Value("${definition.cache.jurisdiction-ttl.secs}")
-    private Integer jurisdictionTTL;
+    private Integer jurisdictionTTLSecs;
 
     @Value("${definition.cache.user-ttl.secs}")
     private Integer userCacheTTLSecs;
@@ -310,18 +310,18 @@ public class ApplicationParams {
     }
 
     public int getJurisdictionTTLSecs() {
-        return jurisdictionTTL;
+        return jurisdictionTTLSecs;
     }
 
-    public Integer getUserCacheTTLSecs() {
+    public int getUserCacheTTLSecs() {
         return userCacheTTLSecs;
     }
 
-    public Integer getCaseDetailsCacheTTLSecs() {
+    public int getCaseDetailsCacheTTLSecs() {
         return caseDetailsCacheTTLSecs;
     }
 
-    public Integer getDraftCacheTTLSecs() {
+    public int getDraftCacheTTLSecs() {
         return draftCacheTTLSecs;
     }
 

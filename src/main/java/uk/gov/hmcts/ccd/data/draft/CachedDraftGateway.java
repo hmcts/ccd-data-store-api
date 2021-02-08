@@ -27,7 +27,7 @@ public class CachedDraftGateway implements DraftGateway {
 
     @Autowired
     public CachedDraftGateway(@Qualifier(DefaultDraftGateway.QUALIFIER)
-                              final DraftGateway draftGateway,
+                              DraftGateway draftGateway,
                               DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder) {
         this.draftGateway = draftGateway;
         this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
@@ -45,8 +45,9 @@ public class CachedDraftGateway implements DraftGateway {
     }
 
     @Override
+    @Cacheable("draftResponseCaseDetailsCache")
     public CaseDetails getCaseDetails(String draftId) {
-        DraftResponse draftResponse = get(draftId);
+        DraftResponse draftResponse = this.get(draftId);
         return draftResponseToCaseDetailsBuilder.build(draftResponse);
     }
 
@@ -68,8 +69,7 @@ public class CachedDraftGateway implements DraftGateway {
         evictSingleCacheValue(draftId);
     }
 
-    @CacheEvict(value = "draftResponseCache")
+    @CacheEvict(value = {"draftResponseCache", "draftResponseCaseDetailsCache"}, allEntries = true)
     public void evictSingleCacheValue(String draftId) {
-
     }
 }

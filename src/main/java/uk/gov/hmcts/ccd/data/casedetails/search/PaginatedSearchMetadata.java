@@ -1,9 +1,14 @@
 package uk.gov.hmcts.ccd.data.casedetails.search;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.ToString;
 
-public class PaginatedSearchMetadata {
+import java.io.Serializable;
 
+@ToString
+public class PaginatedSearchMetadata implements Serializable {
+
+    private static final long serialVersionUID = 3129236643198519380L;
     private Integer totalResultsCount;
     private Integer totalPagesCount;
 

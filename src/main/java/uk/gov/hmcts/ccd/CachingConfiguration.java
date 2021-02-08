@@ -9,11 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 @Configuration
 @EnableCaching
-@Profile("!test")
 public class CachingConfiguration {
 
     @Autowired
@@ -21,7 +19,6 @@ public class CachingConfiguration {
 
     @Bean
     public Config hazelCastConfig() {
-
         Config config = new Config();
         config.setProperty("hazelcast.phone.home.enabled", "false");
         NetworkConfig networkConfig = config.setInstanceName("hazelcast-instance-ccd").getNetworkConfig();
@@ -34,7 +31,6 @@ public class CachingConfiguration {
     private void configCaches(Config config) {
         configCachesForCaseRoleRepository(config);
         configCachesForCaseUserRepository(config);
-        configCachesForCaseDetailsRepository(config);
         configCachesForCaseDetailsRepository(config);
         configCachesForCaseDefinitionRepository(config);
         configCachesForUIDefinitionGateway(config);
@@ -59,22 +55,23 @@ public class CachingConfiguration {
         final int caseDetailsCacheTTLSecs = applicationParams.getCaseDetailsCacheTTLSecs();
 
         config.addMapConfig(newMapConfigWithTtl("caseDetailsByJurisdictionAndIDCache", caseDetailsCacheTTLSecs));
-        config.addMapConfig(newMapConfigWithTtl(
-            "caseDetailsByJurisdictionAndReferenceCache", caseDetailsCacheTTLSecs));
+        config.addMapConfig(newMapConfigWithTtl("caseDetailsByIDCache", caseDetailsCacheTTLSecs));
         config.addMapConfig(newMapConfigWithTtl("caseDetailsByReferenceCache", caseDetailsCacheTTLSecs));
+        config.addMapConfig(newMapConfigWithTtl("uniqueCaseDetailsCache", caseDetailsCacheTTLSecs));
+        config.addMapConfig(newMapConfigWithTtl("paginatedSearchMetadataCache", caseDetailsCacheTTLSecs));
         config.addMapConfig(newMapConfigWithTtl(
-            "caseDetailsByReferenceWithNoAccessCtlCache", caseDetailsCacheTTLSecs));
+                "caseDetailsByMetaDataAndFieldDataCache", caseDetailsCacheTTLSecs));
     }
 
     private void configCachesForCaseDefinitionRepository(Config config) {
         final int definitionCacheMaxIdle = applicationParams.getDefinitionCacheMaxIdleSecs();
         config.addMapConfig(newMapConfigWithMaxIdle("caseTypesForJurisdictionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("caseTypeDefinitionsCache", definitionCacheMaxIdle));
-        config.addMapConfig(newMapConfigWithMaxIdle("userRolesCache", definitionCacheMaxIdle));
-        config.addMapConfig(newMapConfigWithMaxIdle("caseTypeDefinitionLatestVersionCache", definitionCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("userRoleClassificationsCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("jurisdictionCache", definitionCacheMaxIdle));
-        config.addMapConfig(newMapConfigWithMaxIdle("allCaseTypesCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("baseTypesCache", definitionCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle(
+                "caseTypeDefinitionLatestVersionCache", definitionCacheMaxIdle));
     }
 
     private void configCachesForUIDefinitionGateway(Config config) {
@@ -94,20 +91,16 @@ public class CachingConfiguration {
     private void configCachesForDraftGateway(Config config) {
         config.addMapConfig(newMapConfigWithTtl(
             "draftResponseCache", applicationParams.getDraftCacheTTLSecs()));
+        config.addMapConfig(newMapConfigWithTtl(
+                "draftResponseCaseDetailsCache", applicationParams.getDraftCacheTTLSecs()));
+
     }
 
     private void configCachesForUserRepository(Config config) {
         final int userCacheTTLSecs = applicationParams.getUserCacheTTLSecs();
 
-        config.addMapConfig(newMapConfigWithTtl("userDetailsCache", userCacheTTLSecs));
-        config.addMapConfig(newMapConfigWithTtl("userCache", userCacheTTLSecs));
-        config.addMapConfig(newMapConfigWithTtl("userByTokenCache", userCacheTTLSecs));
-        config.addMapConfig(newMapConfigWithTtl("userDefaultSettingsCache", userCacheTTLSecs));
-        config.addMapConfig(newMapConfigWithTtl("userRolesCache", userCacheTTLSecs));
         config.addMapConfig(newMapConfigWithTtl("userClassificationsByJurisdictionCache", userCacheTTLSecs));
         config.addMapConfig(newMapConfigWithTtl("highestUserClassificationCache", userCacheTTLSecs));
-        config.addMapConfig(newMapConfigWithTtl("userIDCache", userCacheTTLSecs));
-        config.addMapConfig(newMapConfigWithTtl("caseworkerUserRolesJurisdictionsCache", userCacheTTLSecs));
     }
 
     private void configCachesForIdamRepository(Config config) {
