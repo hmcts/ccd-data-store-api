@@ -1,4 +1,4 @@
-@F-106
+@F-106 @Ignore
 Feature: F-106: Update Supplementary Data
 
   Background: Load test data for the scenario
