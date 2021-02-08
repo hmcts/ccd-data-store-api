@@ -13,5 +13,7 @@
   "show_condition": null,
   "show_summary_content_option": null,
   "retain_hidden_value": null,
+  "publish": false,
+  "publish_as": null,
   "acls": []
 }

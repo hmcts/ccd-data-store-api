@@ -46,6 +46,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -249,6 +250,28 @@ public abstract class BaseTest {
         significantItem.setDescription(resultSet.getString("description"));
         significantItem.setUrl(resultSet.getString("URL"));
         return significantItem;
+    }
+
+    protected MessageQueueCandidate mapMessageCandidate(ResultSet resultSet, Integer i) throws SQLException {
+        final MessageQueueCandidate messageQueueCandidate = new MessageQueueCandidate();
+        messageQueueCandidate.setId(resultSet.getLong("id"));
+        messageQueueCandidate.setMessageType(resultSet.getString("message_type"));
+        final Timestamp createdAt = resultSet.getTimestamp("time_stamp");
+        if (null != createdAt) {
+            messageQueueCandidate.setTimeStamp(createdAt.toLocalDateTime());
+        }
+        final Timestamp published = resultSet.getTimestamp("published");
+        if (null != published) {
+            messageQueueCandidate.setPublished(published.toLocalDateTime());
+        }
+        try {
+            messageQueueCandidate.setMessageInformation(mapper.readTree(resultSet.getString("message_information")));
+        } catch (IOException e) {
+            fail("Incorrect JSON structure: " + resultSet.getString("DATA"));
+        }
+
+
+        return messageQueueCandidate;
     }
 
     protected AuditEvent mapAuditEvent(ResultSet resultSet, Integer i) throws SQLException {
