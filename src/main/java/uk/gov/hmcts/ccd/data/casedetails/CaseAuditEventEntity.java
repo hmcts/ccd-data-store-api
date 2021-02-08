@@ -20,11 +20,12 @@ import javax.persistence.Table;
 import java.time.LocalDateTime;
 
 import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_CASE_DATA_ID_HQL;
+import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_CASE_DATA_ID_HQL_EXCLUDE_DATA;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_ID_HQL;
 
 @NamedQueries({
     @NamedQuery(name = CaseAuditEventEntity.FIND_BY_CASE, query =
-        FIND_BY_CASE_DATA_ID_HQL
+        FIND_BY_CASE_DATA_ID_HQL_EXCLUDE_DATA
             + " ORDER BY cae.createdDate DESC"
     ),
     @NamedQuery(name = CaseAuditEventEntity.FIND_CREATE_EVENT, query =
@@ -43,6 +44,14 @@ public class CaseAuditEventEntity {
 
     static final String FIND_BY_CASE_DATA_ID_HQL = "SELECT cae FROM CaseAuditEventEntity cae"
         + " LEFT JOIN FETCH cae.significantItemEntity WHERE cae.caseDataId = :" + CaseAuditEventEntity.CASE_DATA_ID;
+
+    static final String FIND_BY_CASE_DATA_ID_HQL_EXCLUDE_DATA =
+        "SELECT cae.id as id, cae.userId as userId, cae.eventId as eventId, cae.eventName as eventName,"
+            + " cae.userFirstName as userFirstName, cae.userLastName as userLastName, cae.summary as summary,"
+            + " cae.description as description, cae.createdDate as createdDate, cae.stateId as stateId,"
+            + " cae.stateName as stateName, cae.securityClassification as securityClassification"
+            + " FROM CaseAuditEventEntity cae LEFT JOIN cae.significantItemEntity as significantItemEntity"
+            + " WHERE cae.caseDataId = :" + CaseAuditEventEntity.CASE_DATA_ID;
 
     static final String FIND_BY_ID_HQL = "SELECT cae FROM CaseAuditEventEntity cae"
         + " WHERE cae.id = :" + CaseAuditEventEntity.EVENT_ID;
