@@ -1,11 +1,15 @@
 elastic:
   enabled: false
-  
+
 java:
   image: 'hmctspublic.azurecr.io/ccd/data-store-api:latest'
   ingressHost: ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   applicationPort: 4452
   aadIdentityName: ccd
+  autoscaling:
+    enabled: true
+    maxReplicas: 9
+    minReplicas: 6
   keyVaults:
     ccd:
       secrets:
@@ -23,9 +27,10 @@ java:
     DATA_STORE_DB_NAME: ccd_data_store
     DATA_STORE_DB_HOST: ccd-data-store-api-postgres-db-{{ .Values.global.environment }}.postgres.database.azure.com
     DATA_STORE_DB_USERNAME: ccd@ccd-data-store-api-postgres-db-{{ .Values.global.environment }}
-    DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&sslmode=require"
+    DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&sslmode=require&gssEncMode=disable"
     DATA_STORE_DB_MAX_POOL_SIZE: 48
-
+# this variable takes a comma separated list of callback urls for which details needs to be logged, or '*' for all
+    LOG_CALLBACK_DETAILS:
     CCD_DRAFT_TTL_DAYS: 180
 
     DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,cmc_claim_external_api,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator,finrem_case_orchestration,employment_tribunals,ethos_repl_service,ccpay_bubble,ctsc_work_allocation,em_ccd_orchestrator,xui_webapp,bulk_scan_payment_processor,pcq_consolidation_service,em_npa_app,ecm_consumer,aac_manage_case_assignment,unspec_service

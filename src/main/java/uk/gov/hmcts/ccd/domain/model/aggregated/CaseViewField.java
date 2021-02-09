@@ -45,11 +45,13 @@ public class CaseViewField implements CommonField {
     private Integer showSummaryContentOption;
     @JsonProperty("retain_hidden_value")
     private Boolean retainHiddenValue;
+    @JsonProperty("publish")
+    private Boolean publish;
+    @JsonProperty("publish_as")
+    private String publishAs;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
     private boolean metadata;
-    @JsonProperty("default_value")
-    private String defaultValue;
 
     public String getId() {
         return id;
@@ -179,6 +181,22 @@ public class CaseViewField implements CommonField {
         this.retainHiddenValue = retainHiddenValue;
     }
 
+    public Boolean getPublish() {
+        return publish;
+    }
+
+    public void setPublish(Boolean publish) {
+        this.publish = publish;
+    }
+
+    public String getPublishAs() {
+        return publishAs;
+    }
+
+    public void setPublishAs(String publishAs) {
+        this.publishAs = publishAs;
+    }
+
     public List<AccessControlList> getAccessControlLists() {
         return accessControlLists;
     }
@@ -218,13 +236,5 @@ public class CaseViewField implements CommonField {
         caseViewField.setRetainHiddenValue(caseFieldDefinition.getRetainHiddenValue());
 
         return caseViewField;
-    }
-
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
     }
 }

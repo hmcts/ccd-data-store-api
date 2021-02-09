@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
@@ -14,8 +13,7 @@ import java.time.Clock;
 @SpringBootApplication
 @EnableTransactionManagement(proxyTargetClass = true)
 @EnableRetry
-@ComponentScan({ "uk.gov.hmcts.ccd", "springfox" })
-@EnableCaching
+@ComponentScan({ "uk.gov.hmcts.ccd" })
 @EnableHypermediaSupport(type = { EnableHypermediaSupport.HypermediaType.HAL })
 public class CoreCaseDataApplication {
 
