@@ -94,6 +94,12 @@ class TestConfiguration extends ContextCleanupListener {
             + "    \"type\": \"MultiSelectList\"\n"
             + "  },"
             + "  {\n"
+            + "    \"type\": \"DynamicMultiSelectList\"\n"
+            + "  },"
+            + "  {\n"
+            + "    \"type\": \"DynamicRadioList\"\n"
+            + "  },"
+            + "  {\n"
             + "    \"type\": \"Document\"\n"
             + "  }\n"
             + "]";
