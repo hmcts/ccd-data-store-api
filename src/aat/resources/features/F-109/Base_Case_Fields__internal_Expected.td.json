@@ -1,0 +1,22 @@
+{
+  "_guid_" : "F-109_Base_Case_Fields_internal_expected",
+  "fields": {
+    "[JURISDICTION]": "BEFTA_JURISDICTION_1",
+    "[LAST_STATE_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
+    "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
+    "[STATE]": "TODO",
+    "[SECURITY_CLASSIFICATION]": "PUBLIC",
+    "[CASE_TYPE]": "BEFTA_CASETYPE_1_1",
+    "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
+  },
+  "fields_formatted": {
+    "[JURISDICTION]": "BEFTA_JURISDICTION_1",
+    "[LAST_STATE_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
+    "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
+    "[STATE]": "TODO",
+    "[SECURITY_CLASSIFICATION]": "PUBLIC",
+    "[CASE_TYPE]": "BEFTA_CASETYPE_1_1",
+    "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
+  },
+  "supplementary_data" : null
+}
