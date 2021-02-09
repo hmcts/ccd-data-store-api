@@ -1,13 +1,13 @@
 #==============================================
-@F-New
-Feature: F-New: Retain Hidden Value
+@F-123
+Feature: F-123: Retain Hidden Value
 #==============================================
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
 #-----------------------------------------------------------------------------------------------------------------------
-  @S-New.1 # 'retainHiddenValue' for top Level field
+  @S-123.1 # 'retainHiddenValue' for top Level field
   Scenario: Must return status 200 along with successfully display the imported definition file containing a top level fields with the correct value for retainHiddenValue
 
     Given a user with [an active profile in CCD],
@@ -19,7 +19,7 @@ Feature: F-New: Retain Hidden Value
 
 
 #-----------------------------------------------------------------------------------------------------------------------
-  @S-New.2 # 'retainHiddenValue' for complex field
+  @S-123.2 # 'retainHiddenValue' for complex field
   Scenario: Must return status 200 along with successfully display the imported definition file containing complex fields with the correct value for retainHiddenValue
 
     Given a user with [an active profile in CCD],
@@ -30,7 +30,7 @@ Feature: F-New: Retain Hidden Value
     And the response has all other details as expected.
 
 #-----------------------------------------------------------------------------------------------------------------------
-  @S-New.2 # 'retainHiddenValue' for eventToComplex field
+  @S-123.2 # 'retainHiddenValue' for eventToComplex field
   Scenario: Must return status 200 along with successfully display the imported definition file containing eventToComplex fields with the correct value for retainHiddenValue
 
     Given a user with [an active profile in CCD],
