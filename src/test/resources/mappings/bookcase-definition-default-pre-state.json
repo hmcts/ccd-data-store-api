@@ -68,6 +68,7 @@
           "id": "TEST_EVENT",
           "name": "TEST EVENT NAME",
           "description": "Just a test",
+          "publish": false,
           "case_fields": [
           ],
           "pre_states": [

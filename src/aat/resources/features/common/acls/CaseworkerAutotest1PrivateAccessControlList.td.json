@@ -1,0 +1,7 @@
+{
+  "_guid_": "CaseworkerAutotest1PrivateAccessControlList",
+  "_extends_": "AllGrantedAccessControlList",
+
+  "role": "caseworker-autotest1-private",
+  "delete": false
+}

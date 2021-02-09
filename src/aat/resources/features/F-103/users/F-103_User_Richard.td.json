@@ -1,0 +1,8 @@
+{
+  "_guid_": "F-103_User_Richard",
+  "_extends_": "BeftaCaseworker2Solicitor2",
+
+  "specs": [
+    "Richard - who can create a case"
+  ]
+}
