@@ -691,6 +691,8 @@
 					"show_summary_change_option": true,
 					"show_summary_content_option": null,
 					"retain_hidden_value": null,
+					"publish" : false,
+          "publish_as" : null,
 					"acls": [
 						{
 							"role": "caseworker-befta_master",
@@ -740,7 +742,7 @@
 									"label": null,
 									"hint_text": null,
 									"show_condition": null,
-									"retain_hidden_value": null
+                  "retain_hidden_value": null
 								},
 								{
 									"complex_field_element_id": "RespondentDetails.RespAddress4.PostCode",
@@ -764,7 +766,7 @@
 									"label": null,
 									"hint_text": null,
 									"show_condition": null,
-									"retain_hidden_value": null
+                  "retain_hidden_value": null
 								},
 								{
 									"complex_field_element_id": "RespondentDetails.RespAddress3.PostTown",
@@ -780,7 +782,7 @@
 									"label": null,
 									"hint_text": null,
 									"show_condition": null,
-									"retain_hidden_value": null
+                  "retain_hidden_value": null
 								},
 								{
 									"complex_field_element_id": "RespondentDetails.RespAddress3.PostCode",
@@ -820,7 +822,7 @@
 									"label": null,
 									"hint_text": null,
 									"show_condition": null,
-									"retain_hidden_value": null
+                  "retain_hidden_value": null
 								},
 								{
 									"complex_field_element_id": "RespondentDetails.RespAddress4.PostTown",
