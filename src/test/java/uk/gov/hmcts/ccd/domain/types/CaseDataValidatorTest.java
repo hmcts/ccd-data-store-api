@@ -4,6 +4,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -13,13 +19,6 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
@@ -35,11 +34,15 @@ import static org.mockito.Mockito.when;
 public class CaseDataValidatorTest extends WireMockBaseTest {
     private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private static final String CASE_FIELD_JSON = "/tests/CaseDataValidator_CaseField.json";
+    private static final String CASE_FIELD_DYNAMIC_JSON = "/tests/CaseDataValidator_DynamicLists.json";
+    private static final String CASE_FIELD_DYNAMIC_DATA_JSON = "/tests/CaseDataValidator_DynamicLists_Data.json";
     private static String CASE_FIELDS_STRING;
+    private static String CASE_FIELDS_DYNAMIC_STRING;
 
     @Inject
     private CaseDataValidator caseDataValidator;
     private List<CaseFieldDefinition> caseFields;
+    private List<CaseFieldDefinition> dynamicCaseFields;
 
     @Mock
     private TextCaseReferenceCaseLinkValidator textCaseReferenceCaseLinkValidator;
@@ -48,11 +51,13 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     @BeforeClass
     public static void setUpClass() {
         CASE_FIELDS_STRING = BaseTest.getResourceAsString(CASE_FIELD_JSON);
+        CASE_FIELDS_DYNAMIC_STRING = BaseTest.getResourceAsString(CASE_FIELD_DYNAMIC_JSON);
     }
 
     @Before
     public void setUp() throws IOException {
         caseFields = BaseTest.getCaseFieldsFromJson(CASE_FIELDS_STRING);
+        dynamicCaseFields = BaseTest.getCaseFieldsFromJson(CASE_FIELDS_DYNAMIC_STRING);
     }
 
     @Test
@@ -80,6 +85,12 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
     private ValidationContext getValidationContext(Map<String, JsonNode> values) {
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setCaseFieldDefinitions(caseFields);
+        return new ValidationContext(caseTypeDefinition, values);
+    }
+
+    private ValidationContext getValidationContextDynamicFields(Map<String, JsonNode> values) {
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(dynamicCaseFields);
         return new ValidationContext(caseTypeDefinition, values);
     }
 
@@ -214,6 +225,210 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
         final ValidationContext validationContext = getValidationContext(values);
+        final List<ValidationResult> result = caseDataValidator.validate(validationContext);
+        assertEquals(result.toString(), 0, result.size());
+    }
+
+    @Test
+    public void validDynamicListInCollection() throws Exception {
+        final String DATA = "{\n"
+            + "        \"TextAreaField\": \"textAreaField1\",\n"
+            + "        \"TextField\": \"textField1\",\n"
+            + "        \"EmailField\": \"test@hmcts.net\",\n"
+            + "        \"DynamicListsComplexField\": {\n"
+            + "            \"DynamicRadioListComplex\": {\n"
+            + "                \"value\": {\n"
+            + "                    \"code\": \"JUDGESMITH\",\n"
+            + "                    \"label\": \"Judge Smith\"\n"
+            + "                },\n"
+            + "                \"list_items\": [{\n"
+            + "                    \"code\": \"JUDGEJUDY\",\n"
+            + "                    \"label\": \"Judge Judy\"\n"
+            + "                }, {\n"
+            + "                    \"code\": \"JUDGERINDER\",\n"
+            + "                    \"label\": \"Judge Rinder\"\n"
+            + "                }, {\n"
+            + "                    \"code\": \"JUDGESMITH\",\n"
+            + "                    \"label\": \"Judge Smith\"\n"
+            + "                }, {\n"
+            + "                    \"code\": \"JUDGEDREDD\",\n"
+            + "                    \"label\": \"Judge Dredd\"\n"
+            + "                }]\n"
+            + "            },\n"
+            + "            \"DynamicMultiSelectComplex\": {\n"
+            + "                \"value\": [{\n"
+            + "                    \"code\": \"MONDAYFIRSTOFMAY\",\n"
+            + "                    \"label\": \"Monday, May 1st\"\n"
+            + "                }, {\n"
+            + "\n"
+            + "                    \"code\": \"THURSDAYFOURTHOFMAY\",\n"
+            + "                    \"label\": \"Thursday, May 4th\"\n"
+            + "                }],\n"
+            + "                \"list_items\": [{\n"
+            + "                    \"code\": \"MONDAYFIRSTOFMAY\",\n"
+            + "                    \"label\": \"Monday, May 1st\"\n"
+            + "                }, {\n"
+            + "                    \"code\": \"TUESDAYSECONDOFMAY\",\n"
+            + "                    \"label\": \"Tuesday, May 2nd\"\n"
+            + "                }, {\n"
+            + "                    \"code\": \"WEDNESDAYTHIRDOFMAY\",\n"
+            + "                    \"label\": \"Wednesday, May 3rd\"\n"
+            + "                }, {\n"
+            + "                    \"code\": \"THURSDAYFOURTHOFMAY\",\n"
+            + "                    \"label\": \"Thursday, May 4th\"\n"
+            + "                }]\n"
+            + "            }\n"
+            + "\n"
+            + "\n"
+            + "        },\n"
+            + "        \"CollectionDynamicMultiSelectList\": [\n"
+            + "            {\n"
+            + "                \"id\": \"MultiSelect1\",\n"
+            + "                \"value\": {\n"
+            + "                    \"value\": [{\n"
+            + "                        \"code\": \"MONDAYFIRSTOFMAY\",\n"
+            + "                        \"label\": \"Monday, May 1st\"\n"
+            + "                    }, {\n"
+            + "\n"
+            + "                        \"code\": \"THURSDAYFOURTHOFMAY\",\n"
+            + "                        \"label\": \"Thursday, May 4th\"\n"
+            + "                    }],\n"
+            + "                    \"list_items\": [{\n"
+            + "                        \"code\": \"MONDAYFIRSTOFMAY\",\n"
+            + "                        \"label\": \"Monday, May 1st\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"TUESDAYSECONDOFMAY\",\n"
+            + "                        \"label\": \"Tuesday, May 2nd\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"WEDNESDAYTHIRDOFMAY\",\n"
+            + "                        \"label\": \"Wednesday, May 3rd\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"THURSDAYFOURTHOFMAY\",\n"
+            + "                        \"label\": \"Thursday, May 4th\"\n"
+            + "                    }]\n"
+            + "                }\n"
+            + "            },\n"
+            + "            {\n"
+            + "                \"id\": \"MultiSelect2\",\n"
+            + "                \"value\": {\n"
+            + "                    \"value\": [{\n"
+            + "                        \"code\": \"TUESDAYSECONDOFMAY\",\n"
+            + "                        \"label\": \"Tuesday, May 2nd\"\n"
+            + "                    }, {\n"
+            + "\n"
+            + "                        \"code\": \"WEDNESDAYTHIRDOFMAY\",\n"
+            + "                        \"label\": \"Wednesday, May 3rd\"\n"
+            + "                    }],\n"
+            + "                    \"list_items\": [{\n"
+            + "                        \"code\": \"MONDAYFIRSTOFMAY\",\n"
+            + "                        \"label\": \"Monday, May 1st\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"TUESDAYSECONDOFMAY\",\n"
+            + "                        \"label\": \"Tuesday, May 2nd\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"WEDNESDAYTHIRDOFMAY\",\n"
+            + "                        \"label\": \"Wednesday, May 3rd\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"THURSDAYFOURTHOFMAY\",\n"
+            + "                        \"label\": \"Thursday, May 4th\"\n"
+            + "                    }]\n"
+            + "                }\n"
+            + "            }\n"
+            + "\n"
+            + "        ],\n"
+            + "        \"CollectionDynamicRadioList\": [\n"
+            + "            {\n"
+            + "                \"id\": \"RadioList1\",\n"
+            + "                \"value\": {\n"
+            + "                    \"value\": {\n"
+            + "                        \"code\": \"JUDGESMITH\",\n"
+            + "                        \"label\": \"Judge Smith\"\n"
+            + "                    },\n"
+            + "                    \"list_items\": [{\n"
+            + "                        \"code\": \"JUDGEJUDY\",\n"
+            + "                        \"label\": \"Judge Judy\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"JUDGERINDER\",\n"
+            + "                        \"label\": \"Judge Rinder\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"JUDGESMITH\",\n"
+            + "                        \"label\": \"Judge Smith\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"JUDGEDREDD\",\n"
+            + "                        \"label\": \"Judge Dredd\"\n"
+            + "                    }]\n"
+            + "                }\n"
+            + "            },\n"
+            + "            {\n"
+            + "                \"id\": \"RadioList2\",\n"
+            + "                \"value\": {\n"
+            + "                    \"value\": {\n"
+            + "                        \"code\": \"JUDGESMITH\",\n"
+            + "                        \"label\": \"Judge Smith\"\n"
+            + "                    },\n"
+            + "                    \"list_items\": [{\n"
+            + "                        \"code\": \"JUDGEJUDY\",\n"
+            + "                        \"label\": \"Judge Judy\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"JUDGERINDER\",\n"
+            + "                        \"label\": \"Judge Rinder\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"JUDGESMITH\",\n"
+            + "                        \"label\": \"Judge Smith\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"JUDGEDREDD\",\n"
+            + "                        \"label\": \"Judge Dredd\"\n"
+            + "                    }]\n"
+            + "                }\n"
+            + "            }\n"
+            + "        ],\n"
+            + "        \"DynamicRadioList\": {\n"
+            + "            \"value\": {\n"
+            + "                \"code\": \"JUDGESMITH\",\n"
+            + "                \"label\": \"Judge Smith\"\n"
+            + "            },\n"
+            + "            \"list_items\": [{\n"
+            + "                \"code\": \"JUDGEJUDY\",\n"
+            + "                \"label\": \"Judge Judy\"\n"
+            + "            }, {\n"
+            + "                \"code\": \"JUDGERINDER\",\n"
+            + "                \"label\": \"Judge Rinder\"\n"
+            + "            }, {\n"
+            + "                \"code\": \"JUDGESMITH\",\n"
+            + "                \"label\": \"Judge Smith\"\n"
+            + "            }, {\n"
+            + "                \"code\": \"JUDGEDREDD\",\n"
+            + "                \"label\": \"Judge Dredd\"\n"
+            + "            }]\n"
+            + "        },\n"
+            + "        \"DynamicMultiSelectList\": {\n"
+            + "            \"value\": [{\n"
+            + "                \"code\": \"MONDAYFIRSTOFMAY\",\n"
+            + "                \"label\": \"Monday, May 1st\"\n"
+            + "            }, {\n"
+            + "\n"
+            + "                \"code\": \"THURSDAYFOURTHOFMAY\",\n"
+            + "                \"label\": \"Thursday, May 4th\"\n"
+            + "            }],\n"
+            + "            \"list_items\": [{\n"
+            + "                \"code\": \"MONDAYFIRSTOFMAY\",\n"
+            + "                \"label\": \"Monday, May 1st\"\n"
+            + "            }, {\n"
+            + "                \"code\": \"TUESDAYSECONDOFMAY\",\n"
+            + "                \"label\": \"Tuesday, May 2nd\"\n"
+            + "            }, {\n"
+            + "                \"code\": \"WEDNESDAYTHIRDOFMAY\",\n"
+            + "                \"label\": \"Wednesday, May 3rd\"\n"
+            + "            }, {\n"
+            + "                \"code\": \"THURSDAYFOURTHOFMAY\",\n"
+            + "                \"label\": \"Thursday, May 4th\"\n"
+            + "            }]\n"
+            + "        }\n"
+            + "    }";
+
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
+        });
+        final ValidationContext validationContext = getValidationContextDynamicFields(values);
         final List<ValidationResult> result = caseDataValidator.validate(validationContext);
         assertEquals(result.toString(), 0, result.size());
     }

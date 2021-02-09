@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.datastore.befta;
 
 import io.cucumber.java.Before;
 import org.junit.AssumptionViolatedException;
+import uk.gov.hmcts.befta.BeftaTestDataLoader;
+import uk.gov.hmcts.befta.DefaultBeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
@@ -31,9 +33,14 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
     }
 
     @Override
-    public void doLoadTestData() {
-        loader.addCcdRoles();
-        loader.importDefinitions();
+    protected BeftaTestDataLoader buildTestDataLoader() {
+        return new DefaultBeftaTestDataLoader() {
+            @Override
+            public void doLoadTestData() {
+                DataStoreTestAutomationAdapter.this.loader.addCcdRoles();
+                DataStoreTestAutomationAdapter.this.loader.importDefinitions();
+            }
+        };
     }
 
     @Override
