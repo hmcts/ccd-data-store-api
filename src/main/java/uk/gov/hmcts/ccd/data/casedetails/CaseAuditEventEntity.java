@@ -49,7 +49,8 @@ public class CaseAuditEventEntity {
         "SELECT cae.id as id, cae.userId as userId, cae.eventId as eventId, cae.eventName as eventName,"
             + " cae.userFirstName as userFirstName, cae.userLastName as userLastName, cae.summary as summary,"
             + " cae.description as description, cae.createdDate as createdDate, cae.stateId as stateId,"
-            + " cae.stateName as stateName, cae.securityClassification as securityClassification"
+            + " cae.stateName as stateName, cae.securityClassification as securityClassification,"
+            + " cae.caseTypeId as caseTypeId, cae.caseDataId as caseDataId"
             + " FROM CaseAuditEventEntity cae LEFT JOIN cae.significantItemEntity as significantItemEntity"
             + " WHERE cae.caseDataId = :" + CaseAuditEventEntity.CASE_DATA_ID;
 
