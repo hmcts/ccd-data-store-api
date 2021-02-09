@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 
@@ -13,6 +14,7 @@ public class WizardPageComplexFieldOverride implements Serializable {
     private String label;
     private String hintText;
     private String showCondition;
+    private Boolean retainHiddenValue;
     private String defaultValue;
 
     @JsonProperty("complex_field_element_id")
@@ -31,6 +33,15 @@ public class WizardPageComplexFieldOverride implements Serializable {
 
     public void setDisplayContext(String displayContext) {
         this.displayContext = displayContext;
+    }
+
+    @JsonProperty("retain_hidden_value")
+    public Boolean getRetainHiddenValue() {
+        return retainHiddenValue;
+    }
+
+    public void setRetainHiddenValue(Boolean retainHiddenValue) {
+        this.retainHiddenValue = retainHiddenValue;
     }
 
     @JsonProperty("label")
@@ -60,19 +71,19 @@ public class WizardPageComplexFieldOverride implements Serializable {
         this.showCondition = showCondition;
     }
 
-    public DisplayContext displayContextType() {
-        return Optional.ofNullable(getDisplayContext())
-            .filter(dc -> !dc.equals("HIDDEN"))
-            .map(DisplayContext::valueOf)
-            .orElse(null);
-    }
-
-    @JsonProperty("default_value")
+    @JsonIgnore()
     public String getDefaultValue() {
         return defaultValue;
     }
 
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
+    }
+
+    public DisplayContext displayContextType() {
+        return Optional.ofNullable(getDisplayContext())
+            .filter(dc -> !dc.equals("HIDDEN"))
+            .map(DisplayContext::valueOf)
+            .orElse(null);
     }
 }

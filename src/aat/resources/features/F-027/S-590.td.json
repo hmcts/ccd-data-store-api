@@ -52,8 +52,9 @@
           "show_summary_change_option": null,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
-          "acls": [],
-          "default_value": null
+          "publish": null,
+          "publish_as": null,
+          "acls": []
         },
         {
           "id": "[LAST_STATE_MODIFIED_DATE]",
@@ -82,8 +83,9 @@
           "show_summary_change_option": null,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
-          "acls": [],
-          "default_value": null
+          "publish": null,
+          "publish_as": null,
+          "acls": []
         },
         {
           "id": "[LAST_MODIFIED_DATE]",
@@ -112,8 +114,9 @@
           "show_summary_change_option": null,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
-          "acls": [],
-          "default_value": null
+          "publish": null,
+          "publish_as": null,
+          "acls": []
         },
         {
           "id": "[CREATED_DATE]",
@@ -142,8 +145,9 @@
           "show_summary_change_option": null,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
-          "acls": [],
-          "default_value": null
+          "publish": null,
+          "publish_as": null,
+          "acls": []
         },
         {
           "id": "[JURISDICTION]",
@@ -172,8 +176,9 @@
           "show_summary_change_option": null,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
-          "acls": [],
-          "default_value": null
+          "publish": null,
+          "publish_as": null,
+          "acls": []
         },
         {
           "id": "[CASE_TYPE]",
@@ -202,8 +207,9 @@
           "show_summary_change_option": null,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
-          "acls": [],
-          "default_value": null
+          "publish": null,
+          "publish_as": null,
+          "acls": []
         },
         {
           "id": "[SECURITY_CLASSIFICATION]",
@@ -232,8 +238,9 @@
           "show_summary_change_option": null,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
-          "acls": [],
-          "default_value": null
+          "publish": null,
+          "publish_as": null,
+          "acls": []
         },
         {
           "id": "[CASE_REFERENCE]",
@@ -262,8 +269,9 @@
           "show_summary_change_option": null,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
-          "acls": [],
-          "default_value": null
+          "publish": null,
+          "publish_as": null,
+          "acls": []
         }
       ],
       "state": {

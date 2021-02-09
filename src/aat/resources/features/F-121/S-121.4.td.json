@@ -81,8 +81,7 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "AddressLine1",
@@ -119,8 +118,7 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "PostCode",
@@ -157,8 +155,7 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "AddressLine2",
@@ -195,8 +192,7 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "PostTown",
@@ -233,8 +229,7 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "County",
@@ -271,8 +266,7 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "Country",
@@ -309,8 +303,7 @@
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               }
             ],
             "collection_field_type": null
@@ -325,6 +318,8 @@
           "show_summary_change_option": true,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
+          "publish": false,
+          "publish_as": null,
           "acls": [
             {
               "role": "caseworker-befta_master",
@@ -333,8 +328,7 @@
               "update": true,
               "delete": true
             }
-          ],
-          "default_value": null
+          ]
         }
       ],
       "event_token": "[[ANYTHING_PRESENT]]",
@@ -359,7 +353,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address1.AddressLine2",
@@ -367,7 +361,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address1.AddressLine3",
@@ -375,7 +369,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address1.Country",
@@ -383,7 +377,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address1.PostCode",
@@ -391,7 +385,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address1.PostTown",
@@ -399,7 +393,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address1.County",
@@ -407,7 +401,7 @@
                   "label": null,
                   "hint_text": null,
                   "show_condition": null,
-                  "default_value": null
+                  "retain_hidden_value": null
                 }
               ]
             }

@@ -20,7 +20,7 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLE
 @Singleton
 public class CollectionValidator implements BaseTypeValidator {
     public static final String VALUE = "value";
-    private static final String ID = "id";
+    public static final String ID = "id";
     private static final String FIELD_SEPARATOR = ".";
 
     @Override

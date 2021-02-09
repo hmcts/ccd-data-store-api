@@ -138,8 +138,7 @@
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 }, {
                   "id" : "AddressLine2",
                   "label" : "Address Line 2",
@@ -191,8 +190,7 @@
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 }, {
                   "id" : "AddressLine3",
                   "label" : "Address Line 3",
@@ -244,8 +242,7 @@
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 }, {
                   "id" : "PostTown",
                   "label" : "Town or City",
@@ -297,8 +294,7 @@
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 }, {
                   "id" : "County",
                   "label" : "County",
@@ -350,8 +346,7 @@
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 }, {
                   "id" : "PostCode",
                   "label" : "Postcode/Zipcode",
@@ -403,8 +398,7 @@
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 }, {
                   "id" : "Country",
                   "label" : "Country",
@@ -456,8 +450,7 @@
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 } ],
                 "collection_field_type" : null
               },
@@ -526,8 +519,7 @@
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 }, {
                   "id" : "ComplexFixedListField",
                   "label" : "A `FixedList` field inside a complex",
@@ -595,8 +587,7 @@
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 }, {
                   "id" : "ComplexNestedField",
                   "label" : "A `Complex` field inside a complex",
@@ -663,8 +654,7 @@
                       "display_context" : null,
                       "display_context_parameter" : null,
                       "retain_hidden_value" : null,
-                      "formatted_value" : null,
-                      "default_value" : null
+                      "formatted_value" : null
                     }, {
                       "id" : "NestedCollectionTextField",
                       "label" : "A `Collection` field of `Text` inside a nested complex",
@@ -725,8 +715,7 @@
                       "display_context" : null,
                       "display_context_parameter" : null,
                       "retain_hidden_value" : null,
-                      "formatted_value" : null,
-                      "default_value" : null
+                      "formatted_value" : null
                     } ],
                     "collection_field_type" : null
                   },
@@ -763,8 +752,7 @@
                   "display_context" : null,
                   "display_context_parameter" : null,
                   "retain_hidden_value" : null,
-                  "formatted_value" : null,
-                  "default_value" : null
+                  "formatted_value" : null
                 } ],
                 "collection_field_type" : null
               },
