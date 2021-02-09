@@ -2,6 +2,9 @@ package uk.gov.hmcts.ccd.datastore.befta;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
+import org.junit.AssumptionViolatedException;
+import uk.gov.hmcts.befta.BeftaTestDataLoader;
+import uk.gov.hmcts.befta.DefaultBeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
@@ -23,6 +26,13 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     private static Map<String, String> uniqueStringsPerTestData = new ConcurrentHashMap<>();
 
+    @Before("@elasticsearch")
+    public void skipElasticSearchTestsIfNotEnabled() {
+        if (!ofNullable(System.getenv("ELASTIC_SEARCH_FTA_ENABLED")).map(Boolean::valueOf).orElse(false)) {
+            throw new AssumptionViolatedException("Elastic Search not Enabled");
+        }
+    }
+
     @Before
     public void createUID(Scenario scenario) {
         String tag = getDataFileTag(scenario);
@@ -40,11 +50,15 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
     }
 
     @Override
-    public void doLoadTestData() {
-        loader.addCcdRoles();
-        loader.importDefinitions();
+    protected BeftaTestDataLoader buildTestDataLoader() {
+        return new DefaultBeftaTestDataLoader() {
+            @Override
+            public void doLoadTestData() {
+                DataStoreTestAutomationAdapter.this.loader.addCcdRoles();
+                DataStoreTestAutomationAdapter.this.loader.importDefinitions();
+            }
+        };
     }
-
 
     @Override
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {

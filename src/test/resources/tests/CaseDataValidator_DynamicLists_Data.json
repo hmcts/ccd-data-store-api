@@ -1,0 +1,194 @@
+{
+  "TextAreaField": "textAreaField1",
+  "TextField": "textField1",
+  "EmailField": "test@hmcts.net",
+  "DynamicListsComplexField": {
+    "DynamicRadioListComplex": {
+      "value": {
+        "code": "JUDGESMITH",
+        "label": "Judge Smith"
+      },
+      "list_items": [{
+        "code": "JUDGEJUDY",
+        "label": "Judge Judy"
+      }, {
+        "code": "JUDGERINDER",
+        "label": "Judge Rinder"
+      }, {
+        "code": "JUDGESMITH",
+        "label": "Judge Smith"
+      }, {
+        "code": "JUDGEDREDD",
+        "label": "Judge Dredd"
+      }]
+    },
+    "DynamicMultiSelectComplex": {
+      "value": [{
+        "code": "MONDAYFIRSTOFMAY",
+        "label": "Monday, May 1st"
+      }, {
+
+        "code": "THURSDAYFOURTHOFMAY",
+        "label": "Thursday, May 4th"
+      }],
+      "list_items": [{
+        "code": "MONDAYFIRSTOFMAY",
+        "label": "Monday, May 1st"
+      }, {
+        "code": "TUESDAYSECONDOFMAY",
+        "label": "Tuesday, May 2nd"
+      }, {
+        "code": "WEDNESDAYTHIRDOFMAY",
+        "label": "Wednesday, May 3rd"
+      }, {
+        "code": "THURSDAYFOURTHOFMAY",
+        "label": "Thursday, May 4th"
+      }]
+    }
+
+
+  },
+  "CollectionDynamicMultiSelectList": [
+    {
+      "id": "MultiSelect1",
+      "value": {
+        "value": [{
+          "code": "MONDAYFIRSTOFMAY",
+          "label": "Monday, May 1st"
+        }, {
+
+          "code": "THURSDAYFOURTHOFMAY",
+          "label": "Thursday, May 4th"
+        }],
+        "list_items": [{
+          "code": "MONDAYFIRSTOFMAY",
+          "label": "Monday, May 1st"
+        }, {
+          "code": "TUESDAYSECONDOFMAY",
+          "label": "Tuesday, May 2nd"
+        }, {
+          "code": "WEDNESDAYTHIRDOFMAY",
+          "label": "Wednesday, May 3rd"
+        }, {
+          "code": "THURSDAYFOURTHOFMAY",
+          "label": "Thursday, May 4th"
+        }]
+      }
+    },
+    {
+      "id": "MultiSelect2",
+      "value": {
+        "value": [{
+          "code": "TUESDAYSECONDOFMAY",
+          "label": "Tuesday, May 2nd"
+        }, {
+
+          "code": "WEDNESDAYTHIRDOFMAY",
+          "label": "Wednesday, May 3rd"
+        }],
+        "list_items": [{
+          "code": "MONDAYFIRSTOFMAY",
+          "label": "Monday, May 1st"
+        }, {
+          "code": "TUESDAYSECONDOFMAY",
+          "label": "Tuesday, May 2nd"
+        }, {
+          "code": "WEDNESDAYTHIRDOFMAY",
+          "label": "Wednesday, May 3rd"
+        }, {
+          "code": "THURSDAYFOURTHOFMAY",
+          "label": "Thursday, May 4th"
+        }]
+      }
+    }
+
+  ],
+  "CollectionDynamicRadioList": [
+    {
+      "id": "RadioList1",
+      "value": {
+        "value": {
+          "code": "JUDGESMITH",
+          "label": "Judge Smith"
+        },
+        "list_items": [{
+          "code": "JUDGEJUDY",
+          "label": "Judge Judy"
+        }, {
+          "code": "JUDGERINDER",
+          "label": "Judge Rinder"
+        }, {
+          "code": "JUDGESMITH",
+          "label": "Judge Smith"
+        }, {
+          "code": "JUDGEDREDD",
+          "label": "Judge Dredd"
+        }]
+      }
+    },
+    {
+      "id": "RadioList2",
+      "value": {
+        "value": {
+          "code": "JUDGESMITH",
+          "label": "Judge Smith"
+        },
+        "list_items": [{
+          "code": "JUDGEJUDY",
+          "label": "Judge Judy"
+        }, {
+          "code": "JUDGERINDER",
+          "label": "Judge Rinder"
+        }, {
+          "code": "JUDGESMITH",
+          "label": "Judge Smith"
+        }, {
+          "code": "JUDGEDREDD",
+          "label": "Judge Dredd"
+        }]
+      }
+    }
+  ],
+  "DynamicRadioList": {
+    "value": {
+      "code": "JUDGESMITH",
+      "label": "Judge Smith"
+    },
+    "list_items": [{
+      "code": "JUDGEJUDY",
+      "label": "Judge Judy"
+    }, {
+      "code": "JUDGERINDER",
+      "label": "Judge Rinder"
+    }, {
+      "code": "JUDGESMITH",
+      "label": "Judge Smith"
+    }, {
+      "code": "JUDGEDREDD",
+      "label": "Judge Dredd"
+    }]
+  },
+  "DynamicMultiSelectList": {
+    "value": [{
+      "code": "MONDAYFIRSTOFMAY",
+      "label": "Monday, May 1st"
+    }, {
+
+      "code": "THURSDAYFOURTHOFMAY",
+      "label": "Thursday, May 4th"
+    }],
+    "list_items": [{
+      "code": "MONDAYFIRSTOFMAY",
+      "label": "Monday, May 1st"
+    }, {
+      "code": "TUESDAYSECONDOFMAY",
+      "label": "Tuesday, May 2nd"
+    }, {
+      "code": "WEDNESDAYTHIRDOFMAY",
+      "label": "Wednesday, May 3rd"
+    }, {
+      "code": "THURSDAYFOURTHOFMAY",
+      "label": "Thursday, May 4th"
+    }]
+  }
+}
