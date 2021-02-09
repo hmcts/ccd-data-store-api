@@ -11,25 +11,20 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.UserRoleBuilder.aUserRole;
 
 class CachedCaseDefinitionRepositoryTest {
 
     private static final String JURISDICTION_ID = "DIVORCE";
     private static final String USER_ROLE_1 = "caseworker-divorce-loa1";
-    private static final String USER_ROLE_2 = "caseworker-probate-loa1";
 
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
