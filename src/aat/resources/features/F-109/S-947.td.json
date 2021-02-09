@@ -29,10 +29,10 @@
         },
         "fields" : [
           {
+            "__operator__": "equivalent",
             "__ordering__": "unordered",
             "__elementId__": "label"
-          },
-          {
+          },{
           "label" : "State",
           "order" : null,
           "metadata" : true,
