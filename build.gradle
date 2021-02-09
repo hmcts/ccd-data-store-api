@@ -30,6 +30,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.4.0'
     id "io.freefair.lombok" version "5.1.0"
     id 'uk.gov.hmcts.java' version '0.12.0'
+    id 'au.com.dius.pact' version '4.1.0'
 }
 
 apply plugin: 'java'
@@ -47,6 +48,11 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'se.patrikerdes.use-latest-versions'
 
 apply from: 'liquibase.gradle'
+
+def versions = [
+        pact_version: '3.5.25'
+]
+
 
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
@@ -122,6 +128,8 @@ configurations {
 
     aatCompile.extendsFrom(testCompile)
     aatRuntime.extendsFrom(testRuntime)
+    contractTestCompile.extendsFrom(testCompile)
+    contractTestRuntime.extendsFrom(testRuntime)
     cucumberRuntime.extendsFrom(functionalRuntime)
 }
 
@@ -234,6 +242,12 @@ dependencies {
     compile 'org.jooq:jool-java-8:0.9.14'
 
     testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.6.0-RDM-7165-2'
+
+    contractTestCompile group: 'au.com.dius', name: 'pact-jvm-provider-spring_2.12', version: versions.pact_version
+    contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+    contractTestRuntime group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+    contractTestRuntime group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
+
 }
 // end::dependencies[]
 
@@ -687,6 +701,17 @@ sourceSets {
             srcDir('src/aat/resources')
         }
     }
+
+    contractTest {
+        java {
+            srcDir('src/contractTest/java')
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+        }
+        resources {
+            srcDir('src/contractTest/resources')
+        }
+    }
 }
 
 task smoke() {
@@ -762,6 +787,23 @@ task functional() {
 
     outputs.upToDateWhen { false }
 }
+
+task contractTest(type: Test) {
+    logger.lifecycle("Runnning contract Tests")
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.contractTest.output.classesDirs
+    classpath = sourceSets.contractTest.runtimeClasspath
+
+}
+
+task runProviderPactVerification(type: Test) {
+    logger.lifecycle("Runs pact Tests")
+    testClassesDirs = sourceSets.contractTest.output.classesDirs
+}
+
+runProviderPactVerification.dependsOn contractTest
+
+runProviderPactVerification.finalizedBy pactVerify
 
 def timestamp() {
     def date = new Date()

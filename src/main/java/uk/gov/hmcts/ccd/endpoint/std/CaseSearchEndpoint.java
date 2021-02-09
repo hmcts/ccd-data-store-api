@@ -110,7 +110,6 @@ public class CaseSearchEndpoint {
 
         Duration between = Duration.between(start, Instant.now());
         log.debug("searchCases execution completed in {} millisecs...", between.toMillis());
-
         return result;
     }
 
