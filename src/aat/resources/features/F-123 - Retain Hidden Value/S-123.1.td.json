@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-New.1",
-  "_extends_": "F-New_Test_Data_Base",
+  "_guid_": "S-123.1",
+  "_extends_": "F-123_Test_Data_Base",
   "title": "Must return status 200 along with successfully display the imported definition file containing a top level fields with the correct value for retainHiddenValue\n",
   "specs": [
     "an active profile in CCD",
