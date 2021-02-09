@@ -790,10 +790,6 @@ task functional() {
 
 task contractTest(type: Test) {
     logger.lifecycle("Runnning contract Tests")
-    environment "pact.broker.scheme", "http"
-    environment "pact.broker.baseUrl", "localhost"
-    environment "pact.broker.port", "80"
-    environment "pact.broker.consumer.tag", "Dev"
     useJUnitPlatform()
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
