@@ -562,7 +562,7 @@
                     "fixed_list_items" : [
                       {
                         "__ordering__": "unordered",
-                        "__elementId__": "role"
+                        "__elementId__": "code"
                       },{
                       "code" : "VALUE4",
                       "label" : "Value 4",
