@@ -280,7 +280,11 @@
                   "live_from" : null,
                   "live_until" : null,
                   "show_condition" : null,
-                  "acls" : [ {
+                  "acls" : [
+                    {
+                      "__ordering__": "unordered",
+                      "__elementId__": "role"
+                    },{
                     "role" : "caseworker-autotest1-private",
                     "create" : true,
                     "read" : true,
@@ -568,7 +572,11 @@
                     "min" : null,
                     "max" : null,
                     "regular_expression" : null,
-                    "fixed_list_items" : [ {
+                    "fixed_list_items" : [
+                      {
+                        "__ordering__": "unordered",
+                        "__elementId__": "code"
+                      },{
                       "code" : "VALUE4",
                       "label" : "Value 4",
                       "order" : null

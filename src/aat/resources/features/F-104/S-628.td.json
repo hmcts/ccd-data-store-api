@@ -877,7 +877,11 @@
                 "min" : null,
                 "max" : null,
                 "regular_expression" : null,
-                "fixed_list_items" : [ {
+                "fixed_list_items" : [
+                  {
+                    "__ordering__": "unordered",
+                    "__elementId__": "code"
+                  },{
                   "code" : "VALUE4",
                   "label" : "Value 4",
                   "order" : null
