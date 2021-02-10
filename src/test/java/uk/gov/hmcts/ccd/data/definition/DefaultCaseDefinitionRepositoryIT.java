@@ -57,7 +57,7 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
 
         assertAll(
             "Assert All of these",
-            () -> assertThat(baseTypes, IsCollectionWithSize.hasSize(15)),
+            () -> assertThat(baseTypes, IsCollectionWithSize.hasSize(17)),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("Text")))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("Number")))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("Email")))),
@@ -71,6 +71,8 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("TextArea")))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is(COLLECTION)))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("MultiSelectList")))),
+            () -> assertThat(baseTypes, hasItem(hasProperty("type", is("DynamicRadioList")))),
+            () -> assertThat(baseTypes, hasItem(hasProperty("type", is("DynamicMultiSelectList")))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is(COMPLEX)))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("Document"))))
         );
