@@ -8,14 +8,12 @@ import io.swagger.annotations.ApiModelProperty;
 import java.time.LocalDateTime;
 import java.util.Map;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 
 @SuppressWarnings("checkstyle:SummaryJavadoc") // Javadoc predates checkstyle implementation in module
 @Data
-@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 public class AuditEvent extends Event {
     @JsonIgnore
