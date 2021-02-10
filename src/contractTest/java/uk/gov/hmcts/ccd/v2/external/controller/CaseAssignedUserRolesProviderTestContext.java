@@ -35,7 +35,8 @@ public class CaseAssignedUserRolesProviderTestContext {
     @Primary
     @Bean
     protected CaseAssignedUserRolesController caseAssignedUserRolesController() {
-        return new CaseAssignedUserRolesController(applicationParams, new UIDService(), caseAssignedUserRolesOperation(), securityUtils);
+        return new CaseAssignedUserRolesController(applicationParams,
+            new UIDService(), caseAssignedUserRolesOperation(), securityUtils);
     }
 
 }

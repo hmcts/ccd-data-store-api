@@ -55,7 +55,7 @@ public class CaseAssignedUserRolesProviderTest {
     }
 
     @State("A User Role exists for a Case")
-    public void aUserRoleExists() {
+    public void setUpUserRoleExists() {
         when(securityUtils.getServiceNameFromS2SToken(anyString())).thenReturn("serviceName");
         when(applicationParams.getAuthorisedServicesForCaseUserRoles()).thenReturn(Arrays.asList("serviceName"));
     }

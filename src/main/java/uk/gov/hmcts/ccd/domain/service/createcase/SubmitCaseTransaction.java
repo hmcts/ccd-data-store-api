@@ -49,7 +49,7 @@ public class SubmitCaseTransaction {
     private final MessageService messageService;
 
     @Inject
-    public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+    SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                      final CaseDetailsRepository caseDetailsRepository,
                                  final CaseAuditEventRepository caseAuditEventRepository,
                                  final CaseTypeService caseTypeService,
