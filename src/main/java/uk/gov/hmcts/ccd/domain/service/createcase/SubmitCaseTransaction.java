@@ -36,7 +36,7 @@ import static javax.transaction.Transactional.TxType.REQUIRES_NEW;
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 @Service
-public class SubmitCaseTransaction {
+class SubmitCaseTransaction {
 
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
@@ -49,7 +49,7 @@ public class SubmitCaseTransaction {
     private final MessageService messageService;
 
     @Inject
-    SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+    public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                      final CaseDetailsRepository caseDetailsRepository,
                                  final CaseAuditEventRepository caseAuditEventRepository,
                                  final CaseTypeService caseTypeService,
