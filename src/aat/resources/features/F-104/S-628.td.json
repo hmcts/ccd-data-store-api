@@ -76,7 +76,7 @@
                 "fixed_list_items" : [ ],
                 "complex_fields" : [
                   {
-                    "__ordering__": "unordered",
+                    "__ordering__": "unordered"
                   },{
                   "id" : "AddressLine1",
                   "label" : "Building and Street",
@@ -638,7 +638,7 @@
                     "fixed_list_items" : [ ],
                     "complex_fields" : [
                       {
-                        "__ordering__": "unordered",
+                        "__ordering__": "unordered"
                       },{
                       "id" : "NestedNumberField",
                       "label" : "A `Number` field inside a nested complex",

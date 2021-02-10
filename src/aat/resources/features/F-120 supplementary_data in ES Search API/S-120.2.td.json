@@ -89,7 +89,7 @@
                 "fixed_list_items" : [ ],
                 "complex_fields" : [
                   {
-                    "__ordering__": "unordered",
+                    "__ordering__": "unordered"
                   },{
                   "id" : "AddressLine1",
                   "label" : "Building and Street",
@@ -497,7 +497,7 @@
                 "fixed_list_items" : [ ],
                 "complex_fields" : [
                   {
-                    "__ordering__": "unordered",
+                    "__ordering__": "unordered"
                   },{
                   "id" : "ComplexTextField",
                   "label" : "A `Text` field inside a complex",
@@ -643,7 +643,7 @@
                     "fixed_list_items" : [ ],
                     "complex_fields" : [
                       {
-                        "__ordering__": "unordered",
+                        "__ordering__": "unordered"
                       },{
                       "id" : "NestedNumberField",
                       "label" : "A `Number` field inside a nested complex",
