@@ -341,11 +341,7 @@ public class AccessControlService {
         if (hasAccessControlList(userRoles, CAN_DELETE, field.getAccessControlLists())) {
             collectionAccess.add(ALLOW_DELETE.getOption());
         }
-        if (hasAccessControlList(userRoles, CAN_UPDATE, field.getAccessControlLists())) {
-            collectionAccess.add(ALLOW_INSERT.getOption());
-            collectionAccess.add(ALLOW_DELETE.getOption());
-        }
-
+        collectionAccess.forEach(option -> LOG.info(option));
         return DisplayContextParameterUtil.updateCollectionDisplayContextParameter(field.getDisplayContextParameter(),
                                                                                    collectionAccess);
     }
