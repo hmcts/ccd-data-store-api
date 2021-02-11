@@ -74,7 +74,10 @@
                 "max" : null,
                 "regular_expression" : null,
                 "fixed_list_items" : [ ],
-                "complex_fields" : [ {
+                "complex_fields" : [
+                  {
+                    "__ordering__": "unordered"
+                  },{
                   "id" : "AddressLine1",
                   "label" : "Building and Street",
                   "hidden" : null,
@@ -336,7 +339,11 @@
                 "max" : null,
                 "regular_expression" : null,
                 "fixed_list_items" : [ ],
-                "complex_fields" : [ {
+                "complex_fields" : [
+                  {
+                    "__ordering__": "unordered",
+                    "__elementId__": "label"
+                  },{
                   "id" : "ComplexTextField",
                   "label" : "A `Text` field inside a complex",
                   "hidden" : false,
@@ -385,7 +392,11 @@
                     "min" : null,
                     "max" : null,
                     "regular_expression" : null,
-                    "fixed_list_items" : [ {
+                    "fixed_list_items" : [
+                      {
+                        "__ordering__": "unordered",
+                        "__elementId__": "code"
+                      },{
                       "code" : "VALUE4",
                       "label" : "Value 4",
                       "order" : null
@@ -437,7 +448,10 @@
                     "max" : null,
                     "regular_expression" : null,
                     "fixed_list_items" : [ ],
-                    "complex_fields" : [ {
+                    "complex_fields" : [
+                      {
+                        "__ordering__": "unordered"
+                      },{
                       "id" : "NestedNumberField",
                       "label" : "A `Number` field inside a nested complex",
                       "hidden" : false,
@@ -566,8 +580,79 @@
                 }
               },
               "display_context_parameter" : null
-            },
-            {
+            }, {
+              "label" : "A `MultiSelectList` field",
+              "order" : null,
+              "metadata" : false,
+              "case_field_id" : "MultiSelectListField",
+              "case_field_type" : {
+                "id" : "MultiSelectList-MultiSelectListType",
+                "type" : "MultiSelectList",
+                "min" : null,
+                "max" : null,
+                "regular_expression" : null,
+                "fixed_list_items" : [ {
+                  "code" : "OPTION5",
+                  "label" : "Option 5",
+                  "order" : null
+                }, {
+                  "code" : "OPTION4",
+                  "label" : "Option 4",
+                  "order" : null
+                }, {
+                  "code" : "OPTION3",
+                  "label" : "Option 3",
+                  "order" : null
+                }, {
+                  "code" : "OPTION2",
+                  "label" : "Option 2",
+                  "order" : null
+                }, {
+                  "code" : "OPTION1",
+                  "label" : "Option 1",
+                  "order" : null
+                } ],
+                "complex_fields" : [ ],
+                "collection_field_type" : null
+              },
+              "display_context_parameter" : null
+            }, {
+              "label" : "A `FixedList` field",
+              "order" : null,
+              "metadata" : false,
+              "case_field_id" : "FixedListField",
+              "case_field_type" : {
+                "id" : "FixedList-FixedListType",
+                "type" : "FixedList",
+                "min" : null,
+                "max" : null,
+                "regular_expression" : null,
+                "fixed_list_items" : [
+                  {
+                    "__ordering__": "unordered",
+                    "__elementId__": "code"
+                  },{
+                  "code" : "VALUE4",
+                  "label" : "Value 4",
+                  "order" : null
+                }, {
+                  "code" : "VALUE3",
+                  "label" : "Value 3",
+                  "order" : null
+                }, {
+                  "code" : "VALUE2",
+                  "label" : "Value 2",
+                  "order" : null
+                }, {
+                  "code" : "VALUE1",
+                  "label" : "Value 1",
+                  "order" : null
+                } ],
+                "complex_fields" : [ ],
+                "collection_field_type" : null
+              },
+              "display_context_parameter" : null
+            }, {
               "label" : "A `TextArea` field",
               "order" : null,
               "metadata" : false,
