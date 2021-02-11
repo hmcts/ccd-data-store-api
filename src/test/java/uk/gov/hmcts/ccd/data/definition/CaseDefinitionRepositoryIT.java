@@ -1,14 +1,12 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.cache.CacheManager;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -16,7 +14,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
-import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,13 +34,11 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.UserRoleBu
 @SpringBootTest
 @AutoConfigureWireMock(port = 0)
 @TestPropertySource(locations = "classpath:test.properties")
+@Ignore
 public class CaseDefinitionRepositoryIT {
 
     @MockBean
     private DefaultCaseDefinitionRepository caseDefinitionRepository;
-
-    @Inject
-    protected CacheManager cacheManager;
 
     @Autowired
     private CachedCaseDefinitionRepository cachedCaseDefinitionRepository;
@@ -68,12 +63,6 @@ public class CaseDefinitionRepositoryIT {
         doReturn(expectedUserRole1).when(caseDefinitionRepository).getUserRoleClassifications(USER_ROLE_1);
         doReturn(expectedUserRole2).when(caseDefinitionRepository).getUserRoleClassifications(USER_ROLE_2);
         doReturn(expectedUserRole3).when(caseDefinitionRepository).getUserRoleClassifications(USER_ROLE_3);
-    }
-
-    @After
-    @AfterEach
-    public void clearCache() {
-        cacheManager.getCacheNames().forEach(cacheName -> cacheManager.getCache(cacheName).clear());
     }
 
     @Test

@@ -1,14 +1,12 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.cache.CacheManager;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -16,7 +14,6 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
-import javax.inject.Inject;
 import java.util.Optional;
 import java.util.Arrays;
 import java.util.Map;
@@ -37,6 +34,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 @SpringBootTest
 @AutoConfigureWireMock(port = 0)
 @TestPropertySource(locations = "classpath:test.properties")
+@Ignore
 public class CaseDetailsRepositoryIT {
 
     private static final long CASE_ID = 100000L;
@@ -47,9 +45,6 @@ public class CaseDetailsRepositoryIT {
 
     @SpyBean
     private DefaultCaseDetailsRepository caseDetailsRepository;
-
-    @Inject
-    protected CacheManager cacheManager;
 
     @Autowired
     private CachedCaseDetailsRepository cachedCaseDetailsRepository;
@@ -82,12 +77,6 @@ public class CaseDetailsRepositoryIT {
 
         doReturn(paginatedSearchMetadata).when(caseDetailsRepository)
             .getPaginatedSearchMetadata(metaData, dataSearchParams);
-    }
-
-    @After
-    @AfterEach
-    public void clearCache() {
-        cacheManager.getCacheNames().forEach(cacheName -> cacheManager.getCache(cacheName).clear());
     }
 
     @Test
