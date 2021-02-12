@@ -148,9 +148,6 @@ public class QueryEndpointIT extends WireMockBaseTest {
         "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/1504259907353529/"
             + "events/%d/case-history";
 
-    private static final String GET_CASE_EVENT_ENABLING_CONDITION = "/aggregated/caseworkers"
-        + "/0/jurisdictions/PROBATE/case-types/"
-        + "TestAddressBookCaseEventEnablingCondition/cases/1504259907353529";
 
     @Inject
     private WebApplicationContext wac;
@@ -1018,52 +1015,6 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         final CaseViewActionableEvent[] actionableEvents = caseView.getActionableEvents();
         assertEquals("Should only no valid triggers", 0, actionableEvents.length);
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-        scripts = {"classpath:sql/insert_cases_event_enabling.sql"})
-    public void shouldFilterEventsWhenEventEnablingConditionIsNotValid() throws Exception {
-
-        // Check that we have the expected test data set size
-        final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
-
-        final MvcResult result = mockMvc.perform(get(GET_CASE_EVENT_ENABLING_CONDITION)
-            .contentType(JSON_CONTENT_TYPE)
-            .header(AUTHORIZATION, "Bearer user1"))
-            .andExpect(status().is(200))
-            .andReturn();
-
-        final CaseView caseView = mapper.readValue(result.getResponse().getContentAsString(), CaseView.class);
-        assertNotNull("Case View is null", caseView);
-        assertEquals("Unexpected Case ID", Long.valueOf(1504259907353529L), Long.valueOf(caseView.getCaseId()));
-
-        final CaseViewActionableEvent[] actionableEvents = caseView.getActionableEvents();
-        assertEquals("Should only no valid triggers", 0, actionableEvents.length);
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-        scripts = {"classpath:sql/insert_cases_event_enabling_valid_data.sql"})
-    public void shouldNotFilterEventsWhenEventEnablingConditionIsValid() throws Exception {
-
-        // Check that we have the expected test data set size
-        final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
-
-        final MvcResult result = mockMvc.perform(get(GET_CASE_EVENT_ENABLING_CONDITION)
-            .contentType(JSON_CONTENT_TYPE)
-            .header(AUTHORIZATION, "Bearer user1"))
-            .andExpect(status().is(200))
-            .andReturn();
-
-        final CaseView caseView = mapper.readValue(result.getResponse().getContentAsString(), CaseView.class);
-        assertNotNull("Case View is null", caseView);
-        assertEquals("Unexpected Case ID", Long.valueOf(1504259907353529L), Long.valueOf(caseView.getCaseId()));
-
-        final CaseViewActionableEvent[] actionableEvents = caseView.getActionableEvents();
-        assertEquals("Should only no valid triggers", 2, actionableEvents.length);
     }
 
     @Test
