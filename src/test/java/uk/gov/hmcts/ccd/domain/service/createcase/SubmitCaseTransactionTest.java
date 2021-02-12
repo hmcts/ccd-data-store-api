@@ -8,7 +8,6 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
@@ -21,6 +20,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.service.common.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -28,7 +28,6 @@ import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
-import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
 import java.time.LocalDateTime;
@@ -42,9 +41,6 @@ import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 
 class SubmitCaseTransactionTest {
@@ -78,8 +74,6 @@ class SubmitCaseTransactionTest {
     private CallbackInvoker callbackInvoker;
     @Mock
     private SecurityClassificationService securityClassificationService;
-    @Mock
-    private CaseUserRepository caseUserRepository;
 
     @Mock
     private CaseDetails caseDetails;
@@ -91,7 +85,7 @@ class SubmitCaseTransactionTest {
     private UIDService uidService;
 
     @Mock
-    private UserAuthorisation userAuthorisation;
+    private CaseDataAccessControl caseDataAccessControl;
 
     @Mock
     private MessageService messageService;
@@ -114,8 +108,8 @@ class SubmitCaseTransactionTest {
                                                           callbackInvoker,
                                                           uidService,
                                                           securityClassificationService,
-                                                          caseUserRepository,
-                                                          userAuthorisation, messageService);
+                                                          caseDataAccessControl,
+                                                          messageService);
 
         event = buildEvent();
         caseTypeDefinition = buildCaseType();
@@ -217,24 +211,8 @@ class SubmitCaseTransactionTest {
     }
 
     @Test
-    @DisplayName("when creator has access level GRANTED, then it should grant access to creator")
-    void shouldGrantAccessToAccessLevelGrantedCreator() {
-        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
-
-        submitCaseTransaction.submitCase(event,
-            caseTypeDefinition,
-                                         idamUser,
-            caseEventDefinition,
-                                         this.caseDetails,
-                                         IGNORE_WARNING);
-
-        verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID), IDAM_ID, CREATOR.getRole());
-    }
-
-    @Test
-    @DisplayName("when creator has access level ALL, then it should NOT grant access to creator")
-    void shouldNotGrantAccessToAccessLevelAllCreator() {
-        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.ALL);
+    @DisplayName("should grant access to creator")
+    void shouldGrantAccessToCreator() {
 
         submitCaseTransaction.submitCase(event,
                                          caseTypeDefinition,
@@ -243,7 +221,7 @@ class SubmitCaseTransactionTest {
                                          this.caseDetails,
                                          IGNORE_WARNING);
 
-        verifyZeroInteractions(caseUserRepository);
+        verify(caseDataAccessControl).grantAccess(CASE_ID, IDAM_ID);
     }
 
     @Test
