@@ -1,7 +1,6 @@
 {
 	"_guid_": "S-121.6",
 	"_extends_": "F-121_Test_Data_Base",
-
 	"title": "must validate date in a right format",
 
 	"specs": [
@@ -10,16 +9,16 @@
 	],
 
 	"request": {
-		"pathVariables": {
-			"ctid": "FT_ComplexFieldsOrdering",
-			"etid": "CREATE6"
-		}
-	},
+    "pathVariables": {
+      "ctid": "FT_ComplexFieldsOrdering",
+      "etid": "CREATE6"
+    }
+  },
 
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"headers": {
-			"Content-Encoding": "gzip",
+      "Content-Encoding": "gzip",
 			"Content-Type": "application/json",
 			"Connection": "[[ANYTHING_PRESENT]]",
 			"Keep-Alive": "[[ANYTHING_PRESENT]]",
