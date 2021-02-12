@@ -106,6 +106,11 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
+    public Long findCaseDetailsReferenceById(final Long id) {
+        return findReferenceById(id).orElse(null);
+    }
+
+    @Override
     public Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference) {
         return findByReference(jurisdiction, caseReference.toString());
     }
@@ -176,6 +181,13 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         }
 
         return getCaseDetailsEntity(id, reference, qb);
+    }
+
+    private Optional<Long> findReferenceById(Long id) {
+        final CaseDetailsQueryBuilder<Long> qb = queryBuilderFactory.selectByReferenceSecured(em);
+        qb.whereId(id);
+
+        return qb.getSingleResult();
     }
 
     /**

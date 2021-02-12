@@ -75,7 +75,7 @@ public class CaseAccessOperation {
     public List<String> findCasesUserIdHasAccessTo(final String userId) {
         return caseUserRepository.findCasesUserIdHasAccessTo(userId)
             .stream()
-            .map(databaseId -> caseDetailsRepository.findById(databaseId).getReference() + "")
+            .map(databaseId -> String.valueOf(caseDetailsRepository.findCaseDetailsReferenceById(databaseId)))
             .collect(Collectors.toList());
     }
 
@@ -87,7 +87,7 @@ public class CaseAccessOperation {
 
         validateCaseRoles(Sets.union(globalCaseRoles, validCaseRoles), targetCaseRoles);
 
-        final Long caseId = new Long(caseDetails.getId());
+        final Long caseId = Long.valueOf(caseDetails.getId());
         final String userId = caseUser.getUserId();
         final List<String> currentCaseRoles = caseUserRepository.findCaseRoles(caseId, userId);
 

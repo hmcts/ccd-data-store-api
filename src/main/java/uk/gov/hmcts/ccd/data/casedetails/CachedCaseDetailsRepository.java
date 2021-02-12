@@ -59,6 +59,11 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
+    public Long findCaseDetailsReferenceById(final Long id) {
+        return ofNullable(caseDetailsRepository.findCaseDetailsReferenceById(id)).orElse(null);
+    }
+
+    @Override
     public CaseDetails findByReference(final Long caseReference) {
         final Function<String, Optional<CaseDetails>> findFunction = key ->
             ofNullable(caseDetailsRepository.findByReference(caseReference));
