@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ExampleProperty;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -31,8 +30,8 @@ import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateReques
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.CreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createevent.CreateEventOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.AccessControlledGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
-import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
@@ -41,6 +40,8 @@ import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
+
+import java.util.List;
 
 import static org.springframework.http.ResponseEntity.status;
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CASE_ACCESSED;
@@ -60,7 +61,7 @@ public class CaseController {
 
     @Autowired
     public CaseController(
-        @Qualifier(CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
+        @Qualifier(AccessControlledGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation,
         @Qualifier("authorised") final CreateEventOperation createEventOperation,
         @Qualifier("authorised") final CreateCaseOperation createCaseOperation,
         UIDService caseReferenceService,

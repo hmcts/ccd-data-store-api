@@ -4,17 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.DefaultObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.AccessControlledGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
@@ -32,7 +32,7 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
 
     @Autowired
     public DefaultGetCaseHistoryViewOperation(
-        @Qualifier(CreatorGetCaseOperation.QUALIFIER) GetCaseOperation getCaseOperation,
+        @Qualifier(AccessControlledGetCaseOperation.QUALIFIER) GetCaseOperation getCaseOperation,
         @Qualifier("authorised") GetEventsOperation getEventsOperation,
         UIDefinitionRepository uiDefinitionRepository, CaseTypeService caseTypeService,
         UIDService uidService,
