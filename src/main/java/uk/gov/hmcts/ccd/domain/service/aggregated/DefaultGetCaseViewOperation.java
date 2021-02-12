@@ -1,22 +1,20 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.google.common.collect.Lists;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.enablingcondition.EnablingConditionParser;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabsDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
@@ -26,6 +24,8 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
+
+import java.util.List;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_HISTORY_VIEWER;
 
@@ -38,7 +38,6 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
     private final GetEventsOperation getEventsOperation;
     private final CaseTypeService caseTypeService;
     private final EventTriggerService eventTriggerService;
-    private final EnablingConditionParser enablingConditionParser;
 
     @Autowired
     public DefaultGetCaseViewOperation(@Qualifier(CreatorGetCaseOperation.QUALIFIER) GetCaseOperation getCaseOperation,
@@ -49,8 +48,7 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
                                        UIDService uidService,
                                        ObjectMapperService objectMapperService,
                                        CompoundFieldOrderService compoundFieldOrderService,
-                                       FieldProcessorService fieldProcessorService,
-                                       EnablingConditionParser enablingConditionParser) {
+                                       FieldProcessorService fieldProcessorService) {
         super(getCaseOperation, uiDefinitionRepository, caseTypeService, uidService, objectMapperService,
               compoundFieldOrderService, fieldProcessorService);
         this.getEventsOperation = getEventsOperation;
