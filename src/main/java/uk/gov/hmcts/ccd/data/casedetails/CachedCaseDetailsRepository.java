@@ -51,7 +51,7 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-    @Cacheable("caseDetailsByReferenceCache")
+    @Cacheable(value = "caseDetailsByReferenceCache", key = "#caseReference")
     public CaseDetails findByReference(final Long caseReference) {
         return ofNullable(caseDetailsRepository.findByReference(caseReference)).orElse(null);
     }
@@ -68,13 +68,13 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-    @Cacheable("caseDetailsByReferenceCache")
+    @Cacheable(value = "caseDetailsByReferenceCache", key = "#reference")
     public Optional<CaseDetails> findByReference(String reference) {
         return caseDetailsRepository.findByReference(reference);
     }
 
     @Override
-    @Cacheable("caseDetailsByReferenceCache")
+    @Cacheable(value = "caseDetailsByReferenceCache", key = "#reference")
     public Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference) {
         return caseDetailsRepository.findByReferenceWithNoAccessControl(reference);
     }
