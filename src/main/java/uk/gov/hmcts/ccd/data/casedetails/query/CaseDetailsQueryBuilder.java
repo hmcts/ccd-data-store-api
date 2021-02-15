@@ -72,7 +72,7 @@ public abstract class CaseDetailsQueryBuilder<T> {
 
     public CaseDetailsQueryBuilder whereIds(List<Long> ids) {
         if (CollectionUtils.isNotEmpty(ids)) {
-            predicates.add(cb.in(root.get("reference")).value(ids));
+            predicates.add(cb.in(root.get("id")).value(ids));
         }
         return this;
     }
