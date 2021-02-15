@@ -240,7 +240,7 @@ class CaseAccessOperationTest {
 
             when(caseUserRepository.findCasesUserIdHasAccessTo(USER_ID))
                 .thenReturn(ids);
-            when(caseDetailsRepository.findCaseDetailsReferencesByIds(ids))
+            when(caseDetailsRepository.findCaseReferencesByIds(ids))
                 .thenReturn(ids);
 
             List<String> usersCases = caseAccessOperation.findCasesUserIdHasAccessTo(USER_ID);
@@ -248,7 +248,7 @@ class CaseAccessOperationTest {
             assertAll(
                 () -> assertEquals(1, usersCases.size()),
                 () -> assertEquals(String.valueOf(1L), usersCases.get(0)),
-                () -> verify(caseDetailsRepository, times(1)).findCaseDetailsReferencesByIds(ids)
+                () -> verify(caseDetailsRepository, times(1)).findCaseReferencesByIds(ids)
             );
         }
 
@@ -262,7 +262,7 @@ class CaseAccessOperationTest {
 
             assertAll(
                 () -> assertEquals(0, usersCases.size()),
-                () -> verify(caseDetailsRepository, times(0)).findCaseDetailsReferencesByIds(ids)
+                () -> verify(caseDetailsRepository, times(0)).findCaseReferencesByIds(ids)
             );
         }
 

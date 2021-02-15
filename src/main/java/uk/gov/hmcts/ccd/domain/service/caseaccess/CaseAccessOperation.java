@@ -73,11 +73,16 @@ public class CaseAccessOperation {
     }
 
     public List<String> findCasesUserIdHasAccessTo(final String userId) {
-        return caseDetailsRepository
-            .findCaseDetailsReferencesByIds(caseUserRepository.findCasesUserIdHasAccessTo(userId))
-            .stream()
-            .map(String::valueOf)
-            .collect(Collectors.toList());
+        List<Long> usersCases = caseUserRepository.findCasesUserIdHasAccessTo(userId);
+        if (usersCases.size() == 0) {
+            return List.of();
+        } else {
+            return caseDetailsRepository
+                .findCaseReferencesByIds(usersCases)
+                .stream()
+                .map(String::valueOf)
+                .collect(Collectors.toList());
+        }
     }
 
     @Transactional

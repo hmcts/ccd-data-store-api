@@ -59,8 +59,8 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-    public List<Long> findCaseDetailsReferencesByIds(final List<Long> ids) {
-        return caseDetailsRepository.findCaseDetailsReferencesByIds(ids);
+    public List<Long> findCaseReferencesByIds(final List<Long> ids) {
+        return caseDetailsRepository.findCaseReferencesByIds(ids);
     }
 
     @Override
