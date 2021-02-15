@@ -70,6 +70,13 @@ public abstract class CaseDetailsQueryBuilder<T> {
         return this;
     }
 
+    public CaseDetailsQueryBuilder whereIds(List<Long> ids) {
+        if (CollectionUtils.isNotEmpty(ids)) {
+            predicates.add(cb.in(root.get("reference")).value(ids));
+        }
+        return this;
+    }
+
     public CaseDetailsQueryBuilder whereCaseType(String caseType) {
         predicates.add(cb.equal(root.get("caseType"), caseType));
 

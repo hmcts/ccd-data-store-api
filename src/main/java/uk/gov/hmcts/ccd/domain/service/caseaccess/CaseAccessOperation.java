@@ -73,9 +73,10 @@ public class CaseAccessOperation {
     }
 
     public List<String> findCasesUserIdHasAccessTo(final String userId) {
-        return caseUserRepository.findCasesUserIdHasAccessTo(userId)
+        return caseDetailsRepository
+            .findCaseDetailsReferencesByIds(caseUserRepository.findCasesUserIdHasAccessTo(userId))
             .stream()
-            .map(databaseId -> String.valueOf(caseDetailsRepository.findCaseDetailsReferenceById(databaseId)))
+            .map(String::valueOf)
             .collect(Collectors.toList());
     }
 
