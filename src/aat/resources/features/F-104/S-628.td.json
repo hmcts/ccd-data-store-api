@@ -1252,7 +1252,8 @@
 								"value": "collection text"
 							}
 						]
-					}
+					},
+				    "supplementary_data" : null
 				}
 			],
 			"total": 1
