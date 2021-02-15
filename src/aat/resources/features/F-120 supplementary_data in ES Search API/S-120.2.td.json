@@ -688,6 +688,10 @@
 										"show_condition": null,
 										"acls": [
 											{
+												"__ordering__": "unordered",
+												"__elementId__": "role"
+											},
+											{
 												"_extends_": "CaseworkerAutotest1PrivateAccessControlList"
 											},
 											{
