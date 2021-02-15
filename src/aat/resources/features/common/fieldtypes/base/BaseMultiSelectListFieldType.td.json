@@ -1,0 +1,7 @@
+{
+  "_guid_": "BaseMultiSelectListFieldType",
+  "_extends_": "CommonFieldType",
+
+  "id": "MultiSelectList-MultiSelectListType",
+  "type": "MultiSelectList"
+}

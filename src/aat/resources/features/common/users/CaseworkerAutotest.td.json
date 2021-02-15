@@ -1,0 +1,6 @@
+{
+  "_guid_": "CaseworkerAutotest",
+
+  "username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
+  "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+}
