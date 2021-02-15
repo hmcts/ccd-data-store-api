@@ -102,7 +102,7 @@ public class CaseAuditEventRepositoryTest extends WireMockBaseTest {
         List<AuditEvent> eventList = classUnderTest.findByCase(caseDetails);
 
         assertAll(
-            () -> assertEquals(eventList.size(), 3),
+            () -> assertEquals(3, eventList.size()),
             () -> assertNull(eventList.get(0).getData()),
             () -> assertNull(eventList.get(0).getDataClassification()),
             () -> assertNull(eventList.get(1).getData()),

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.Data;
 import uk.gov.hmcts.ccd.data.JsonDataConverter;
 import uk.gov.hmcts.ccd.data.SignificantItemEntity;
 
@@ -38,6 +39,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventEntity.FIND_BY_ID_
         FIND_BY_ID_HQL
     )
 })
+@Data
 @Table(name = "case_event")
 @Entity
 public class CaseAuditEventEntity {
@@ -106,152 +108,6 @@ public class CaseAuditEventEntity {
     @Column(name = "data_classification", nullable = false)
     @Convert(converter = JsonDataConverter.class)
     private JsonNode dataClassification;
-
     @OneToOne(mappedBy = "caseEvent", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private SignificantItemEntity significantItemEntity;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getUserLastName() {
-        return userLastName;
-    }
-
-    public void setUserLastName(String userLastName) {
-        this.userLastName = userLastName;
-    }
-
-    public String getUserFirstName() {
-        return userFirstName;
-    }
-
-    public void setUserFirstName(String userFirstName) {
-        this.userFirstName = userFirstName;
-    }
-
-    public Long getCaseDataId() {
-        return caseDataId;
-    }
-
-    public void setCaseDataId(Long caseDataId) {
-        this.caseDataId = caseDataId;
-    }
-
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public String getStateId() {
-        return stateId;
-    }
-
-    public void setStateId(String stateId) {
-        this.stateId = stateId;
-    }
-
-    public String getStateName() {
-        return stateName;
-    }
-
-    public void setStateName(String stateName) {
-        this.stateName = stateName;
-    }
-
-    public String getCaseTypeId() {
-        return caseTypeId;
-    }
-
-    public void setCaseTypeId(String caseTypeId) {
-        this.caseTypeId = caseTypeId;
-    }
-
-    public Integer getCaseTypeVersion() {
-        return caseTypeVersion;
-    }
-
-    public void setCaseTypeVersion(Integer caseTypeVersion) {
-        this.caseTypeVersion = caseTypeVersion;
-    }
-
-    public JsonNode getData() {
-        return data;
-    }
-
-    public void setData(JsonNode data) {
-        this.data = data;
-    }
-
-    public String getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
-    }
-
-    public String getEventName() {
-        return eventName;
-    }
-
-    public void setEventName(String eventName) {
-        this.eventName = eventName;
-    }
-
-    public String getSummary() {
-        return summary;
-    }
-
-    public void setSummary(String shortComment) {
-        this.summary = shortComment;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String longComment) {
-        this.description = longComment;
-    }
-
-    public SecurityClassification getSecurityClassification() {
-        return securityClassification;
-    }
-
-    public void setSecurityClassification(SecurityClassification securityClassification) {
-        this.securityClassification = securityClassification;
-    }
-
-    public JsonNode getDataClassification() {
-        return dataClassification;
-    }
-
-    public void setDataClassification(JsonNode dataClassification) {
-        this.dataClassification = dataClassification;
-    }
-
-    public SignificantItemEntity getSignificantItemEntity() {
-        return significantItemEntity;
-    }
-
-    public void setSignificantItemEntity(SignificantItemEntity significantItemEntity) {
-        this.significantItemEntity = significantItemEntity;
-    }
-
 }
