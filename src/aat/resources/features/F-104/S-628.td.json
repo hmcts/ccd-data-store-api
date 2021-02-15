@@ -151,6 +151,10 @@
 										"show_condition": null,
 										"acls": [
 											{
+												"__ordering__": "UNORDERED",
+												"__elementId__": "role"
+											},
+											{
 												"_extends_": "CaseworkerAutotest1PrivateAccessControlList"
 											},
 											{
@@ -191,6 +195,10 @@
 										"live_until": null,
 										"show_condition": null,
 										"acls": [
+											{
+												"__ordering__": "UNORDERED",
+												"__elementId__": "role"
+											},
 											{
 												"_extends_": "CaseworkerAutotest1PrivateAccessControlList"
 											},
@@ -233,6 +241,10 @@
 										"show_condition": null,
 										"acls": [
 											{
+												"__ordering__": "UNORDERED",
+												"__elementId__": "role"
+											},
+											{
 												"_extends_": "CaseworkerAutotest1PrivateAccessControlList"
 											},
 											{
@@ -273,6 +285,10 @@
 										"live_until": null,
 										"show_condition": null,
 										"acls": [
+											{
+												"__ordering__": "UNORDERED",
+												"__elementId__": "role"
+											},
 											{
 												"_extends_": "CaseworkerAutotest1PrivateAccessControlList"
 											},
@@ -315,6 +331,10 @@
 										"show_condition": null,
 										"acls": [
 											{
+												"__ordering__": "UNORDERED",
+												"__elementId__": "role"
+											},
+											{
 												"_extends_": "CaseworkerAutotest1PrivateAccessControlList"
 											},
 											{
@@ -355,6 +375,10 @@
 										"live_until": null,
 										"show_condition": null,
 										"acls": [
+											{
+												"__ordering__": "UNORDERED",
+												"__elementId__": "role"
+											},
 											{
 												"_extends_": "CaseworkerAutotest1PrivateAccessControlList"
 											},
@@ -489,6 +513,10 @@
 										"show_condition": null,
 										"acls": [
 											{
+												"__ordering__": "UNORDERED",
+												"__elementId__": "role"
+											},
+											{
 												"_extends_": "CaseworkerAutotest1PrivateAccessControlList"
 											},
 											{
@@ -549,6 +577,10 @@
 													"show_condition": null,
 													"acls": [
 														{
+															"__ordering__": "UNORDERED",
+															"__elementId__": "role"
+														},
+														{
 															"_extends_": "CaseworkerAutotest1PrivateAccessControlList"
 														},
 														{
@@ -599,6 +631,10 @@
 													"show_condition": null,
 													"acls": [
 														{
+															"__ordering__": "UNORDERED",
+															"__elementId__": "role"
+														},
+														{
 															"_extends_": "CaseworkerAutotest1PrivateAccessControlList"
 														},
 														{
@@ -624,6 +660,10 @@
 										"live_until": null,
 										"show_condition": null,
 										"acls": [
+											{
+												"__ordering__": "UNORDERED",
+												"__elementId__": "role"
+											},
 											{
 												"_extends_": "CaseworkerAutotest1PrivateAccessControlList"
 											},
