@@ -39,10 +39,6 @@
           "forename": "testfirstname",
           "surname": "testsurname",
           "roles": [
-            {
-              "__operator__": "equivalent",
-              "__ordering__": "unordered"
-            },
             "caseworker-befta_jurisdiction_1",
             "caseworker"
           ],
