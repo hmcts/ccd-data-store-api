@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -62,7 +61,6 @@ import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.YES_OR_NO_FIELD;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.caseTypesParam;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.createPostRequest;
 
-@Ignore
 class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
 
     private static final String POST_SEARCH_CASES = "/searchCases";

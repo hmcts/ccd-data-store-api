@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockitoAnnotations;
@@ -91,7 +90,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPage
 
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 @SuppressWarnings("checkstyle:OperatorWrap")
-@Ignore
 public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
