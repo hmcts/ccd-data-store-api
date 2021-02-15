@@ -4,16 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 
-import java.util.List;
 import java.util.Optional;
 
 @Component
-@ConditionalOnProperty(name = "ccd.access-control", havingValue = "true")
+@ConditionalOnProperty(name = "ccd.new-access-control-enabled", havingValue = "true")
 public class DefaultCaseDataAccessControl implements CaseDataAccessControl, AccessControl {
 
     private final RoleAssignmentService roleAssignmentService;
@@ -33,7 +32,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     // that contains the additional information about the operation result
     @Override
     public Optional<CaseDetails> applyAccessControl(CaseDetails caseDetails) {
-        List<RoleAssignment> roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
+        RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
         CaseDetails cloned = caseService.clone(caseDetails);
 
         // 2.) Filter - Determine which of the role assignments are valid for the case by following the logic described

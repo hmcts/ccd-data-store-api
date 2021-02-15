@@ -5,13 +5,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataAccessControl;
 
 import java.util.Optional;
 
 @Service
 @Qualifier(AccessControlledGetCaseOperation.QUALIFIER)
-public class AccessControlledGetCaseOperation implements GetCaseOperation {
+public class AccessControlledGetCaseOperation implements GetCaseOperation, AccessControl {
     public static final String QUALIFIER = "access-control";
 
     private final GetCaseOperation getCaseOperation;

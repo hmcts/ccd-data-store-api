@@ -1,12 +1,13 @@
-package uk.gov.hmcts.ccd.domain.model.definition;
+package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol;
 
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
 @Builder
+@Data
 public class RoleAssignment {
     private String id;
     private String actorIdType; // currently IDAM
@@ -17,9 +18,9 @@ public class RoleAssignment {
     private String grantType; // BASIC, STANDARD, SPECIFIC, CHALLENGED, EXCLUDED
     private String roleCategory; // JUDICIAL, STAFF
     private Boolean readOnly;
-    private String beginTime; //  "YYYY-MM-DDTHH:MI:SSZ"
-    private String endTime; //  "YYYY-MM-DDTHH:MI:SSZ"
-    private String created; //  "YYYY-MM-DDTHH:MI:SSZ"
+    private LocalDateTime beginTime;
+    private LocalDateTime endTime;
+    private LocalDateTime created;
     private List<String> authorisations;
-    private List<RoleAssignmentAttribute> attributes;
+    private RoleAssignmentAttributes attributes;
 }

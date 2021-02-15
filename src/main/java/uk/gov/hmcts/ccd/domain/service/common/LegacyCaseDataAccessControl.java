@@ -19,7 +19,7 @@ import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
  */
 @Deprecated
 @Component
-@ConditionalOnProperty(name = "ccd.access-control", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(name = "ccd.new-access-control-enabled", havingValue = "false", matchIfMissing = true)
 public class LegacyCaseDataAccessControl implements CaseDataAccessControl, AccessControl {
     private final UserAuthorisation userAuthorisation;
     private final CaseUserRepository caseUserRepository;

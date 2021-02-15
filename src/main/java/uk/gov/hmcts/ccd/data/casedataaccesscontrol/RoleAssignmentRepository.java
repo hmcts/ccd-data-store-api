@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.data.roleassignment;
+package uk.gov.hmcts.ccd.data.casedataaccesscontrol;
 
 public interface RoleAssignmentRepository {
 

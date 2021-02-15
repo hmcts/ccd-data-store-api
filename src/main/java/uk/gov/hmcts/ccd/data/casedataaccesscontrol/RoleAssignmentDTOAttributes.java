@@ -1,11 +1,11 @@
-package uk.gov.hmcts.ccd.data.roleassignment;
+package uk.gov.hmcts.ccd.data.casedataaccesscontrol;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Builder
 @Data
-public class RoleAssignmentRecordAttribute {
+public class RoleAssignmentDTOAttributes {
     String jurisdiction;
     String caseId;
     String region;
