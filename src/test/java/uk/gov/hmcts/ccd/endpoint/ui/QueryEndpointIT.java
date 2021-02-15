@@ -72,6 +72,7 @@ import static uk.gov.hmcts.ccd.v2.DCPTestHelper.DATE_TIME_FIELD;
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.arrayOf;
 import static uk.gov.hmcts.ccd.v2.DCPTestHelper.mapOf;
 
+@Ignore
 public class QueryEndpointIT extends WireMockBaseTest {
     private static final String GET_CASES = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/"
         + "TestAddressBookCase/cases";

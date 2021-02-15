@@ -57,8 +57,9 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
+    @Cacheable(value = "caseDetailsByReferenceCache", key = "#reference")
     public Optional<CaseDetails> findByReference(String jurisdiction, Long reference) {
-        return findByReference(jurisdiction, reference.toString());
+        return caseDetailsRepository.findByReference(jurisdiction, reference);
     }
 
     @Override

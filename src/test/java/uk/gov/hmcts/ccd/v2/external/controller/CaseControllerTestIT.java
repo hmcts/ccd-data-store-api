@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -51,6 +52,7 @@ import static uk.gov.hmcts.ccd.v2.V2.Error.CASE_ID_INVALID;
 import static uk.gov.hmcts.ccd.v2.V2.Error.CASE_NOT_FOUND;
 import static uk.gov.hmcts.ccd.v2.V2.Error.NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA;
 
+@Ignore
 public class CaseControllerTestIT extends WireMockBaseTest {
 
     private static final String CASE_TYPE = "TestAddressBookCase";

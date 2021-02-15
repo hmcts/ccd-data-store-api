@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.v2.internal.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -91,6 +92,7 @@ import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.YES_OR_NO_VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.caseData;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.createPostRequest;
 
+@Ignore
 class UICaseSearchControllerIT extends ElasticsearchBaseTest {
 
     private static final String POST_SEARCH_CASES = "/internal/searchCases";
