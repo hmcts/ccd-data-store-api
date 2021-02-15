@@ -126,6 +126,7 @@
 										"complexACLs": [],
 										"display_context": null,
 										"display_context_parameter": null,
+										"retain_hidden_value": null,
 										"formatted_value": null
 									},
 									{
@@ -171,6 +172,7 @@
 										"complexACLs": [],
 										"display_context": null,
 										"display_context_parameter": null,
+										"retain_hidden_value": null,
 										"formatted_value": null
 									},
 									{
@@ -216,6 +218,7 @@
 										"complexACLs": [],
 										"display_context": null,
 										"display_context_parameter": null,
+										"retain_hidden_value": null,
 										"formatted_value": null
 									},
 									{
@@ -261,6 +264,7 @@
 										"complexACLs": [],
 										"display_context": null,
 										"display_context_parameter": null,
+										"retain_hidden_value": null,
 										"formatted_value": null
 									},
 									{
@@ -306,6 +310,7 @@
 										"complexACLs": [],
 										"display_context": null,
 										"display_context_parameter": null,
+										"retain_hidden_value": null,
 										"formatted_value": null
 									},
 									{
@@ -351,6 +356,7 @@
 										"complexACLs": [],
 										"display_context": null,
 										"display_context_parameter": null,
+										"retain_hidden_value": null,
 										"formatted_value": null
 									},
 									{
@@ -377,6 +383,10 @@
 										"show_condition": null,
 										"acls": [
 											{
+												"__ordering__": "UNORDERED",
+												"__elementId__": "role"
+											},
+											{
 												"_extends_": "CaseworkerAutotest1PrivateAccessControlList"
 											},
 											{
@@ -392,6 +402,7 @@
 										"complexACLs": [],
 										"display_context": null,
 										"display_context_parameter": null,
+										"retain_hidden_value": null,
 										"formatted_value": null
 									}
 								],
@@ -458,6 +469,7 @@
 										"complexACLs": [],
 										"display_context": null,
 										"display_context_parameter": null,
+										"retain_hidden_value": null,
 										"formatted_value": null
 									},
 									{
@@ -524,6 +536,7 @@
 										"complexACLs": [],
 										"display_context": null,
 										"display_context_parameter": null,
+										"retain_hidden_value": null,
 										"formatted_value": null
 									},
 									{
@@ -588,6 +601,7 @@
 													"complexACLs": [],
 													"display_context": null,
 													"display_context_parameter": null,
+													"retain_hidden_value": null,
 													"formatted_value": null
 												},
 												{
@@ -642,6 +656,7 @@
 													"complexACLs": [],
 													"display_context": null,
 													"display_context_parameter": null,
+													"retain_hidden_value": null,
 													"formatted_value": null
 												}
 											],
@@ -672,6 +687,7 @@
 										"complexACLs": [],
 										"display_context": null,
 										"display_context_parameter": null,
+										"retain_hidden_value": null,
 										"formatted_value": null
 									}
 								],
