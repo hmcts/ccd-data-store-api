@@ -102,9 +102,6 @@
 										},
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-										},
-										{
-                      "_extends_": "CaseworkerCaaAccessControlList"
 										}
 									]
 								},
@@ -172,10 +169,7 @@
 										},
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-										},
-										{
-                      "_extends_": "CaseworkerCaaAccessControlList"
-                    }
+										}
 									]
 								},
 								{
@@ -207,10 +201,7 @@
 										},
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-										},
-										{
-                      "_extends_": "CaseworkerCaaAccessControlList"
-                    }
+										}
 									]
 								},
 								{
@@ -242,10 +233,7 @@
 										},
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-										},
-										{
-                      "_extends_": "CaseworkerCaaAccessControlList"
-                    }
+										}
 									]
 								},
 								{
@@ -275,10 +263,7 @@
 										},
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-										},
-										{
-                      "_extends_": "CaseworkerCaaAccessControlList"
-                    }
+										}
 									]
 								}
 							],
