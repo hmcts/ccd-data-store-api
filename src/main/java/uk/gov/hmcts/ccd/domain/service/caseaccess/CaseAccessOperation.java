@@ -74,7 +74,7 @@ public class CaseAccessOperation {
 
     public List<String> findCasesUserIdHasAccessTo(final String userId) {
         List<Long> usersCases = caseUserRepository.findCasesUserIdHasAccessTo(userId);
-        if (usersCases.size() == 0) {
+        if (usersCases.isEmpty()) {
             return List.of();
         } else {
             return caseDetailsRepository
