@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
 import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
 import org.junit.AssumptionViolatedException;
 import uk.gov.hmcts.befta.BeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultBeftaTestDataLoader;
@@ -10,12 +11,12 @@ import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Optional.ofNullable;
 
@@ -30,6 +31,22 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         if (!ofNullable(System.getenv("ELASTIC_SEARCH_FTA_ENABLED")).map(Boolean::valueOf).orElse(false)) {
             throw new AssumptionViolatedException("Elastic Search not Enabled");
         }
+    }
+
+    @Before
+    public void createUID(Scenario scenario) {
+        String tag = getDataFileTag(scenario);
+        String uid = tag + UUID.randomUUID().toString();
+        uniqueStringsPerTestData.put(tag,uid);
+    }
+
+    private synchronized String getDataFileTag(Scenario scenario) {
+        return scenario.getSourceTagNames().stream()
+            .filter(t -> t.startsWith("@S-"))
+            .findFirst()
+            .map(t -> t.substring(1))
+            .map(Object::toString)
+            .orElse("error cant find tag");
     }
 
     @Override
@@ -77,9 +94,15 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                                                                         previousValueContextPath,
                                                                         incrementBy);
         } else if (key.toString().equals("UniqueString")) {
-            return uniqueStringsPerTestData
-                    .computeIfAbsent(scenarioContext.getContextId(), k ->
-                    UUID.randomUUID().toString());
+
+            String scenarioTag;
+            try {
+                scenarioTag = scenarioContext.getParentContext().getCurrentScenarioTag();
+            } catch (NullPointerException e) {
+                scenarioTag = scenarioContext.getCurrentScenarioTag();
+            }
+            return uniqueStringsPerTestData.get(scenarioTag);
+
         } else if (key.toString().startsWith("approximately ")) {
             try {
                 String actualSizeFromHeaderStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
@@ -113,7 +136,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         return super.calculateCustomValue(scenarioContext, key);
     }
 
-    private boolean elasticSearchEnabled() {
+    private boolean elasticSearchFunctionalTestsEnabled() {
         return ofNullable(System.getenv("ELASTIC_SEARCH_ENABLED")).map(Boolean::valueOf).orElse(false);
     }
 
