@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.data.roleassignment;
+package uk.gov.hmcts.ccd.data.casedataaccesscontrol;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,15 +6,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -28,7 +25,8 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
     private static final Logger LOG = LoggerFactory.getLogger(DefaultRoleAssignmentRepository.class);
 
     public static final String QUALIFIER = "default";
-    public static final String AM_ERROR = "Problem getting Role Assignments from AccessManagement store because of %s";
+    public static final String ROLE_ASSIGNMENT_SERVICE_ERROR =
+        "Problem getting Role Assignments from AccessManagement store because of %s";
 
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
@@ -59,9 +57,9 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
             LOG.warn("Error while retrieving Role Assignments", e);
             if (e instanceof HttpClientErrorException
                 && ((HttpClientErrorException) e).getRawStatusCode() == HttpStatus.NOT_FOUND.value()) {
-                throw new ResourceNotFoundException(String.format(AM_ERROR, e.getMessage()));
+                throw new ResourceNotFoundException(String.format(ROLE_ASSIGNMENT_SERVICE_ERROR, e.getMessage()));
             } else {
-                throw new ServiceException(String.format(AM_ERROR, e.getMessage()));
+                throw new ServiceException(String.format(ROLE_ASSIGNMENT_SERVICE_ERROR, e.getMessage()));
             }
         }
     }

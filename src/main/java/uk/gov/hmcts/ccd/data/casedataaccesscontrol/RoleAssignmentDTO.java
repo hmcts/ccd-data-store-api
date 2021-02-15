@@ -1,13 +1,14 @@
-package uk.gov.hmcts.ccd.data.roleassignment;
+package uk.gov.hmcts.ccd.data.casedataaccesscontrol;
 
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
 @Data
-public class RoleAssignmentRecord {
+public class RoleAssignmentDTO {
     private String id;
     private String actorIdType;
     private String actorId;
@@ -17,9 +18,9 @@ public class RoleAssignmentRecord {
     private String grantType;
     private String roleCategory;
     private Boolean readOnly;
-    private String beginTime;
-    private String endTime;
-    private String created;
+    private LocalDateTime beginTime;
+    private LocalDateTime endTime;
+    private LocalDateTime created;
     private List<String> authorisations;
-    private List<RoleAssignmentRecordAttribute> attributes;
+    private RoleAssignmentDTOAttributes attributes;
 }

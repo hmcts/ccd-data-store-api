@@ -1,11 +1,11 @@
-package uk.gov.hmcts.ccd.domain.model.definition;
+package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Builder
 @Data
-public class RoleAssignmentAttribute {
+public class RoleAssignmentAttributes {
     private String jurisdiction;
     private String caseId;
     private String region;

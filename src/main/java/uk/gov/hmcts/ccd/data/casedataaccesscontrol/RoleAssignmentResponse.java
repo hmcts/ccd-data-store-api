@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.data.roleassignment;
+package uk.gov.hmcts.ccd.data.casedataaccesscontrol;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -10,5 +10,5 @@ import java.util.List;
 @Data
 public class RoleAssignmentResponse {
     @JsonProperty("roleAssignmentResponse")
-    private List<RoleAssignmentRecord> roleAssignmentRecords;
+    private List<RoleAssignmentDTO> roleAssignments;
 }
