@@ -99,7 +99,12 @@
                   "live_from" : null,
                   "live_until" : null,
                   "show_condition" : null,
-                  "acls" : [ {
+                  "acls" : [
+        {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "role"
+        },
+                  {
                     "_extends_": "CaseworkerAutotest1PrivateAccessControlList"
                   }, {
                     "_extends_": "CaseworkerAutotest1SeniorAccessControlList"
@@ -365,7 +370,13 @@
                   "live_from" : null,
                   "live_until" : null,
                   "show_condition" : null,
-                  "acls" : [ {
+                  "acls" : [ 
+        {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "role"
+        },
+                 
+                 {
                     "_extends_": "CaseworkerAutotest1PrivateAccessControlList"
                   }, {
                     "_extends_": "CaseworkerAutotest1SeniorAccessControlList"

@@ -101,6 +101,10 @@
           "label": "Retain Hidden Value Page",
           "order": 1,
           "wizard_page_fields": [
+        {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "case_field_id"
+        },
             {
               "case_field_id": "TextField",
               "order": 2,
