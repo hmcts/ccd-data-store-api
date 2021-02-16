@@ -1,145 +1,153 @@
 {
-  "_guid_": "S-123.1",
-  "_extends_": "F-123_Test_Data_Base",
-  "title": "Must return status 200 along with successfully display the imported definition file containing a top level fields with the correct value for retainHiddenValue\n",
-  "specs": [
-    "an active profile in CCD",
-    "has the 200 return code"
-  ],
-  "request": {
-    "pathVariables": {
-      "ctid": "FT_RetainHiddenValue",
-      "etid": "CREATE1"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_200_Response",
-    "headers": {
-      "Content-Encoding": "gzip",
-      "Content-Type": "application/json",
-      "Connection": "[[ANYTHING_PRESENT]]",
-      "Keep-Alive": "[[ANYTHING_PRESENT]]",
-      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
-      "Strict-Transport-Security": "[[ANYTHING_NULLABLE]]"
-    },
-    "body": {
-      "id": "CREATE1",
-      "name": "Create case 1",
-      "description": "Create case 1",
-      "case_id": null,
-      "case_fields": [
-        {
-          "_extends_": "CaseViewFieldMetadataFalse",
-          "id": "DateField",
-          "label": "Date Field",
-          "value": null,
-          "field_type": {
-            "_extends_": "BaseDateFieldType"
-          },
-          "formatted_value": null,
-          "show_condition": "NumberField!=\"0\"",
-          "acls": [
-            {
-              "_extends_": "CaseworkerBeftaMasterAccessControlList"
-            }
-          ]
-        },
-        {
-          "_extends_": "CaseViewFieldMetadataFalse",
-          "id": "TextAreaField",
-          "label": "Text Area",
-          "value": null,
-          "field_type": {
-            "_extends_": "BaseTextAreaFieldType"
-          },
-          "formatted_value": null,
-          "show_condition": "NumberField!=\"0\"",
-          "retain_hidden_value": false,
-          "acls": [
-            {
-              "_extends_": "CaseworkerBeftaMasterAccessControlList"
-            }
-          ]
-        },
-        {
-          "_extends_": "CaseViewFieldMetadataFalse",
-          "id": "TextField",
-          "label": "Text Field",
-          "value": null,
-          "field_type": {
-            "_extends_": "BaseTextFieldType"
-          },
-          "formatted_value": null,
-          "show_condition": "NumberField!=\"0\"",
-          "retain_hidden_value": true,
-          "acls": [
-            {
-              "_extends_": "CaseworkerBeftaMasterAccessControlList"
-            }
-          ]
-        },
-        {
-          "_extends_": "CaseViewFieldMetadataFalse",
-          "id": "NumberField",
-          "label": "Number Field",
-          "value": null,
-          "field_type": {
-            "_extends_": "BaseNumberFieldType"
-          },
-          "formatted_value": null,
-          "acls": [
-            {
-              "_extends_": "CaseworkerBeftaMasterAccessControlList"
-            }
-          ]
-        }
-      ],
-      "event_token": "[[ANYTHING_PRESENT]]",
-      "wizard_pages": [
-        {
-          "id": "CREATE1SingleFormPage",
-          "label": "Retain Hidden Value Page",
-          "order": 1,
-          "wizard_page_fields": [
-            {
-              "case_field_id": "TextField",
-              "order": 2,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            },
-            {
-              "case_field_id": "TextAreaField",
-              "order": 3,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            },
-            {
-              "case_field_id": "DateField",
-              "order": 4,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            },
-            {
-              "case_field_id": "NumberField",
-              "order": 1,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            }
-          ],
-          "show_condition": null,
-          "callback_url_mid_event": null,
-          "retries_timeout_mid_event": []
-        }
-      ],
-      "show_summary": true,
-      "show_event_notes": null,
-      "end_button_label": null,
-      "can_save_draft": null,
-      "_links": {
-        "self": {
-          "href": "[[ANYTHING_PRESENT]]"
-        }
-      }
-    }
-  }
+	"_guid_": "S-123.1",
+	"_extends_": "F-123_Test_Data_Base",
+
+	"title": "Must return status 200 along with successfully display the imported definition file containing a top level fields with the correct value for retainHiddenValue\n",
+
+	"specs": [
+		"an active profile in CCD",
+		"has the 200 return code"
+	],
+
+	"request": {
+		"pathVariables": {
+			"ctid": "FT_RetainHiddenValue",
+			"etid": "CREATE1"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Type": "application/json",
+			"Connection": "[[ANYTHING_PRESENT]]",
+			"Keep-Alive": "[[ANYTHING_PRESENT]]",
+			"Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+			"Strict-Transport-Security": "[[ANYTHING_NULLABLE]]"
+		},
+		"body": {
+			"id": "CREATE1",
+			"name": "Create case 1",
+			"description": "Create case 1",
+			"case_id": null,
+			"case_fields": [
+				{
+					"_extends_": "CaseViewFieldMetadataFalse",
+					"id": "DateField",
+					"label": "Date Field",
+					"value": null,
+					"field_type": {
+						"_extends_": "BaseDateFieldType"
+					},
+					"formatted_value": null,
+					"show_condition": "NumberField!=\"0\"",
+					"acls": [
+						{
+							"_extends_": "CaseworkerBeftaMasterAccessControlList"
+						}
+					]
+				},
+				{
+					"_extends_": "CaseViewFieldMetadataFalse",
+					"id": "TextAreaField",
+					"label": "Text Area",
+					"value": null,
+					"field_type": {
+						"_extends_": "BaseTextAreaFieldType"
+					},
+					"formatted_value": null,
+					"show_condition": "NumberField!=\"0\"",
+					"retain_hidden_value": false,
+					"acls": [
+						{
+							"_extends_": "CaseworkerBeftaMasterAccessControlList"
+						}
+					]
+				},
+				{
+					"_extends_": "CaseViewFieldMetadataFalse",
+					"id": "TextField",
+					"label": "Text Field",
+					"value": null,
+					"field_type": {
+						"_extends_": "BaseTextFieldType"
+					},
+					"formatted_value": null,
+					"show_condition": "NumberField!=\"0\"",
+					"retain_hidden_value": true,
+					"acls": [
+						{
+							"_extends_": "CaseworkerBeftaMasterAccessControlList"
+						}
+					]
+				},
+				{
+					"_extends_": "CaseViewFieldMetadataFalse",
+					"id": "NumberField",
+					"label": "Number Field",
+					"value": null,
+					"field_type": {
+						"_extends_": "BaseNumberFieldType"
+					},
+					"formatted_value": null,
+					"acls": [
+						{
+							"_extends_": "CaseworkerBeftaMasterAccessControlList"
+						}
+					]
+				}
+			],
+			"event_token": "[[ANYTHING_PRESENT]]",
+			"wizard_pages": [
+				{
+					"id": "CREATE1SingleFormPage",
+					"label": "Retain Hidden Value Page",
+					"order": 1,
+					"wizard_page_fields": [
+						{
+							"__ordering__": "UNORDERED",
+							"__elementId__": "case_field_id"
+						},
+						{
+							"case_field_id": "TextField",
+							"order": 2,
+							"page_column_no": null,
+							"complex_field_overrides": []
+						},
+						{
+							"case_field_id": "TextAreaField",
+							"order": 3,
+							"page_column_no": null,
+							"complex_field_overrides": []
+						},
+						{
+							"case_field_id": "DateField",
+							"order": 4,
+							"page_column_no": null,
+							"complex_field_overrides": []
+						},
+						{
+							"case_field_id": "NumberField",
+							"order": 1,
+							"page_column_no": null,
+							"complex_field_overrides": []
+						}
+					],
+					"show_condition": null,
+					"callback_url_mid_event": null,
+					"retries_timeout_mid_event": []
+				}
+			],
+			"show_summary": true,
+			"show_event_notes": null,
+			"end_button_label": null,
+			"can_save_draft": null,
+			"_links": {
+				"self": {
+					"href": "[[ANYTHING_PRESENT]]"
+				}
+			}
+		}
+	}
 }

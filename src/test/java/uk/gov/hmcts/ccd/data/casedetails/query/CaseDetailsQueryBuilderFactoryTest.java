@@ -60,6 +60,7 @@ class CaseDetailsQueryBuilderFactoryTest {
         when(criteriaBuilder.createQuery(CaseDetailsEntity.class)).thenReturn(query);
         when(criteriaBuilder.createQuery(Long.class)).thenReturn(countQuery);
         when(query.from(CaseDetailsEntity.class)).thenReturn(root);
+        when(countQuery.from(CaseDetailsEntity.class)).thenReturn(root);
     }
 
     private void assertAllA(CaseDetailsQueryBuilder<CaseDetailsEntity> queryBuilder) {
@@ -184,4 +185,35 @@ class CaseDetailsQueryBuilderFactoryTest {
         }
     }
 
+    @Nested
+    @DisplayName("selectByReferenceSecured()")
+    class SelectByReferenceSecured {
+        @Test
+        @DisplayName("should selectByReferenceSecured query")
+        void shouldSecureSelectByReferenceQuery() {
+            CaseDetailsQueryBuilder<Long> queryBuilder = factory.selectByReferenceSecured(em);
+            assertAll(
+                () -> assertThat(queryBuilder, is(notNullValue())),
+                () -> verify(userAuthorisationSecurity).secure(queryBuilder, null),
+                () -> verify(caseStateAuthorisationSecurity).secure(queryBuilder, null)
+            );
+        }
+
+        @Test
+        @DisplayName("should add order by clause to select by reference query")
+        void shouldAddOrderByClauseToSelectByReferenceQuery() {
+            String sortDirection = "desc";
+            MetaData metaData = new MetaData("caseType", "jurisdiction");
+            metaData.setSortDirection(Optional.of(sortDirection));
+
+            CaseDetailsQueryBuilder<Long> queryBuilder = factory.selectByReferenceSecured(em);
+            queryBuilder.orderBy(metaData);
+
+            assertAll(
+                () -> assertThat(queryBuilder, is(notNullValue())),
+                () -> verify(root).get("createdDate"),
+                () -> verify(criteriaBuilder).desc(any())
+            );
+        }
+    }
 }
