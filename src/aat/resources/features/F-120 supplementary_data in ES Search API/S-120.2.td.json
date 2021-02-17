@@ -86,7 +86,10 @@
                 "max" : null,
                 "regular_expression" : null,
                 "fixed_list_items" : [ ],
-                "complex_fields" : [ {
+                "complex_fields" : [
+                  {
+                    "__ordering__": "unordered"
+                  },{
                   "id" : "AddressLine1",
                   "label" : "Building and Street",
                   "hidden" : null,
@@ -355,7 +358,10 @@
                 "max" : null,
                 "regular_expression" : null,
                 "fixed_list_items" : [ ],
-                "complex_fields" : [ {
+                "complex_fields" : [
+                  {
+                    "__ordering__": "unordered"
+                  },{
                   "id" : "ComplexTextField",
                   "label" : "A `Text` field inside a complex",
                   "hidden" : false,
@@ -405,7 +411,11 @@
                     "min" : null,
                     "max" : null,
                     "regular_expression" : null,
-                    "fixed_list_items" : [ {
+                    "fixed_list_items" : [
+                      {
+                        "__ordering__": "unordered",
+                        "__elementId__": "code"
+                      },{
                       "code" : "VALUE4",
                       "label" : "Value 4",
                       "order" : null
@@ -458,7 +468,10 @@
                     "max" : null,
                     "regular_expression" : null,
                     "fixed_list_items" : [ ],
-                    "complex_fields" : [ {
+                    "complex_fields" : [
+                      {
+                        "__ordering__": "unordered"
+                      },{
                       "id" : "NestedNumberField",
                       "label" : "A `Number` field inside a nested complex",
                       "hidden" : false,
