@@ -52,6 +52,7 @@ public abstract class WireMockBaseTest extends BaseTest {
         ReflectionTestUtils.setField(applicationParams, "uiDefinitionHost", hostUrl);
         ReflectionTestUtils.setField(applicationParams, "userProfileHost", hostUrl);
         ReflectionTestUtils.setField(applicationParams, "draftHost", hostUrl);
+        ReflectionTestUtils.setField(applicationParams, "roleAssignmentServiceHost", hostUrl);
     }
 
     public void stubFor(MappingBuilder mappingBuilder) {
