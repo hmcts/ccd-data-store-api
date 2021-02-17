@@ -101,7 +101,8 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
         stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).willReturn(badRequest()));
 
         final BadRequestException exception = assertThrows(BadRequestException.class,
-                                                           () -> roleAssignmentRepository.getRoleAssignments(ACTOR_ID));
+            () -> roleAssignmentRepository.getRoleAssignments(ACTOR_ID));
+
         assertThat(exception.getMessage(),
                    startsWith("Client error when getting Role Assignments from Role Assignment Service because of "));
     }
@@ -112,7 +113,8 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
         stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).willReturn(serverError()));
 
         final ServiceException exception = assertThrows(ServiceException.class,
-                                                        () -> roleAssignmentRepository.getRoleAssignments(ACTOR_ID));
+            () -> roleAssignmentRepository.getRoleAssignments(ACTOR_ID));
+
         assertThat(exception.getMessage(),
                    startsWith("Problem getting Role Assignments from Role Assignment Service because of "));
     }
