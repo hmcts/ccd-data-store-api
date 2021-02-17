@@ -228,6 +228,46 @@ class CaseAccessOperationTest {
         }
     }
 
+    @Nested
+    @DisplayName("findCasesUserIdHasAccessTo(userId)")
+    class FindCasesUserIdHasAccessTo {
+
+        private final List<Long> ids = Collections.singletonList(1L);
+
+        @Test
+        @DisplayName("should return cases that the user has access to")
+        void shouldReturnCasesUserHasAccessTo() {
+
+            when(caseUserRepository.findCasesUserIdHasAccessTo(USER_ID))
+                .thenReturn(ids);
+            when(caseDetailsRepository.findCaseReferencesByIds(ids))
+                .thenReturn(ids);
+
+            List<String> usersCases = caseAccessOperation.findCasesUserIdHasAccessTo(USER_ID);
+
+            assertAll(
+                () -> assertEquals(1, usersCases.size()),
+                () -> assertEquals(String.valueOf(1L), usersCases.get(0)),
+                () -> verify(caseDetailsRepository, times(1)).findCaseReferencesByIds(ids)
+            );
+        }
+
+        @Test
+        @DisplayName("should return zero cases if the user has no access to any cases")
+        void shouldReturnEmptyListIfUserHasAccessToNoCases() {
+            when(caseUserRepository.findCasesUserIdHasAccessTo(USER_ID))
+                .thenReturn(new ArrayList<>());
+
+            List<String> usersCases = caseAccessOperation.findCasesUserIdHasAccessTo(USER_ID);
+
+            assertAll(
+                () -> assertEquals(0, usersCases.size()),
+                () -> verify(caseDetailsRepository, times(0)).findCaseReferencesByIds(ids)
+            );
+        }
+
+    }
+
     @Nested()
     @DisplayName("addCaseUserRoles(caseUserRoles)")
     class AddCaseAssignUserRoles {
