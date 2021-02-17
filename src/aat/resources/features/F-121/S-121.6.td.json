@@ -1,7 +1,6 @@
 {
 	"_guid_": "S-121.6",
 	"_extends_": "F-121_Test_Data_Base",
-
 	"title": "must validate date in a right format",
 
 	"specs": [
@@ -10,16 +9,16 @@
 	],
 
 	"request": {
-		"pathVariables": {
-			"ctid": "FT_ComplexFieldsOrdering",
-			"etid": "CREATE6"
-		}
-	},
+    "pathVariables": {
+      "ctid": "FT_ComplexFieldsOrdering",
+      "etid": "CREATE6"
+    }
+  },
 
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"headers": {
-			"Content-Encoding": "gzip",
+      "Content-Encoding": "gzip",
 			"Content-Type": "application/json",
 			"Connection": "[[ANYTHING_PRESENT]]",
 			"Keep-Alive": "[[ANYTHING_PRESENT]]",
@@ -32,6 +31,9 @@
 			"description": "[[ANYTHING_PRESENT]]",
 			"case_id": null,
 			"case_fields": [
+				{
+					"__ordering__": "UNORDERED"
+				},
 				{
 					"id": "RespondentDetails",
 					"label": "Respondent details",
@@ -47,6 +49,9 @@
 						"regular_expression": null,
 						"fixed_list_items": [],
 						"complex_fields": [
+							{
+								"__ordering__": "UNORDERED"
+							},
 							{
 								"id": "RespName",
 								"label": "Respondent name",
@@ -71,11 +76,7 @@
 								"show_condition": null,
 								"acls": [
 									{
-										"role": "caseworker-befta_master",
-										"create": true,
-										"read": true,
-										"update": true,
-										"delete": true
+										"_extends_": "CaseworkerBeftaMasterAccessControlList"
 									}
 								],
 								"complexACLs": [],
@@ -101,6 +102,9 @@
 									"fixed_list_items": [],
 									"complex_fields": [
 										{
+											"__ordering__": "UNORDERED"
+										},
+										{
 											"id": "AddressLine1",
 											"label": "Building and Street",
 											"hidden": null,
@@ -124,11 +128,7 @@
 											"show_condition": null,
 											"acls": [
 												{
-													"role": "caseworker-befta_master",
-													"create": true,
-													"read": true,
-													"update": true,
-													"delete": true
+													"_extends_": "CaseworkerBeftaMasterAccessControlList"
 												}
 											],
 											"complexACLs": [],
@@ -161,11 +161,7 @@
 											"show_condition": null,
 											"acls": [
 												{
-													"role": "caseworker-befta_master",
-													"create": true,
-													"read": true,
-													"update": true,
-													"delete": true
+													"_extends_": "CaseworkerBeftaMasterAccessControlList"
 												}
 											],
 											"complexACLs": [],
@@ -198,11 +194,7 @@
 											"show_condition": null,
 											"acls": [
 												{
-													"role": "caseworker-befta_master",
-													"create": true,
-													"read": true,
-													"update": true,
-													"delete": true
+													"_extends_": "CaseworkerBeftaMasterAccessControlList"
 												}
 											],
 											"complexACLs": [],
@@ -235,11 +227,7 @@
 											"show_condition": null,
 											"acls": [
 												{
-													"role": "caseworker-befta_master",
-													"create": true,
-													"read": true,
-													"update": true,
-													"delete": true
+													"_extends_": "CaseworkerBeftaMasterAccessControlList"
 												}
 											],
 											"complexACLs": [],
@@ -272,11 +260,7 @@
 											"show_condition": null,
 											"acls": [
 												{
-													"role": "caseworker-befta_master",
-													"create": true,
-													"read": true,
-													"update": true,
-													"delete": true
+													"_extends_": "CaseworkerBeftaMasterAccessControlList"
 												}
 											],
 											"complexACLs": [],
@@ -309,11 +293,7 @@
 											"show_condition": null,
 											"acls": [
 												{
-													"role": "caseworker-befta_master",
-													"create": true,
-													"read": true,
-													"update": true,
-													"delete": true
+													"_extends_": "CaseworkerBeftaMasterAccessControlList"
 												}
 											],
 											"complexACLs": [],
@@ -346,11 +326,7 @@
 											"show_condition": null,
 											"acls": [
 												{
-													"role": "caseworker-befta_master",
-													"create": true,
-													"read": true,
-													"update": true,
-													"delete": true
+													"_extends_": "CaseworkerBeftaMasterAccessControlList"
 												}
 											],
 											"complexACLs": [],
@@ -368,11 +344,7 @@
 								"show_condition": null,
 								"acls": [
 									{
-										"role": "caseworker-befta_master",
-										"create": true,
-										"read": true,
-										"update": true,
-										"delete": true
+										"_extends_": "CaseworkerBeftaMasterAccessControlList"
 									}
 								],
 								"complexACLs": [],
@@ -398,6 +370,9 @@
 									"fixed_list_items": [],
 									"complex_fields": [
 										{
+											"__ordering__": "UNORDERED"
+										},
+										{
 											"id": "AddressLine1",
 											"label": "Building and Street",
 											"hidden": null,
@@ -421,11 +396,7 @@
 											"show_condition": null,
 											"acls": [
 												{
-													"role": "caseworker-befta_master",
-													"create": true,
-													"read": true,
-													"update": true,
-													"delete": true
+													"_extends_": "CaseworkerBeftaMasterAccessControlList"
 												}
 											],
 											"complexACLs": [],
@@ -458,11 +429,7 @@
 											"show_condition": null,
 											"acls": [
 												{
-													"role": "caseworker-befta_master",
-													"create": true,
-													"read": true,
-													"update": true,
-													"delete": true
+													"_extends_": "CaseworkerBeftaMasterAccessControlList"
 												}
 											],
 											"complexACLs": [],
@@ -495,11 +462,7 @@
 											"show_condition": null,
 											"acls": [
 												{
-													"role": "caseworker-befta_master",
-													"create": true,
-													"read": true,
-													"update": true,
-													"delete": true
+													"_extends_": "CaseworkerBeftaMasterAccessControlList"
 												}
 											],
 											"complexACLs": [],
@@ -532,11 +495,7 @@
 											"show_condition": null,
 											"acls": [
 												{
-													"role": "caseworker-befta_master",
-													"create": true,
-													"read": true,
-													"update": true,
-													"delete": true
+													"_extends_": "CaseworkerBeftaMasterAccessControlList"
 												}
 											],
 											"complexACLs": [],
@@ -569,11 +528,7 @@
 											"show_condition": null,
 											"acls": [
 												{
-													"role": "caseworker-befta_master",
-													"create": true,
-													"read": true,
-													"update": true,
-													"delete": true
+													"_extends_": "CaseworkerBeftaMasterAccessControlList"
 												}
 											],
 											"complexACLs": [],
@@ -606,11 +561,7 @@
 											"show_condition": null,
 											"acls": [
 												{
-													"role": "caseworker-befta_master",
-													"create": true,
-													"read": true,
-													"update": true,
-													"delete": true
+													"_extends_": "CaseworkerBeftaMasterAccessControlList"
 												}
 											],
 											"complexACLs": [],
@@ -643,11 +594,7 @@
 											"show_condition": null,
 											"acls": [
 												{
-													"role": "caseworker-befta_master",
-													"create": true,
-													"read": true,
-													"update": true,
-													"delete": true
+													"_extends_": "CaseworkerBeftaMasterAccessControlList"
 												}
 											],
 											"complexACLs": [],
@@ -665,11 +612,7 @@
 								"show_condition": null,
 								"acls": [
 									{
-										"role": "caseworker-befta_master",
-										"create": true,
-										"read": true,
-										"update": true,
-										"delete": true
+										"_extends_": "CaseworkerBeftaMasterAccessControlList"
 									}
 								],
 								"complexACLs": [],
@@ -695,11 +638,7 @@
           "publish_as" : null,
 					"acls": [
 						{
-							"role": "caseworker-befta_master",
-							"create": true,
-							"read": true,
-							"update": true,
-							"delete": true
+							"_extends_": "CaseworkerBeftaMasterAccessControlList"
 						}
 					]
 				}
