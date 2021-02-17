@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.stubbing.StubMapping;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.context.jdbc.Sql;
@@ -22,8 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.removeStub;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -48,7 +44,6 @@ public class SearchWithSortIT extends WireMockBaseTest {
     @Inject
     private ApplicationParams applicationParams;
     private MockMvc mockMvc;
-    private StubMapping stubMapping;
 
     @Before
     public void setUp() {
@@ -58,13 +53,8 @@ public class SearchWithSortIT extends WireMockBaseTest {
 
         ReflectionTestUtils.setField(applicationParams, "paginationPageSize", 3);
 
-        stubMapping  = stubFor(WireMock.get(urlMatching("/api/data/case-type/TestAddressBookCase/version"))
+        stubFor(WireMock.get(urlMatching("/api/data/case-type/TestAddressBookCase/version"))
             .willReturn(okJson("{\"version\": \"34\"}")));
-    }
-
-    @After
-    public void tearDown() {
-        removeStub(stubMapping);
     }
 
     @Test

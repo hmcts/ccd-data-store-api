@@ -70,11 +70,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
@@ -107,11 +103,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
@@ -144,11 +136,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
@@ -181,11 +169,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
@@ -218,11 +202,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
@@ -255,11 +235,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
@@ -292,11 +268,7 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
@@ -318,13 +290,11 @@
           "show_summary_change_option": true,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
+          "publish": false,
+          "publish_as": null,
           "acls": [
             {
-              "role": "caseworker-befta_master",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
+              "_extends_": "CaseworkerBeftaMasterAccessControlList"
             }
           ]
         }
@@ -350,49 +320,56 @@
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address1.AddressLine2",
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address1.AddressLine3",
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address1.Country",
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address1.PostCode",
                   "display_context": "MANDATORY",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address1.PostTown",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 },
                 {
                   "complex_field_element_id": "Address1.County",
                   "display_context": "HIDDEN",
                   "label": null,
                   "hint_text": null,
-                  "show_condition": null
+                  "show_condition": null,
+                  "retain_hidden_value": null
                 }
               ]
             }

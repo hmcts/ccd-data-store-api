@@ -1,0 +1,117 @@
+{
+  "_guid_": "F-122-UpdateEventBase",
+  "title": "must submit the event creation successfully for TextField and EmailField inputs",
+
+  "productName": "CCD data store",
+  "operationName": "submit updateCase event with TextField and EmailField values",
+
+  "method": "POST",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a case Id that has just been created",
+    "contains Update token created as in S-122-GetToken_UpdateCase"
+  ],
+
+  "user": {
+    "username": "master.caseworker@gmail.com",
+    "password": "[[$CCD_BEFTA_MASTER_CASEWORKER_PWD]]"
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_ConditionalPostState",
+      "cid": "${[scenarioContext][childContexts][FT_ConditionalPostState_Create_Case][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "_extends_": "FT_ConditionalPostState_Base_Case_Data",
+        "TextField": "updated testing 1234",
+        "EmailField": null
+      },
+      "event": {
+        "id": "updateCase",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token": "${[scenarioContext][childContexts][S-122-GetToken_UpdateCase][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 201,
+    "responseMessage": "OK",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Vary": "Accept-Encoding"
+    },
+    "body": {
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "[[ANYTHING_PRESENT]]",
+      "case_type": "[[ANYTHING_PRESENT]]",
+      "created_on": "[[ANYTHING_PRESENT]]",
+      "last_modified_on": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "state": "[[ANYTHING_PRESENT]]",
+      "security_classification": "[[ANYTHING_PRESENT]]",
+      "data": {
+        "TextField": "updated testing 1234",
+        "TextAreaField": null,
+        "DateField": null,
+        "AddressField": {
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null,
+          "Country": null
+        },
+        "PhoneField": null,
+        "NumberField": null,
+        "YesNoField": null,
+        "MarritalStatus": null,
+        "MoneyField": null,
+        "EmailField": null,
+        "MultiSelectField": []
+      },
+      "data_classification": {
+        "AddressField": {
+          "classification": "PUBLIC",
+          "value": {
+            "AddressLine1": "PUBLIC",
+            "AddressLine2": "PUBLIC",
+            "AddressLine3": "PUBLIC",
+            "Country": "PUBLIC"
+          }
+        },
+        "MoneyField": "PUBLIC",
+        "MultiSelectField": "PUBLIC",
+        "YesNoField": "PUBLIC",
+        "EmailField": "PUBLIC",
+        "TextField": "PUBLIC",
+        "PhoneField": "PUBLIC",
+        "MarritalStatus": "PUBLIC",
+        "DateField": "PUBLIC",
+        "TextAreaField": "PUBLIC",
+        "NumberField": "PUBLIC"
+      },
+      "supplementary_data": null,
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}
