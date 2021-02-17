@@ -34,6 +34,11 @@
         "TextField": "updated testing 1234",
         "EmailField": null
       },
+      "event": {
+        "id": "updateCase",
+        "summary": "",
+        "description": ""
+      },
       "security_classification": "PUBLIC",
       "event_token": "${[scenarioContext][childContexts][S-122-GetToken_UpdateCase][testData][actualResponse][body][token]}",
       "ignore_warning": true

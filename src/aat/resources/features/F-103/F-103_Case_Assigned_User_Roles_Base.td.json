@@ -1,0 +1,37 @@
+{
+	"_guid_": "F-103_Case_Assigned_User_Roles_Base",
+	"title": "Get Case-Assigned Users and Roles",
+	"productName": "CCD Data Store",
+	"operationName": "Get Case-Assigned Users and Roles",
+	"method": "GET",
+	"uri": "/case-users",
+	"users": {
+		"invokingUser": {
+      "_extends_": "BeftaCaseworkerCaa"
+		},
+		"userRichard": {
+      "_extends_": "BeftaCaseworker2Solicitor2"
+		},
+		"userDil": {
+      "_extends_": "BeftaCaseworker2Solicitor3"
+		},
+		"userSteve": {
+      "_extends_": "BeftaCaseworker2Solicitor1"
+		}
+	},
+	"request": {
+		"_extends_": "Common_Request",
+		"queryParams": {
+			"case_ids": "${[scenarioContext][childContexts][F103_Case_Data_Create_C1][testData][actualResponse][body][id]}",
+			"user_ids": "${[scenarioContext][testData][users][userDil][id]}"
+		}
+	},
+	"expectedResponse": {
+		"headers": {
+			"_extends_": "Common_Response_Headers",
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Type": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "[[ANYTHING_PRESENT]]"
+		}
+	}
+}

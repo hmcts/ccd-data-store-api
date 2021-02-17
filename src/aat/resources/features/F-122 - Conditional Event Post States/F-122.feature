@@ -27,6 +27,8 @@ Feature: F-122: Conditional Event Post States
 
     Then a positive response is received,
     And the response has all the details as expected
+    And the response [contains state: CaseDeleted, updated values for TextField, EmailField along with an HTTP-201 Created],
+
 
 #-----------------------------------------------------------------------------------------------------------------------
   @S-122.2
@@ -146,5 +148,7 @@ Feature: F-122: Conditional Event Post States
 
     Then a positive response is received,
     And the response has all the details as expected
+
+#-----------------------------------------------------------------------------------------------------------------------
 
 #-----------------------------------------------------------------------------------------------------------------------
