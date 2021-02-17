@@ -68,6 +68,7 @@ dependencyCheck {
 mainClassName = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
 
 // tag::repositories[]
+// 
 repositories {
     mavenLocal()
     mavenCentral()
