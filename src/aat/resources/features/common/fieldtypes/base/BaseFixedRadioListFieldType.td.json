@@ -1,0 +1,7 @@
+{
+  "_guid_": "BaseFixedRadioListFieldType",
+  "_extends_": "CommonFieldType",
+
+  "id": "FixedRadioList-FixedRadioListType",
+  "type": "FixedRadioList"
+}
