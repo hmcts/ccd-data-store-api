@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -25,8 +26,12 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
     private static final Logger LOG = LoggerFactory.getLogger(DefaultRoleAssignmentRepository.class);
 
     public static final String QUALIFIER = "default";
+    public static final String ROLE_ASSIGNMENTS_NOT_FOUND =
+        "No Role Assignments found for userId=%s when getting from Role Assignment Service because of %s";
+    public static final String ROLE_ASSIGNMENTS_CLIENT_ERROR =
+        "Client error when getting Role Assignments from Role Assignment Service because of %s";
     public static final String ROLE_ASSIGNMENT_SERVICE_ERROR =
-        "Problem getting Role Assignments from AccessManagement store because of %s";
+        "Problem getting Role Assignments from Role Assignment Service because of %s";
 
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
@@ -57,7 +62,11 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
             LOG.warn("Error while retrieving Role Assignments", e);
             if (e instanceof HttpClientErrorException
                 && ((HttpClientErrorException) e).getRawStatusCode() == HttpStatus.NOT_FOUND.value()) {
-                throw new ResourceNotFoundException(String.format(ROLE_ASSIGNMENT_SERVICE_ERROR, e.getMessage()));
+                throw new ResourceNotFoundException(String.format(ROLE_ASSIGNMENTS_NOT_FOUND,
+                                                                  userId, e.getMessage()));
+            } else if (e instanceof HttpClientErrorException
+                && HttpStatus.valueOf(((HttpClientErrorException) e).getRawStatusCode()).is4xxClientError()) {
+                throw new BadRequestException(String.format(ROLE_ASSIGNMENTS_CLIENT_ERROR, e.getMessage()));
             } else {
                 throw new ServiceException(String.format(ROLE_ASSIGNMENT_SERVICE_ERROR, e.getMessage()));
             }
