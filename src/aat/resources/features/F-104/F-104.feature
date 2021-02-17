@@ -1,11 +1,11 @@
-@F-104 @elasticsearch @Ignore # Fix for LAST_STATE_MODIFIED_DATE coming in 19.1
+@F-104 @elasticsearch
 Feature: F-104: External Search API
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
     #possitive request scenario of each type
-  @S-625 @estest
+  @S-625
   Scenario: Usecase request using SearchResultsFields useCase returns correct fields
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
@@ -53,7 +53,7 @@ Feature: F-104: External Search API
     And the response has all other details as expected.
 
 
-  @S-628
+  @S-628 @Ignore
   Scenario: Standard request return all fields in a case user has access to
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
@@ -197,7 +197,7 @@ Feature: F-104: External Search API
     And the response has all other details as expected.
 
 
-  @S-637 # oldest case first normally - we want to order by newest case created first
+  @S-637 # oldest case first normally - we want to order by newest case created first @esuniquevalues
   Scenario: Standard request can be ordered by metadata field
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering3_2],
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data_Ordering3_1],
@@ -212,7 +212,7 @@ Feature: F-104: External Search API
     And the response [contains cases in ordered as per request configuration],
     And the response has all other details as expected.
 
-  @S-638
+  @S-638 @Ignore
   Scenario: all CaseType Headers are returned even if no cases are found for a standard search
     And a user with [a valid user profile],
     When the request [is configured to search for a case that doesn't exist],
