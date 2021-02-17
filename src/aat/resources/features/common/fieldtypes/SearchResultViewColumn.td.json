@@ -1,0 +1,12 @@
+{
+  "_guid_": "SearchResultViewColumn",
+
+  "label": "Last State Modified Date",
+  "order": 1,
+  "metadata": false,
+  "case_field_id": "[LAST_STATE_MODIFIED_DATE]",
+  "case_field_type": {
+    "_extends_": "BaseDateTimeFieldType"
+  },
+  "display_context_parameter": null
+}

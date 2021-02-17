@@ -23,6 +23,8 @@ public interface CaseDetailsRepository {
     @Deprecated
     CaseDetails findById(Long id);
 
+    List<Long> findCaseReferencesByIds(List<Long> ids);
+
     Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference);
 
     Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference);
