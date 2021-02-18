@@ -1,13 +1,15 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.time.LocalDateTime;
+import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Builder
 @Data
+@AllArgsConstructor
 public class RoleAssignment {
     private String id;
     private String actorIdType; // currently IDAM
@@ -23,4 +25,10 @@ public class RoleAssignment {
     private LocalDateTime created;
     private List<String> authorisations;
     private RoleAssignmentAttributes attributes;
+    @JsonIgnore
+    private MatchingResults matchingResults;
+
+    public RoleAssignment() {
+        matchingResults = new MatchingResults();
+    }
 }
