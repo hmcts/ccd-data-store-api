@@ -53,7 +53,7 @@ Feature: F-104: External Search API
     And the response has all other details as expected.
 
 
-  @S-628
+  @S-628 @Ignore
   Scenario: Standard request return all fields in a case user has access to
     Given a case that has just been created as in [Private_Case_Creation_Autotest1_Data],
     And a wait time of [5] seconds [to allow for Logstash to index the case just created],
@@ -212,7 +212,7 @@ Feature: F-104: External Search API
     And the response [contains cases in ordered as per request configuration],
     And the response has all other details as expected.
 
-  @S-638
+  @S-638 @Ignore
   Scenario: all CaseType Headers are returned even if no cases are found for a standard search
     And a user with [a valid user profile],
     When the request [is configured to search for a case that doesn't exist],

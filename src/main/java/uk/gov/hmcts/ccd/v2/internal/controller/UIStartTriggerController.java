@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,6 +41,7 @@ public class UIStartTriggerController {
         this.caseReferenceService = caseReferenceService;
     }
 
+    @Transactional
     @GetMapping(
         path = "/case-types/{caseTypeId}/event-triggers/{triggerId}",
         headers = {
@@ -83,6 +85,7 @@ public class UIStartTriggerController {
         return ResponseEntity.ok(forCaseType(caseUpdateViewEvent, caseTypeId, ignoreWarning));
     }
 
+    @Transactional
     @GetMapping(
         path = "/cases/{caseId}/event-triggers/{triggerId}",
         headers = {
@@ -132,6 +135,7 @@ public class UIStartTriggerController {
         return ResponseEntity.ok(forCase(caseUpdateViewEvent, caseId, ignoreWarning));
     }
 
+    @Transactional
     @GetMapping(
         path = "/drafts/{draftId}/event-trigger",
         headers = {

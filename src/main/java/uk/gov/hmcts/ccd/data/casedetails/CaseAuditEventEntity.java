@@ -91,7 +91,7 @@ public class CaseAuditEventEntity {
     private Long caseDataId;
     @Column(name = "created_date")
     private LocalDateTime createdDate;
-    @Column(name = "state_id")
+    @Column(name = "state_idLocalDateTime")
     private String stateId;
     @Column(name = "state_name")
     private String stateName;
@@ -108,6 +108,16 @@ public class CaseAuditEventEntity {
     @Column(name = "data_classification", nullable = false)
     @Convert(converter = JsonDataConverter.class)
     private JsonNode dataClassification;
+
+    @Column(name = "proxied_by")
+    private String proxiedBy;
+
+    @Column(name = "proxied_by_last_name")
+    private String proxiedByLastName;
+
+    @Column(name = "proxied_by_first_name")
+    private String proxiedByFirstName;
+
     @OneToOne(mappedBy = "caseEvent", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private SignificantItemEntity significantItemEntity;
 }
