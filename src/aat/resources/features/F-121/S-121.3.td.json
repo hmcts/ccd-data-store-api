@@ -595,37 +595,37 @@
 								{
 									"complex_field_element_id": "Address1.AddressLine1",
 									"display_context": "MANDATORY",
-                  "_extends": "WizardPageComplexFieldOverride"
+                  "_extends_": "WizardPageComplexFieldOverride"
 								},
 								{
 									"complex_field_element_id": "Address1.AddressLine2",
 									"display_context": "MANDATORY",
-                  "_extends": "WizardPageComplexFieldOverride"
+                  "_extends_": "WizardPageComplexFieldOverride"
 								},
 								{
 									"complex_field_element_id": "Address1.AddressLine3",
 									"display_context": "MANDATORY",
-                  "_extends": "WizardPageComplexFieldOverride"
+                  "_extends_": "WizardPageComplexFieldOverride"
 								},
 								{
 									"complex_field_element_id": "Address1.PostTown",
 									"display_context": "HIDDEN",
-                  "_extends": "WizardPageComplexFieldOverride"
+                  "_extends_": "WizardPageComplexFieldOverride"
 								},
 								{
 									"complex_field_element_id": "Address1.County",
 									"display_context": "HIDDEN",
-                  "_extends": "WizardPageComplexFieldOverride"
+                  "_extends_": "WizardPageComplexFieldOverride"
 								},
 								{
 									"complex_field_element_id": "Address1.PostCode",
 									"display_context": "HIDDEN",
-                  "_extends": "WizardPageComplexFieldOverride"
+                  "_extends_": "WizardPageComplexFieldOverride"
 								},
 								{
 									"complex_field_element_id": "Address1.Country",
 									"display_context": "HIDDEN",
-                  "_extends": "WizardPageComplexFieldOverride"
+                  "_extends_": "WizardPageComplexFieldOverride"
 								}
 							]
 						},
@@ -641,37 +641,37 @@
 								{
 									"complex_field_element_id": "Address2.AddressLine3",
 									"display_context": "MANDATORY",
-                  "_extends": "WizardPageComplexFieldOverride"
+                  "_extends_": "WizardPageComplexFieldOverride"
 								},
 								{
 									"complex_field_element_id": "Address2.AddressLine1",
 									"display_context": "MANDATORY",
-                  "_extends": "WizardPageComplexFieldOverride"
+                  "_extends_": "WizardPageComplexFieldOverride"
 								},
 								{
 									"complex_field_element_id": "Address2.AddressLine2",
 									"display_context": "MANDATORY",
-                  "_extends": "WizardPageComplexFieldOverride"
+                  "_extends_": "WizardPageComplexFieldOverride"
 								},
 								{
 									"complex_field_element_id": "Address2.PostTown",
 									"display_context": "HIDDEN",
-                  "_extends": "WizardPageComplexFieldOverride"
+                  "_extends_": "WizardPageComplexFieldOverride"
 								},
 								{
 									"complex_field_element_id": "Address2.County",
 									"display_context": "HIDDEN",
-                  "_extends": "WizardPageComplexFieldOverride"
+                  "_extends_": "WizardPageComplexFieldOverride"
 								},
 								{
 									"complex_field_element_id": "Address2.PostCode",
 									"display_context": "HIDDEN",
-                  "_extends": "WizardPageComplexFieldOverride"
+                  "_extends_": "WizardPageComplexFieldOverride"
 								},
 								{
 									"complex_field_element_id": "Address2.Country",
 									"display_context": "HIDDEN",
-                  "_extends": "WizardPageComplexFieldOverride"
+                  "_extends_": "WizardPageComplexFieldOverride"
 								}
 							]
 						}
