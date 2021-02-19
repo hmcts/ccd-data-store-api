@@ -17,18 +17,18 @@ public class AccessControlledGetCaseOperation implements GetCaseOperation, Acces
 
     private final GetCaseOperation getCaseOperation;
     private final GetCaseOperation creatorGetCaseOperation;
-    private final CaseDataAccessControl defaultCaseDataAccessControl;
+    private final CaseDataAccessControl caseDataAccessControl;
     private final ApplicationParams applicationParams;
 
     @Autowired
     public AccessControlledGetCaseOperation(@Qualifier(CreatorGetCaseOperation.QUALIFIER)
                                                     GetCaseOperation creatorGetCaseOperation,
                                             @Qualifier("default") GetCaseOperation getCaseOperation,
-                                            CaseDataAccessControl defaultCaseDataAccessControl,
+                                            CaseDataAccessControl caseDataAccessControl,
                                             ApplicationParams applicationParams) {
         this.getCaseOperation = getCaseOperation;
         this.creatorGetCaseOperation = creatorGetCaseOperation;
-        this.defaultCaseDataAccessControl = defaultCaseDataAccessControl;
+        this.caseDataAccessControl = caseDataAccessControl;
         this.applicationParams = applicationParams;
     }
 
@@ -41,7 +41,7 @@ public class AccessControlledGetCaseOperation implements GetCaseOperation, Acces
     public Optional<CaseDetails> execute(String caseReference) {
         if (applicationParams.getCcdNewAccessControlEnabled()) {
             return getCaseOperation.execute(caseReference)
-                .flatMap(defaultCaseDataAccessControl::applyAccessControl);
+                .flatMap(caseDataAccessControl::applyAccessControl);
         } else {
             return creatorGetCaseOperation.execute(caseReference);
         }

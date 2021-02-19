@@ -39,11 +39,8 @@ public class LegacyCaseDataAccessControl implements CaseDataAccessControl, Acces
         }
     }
 
-    /**
-     * Not used. Only here to comply with the interface.
-     */
     @Override
     public Optional<CaseDetails> applyAccessControl(CaseDetails caseDetails) {
-        return Optional.empty();
+        throw new UnsupportedOperationException("Not used. Only here to comply with the interface.");
     }
 }
