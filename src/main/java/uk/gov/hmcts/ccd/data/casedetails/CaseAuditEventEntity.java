@@ -91,7 +91,7 @@ public class CaseAuditEventEntity {
     private Long caseDataId;
     @Column(name = "created_date")
     private LocalDateTime createdDate;
-    @Column(name = "state_idLocalDateTime")
+    @Column(name = "state_id")
     private String stateId;
     @Column(name = "state_name")
     private String stateName;
