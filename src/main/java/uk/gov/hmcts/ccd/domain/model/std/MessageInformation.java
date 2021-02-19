@@ -10,25 +10,25 @@ import java.time.LocalDateTime;
 public class MessageInformation {
     @JsonIgnore
     private Long id;
-    @JsonProperty("user_id")
+    @JsonProperty("UserId")
     private String userId;
-    @JsonProperty("jurisdiction_id")
+    @JsonProperty("JurisdictionId")
     private String jurisdictionId;
-    @JsonProperty("case_type_id")
+    @JsonProperty("CaseTypeId")
     private String caseTypeId;
-    @JsonProperty("case_id")
+    @JsonProperty("CaseId")
     private String caseId;
-    @JsonProperty("event_timestamp")
+    @JsonProperty("EventTimeStamp")
     private LocalDateTime eventTimestamp;
-    @JsonProperty("event_instance_id")
+    @JsonProperty("EventInstanceId")
     private Long eventInstanceId;
-    @JsonProperty("event_id")
+    @JsonProperty("EventId")
     private String eventId;
-    @JsonProperty("previous_state_id")
+    @JsonProperty("PreviousStateId")
     private String previousStateId;
-    @JsonProperty("new_state_id")
+    @JsonProperty("NewStateId")
     private String newStateId;
-    @JsonProperty("additional_data")
+    @JsonProperty("AdditionalData")
     @ApiModelProperty("A JSON object (for future use) that contains additional case fields that have been configured "
         + "to be included in the event information that is published.")
     private AdditionalMessageInformation data;
