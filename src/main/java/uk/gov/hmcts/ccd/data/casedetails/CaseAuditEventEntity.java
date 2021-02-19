@@ -53,7 +53,8 @@ public class CaseAuditEventEntity {
             + " cae.description as description, cae.createdDate as createdDate, cae.stateId as stateId,"
             + " cae.stateName as stateName, cae.securityClassification as securityClassification,"
             + " cae.caseTypeId as caseTypeId, cae.caseDataId as caseDataId, cae.caseTypeVersion as caseTypeVersion,"
-            + " cae.proxiedBy as proxiedBy, cae.proxiedByLastName as proxiedByLastName, cae.proxiedByFirstName as proxiedByFirstName"
+            + " cae.proxiedBy as proxiedBy, cae.proxiedByLastName as proxiedByLastName,"
+            + " cae.proxiedByFirstName as proxiedByFirstName"
             + " FROM CaseAuditEventEntity cae LEFT JOIN cae.significantItemEntity as significantItemEntity"
             + " WHERE cae.caseDataId = :" + CaseAuditEventEntity.CASE_DATA_ID;
 
