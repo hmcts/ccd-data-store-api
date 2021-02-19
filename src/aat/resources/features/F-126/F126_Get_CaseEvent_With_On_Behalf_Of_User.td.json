@@ -39,7 +39,11 @@
 			"Content-Length": "[[ANYTHING_PRESENT]]"
 		},
     "body" : {
-      "auditEvents" : [ {
+      "auditEvents" : [
+              {
+                "__ordering__": "unordered"
+              },
+       {
         "id" : "UPDATE",
         "summary" : "",
         "description" : "",
@@ -198,6 +202,27 @@
           }
         }
       }, {
+      "id" : "CREATE",
+      "summary" : "",
+      "description" : "",
+      "user_id" : "65877528-f52a-46aa-9b1c-62ba7c761856",
+      "user_last_name" : "Befta",
+      "user_first_name" : "Caseworker 2",
+      "event_name" : "Create a new case",
+      "created_date" : "2021-02-18T23:26:53.727904",
+      "case_type_id" : "BEFTA_CASETYPE_2_1",
+      "case_type_version" : null,
+      "state_id" : "TODO",
+      "state_name" : "To do",
+      "data" : null,
+      "data_classification" : null,
+      "security_classification" : "PUBLIC",
+      "significant_item" : null,
+      "proxied_by" : null,
+      "proxied_by_last_name" : null,
+      "proxied_by_first_name" : null,
+      "security_classifications" : null
+    }, {
         "id" : "CREATE",
         "summary" : "",
         "description" : "",
