@@ -30,6 +30,14 @@ public class CaseDetailsQueryBuilderFactory {
         return selectSecured(em, null);
     }
 
+    public CaseDetailsQueryBuilder<Long> selectByReferenceSecured(EntityManager em, MetaData metaData) {
+        return secure(new SelectCaseDetailsReferenceQueryBuilder(em), metaData);
+    }
+
+    public CaseDetailsQueryBuilder<Long> selectByReferenceSecured(EntityManager em) {
+        return selectByReferenceSecured(em, null);
+    }
+
     public CaseDetailsQueryBuilder<Long> count(EntityManager em, MetaData metaData) {
         return secure(new CountCaseDetailsQueryBuilder(em), metaData);
     }
