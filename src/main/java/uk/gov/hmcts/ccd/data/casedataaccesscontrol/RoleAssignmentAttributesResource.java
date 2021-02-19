@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleAssignmentDTOAttributes implements Serializable {
+public class RoleAssignmentAttributesResource implements Serializable {
     private static final long serialVersionUID = -7106266789404292869L;
 
     String jurisdiction;

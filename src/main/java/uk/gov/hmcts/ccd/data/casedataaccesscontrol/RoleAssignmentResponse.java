@@ -17,5 +17,5 @@ public class RoleAssignmentResponse implements Serializable {
     private static final long serialVersionUID = -3552426127042849422L;
 
     @JsonProperty("roleAssignmentResponse")
-    private List<RoleAssignmentDTO> roleAssignments;
+    private List<RoleAssignmentResource> roleAssignments;
 }
