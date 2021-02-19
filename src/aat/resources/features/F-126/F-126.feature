@@ -5,7 +5,7 @@ Feature: F-126: On Behalf Of User and Proxied by User on event creation
     Given an appropriate test context as detailed in the test data source
 
 
-  @S-1261
+  @S-1261 @Ignore
   Scenario: must successfully update userid with on behalf of user and proxied by user details
     Given an appropriate test context as detailed in the test data source
     And a user with [an active profile in CCD]
