@@ -49,7 +49,7 @@
         "event_name" : "Update",
         "created_date" : "[[ANYTHING_PRESENT]]",
         "case_type_id" : "BEFTA_CASETYPE_2_1",
-        "case_type_version" : "[[ANYTHING_PRESENT]]",
+        "case_type_version" : null,
         "state_id" : "[[ANYTHING_PRESENT]]",
         "state_name" : "[[ANYTHING_PRESENT]]",
         "data" : null,
@@ -59,55 +59,7 @@
         "proxied_by": "${[scenarioContext][childContexts][F126_Update_Case_With_On_Behalf_Of_User][testData][users][invokingUser][id]}",
         "proxied_by_last_name" : "[[ANYTHING_PRESENT]]",
         "proxied_by_first_name" : "[[ANYTHING_PRESENT]]",
-        "security_classifications" : {
-          "DocumentField4" : "PUBLIC",
-          "MoneyGBPField" : "PUBLIC",
-          "FixedListField" : "PUBLIC",
-          "AddressUKField" : {
-            "value" : {
-              "County" : "PUBLIC",
-              "Country" : "PUBLIC",
-              "PostCode" : "PUBLIC",
-              "PostTown" : "PUBLIC",
-              "AddressLine1" : "PUBLIC",
-              "AddressLine2" : "PUBLIC",
-              "AddressLine3" : "PUBLIC"
-            },
-            "classification" : "PUBLIC"
-          },
-          "ComplexField" : {
-            "value" : {
-              "ComplexTextField" : "PUBLIC",
-              "ComplexNestedField" : {
-                "value" : {
-                  "NestedNumberField" : "PUBLIC",
-                  "NestedCollectionTextField" : {
-                    "value" : [ ],
-                    "classification" : "PUBLIC"
-                  }
-                },
-                "classification" : "PUBLIC"
-              },
-              "ComplexFixedListField" : "PUBLIC"
-            },
-            "classification" : "PUBLIC"
-          },
-          "FixedRadioListField" : "PUBLIC",
-          "DateTimeField" : "PUBLIC",
-          "PhoneUKField" : "PUBLIC",
-          "DocumentField7" : "PUBLIC",
-          "NumberField" : "PUBLIC",
-          "MultiSelectListField" : "PUBLIC",
-          "YesOrNoField" : "PUBLIC",
-          "EmailField" : "PUBLIC",
-          "TextField" : "PUBLIC",
-          "DateField" : "PUBLIC",
-          "TextAreaField" : "PUBLIC",
-          "CollectionField" : {
-            "value" : [ ],
-            "classification" : "PUBLIC"
-          }
-        }
+        "security_classifications" : null
       }, {
         "id" : "CREATE",
         "summary" : "",
@@ -118,7 +70,7 @@
         "event_name" : "Create a new case",
         "created_date" : "[[ANYTHING_PRESENT]]",
         "case_type_id" : "BEFTA_CASETYPE_2_1",
-        "case_type_version" : "[[ANYTHING_PRESENT]]",
+        "case_type_version" : null,
         "state_id" : "[[ANYTHING_PRESENT]]",
         "state_name" : "[[ANYTHING_PRESENT]]",
         "data" : null,
@@ -128,55 +80,7 @@
         "proxied_by" : null,
         "proxied_by_last_name" : null,
         "proxied_by_first_name" : null,
-        "security_classifications" : {
-          "DocumentField4" : "PUBLIC",
-          "MoneyGBPField" : "PUBLIC",
-          "FixedListField" : "PUBLIC",
-          "AddressUKField" : {
-            "value" : {
-              "County" : "PUBLIC",
-              "Country" : "PUBLIC",
-              "PostCode" : "PUBLIC",
-              "PostTown" : "PUBLIC",
-              "AddressLine1" : "PUBLIC",
-              "AddressLine2" : "PUBLIC",
-              "AddressLine3" : "PUBLIC"
-            },
-            "classification" : "PUBLIC"
-          },
-          "ComplexField" : {
-            "value" : {
-              "ComplexTextField" : "PUBLIC",
-              "ComplexNestedField" : {
-                "value" : {
-                  "NestedNumberField" : "PUBLIC",
-                  "NestedCollectionTextField" : {
-                    "value" : [ ],
-                    "classification" : "PUBLIC"
-                  }
-                },
-                "classification" : "PUBLIC"
-              },
-              "ComplexFixedListField" : "PUBLIC"
-            },
-            "classification" : "PUBLIC"
-          },
-          "FixedRadioListField" : "PUBLIC",
-          "DateTimeField" : "PUBLIC",
-          "PhoneUKField" : "PUBLIC",
-          "DocumentField7" : "PUBLIC",
-          "NumberField" : "PUBLIC",
-          "MultiSelectListField" : "PUBLIC",
-          "YesOrNoField" : "PUBLIC",
-          "EmailField" : "PUBLIC",
-          "TextField" : "PUBLIC",
-          "DateField" : "PUBLIC",
-          "TextAreaField" : "PUBLIC",
-          "CollectionField" : {
-            "value" : [ ],
-            "classification" : "PUBLIC"
-          }
-        }
+        "security_classifications" : null
       } ],
       "_links" : {
         "self" : {
