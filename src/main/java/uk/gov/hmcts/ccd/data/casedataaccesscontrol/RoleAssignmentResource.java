@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleAssignmentDTO implements Serializable {
+public class RoleAssignmentResource implements Serializable {
     private static final long serialVersionUID = -6558703031023866825L;
 
     private String id;
@@ -29,5 +29,5 @@ public class RoleAssignmentDTO implements Serializable {
     private LocalDateTime endTime;
     private LocalDateTime created;
     private List<String> authorisations;
-    private RoleAssignmentDTOAttributes attributes;
+    private RoleAssignmentAttributesResource attributes;
 }

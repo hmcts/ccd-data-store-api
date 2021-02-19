@@ -57,29 +57,29 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
         RoleAssignmentResponse roleAssignments = roleAssignmentRepository.getRoleAssignments(ACTOR_ID);
 
         assertThat(roleAssignments.getRoleAssignments().size(), is(1));
-        RoleAssignmentDTO roleAssignmentDTO = roleAssignments.getRoleAssignments().get(0);
-        assertThat(roleAssignmentDTO.getId(), is(ID));
-        assertThat(roleAssignmentDTO.getActorIdType(), is(ACTOR_ID_TYPE));
-        assertThat(roleAssignmentDTO.getActorId(), is(ACTOR_ID));
-        assertThat(roleAssignmentDTO.getRoleType(), is(ROLE_TYPE));
-        assertThat(roleAssignmentDTO.getRoleName(), is(ROLE_NAME));
-        assertThat(roleAssignmentDTO.getClassification(), is(CLASSIFICATION));
-        assertThat(roleAssignmentDTO.getGrantType(), is(GRANT_TYPE));
-        assertThat(roleAssignmentDTO.getRoleCategory(), is(ROLE_CATEGORY));
-        assertThat(roleAssignmentDTO.getReadOnly(), is(READ_ONLY));
-        assertThat(roleAssignmentDTO.getBeginTime(), is(EXPECTED_BEGIN_TIME));
-        assertThat(roleAssignmentDTO.getEndTime(), is(EXPECTED_END_TIME));
-        assertThat(roleAssignmentDTO.getCreated(), is(EXPECTED_CREATED));
+        RoleAssignmentResource roleAssignmentResource = roleAssignments.getRoleAssignments().get(0);
+        assertThat(roleAssignmentResource.getId(), is(ID));
+        assertThat(roleAssignmentResource.getActorIdType(), is(ACTOR_ID_TYPE));
+        assertThat(roleAssignmentResource.getActorId(), is(ACTOR_ID));
+        assertThat(roleAssignmentResource.getRoleType(), is(ROLE_TYPE));
+        assertThat(roleAssignmentResource.getRoleName(), is(ROLE_NAME));
+        assertThat(roleAssignmentResource.getClassification(), is(CLASSIFICATION));
+        assertThat(roleAssignmentResource.getGrantType(), is(GRANT_TYPE));
+        assertThat(roleAssignmentResource.getRoleCategory(), is(ROLE_CATEGORY));
+        assertThat(roleAssignmentResource.getReadOnly(), is(READ_ONLY));
+        assertThat(roleAssignmentResource.getBeginTime(), is(EXPECTED_BEGIN_TIME));
+        assertThat(roleAssignmentResource.getEndTime(), is(EXPECTED_END_TIME));
+        assertThat(roleAssignmentResource.getCreated(), is(EXPECTED_CREATED));
 
-        assertThat(roleAssignmentDTO.getAttributes().getContractType(), is(ATTRIBUTES_CONTRACT_TYPE));
-        assertThat(roleAssignmentDTO.getAttributes().getJurisdiction(), is(ATTRIBUTES_JURISDICTION));
-        assertThat(roleAssignmentDTO.getAttributes().getCaseId(), is(ATTRIBUTES_CASE_ID));
-        assertThat(roleAssignmentDTO.getAttributes().getLocation(), is(ATTRIBUTES_LOCATION));
-        assertThat(roleAssignmentDTO.getAttributes().getRegion(), is(ATTRIBUTES_REGION));
+        assertThat(roleAssignmentResource.getAttributes().getContractType(), is(ATTRIBUTES_CONTRACT_TYPE));
+        assertThat(roleAssignmentResource.getAttributes().getJurisdiction(), is(ATTRIBUTES_JURISDICTION));
+        assertThat(roleAssignmentResource.getAttributes().getCaseId(), is(ATTRIBUTES_CASE_ID));
+        assertThat(roleAssignmentResource.getAttributes().getLocation(), is(ATTRIBUTES_LOCATION));
+        assertThat(roleAssignmentResource.getAttributes().getRegion(), is(ATTRIBUTES_REGION));
 
-        assertThat(roleAssignmentDTO.getAuthorisations().size(), is(2));
-        assertThat(roleAssignmentDTO.getAuthorisations().get(0), is(AUTHORISATIONS_AUTH_1));
-        assertThat(roleAssignmentDTO.getAuthorisations().get(1), is(AUTHORISATIONS_AUTH_2));
+        assertThat(roleAssignmentResource.getAuthorisations().size(), is(2));
+        assertThat(roleAssignmentResource.getAuthorisations().get(0), is(AUTHORISATIONS_AUTH_1));
+        assertThat(roleAssignmentResource.getAuthorisations().get(1), is(AUTHORISATIONS_AUTH_2));
     }
 
     @DisplayName("should error on 404 when GET roleAssignments")

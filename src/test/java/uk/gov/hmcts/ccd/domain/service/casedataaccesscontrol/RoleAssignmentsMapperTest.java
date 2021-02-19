@@ -5,8 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentDTO;
-import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentDTOAttributes;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResource;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentAttributesResource;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
@@ -43,8 +43,8 @@ class RoleAssignmentsMapperTest {
 
         @Test
         public void shouldMapToRoleAssignments() {
-            RoleAssignmentDTO roleAssignment1 = createRoleAssignmentRecord(ASSIGNMENT_1, CASE_ID1);
-            RoleAssignmentDTO roleAssignment2 = createRoleAssignmentRecord(ASSIGNMENT_2, CASE_ID2);
+            RoleAssignmentResource roleAssignment1 = createRoleAssignmentRecord(ASSIGNMENT_1, CASE_ID1);
+            RoleAssignmentResource roleAssignment2 = createRoleAssignmentRecord(ASSIGNMENT_2, CASE_ID2);
             RoleAssignmentResponse response = createRoleAssignmentResponse(asList(
                 roleAssignment1, roleAssignment2
             ));
@@ -90,14 +90,14 @@ class RoleAssignmentsMapperTest {
     }
 
     private static RoleAssignmentResponse createRoleAssignmentResponse(
-        List<RoleAssignmentDTO> roleAssignments) {
+        List<RoleAssignmentResource> roleAssignments) {
         return RoleAssignmentResponse.builder()
             .roleAssignments(roleAssignments)
             .build();
     }
 
-    private static RoleAssignmentDTO createRoleAssignmentRecord(String id, String caseId) {
-        return RoleAssignmentDTO.builder()
+    private static RoleAssignmentResource createRoleAssignmentRecord(String id, String caseId) {
+        return RoleAssignmentResource.builder()
             .id(id)
             .actorIdType("IDAM") // currently IDAM
             .actorId("aecfec12-1f9a-40cb-bd8c-7a9f3506e67c")
@@ -115,8 +115,8 @@ class RoleAssignmentsMapperTest {
             .build();
     }
 
-    private static RoleAssignmentDTOAttributes createRoleAssignmentRecordAttribute(String caseId) {
-        return RoleAssignmentDTOAttributes.builder()
+    private static RoleAssignmentAttributesResource createRoleAssignmentRecordAttribute(String caseId) {
+        return RoleAssignmentAttributesResource.builder()
             .jurisdiction("DIVORCE")
             .caseId(caseId)
             .region("Hampshire")
