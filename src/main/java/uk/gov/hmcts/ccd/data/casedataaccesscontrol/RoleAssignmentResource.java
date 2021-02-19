@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data.casedataaccesscontrol;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class RoleAssignmentResource implements Serializable {
     private static final long serialVersionUID = -6558703031023866825L;
 
