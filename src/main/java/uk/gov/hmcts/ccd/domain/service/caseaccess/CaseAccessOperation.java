@@ -235,7 +235,9 @@ public class CaseAccessOperation {
             cauRolesByCaseId.entrySet().stream()
             .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
                 // filter out no organisation_id
-                .filter(caseUserRole -> StringUtils.isNoneBlank(caseUserRole.getOrganisationId()))
+                .filter(caseUserRole ->
+                        StringUtils.isNoneBlank(caseUserRole.getOrganisationId()) &&
+                        !caseUserRole.getCaseRole().equals(CREATOR.getRole()))
                 .collect(Collectors.toList())))
             // filter cases that have no remaining roles
             .entrySet().stream().filter(e -> !e.getValue().isEmpty())
