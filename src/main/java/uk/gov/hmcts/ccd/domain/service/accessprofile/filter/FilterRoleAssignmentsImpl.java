@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.accessprofile.filter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -130,7 +130,7 @@ public class FilterRoleAssignmentsImpl implements FilterRoleAssignments, AccessC
             roleAssignment.getBeginTime(),
             roleAssignment.getEndTime(),
             roleAssignment.getId());
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
         boolean value = roleAssignment.getBeginTime().compareTo(now) < 0
             && roleAssignment.getEndTime().compareTo(now) > 0;
         roleAssignment.getMatchingResults().setValidDate(value);
