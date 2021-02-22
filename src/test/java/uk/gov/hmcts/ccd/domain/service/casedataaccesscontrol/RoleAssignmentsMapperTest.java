@@ -5,13 +5,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResource;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentAttributesResource;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResource;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,9 +27,9 @@ class RoleAssignmentsMapperTest {
     public static final String CASE_ID2 = "caseId2";
     public static final String ASSIGNMENT_1 = "assignment1";
     public static final String ASSIGNMENT_2 = "assignment2";
-    private static final LocalDateTime BEGIN_TIME = LocalDateTime.of(2015, 10, 21, 13, 32);
-    private static final LocalDateTime END_TIME = LocalDateTime.of(2215, 11, 22, 14, 33);
-    private static final LocalDateTime CREATED = LocalDateTime.of(2020, 12, 23, 15, 34);
+    private static final Instant BEGIN_TIME = Instant.parse("2015-10-21T13:32:21.123Z");
+    private static final Instant END_TIME = Instant.parse("2215-11-04T14:43:22.456Z");
+    private static final Instant CREATED = Instant.parse("2020-12-04T15:54:23.789Z");
 
     @BeforeEach
     void setUp() {

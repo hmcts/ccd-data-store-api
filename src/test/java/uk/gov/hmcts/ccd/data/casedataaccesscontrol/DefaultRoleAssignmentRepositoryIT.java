@@ -9,7 +9,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import javax.inject.Inject;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.badRequest;
 import static com.github.tomakehurst.wiremock.client.WireMock.notFound;
@@ -33,11 +33,11 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
     private static final String ROLE_CATEGORY = "JUDICIAL";
     private static final Boolean READ_ONLY = Boolean.FALSE;
     private static final String BEGIN_TIME = "2021-01-01T00:00:00Z";
-    private static final LocalDateTime EXPECTED_BEGIN_TIME = LocalDateTime.of(2021, 01, 01, 00, 00, 00);
     private static final String END_TIME = "2223-01-01T00:00:00Z";
-    private static final LocalDateTime EXPECTED_END_TIME = LocalDateTime.of(2223, 01, 01, 00, 00, 00);
     private static final String CREATED = "2020-12-23T06:37:58.000196065Z";
-    private static final LocalDateTime EXPECTED_CREATED = LocalDateTime.of(2020, 12, 23, 06, 37, 58, 196065);
+    private static final Instant EXPECTED_BEGIN_TIME = Instant.parse(BEGIN_TIME);
+    private static final Instant EXPECTED_END_TIME = Instant.parse(END_TIME);
+    private static final Instant EXPECTED_CREATED = Instant.parse(CREATED);
     private static final String ATTRIBUTES_CONTRACT_TYPE = "SALARIED";
     private static final String ATTRIBUTES_JURISDICTION = "divorce";
     private static final String ATTRIBUTES_CASE_ID = "1504259907353529";

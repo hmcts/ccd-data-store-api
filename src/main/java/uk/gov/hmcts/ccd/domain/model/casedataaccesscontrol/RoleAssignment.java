@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Builder
@@ -18,9 +18,9 @@ public class RoleAssignment {
     private String grantType; // BASIC, STANDARD, SPECIFIC, CHALLENGED, EXCLUDED
     private String roleCategory; // JUDICIAL, STAFF
     private Boolean readOnly;
-    private LocalDateTime beginTime;
-    private LocalDateTime endTime;
-    private LocalDateTime created;
+    private Instant beginTime;
+    private Instant endTime;
+    private Instant created;
     private List<String> authorisations;
     private RoleAssignmentAttributes attributes;
 }

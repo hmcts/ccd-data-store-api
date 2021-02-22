@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Builder
@@ -27,9 +27,9 @@ public class RoleAssignmentResource implements Serializable {
     private String grantType;
     private String roleCategory;
     private Boolean readOnly;
-    private LocalDateTime beginTime;
-    private LocalDateTime endTime;
-    private LocalDateTime created;
+    private Instant beginTime;
+    private Instant endTime;
+    private Instant created;
     private List<String> authorisations;
     private RoleAssignmentAttributesResource attributes;
 }
