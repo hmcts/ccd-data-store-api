@@ -1,7 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.accessprofile.filter;
 
 import com.google.common.collect.Lists;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -99,11 +100,11 @@ class FilterRoleAssignmentsImplTest {
         RoleAssignments roleAssignments = mock(RoleAssignments.class);
 
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
-            LocalDateTime.now().minusDays(1),
-            LocalDateTime.now().plusDays(2), "PRIVATE");
+            Instant.now().minus(1, ChronoUnit.DAYS),
+            Instant.now().plus(2, ChronoUnit.DAYS), "PRIVATE");
         RoleAssignment roleAssignment2 = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
-            LocalDateTime.now().minusDays(1),
-            LocalDateTime.now().plusDays(2), "RESTRICTED");
+            Instant.now().minus(1, ChronoUnit.DAYS),
+            Instant.now().plus(2, ChronoUnit.DAYS), "RESTRICTED");
 
         List<RoleAssignment> roleAssignmentList = Lists.newArrayList(roleAssignment, roleAssignment2);
 
@@ -116,11 +117,12 @@ class FilterRoleAssignmentsImplTest {
         RoleAssignments roleAssignments = mock(RoleAssignments.class);
 
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
-            LocalDateTime.now().plusDays(1),
-            LocalDateTime.now().plusDays(2), "PUBLIC");
+            Instant.now().plus(1, ChronoUnit.DAYS),
+            Instant.now().plus(2, ChronoUnit.DAYS), "PUBLIC");
         RoleAssignment roleAssignment2 = createRoleAssignment(CASE_ID_2, JURISDICTION_2,
-            LocalDateTime.now().plusDays(1),
-            LocalDateTime.now().plusDays(2), "PUBLIC");
+            Instant.now().plus(1, ChronoUnit.DAYS),
+            Instant.now().plus(2, ChronoUnit.DAYS)
+            , "PUBLIC");
 
         List<RoleAssignment> roleAssignmentList = Lists.newArrayList(roleAssignment, roleAssignment2);
 
@@ -131,14 +133,14 @@ class FilterRoleAssignmentsImplTest {
 
     private RoleAssignment createRoleAssignment(String caseId, String jurisdiction) {
         return createRoleAssignment(caseId, jurisdiction,
-            LocalDateTime.now().minusDays(1),
-            LocalDateTime.now().plusDays(1),
+            Instant.now().minus(1, ChronoUnit.DAYS),
+            Instant.now().plus(1, ChronoUnit.DAYS),
             "PUBLIC");
     }
 
     private RoleAssignment createRoleAssignment(String caseId, String jurisdiction,
-                                                LocalDateTime startDate,
-                                                LocalDateTime endDate,
+                                                Instant startDate,
+                                                Instant endDate,
                                                 String securityClassification) {
         RoleAssignment roleAssignment = new RoleAssignment();
 
@@ -152,7 +154,7 @@ class FilterRoleAssignmentsImplTest {
         roleAssignment.setReadOnly(false);
         roleAssignment.setBeginTime(startDate);
         roleAssignment.setEndTime(endDate);
-        roleAssignment.setCreated(LocalDateTime.now());
+        roleAssignment.setCreated(Instant.now());
         roleAssignment.setAuthorisations(Lists.newArrayList());
 
         // role assignment attributes
