@@ -52,7 +52,9 @@ public class CaseAuditEventEntity {
             + " cae.userFirstName as userFirstName, cae.userLastName as userLastName, cae.summary as summary,"
             + " cae.description as description, cae.createdDate as createdDate, cae.stateId as stateId,"
             + " cae.stateName as stateName, cae.securityClassification as securityClassification,"
-            + " cae.caseTypeId as caseTypeId, cae.caseDataId as caseDataId"
+            + " cae.caseTypeId as caseTypeId, cae.caseDataId as caseDataId, cae.caseTypeVersion as caseTypeVersion,"
+            + " cae.proxiedBy as proxiedBy, cae.proxiedByLastName as proxiedByLastName,"
+            + " cae.proxiedByFirstName as proxiedByFirstName"
             + " FROM CaseAuditEventEntity cae LEFT JOIN cae.significantItemEntity as significantItemEntity"
             + " WHERE cae.caseDataId = :" + CaseAuditEventEntity.CASE_DATA_ID;
 
@@ -91,7 +93,7 @@ public class CaseAuditEventEntity {
     private Long caseDataId;
     @Column(name = "created_date")
     private LocalDateTime createdDate;
-    @Column(name = "state_idLocalDateTime")
+    @Column(name = "state_id")
     private String stateId;
     @Column(name = "state_name")
     private String stateName;
