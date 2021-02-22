@@ -14,12 +14,15 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Transactional
@@ -82,6 +85,31 @@ public class CaseAuditEventRepositoryTest extends WireMockBaseTest {
     @DisplayName("should throw exception when audit event is not found")
     public void shouldThrowExceptionWhenAuditEventNotFound() {
         assertThrows(ResourceNotFoundException.class, () -> classUnderTest.findByEventId(10000L));
+    }
+
+    @Test
+    @DisplayName("should return the case events without data and dataClassification")
+    public void shouldReturnAuditEventListWithoutDataAndDataClassification() {
+        setUpCaseData(CASE_DATA_ID);
+
+        setUpCaseEvent(CASE_DATA_ID, "The Create Event", "2017-09-28 08:46:16.258");
+        setUpCaseEvent(CASE_DATA_ID, "First Event after Create Event", "2017-09-28 08:46:16.259");
+        setUpCaseEvent(CASE_DATA_ID, "Second Event after Create Event", "2017-09-28 08:46:16.260");
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setId(String.valueOf(CASE_DATA_ID));
+
+        List<AuditEvent> eventList = classUnderTest.findByCase(caseDetails);
+
+        assertAll(
+            () -> assertEquals(3, eventList.size()),
+            () -> assertNull(eventList.get(0).getData()),
+            () -> assertNull(eventList.get(0).getDataClassification()),
+            () -> assertNull(eventList.get(1).getData()),
+            () -> assertNull(eventList.get(1).getDataClassification()),
+            () -> assertNull(eventList.get(2).getData()),
+            () -> assertNull(eventList.get(2).getDataClassification())
+        );
     }
 
     private void setUpCaseData(Long caseDataId) {
