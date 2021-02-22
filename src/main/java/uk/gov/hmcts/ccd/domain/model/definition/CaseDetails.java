@@ -330,6 +330,21 @@ public class CaseDetails implements Cloneable {
         return metadata;
     }
 
+    @JsonIgnore
+    public Map<String, Object> getFormattedMetadata() {
+        if (metadata.isEmpty()) {
+            metadata.put(JURISDICTION.getReference(), getJurisdiction());
+            metadata.put(CASE_TYPE.getReference(), getCaseTypeId());
+            metadata.put(STATE.getReference(), getState());
+            metadata.put(CASE_REFERENCE.getReference(), getReference() != null ? getReference().toString() : getId());
+            metadata.put(CREATED_DATE.getReference(), getCreatedDate());
+            metadata.put(LAST_MODIFIED_DATE.getReference(), getLastModified());
+            metadata.put(LAST_STATE_MODIFIED_DATE.getReference(), getLastStateModifiedDate());
+            metadata.put(SECURITY_CLASSIFICATION.getReference(), getSecurityClassification());
+        }
+        return metadata;
+    }
+
     public Integer getDeleteDraftResponseStatusCode() {
         return deleteDraftResponseStatusCode;
     }

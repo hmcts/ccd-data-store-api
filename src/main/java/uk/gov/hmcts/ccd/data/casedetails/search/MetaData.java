@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.data.casedetails.search;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.ImmutableList;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
+import uk.gov.hmcts.ccd.domain.model.common.CaseReferenceUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -117,7 +118,7 @@ public class MetaData {
     }
 
     public void setCaseReference(Optional<String> caseReference) {
-        this.caseReference = caseReference;
+        this.caseReference = formatCaseReference(caseReference);
     }
 
     public Optional<String> getCaseReference() {
@@ -227,6 +228,16 @@ public class MetaData {
                 String.format("Failed to invoke method '%s' with Optional String value of '%s'",
                     methodName, value));
         }
+    }
+
+    private Optional<String> formatCaseReference(Optional<String> caseReference){
+
+        if (caseReference.isPresent()){
+            CaseReferenceUtils.checkRegex(caseReference.get());
+            return Optional.of(CaseReferenceUtils.formatCaseReference(caseReference.get()));
+        }
+        return caseReference;
+
     }
 
     private String getMethodName(CaseField metadataField, String prefix) {

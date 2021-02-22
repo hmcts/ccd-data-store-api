@@ -120,7 +120,7 @@ public class MergeDataToSearchResultOperation {
                                                            final CaseTypeDefinition caseTypeDefinition,
                                                            final SearchResultDefinition searchResult) {
         Map<String, JsonNode> caseData = new HashMap<>(caseDetails.getData());
-        Map<String, Object> caseMetadata = new HashMap<>(caseDetails.getMetadata());
+        Map<String, Object> caseMetadata = new HashMap<>(caseDetails.getFormattedMetadata());
         Map<String, TextNode> labels = caseTypeDefinition.getLabelsFromCaseFields();
         Map<String, Object> caseFields = prepareData(searchResult, caseData, caseMetadata, labels);
 
