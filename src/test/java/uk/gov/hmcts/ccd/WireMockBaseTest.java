@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.cloud.contract.wiremock.WireMockConfigurationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +24,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import javax.inject.Inject;
 import java.io.IOException;
 
-@DirtiesContext  // required for Jenkins agent
 @AutoConfigureWireMock(port = 0)
 public abstract class WireMockBaseTest extends BaseTest {
 
