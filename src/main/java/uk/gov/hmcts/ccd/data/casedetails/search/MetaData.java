@@ -230,14 +230,15 @@ public class MetaData {
         }
     }
 
-    private Optional<String> formatCaseReference(Optional<String> caseReference){
+    private Optional<String> formatCaseReference(Optional<String> caseReference) {
 
-        if (caseReference.isPresent()){
-            CaseReferenceUtils.checkRegex(caseReference.get());
+        if (caseReference.isPresent()) {
+            if (!CaseReferenceUtils.checkRegex(caseReference.get())) {
+                return Optional.of("0000000000000000");
+            }
             return Optional.of(CaseReferenceUtils.formatCaseReference(caseReference.get()));
         }
         return caseReference;
-
     }
 
     private String getMethodName(CaseField metadataField, String prefix) {

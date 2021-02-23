@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.domain.model.common;
 
-import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
 public class CaseReferenceUtils {
 
     private CaseReferenceUtils() {
@@ -15,11 +12,8 @@ public class CaseReferenceUtils {
         return caseReference;
     }
 
-    public static void checkRegex(final String value) {
+    public static boolean checkRegex(final String value) {
         final String regularExpression = "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)";
-        if (value.matches(regularExpression)) {
-            return;
-        }
-        throw new ValidationException(String.format("casereference:%s, has not the correct value.", value));
+        return value.matches(regularExpression) ;
     }
 }
