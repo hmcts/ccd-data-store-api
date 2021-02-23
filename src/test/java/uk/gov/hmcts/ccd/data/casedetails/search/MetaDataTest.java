@@ -17,7 +17,9 @@ class MetaDataTest {
     private static final String CASE_TYPE_ID = "CaseOne";
     private static final String JURISDICTION_ID = "JurisdictionOne";
     private static final String STATE = "StateOne";
-    private static final String CASE_REFERENCE = "REF#8888";
+    private static final String CASE_REFERENCE = "1592492280314163";
+    private static final String CASE_REFERENCE_WITH_HYPHENS = "1592-4922-8031-4163";
+    private static final String NULL_CASE_REFERENCE = "0000000000000000";
     private static final String SECURITY_CLASSIFICATION = "Public";
     private static final String PAGE = "PageOne";
     private static final String CREATED_DATE = "Now";
@@ -103,6 +105,39 @@ class MetaDataTest {
 
         assertAll(
             () -> assertThat(result.get(), is(CASE_REFERENCE))
+        );
+    }
+
+    @Test
+    void shouldGetOptionalMetadataValuesForIncorrectCaseReference() {
+        MetaData metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
+
+        metadata.setOptionalMetadata(MetaData.CaseField.CASE_REFERENCE, "banana");
+
+        assertAll(
+            () -> assertThat(metadata.getCaseReference().get(), is(NULL_CASE_REFERENCE))
+        );
+    }
+
+    @Test
+    void shouldGetOptionalMetadataValuesForCorrectCaseReference_hyphen() {
+        MetaData metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
+
+        metadata.setOptionalMetadata(MetaData.CaseField.CASE_REFERENCE, CASE_REFERENCE_WITH_HYPHENS);
+
+        assertAll(
+            () -> assertThat(metadata.getCaseReference().get(), is(CASE_REFERENCE))
+        );
+    }
+
+    @Test
+    void shouldGetOptionalMetadataValuesForCorrectCaseReference() {
+        MetaData metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
+
+        metadata.setOptionalMetadata(MetaData.CaseField.CASE_REFERENCE, CASE_REFERENCE);
+
+        assertAll(
+            () -> assertThat(metadata.getCaseReference().get(), is(CASE_REFERENCE))
         );
     }
 

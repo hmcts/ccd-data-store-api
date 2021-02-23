@@ -118,7 +118,7 @@ public class MetaData {
     }
 
     public void setCaseReference(Optional<String> caseReference) {
-        this.caseReference = formatCaseReference(caseReference);
+        this.caseReference = CaseReferenceUtils.getFormatCaseReference(caseReference);
     }
 
     public Optional<String> getCaseReference() {
@@ -228,17 +228,6 @@ public class MetaData {
                 String.format("Failed to invoke method '%s' with Optional String value of '%s'",
                     methodName, value));
         }
-    }
-
-    private Optional<String> formatCaseReference(Optional<String> caseReference) {
-
-        if (caseReference.isPresent()) {
-            if (!CaseReferenceUtils.checkRegex(caseReference.get())) {
-                return Optional.of("0000000000000000");
-            }
-            return Optional.of(CaseReferenceUtils.formatCaseReference(caseReference.get()));
-        }
-        return caseReference;
     }
 
     private String getMethodName(CaseField metadataField, String prefix) {
