@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.common;
+package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -7,12 +7,12 @@ import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
-import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 
 import java.util.Optional;
 
 @Component
-@ConditionalOnProperty(name = "ccd.new-access-control-enabled", havingValue = "true")
+@ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "true")
 public class DefaultCaseDataAccessControl implements CaseDataAccessControl, AccessControl {
 
     private final RoleAssignmentService roleAssignmentService;

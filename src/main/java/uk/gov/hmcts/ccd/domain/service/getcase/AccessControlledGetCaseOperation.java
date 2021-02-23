@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
-import uk.gov.hmcts.ccd.domain.service.common.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 
 import java.util.Optional;
 
@@ -39,7 +39,7 @@ public class AccessControlledGetCaseOperation implements GetCaseOperation, Acces
 
     @Override
     public Optional<CaseDetails> execute(String caseReference) {
-        if (applicationParams.getCcdNewAccessControlEnabled()) {
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
             return getCaseOperation.execute(caseReference)
                 .flatMap(caseDataAccessControl::applyAccessControl);
         } else {

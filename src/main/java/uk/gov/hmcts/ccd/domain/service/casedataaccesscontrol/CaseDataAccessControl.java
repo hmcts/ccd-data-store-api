@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.common;
+package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 

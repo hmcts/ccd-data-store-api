@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.common;
+package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,15 +19,15 @@ import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
  */
 @Deprecated
 @Component
-@ConditionalOnProperty(name = "ccd.new-access-control-enabled", havingValue = "false", matchIfMissing = true)
-public class LegacyCaseDataAccessControl implements CaseDataAccessControl, AccessControl {
+@ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "false", matchIfMissing = true)
+public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, AccessControl {
     private final UserAuthorisation userAuthorisation;
     private final CaseUserRepository caseUserRepository;
 
     @Autowired
-    public LegacyCaseDataAccessControl(final UserAuthorisation userAuthorisation,
-                                       final @Qualifier(CachedCaseUserRepository.QUALIFIER)
-                                           CaseUserRepository caseUserRepository) {
+    public RoleBasedCaseDataAccessControl(final UserAuthorisation userAuthorisation,
+                                          final @Qualifier(CachedCaseUserRepository.QUALIFIER)
+                                              CaseUserRepository caseUserRepository) {
         this.userAuthorisation = userAuthorisation;
         this.caseUserRepository = caseUserRepository;
     }
