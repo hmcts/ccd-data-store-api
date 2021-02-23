@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol;
 
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,9 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RoleAssignmentAttributes {
-    private String jurisdiction;
-    private String caseId;
-    private String region;
-    private String location;
-    private String contractType; // SALARIED, FEEPAY
+    private Optional<String> jurisdiction;
+    private Optional<String> caseId;
+    private Optional<String> region;
+    private Optional<String> location;
+    private Optional<String> contractType; // SALARIED, FEEPAY
 }

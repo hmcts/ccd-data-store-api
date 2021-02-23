@@ -1,14 +1,16 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
-import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.FilterRoleAssignments;
+import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.RoleAssignmentsFilteringService;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 
 @Component
@@ -18,17 +20,17 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     private final RoleAssignmentService roleAssignmentService;
     private final SecurityUtils securityUtils;
     private final CaseService caseService;
-    private FilterRoleAssignments filterRoleAssignments;
+    private RoleAssignmentsFilteringService roleAssignmentsFilteringService;
 
     @Autowired
     public DefaultCaseDataAccessControl(RoleAssignmentService roleAssignmentService,
                                         SecurityUtils securityUtils,
                                         CaseService caseService,
-                                        FilterRoleAssignments filterRoleAssignments) {
+                                        RoleAssignmentsFilteringService roleAssignmentsFilteringService) {
         this.roleAssignmentService = roleAssignmentService;
         this.securityUtils = securityUtils;
         this.caseService = caseService;
-        this.filterRoleAssignments = filterRoleAssignments;
+        this.roleAssignmentsFilteringService = roleAssignmentsFilteringService;
     }
 
     // Returns Optional<CaseDetails>. If this is not enough think of wrapping it in a AccessControlResponse
@@ -38,7 +40,8 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
         CaseDetails cloned = caseService.clone(caseDetails);
 
-        roleAssignments = filterRoleAssignments.filter(roleAssignments, caseDetails);
+        List<RoleAssignmentFilteringResult> filteringResults = roleAssignmentsFilteringService
+            .filter(roleAssignments, caseDetails);
 
         // 3.) Augment - Add to the list of filtered roles entries corresponding to the users Idam roles prefixed
         // by 'idam:' (subject to a column that states whether these roles apply to case specific roles)
