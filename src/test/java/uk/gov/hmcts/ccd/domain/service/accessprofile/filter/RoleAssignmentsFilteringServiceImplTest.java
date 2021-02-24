@@ -4,12 +4,10 @@ import com.google.common.collect.Lists;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -25,12 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class RoleAssignmentsFilteringServiceImplTest {
-
-    private static final String JURISDICTION_1 = "JURISDICTION_1";
-    private static final String JURISDICTION_2 = "JURISDICTION_2";
-    private static final String CASE_ID_1 = "CASE_ID_1";
-    private static final String CASE_ID_2 = "CASE_ID_2";
+class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
 
     private RoleAssignmentsFilteringServiceImpl classUnderTest;
 
@@ -91,18 +84,6 @@ class RoleAssignmentsFilteringServiceImplTest {
         assertEquals(0, filteredRoleAssignments.size());
     }
 
-    private CaseDetails mockCaseDetails() {
-        return mockCaseDetails(SecurityClassification.PUBLIC);
-    }
-
-    private CaseDetails mockCaseDetails(SecurityClassification securityClassification) {
-        CaseDetails caseDetails = mock(CaseDetails.class);
-        when(caseDetails.getSecurityClassification()).thenReturn(securityClassification);
-        when(caseDetails.getReferenceAsString()).thenReturn(CASE_ID_1);
-        when(caseDetails.getJurisdiction()).thenReturn(JURISDICTION_1);
-        return caseDetails;
-    }
-
     private RoleAssignments mockRoleAssignments() {
         RoleAssignments roleAssignments = mock(RoleAssignments.class);
 
@@ -148,44 +129,5 @@ class RoleAssignmentsFilteringServiceImplTest {
         when(roleAssignments.getRoleAssignments()).thenReturn(roleAssignmentList);
 
         return roleAssignments;
-    }
-
-    private RoleAssignment createRoleAssignment(String caseId, String jurisdiction) {
-        return createRoleAssignment(caseId, jurisdiction,
-            Instant.now().minus(1, ChronoUnit.DAYS),
-            Instant.now().plus(1, ChronoUnit.DAYS),
-            "PUBLIC");
-    }
-
-    private RoleAssignment createRoleAssignment(String caseId, String jurisdiction,
-                                                Instant startDate,
-                                                Instant endDate,
-                                                String securityClassification) {
-        RoleAssignment roleAssignment = RoleAssignment.builder().build();
-
-        roleAssignment.setActorId("Actor1");
-        roleAssignment.setRoleName("RoleName1");
-        roleAssignment.setActorIdType("IDAM");
-        roleAssignment.setRoleType("ORGANISATION");
-        roleAssignment.setClassification(securityClassification);
-        roleAssignment.setGrantType("BASIC");
-        roleAssignment.setRoleCategory("JUDICIAL");
-        roleAssignment.setReadOnly(false);
-        roleAssignment.setBeginTime(startDate);
-        roleAssignment.setEndTime(endDate);
-        roleAssignment.setCreated(Instant.now());
-        roleAssignment.setAuthorisations(Lists.newArrayList());
-
-        // role assignment attributes
-        RoleAssignmentAttributes roleAssignmentAttributes = new RoleAssignmentAttributes();
-
-        roleAssignmentAttributes.setCaseId(Optional.of(caseId));
-        roleAssignmentAttributes.setJurisdiction(Optional.of(jurisdiction));
-        roleAssignmentAttributes.setContractType(Optional.of("SALARIED"));
-        roleAssignmentAttributes.setLocation(Optional.of(""));
-        roleAssignmentAttributes.setRegion(Optional.of(""));
-        roleAssignment.setAttributes(roleAssignmentAttributes);
-
-        return roleAssignment;
     }
 }
