@@ -6,8 +6,6 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -18,6 +16,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.service.AccessControl;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -26,17 +26,13 @@ import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
-import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
-import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
 import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
-
 @Service
-class SubmitCaseTransaction {
+class SubmitCaseTransaction implements AccessControl {
 
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
@@ -44,8 +40,7 @@ class SubmitCaseTransaction {
     private final CallbackInvoker callbackInvoker;
     private final UIDService uidService;
     private final SecurityClassificationService securityClassificationService;
-    private final CaseUserRepository caseUserRepository;
-    private final UserAuthorisation userAuthorisation;
+    private final CaseDataAccessControl caseDataAccessControl;
     private final MessageService messageService;
 
     @Inject
@@ -56,9 +51,7 @@ class SubmitCaseTransaction {
                                  final CallbackInvoker callbackInvoker,
                                  final UIDService uidService,
                                  final SecurityClassificationService securityClassificationService,
-                                 final @Qualifier(CachedCaseUserRepository.QUALIFIER)
-                                         CaseUserRepository caseUserRepository,
-                                 final UserAuthorisation userAuthorisation,
+                                 final CaseDataAccessControl caseDataAccessControl,
                                  final @Qualifier("caseEventMessageService") MessageService messageService
                                  ) {
         this.caseDetailsRepository = caseDetailsRepository;
@@ -67,8 +60,7 @@ class SubmitCaseTransaction {
         this.callbackInvoker = callbackInvoker;
         this.uidService = uidService;
         this.securityClassificationService = securityClassificationService;
-        this.caseUserRepository = caseUserRepository;
-        this.userAuthorisation = userAuthorisation;
+        this.caseDataAccessControl = caseDataAccessControl;
         this.messageService = messageService;
     }
 
@@ -105,11 +97,7 @@ class SubmitCaseTransaction {
             saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, event, caseTypeDefinition, idamUser,
                 caseEventDefinition, newCaseDetails);
 
-        if (AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
-            caseUserRepository.grantAccess(Long.valueOf(savedCaseDetails.getId()),
-                                           idamUser.getId(),
-                                           CREATOR.getRole());
-        }
+        caseDataAccessControl.grantAccess(savedCaseDetails.getId(), idamUser.getId());
 
         return savedCaseDetails;
     }

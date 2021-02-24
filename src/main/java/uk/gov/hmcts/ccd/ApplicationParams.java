@@ -47,6 +47,9 @@ public class ApplicationParams {
     @Value("${ccd.case-definition.host}")
     private String caseDefinitionHost;
 
+    @Value("${role.assignment.api.host}")
+    private String roleAssignmentServiceHost;
+
     @Value("${ccd.draft.host}")
     private String draftHost;
 
@@ -145,6 +148,9 @@ public class ApplicationParams {
 
     @Value("${ccd.access-control.caseworker.role.regex}")
     private String ccdAccessControlCaseworkerRoleRegex;
+
+    @Value("${enable-attribute-based-access-control}")
+    private boolean enableAttributeBasedAccessControl;
 
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
@@ -257,6 +263,14 @@ public class ApplicationParams {
 
     public String caseRolesURL() {
         return caseDefinitionHost + "/api/data/caseworkers/uid/jurisdictions/jid/case-types";
+    }
+
+    public String roleAssignmentBaseURL() {
+        return roleAssignmentServiceHost + "/am/role-assignments";
+    }
+
+    public String amGetRoleAssignmentsURL() {
+        return roleAssignmentBaseURL() + "/actors/{uid}";
     }
 
     public String userDefaultSettingsURL() {
@@ -393,6 +407,10 @@ public class ApplicationParams {
 
     public String getCcdAccessControlCaseworkerRoleRegex() {
         return ccdAccessControlCaseworkerRoleRegex;
+    }
+
+    public boolean getEnableAttributeBasedAccessControl() {
+        return enableAttributeBasedAccessControl;
     }
 
     public List<String> getCcdAccessControlCitizenRoles() {

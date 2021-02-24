@@ -36,6 +36,8 @@ import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway;
 import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.DefaultRoleAssignmentRepository;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -100,6 +102,9 @@ public abstract class BaseTest {
     @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
     private CaseDefinitionRepository caseDefinitionRepository;
     @Inject
+    @Qualifier(DefaultRoleAssignmentRepository.QUALIFIER)
+    private RoleAssignmentRepository roleAssignmentRepository;
+    @Inject
     @Qualifier(DefaultCaseRoleRepository.QUALIFIER)
     private CaseRoleRepository caseRoleRepository;
     @Inject
@@ -132,6 +137,7 @@ public abstract class BaseTest {
         MockitoAnnotations.initMocks(this);
         ReflectionTestUtils.setField(caseRoleRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(caseDefinitionRepository, "securityUtils", securityUtils);
+        ReflectionTestUtils.setField(roleAssignmentRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(uiDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(userRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(callbackService, "securityUtils", securityUtils);
