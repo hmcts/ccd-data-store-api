@@ -640,12 +640,59 @@ class CaseAccessOperationTest {
         }
 
         @Test
+        @DisplayName("should not decrement organisation user count for single new case-user with [CREATOR] role")
+        void shouldNotIncrementOrganisationUserCountWithCreatorRole() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(
+                    CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR, ORGANISATION)
+            );
+            // no existing relationship
+            when(caseUserRepository.findCaseUserRoles(
+                argThat(arg -> arg.contains(CASE_ID)),
+                argThat(arg -> arg.contains(USER_ID))
+            )).thenReturn(new ArrayList<>());
+
+            // ACT
+            caseAccessOperation.removeCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(supplementaryDataRepository, never()).incrementSupplementaryData(anyString(), anyString(), any());
+        }
+
+        @Test
         @DisplayName("should decrement organisation user count only once for repeat remove case-user relationship")
         void shouldDecrementOrganisationUserCountOnlyOnceForRepeatRelationship() {
             // ARRANGE
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION),
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
+            );
+
+            // for an existing relation and then after removal
+            when(caseUserRepository.findCaseUserRoles(
+                argThat(arg -> arg.contains(CASE_ID)),
+                argThat(arg -> arg.contains(USER_ID))
+            )).thenReturn(List.of(createCaseUserEntity(CASE_ID, CASE_ROLE, USER_ID)))
+                .thenReturn(new ArrayList<>());
+
+            // ACT
+            caseAccessOperation.removeCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(supplementaryDataRepository, times(1))
+                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), -1L);
+        }
+
+        @Test
+        @DisplayName("should decrement organisation user count only once and ignore creator role")
+        void shouldDecrementOrganisationUserCountOnlyOnceForRepeatRelationshipIgnoreCreatorRole() {
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION),
+                new CaseAssignedUserRoleWithOrganisation(
+                    CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR, ORGANISATION)
             );
 
             // for an existing relation and then after removal

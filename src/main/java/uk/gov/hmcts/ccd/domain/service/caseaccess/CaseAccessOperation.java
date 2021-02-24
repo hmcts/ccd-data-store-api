@@ -237,7 +237,7 @@ public class CaseAccessOperation {
                 // filter out no organisation_id
                 .filter(caseUserRole ->
                         StringUtils.isNoneBlank(caseUserRole.getOrganisationId())
-                            && !caseUserRole.getCaseRole().equals(CREATOR.getRole()))
+                            && !caseUserRole.getCaseRole().equalsIgnoreCase(CREATOR.getRole()))
                 .collect(Collectors.toList())))
             // filter cases that have no remaining roles
             .entrySet().stream().filter(e -> !e.getValue().isEmpty())
