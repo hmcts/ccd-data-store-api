@@ -197,6 +197,9 @@
 				"CollectionComplexDateTime": {
 					"classification": "PUBLIC",
 					"value": [
+            {
+              "__ordering__": "ordered"
+            },
 						{
 							"value": {
 								"DateField": "PUBLIC",
