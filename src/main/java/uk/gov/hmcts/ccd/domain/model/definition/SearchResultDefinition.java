@@ -35,9 +35,7 @@ public class SearchResultDefinition implements Serializable {
             if (fieldsUserRoles.containsKey(srf.getCaseFieldId())) {
                 fieldsUserRoles.get(srf.getCaseFieldId()).add(srf.getRole());
             } else {
-                List<String> roles = new ArrayList<>();
-                roles.add(srf.getRole());
-                fieldsUserRoles.put(srf.getCaseFieldId(), roles);
+                fieldsUserRoles.put(srf.getCaseFieldId(), new ArrayList<>(Arrays.asList(srf.getRole())));
             }
         }
         return fieldsUserRoles;
