@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,7 @@ public class SearchResultDefinition implements Serializable {
             if (fieldsUserRoles.containsKey(srf.getCaseFieldId())) {
                 fieldsUserRoles.get(srf.getCaseFieldId()).add(srf.getRole());
             } else {
-                fieldsUserRoles.put(srf.getCaseFieldId(), new ArrayList<>(Arrays.asList(srf.getRole())));
+                fieldsUserRoles.put(srf.getCaseFieldId(), new ArrayList<>(Collections.singletonList(srf.getRole())));
             }
         }
         return fieldsUserRoles;
