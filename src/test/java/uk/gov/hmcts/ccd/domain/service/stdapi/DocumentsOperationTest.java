@@ -13,6 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.reset;
@@ -84,6 +86,15 @@ public class DocumentsOperationTest extends WireMockBaseTest {
 
         final List<Document> results = documentsOperation.getPrintableDocumentsForCase(TEST_CASE_REFERENCE);
         assertEquals("Incorrect number of documents", 0, results.size());
+    }
+
+    @Test
+    public void shouldThrowServiceExceptionIfUnknownExceptionOccurred() {
+        Exception exception = assertThrows(ServiceException.class,
+            () -> documentsOperation.getPrintableDocumentsForCase(TEST_CASE_REFERENCE));
+
+        assertEquals(exception.getMessage(), String.format("Cannot get documents for the Jurisdiction:%s, "
+            + "Case Type Id:%s, Case Reference:%s", TEST_JURISDICTION, TEST_CASE_TYPE, TEST_CASE_REFERENCE));
     }
 
     @Test
