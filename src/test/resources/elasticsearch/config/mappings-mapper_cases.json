@@ -422,9 +422,13 @@
         "type": "date"
       },
       "reference": {
-        "type": "text",
-        "analyzer": "standard",
-        "search_analyzer": "case_id_analyzer"
+        "fields": {
+          "keyword": {
+            "ignore_above": 256,
+            "type": "keyword"
+          }
+        },
+        "type": "text"
       },
       "security_classification": {
         "type": "keyword"

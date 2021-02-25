@@ -19,7 +19,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.ccd.datastore.util.CaseIdHelper.hypheniseACaseId;
 
 public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
@@ -77,16 +76,6 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                 long longRef = (long) ReflectionUtils.deepGetFieldInObject(
                     scenarioContext,"childContexts." + childContext + ".testData.actualResponse.body.id");
                 return Long.toString(longRef);
-            } catch (Exception e) {
-                throw new FunctionalTestException("Problem getting case id as long", e);
-            }
-        } else if (key.toString().startsWith("HyphenisedCaseIdFromCaseCreation")) {
-            String childContext = key.toString().replace("HyphenisedCaseIdFromCaseCreation_","");
-            try {
-                long longRef = (long) ReflectionUtils.deepGetFieldInObject(
-                    scenarioContext,"childContexts." + childContext + ".testData.actualResponse.body.id");
-                String result = hypheniseACaseId(Long.toString(longRef));
-                return result;
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem getting case id as long", e);
             }
