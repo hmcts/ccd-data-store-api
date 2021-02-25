@@ -5,6 +5,7 @@ import java.util.Optional;
 public class CaseReferenceUtils {
 
     public  static final String  CASE_REFERENCE_EXPRESSION = "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)";
+    public  static final String  EMPTY_CASE_REFERENCE = "0000000000000000";
 
     private CaseReferenceUtils() {
     }
@@ -24,7 +25,7 @@ public class CaseReferenceUtils {
 
         if (caseReference.isPresent()) {
             if (!CaseReferenceUtils.isAValidCaseReferenceFormat(caseReference.get())) {
-                return Optional.of("0000000000000000");
+                return Optional.of(EMPTY_CASE_REFERENCE);
             }
             return Optional.of(CaseReferenceUtils.removeHyphens(caseReference.get()));
         }
