@@ -1,14 +1,11 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.cache.CacheManager;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -16,7 +13,6 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
-import javax.inject.Inject;
 import java.util.Optional;
 import java.util.Arrays;
 import java.util.Map;
@@ -41,15 +37,11 @@ public class CaseDetailsRepositoryIT {
 
     private static final long CASE_ID = 100000L;
     private static final long CASE_REFERENCE = 999999L;
-    private static final String CASE_REFERENCE_STR = "1234123412341236";
     private static final String JURISDICTION_ID = "JeyOne";
     private static final String CASE_TYPE_ID = "CaseTypeOne";
 
     @SpyBean
     private DefaultCaseDetailsRepository caseDetailsRepository;
-
-    @Inject
-    protected CacheManager cacheManager;
 
     @Autowired
     private CachedCaseDetailsRepository cachedCaseDetailsRepository;
@@ -82,12 +74,6 @@ public class CaseDetailsRepositoryIT {
 
         doReturn(paginatedSearchMetadata).when(caseDetailsRepository)
             .getPaginatedSearchMetadata(metaData, dataSearchParams);
-    }
-
-    @After
-    @AfterEach
-    public void clearCache() {
-        cacheManager.getCacheNames().forEach(cacheName -> cacheManager.getCache(cacheName).clear());
     }
 
     @Test
@@ -201,15 +187,16 @@ public class CaseDetailsRepositoryIT {
 
     @Test
     public void findByReferenceAndJurisdiction() {
+        String caseReference = "case1";
         doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(JURISDICTION_ID,
-                CASE_REFERENCE_STR);
+                caseReference);
 
-        cachedCaseDetailsRepository.findByReference(JURISDICTION_ID, CASE_REFERENCE_STR);
+        cachedCaseDetailsRepository.findByReference(JURISDICTION_ID, caseReference);
 
         verify(caseDetailsRepository, times(1)).findByReference(JURISDICTION_ID,
-                CASE_REFERENCE_STR);
+                caseReference);
 
-        final CaseDetails returned = cachedCaseDetailsRepository.findByReference(JURISDICTION_ID, CASE_REFERENCE_STR)
+        final CaseDetails returned = cachedCaseDetailsRepository.findByReference(JURISDICTION_ID, caseReference)
                 .orElseThrow(() -> new AssertionError("Not found"));
 
         assertAll(
@@ -220,13 +207,14 @@ public class CaseDetailsRepositoryIT {
 
     @Test
     public void findByReferenceString() {
-        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(CASE_REFERENCE_STR);
+        String caseReference = "case2";
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReference(caseReference);
 
-        cachedCaseDetailsRepository.findByReference(CASE_REFERENCE_STR);
+        cachedCaseDetailsRepository.findByReference(caseReference);
 
-        verify(caseDetailsRepository, times(1)).findByReference(CASE_REFERENCE_STR);
+        verify(caseDetailsRepository, times(1)).findByReference(caseReference);
 
-        final CaseDetails returned = cachedCaseDetailsRepository.findByReference(CASE_REFERENCE_STR)
+        final CaseDetails returned = cachedCaseDetailsRepository.findByReference(caseReference)
                 .orElseThrow(() -> new AssertionError("Not found"));
 
         assertAll(
@@ -237,15 +225,16 @@ public class CaseDetailsRepositoryIT {
 
     @Test
     public void findByReferenceWithNoAccessControlAgain() {
+        String caseReference = "case3";
         doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findByReferenceWithNoAccessControl(
-                CASE_REFERENCE_STR);
+                caseReference);
 
-        cachedCaseDetailsRepository.findByReferenceWithNoAccessControl(CASE_REFERENCE_STR);
+        cachedCaseDetailsRepository.findByReferenceWithNoAccessControl(caseReference);
 
         verify(caseDetailsRepository, times(1)).findByReferenceWithNoAccessControl(
-                CASE_REFERENCE_STR);
+                caseReference);
 
-        final CaseDetails returned = cachedCaseDetailsRepository.findByReferenceWithNoAccessControl(CASE_REFERENCE_STR)
+        final CaseDetails returned = cachedCaseDetailsRepository.findByReferenceWithNoAccessControl(caseReference)
                 .orElseThrow(() -> new AssertionError("Not found"));
 
         assertAll(

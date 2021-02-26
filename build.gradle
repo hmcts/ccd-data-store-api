@@ -636,6 +636,8 @@ jacocoTestReport {
 }
 
 test {
+    minHeapSize = '2g'
+    maxHeapSize = '4g'
     timeout = Duration.ofMinutes(30)
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     generateCucumberReports.enabled = false

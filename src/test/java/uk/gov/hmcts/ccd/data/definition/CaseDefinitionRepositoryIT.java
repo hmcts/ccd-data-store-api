@@ -1,14 +1,11 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.cache.CacheManager;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -16,7 +13,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
-import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,9 +38,6 @@ public class CaseDefinitionRepositoryIT {
     @MockBean
     private DefaultCaseDefinitionRepository caseDefinitionRepository;
 
-    @Inject
-    protected CacheManager cacheManager;
-
     @Autowired
     private CachedCaseDefinitionRepository cachedCaseDefinitionRepository;
 
@@ -52,6 +45,7 @@ public class CaseDefinitionRepositoryIT {
     private static final String USER_ROLE_1 = "caseworker-divorce-loa1";
     private static final String USER_ROLE_2 = "caseworker-probate-loa1";
     private static final String USER_ROLE_3 = "caseworker-scss-loa1";
+    private static final String USER_ROLE_4 = "caseworker-cmc-loa1";
 
     private final List<CaseTypeDefinition> expectedCaseTypes =
             newArrayList(new CaseTypeDefinition(), new CaseTypeDefinition());
@@ -60,6 +54,7 @@ public class CaseDefinitionRepositoryIT {
     private final UserRole expectedUserRole1 = aUserRole().withRole(USER_ROLE_1).build();
     private final UserRole expectedUserRole2 = aUserRole().withRole(USER_ROLE_2).build();
     private final UserRole expectedUserRole3 = aUserRole().withRole(USER_ROLE_3).build();
+    private final UserRole expectedUserRole4 = aUserRole().withRole(USER_ROLE_4).build();
 
     @Before
     public void setUp() {
@@ -68,12 +63,7 @@ public class CaseDefinitionRepositoryIT {
         doReturn(expectedUserRole1).when(caseDefinitionRepository).getUserRoleClassifications(USER_ROLE_1);
         doReturn(expectedUserRole2).when(caseDefinitionRepository).getUserRoleClassifications(USER_ROLE_2);
         doReturn(expectedUserRole3).when(caseDefinitionRepository).getUserRoleClassifications(USER_ROLE_3);
-    }
-
-    @After
-    @AfterEach
-    public void clearCache() {
-        cacheManager.getCacheNames().forEach(cacheName -> cacheManager.getCache(cacheName).clear());
+        doReturn(expectedUserRole4).when(caseDefinitionRepository).getUserRoleClassifications(USER_ROLE_4);
     }
 
     @Test
@@ -125,32 +115,29 @@ public class CaseDefinitionRepositoryIT {
     @Test
     public void shouldCacheUserRolesForSubsequentCalls() {
         final List<UserRole> userRolesList = cachedCaseDefinitionRepository
-            .getClassificationsForUserRoleList(Arrays.asList(USER_ROLE_2, USER_ROLE_1));
+            .getClassificationsForUserRoleList(Arrays.asList(USER_ROLE_3, USER_ROLE_2));
 
         assertAll(
-            () -> assertEquals(countUserRoles(userRolesList), 2L),
+            () -> assertEquals(2L, userRolesList.size()),
             () -> verify(caseDefinitionRepository, times(2))
                 .getUserRoleClassifications(anyString())
         );
 
-        cachedCaseDefinitionRepository.getClassificationsForUserRoleList(Arrays.asList(USER_ROLE_1, USER_ROLE_2));
+        final List<UserRole> userRolesList1 = cachedCaseDefinitionRepository
+                .getClassificationsForUserRoleList(Arrays.asList(USER_ROLE_2, USER_ROLE_3));
 
         assertAll(
-            () -> assertEquals(countUserRoles(userRolesList), 2L),
+            () -> assertEquals(2L, userRolesList1.size()),
             () -> verifyNoMoreInteractions(caseDefinitionRepository)
         );
 
-        cachedCaseDefinitionRepository.getClassificationsForUserRoleList(Arrays.asList(USER_ROLE_3, USER_ROLE_1));
+        final List<UserRole> userRolesList2 = cachedCaseDefinitionRepository
+                .getClassificationsForUserRoleList(Arrays.asList(USER_ROLE_4, USER_ROLE_2));
 
         assertAll(
-            () -> assertEquals(countUserRoles(userRolesList), 2L),
+            () -> assertEquals(2L, userRolesList2.size()),
             () -> verify(caseDefinitionRepository, times(3))
                 .getUserRoleClassifications(anyString())
         );
-    }
-
-    private long countUserRoles(final List<UserRole> userRolesList) {
-        return userRolesList.stream().filter(userRole -> userRole.getRole().equals(USER_ROLE_1)
-                || userRole.getRole().equals(USER_ROLE_2) || userRole.getRole().equals(USER_ROLE_3)).count();
     }
 }

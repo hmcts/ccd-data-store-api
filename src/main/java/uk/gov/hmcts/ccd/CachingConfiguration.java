@@ -65,6 +65,7 @@ public class CachingConfiguration {
 
     private void configCachesForCaseDefinitionRepository(Config config) {
         final int definitionCacheMaxIdle = applicationParams.getDefinitionCacheMaxIdleSecs();
+
         config.addMapConfig(newMapConfigWithMaxIdle("caseTypesForJurisdictionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("caseTypeDefinitionsCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("userRoleClassificationsCache", definitionCacheMaxIdle));
@@ -89,11 +90,10 @@ public class CachingConfiguration {
     }
 
     private void configCachesForDraftGateway(Config config) {
-        config.addMapConfig(newMapConfigWithTtl(
-            "draftResponseCache", applicationParams.getDraftCacheTTLSecs()));
-        config.addMapConfig(newMapConfigWithTtl(
-                "draftResponseCaseDetailsCache", applicationParams.getDraftCacheTTLSecs()));
+        final int draftCacheTTLSecs = applicationParams.getDraftCacheTTLSecs();
 
+        config.addMapConfig(newMapConfigWithTtl("draftResponseCache", draftCacheTTLSecs));
+        config.addMapConfig(newMapConfigWithTtl("draftResponseCaseDetailsCache", draftCacheTTLSecs));
     }
 
     private void configCachesForUserRepository(Config config) {
