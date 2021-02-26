@@ -25,6 +25,9 @@
 	"expectedResponse": {
 		"body": {
 			"headers" : [
+        {
+          "__ordering__": "ordered"
+        },
 				{
 					"metadata" : {
 						"jurisdiction" : "AUTOTEST1",

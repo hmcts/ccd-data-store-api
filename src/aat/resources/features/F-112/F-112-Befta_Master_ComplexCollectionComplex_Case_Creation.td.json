@@ -89,7 +89,11 @@
       "security_classification": "PUBLIC",
       "case_data": {
         "Homeless": "Yes",
-        "Children" : [ {
+        "Children" : [
+          {
+            "__ordering__": "ordered"
+          },
+          {
           "value" : {
             "ChildFullName" : "child1",
             "ChildGender" : "MALE",
@@ -132,7 +136,11 @@
         "Homeless": "PUBLIC",
         "Children" : {
           "classification" : "PUBLIC",
-          "value" : [ {
+          "value" : [
+            {
+              "__ordering__": "ordered"
+            },
+            {
             "value" : {
               "ChildFullName" : "PUBLIC",
               "ChildGender" : "PUBLIC",
@@ -197,7 +205,11 @@
         "Homeless": "PUBLIC",
         "Children" : {
           "classification" : "PUBLIC",
-          "value" : [ {
+          "value" : [
+            {
+              "__ordering__": "ordered"
+            },
+            {
             "value" : {
               "ChildFullName" : "PUBLIC",
               "ChildGender" : "PUBLIC",
