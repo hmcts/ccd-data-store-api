@@ -21,7 +21,11 @@
   },
   "expectedResponse": {
     "body" : {
-      "headers" : [ {
+      "headers" : [
+        {
+          "__ordering__": "ordered"
+        },
+        {
         "metadata" : {
           "jurisdiction" : "BEFTA_JURISDICTION_2",
           "case_type_id" : "BEFTA_CASETYPE_2_1"
