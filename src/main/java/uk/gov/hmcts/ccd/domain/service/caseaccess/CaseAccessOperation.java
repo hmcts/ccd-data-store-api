@@ -74,10 +74,16 @@ public class CaseAccessOperation {
 
     @Transactional
     public List<String> findCasesUserIdHasAccessTo(final String userId) {
-        return caseUserRepository.findCasesUserIdHasAccessTo(userId)
-            .stream()
-            .map(databaseId -> caseDetailsRepository.findById(databaseId).getReference() + "")
-            .collect(Collectors.toList());
+        List<Long> usersCases = caseUserRepository.findCasesUserIdHasAccessTo(userId);
+        if (usersCases.isEmpty()) {
+            return List.of();
+        } else {
+            return caseDetailsRepository
+                .findCaseReferencesByIds(usersCases)
+                .stream()
+                .map(String::valueOf)
+                .collect(Collectors.toList());
+        }
     }
 
     @Transactional
@@ -88,7 +94,7 @@ public class CaseAccessOperation {
 
         validateCaseRoles(Sets.union(globalCaseRoles, validCaseRoles), targetCaseRoles);
 
-        final Long caseId = new Long(caseDetails.getId());
+        final Long caseId = Long.valueOf(caseDetails.getId());
         final String userId = caseUser.getUserId();
         final List<String> currentCaseRoles = caseUserRepository.findCaseRoles(caseId, userId);
 
@@ -230,7 +236,9 @@ public class CaseAccessOperation {
             cauRolesByCaseId.entrySet().stream()
             .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
                 // filter out no organisation_id
-                .filter(caseUserRole -> StringUtils.isNoneBlank(caseUserRole.getOrganisationId()))
+                .filter(caseUserRole ->
+                        StringUtils.isNoneBlank(caseUserRole.getOrganisationId())
+                            && !caseUserRole.getCaseRole().equalsIgnoreCase(CREATOR.getRole()))
                 .collect(Collectors.toList())))
             // filter cases that have no remaining roles
             .entrySet().stream().filter(e -> !e.getValue().isEmpty())
