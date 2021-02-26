@@ -331,7 +331,7 @@ public class CaseDetails implements Cloneable {
     }
 
     @JsonIgnore
-    public Map<String, Object> getFormattedMetadata() {
+    public Map<String, Object> getConvertedMetadata() {
         if (metadata.isEmpty()) {
             getMetadata();
             metadata.put(CASE_REFERENCE.getReference(), getReference() != null ? getReference().toString() : getId());
