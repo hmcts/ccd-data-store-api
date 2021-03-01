@@ -4,11 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -18,14 +20,17 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     private final RoleAssignmentService roleAssignmentService;
     private final SecurityUtils securityUtils;
     private final CaseService caseService;
+    private final FakeRoleAssignmentsGenerator fakeRoleAssignmentsGenerator;
 
     @Autowired
     public DefaultCaseDataAccessControl(RoleAssignmentService roleAssignmentService,
                                         SecurityUtils securityUtils,
-                                        CaseService caseService) {
+                                        CaseService caseService,
+                                        FakeRoleAssignmentsGenerator fakeRoleAssignmentsGenerator) {
         this.roleAssignmentService = roleAssignmentService;
         this.securityUtils = securityUtils;
         this.caseService = caseService;
+        this.fakeRoleAssignmentsGenerator = fakeRoleAssignmentsGenerator;
     }
 
     // Returns Optional<CaseDetails>. If this is not enough think of wrapping it in a AccessControlResponse
@@ -40,6 +45,8 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
 
         // 3.) Augment - Add to the list of filtered roles entries corresponding to the users Idam roles prefixed
         // by 'idam:' (subject to a column that states whether these roles apply to case specific roles)
+        List<RoleAssignment> augmentedRoleAssignments = fakeRoleAssignmentsGenerator
+            .addFakeRoleAssignments(roleAssignments.getRoleAssignments());
 
         // 4.) determine AccessProfiles from the new RoleToAccessProfiles Tab
         // https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1460559903#AccessControlScopeofDelivery-NewRoleToAccessProfilesTab
