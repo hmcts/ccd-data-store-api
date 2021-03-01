@@ -2,8 +2,6 @@ package uk.gov.hmcts.ccd.domain.model.common;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
-
 import static org.junit.Assert.assertEquals;
 
 class CaseReferenceUtilsTest {
@@ -14,29 +12,17 @@ class CaseReferenceUtilsTest {
     @Test
     void testRemoveHyphens() {
         final String result = CaseReferenceUtils.removeHyphens(validCaseWithHyphens);
-        assertEquals(result,validCaseWithoutHyphens);
+        assertEquals(result, validCaseWithoutHyphens);
     }
 
     @Test
     void testIsAValidCaseReferenceFormat() {
-        assertEquals(true,CaseReferenceUtils.isAValidCaseReferenceFormat(validCaseWithHyphens));
-        assertEquals(true,CaseReferenceUtils.isAValidCaseReferenceFormat(validCaseWithoutHyphens));
+        assertEquals(true, CaseReferenceUtils.isAValidCaseReferenceFormat(validCaseWithHyphens));
+        assertEquals(true, CaseReferenceUtils.isAValidCaseReferenceFormat(validCaseWithoutHyphens));
     }
 
     @Test
     void failIsAValidCaseReferenceFormat() {
-        assertEquals(false,CaseReferenceUtils.isAValidCaseReferenceFormat("TETE"));
-    }
-
-    @Test
-    void testGetFormatCaseReference() {
-        final Optional<String> result = CaseReferenceUtils.getFormatCaseReference(Optional.of(validCaseWithHyphens));
-        assertEquals(result,Optional.of(validCaseWithoutHyphens));
-    }
-
-    @Test
-    void testGetFormatCaseReferenceForIncorrectValue() {
-        final Optional<String> result = CaseReferenceUtils.getFormatCaseReference(Optional.of("TETE"));
-        assertEquals(result,Optional.of(CaseReferenceUtils.EMPTY_CASE_REFERENCE));
+        assertEquals(false, CaseReferenceUtils.isAValidCaseReferenceFormat("TETE"));
     }
 }
