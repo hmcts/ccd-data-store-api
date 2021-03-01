@@ -118,7 +118,7 @@ public class MetaData {
     }
 
     public void setCaseReference(Optional<String> caseReference) {
-        this.caseReference = CaseReferenceUtils.getFormatCaseReference(caseReference);
+        this.caseReference = caseReference;
     }
 
     public Optional<String> getCaseReference() {
@@ -232,6 +232,17 @@ public class MetaData {
 
     private String getMethodName(CaseField metadataField, String prefix) {
         return prefix + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, metadataField.getParameterName());
+    }
+
+    public boolean validateAndsConvertReference() {
+        if (caseReference.isPresent()) {
+            if (CaseReferenceUtils.isAValidCaseReferenceFormat(caseReference.get())) {
+                caseReference = Optional.of(CaseReferenceUtils.removeHyphens(caseReference.get()));
+                return true;
+            }
+            return false;
+        }
+        return true;
     }
 
     @Override

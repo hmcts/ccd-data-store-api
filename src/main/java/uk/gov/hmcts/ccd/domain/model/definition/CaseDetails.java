@@ -330,15 +330,6 @@ public class CaseDetails implements Cloneable {
         return metadata;
     }
 
-    @JsonIgnore
-    public Map<String, Object> getConvertedMetadata() {
-        if (metadata.isEmpty()) {
-            getMetadata();
-            metadata.put(CASE_REFERENCE.getReference(), getReference() != null ? getReference().toString() : getId());
-        }
-        return metadata;
-    }
-
     public Integer getDeleteDraftResponseStatusCode() {
         return deleteDraftResponseStatusCode;
     }

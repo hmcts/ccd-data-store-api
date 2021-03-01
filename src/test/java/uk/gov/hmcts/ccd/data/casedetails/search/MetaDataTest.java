@@ -108,27 +108,6 @@ class MetaDataTest {
         );
     }
 
-    @Test
-    void shouldGetOptionalMetadataValuesForIncorrectCaseReference() {
-        MetaData metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
-
-        metadata.setOptionalMetadata(MetaData.CaseField.CASE_REFERENCE, "banana");
-
-        assertAll(
-            () -> assertThat(metadata.getCaseReference().get(), is(NULL_CASE_REFERENCE))
-        );
-    }
-
-    @Test
-    void shouldGetOptionalMetadataValuesForCorrectCaseReference_hyphen() {
-        MetaData metadata = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
-
-        metadata.setOptionalMetadata(MetaData.CaseField.CASE_REFERENCE, CASE_REFERENCE_WITH_HYPHENS);
-
-        assertAll(
-            () -> assertThat(metadata.getCaseReference().get(), is(CASE_REFERENCE))
-        );
-    }
 
     @Test
     void shouldGetOptionalMetadataValuesForCorrectCaseReference() {
