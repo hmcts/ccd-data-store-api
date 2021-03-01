@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.accessprofile.filter.matcher;
+package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -12,57 +12,62 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.BaseFilter;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-class RegionMatcherTest extends BaseFilter {
+class LocationMatcherTest extends BaseFilter {
 
-    private RegionMatcher classUnderTest;
+    private LocationMatcher classUnderTest;
 
     @BeforeEach
     void setUp() {
-        classUnderTest = new RegionMatcher();
+        classUnderTest = new LocationMatcher();
     }
 
     @Test
-    void shouldMatchWhenRegionIsNull() {
+    void shouldMatchWhenLocationIsNull() {
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
             Instant.now().minus(1, ChronoUnit.DAYS),
             Instant.now().plus(2, ChronoUnit.DAYS),
-            "PRIVATE", null, Optional.of(""));
+            "PRIVATE", null, null);
+
         RoleAssignmentFilteringResult result = new RoleAssignmentFilteringResult(roleAssignment,
             new RoleMatchingResult());
+
         CaseDetails caseDetails = mockCaseDetails();
         boolean matched = classUnderTest.matchAttribute(result, caseDetails);
         assertTrue(matched);
-        assertTrue(result.getRoleMatchingResult().isValidRegion());
+        assertTrue(result.getRoleMatchingResult().isLocationMatched());
     }
 
     @Test
-    void shouldMatchWhenRegionIsEmptyOnCaseDetailsAndRoleAssignment() {
+    void shouldMatchWhenLocationIsEmptyOnCaseDetailsAndRoleAssignment() {
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
             Instant.now().minus(1, ChronoUnit.DAYS),
             Instant.now().plus(2, ChronoUnit.DAYS),
             "PRIVATE", Optional.of(""), Optional.of(""));
+
         RoleAssignmentFilteringResult result = new RoleAssignmentFilteringResult(roleAssignment,
             new RoleMatchingResult());
+
         CaseDetails caseDetails = mockCaseDetails();
         boolean matched = classUnderTest.matchAttribute(result, caseDetails);
         assertTrue(matched);
-        assertTrue(result.getRoleMatchingResult().isValidRegion());
+        assertTrue(result.getRoleMatchingResult().isLocationMatched());
     }
 
     @Test
-    void shouldNotMatchWhenRegionIsNotEmptyOnRoleAssignmentAndEmptyOnCaseDetails() {
+    void shouldNotMatchWhenLocationIsNotEmptyOnRoleAssignmentAndEmptyOnCaseDetails() {
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
             Instant.now().minus(1, ChronoUnit.DAYS),
             Instant.now().plus(2, ChronoUnit.DAYS),
-            "PRIVATE", Optional.of("England"), Optional.of(""));
+            "PRIVATE", Optional.of(""), Optional.of("London"));
+
         RoleAssignmentFilteringResult result = new RoleAssignmentFilteringResult(roleAssignment,
             new RoleMatchingResult());
+
         CaseDetails caseDetails = mockCaseDetails();
         boolean matched = classUnderTest.matchAttribute(result, caseDetails);
         assertFalse(matched);
-        assertFalse(result.getRoleMatchingResult().isValidRegion());
+        assertFalse(result.getRoleMatchingResult().isLocationMatched());
     }
-
 }

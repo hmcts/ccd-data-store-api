@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.accessprofile.filter.matcher;
+package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -13,13 +13,16 @@ import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils
 
 @Slf4j
 @Component
-public class SecurityClassificationMatcher implements AttributeMatcher {
+public class SecurityClassificationMatcher implements RoleAttributeMatcher {
 
     @Override
-    public boolean matchAttribute(RoleAssignmentFilteringResult result, CaseDetails caseDetails) {
+    public void matchAttribute(RoleAssignmentFilteringResult result, CaseDetails caseDetails) {
         RoleAssignment roleAssignment = result.getRoleAssignment();
-        log.debug("Apply filter on security classification {} for role assignment {}",
+        SecurityClassification caseDetailsSecurityClassification = caseDetails.getSecurityClassification();
+        log.debug("Match role assignment security classification {} with case details security classification "
+                + " {} for role assignment {}",
             roleAssignment.getClassification(),
+            caseDetailsSecurityClassification,
             roleAssignment.getId());
         Optional<SecurityClassification> securityClassification = getSecurityClassification(roleAssignment
             .getClassification());
@@ -28,9 +31,14 @@ public class SecurityClassificationMatcher implements AttributeMatcher {
                 .getClassification())
                 .get())
                 .test(caseDetails);
-            result.getRoleMatchingResult().setValidClassification(value);
+            result.getRoleMatchingResult().setClassificationMatched(value);
         }
-        return result.getRoleMatchingResult().isValidClassification();
+
+        log.debug("Role assignment security classification {} and case details security classification "
+                + " {} match {}",
+            roleAssignment.getClassification(),
+            caseDetailsSecurityClassification,
+            result.getRoleMatchingResult().isClassificationMatched());
     }
 
 }

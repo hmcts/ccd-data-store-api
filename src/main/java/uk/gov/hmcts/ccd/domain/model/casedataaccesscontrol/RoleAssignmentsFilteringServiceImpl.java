@@ -1,28 +1,25 @@
-package uk.gov.hmcts.ccd.domain.service.accessprofile.filter;
+package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleMatchingResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
-import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.matcher.AttributeMatcher;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.RoleAttributeMatcher;
 
 @Slf4j
 @Component
 public class RoleAssignmentsFilteringServiceImpl implements RoleAssignmentsFilteringService, AccessControl {
 
-    private List<AttributeMatcher> attributeMatchers;
+    private List<RoleAttributeMatcher> roleAttributeMatchers;
 
     @Autowired
-    public RoleAssignmentsFilteringServiceImpl(List<AttributeMatcher> attributeMatchers) {
-        this.attributeMatchers = attributeMatchers;
+    public RoleAssignmentsFilteringServiceImpl(List<RoleAttributeMatcher> roleAttributeMatchers) {
+        this.roleAttributeMatchers = roleAttributeMatchers;
     }
 
     @Override
@@ -37,10 +34,10 @@ public class RoleAssignmentsFilteringServiceImpl implements RoleAssignmentsFilte
                 RoleAssignmentFilteringResult result = new RoleAssignmentFilteringResult(roleAssignment,
                     new RoleMatchingResult());
 
-                attributeMatchers.forEach(matcher -> matcher.matchAttribute(result, caseDetails));
+                roleAttributeMatchers.forEach(matcher -> matcher.matchAttribute(result, caseDetails));
                 return result;
             })
-            .filter(result -> result.getRoleMatchingResult().matchedAExceptRegionAndLocation())
+            .filter(result -> result.getRoleMatchingResult().matchedAllValues())
             .collect(Collectors.toList());
 
         return roleAssignmentFilterResults;

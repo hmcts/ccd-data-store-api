@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.accessprofile.filter.matcher;
+package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -33,7 +33,7 @@ class SecurityClassificationMatcherTest extends BaseFilter {
         CaseDetails caseDetails = mockCaseDetails();
         boolean matched = classUnderTest.matchAttribute(result, caseDetails);
         assertTrue(matched);
-        assertTrue(result.getRoleMatchingResult().isValidClassification());
+        assertTrue(result.getRoleMatchingResult().isClassificationMatched());
     }
 
     @Test
@@ -46,7 +46,7 @@ class SecurityClassificationMatcherTest extends BaseFilter {
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED);
         boolean matched = classUnderTest.matchAttribute(result, caseDetails);
         assertFalse(matched);
-        assertFalse(result.getRoleMatchingResult().isValidClassification());
+        assertFalse(result.getRoleMatchingResult().isClassificationMatched());
     }
 
 
@@ -60,7 +60,7 @@ class SecurityClassificationMatcherTest extends BaseFilter {
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED);
         boolean matched = classUnderTest.matchAttribute(result, caseDetails);
         assertFalse(matched);
-        assertFalse(result.getRoleMatchingResult().isValidClassification());
+        assertFalse(result.getRoleMatchingResult().isClassificationMatched());
     }
 
     @Test
@@ -73,7 +73,7 @@ class SecurityClassificationMatcherTest extends BaseFilter {
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED);
         boolean matched = classUnderTest.matchAttribute(result, caseDetails);
         assertFalse(matched);
-        assertFalse(result.getRoleMatchingResult().isValidClassification());
+        assertFalse(result.getRoleMatchingResult().isClassificationMatched());
     }
 
 }

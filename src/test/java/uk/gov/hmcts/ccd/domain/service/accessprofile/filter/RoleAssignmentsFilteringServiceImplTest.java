@@ -10,14 +10,15 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentsFilteringServiceImpl;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.matcher.AttributeMatcher;
-import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.matcher.BeginDateEndDateMatcher;
-import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.matcher.CaseIdMatcher;
-import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.matcher.JurisdictionMatcher;
-import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.matcher.LocationMatcher;
-import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.matcher.RegionMatcher;
-import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.matcher.SecurityClassificationMatcher;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.RoleAttributeMatcher;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.BeginDateEndDateMatcher;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.CaseIdMatcher;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.JurisdictionMatcher;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.LocationMatcher;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.RegionMatcher;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.SecurityClassificationMatcher;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -29,13 +30,13 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
 
     @BeforeEach
     void setUp() {
-        List<AttributeMatcher> attributeMatchers = Lists.newArrayList(new BeginDateEndDateMatcher(),
+        List<RoleAttributeMatcher> roleAttributeMatchers = Lists.newArrayList(new BeginDateEndDateMatcher(),
             new CaseIdMatcher(),
             new JurisdictionMatcher(),
             new LocationMatcher(),
             new RegionMatcher(),
             new SecurityClassificationMatcher());
-        classUnderTest = new RoleAssignmentsFilteringServiceImpl(attributeMatchers);
+        classUnderTest = new RoleAssignmentsFilteringServiceImpl(roleAttributeMatchers);
     }
 
     @Test

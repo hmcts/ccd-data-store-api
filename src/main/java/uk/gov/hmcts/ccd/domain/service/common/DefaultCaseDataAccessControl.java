@@ -10,7 +10,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteri
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
-import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.RoleAssignmentsFilteringService;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentsFilteringService;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 
 @Component
