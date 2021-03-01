@@ -95,7 +95,8 @@ public class JexlEnablingConditionConverter implements EnablingConditionConverte
     }
 
     private String getLeftHandSideOfEquals(Matcher matcher) {
-        return matcher.group(1).trim();
+        String variable = matcher.group(1).trim().replace("[", "");
+        return variable.replaceAll("]", "");
     }
 
     private String getEqualsSign(Matcher matcher, String value, boolean equality) {

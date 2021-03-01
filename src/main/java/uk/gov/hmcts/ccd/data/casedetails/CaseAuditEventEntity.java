@@ -52,7 +52,9 @@ public class CaseAuditEventEntity {
             + " cae.userFirstName as userFirstName, cae.userLastName as userLastName, cae.summary as summary,"
             + " cae.description as description, cae.createdDate as createdDate, cae.stateId as stateId,"
             + " cae.stateName as stateName, cae.securityClassification as securityClassification,"
-            + " cae.caseTypeId as caseTypeId, cae.caseDataId as caseDataId"
+            + " cae.caseTypeId as caseTypeId, cae.caseDataId as caseDataId, cae.caseTypeVersion as caseTypeVersion,"
+            + " cae.proxiedBy as proxiedBy, cae.proxiedByLastName as proxiedByLastName,"
+            + " cae.proxiedByFirstName as proxiedByFirstName"
             + " FROM CaseAuditEventEntity cae LEFT JOIN cae.significantItemEntity as significantItemEntity"
             + " WHERE cae.caseDataId = :" + CaseAuditEventEntity.CASE_DATA_ID;
 
@@ -108,6 +110,16 @@ public class CaseAuditEventEntity {
     @Column(name = "data_classification", nullable = false)
     @Convert(converter = JsonDataConverter.class)
     private JsonNode dataClassification;
+
+    @Column(name = "proxied_by")
+    private String proxiedBy;
+
+    @Column(name = "proxied_by_last_name")
+    private String proxiedByLastName;
+
+    @Column(name = "proxied_by_first_name")
+    private String proxiedByFirstName;
+
     @OneToOne(mappedBy = "caseEvent", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private SignificantItemEntity significantItemEntity;
 }

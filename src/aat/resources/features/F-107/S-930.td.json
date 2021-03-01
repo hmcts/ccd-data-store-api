@@ -7,6 +7,7 @@
     "an active profile in CCD",
     "contains some OrganisationPolicy fields with all correct values"
   ],
+
   "request": {
     "pathVariables": {
       "cid": "${[scenarioContext][childContexts][S-930_Create_Case_Data][testData][actualResponse][body][id]}"
@@ -15,6 +16,7 @@
       "event_token": "${[scenarioContext][childContexts][S-930-Prerequisite][testData][actualResponse][body][token]}"
     }
   },
+
   "expectedResponse": {
     "body": {
       "_links": {
