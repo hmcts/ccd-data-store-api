@@ -1,0 +1,54 @@
+{
+  "_guid_": "S-11029.1",
+  "_extends_": "F-109_test_Data_Base_ES_internal",
+
+  "specs": [
+    "with access to create a case for Befta_Jurisdiction1",
+    "with only the 'caseworker-caa' role",
+    "is made to query the previously created case from Befta_Jurisdiction1",
+    "contains the case type of Befta_Jurisdiction1"
+  ],
+
+  "request": {
+    "queryParams": {
+      "ctid": "BEFTA_CASETYPE_1_1",
+      "use_case": "WORKBASKET"
+    },
+    "body": {
+      "query": {
+        "match": {
+          "reference": "${[scenarioContext][childContexts][F-109-Befta_Jurisdiction1_Case_Creation][testData][actualResponse][body][id]}"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "headers": [{
+        "metadata": {
+          "jurisdiction": "BEFTA_JURISDICTION_1",
+          "case_type_id": "BEFTA_CASETYPE_1_1"
+        },
+        "fields": [{
+          "label": "`Text` field",
+          "order": 1,
+          "metadata": false,
+          "case_field_id": "TextField",
+          "case_field_type": "[[ANYTHING_PRESENT]]",
+          "display_context_parameter": "[[ANY_STRING_NULLABLE]]"
+        }, {
+          "label": "`Email` field",
+          "order": 2,
+          "metadata": false,
+          "case_field_id": "EmailField",
+          "case_field_type": "[[ANYTHING_PRESENT]]",
+          "display_context_parameter": "[[ANY_STRING_NULLABLE]]"
+        }],
+        "cases": "[[ANYTHING_PRESENT]]"
+      }],
+      "cases": "[[ANYTHING_PRESENT]]",
+      "total": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

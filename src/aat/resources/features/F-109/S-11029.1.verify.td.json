@@ -1,0 +1,62 @@
+{
+  "_guid_": "S-11029.1_Get_Work_Basket_Result_Fields_caseworker-befta_jurisdiction_1",
+  "title": "Verify Internal Elastic Search Endpoint Work Basket Results",
+
+  "specs": [
+    "to verify different Label value for TextField for user with role caseworker-befta_jurisdiction_1"
+  ],
+
+  "productName": "CCD Data Store api",
+  "operationName": "internal/searchCases",
+  "method": "POST",
+  "uri": "internal/searchCases",
+
+  "user" : {
+    "_extends_": "BeftaCaseworker1"
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "ctid": "BEFTA_CASETYPE_1_1",
+      "use_case": "WORKBASKET"
+    },
+    "body": {
+      "query": {
+        "match": {
+          "reference": "${[scenarioContext][siblingContexts][F-109-Befta_Jurisdiction1_Case_Creation][testData][actualResponse][body][id]}"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "headers": [{
+        "metadata": {
+          "jurisdiction": "BEFTA_JURISDICTION_1",
+          "case_type_id": "BEFTA_CASETYPE_1_1"
+        },
+        "fields": [{
+          "label": "Caseworker Text field",
+          "order": 1,
+          "metadata": false,
+          "case_field_id": "TextField",
+          "case_field_type": "[[ANYTHING_PRESENT]]",
+          "display_context_parameter": "[[ANY_STRING_NULLABLE]]"
+        }, {
+          "label": "Caseworker Email field",
+          "order": 2,
+          "metadata": false,
+          "case_field_id": "EmailField",
+          "case_field_type": "[[ANYTHING_PRESENT]]",
+          "display_context_parameter": "[[ANY_STRING_NULLABLE]]"
+        }],
+        "cases": "[[ANYTHING_PRESENT]]"
+      }],
+      "cases": "[[ANYTHING_PRESENT]]",
+      "total": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

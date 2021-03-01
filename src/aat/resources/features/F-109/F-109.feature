@@ -100,3 +100,18 @@ Feature: F-109: Role-Based Authorisation of Caseworker CAAs
     Then a positive response is received,
     And the response has all the details as expected,
     And a call [to verify Olawale's reception of the role CR-1 over the case C1] will get the expected response as in [S-105.1_Get_Case_Roles_for_Case_C1].
+
+  @S-11029.1
+  Scenario: Must return internal/searchCases different WorkBasketResultField values for UserRole and Label based on user assigned roles
+    Given a user [with access to create a case for Befta_Jurisdiction1]
+    And a case that has just been created as in [F-109-Befta_Jurisdiction1_Case_Creation]
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created]
+    And a user [with only the 'caseworker-caa' role]
+    When a request is prepared with appropriate values
+    And the request [is made to query the previously created case from Befta_Jurisdiction1]
+    And it is submitted to call the [internal/searchCases] operation of [CCD Data Store api]
+    Then a positive response is received
+    And the request [contains the case type of Befta_Jurisdiction1]
+    And the response has all the details as expected
+    And a call [to verify different Label value for TextField for user with role caseworker-befta_jurisdiction_1] will get the expected response as in [S-11029.1_Get_Work_Basket_Result_Fields_caseworker-befta_jurisdiction_1].
+
