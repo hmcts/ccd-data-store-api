@@ -17,12 +17,12 @@ class CaseReferenceUtilsTest {
 
     @Test
     void testIsAValidCaseReferenceFormat() {
-        assertEquals(true, CaseReferenceUtils.isAValidCaseReferenceFormat(validCaseWithHyphens));
-        assertEquals(true, CaseReferenceUtils.isAValidCaseReferenceFormat(validCaseWithoutHyphens));
+        assertEquals(true, CaseReferenceUtils.isAValidCaseReference(validCaseWithHyphens));
+        assertEquals(true, CaseReferenceUtils.isAValidCaseReference(validCaseWithoutHyphens));
     }
 
     @Test
     void failIsAValidCaseReferenceFormat() {
-        assertEquals(false, CaseReferenceUtils.isAValidCaseReferenceFormat("TETE"));
+        assertEquals(false, CaseReferenceUtils.isAValidCaseReference("TETE"));
     }
 }

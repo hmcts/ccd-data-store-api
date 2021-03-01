@@ -21,8 +21,8 @@ public class PaginatedSearchMetaDataOperation {
 
     public PaginatedSearchMetadata execute(MetaData metaData, Map<String, String> criteria) {
 
-        if (!metaData.validateAndsConvertReference()) {
-            return new PaginatedSearchMetadata();
+        if (!metaData.validateAndConvertReference()) {
+            return PaginatedSearchMetadata.EMPTY;
         }
         return caseDetailsRepository.getPaginatedSearchMetadata(metaData, criteria);
     }

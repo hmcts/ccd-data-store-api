@@ -234,15 +234,14 @@ public class MetaData {
         return prefix + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, metadataField.getParameterName());
     }
 
-    public boolean validateAndsConvertReference() {
-        if (caseReference.isPresent()) {
-            if (CaseReferenceUtils.isAValidCaseReferenceFormat(caseReference.get())) {
-                caseReference = Optional.of(CaseReferenceUtils.removeHyphens(caseReference.get()));
-                return true;
+    public boolean validateAndConvertReference() {
+        return caseReference.map(reference -> {
+            boolean valid = CaseReferenceUtils.isAValidCaseReference(reference);
+            if (valid) {
+                caseReference = Optional.of(CaseReferenceUtils.removeHyphens(reference));
             }
-            return false;
-        }
-        return true;
+            return valid;
+        }).orElse(true);
     }
 
     @Override

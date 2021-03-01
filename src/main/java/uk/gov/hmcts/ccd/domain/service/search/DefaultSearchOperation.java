@@ -26,7 +26,7 @@ public class DefaultSearchOperation implements SearchOperation {
     @Override
     public List<CaseDetails> execute(MetaData metaData, Map<String, String> criteria) {
 
-        if (!metaData.validateAndsConvertReference()) {
+        if (!metaData.validateAndConvertReference()) {
             return Lists.newArrayList();
         }
         return caseDetailsRepository.findByMetaDataAndFieldData(metaData, criteria);
