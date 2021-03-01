@@ -67,7 +67,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
     }
 
     @Test
-    void shouldFilerBasedOnSecurityClassificationWhenCaseClassificationIsRestricted() {
+    void shouldFilterBasedOnSecurityClassificationWhenCaseClassificationIsRestricted() {
         RoleAssignments roleAssignments = mockRoleAssignmentsOnSecurityClassification();
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED);
         List<RoleAssignmentFilteringResult> filteredRoleAssignments = classUnderTest

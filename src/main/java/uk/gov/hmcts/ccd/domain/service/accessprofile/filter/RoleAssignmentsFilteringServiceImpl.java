@@ -40,7 +40,7 @@ public class RoleAssignmentsFilteringServiceImpl implements RoleAssignmentsFilte
                 attributeMatchers.forEach(matcher -> matcher.matchAttribute(result, caseDetails));
                 return result;
             })
-            .filter(result -> result.getRoleMatchingResult().matchedAllValues())
+            .filter(result -> result.getRoleMatchingResult().matchedAExceptRegionAndLocation())
             .collect(Collectors.toList());
 
         return roleAssignmentFilterResults;

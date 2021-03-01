@@ -15,8 +15,15 @@ public class RoleMatchingResult {
         return isValidDate()
             && isValidCaseId()
             && isValidJurisdiction()
+            && isValidClassification()
             && isValidRegion()
-            && isValidLocation()
+            && isValidLocation();
+    }
+
+    public boolean matchedAExceptRegionAndLocation() {
+        return isValidDate()
+            && isValidCaseId()
+            && isValidJurisdiction()
             && isValidClassification();
     }
 }
