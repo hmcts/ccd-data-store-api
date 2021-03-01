@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -93,14 +92,7 @@ public class FakeRoleAssignmentsGenerator {
 
     private boolean atLeastOneCaseRoleExists(List<RoleAssignment> roleAssignments) {
         return roleAssignments.stream()
-            .anyMatch(this::isCaseRole);
-    }
-
-    private boolean isCaseRole(RoleAssignment roleAssignment) {
-        return roleAssignment.getAttributes() != null
-            && roleAssignment.getAttributes().getCaseId().isPresent()
-            && !roleAssignment.getAttributes().getCaseId().get().equals("null")
-            && StringUtils.isNotBlank(roleAssignment.getAttributes().getCaseId().get());
+            .anyMatch(RoleAssignment::isCaseRoleAssignment);
     }
 
     public List<String> filterGrantedRoles(List<String> userRoles) {

@@ -15,9 +15,9 @@ public class RoleAssignmentFilteringResult {
 
     public AccessProcess getAccessProcess(String grantType) {
         if (STANDARD.name().equals(grantType)
-        && SPECIFIC.name().equals(grantType)
-        && CHALLENGED.name().equals(grantType)
-        && roleMatchingResult.matchedAllValues()) {
+            && SPECIFIC.name().equals(grantType)
+            && CHALLENGED.name().equals(grantType)
+            && roleMatchingResult.matchedAllValues()) {
             return AccessProcess.NONE;
         } else if (STANDARD.name().equals(grantType)
             && roleMatchingResult.matchedAExceptRegionAndLocation()) {

@@ -9,6 +9,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
 import java.util.HashSet;
@@ -29,7 +30,6 @@ import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.FakeRoleAssi
 import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.FakeRoleAssignmentsGenerator.GRANT_TYPE_SPECIFIC;
 import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.FakeRoleAssignmentsGenerator.GRANT_TYPE_STANDARD;
 import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.FakeRoleAssignmentsGenerator.IDAM_PREFIX;
-import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.FakeRoleAssignmentsGenerator.ROLE_TYPE_CASE;
 
 @DisplayName("FakeRoleAssignmentsGenerator")
 class FakeRoleAssignmentsGeneratorTest {
@@ -54,7 +54,6 @@ class FakeRoleAssignmentsGeneratorTest {
     class AddFakeRoleAssignments {
 
         public static final String JURISDICTION = "DIVORCE";
-        public static final String ROLE_TYPE_ORGANISATION = "ORGANISATION";
         public static final String ROLE_SOLICITOR = "caseworker-divorce-solicitor";
         public static final String EXPECTED_ROLE_SOLICITOR = IDAM_PREFIX + "caseworker-divorce-solicitor";
         public static final String ROLE_LOCAL_AUTHORITY = "caseworker-divorce-localAuthority";
@@ -70,15 +69,12 @@ class FakeRoleAssignmentsGeneratorTest {
         @Test
         @DisplayName("should add fake RoleAssignments for granted user roles")
         public void shouldAddFakeRoleAssignmentsForGrantedUserRoles() {
-            given(userRepository.getUserRoles()).willReturn(new HashSet<>(asList("caseworker",
-                                                                                 "caseworker-divorce",
+            given(userRepository.getUserRoles()).willReturn(new HashSet<>(asList(ROLE_CASEWORKER_1,
+                                                                                 ROLE_CASEWORKER_2,
                                                                                  ROLE_SOLICITOR,
                                                                                  ROLE_LOCAL_AUTHORITY)));
 
-            List<RoleAssignment> roleAssignments = singletonList(RoleAssignment.builder()
-                                                                     .roleName(ROLE_PROVIDED)
-                                                                     .roleType(ROLE_TYPE_CASE)
-                                                                     .build());
+            List<RoleAssignment> roleAssignments = singletonList(caseRoleAssignment());
 
             List<RoleAssignment> augmentedRoleAssignments = fakeRoleAssignmentsGenerator
                 .addFakeRoleAssignments(roleAssignments);
@@ -116,22 +112,18 @@ class FakeRoleAssignmentsGeneratorTest {
         @Test
         @DisplayName("should not add fake RoleAssignments for granted roles when no single case RoleAssignment present")
         public void shouldNotAddFakeRoleAssignmentsForGrantedUserRolesWhenNoSingleCaseRoleAssignmentPresent() {
-            given(userRepository.getUserRoles()).willReturn(new HashSet<>(asList("caseworker",
-                                                                                 "caseworker-divorce",
+            given(userRepository.getUserRoles()).willReturn(new HashSet<>(asList(ROLE_CASEWORKER_1,
+                                                                                 ROLE_CASEWORKER_2,
                                                                                  ROLE_SOLICITOR,
                                                                                  ROLE_LOCAL_AUTHORITY)));
 
-            List<RoleAssignment> roleAssignments = singletonList(RoleAssignment.builder()
-                                                                     .roleName(ROLE_PROVIDED)
-                                                                     .roleType(ROLE_TYPE_ORGANISATION)
-                                                                     .build());
+            List<RoleAssignment> roleAssignments = singletonList(organisationRoleAssignment());
 
             List<RoleAssignment> augmentedRoleAssignments = fakeRoleAssignmentsGenerator
                 .addFakeRoleAssignments(roleAssignments);
 
             assertAll(
                 () -> assertThat(augmentedRoleAssignments.size(), is(1)),
-                () -> assertThat(augmentedRoleAssignments.get(0).getRoleType(), is(ROLE_TYPE_ORGANISATION)),
                 () -> assertThat(augmentedRoleAssignments.get(0).getRoleName(), is(ROLE_PROVIDED))
             );
         }
@@ -147,10 +139,7 @@ class FakeRoleAssignmentsGeneratorTest {
             given(caseDefinitionRepository.getClassificationsForUserRoleList(anyList()))
                 .willReturn(userRolesWithClassification);
 
-            List<RoleAssignment> roleAssignments = singletonList(RoleAssignment.builder()
-                                                                     .roleName(ROLE_PROVIDED)
-                                                                     .roleType(ROLE_TYPE_ORGANISATION)
-                                                                     .build());
+            List<RoleAssignment> roleAssignments = singletonList(organisationRoleAssignment());
 
             List<RoleAssignment> augmentedRoleAssignments = fakeRoleAssignmentsGenerator
                 .addFakeRoleAssignments(roleAssignments);
@@ -183,6 +172,21 @@ class FakeRoleAssignmentsGeneratorTest {
 
                 () -> verify(userRepository).getUserRoles()
             );
+        }
+
+        private RoleAssignment caseRoleAssignment() {
+            return roleAssignment(Optional.of("12345"));
+        }
+
+        private RoleAssignment organisationRoleAssignment() {
+            return roleAssignment(Optional.empty());
+        }
+
+        private RoleAssignment roleAssignment(Optional<String> caseId) {
+            return RoleAssignment.builder()
+                .roleName(ROLE_PROVIDED)
+                .attributes(RoleAssignmentAttributes.builder().caseId(caseId).build())
+                .build();
         }
 
         private UserRole createUserRole(String role, String classification) {
