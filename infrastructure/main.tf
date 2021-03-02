@@ -116,7 +116,7 @@ resource "azurerm_key_vault_secret" "draft-store-key" {
 // DB version 11              //
 ////////////////////////////////
 
-module "user-profile-db-v11" {
+module "data-store-db-v11" {
   source          = "git@github.com:hmcts/cnp-module-postgres?ref=master"
   product         = "${var.component}-db-v11"
   component       = var.component
@@ -135,30 +135,30 @@ module "user-profile-db-v11" {
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER-V11" {
   name         = "${var.component}-POSTGRES-USER-V11"
-  value        = module.user-profile-db-v11.user_name
+  value        = module.data-store-db-v11.user_name
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-PASS-V11" {
   name         = "${var.component}-POSTGRES-PASS-V11"
-  value        = module.user-profile-db-v11.postgresql_password
+  value        = module.data-store-db-v11.postgresql_password
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_HOST-V11" {
   name         = "${var.component}-POSTGRES-HOST-V11"
-  value        = module.user-profile-db-v11.host_name
+  value        = module.data-store-db-v11.host_name
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_PORT-V11" {
   name         = "${var.component}-POSTGRES-PORT-V11"
-  value        = module.user-profile-db-v11.postgresql_listen_port
+  value        = module.data-store-db-v11.postgresql_listen_port
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_DATABASE-V11" {
   name         = "${var.component}-POSTGRES-DATABASE-V11"
-  value        = module.user-profile-db-v11.postgresql_database
+  value        = module.data-store-db-v11.postgresql_database
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
 }
