@@ -127,9 +127,10 @@ module "data-store-db-v11" {
   postgresql_user = "${var.postgresql_user}"
   database_name   = "${var.database_name}"
   postgresql_version = "11"
-  sku_name        = "GP_Gen5_2"
+  sku_name        = "${var.database_sku_name}"
   sku_tier        = "GeneralPurpose"
-  storage_mb      = "51200"
+  sku_capacity    = "${var.database_sku_capacity}"
+  storage_mb      = "${var.database_storage_mb}"
   common_tags     = "${var.common_tags}"
 }
 
