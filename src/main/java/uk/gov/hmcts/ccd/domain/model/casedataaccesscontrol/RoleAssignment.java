@@ -34,7 +34,6 @@ public class RoleAssignment {
     public boolean isCaseRoleAssignment() {
         return this.getAttributes() != null
             && this.getAttributes().getCaseId() != null
-            && this.getAttributes().getCaseId().isPresent()
-            && StringUtils.isNotBlank(this.getAttributes().getCaseId().get());
+            && StringUtils.isNotBlank(this.getAttributes().getCaseId().orElse(""));
     }
 }
