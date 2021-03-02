@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.common;
+package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,7 +14,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
-class LegacyCaseDataAccessControlTest {
+class RoleBasedCaseDataAccessControlTest {
 
     private static final String IDAM_ID = "23";
     private static final String CASE_ID = "45677";
@@ -26,7 +26,7 @@ class LegacyCaseDataAccessControlTest {
     private UserAuthorisation userAuthorisation;
 
     @InjectMocks
-    private LegacyCaseDataAccessControl instance;
+    private RoleBasedCaseDataAccessControl instance;
 
     @BeforeEach
     void setup() {

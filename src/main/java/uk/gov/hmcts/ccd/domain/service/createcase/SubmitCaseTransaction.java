@@ -17,7 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
-import uk.gov.hmcts.ccd.domain.service.common.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;

@@ -149,8 +149,8 @@ public class ApplicationParams {
     @Value("${ccd.access-control.caseworker.role.regex}")
     private String ccdAccessControlCaseworkerRoleRegex;
 
-    @Value("${ccd.new-access-control-enabled}")
-    private boolean ccdNewAccessControlEnabled;
+    @Value("${enable-attribute-based-access-control}")
+    private boolean enableAttributeBasedAccessControl;
 
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
@@ -409,8 +409,8 @@ public class ApplicationParams {
         return ccdAccessControlCaseworkerRoleRegex;
     }
 
-    public boolean getCcdNewAccessControlEnabled() {
-        return ccdNewAccessControlEnabled;
+    public boolean getEnableAttributeBasedAccessControl() {
+        return enableAttributeBasedAccessControl;
     }
 
     public List<String> getCcdAccessControlCitizenRoles() {
