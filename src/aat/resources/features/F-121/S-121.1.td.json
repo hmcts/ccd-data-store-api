@@ -32,6 +32,9 @@
       "case_id": null,
       "case_fields": [
         {
+          "__ordering__": "UNORDERED"
+        },
+        {
           "id": "Address1",
           "label": "Address 1",
           "hidden": false,
@@ -46,6 +49,9 @@
             "regular_expression": null,
             "fixed_list_items": [],
             "complex_fields": [
+              {
+                "__ordering__": "UNORDERED"
+              },
               {
                 "id": "AddressLine1",
                 "label": "Building and Street",
@@ -70,19 +76,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "AddressLine2",
@@ -108,19 +109,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "AddressLine3",
@@ -146,19 +142,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "PostTown",
@@ -184,19 +175,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "County",
@@ -222,19 +208,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "PostCode",
@@ -260,19 +241,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "Country",
@@ -298,19 +274,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               }
             ],
             "collection_field_type": null
@@ -325,16 +296,13 @@
           "show_summary_change_option": true,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
+          "publish" : false,
+          "publish_as" : null,
           "acls": [
             {
-              "role": "caseworker-befta_master",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
+              "_extends_": "CaseworkerBeftaMasterAccessControlList"
             }
-          ],
-          "default_value": null
+          ]
         },
         {
           "id": "Address2",
@@ -352,6 +320,9 @@
             "fixed_list_items": [],
             "complex_fields": [
               {
+                "__ordering__": "UNORDERED"
+              },
+              {
                 "id": "AddressLine1",
                 "label": "Building and Street",
                 "hidden": null,
@@ -375,19 +346,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "AddressLine2",
@@ -413,19 +379,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "AddressLine3",
@@ -451,19 +412,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "PostTown",
@@ -489,19 +445,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "County",
@@ -527,19 +478,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "PostCode",
@@ -565,19 +511,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               },
               {
                 "id": "Country",
@@ -603,19 +544,14 @@
                 "show_condition": null,
                 "acls": [
                   {
-                    "role": "caseworker-befta_master",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
+                    "_extends_": "CaseworkerBeftaMasterAccessControlList"
                   }
                 ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
                 "retain_hidden_value": null,
-                "formatted_value": null,
-                "default_value": null
+                "formatted_value": null
               }
             ],
             "collection_field_type": null
@@ -630,16 +566,13 @@
           "show_summary_change_option": true,
           "show_summary_content_option": null,
           "retain_hidden_value": null,
+          "publish" : false,
+          "publish_as" : null,
           "acls": [
             {
-              "role": "caseworker-befta_master",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
+              "_extends_": "CaseworkerBeftaMasterAccessControlList"
             }
-          ],
-          "default_value": null
+          ]
         }
       ],
       "event_token": "[[ANYTHING_PRESENT]]",

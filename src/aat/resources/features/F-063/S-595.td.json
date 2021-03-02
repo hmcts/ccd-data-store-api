@@ -12,8 +12,7 @@
 
   "users": {
     "invokingUser": {
-      "username": "befta.caseworker.3@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_3_PWD]]"
+      "_extends_": "BeftaCaseworker3"
     }
   },
 
@@ -31,6 +30,10 @@
     },
     "body": {
       "searchInputs": [
+        {
+          "__ordering__": "unordered",
+          "__elementId__": "label"
+        },
         {
           "label": "Search `Text` field",
           "order": 1,

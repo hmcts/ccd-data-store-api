@@ -3,11 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Optional;
-import javax.inject.Inject;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -29,12 +25,14 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
+import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
@@ -44,6 +42,12 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+
+import javax.inject.Inject;
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
@@ -71,13 +75,14 @@ public class CreateCaseEventService {
     private final FieldProcessorService fieldProcessorService;
     private final Clock clock;
     private final CasePostStateService casePostStateService;
+    private final MessageService messageService;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                   @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                   final CaseDetailsRepository caseDetailsRepository,
                                   @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                      final CaseDefinitionRepository caseDefinitionRepository,
+                                  final CaseDefinitionRepository caseDefinitionRepository,
                                   final CaseAuditEventRepository caseAuditEventRepository,
                                   final EventTriggerService eventTriggerService,
                                   final EventTokenService eventTokenService,
@@ -92,7 +97,8 @@ public class CreateCaseEventService {
                                   final UserAuthorisation userAuthorisation,
                                   final FieldProcessorService fieldProcessorService,
                                   final CasePostStateService casePostStateService,
-                                  @Qualifier("utcClock") final Clock clock) {
+                                  @Qualifier("utcClock") final Clock clock,
+                                  @Qualifier("caseEventMessageService") final MessageService messageService) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -111,6 +117,7 @@ public class CreateCaseEventService {
         this.fieldProcessorService = fieldProcessorService;
         this.casePostStateService = casePostStateService;
         this.clock = clock;
+        this.messageService = messageService;
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
@@ -133,13 +140,14 @@ public class CreateCaseEventService {
 
         validatePreState(caseDetails, caseEventDefinition);
         content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, caseEventDefinition));
+        String oldState = caseDetails.getState();
         mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, caseEventDefinition, caseTypeDefinition);
         AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse =
             callbackInvoker.invokeAboutToSubmitCallback(caseEventDefinition,
-            caseDetailsBefore,
-            caseDetails,
-            caseTypeDefinition,
-            content.getIgnoreWarning());
+                caseDetailsBefore,
+                caseDetails,
+                caseTypeDefinition,
+                content.getIgnoreWarning());
 
         final Optional<String> newState = aboutToSubmitCallbackResponse.getState();
 
@@ -147,16 +155,18 @@ public class CreateCaseEventService {
         LocalDateTime timeNow = now();
         final CaseDetails savedCaseDetails =
             saveCaseDetails(caseDetailsBefore,
-            caseDetails,
-            caseEventDefinition,
-            newState,
-            timeNow);
+                caseDetails,
+                caseEventDefinition,
+                newState,
+                timeNow);
         saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse,
             content.getEvent(),
             caseEventDefinition,
             savedCaseDetails,
             caseTypeDefinition,
-            timeNow);
+            timeNow,
+            oldState,
+            content.getOnBehalfOfUserToken());
 
         return CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsBefore)
@@ -248,12 +258,14 @@ public class CreateCaseEventService {
                                               final Event event,
                                               final CaseEventDefinition caseEventDefinition,
                                               final CaseDetails caseDetails,
-                                              final CaseTypeDefinition caseTypeDefinition, LocalDateTime timeNow) {
-        final IdamUser user = userRepository.getUser();
+                                              final CaseTypeDefinition caseTypeDefinition,
+                                              final LocalDateTime timeNow,
+                                              final String oldState,
+                                              final String onBehalfOfUserToken) {
+
         final CaseStateDefinition caseStateDefinition =
             caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
         final AuditEvent auditEvent = new AuditEvent();
-
         auditEvent.setEventId(event.getEventId());
         auditEvent.setEventName(caseEventDefinition.getName());
         auditEvent.setSummary(event.getSummary());
@@ -264,15 +276,34 @@ public class CreateCaseEventService {
         auditEvent.setStateName(caseStateDefinition.getName());
         auditEvent.setCaseTypeId(caseTypeDefinition.getId());
         auditEvent.setCaseTypeVersion(caseTypeDefinition.getVersion().getNumber());
-        auditEvent.setUserId(user.getId());
-        auditEvent.setUserLastName(user.getSurname());
-        auditEvent.setUserFirstName(user.getForename());
         auditEvent.setCreatedDate(timeNow);
         auditEvent.setSecurityClassification(securityClassificationService.getClassificationForEvent(caseTypeDefinition,
             caseEventDefinition));
         auditEvent.setDataClassification(caseDetails.getDataClassification());
         auditEvent.setSignificantItem(aboutToSubmitCallbackResponse.getSignificantItem());
+        saveUserDetails(onBehalfOfUserToken, auditEvent);
 
         caseAuditEventRepository.set(auditEvent);
+        messageService.handleMessage(MessageContext.builder()
+            .caseDetails(caseDetails)
+            .caseTypeDefinition(caseTypeDefinition)
+            .caseEventDefinition(caseEventDefinition)
+            .oldState(oldState).build());
+    }
+
+    private void saveUserDetails(String onBehalfOfUserToken, AuditEvent auditEvent) {
+        boolean onBehalfOfUserTokenExists = !StringUtils.isEmpty(onBehalfOfUserToken);
+        IdamUser user = onBehalfOfUserTokenExists
+            ? userRepository.getUser(onBehalfOfUserToken)
+            : userRepository.getUser();
+        auditEvent.setUserId(user.getId());
+        auditEvent.setUserLastName(user.getSurname());
+        auditEvent.setUserFirstName(user.getForename());
+        if (onBehalfOfUserTokenExists) {
+            user = userRepository.getUser();
+            auditEvent.setProxiedBy(user.getId());
+            auditEvent.setProxiedByLastName(user.getSurname());
+            auditEvent.setProxiedByFirstName(user.getForename());
+        }
     }
 }

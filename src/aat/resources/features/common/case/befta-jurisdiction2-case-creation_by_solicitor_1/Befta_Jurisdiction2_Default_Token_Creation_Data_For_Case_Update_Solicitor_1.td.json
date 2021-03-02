@@ -1,0 +1,44 @@
+{
+	"_guid_": "Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Update_Solicitor_1",
+
+	"productName": "CCD Data Store",
+	"operationName": "Update event token as Case worker",
+
+	"method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+
+  "specs": [
+		"to create a token for case update event"
+	],
+
+	"users": {
+		"invokingUser": {
+      "_extends_": "BeftaCaseworker2Solicitor1"
+		}
+	},
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_JURISDICTION_2",
+      "ctid": "BEFTA_CASETYPE_2_1",
+      "etid": "UPDATE"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "token": "[[ANYTHING_PRESENT]]",
+      "case_details": "[[ANYTHING_PRESENT]]",
+      "event_id": "UPDATE"
+    }
+  }
+}

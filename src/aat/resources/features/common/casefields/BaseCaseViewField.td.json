@@ -1,0 +1,19 @@
+{
+  "_guid_": "BaseCaseViewField",
+
+  "hidden": false,
+  "hint_text": null,
+  "field_type": {
+    "_extends_" : "BaseDateTimeFieldType"
+  },
+  "validation_expr": null,
+  "security_label": "PUBLIC",
+  "order": null,
+  "display_context_parameter": null,
+  "show_condition": null,
+  "show_summary_content_option": null,
+  "retain_hidden_value": null,
+  "publish": false,
+  "publish_as": null,
+  "acls": []
+}

@@ -1,19 +1,22 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
 import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
 import org.junit.AssumptionViolatedException;
+import uk.gov.hmcts.befta.BeftaTestDataLoader;
+import uk.gov.hmcts.befta.DefaultBeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
 import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Optional.ofNullable;
 
@@ -30,10 +33,31 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         }
     }
 
+    @Before
+    public void createUID(Scenario scenario) {
+        String tag = getDataFileTag(scenario);
+        String uid = tag + UUID.randomUUID().toString();
+        uniqueStringsPerTestData.put(tag,uid);
+    }
+
+    private synchronized String getDataFileTag(Scenario scenario) {
+        return scenario.getSourceTagNames().stream()
+            .filter(t -> t.startsWith("@S-"))
+            .findFirst()
+            .map(t -> t.substring(1))
+            .map(Object::toString)
+            .orElse("error cant find tag");
+    }
+
     @Override
-    public void doLoadTestData() {
-        loader.addCcdRoles();
-        loader.importDefinitions();
+    protected BeftaTestDataLoader buildTestDataLoader() {
+        return new DefaultBeftaTestDataLoader() {
+            @Override
+            public void doLoadTestData() {
+                DataStoreTestAutomationAdapter.this.loader.addCcdRoles();
+                DataStoreTestAutomationAdapter.this.loader.importDefinitions();
+            }
+        };
     }
 
     @Override
@@ -70,14 +94,49 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                                                                         previousValueContextPath,
                                                                         incrementBy);
         } else if (key.toString().equals("UniqueString")) {
-            return uniqueStringsPerTestData
-                    .computeIfAbsent(scenarioContext.getContextId(), k ->
-                    UUID.randomUUID().toString());
+
+            String scenarioTag;
+            try {
+                scenarioTag = scenarioContext.getParentContext().getCurrentScenarioTag();
+            } catch (NullPointerException e) {
+                scenarioTag = scenarioContext.getCurrentScenarioTag();
+            }
+            return uniqueStringsPerTestData.get(scenarioTag);
+
+        } else if (key.toString().startsWith("approximately ")) {
+            try {
+                String actualSizeFromHeaderStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
+                        "testData.actualResponse.headers.Content-Length");
+                String expectedSizeStr = key.toString().replace("approximately ", "");
+
+                int actualSize =  Integer.parseInt(actualSizeFromHeaderStr);
+                int expectedSize = Integer.parseInt(expectedSizeStr);
+
+                if (Math.abs(actualSize - expectedSize) < (actualSize * 10 / 100)) {
+                    return actualSizeFromHeaderStr;
+                }
+                return expectedSize;
+            } catch (Exception e) {
+                throw new FunctionalTestException("Problem checking acceptable response payload: ", e);
+            }
+        } else if (key.toString().startsWith("contains ")) {
+            try {
+                String actualValueStr = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,
+                    "testData.actualResponse.body.__plainTextValue__");
+                String expectedValueStr = key.toString().replace("contains ", "");
+
+                if (actualValueStr.contains(expectedValueStr)) {
+                    return actualValueStr;
+                }
+                return "expectedValueStr " + expectedValueStr + " not present in response ";
+            } catch (Exception e) {
+                throw new FunctionalTestException("Problem checking acceptable response payload: ", e);
+            }
         }
         return super.calculateCustomValue(scenarioContext, key);
     }
 
-    private boolean elasticSearchEnabled() {
+    private boolean elasticSearchFunctionalTestsEnabled() {
         return ofNullable(System.getenv("ELASTIC_SEARCH_ENABLED")).map(Boolean::valueOf).orElse(false);
     }
 

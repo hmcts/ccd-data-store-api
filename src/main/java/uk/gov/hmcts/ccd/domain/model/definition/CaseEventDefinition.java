@@ -45,8 +45,12 @@ public class CaseEventDefinition implements Serializable {
     private String endButtonLabel = null;
     @JsonProperty("can_save_draft")
     private Boolean canSaveDraft = null;
+    @JsonProperty("publish")
+    private Boolean publish;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
+    @JsonProperty("event_enabling_condition")
+    private String eventEnablingCondition;
 
     public String getId() {
         return id;
@@ -201,9 +205,25 @@ public class CaseEventDefinition implements Serializable {
         this.canSaveDraft = canSaveDraft;
     }
 
+    public Boolean getPublish() {
+        return publish;
+    }
+
+    public void setPublish(Boolean publish) {
+        this.publish = publish;
+    }
+
     public Optional<CaseEventFieldDefinition> getCaseEventField(String caseFieldId) {
         return getCaseFields().stream()
             .filter(f -> f.getCaseFieldId().equals(caseFieldId))
             .findFirst();
+    }
+
+    public String getEventEnablingCondition() {
+        return eventEnablingCondition;
+    }
+
+    public void setEventEnablingCondition(String eventEnablingCondition) {
+        this.eventEnablingCondition = eventEnablingCondition;
     }
 }

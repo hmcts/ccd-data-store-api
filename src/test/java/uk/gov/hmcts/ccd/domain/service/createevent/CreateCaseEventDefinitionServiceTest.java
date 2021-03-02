@@ -1,15 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,12 +25,13 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.message.CaseEventMessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
@@ -47,7 +39,18 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
@@ -105,6 +108,8 @@ class CreateCaseEventDefinitionServiceTest {
     private Clock clock;
     @Mock
     private CasePostStateService casePostStateService;
+    @Mock
+    private CaseEventMessageService caseEventMessageService;
 
     private Clock fixedClock = Clock.fixed(Instant.parse("2018-08-19T16:02:42.00Z"), ZoneOffset.UTC);
 
@@ -147,6 +152,7 @@ class CreateCaseEventDefinitionServiceTest {
         caseTypeDefinition.setVersion(version);
         caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setPostStates(getEventPostStates(POST_STATE));
+        caseEventDefinition.setPublish(Boolean.TRUE);
         final SignificantItem significantItem = new SignificantItem();
         significantItem.setUrl("http://www.yahoo.com");
         significantItem.setDescription("description");
@@ -178,6 +184,7 @@ class CreateCaseEventDefinitionServiceTest {
         doReturn(caseDetails).when(caseDetailsRepository).set(caseDetails);
         doReturn(postState).when(caseTypeService).findState(caseTypeDefinition, POST_STATE);
         doReturn(user).when(userRepository).getUser();
+        doReturn(user).when(userRepository).getUser(anyString());
         doReturn(caseDetailsBefore).when(caseService).clone(caseDetails);
         doReturn(data).when(fieldProcessorService).processData(any(), any(), any(CaseEventDefinition.class));
         given(callbackInvoker.invokeAboutToSubmitCallback(any(),
@@ -254,6 +261,26 @@ class CreateCaseEventDefinitionServiceTest {
             caseDetails,
             caseTypeDefinition,
             IGNORE_WARNING);
+    }
+
+    @Test
+    @DisplayName("should update Last state modified")
+    void shouldUpdateUserDetailsWhenOnBehalfOfUserTokenIsPassed() {
+        caseDataContent = newCaseDataContent()
+            .withEvent(event)
+            .withData(data)
+            .withToken(TOKEN)
+            .withIgnoreWarning(IGNORE_WARNING)
+            .withOnBehalfOfUserToken("Test_Token").build();
+
+        CreateCaseEventResult caseEventResult = createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        verify(userRepository).getUser("Test_Token");
+        verify(userRepository).getUser();
+
+        assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
+        assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate())
+            .isEqualTo(LocalDateTime.now(clock));
     }
 
     private void createCaseEvent() {

@@ -38,11 +38,11 @@ public class CaseViewFieldBuilder {
         field.setShowSummaryChangeOption(eventFieldDefinition.getShowSummaryChangeOption());
         field.setShowSummaryContentOption(eventFieldDefinition.getShowSummaryContentOption());
         field.setRetainHiddenValue(eventFieldDefinition.getRetainHiddenValue());
+        field.setPublish(eventFieldDefinition.getPublish());
+        field.setPublishAs(eventFieldDefinition.getPublishAs());
         field.setAccessControlLists(caseFieldDefinition.getAccessControlLists());
         field.setMetadata(caseFieldDefinition.isMetadata());
         field.setFormattedValue(caseFieldDefinition.getFormattedValue());
-        field.setDefaultValue(ofNullable(eventFieldDefinition.getDefaultValue())
-                                        .orElse(caseFieldDefinition.getDefaultValue()));
 
         caseFieldDefinition.propagateACLsToNestedFields();
 
