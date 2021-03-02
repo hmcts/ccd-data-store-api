@@ -2,9 +2,11 @@ package uk.gov.hmcts.ccd.domain.model.common;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.util.UriUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -28,13 +30,13 @@ public class HttpError<T extends Serializable> implements Serializable {
 
         this.exception = exception.getClass().getName();
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
-        this.status = getStatus(responseStatus);
+        this.status = getStatusFromResponseStatus(responseStatus);
         this.error = getErrorReason(responseStatus);
         this.message = exception.getMessage();
-        this.path = request.getRequestURI();
+        this.path = UriUtils.encodePath(request.getRequestURI(), StandardCharsets.UTF_8);
     }
 
-    private Integer getStatus(ResponseStatus responseStatus) {
+    private Integer getStatusFromResponseStatus(ResponseStatus responseStatus) {
         if (null != responseStatus) {
             final HttpStatus httpStatus = getHttpStatus(responseStatus);
             if (null != httpStatus) {

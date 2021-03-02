@@ -1,26 +1,98 @@
 {
   "priority": 1,
-  "request": {
-    "method": "GET",
-    "url": "/idam/details",
-    "headers": {
-      "Authorization": {
-        "equalTo": "Bearer CitizenToken"
+  "mappings": [
+    {
+      "request": {
+        "method": "GET",
+        "url": "/idam/o/.well-known/openid-configuration"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "issuer": "http://localhost:{{request.requestLine.port}}/idam/o",
+          "jwks_uri": "http://localhost:{{request.requestLine.port}}/idam/o/jwks"
+        },
+        "transformers": ["response-template"]
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "url": "/idam/o/jwks"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "keys": [
+            {
+              "alg": "RSA1_5",
+              "kty": "RSA",
+              "use": "enc",
+              "kid": "DF/KlP04e4LqxIEYZdM/I7CN1M0=",
+              "n": "uAI5B3u_OUxNDCRuYQtq9tQfBO9ccrkjYiNzvUDFGO94CaTYvyuQoAQ08oB_6ZWLzc446LFaYLb6oqwJE4hH0CMOxK0ZUfAf3-8hIW9WcZXPxES6K59yj1f-pifkRZM-BHiYl4lyA6AQX5bIli3CDBvhD9YdipkDKEbxLNvlYtJk-qCAAmMbNu5H19I7-7Ofpjyp6FceVvx5B_uUx-uoWNXNZP8ZdCP9BhWK3JB1QK-aRfgJwjAc9sMcOW87Os11QIF0TeheWOhULo4vtYWyTNB7ha3WUBBuwzG2RU7zpxX-1g2Adt_dpT1dkMAmn4xD-YAzNmOC4y5Pf1l958ckLQ",
+              "e": "AQAB"
+            },
+            {
+              "alg": "RSA-OAEP",
+              "kty": "RSA",
+              "use": "enc",
+              "kid": "DF/KlP04e4LqxIEYZdM/I7CN1M0=",
+              "n": "uAI5B3u_OUxNDCRuYQtq9tQfBO9ccrkjYiNzvUDFGO94CaTYvyuQoAQ08oB_6ZWLzc446LFaYLb6oqwJE4hH0CMOxK0ZUfAf3-8hIW9WcZXPxES6K59yj1f-pifkRZM-BHiYl4lyA6AQX5bIli3CDBvhD9YdipkDKEbxLNvlYtJk-qCAAmMbNu5H19I7-7Ofpjyp6FceVvx5B_uUx-uoWNXNZP8ZdCP9BhWK3JB1QK-aRfgJwjAc9sMcOW87Os11QIF0TeheWOhULo4vtYWyTNB7ha3WUBBuwzG2RU7zpxX-1g2Adt_dpT1dkMAmn4xD-YAzNmOC4y5Pf1l958ckLQ",
+              "e": "AQAB"
+            },
+            {
+              "alg": "RSA-OAEP-256",
+              "kty": "RSA",
+              "use": "enc",
+              "kid": "DF/KlP04e4LqxIEYZdM/I7CN1M0=",
+              "n": "uAI5B3u_OUxNDCRuYQtq9tQfBO9ccrkjYiNzvUDFGO94CaTYvyuQoAQ08oB_6ZWLzc446LFaYLb6oqwJE4hH0CMOxK0ZUfAf3-8hIW9WcZXPxES6K59yj1f-pifkRZM-BHiYl4lyA6AQX5bIli3CDBvhD9YdipkDKEbxLNvlYtJk-qCAAmMbNu5H19I7-7Ofpjyp6FceVvx5B_uUx-uoWNXNZP8ZdCP9BhWK3JB1QK-aRfgJwjAc9sMcOW87Os11QIF0TeheWOhULo4vtYWyTNB7ha3WUBBuwzG2RU7zpxX-1g2Adt_dpT1dkMAmn4xD-YAzNmOC4y5Pf1l958ckLQ",
+              "e": "AQAB"
+            },
+            {
+              "alg": "RS256",
+              "kty": "RSA",
+              "use": "sig",
+              "kid": "Fo+Ap2m8COtNootf1xMh4lg70YA=",
+              "n": "uAI5B3u_OUxNDCRuYQtq9tQfBO9ccrkjYiNzvUDFGO94CaTYvyuQoAQ08oB_6ZWLzc446LFaYLb6oqwJE4hH0CMOxK0ZUfAf3-8hIW9WcZXPxES6K59yj1f-pifkRZM-BHiYl4lyA6AQX5bIli3CDBvhD9YdipkDKEbxLNvlYtJk-qCAAmMbNu5H19I7-7Ofpjyp6FceVvx5B_uUx-uoWNXNZP8ZdCP9BhWK3JB1QK-aRfgJwjAc9sMcOW87Os11QIF0TeheWOhULo4vtYWyTNB7ha3WUBBuwzG2RU7zpxX-1g2Adt_dpT1dkMAmn4xD-YAzNmOC4y5Pf1l958ckLQ",
+              "e": "AQAB"
+            }
+          ]
+        },
+        "transformers": ["response-template"]
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "url": "/idam/o/userinfo",
+        "headers": {
+          "Authorization": {
+            "equalTo": "Bearer CitizenToken"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "sub": "Cloud.Strife@test.com",
+          "uid": "123",
+          "roles": [
+            "citizen"
+          ],
+          "name": "Cloud Strife",
+          "given_name": "Cloud",
+          "family_name": "Strife"
+        }
       }
     }
-  },
-  "response": {
-    "status": 200,
-    "headers": {
-      "Content-Type": "application/json"
-    },
-    "jsonBody": {
-      "id": "123",
-      "email" : "Cloud.Strife@test.com",
-      "forename" : "Cloud",
-      "surname": "Strife",
-      "roles" : [ "citizen" ],
-      "defaultService" : "ccd"
-    }
-  }
+  ]
 }

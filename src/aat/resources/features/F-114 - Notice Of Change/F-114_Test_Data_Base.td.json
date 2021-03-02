@@ -1,0 +1,72 @@
+{
+  "title": "should create a case with organisation policy",
+  "_guid_": "F-114_Test_Data_Base",
+  "productName": "CCD Data Store",
+  "operationName": "Submit Case Creation as Caseworker",
+  "method": "POST",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+  "specs": [
+    "to create a full case"
+  ],
+  "users": {
+    "invokingUser": {
+      "username": "master.caseworker@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
+  },
+  "user": {
+    "username": "master.caseworker@gmail.com",
+    "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_ComplexOrganisation"
+    },
+    "body": {
+      "data": {
+        "OrganisationField": {
+          "OrganisationID": null,
+          "OrganisationName": null
+        },
+        "OrganisationPolicyField": {
+          "OrgPolicyCaseAssignedRole": "[Claimant]",
+          "OrgPolicyReference": null,
+          "Organisation": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        },
+        "ChangeOrganisationRequestField": {
+          "CaseRoleId": null,
+          "Reason": null,
+          "RequestTimestamp": null,
+          "ApprovalStatus": "1",
+          "ApprovalRejectionTimestamp": null,
+          "NotesReason": null,
+          "OrganisationToAdd": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          },
+          "OrganisationToRemove": {
+            "OrganisationID": null,
+            "OrganisationName": null
+          }
+        }
+      },
+      "event": {
+        "id": "createOrganisation",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][F-114_Case_Data_Create_Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": false,
+      "draft_id": null
+    }
+  }
+}

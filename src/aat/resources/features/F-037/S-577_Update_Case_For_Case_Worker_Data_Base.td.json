@@ -1,37 +1,41 @@
 {
-  "_guid_": "S-577_Update_Case_For_Case_Worker_Data_Base",
-  "_extends_": "S-577_Response_Data_Base",
-  "productName": "CCD Data Store",
-  "operationName": "submit event for an existing case (V2)",
-  "method": "POST",
-  "uri": "/cases/{cid}/events",
-  "user": {
-    "_extends_": "Common_User_For_Request"
-  },
-  "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers",
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json",
-      "experimental": true
-    },
-    "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
-    },
-    "body": {
-      "data": {
-        "DocumentField2": {
-          "document_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
-          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
-          "document_filename": "Elastic Search test Case.png"
-        }
-      },
-      "event": {
-        "id": "UPDATE",
-        "summary": "",
-        "description": ""
-      },
-      "event_token": "${[scenarioContext][childContexts][S-577-Prerequisite_Solicitor_2_Token_For_Update_Case][testData][actualResponse][body][token]}",
-      "ignore_warning": false
-    }
-  }
+	"_guid_": "S-577_Update_Case_For_Case_Worker_Data_Base",
+	"_extends_": "S-577_Response_Data_Base",
+
+	"productName": "CCD Data Store",
+	"operationName": "submit event for an existing case (V2)",
+
+	"method": "POST",
+	"uri": "/cases/{cid}/events",
+
+	"user": {
+		"_extends_": "Common_User_For_Request"
+	},
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers",
+			"Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json",
+			"experimental": true
+		},
+		"pathVariables": {
+			"cid": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+		},
+		"body": {
+			"data": {
+				"DocumentField2": {
+					"document_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
+					"document_binary_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+					"document_filename": "Elastic Search test Case.png"
+				}
+			},
+			"event": {
+				"id": "UPDATE",
+				"summary": "",
+				"description": ""
+			},
+			"event_token": "${[scenarioContext][childContexts][S-577-Prerequisite_Solicitor_2_Token_For_Update_Case][testData][actualResponse][body][token]}",
+			"ignore_warning": false
+		}
+	}
 }

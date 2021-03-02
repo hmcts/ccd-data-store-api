@@ -18,12 +18,24 @@ public class CaseDetailsQueryBuilderFactory {
         this.caseDetailsAuthorisationSecurities = caseDetailsAuthorisationSecurities;
     }
 
-    public CaseDetailsQueryBuilder<CaseDetailsEntity> select(EntityManager em, MetaData metaData) {
+    public CaseDetailsQueryBuilder<CaseDetailsEntity> selectUnsecured(EntityManager em) {
+        return new SelectCaseDetailsQueryBuilder(em);
+    }
+
+    public CaseDetailsQueryBuilder<CaseDetailsEntity> selectSecured(EntityManager em, MetaData metaData) {
         return secure(new SelectCaseDetailsQueryBuilder(em), metaData);
     }
 
-    public CaseDetailsQueryBuilder<CaseDetailsEntity> select(EntityManager em) {
-        return select(em, null);
+    public CaseDetailsQueryBuilder<CaseDetailsEntity> selectSecured(EntityManager em) {
+        return selectSecured(em, null);
+    }
+
+    public CaseDetailsQueryBuilder<Long> selectByReferenceSecured(EntityManager em, MetaData metaData) {
+        return secure(new SelectCaseDetailsReferenceQueryBuilder(em), metaData);
+    }
+
+    public CaseDetailsQueryBuilder<Long> selectByReferenceSecured(EntityManager em) {
+        return selectByReferenceSecured(em, null);
     }
 
     public CaseDetailsQueryBuilder<Long> count(EntityManager em, MetaData metaData) {

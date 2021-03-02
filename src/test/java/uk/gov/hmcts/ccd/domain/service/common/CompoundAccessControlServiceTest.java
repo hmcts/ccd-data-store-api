@@ -7,8 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 import java.io.IOException;
 import java.util.Map;
@@ -16,7 +16,7 @@ import java.util.Map;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ROLE_IN_USER_ROLES;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.USER_ROLES;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.addressesStart;
@@ -155,7 +155,8 @@ class CompoundAccessControlServiceTest {
         + "        \"id\": \"null\"\n"
         + "      }\n";
     private static final String addressEnd = "    ]\n";
-    private static final String addresses = addressesStart + newAddress1 + "," + newAddress2 + "," + newAddress3 + addressEnd;
+    private static final String addresses =
+        addressesStart + newAddress1 + "," + newAddress2 + "," + newAddress3 + addressEnd;
     private static final String notes = "    \"Notes\": [\n"
         + "      {\n"
         + "        \"value\": {\n"
@@ -287,7 +288,8 @@ class CompoundAccessControlServiceTest {
         + "    \"LastName\": \"Potter\"\n";
     private static final String personEnd = "  }\n"
         + "}";
-    private static final String newPerson = newPersonStart + name + "," + birthInfo + "," + addresses + "," + notes + personEnd;
+    private static final String newPerson =
+        newPersonStart + name + "," + birthInfo + "," + addresses + "," + notes + personEnd;
     private static final String peopleStart = "{\n  \"People\": [\n";
     private static final String peopleEnd = "  ]\n}";
 
@@ -303,7 +305,7 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access if parent and children have ACLs")
         void shouldGrantAccessIfParentAndChildrenHaveAccess() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
@@ -320,54 +322,63 @@ class CompoundAccessControlServiceTest {
                     .withCreate(true)
                     .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(person1, person2);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(person1, person2, newPerson), dataNode, people, USER_ROLES), is(true));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(person1, person2,
+                    newPerson), dataNode, people, USER_ROLES),
+                is(true)
+            );
         }
 
         @Test
         @DisplayName("Should grant access if parent and children have ACLs - inherited from parent")
         void shouldGrantAccessIfParentHasAccess() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(person1, person2);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(person1, person2, newPersonStart + addresses + personEnd),
+            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(person1,
+                person2, newPersonStart + addresses + personEnd),
                 dataNode, people, USER_ROLES), is(true));
         }
 
         @Test
         @DisplayName("Should be OK with empty fields")
         void shouldBeOKWithEmptyFields() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(person1, person2);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(person1, person2, newPersonStart + personEnd),
+            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(person1,
+                person2, newPersonStart + personEnd),
                 dataNode, people, USER_ROLES), is(true));
         }
 
         @Test
         @DisplayName("Should grant access if parent and required children have ACLs")
         void shouldGrantAccessIfParentAndRequiredChildrenHaveAccess() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
@@ -384,19 +395,21 @@ class CompoundAccessControlServiceTest {
                     .withCreate(false)
                     .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(person1, person2);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(person1, person2,
-                newPersonStart + name + "," + birthInfo + "," + addresses + personEnd), dataNode, people, USER_ROLES), is(true));
+            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(person1,
+                person2, newPersonStart + name + "," + birthInfo + "," + addresses + personEnd), dataNode, people,
+                USER_ROLES), is(true));
         }
 
         @Test
         @DisplayName("Should grant access to add new child if child has the required ACLs - existing data")
         void shouldGrantAccessToNewChildIfChildrenHasAccess() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
@@ -407,20 +420,26 @@ class CompoundAccessControlServiceTest {
                 .withCreate(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             String person = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(person);
 
-            String personWithNewAddress = p2Start + addressesStart + p2Address1 + "," + p2Address2 + "," + newAddress1 + addressEnd + p2End;
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress), dataNode, people, USER_ROLES), is(true));
+            String personWithNewAddress =
+                p2Start + addressesStart + p2Address1 + "," + p2Address2 + "," + newAddress1 + addressEnd + p2End;
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress),
+                    dataNode, people, USER_ROLES),
+                is(true)
+            );
         }
 
         @Test
         @DisplayName("Should grant access to add new child if child has the required ACLs - fine grain ACL")
         void shouldGrantAccessToNewChildIfChildrenHasAccessFineGrained() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
@@ -431,20 +450,27 @@ class CompoundAccessControlServiceTest {
                 .withCreate(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
-            String person = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWId + p2End;
+            String person =
+                p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWId + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(person);
 
-            String personWithNewAddress = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWIdWNewlyAddedTags + p2End;
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress), dataNode, people, USER_ROLES), is(true));
+            String personWithNewAddress = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + ","
+                + notesWIdWNewlyAddedTags + p2End;
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress),
+                    dataNode, people, USER_ROLES),
+                is(true)
+            );
         }
 
         @Test
         @DisplayName("Should deny access to add new child if child has the required ACLs - fine grain ACL")
         void shouldDenyAccessToNewChildIfChildrenHasAccessFineGrained() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
@@ -455,20 +481,27 @@ class CompoundAccessControlServiceTest {
                 .withCreate(false)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
-            String person = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWId + p2End;
+            String person =
+                p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWId + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(person);
 
-            String personWithNewAddress = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWIdWNewlyAddedTags + p2End;
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress), dataNode, people, USER_ROLES), is(false));
+            String personWithNewAddress = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + ","
+                + notesWIdWNewlyAddedTags + p2End;
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress),
+                    dataNode, people, USER_ROLES),
+                is(false)
+            );
         }
 
         @Test
         @DisplayName("Should deny access to add new child if child lacks the required ACLs - existing data")
         void shouldDenyAccessToNewChildIfChildrenHasAccess() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
@@ -479,20 +512,26 @@ class CompoundAccessControlServiceTest {
                 .withCreate(false)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             String person = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(person);
 
-            String personWithNewAddress = p2Start + addressesStart + p2Address1 + "," + p2Address2 + "," + newAddress1 + addressEnd + p2End;
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress), dataNode, people, USER_ROLES), is(false));
+            String personWithNewAddress = p2Start + addressesStart + p2Address1 + "," + p2Address2 + "," + newAddress1
+                + addressEnd + p2End;
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress),
+                    dataNode, people, USER_ROLES),
+                is(false)
+            );
         }
 
         @Test
         @DisplayName("Should deny access if a child does not have ACLs")
         void shouldDenyAccessIfParentAndChildrenHaveAccess() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
@@ -509,12 +548,17 @@ class CompoundAccessControlServiceTest {
                     .withCreate(true)
                     .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(person1, person2);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(person1, person2, newPerson), dataNode, people, USER_ROLES), is(false));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(person1, person2,
+                    newPerson), dataNode, people, USER_ROLES),
+                is(false)
+            );
         }
     }
 
@@ -524,14 +568,15 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access when nothing changes even when U doesn't exist")
         void shouldGrantAccessWhenNoUpdates() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withUpdate(false)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(person1);
 
@@ -542,77 +587,89 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access when child field updated and U exists- name change")
         void shouldGrantAccessWhenChildFieldUpdatedAndACLExists() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withUpdate(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(existingPersonStart + name + personEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(existingPersonStart + nameUpdated + personEnd),
+            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(existingPersonStart
+                    + nameUpdated + personEnd),
                 dataNode, people, USER_ROLES), is(true));
         }
 
         @Test
         @DisplayName("Should deny access for child field updates when no U - name change")
         void shouldDenyAccessWhenChildFieldUpdatedAndNoACL() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withUpdate(false)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(existingPersonStart + name + personEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(existingPersonStart + nameUpdated + personEnd),
+            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(existingPersonStart
+                    + nameUpdated + personEnd),
                 dataNode, people, USER_ROLES), is(false));
         }
 
         @Test
         @DisplayName("Should grant access when child field updated and U exists - address.line1 change")
         void shouldGrantAccessWhenChildFieldUpdatedAndACLInheritedFromParent() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
                 .withUpdate(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
-            JsonNode dataNode = generatePeopleDataWithPerson(existingPersonStart + addressesStart + existingAddress1 + addressEnd + personEnd);
+            JsonNode dataNode = generatePeopleDataWithPerson(existingPersonStart + addressesStart + existingAddress1
+                + addressEnd + personEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(existingPersonStart + addressesStart +
-                existingAddress1Line1Updated + addressEnd + personEnd), dataNode, people, USER_ROLES), is(true));
+            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(existingPersonStart
+                + addressesStart
+                + existingAddress1Line1Updated + addressEnd + personEnd), dataNode, people, USER_ROLES), is(true));
         }
 
         @Test
         @DisplayName("Should grant access when a child is updated and U exist - multiple address.line1 change")
         void shouldGrantAccessWhenAChildFieldUpdatedAndACLExist() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
                 .withUpdate(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
-            String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd + personEnd;
-            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
+            String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd
+                + personEnd;
+            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1
+                + addressEnd + "," + p2Notes + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
 
-            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1Line1Updated + addressEnd + personEnd;
-            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1Line1Updated + addressEnd + "," + p2Notes + p2End;
+            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + ","
+                + existingAddress1Line1Updated + addressEnd + personEnd;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + ","
+                + existingAddress1Line1Updated + addressEnd + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(true));
         }
@@ -620,7 +677,7 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should deny access when a child is updated and U doesn't exist - multiple address.line1 change")
         void shouldDenyAccessWhenChildUpdatedAndNoACL() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
@@ -632,23 +689,29 @@ class CompoundAccessControlServiceTest {
                 .withUpdate(false)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
-            String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd + personEnd;
-            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
+            String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd
+                + personEnd;
+            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1
+                + addressEnd + "," + p2Notes + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
 
-            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1Line1Updated + addressEnd + personEnd;
-            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1Line1Updated + addressEnd + "," + p2Notes + p2End;
+            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + ","
+                + existingAddress1Line1Updated + addressEnd + personEnd;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + ","
+                + existingAddress1Line1Updated + addressEnd + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(false));
         }
 
         @Test
-        @DisplayName("Should grant access when child nodes same but a new node added C exist and No U - new address added")
+        @DisplayName("Should grant access when child nodes same but a new node added C exist and No U - new address "
+            + "added")
         void shouldGrantAccessWhenChildNotUpdatedAndOnlyNewChildAdded() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
@@ -662,20 +725,24 @@ class CompoundAccessControlServiceTest {
                     .withUpdate(false)
                     .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
-            String p = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + p2Notes + p2End;
-            JsonNode dataNode = generatePeopleDataWithPerson(p);
+            String p2 =
+                p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + p2Notes + p2End;
+            JsonNode dataNode = generatePeopleDataWithPerson(p2);
 
-            String pUpdated = p2Start + p2Names + addressesStart + newAddress1 + "," + p2Address1 + "," + p2Address2 + addressEnd + "," + p2Notes + p2End;
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(pUpdated), dataNode, people, USER_ROLES), is(true));
+            String p2Updated = p2Start + p2Names + addressesStart + newAddress1 + "," + p2Address1 + "," + p2Address2
+                + addressEnd + "," + p2Notes + p2End;
+            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(p2Updated),
+                dataNode, people, USER_ROLES), is(true));
         }
 
         @Test
         @DisplayName("Should grand access when a child is updated and U exist - fine grained ACL")
         void shouldGrantAccessWhenChildUpdatedAndFineGrainedACLExists() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
@@ -699,23 +766,30 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
-            String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd + personEnd;
-            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
+            String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd
+                + personEnd;
+            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1
+                + addressEnd + "," + p2Notes + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
 
-            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1LinesUpdated + addressEnd + personEnd;
-            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
+            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + ","
+                + existingAddress1LinesUpdated + addressEnd + personEnd;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + ","
+                + existingAddress1LinesUpdated + addressEnd
+                + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(true));
         }
 
         @Test
-        @DisplayName("Should grand access when a child is updated and U exist, complex child has no initial value - fine grained ACL")
+        @DisplayName("Should grand access when a child is updated and U exist, complex child has no initial value - "
+            + "fine grained ACL")
         void shouldGrantAccessWhenChildUpdatedFromNullAndFineGrainedACLExists() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
@@ -739,23 +813,29 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
-            String p1 = existingPersonStart + addressesStart + existingAddress1NullLine1 + "," + existingAddress2 + addressEnd + personEnd;
-            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
+            String p1 = existingPersonStart + addressesStart + existingAddress1NullLine1 + "," + existingAddress2
+                + addressEnd + personEnd;
+            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1
+                + addressEnd + "," + p2Notes + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
 
-            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1LinesUpdated + addressEnd + personEnd;
-            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
+            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + ","
+                + existingAddress1LinesUpdated + addressEnd + personEnd;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + ","
+                + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(true));
         }
 
         @Test
-        @DisplayName("Should grand access when a child is updated and U exist, complex child has null initial value - fine grained ACL")
+        @DisplayName("Should grand access when a child is updated and U exist, complex child has null initial value - "
+            + "fine grained ACL")
         void shouldGrantAccessWhenChildUpdatedFromNullNodeAndFineGrainedACLExists() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
@@ -789,23 +869,29 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
-            String p1 = existingPersonStart + addressesStart + existingAddressWNullLines + "," + existingAddress2 + addressEnd + personEnd;
-            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
+            String p1 = existingPersonStart + addressesStart + existingAddressWNullLines + "," + existingAddress2
+                + addressEnd + personEnd;
+            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1
+                + addressEnd + "," + p2Notes + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
 
-            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1LinesUpdated + addressEnd + personEnd;
-            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
+            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + ","
+                + existingAddress1LinesUpdated + addressEnd + personEnd;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + ","
+                + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(true));
         }
 
         @Test
-        @DisplayName("Should grand access when a child is updated and U exist, complex child has null final value - fine grained ACL")
+        @DisplayName("Should grand access when a child is updated and U exist, complex child has null final value - "
+            + "fine grained ACL")
         void shouldGrantAccessWhenChildUpdatedToNullAndFineGrainedACLExists() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
@@ -829,23 +915,29 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
-            String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd + personEnd;
-            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
+            String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd
+                + personEnd;
+            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1
+                + addressEnd + "," + p2Notes + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
 
-            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1NullLine1 + addressEnd + personEnd;
-            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
+            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1NullLine1
+                + addressEnd + personEnd;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + ","
+                + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(true));
         }
 
         @Test
-        @DisplayName("Should deny access when a child is updated and U doesnot exist, complex child has no initial value - fine grained ACL")
+        @DisplayName("Should deny access when a child is updated and U doesnot exist, complex child has no initial "
+            + "value - fine grained ACL")
         void shouldDenyAccessWhenChildUpdatedFromNullAndFineGrainedACLDoesNotExist() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
@@ -869,23 +961,30 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
-            String p1 = existingPersonStart + addressesStart + existingAddress1NullLine1 + "," + existingAddress2 + addressEnd + personEnd;
-            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
+            String p1 = existingPersonStart + addressesStart + existingAddress1NullLine1 + "," + existingAddress2
+                + addressEnd + personEnd;
+            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1
+                + addressEnd + "," + p2Notes + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
 
-            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1LinesUpdated + addressEnd + personEnd;
-            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
+            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + ","
+                + existingAddress1LinesUpdated + addressEnd + personEnd;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + ","
+                + existingAddress1LinesUpdated + addressEnd
+                + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(false));
         }
 
         @Test
-        @DisplayName("Should deny access when a child is updated and U doesnot exist, complex child has null final value - fine grained ACL")
+        @DisplayName("Should deny access when a child is updated and U doesnot exist, complex child has null final "
+            + "value - fine grained ACL")
         void shouldDenyAccessWhenChildUpdatedToNullAndFineGrainedACLDoesNotExist() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
@@ -909,23 +1008,29 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
-            String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd + personEnd;
-            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
+            String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd
+                + personEnd;
+            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1
+                + addressEnd + "," + p2Notes + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
 
-            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1NullLine1 + addressEnd + personEnd;
-            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
+            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1NullLine1
+                + addressEnd + personEnd;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + ","
+                + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(false));
         }
 
         @Test
-        @DisplayName("Should grant access when child is not updated and No U exists but 'null' is sent as value - READONLY case")
+        @DisplayName("Should grant access when child is not updated and No U exists but 'null' is sent as value - "
+            + "READONLY case")
         void shouldGrantAccessWhenChildIsNotUpdatedAndNullValueSent() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
@@ -949,20 +1054,25 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
-            String p1 = existingPersonStart + addressesStart + existingAddressWMissingLines + "," + existingAddress2 + addressEnd + personEnd;
+            String p1 = existingPersonStart + addressesStart + existingAddressWMissingLines + "," + existingAddress2
+                + addressEnd + personEnd;
             JsonNode dataNode = generatePeopleDataWithPerson(p1);
 
-            String p1Updated = existingPersonStart + addressesStart + existingAddressWNullLines + "," + existingAddress2 + addressEnd + personEnd;
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(p1Updated), dataNode, people, USER_ROLES), is(true));
+            String p1Updated = existingPersonStart + addressesStart + existingAddressWNullLines + "," + existingAddress2
+                + addressEnd + personEnd;
+            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(p1Updated),
+                dataNode, people, USER_ROLES), is(true));
         }
 
         @Test
-        @DisplayName("Should deny access when a child is updated and No U exist - fine grained ACL Name, address.line1/2 changes")
+        @DisplayName("Should deny access when a child is updated and No U exist - fine grained ACL Name, address."
+            + "line1/2 changes")
         void shouldDenyAccessWhenChildUpdatedAndNoFineGrainedACLExists() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
@@ -986,15 +1096,20 @@ class CompoundAccessControlServiceTest {
                     .build()
             ));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
-            String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd + personEnd;
-            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
+            String p1 = existingPersonStart + addressesStart + existingAddress1 + "," + existingAddress2 + addressEnd
+                + personEnd;
+            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1
+                + addressEnd + "," + p2Notes + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(p1, p2);
 
-            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + "," + existingAddress1LinesUpdated + addressEnd + personEnd;
-            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
+            String p1Updated = existingPersonStart + addressesStart + existingAddress2 + ","
+                + existingAddress1LinesUpdated + addressEnd + personEnd;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + ","
+                + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, USER_ROLES), is(false));
         }
@@ -1006,14 +1121,15 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access when a root node is deleted and D exists")
         void shouldGrantAccessWhenRootDeletedAndACLExist() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withDelete(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(person1, person2);
 
@@ -1024,14 +1140,15 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should deny access when a root node is deleted and No D")
         void shouldDenyAccessWhenRootDeletedAndNoACL() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withDelete(false)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generatePeopleDataWithPerson(person1, person2);
 
@@ -1042,19 +1159,22 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access when a child node is deleted and D exists")
         void shouldGrantAccessWhenChildDeletedAndACLExist() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withDelete(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
-            String p1 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
+            String p1 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1
+                + addressEnd + "," + p2Notes + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(p1);
 
-            String p1Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
+            String p1Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + existingAddress1 + addressEnd
+                + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p1Updated), dataNode, people, USER_ROLES), is(true));
         }
@@ -1062,19 +1182,22 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should deny access when a child node is deleted and No D")
         void shouldDenyAccessWhenChildDeletedAndNoACLExist() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withDelete(false)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
-            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
+            String p2 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1
+                + addressEnd + "," + p2Notes + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(person1, p2);
 
-            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
+            String p2Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + existingAddress1 + addressEnd
+                + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, person1), dataNode, people, USER_ROLES), is(false));
         }
@@ -1082,7 +1205,7 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should deny access when a child node is deleted and No D - fine grained ACL")
         void shouldDenyAccessWhenChildDeletedAndNoACLExistForChildField() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withDelete(true)
@@ -1094,13 +1217,16 @@ class CompoundAccessControlServiceTest {
                     .withDelete(false)
                     .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
-            String p1 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
+            String p1 = p2Start + p2Names + addressesStart + p2Address1 + "," + p2Address2 + "," + existingAddress1
+                + addressEnd + "," + p2Notes + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(p1);
 
-            String p1Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + existingAddress1 + addressEnd + "," + p2Notes + p2End;
+            String p1Updated = p2Start + p2Names + addressesStart + p2Address1 + "," + existingAddress1 + addressEnd
+                + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p1Updated), dataNode, people, USER_ROLES), is(false));
         }
@@ -1108,7 +1234,7 @@ class CompoundAccessControlServiceTest {
         @Test
         @DisplayName("Should grant access to add new child if child has the required ACLs - whole node deleted")
         void shouldGrantAccessToNewChildIfChildrenHasAccessFineGrained() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withDelete(true)
@@ -1119,20 +1245,27 @@ class CompoundAccessControlServiceTest {
                 .withDelete(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
-            String person = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWId + p2End;
+            String person = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWId
+                + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(person);
 
-            String personWithNewAddress = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWIdDeletedTags + p2End;
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress), dataNode, people, USER_ROLES), is(true));
+            String personWithNewAddress = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + ","
+                + notesWIdDeletedTags + p2End;
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress),
+                    dataNode, people, USER_ROLES),
+                is(true)
+            );
         }
 
         @Test
         @DisplayName("Should deny access to add new child if child has the required ACLs - whole node deleted")
         void shouldDenyAccessToNewChildIfChildrenHasAccessFineGrained() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withDelete(true)
@@ -1143,14 +1276,21 @@ class CompoundAccessControlServiceTest {
                 .withDelete(false)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
-            String person = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWId + p2End;
+            String person = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWId
+                + p2End;
             JsonNode dataNode = generatePeopleDataWithPerson(person);
 
-            String personWithNewAddress = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + "," + notesWIdDeletedTags + p2End;
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress), dataNode, people, USER_ROLES), is(false));
+            String personWithNewAddress = p2Start + addressesStart + p2Address1 + "," + p2Address2 + addressEnd + ","
+                + notesWIdDeletedTags + p2End;
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(personWithNewAddress),
+                    dataNode, people, USER_ROLES),
+                is(false)
+            );
         }
     }
 
@@ -1159,16 +1299,18 @@ class CompoundAccessControlServiceTest {
     class CompoundFieldComplexUnderCollectionFieldTests {
 
         @Test
-        @DisplayName("Should grant access when a nested complex child node is deleted and has the required ACLs - whole node deleted")
+        @DisplayName("Should grant access when a nested complex child node is deleted and has the required ACLs - whole"
+            + " node deleted")
         void shouldGrantAccessWhenNestedComplexChildDeletedAndDeleteACLExists() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withDelete(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + name + "," + birthInfo + personEnd;
             JsonNode existingData = generatePeopleDataWithPerson(p1);
@@ -1176,13 +1318,15 @@ class CompoundAccessControlServiceTest {
             String p2 = existingPersonStart + name + personEnd;
             JsonNode newData = generatePeopleDataWithPerson(p2); // i.e. with deleted BirthInfo
 
-            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES), is(true));
+            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES),
+                is(true));
         }
 
         @Test
-        @DisplayName("Should grant access when a nested complex child node is deleted and has the required fine grained ACLs - whole node deleted")
+        @DisplayName("Should grant access when a nested complex child node is deleted and has the required fine "
+            + "grained ACLs - whole node deleted")
         void shouldGrantAccessWhenNestedComplexChildDeletedAndFineGrainedDeleteACLExists() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withDelete(true)
@@ -1194,8 +1338,9 @@ class CompoundAccessControlServiceTest {
                     .withDelete(true)
                     .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + name + "," + birthInfo + personEnd;
             JsonNode existingData = generatePeopleDataWithPerson(p1);
@@ -1203,20 +1348,22 @@ class CompoundAccessControlServiceTest {
             String p2 = existingPersonStart + name + personEnd;
             JsonNode newData = generatePeopleDataWithPerson(p2); // i.e. with deleted BirthInfo
 
-            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES), is(true));
+            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES),
+                    is(true));
         }
 
         @Test
         @DisplayName("Should be OK with empty nested complex child in new data")
         void shouldBeOKWithEmptyNestedComplexFieldInNewData() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withDelete(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + name + "," + birthInfo + personEnd;
             JsonNode existingData = generatePeopleDataWithPerson(p1);
@@ -1224,20 +1371,22 @@ class CompoundAccessControlServiceTest {
             String p2 = existingPersonStart + name + ",    \"BirthInfo\": {}" + personEnd;
             JsonNode newData = generatePeopleDataWithPerson(p2);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES), is(true));
+            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES),
+                is(true));
         }
 
         @Test
         @DisplayName("Should be OK with empty nested complex child in existing data")
         void shouldBeOKWithEmptyNestedComplexFieldInExistingData() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withDelete(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + name + ",    \"BirthInfo\": {}" + personEnd;
             JsonNode existingData = generatePeopleDataWithPerson(p1);
@@ -1245,20 +1394,22 @@ class CompoundAccessControlServiceTest {
             String p2 = existingPersonStart + name + "," + birthInfo + personEnd;
             JsonNode newData = generatePeopleDataWithPerson(p2);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES), is(true));
+            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES),
+                is(true));
         }
 
         @Test
         @DisplayName("Should be OK with null nested complex child in new data")
         void shouldBeOKWithNullNestedComplexFieldInNewData() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withDelete(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + name + "," + birthInfo + personEnd;
             JsonNode existingData = generatePeopleDataWithPerson(p1);
@@ -1266,20 +1417,22 @@ class CompoundAccessControlServiceTest {
             String p2 = existingPersonStart + name + ",    \"BirthInfo\": null" + personEnd;
             JsonNode newData = generatePeopleDataWithPerson(p2);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES), is(true));
+            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES),
+                is(true));
         }
 
         @Test
         @DisplayName("Should be OK with null nested complex child in existing data")
         void shouldBeOKWithNullNestedComplexFieldInExistingData() throws IOException {
-            final CaseField people = getPeopleCollectionFieldDefinition();
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withDelete(true)
                 .build()));
 
-            final CaseType caseType = newCaseType().withField(people).build();
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            final CaseTypeDefinition caseTypeDefinition = newCaseType().withField(people).build();
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             String p1 = existingPersonStart + name + ",    \"BirthInfo\": null" + personEnd;
             JsonNode existingData = generatePeopleDataWithPerson(p1);
@@ -1287,7 +1440,8 @@ class CompoundAccessControlServiceTest {
             String p2 = existingPersonStart + name + "," + birthInfo + personEnd;
             JsonNode newData = generatePeopleDataWithPerson(p2);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES), is(true));
+            assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, USER_ROLES),
+                is(true));
         }
     }
 
@@ -1421,11 +1575,11 @@ class CompoundAccessControlServiceTest {
             + "}";
         private final String noteStart = "{\n  \"Note\": \n";
         private final String noteEnd = "  \n}";
-        private CaseType caseType;
-        private CaseField note;
+        private CaseTypeDefinition caseTypeDefinition;
+        private CaseFieldDefinition note;
 
         @BeforeEach
-        void Setup() {
+        void setup() {
             note = newCaseField()
                 .withId("Note")
                 .withFieldType(aFieldType()
@@ -1441,7 +1595,7 @@ class CompoundAccessControlServiceTest {
                     .withComplexField(getTagFieldDefinition())
                     .build())
                 .build();
-            caseType = newCaseType().withField(note).build();
+            caseTypeDefinition = newCaseType().withField(note).build();
         }
 
         @Test
@@ -1452,11 +1606,16 @@ class CompoundAccessControlServiceTest {
                 .withCreate(true)
                 .build()));
 
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWOutTags + noteEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithANewTag + noteEnd), dataNode, note, USER_ROLES), is(true));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart
+                    + noteWithANewTag + noteEnd), dataNode, note, USER_ROLES),
+                is(true)
+            );
         }
 
         @Test
@@ -1467,11 +1626,16 @@ class CompoundAccessControlServiceTest {
                 .withCreate(true)
                 .build()));
 
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithMultipleNewTags + noteEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithANewTag + noteEnd), dataNode, note, USER_ROLES), is(true));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart
+                    + noteWithANewTag + noteEnd), dataNode, note, USER_ROLES),
+                is(true)
+            );
         }
 
         @Test
@@ -1482,11 +1646,18 @@ class CompoundAccessControlServiceTest {
                 .withCreate(true)
                 .build()));
 
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithExisting2Tags + noteEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithExisting2TagsAndANewTag + noteEnd), dataNode, note, USER_ROLES), is(true));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(
+                    generateJsonNodeWithData(noteStart + noteWithExisting2TagsAndANewTag + noteEnd),
+                    dataNode, note, USER_ROLES
+                ),
+                is(true)
+            );
         }
 
         @Test
@@ -1497,11 +1668,16 @@ class CompoundAccessControlServiceTest {
                 .withCreate(false)
                 .build()));
 
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWOutTags + noteEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithANewTag + noteEnd), dataNode, note, USER_ROLES), is(false));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart
+                    + noteWithANewTag + noteEnd), dataNode, note, USER_ROLES),
+                is(false)
+            );
 
         }
 
@@ -1513,11 +1689,18 @@ class CompoundAccessControlServiceTest {
                 .withCreate(false)
                 .build()));
 
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithExisting2Tags + noteEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithExisting2TagsAndANewTag + noteEnd), dataNode, note, USER_ROLES), is(false));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(
+                    generateJsonNodeWithData(noteStart + noteWithExisting2TagsAndANewTag + noteEnd),
+                    dataNode, note, USER_ROLES
+                ),
+                is(false)
+            );
         }
 
         @Test
@@ -1528,11 +1711,18 @@ class CompoundAccessControlServiceTest {
                 .withUpdate(true)
                 .build()));
 
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithExisting2Tags + noteEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithExisting2TagsUpdated + noteEnd), dataNode, note, USER_ROLES), is(true));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(
+                    generateJsonNodeWithData(noteStart + noteWithExisting2TagsUpdated + noteEnd),
+                    dataNode, note, USER_ROLES
+                ),
+                is(true)
+            );
         }
 
         @Test
@@ -1543,11 +1733,18 @@ class CompoundAccessControlServiceTest {
                 .withUpdate(false)
                 .build()));
 
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithExisting2Tags + noteEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithExisting2TagsUpdated + noteEnd), dataNode, note, USER_ROLES), is(false));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(
+                    generateJsonNodeWithData(noteStart + noteWithExisting2TagsUpdated + noteEnd),
+                    dataNode, note, USER_ROLES
+                ),
+                is(false)
+            );
         }
 
         @Test
@@ -1558,11 +1755,18 @@ class CompoundAccessControlServiceTest {
                 .withDelete(true)
                 .build()));
 
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithExisting2Tags + noteEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithExisting2TagsOneDeleted + noteEnd), dataNode, note, USER_ROLES), is(true));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(
+                    generateJsonNodeWithData(noteStart + noteWithExisting2TagsOneDeleted + noteEnd),
+                    dataNode, note, USER_ROLES
+                ),
+                is(true)
+            );
         }
 
         @Test
@@ -1573,11 +1777,18 @@ class CompoundAccessControlServiceTest {
                 .withDelete(false)
                 .build()));
 
-            caseType.getCaseFields().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
+                caseField.propagateACLsToNestedFields());
 
             JsonNode dataNode = generateJsonNodeWithData(noteStart + noteWithExisting2Tags + noteEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generateJsonNodeWithData(noteStart + noteWithExisting2TagsOneDeleted + noteEnd), dataNode, note, USER_ROLES), is(false));
+            assertThat(
+                compoundAccessControlService.hasAccessForAction(
+                    generateJsonNodeWithData(noteStart + noteWithExisting2TagsOneDeleted + noteEnd),
+                    dataNode, note, USER_ROLES
+                ),
+                is(false)
+            );
         }
     }
 

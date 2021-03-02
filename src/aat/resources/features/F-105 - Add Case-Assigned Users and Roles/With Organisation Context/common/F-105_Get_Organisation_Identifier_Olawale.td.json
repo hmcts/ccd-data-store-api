@@ -1,0 +1,12 @@
+{
+  "title": "Retrieve user's in Olawale's organisation (+ organisationIdentifier)",
+
+  "_guid_": "F-105_Get_Organisation_Identifier_Olawale",
+  "_extends_": "F-105_Get_Organisation_Identifier_Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "F-105_User_Olawale"
+    }
+  }
+}

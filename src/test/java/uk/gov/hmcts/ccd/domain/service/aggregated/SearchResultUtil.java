@@ -4,22 +4,29 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchResult;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 
 import java.util.Map;
 
-class SearchResultUtil {
+public class SearchResultUtil {
+
+    private SearchResultUtil() {
+        // Hide Utility Class Constructor : Utility classes should not have a public or default constructor
+        // (squid:S1118)
+    }
+
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
     public static class SearchResultBuilder {
-        private final SearchResult searchResult;
+        private final SearchResultDefinition searchResult;
 
         private SearchResultBuilder() {
-            this.searchResult = new SearchResult();
+            this.searchResult = new SearchResultDefinition();
         }
 
-        static SearchResultUtil.SearchResultBuilder aSearchResult() {
+        @SuppressWarnings("checkstyle:MethodName") // method naming predates checkstyle implementation in module
+        public static SearchResultUtil.SearchResultBuilder searchResult() {
             return new SearchResultBuilder();
         }
 
@@ -28,16 +35,17 @@ class SearchResultUtil {
             return this;
         }
 
-        public SearchResult build() {
+        public SearchResultDefinition build() {
             return searchResult;
         }
     }
 
-    static SearchResultField buildSearchResultField(String caseTypedId,
-                                                    String caseFieldId,
-                                                    String caseFieldPath,
-                                                    String label,
-                                                    String displayContextParameter) {
+    public static SearchResultField buildSearchResultField(String caseTypedId,
+                                                           String caseFieldId,
+                                                           String caseFieldPath,
+                                                           String label,
+                                                           String displayContextParameter,
+                                                           String role) {
         SearchResultField searchResultField = new SearchResultField();
         searchResultField.setCaseFieldId(caseFieldId);
         searchResultField.setCaseFieldPath(caseFieldPath);
@@ -45,6 +53,7 @@ class SearchResultUtil {
         searchResultField.setLabel(label);
         searchResultField.setDisplayOrder(1);
         searchResultField.setDisplayContextParameter(displayContextParameter);
+        searchResultField.setRole(role);
         return searchResultField;
     }
 

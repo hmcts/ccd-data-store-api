@@ -1,0 +1,64 @@
+{
+  "_guid_": "S-912",
+  "_extends_": "F-108_Test_Data_Base",
+  "specs": [
+    "private multi jurisdiction access",
+    "is configured to search for both the previously created cases",
+    "contains details of 2 previously created cases",
+    "does not return the case field where user role has lower security classification than case field"
+  ],
+
+  "user": {
+    "username": "[[$CCD_PRIVATE_CROSS_CASE_TYPE_CASEWORKER_EMAIL]]",
+    "password": "[[$CCD_PRIVATE_CROSS_CASE_TYPE_CASEWORKER_PASSWORD]]"
+  },
+
+  "request": {
+    "queryParams": {
+      "ctid": "AAT_PRIVATE,AAT_PRIVATE2"
+    },
+    "body": {
+      "_source": [
+        "alias.NumberFieldAlias",
+        "alias.EmailFieldAlias",
+        "alias.TextFieldAlias"
+      ],
+      "query": {
+        "match": {
+          "alias.NumberFieldAlias": 912
+        }
+      }
+    }
+  },
+
+
+  "expectedResponse": {
+    "body": {
+      "total": 2,
+      "cases": [{
+        "_extends_" : "F-108_Base_Case_Fields_expected",
+        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-912_Create_Case_Private_Autotest1]}",
+        "case_data": {
+          "NumberFieldAlias": "912",
+          "TextFieldAlias": "text"
+        }
+      },{
+        "_extends_" : "F-108_Base_Case_Fields_expected",
+        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-912_Create_Case_Private_Autotest2]}",
+        "jurisdiction" : "AUTOTEST2",
+        "case_type_id" : "AAT_PRIVATE2",
+        "case_data": {
+          "NumberFieldAlias": "912",
+          "TextFieldAlias": "text"
+        }
+      }],
+      "case_types_results" : [{
+        "total" : 1,
+        "case_type_id" : "AAT_PRIVATE"
+      }, {
+        "total" : 1,
+        "case_type_id" : "AAT_PRIVATE2"
+      }]
+    }
+  }
+}

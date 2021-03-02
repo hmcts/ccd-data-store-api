@@ -3,6 +3,14 @@ package uk.gov.hmcts.ccd.domain.service.processor;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,21 +20,27 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
-
-import java.io.IOException;
-import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 class FieldProcessorServiceTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP = new TypeReference<HashMap<String, JsonNode>>() {};
+    private static final TypeReference<HashMap<String, JsonNode>> STRING_JSON_MAP =
+        new TypeReference<HashMap<String, JsonNode>>() {};
     private static final String CASE_TYPE_ID = "CaseType";
     private static final String EVENT_ID = "EventId";
     private static final String ID1 = "ID1";
@@ -59,10 +73,10 @@ class FieldProcessorServiceTest {
     private CaseViewFieldProcessor caseViewFieldProcessor2;
 
     @Mock
-    private CaseType caseType;
+    private CaseTypeDefinition caseType;
 
     @Mock
-    private CaseEvent event;
+    private CaseEventDefinition event;
 
     @BeforeEach
     void setUp() {
@@ -89,7 +103,8 @@ class FieldProcessorServiceTest {
         wizardPage2.setWizardPageFields(Collections.singletonList(wizardPageField2));
         wizardPages.add(wizardPage1);
         wizardPages.add(wizardPage2);
-        when(uiDefinitionRepository.getWizardPageCollection(Mockito.eq(CASE_TYPE_ID), Mockito.eq(EVENT_ID))).thenReturn(wizardPages);
+        when(uiDefinitionRepository.getWizardPageCollection(Mockito.eq(CASE_TYPE_ID), Mockito.eq(EVENT_ID)))
+            .thenReturn(wizardPages);
     }
 
     @Nested
@@ -101,13 +116,13 @@ class FieldProcessorServiceTest {
             CaseViewField caseViewField1 = new CaseViewField();
             CaseViewField caseViewField2 = new CaseViewField();
             CaseViewField caseViewField3 = new CaseViewField();
-            when(caseViewFieldProcessor1.execute(caseViewField1)).thenReturn(caseViewField2);
-            when(caseViewFieldProcessor2.execute(caseViewField2)).thenReturn(caseViewField3);
+            when(caseViewFieldProcessor1.execute(caseViewField1, null)).thenReturn(caseViewField2);
+            when(caseViewFieldProcessor2.execute(caseViewField2, null)).thenReturn(caseViewField3);
 
             final CaseViewField result = fieldProcessorService.processCaseViewField(caseViewField1);
 
-            verify(caseViewFieldProcessor1).execute(caseViewField1);
-            verify(caseViewFieldProcessor2).execute(caseViewField2);
+            verify(caseViewFieldProcessor1).execute(caseViewField1, null);
+            verify(caseViewFieldProcessor2).execute(caseViewField2, null);
             verifyNoMoreInteractions(caseViewFieldProcessor1, caseViewFieldProcessor2);
             assertAll(
                 () -> assertThat(result, is(caseViewField3))
@@ -129,7 +144,8 @@ class FieldProcessorServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
             List<CaseViewField> caseViewFields = Arrays.asList(caseViewField1, caseViewField2);
 
-            final List<CaseViewField> result = fieldProcessorService.processCaseViewFields(caseViewFields, caseType, event);
+            final List<CaseViewField> result =
+                fieldProcessorService.processCaseViewFields(caseViewFields, caseType, event);
 
             verify(caseViewFieldProcessor1).execute(caseViewField1, wizardPageField1);
             verify(caseViewFieldProcessor1).execute(caseViewField2, wizardPageField2);
@@ -150,27 +166,37 @@ class FieldProcessorServiceTest {
 
         @Test
         void shouldProcessDataWithAllProcessors() throws IOException {
-            CaseField caseField1 = caseField(ID1);
-            CaseField caseField2 = caseField(ID2);
-            CaseEventField caseEventField1 = caseEventField(ID1);
-            CaseEventField caseEventField2 = caseEventField(ID2);
+            CaseFieldDefinition caseField1 = caseField(ID1);
+            CaseFieldDefinition caseField2 = caseField(ID2);
+            CaseEventFieldDefinition caseEventField1 = caseEventField(ID1);
+            CaseEventFieldDefinition caseEventField2 = caseEventField(ID2);
             when(caseType.getCaseField(eq(ID1))).thenReturn(Optional.of(caseField1));
             when(caseType.getCaseField(eq(ID2))).thenReturn(Optional.of(caseField2));
             when(event.getCaseEventField(eq(ID1))).thenReturn(Optional.of(caseEventField1));
             when(event.getCaseEventField(eq(ID2))).thenReturn(Optional.of(caseEventField2));
             when(caseDataFieldProcessor1
-                .execute(Mockito.any(JsonNode.class), Mockito.any(CaseField.class), Mockito.any(CaseEventField.class), Mockito.any(WizardPageField.class)))
+                .execute(Mockito.any(JsonNode.class),
+                    Mockito.any(CaseFieldDefinition.class),
+                    Mockito.any(CaseEventFieldDefinition.class),
+                    Mockito.any(WizardPageField.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
             when(caseDataFieldProcessor2
-                .execute(Mockito.any(JsonNode.class), Mockito.any(CaseField.class), Mockito.any(CaseEventField.class), Mockito.any(WizardPageField.class)))
+                .execute(Mockito.any(JsonNode.class),
+                    Mockito.any(CaseFieldDefinition.class),
+                    Mockito.any(CaseEventFieldDefinition.class),
+                    Mockito.any(WizardPageField.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
             final Map<String, JsonNode> result = fieldProcessorService.processData(data(), caseType, event);
 
-            verify(caseDataFieldProcessor1).execute(Mockito.any(JsonNode.class), eq(caseField1), eq(caseEventField1), eq(wizardPageField1));
-            verify(caseDataFieldProcessor1).execute(Mockito.any(JsonNode.class), eq(caseField2), eq(caseEventField2), eq(wizardPageField2));
-            verify(caseDataFieldProcessor2).execute(Mockito.any(JsonNode.class), eq(caseField1), eq(caseEventField1), eq(wizardPageField1));
-            verify(caseDataFieldProcessor2).execute(Mockito.any(JsonNode.class), eq(caseField2), eq(caseEventField2), eq(wizardPageField2));
+            verify(caseDataFieldProcessor1).execute(Mockito.any(JsonNode.class), eq(caseField1), eq(caseEventField1),
+                eq(wizardPageField1));
+            verify(caseDataFieldProcessor1).execute(Mockito.any(JsonNode.class), eq(caseField2), eq(caseEventField2),
+                eq(wizardPageField2));
+            verify(caseDataFieldProcessor2).execute(Mockito.any(JsonNode.class), eq(caseField1), eq(caseEventField1),
+                eq(wizardPageField1));
+            verify(caseDataFieldProcessor2).execute(Mockito.any(JsonNode.class), eq(caseField2), eq(caseEventField2),
+                eq(wizardPageField2));
             verifyNoMoreInteractions(caseDataFieldProcessor1, caseDataFieldProcessor2);
             assertAll(
                 () -> assertThat(result.size(), is(2)),
@@ -218,14 +244,14 @@ class FieldProcessorServiceTest {
         return wizardPageField;
     }
 
-    private CaseField caseField(String id) {
-        CaseField caseField = new CaseField();
+    private CaseFieldDefinition caseField(String id) {
+        CaseFieldDefinition caseField = new CaseFieldDefinition();
         caseField.setId(id);
         return caseField;
     }
 
-    private CaseEventField caseEventField(String id) {
-        CaseEventField caseEventField = new CaseEventField();
+    private CaseEventFieldDefinition caseEventField(String id) {
+        CaseEventFieldDefinition caseEventField = new CaseEventFieldDefinition();
         caseEventField.setCaseFieldId(id);
         return caseEventField;
     }

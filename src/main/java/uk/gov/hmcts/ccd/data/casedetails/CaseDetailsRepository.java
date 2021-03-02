@@ -13,13 +13,8 @@ public interface CaseDetailsRepository {
 
     Optional<CaseDetails> findById(String jurisdiction, Long id);
 
-    Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference);
-
-    Optional<CaseDetails> findByReference(String jurisdiction, String reference);
-
-    Optional<CaseDetails> findByReference(String reference);
-
     /**
+     * Find by identifier.
      *
      * @param id Internal case ID
      * @return Case details
@@ -28,7 +23,18 @@ public interface CaseDetailsRepository {
     @Deprecated
     CaseDetails findById(Long id);
 
+    List<Long> findCaseReferencesByIds(List<Long> ids);
+
+    Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference);
+
+    Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference);
+
+    Optional<CaseDetails> findByReference(String jurisdiction, String reference);
+
+    Optional<CaseDetails> findByReference(String reference);
+
     /**
+     * Find by reference.
      *
      * @param caseReference Public case reference
      * @return Case details
@@ -38,6 +44,7 @@ public interface CaseDetailsRepository {
     CaseDetails findByReference(Long caseReference);
 
     /**
+     * Find unique case.
      *
      * @param jurisdictionId Case's jurisdiction ID
      * @param caseTypeId Case's type ID

@@ -1,0 +1,35 @@
+{
+  "_guid_": "S-904",
+  "_extends_": "F-108_Test_Data_Base",
+  "specs": [
+    "a role with no read access to the case state",
+    "is configured to search for the previously created case via exact match",
+    "contains no cases"
+  ],
+
+  "user" : {
+    "username": "[[$CCD_PRIVATE_CASEWORKER_SOLICITOR_EMAIL]]",
+    "password": "[[$CCD_PRIVATE_CASEWORKER_SOLICITOR_PASSWORD]]"
+  },
+
+  "request": {
+    "queryParams": {
+      "ctid": "AAT_PRIVATE_B"
+    },
+    "body": {
+      "query": {
+        "match": {
+          "reference": "${[scenarioContext][childContexts][Private_Case_Creation_Autotest1_AAT_PRIVATE_B_Data][testData][actualResponse][body][id]}"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "total": 0,
+      "cases": [],
+      "case_types_results" : "[[ANY_NULLABLE]]"
+    }
+  }
+}

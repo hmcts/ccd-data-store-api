@@ -1,0 +1,21 @@
+{
+	"_guid_": "F-121_Test_Data_Base",
+
+	"productName": "CCD Data Store",
+	"operationName": "validation of a set of fields as Case worker",
+
+	"method": "GET",
+  "uri": "/internal/case-types/{ctid}/event-triggers/{etid}?ignore-warning=false",
+
+	"user": {
+		"_extends_": "Common_User_For_Request",
+    "_extends_": "BeftaMasterCaseworker"
+	},
+
+	"request": {
+		"_extends_": "Common_Request",
+    "headers": {
+      "experimental": "true"
+    }
+	}
+}

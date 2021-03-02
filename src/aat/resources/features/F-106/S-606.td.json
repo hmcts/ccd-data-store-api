@@ -1,0 +1,35 @@
+{
+	"title": "Need to be able to increment an existing property",
+	"_guid_": "S-606",
+	"productName": "CCD Data Store api",
+	"operationName": "Update Supplementary Data",
+	"_extends_": "F-106_Update_Supplementary_Data_Base",
+	"specs": [
+		"Dil - who can create a case",
+    "contains increments of a specified value to an existing Supplementary Data property"
+	],
+  "request": {
+    "body": {
+      "supplementary_data_updates": {
+        "$inc": {
+          "orgs_assigned_users.OrgA": 1,
+          "orgs_assigned_users.OrgB": -1
+        }
+      }
+    }
+  },
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Type": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "gzip"
+		},
+    "body": {
+      "supplementary_data": {
+        "orgs_assigned_users.OrgA": 26,
+        "orgs_assigned_users.OrgB": 0
+      }
+    }
+	}
+}

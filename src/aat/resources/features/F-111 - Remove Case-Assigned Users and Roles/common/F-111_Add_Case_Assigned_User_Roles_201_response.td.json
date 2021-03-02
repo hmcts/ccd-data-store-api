@@ -1,0 +1,8 @@
+{
+  "_guid_": "F-111_Add_Case_Assigned_User_Roles_201_response",
+  "_extends_": "Common_201_Response",
+
+  "body": {
+    "status_message": "Case-User-Role assignments created successfully"
+  }
+}

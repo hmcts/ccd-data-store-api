@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
 import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +12,7 @@ import org.mockito.MockitoAnnotations;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -40,7 +42,7 @@ class CachedCaseUserRepositoryTest {
 
     @Test
     @DisplayName("should initially retrieve case user roles from decorated repository")
-    void shoudlGetUserCaseRolesFromDefaultRepository() {
+    void shouldGetUserCaseRolesFromDefaultRepository() {
         List<String> returned = classUnderTest.findCaseRoles(caseId, userId);
 
         assertAll(
@@ -70,6 +72,35 @@ class CachedCaseUserRepositoryTest {
         assertAll(
             () -> assertThat(returned2, is(caseIds)),
             () -> verifyNoMoreInteractions(caseUserRepository)
+        );
+    }
+
+    @Test
+    @DisplayName("should initially retrieve case ids user has access")
+    void shouldGetCaseUserRolesFromDefaultRepository() {
+        List<Long> caseIds = new ArrayList<>();
+        caseIds.add(1234L);
+        caseIds.add(1235L);
+
+        List<String> userIds = new ArrayList<>();
+        userIds.add("123456");
+        userIds.add("123457");
+        List<CaseUserEntity> caseUserEntities = new ArrayList<>();
+        caseUserEntities.add(new CaseUserEntity(1234L, "123456", "[CREATOR]"));
+        caseUserEntities.add(new CaseUserEntity(1235L, "123457", "[SOLICITOR]"));
+        doReturn(caseUserEntities).when(caseUserRepository).findCaseUserRoles(anyList(), anyList());
+
+        List<CaseUserEntity> returned = classUnderTest.findCaseUserRoles(caseIds, userIds);
+
+        assertAll(
+            () -> assertThat(returned, is(caseUserEntities)),
+            () -> verify(caseUserRepository, times(1)).findCaseUserRoles(caseIds, userIds)
+        );
+        List<CaseUserEntity> returned2 = classUnderTest.findCaseUserRoles(caseIds, userIds);
+
+        assertAll(
+            () -> assertThat(returned2, is(caseUserEntities)),
+            () -> verify(caseUserRepository, times(2)).findCaseUserRoles(caseIds, userIds)
         );
     }
 }

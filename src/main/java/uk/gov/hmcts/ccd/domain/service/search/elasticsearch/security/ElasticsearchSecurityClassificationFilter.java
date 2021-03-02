@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
 @Component
@@ -22,7 +22,8 @@ public class ElasticsearchSecurityClassificationFilter implements CaseSearchFilt
     private final CaseTypeService caseTypeService;
 
     @Autowired
-    public ElasticsearchSecurityClassificationFilter(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
+    public ElasticsearchSecurityClassificationFilter(@Qualifier(CachedUserRepository.QUALIFIER)
+                                                             UserRepository userRepository,
                                                      CaseTypeService caseTypeService) {
         this.userRepository = userRepository;
         this.caseTypeService = caseTypeService;
@@ -30,11 +31,13 @@ public class ElasticsearchSecurityClassificationFilter implements CaseSearchFilt
 
     @Override
     public Optional<QueryBuilder> getFilter(String caseTypeId) {
-        return Optional.of(QueryBuilders.termsQuery(SECURITY_CLASSIFICATION_FIELD_COL, getSecurityClassifications(caseTypeId)));
+        return Optional.of(QueryBuilders.termsQuery(SECURITY_CLASSIFICATION_FIELD_COL,
+            getSecurityClassifications(caseTypeId)));
     }
 
     private List<String> getSecurityClassifications(String caseTypeId) {
-        CaseType caseType = caseTypeService.getCaseType(caseTypeId);
-        return userRepository.getHighestUserClassification(caseType.getJurisdiction().getId()).getClassificationsLowerOrEqualTo();
+        CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseTypeId);
+        return userRepository.getHighestUserClassification(caseTypeDefinition.getJurisdictionDefinition().getId())
+            .getClassificationsLowerOrEqualTo();
     }
 }

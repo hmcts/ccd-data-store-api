@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
 @Service
@@ -23,7 +23,7 @@ public class DefaultGetCaseTypeOperation implements GetCaseTypeOperation {
     }
 
     @Override
-    public Optional<CaseType> execute(String caseTypeId, Predicate<AccessControlList> access) {
+    public Optional<CaseTypeDefinition> execute(String caseTypeId, Predicate<AccessControlList> access) {
         return Optional.ofNullable(caseTypeService.getCaseType(caseTypeId));
     }
 

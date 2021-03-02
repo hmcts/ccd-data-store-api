@@ -1,0 +1,89 @@
+{
+  "case_type_id": "MAPPER",
+  "created_date": "2020-05-07T16:56:55.621Z",
+  "data": {
+    "AddressUKField": {
+      "AddressLine1": null,
+      "AddressLine2": null,
+      "AddressLine3": null,
+      "Country": null,
+      "County": null,
+      "PostCode": null,
+      "PostTown": null
+    },
+    "CollectionField": [],
+    "ComplexField": {
+      "ComplexFixedListField": null,
+      "ComplexNestedField": {
+        "NestedCollectionTextField": [],
+        "NestedNumberField": null
+      },
+      "ComplexTextField": "ComplexTextValue"
+    },
+    "DateField": null,
+    "DateTimeField": null,
+    "EmailField": "email2@gmail.com",
+    "FixedRadioListField": null,
+    "MoneyGBPField": null,
+    "MultiSelectListField": [],
+    "NumberField": null,
+    "OtherFixedListField": "VALUE2",
+    "PhoneUKField": null,
+    "TextAreaField": null,
+    "TextField": "BBB TextValue",
+    "YesOrNoField": null
+  },
+  "data_classification": {
+    "AddressUKField": {
+      "classification": "PUBLIC",
+      "value": {
+        "AddressLine1": "PUBLIC",
+        "AddressLine2": "PUBLIC",
+        "AddressLine3": "PUBLIC",
+        "Country": "PUBLIC",
+        "County": "PUBLIC",
+        "PostCode": "PUBLIC",
+        "PostTown": "PUBLIC"
+      }
+    },
+    "CollectionField": {
+      "classification": "PUBLIC",
+      "value": []
+    },
+    "ComplexField": {
+      "classification": "PUBLIC",
+      "value": {
+        "ComplexFixedListField": "PUBLIC",
+        "ComplexNestedField": {
+          "classification": "PUBLIC",
+          "value": {
+            "NestedCollectionTextField": {
+              "classification": "PUBLIC",
+              "value": []
+            },
+            "NestedNumberField": "PUBLIC"
+          }
+        },
+        "ComplexTextField": "PUBLIC"
+      }
+    },
+    "DateField": "PUBLIC",
+    "DateTimeField": "PUBLIC",
+    "EmailField": "PUBLIC",
+    "FixedRadioListField": "PUBLIC",
+    "MoneyGBPField": "PUBLIC",
+    "MultiSelectListField": "PUBLIC",
+    "NumberField": "PUBLIC",
+    "OtherFixedListField": "PUBLIC",
+    "PhoneUKField": "PUBLIC",
+    "TextAreaField": "PUBLIC",
+    "TextField": "PUBLIC",
+    "YesOrNoField": "PUBLIC"
+  },
+  "jurisdiction": "AUTOTEST2",
+  "last_modified": "2020-05-07T16:56:55.635Z",
+  "last_state_modified_date": "2020-05-07T16:56:55.621Z",
+  "reference": 1588870615652827,
+  "security_classification": "PUBLIC",
+  "state": "TODO"
+}

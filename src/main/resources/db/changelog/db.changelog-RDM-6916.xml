@@ -1,0 +1,37 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <!-- 
+      Run outside of a transaction to permit indexes to be run CONCURRENTLY: i.e. without write locks on table.
+      Use a seperate changeSet for each SQL statement to keep databasechangelog table valid in event of failure.
+    -->
+    <changeSet id="rdm-6916-1" author="matt.nayler@hmcts.net" runInTransaction="false">
+
+        <sql dbms="postgresql">
+            CREATE INDEX CONCURRENTLY
+            IF NOT EXISTS idx_case_event_created_date 
+            ON case_event(created_date)
+        </sql>
+
+    </changeSet>
+    <changeSet id="rdm-6916-2" author="matt.nayler@hmcts.net" runInTransaction="false">
+
+        <sql dbms="postgresql">
+            CREATE INDEX CONCURRENTLY
+            IF NOT EXISTS idx_case_event_case_type_id 
+            ON case_event(case_type_id)
+        </sql>
+
+    </changeSet>
+    <changeSet id="rdm-6916-3" author="matt.nayler@hmcts.net" runInTransaction="false">
+
+        <sql dbms="postgresql">
+            CREATE INDEX CONCURRENTLY
+            IF NOT EXISTS idx_case_event_event_id_state_id 
+            ON case_event(event_id, state_id)
+        </sql>
+
+    </changeSet>
+
+</databaseChangeLog>

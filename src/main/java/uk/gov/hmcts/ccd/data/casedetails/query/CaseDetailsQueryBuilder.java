@@ -70,6 +70,12 @@ public abstract class CaseDetailsQueryBuilder<T> {
         return this;
     }
 
+    public CaseDetailsQueryBuilder whereIdsAreIn(List<Long> ids) {
+        predicates.add(cb.in(root.get("id")).value(ids));
+
+        return this;
+    }
+
     public CaseDetailsQueryBuilder whereCaseType(String caseType) {
         predicates.add(cb.equal(root.get("caseType"), caseType));
 
@@ -102,7 +108,8 @@ public abstract class CaseDetailsQueryBuilder<T> {
     }
 
     public CaseDetailsQueryBuilder whereSecurityClassification(String rawClassification) {
-        final SecurityClassification securityClassification = SecurityClassification.valueOf(rawClassification.toUpperCase());
+        final SecurityClassification securityClassification =
+            SecurityClassification.valueOf(rawClassification.toUpperCase());
         predicates.add(cb.equal(root.get("securityClassification"), securityClassification));
 
         return this;
@@ -115,7 +122,7 @@ public abstract class CaseDetailsQueryBuilder<T> {
         metadata.getState().ifPresent(this::whereState);
         metadata.getCaseReference().ifPresent(this::whereReference);
         metadata.getCreatedDate().ifPresent(this::whereCreatedDate);
-        metadata.getLastModified().ifPresent(this::whereLastModified);
+        metadata.getLastModifiedDate().ifPresent(this::whereLastModified);
         metadata.getSecurityClassification().ifPresent(this::whereSecurityClassification);
 
         return this;

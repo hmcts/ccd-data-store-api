@@ -1,30 +1,30 @@
 {
 	"title": "must return 404 error response for case not found",
 	"_guid_": "S-529",
-  "productName": "CCD Data Store",
-  "operationName": "Grant access to a case",
+	"productName": "CCD Data Store",
+	"operationName": "Grant access to a case",
 	"_extends_": "F-101_Test_Data_Base",
 
 	"specs": [
 		"an active solicitor profile in CCD",
-    "another active solicitor profile in CCD",
+		"another active solicitor profile in CCD",
 		"uses a case id that does not exists",
 		"has the 404 return code"
 	],
-  "request": {
-    "pathVariables": {
-      "cid": "1580488861039999"
-    },
-    "body": {
-      "case_roles": [
-        "[DEFENDANT]"
-      ]
-    }
-  },
-  "expectedResponse": {
-    "responseCode" : 404,
-    "headers" : {
-      "_extends_": "Common_404_Response"
-    }
-  }
+	"request": {
+		"pathVariables": {
+			"cid": "1580488861039999"
+		},
+		"body": {
+			"case_roles": [
+				"[DEFENDANT]"
+			]
+		}
+	},
+	"expectedResponse": {
+		"responseCode" : 404,
+		"headers" : {
+			"_extends_": "Common_404_Response"
+		}
+	}
 }

@@ -16,8 +16,8 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -55,7 +55,8 @@ class AuthorisedSearchOperationTest {
     private static final String CASEWORKER_PROBATE_LOA1 = "caseworker-probate-loa1";
     private static final String CASEWORKER_PROBATE_LOA3 = "caseworker-probate-loa3";
     private static final String CASEWORKER_DIVORCE = "caseworker-divorce-loa3";
-    private static final Set<String> USER_ROLES = Sets.newHashSet(CASEWORKER_DIVORCE, CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA3);
+    private static final Set<String> USER_ROLES = Sets.newHashSet(CASEWORKER_DIVORCE, CASEWORKER_PROBATE_LOA1,
+        CASEWORKER_PROBATE_LOA3);
 
     @Mock
     private SearchOperation nextOperationInChain;
@@ -70,8 +71,8 @@ class AuthorisedSearchOperationTest {
 
     private MetaData metaData;
     private HashMap<String, String> criteria;
-    private CaseType caseType;
-    private final List<CaseField> caseFields = Lists.newArrayList();
+    private CaseTypeDefinition caseType;
+    private final List<CaseFieldDefinition> caseFields = Lists.newArrayList();
 
     private JsonNode classifiedDataNode1;
     private JsonNode classifiedDataClassificationNode1;
@@ -91,15 +92,16 @@ class AuthorisedSearchOperationTest {
 
         metaData = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
-        caseType = new CaseType();
-        caseType.setCaseFields(caseFields);
+        caseType = new CaseTypeDefinition();
+        caseType.setCaseFieldDefinitions(caseFields);
 
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
         when(userRepository.getUserRoles()).thenReturn(USER_ROLES);
 
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseType, USER_ROLES, CAN_READ);
 
-        caseFields.addAll(getCaseFieldsWithIds("dataTestField11", "dataTestField12", "classificationTestField11", "classificationTestField12"));
+        caseFields.addAll(getCaseFieldsWithIds("dataTestField11", "dataTestField12",
+            "classificationTestField11", "classificationTestField12"));
 
         classifiedDataNode1 = JSON_NODE_FACTORY.objectNode();
         ((ObjectNode) classifiedDataNode1).put("dataTestField11", "dataTestValue11");
@@ -117,7 +119,8 @@ class AuthorisedSearchOperationTest {
         classifiedCase1.setData(JacksonUtils.convertValue(classifiedDataNode1));
         classifiedCase1.setDataClassification(JacksonUtils.convertValue(classifiedDataClassificationNode1));
 
-        caseFields.addAll(getCaseFieldsWithIds("dataTestField21", "dataTestField22", "classificationTestField21", "classificationTestField22"));
+        caseFields.addAll(getCaseFieldsWithIds("dataTestField21", "dataTestField22",
+            "classificationTestField21", "classificationTestField22"));
 
         classifiedDataNode2 = JSON_NODE_FACTORY.objectNode();
         ((ObjectNode) classifiedDataNode2).put("dataTestField21", "dataTestValue21");
@@ -135,9 +138,12 @@ class AuthorisedSearchOperationTest {
         classifiedCase2.setData(JacksonUtils.convertValue(classifiedDataNode2));
         classifiedCase2.setDataClassification(JacksonUtils.convertValue(classifiedDataClassificationNode2));
 
-        doReturn(Arrays.asList(classifiedCase1, classifiedCase2)).when(nextOperationInChain).execute(metaData, criteria);
-        doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(eq(classifiedCase1.getState()), eq(caseType), eq(USER_ROLES), eq(CAN_READ));
-        doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(eq(classifiedCase2.getState()), eq(caseType), eq(USER_ROLES), eq(CAN_READ));
+        doReturn(Arrays.asList(classifiedCase1, classifiedCase2)).when(nextOperationInChain).execute(metaData,
+            criteria);
+        doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(eq(classifiedCase1.getState()),
+            eq(caseType), eq(USER_ROLES), eq(CAN_READ));
+        doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(eq(classifiedCase2.getState()),
+            eq(caseType), eq(USER_ROLES), eq(CAN_READ));
 
         doReturn(authorisedDataNode1).when(accessControlService).filterCaseFieldsByAccess(
             eq(classifiedDataNode1),
@@ -169,10 +175,10 @@ class AuthorisedSearchOperationTest {
             caseDefinitionRepository, accessControlService, userRepository);
     }
 
-    private List<CaseField> getCaseFieldsWithIds(String... dataTestFields) {
+    private List<CaseFieldDefinition> getCaseFieldsWithIds(String... dataTestFields) {
         return Stream.of(dataTestFields)
             .map(field -> {
-                CaseField caseField = new CaseField();
+                CaseFieldDefinition caseField = new CaseFieldDefinition();
                 caseField.setId(field);
                 return caseField;
             })
@@ -277,7 +283,9 @@ class AuthorisedSearchOperationTest {
         assertAll(
             () -> assertThat(output, is(notNullValue())),
             () -> assertThat(output, hasSize(0)),
-            () -> verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(USER_ROLES), eq(CAN_READ), anyBoolean())
+            () -> verify(accessControlService, never())
+                .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFields), eq(USER_ROLES), eq(CAN_READ),
+                    anyBoolean())
         );
     }
 }

@@ -1,7 +1,6 @@
 {
 	"_guid_": "S-280",
 	"_extends_": "F-044_Test_Data_Base",
-
 	"title": "must return negative response when request does not provide an authorised access",
 
 	"specs": [
@@ -9,11 +8,13 @@
 		"does not provide authorised access to the operation",
 		"contains an HTTP 403 Forbidden"
 	],
+
 	"request": {
-    "headers": {
-      "ServiceAuthorization": "eyJhbGciOiJIUzI1NiJ9"
-    }
+		"headers": {
+			"ServiceAuthorization": "eyJhbGciOiJIUzI1NiJ9"
+		}
 	},
+
 	"expectedResponse": {
 		"_extends_": "Common_403_Response",
 		"body": {

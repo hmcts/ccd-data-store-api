@@ -5,11 +5,11 @@ import java.io.Serializable;
 public class SearchAliasField implements Serializable {
 
     private static final long serialVersionUID = -9131437463329052815L;
-    
+
     private String id;
     private String caseTypeId;
     private String caseFieldPath;
-    private FieldType fieldType;
+    private FieldTypeDefinition fieldTypeDefinition;
 
     public String getId() {
         return id;
@@ -35,11 +35,11 @@ public class SearchAliasField implements Serializable {
         this.caseFieldPath = caseFieldPath;
     }
 
-    public FieldType getFieldType() {
-        return fieldType;
+    public FieldTypeDefinition getFieldTypeDefinition() {
+        return fieldTypeDefinition;
     }
 
-    public void setFieldType(FieldType fieldType) {
-        this.fieldType = fieldType;
+    public void setFieldTypeDefinition(FieldTypeDefinition fieldTypeDefinition) {
+        this.fieldTypeDefinition = fieldTypeDefinition;
     }
 }

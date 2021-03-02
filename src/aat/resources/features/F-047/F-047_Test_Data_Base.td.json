@@ -1,29 +1,34 @@
 {
-  "_guid_": "F-047_Test_Data_Base",
-  "productName": "CCD Data Store",
-  "operationName": "Get case ids",
-  "method": "GET",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/ids",
-  "user": {
-    "_extends_": "Common_User_For_Request"
-  },
-  "request": {
-    "_extends_": "Common_Request",
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT"
-    },
-    "queryParams": {
-      "userId": "F047UserIdTest"
-    }
-  },
-  "expectedResponse": {
-    "headers": {
-      "_extends_": "Common_Response_Headers",
-      "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Type": "[[ANYTHING_PRESENT]]",
-      "Content-Encoding": "[[ANYTHING_PRESENT]]"
-    }
-  }
+	"_guid_": "F-047_Test_Data_Base",
+
+	"productName": "CCD Data Store",
+	"operationName": "Get case ids",
+
+	"method": "GET",
+	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/ids",
+
+	"user": {
+		"_extends_": "Common_User_For_Request"
+	},
+
+	"request": {
+		"_extends_": "Common_Request",
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "AUTOTEST1",
+			"ctid": "AAT"
+		},
+		"queryParams": {
+			"userId": "F047UserIdTest"
+		}
+	},
+
+	"expectedResponse": {
+		"headers": {
+			"_extends_": "Common_Response_Headers",
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Type": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "[[ANYTHING_PRESENT]]"
+		}
+	}
 }

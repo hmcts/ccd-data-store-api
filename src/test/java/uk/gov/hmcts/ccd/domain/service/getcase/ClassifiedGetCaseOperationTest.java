@@ -15,7 +15,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 class ClassifiedGetCaseOperationTest {
 
@@ -49,7 +52,7 @@ class ClassifiedGetCaseOperationTest {
 
     @Nested
     @DisplayName("execute(jurisdictionId, caseTypeId, caseReference)")
-    class execute_jurisdictionCaseTypeReference {
+    class ExecuteJurisdictionCaseTypeReference {
         @Test
         @DisplayName("should call decorated implementation")
         void shouldCallDecoratedImplementation() {
@@ -99,7 +102,7 @@ class ClassifiedGetCaseOperationTest {
 
     @Nested
     @DisplayName("execute(caseReference)")
-    class execute_reference {
+    class ExecuteReference {
         @Test
         @DisplayName("should call decorated implementation")
         void shouldCallDecoratedImplementation() {

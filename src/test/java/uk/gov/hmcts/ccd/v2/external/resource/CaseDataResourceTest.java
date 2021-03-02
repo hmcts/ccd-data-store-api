@@ -39,19 +39,19 @@ class CaseDataResourceTest {
     @Test
     @DisplayName("should copy case data unwrapped")
     void shouldCopyUnwrappedCaseDataContent() {
-        final CaseDataResource uiStartTriggerResource = new CaseDataResource(CASE_DATA_CONTENT, CASE_TYPE_ID, PAGE_ID);
+        final CaseDataResource caseDataResource = new CaseDataResource(CASE_DATA_CONTENT, CASE_TYPE_ID, PAGE_ID);
 
         assertAll(
-            () -> assertThat(uiStartTriggerResource.getData(), equalTo(UNWRAPPED_DATA_NODE))
+            () -> assertThat(caseDataResource.getData(), equalTo(UNWRAPPED_DATA_NODE))
         );
     }
 
     @Test
     @DisplayName("should link to itself")
     void shouldLinkToSelf() {
-        final CaseDataResource uiStartTriggerResource = new CaseDataResource(CASE_DATA_CONTENT, CASE_TYPE_ID, PAGE_ID);
+        final CaseDataResource caseDataResource = new CaseDataResource(CASE_DATA_CONTENT, CASE_TYPE_ID, PAGE_ID);
 
-        Optional<Link> self = uiStartTriggerResource.getLink("self");
+        Optional<Link> self = caseDataResource.getLink("self");
         assertThat(self.get().getHref(), equalTo(linkSelfForCaseData));
     }
 

@@ -1,13 +1,13 @@
 {
-  "_guid_": "F101_GetToken",
-  "_extends_": "Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation_Solicitor_1",
-  "specs": [
-    "to create a token for case creation"
-  ],
-  "users": {
-    "invokingUser": {
-      "username": "befta.caseworker.2.solicitor.2@gmail.com",
-      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
-    }
-  }
+	"_guid_": "F101_GetToken",
+	"_extends_": "Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation_Solicitor_1",
+	"specs": [
+		"to create a token for case creation"
+	],
+	"users": {
+		"invokingUser": {
+			"username": "befta.caseworker.2.solicitor.2@gmail.com",
+			"password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+		}
+	}
 }

@@ -11,12 +11,14 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.AuthCheckerConfiguration;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,9 +27,16 @@ import java.util.Set;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.emptyCollectionOf;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.UserRoleBuilder.aUserRole;
@@ -54,6 +63,9 @@ public class UserRepositoryTest {
     private Authentication authentication;
 
     @Mock
+    private AuthCheckerConfiguration authCheckerConfiguration;
+
+    @Mock
     private SecurityContext securityContext;
 
     private UserRepository userRepository;
@@ -65,23 +77,25 @@ public class UserRepositoryTest {
         doReturn(authentication).when(securityContext).getAuthentication();
         SecurityContextHolder.setContext(securityContext);
 
-        userRepository = spy(new DefaultUserRepository(applicationParams,
-                                                       caseDefinitionRepository, securityUtils, restTemplate));
+        userRepository = spy(new DefaultUserRepository(applicationParams, caseDefinitionRepository, securityUtils,
+            restTemplate, authCheckerConfiguration));
     }
 
     @Nested
     @DisplayName("getUserRoles()")
-    class getUserRoles {
+    class GetUserRoles {
 
         @Test
         @DisplayName("should retrieve roles from security principals")
         void shouldRetrieveRolesFromPrincipal() {
-            MockUtils.setSecurityAuthorities(authentication, CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA2, CASEWORKER_DIVORCE);
+            MockUtils.setSecurityAuthorities(authentication, CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA2,
+                CASEWORKER_DIVORCE);
+            mockUserInfo("userId");
 
             Set<String> userRoles = userRepository.getUserRoles();
 
             verify(securityContext, times(1)).getAuthentication();
-            verify(authentication, times(1)).getPrincipal();
+            verify(authentication, times(1)).getAuthorities();
             assertThat(userRoles, hasItems(CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA2, CASEWORKER_DIVORCE));
         }
 
@@ -89,17 +103,24 @@ public class UserRepositoryTest {
         @DisplayName("should retrieve no role if no relevant role found")
         void shouldRetrieveNoRoleIfNoRelevantRoleFound() {
             MockUtils.setSecurityAuthorities(authentication);
+            mockUserInfo("userId");
 
             Set<String> userRoles = userRepository.getUserRoles();
 
             assertThat(userRoles, is(emptyCollectionOf(String.class)));
         }
 
+        private void mockUserInfo(String userId) {
+            UserInfo userInfo = UserInfo.builder()
+                .uid(userId)
+                .build();
+            when(securityUtils.getUserInfo()).thenReturn(userInfo);
+        }
     }
 
     @Nested
     @DisplayName("getUserClassifications()")
-    class getUserClassifications {
+    class GetUserClassifications {
 
         @Test
         @DisplayName("should retrieve roles from user repository")
@@ -122,7 +143,8 @@ public class UserRepositoryTest {
             when(caseDefinitionRepository.getClassificationsForUserRoleList(roles)).thenReturn(userRoleList);
             doReturn(newHashSet(CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA2)).when(userRepository).getUserRoles();
 
-            final Set<SecurityClassification> userClassifications = userRepository.getUserClassifications("PROBATE");
+            final Set<SecurityClassification> userClassifications =
+                userRepository.getUserClassifications("PROBATE");
 
             assertThat(userClassifications, hasSize(2));
             assertThat(userClassifications, hasItems(PUBLIC, PRIVATE));
@@ -145,7 +167,8 @@ public class UserRepositoryTest {
         }
 
         @Test
-        @DisplayName("should retrieve no security classification if empty list of roles returned from case definition store")
+        @DisplayName("should retrieve no security classification if empty list of roles returned from case definition"
+            + " store")
         public void shouldRetrieveNoSecurityClassificationIfEmptyListOfRolesFromCaseDefinition() {
             doReturn(newHashSet()).when(userRepository).getUserRoles();
 
@@ -156,14 +179,16 @@ public class UserRepositoryTest {
         @DisplayName("should fail to retrieve security classifications if unable to talk to definition store")
         public void shouldFailIfExceptionWhileRetrievingUserRoleFromCaseDefinition() {
             doReturn(newHashSet(CASEWORKER_PROBATE_LOA1)).when(userRepository).getUserRoles();
-            doThrow(ServiceException.class).when(caseDefinitionRepository).getClassificationsForUserRoleList(Arrays.asList(CASEWORKER_PROBATE_LOA1));
+            doThrow(ServiceException.class).when(caseDefinitionRepository).getClassificationsForUserRoleList(Arrays
+                .asList(CASEWORKER_PROBATE_LOA1));
 
             assertThrows(ServiceException.class, () -> userRepository.getUserClassifications("PROBATE"),
                          "Classification retrieval should have failed");
         }
 
         private void assertNoClassifications() {
-            final Set<SecurityClassification> userClassifications = userRepository.getUserClassifications("PROBATE");
+            final Set<SecurityClassification> userClassifications =
+                userRepository.getUserClassifications("PROBATE");
 
             assertThat(userClassifications, hasSize(0));
         }

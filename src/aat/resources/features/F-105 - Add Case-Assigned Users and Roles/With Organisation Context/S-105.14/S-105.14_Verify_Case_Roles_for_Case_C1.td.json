@@ -1,0 +1,29 @@
+{
+  "_guid_": "S-105.14_Verify_Case_Roles_for_Case_C1",
+  "_extends_": "F-105_Get_Case_Roles_for_Case_C1_Base",
+
+  "specs": [
+    "to verify Olawale's reception of the role CR-1 and CR-2 over the case C1"
+  ],
+
+  "expectedResponse": {
+    "body": {
+      "case_users": [
+        {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "case_id,user_id,case_role"
+        },
+        {
+          "case_id": "${}${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][parentContext][testData][users][userOlawale][id]}",
+          "case_role": "[CR-1]"
+        },
+        {
+          "case_id": "${}${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][parentContext][testData][users][userOlawale][id]}",
+          "case_role": "[CR-2]"
+        }
+      ]
+    }
+  }
+}

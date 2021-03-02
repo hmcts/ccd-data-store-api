@@ -1,0 +1,62 @@
+{
+  "_guid_": "S-914",
+  "_extends_": "F-108_Test_Data_Base",
+  "specs": [
+    "restricted security classification",
+    "is configured to search for both the previously created cases",
+    "contains details of the restricted email field for the 2 previously created cases"
+  ],
+
+  "user": {
+    "username": "[[$CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_EMAIL]]",
+    "password": "[[$CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_PASSWORD]]"
+  },
+
+  "request": {
+    "queryParams": {
+      "ctid": "AAT_PRIVATE,AAT_PRIVATE2"
+    },
+    "body": {
+      "_source": [
+        "alias.NumberFieldAlias",
+        "alias.EmailFieldAlias"
+      ],
+      "query": {
+        "match": {
+          "alias.NumberFieldAlias": 914
+        }
+      }
+    }
+  },
+
+
+  "expectedResponse": {
+    "body": {
+      "total": 2,
+      "cases": [{
+        "_extends_" : "F-108_Base_Case_Fields_expected",
+        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-914_Create_Case_Private_Autotest1]}",
+        "case_data": {
+          "NumberFieldAlias": "914",
+          "EmailFieldAlias": "fuctional@test.com"
+        }
+      },{
+        "_extends_" : "F-108_Base_Case_Fields_expected",
+        "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_S-914_Create_Case_Private_Autotest2]}",
+        "jurisdiction" : "AUTOTEST2",
+        "case_type_id" : "AAT_PRIVATE2",
+        "case_data": {
+          "NumberFieldAlias": "914",
+          "EmailFieldAlias": "fuctional@test.com"
+        }
+      }],
+      "case_types_results" : [{
+        "total" : 1,
+        "case_type_id" : "AAT_PRIVATE"
+      },{
+        "total" : 1,
+        "case_type_id" : "AAT_PRIVATE2"
+      }]
+    }
+  }
+}

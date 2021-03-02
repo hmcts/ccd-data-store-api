@@ -2,6 +2,9 @@ package uk.gov.hmcts.ccd.domain.service.createcase;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
+import java.util.HashMap;
+import java.util.Map;
+import javax.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -14,12 +17,15 @@ import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
+import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
@@ -27,9 +33,6 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import javax.inject.Inject;
-import java.util.HashMap;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -48,10 +51,12 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     private final CallbackInvoker callbackInvoker;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final DraftGateway draftGateway;
+    private final CasePostStateService casePostStateService;
 
     @Inject
     public DefaultCreateCaseOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
+                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                      final CaseDefinitionRepository caseDefinitionRepository,
                                       final EventTriggerService eventTriggerService,
                                       final EventTokenService eventTokenService,
                                       final CaseDataService caseDataService,
@@ -60,6 +65,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
                                       final CaseTypeService caseTypeService,
                                       final CallbackInvoker callbackInvoker,
                                       final ValidateCaseFieldsOperation validateCaseFieldsOperation,
+                                      final CasePostStateService casePostStateService,
                                       @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -71,6 +77,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         this.caseDataService = caseDataService;
         this.callbackInvoker = callbackInvoker;
         this.validateCaseFieldsOperation = validateCaseFieldsOperation;
+        this.casePostStateService = casePostStateService;
         this.draftGateway = draftGateway;
     }
 
@@ -83,65 +90,81 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             throw new ValidationException("Cannot create case because of event is not specified");
         }
 
-        final CaseType caseType = caseDefinitionRepository.getCaseType(caseTypeId);
-        if (caseType == null) {
+        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
+        if (caseTypeDefinition == null) {
             throw new ValidationException("Cannot find case type definition for " + caseTypeId);
         }
 
-        final CaseEvent eventTrigger = eventTriggerService.findCaseEvent(caseType, event.getEventId());
-        if (eventTrigger == null) {
-            throw new ValidationException(event.getEventId() + " is not a known event ID for the specified case type " + caseTypeId);
+        final CaseEventDefinition caseEventDefinition =
+            eventTriggerService.findCaseEvent(caseTypeDefinition, event.getEventId());
+        if (caseEventDefinition == null) {
+            throw new ValidationException(event.getEventId() + " is not a known event ID for the specified case type "
+                + caseTypeId);
         }
 
-        if (!eventTriggerService.isPreStateValid(null, eventTrigger)) {
-            throw new ValidationException("Cannot create case because of " + eventTrigger.getId() + " has pre-states defined");
+        if (!eventTriggerService.isPreStateValid(null, caseEventDefinition)) {
+            throw new ValidationException("Cannot create case because of " + caseEventDefinition.getId()
+                + " has pre-states defined");
         }
 
         String token = caseDataContent.getToken();
-        eventTokenService.validateToken(token, userRepository.getUserId(), eventTrigger, caseType.getJurisdiction(), caseType);
+        eventTokenService.validateToken(token, userRepository.getUserId(),
+            caseEventDefinition,
+            caseTypeDefinition.getJurisdictionDefinition(),
+            caseTypeDefinition);
 
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId, caseDataContent);
 
         final CaseDetails newCaseDetails = new CaseDetails();
 
         newCaseDetails.setCaseTypeId(caseTypeId);
-        newCaseDetails.setJurisdiction(caseType.getJurisdictionId());
-        newCaseDetails.setState(eventTrigger.getPostState());
-        newCaseDetails.setSecurityClassification(caseType.getSecurityClassification());
-        newCaseDetails.setData(caseSanitiser.sanitise(caseType, caseDataContent.getData()));
-        newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(caseType, newCaseDetails.getData(), EMPTY_DATA_CLASSIFICATION));
+        newCaseDetails.setJurisdiction(caseTypeDefinition.getJurisdictionId());
+        newCaseDetails.setSecurityClassification(caseTypeDefinition.getSecurityClassification());
+        Map<String, JsonNode> data = caseDataContent.getData();
+        newCaseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition, data));
+        newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(
+            caseTypeDefinition,
+            newCaseDetails.getData(),
+            EMPTY_DATA_CLASSIFICATION));
+        updateCaseState(caseEventDefinition, newCaseDetails);
 
         final IdamUser idamUser = userRepository.getUser();
         final CaseDetails savedCaseDetails = submitCaseTransaction.submitCase(event,
-                                                                              caseType,
+                                                                              caseTypeDefinition,
                                                                               idamUser,
-                                                                              eventTrigger,
+                                                                              caseEventDefinition,
                                                                               newCaseDetails,
                                                                               ignoreWarning);
 
-        submittedCallback(eventTrigger, savedCaseDetails);
+        submittedCallback(caseEventDefinition, savedCaseDetails);
 
         deleteDraft(caseDataContent, savedCaseDetails);
 
         return savedCaseDetails;
     }
 
+    private void updateCaseState(CaseEventDefinition caseEventDefinition, CaseDetails newCaseDetails) {
+        newCaseDetails.setState(this.casePostStateService
+            .evaluateCaseState(caseEventDefinition, newCaseDetails));
+    }
+
     private void deleteDraft(CaseDataContent caseDataContent, CaseDetails savedCaseDetails) {
         if (StringUtils.isNotBlank(caseDataContent.getDraftId())) {
             try {
                 draftGateway.delete(Draft.stripId(caseDataContent.getDraftId()));
-                savedCaseDetails.setDeleteDraftResponseEntity(caseDataContent.getDraftId(), ResponseEntity.ok().build());
+                savedCaseDetails.setDeleteDraftResponseEntity(caseDataContent.getDraftId(),
+                    ResponseEntity.ok().build());
             } catch (Exception e) {
                 savedCaseDetails.setIncompleteDeleteDraftResponse();
             }
         }
     }
 
-    private void submittedCallback(CaseEvent eventTrigger, CaseDetails savedCaseDetails) {
-        if (!isBlank(eventTrigger.getCallBackURLSubmittedEvent())) {
+    private void submittedCallback(CaseEventDefinition caseEventDefinition, CaseDetails savedCaseDetails) {
+        if (!isBlank(caseEventDefinition.getCallBackURLSubmittedEvent())) {
             try { // make a call back
                 final ResponseEntity<AfterSubmitCallbackResponse> callBackResponse =
-                    callbackInvoker.invokeSubmittedCallback(eventTrigger,
+                    callbackInvoker.invokeSubmittedCallback(caseEventDefinition,
                                                             null,
                                                             savedCaseDetails);
                 savedCaseDetails.setAfterSubmitCallbackResponseEntity(callBackResponse);

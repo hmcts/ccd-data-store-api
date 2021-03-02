@@ -23,21 +23,21 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.domain.model.aggregated.IDAMProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 
 class CachedUserRepositoryTest {
 
     private static final String JURISDICTION_ID = "DIVORCE";
     @Mock
-    private UserRepository userRepository;
-    private CachedUserRepository cachedUserRepository;
+    private uk.gov.hmcts.ccd.data.user.UserRepository userRepository;
+    private uk.gov.hmcts.ccd.data.user.CachedUserRepository cachedUserRepository;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        cachedUserRepository = new CachedUserRepository(userRepository);
+        cachedUserRepository = new uk.gov.hmcts.ccd.data.user.CachedUserRepository(userRepository);
     }
 
     @Nested
@@ -84,10 +84,10 @@ class CachedUserRepositoryTest {
         @Test
         @DisplayName("should initially retrieve user details from decorated repository")
         void shouldRetrieveUserDetailsFromDecorated() {
-            final IDAMProperties expectedUserDetails = new IDAMProperties();
+            final IdamProperties expectedUserDetails = new IdamProperties();
             doReturn(expectedUserDetails).when(userRepository).getUserDetails();
 
-            final IDAMProperties userDetails = cachedUserRepository.getUserDetails();
+            final IdamProperties userDetails = cachedUserRepository.getUserDetails();
 
             assertAll(
                 () -> assertThat(userDetails, is(expectedUserDetails)),
@@ -98,16 +98,16 @@ class CachedUserRepositoryTest {
         @Test
         @DisplayName("should cache user details for subsequent calls")
         void shouldCacheUserDetailsForSubsequentCalls() {
-            final IDAMProperties expectedUserDetails = new IDAMProperties();
+            final IdamProperties expectedUserDetails = new IdamProperties();
             doReturn(expectedUserDetails).when(userRepository).getUserDetails();
 
             cachedUserRepository.getUserDetails();
 
             verify(userRepository, times(1)).getUserDetails();
 
-            doReturn(new IDAMProperties()).when(userRepository).getUserDetails();
+            doReturn(new IdamProperties()).when(userRepository).getUserDetails();
 
-            final IDAMProperties userDetails = cachedUserRepository.getUserDetails();
+            final IdamProperties userDetails = cachedUserRepository.getUserDetails();
 
             assertAll(
                 () -> assertThat(userDetails, is(expectedUserDetails)),
@@ -201,7 +201,8 @@ class CachedUserRepositoryTest {
     @DisplayName("getHighestUserClassification()")
     class GetHighestUserClassification {
         @Test
-        @DisplayName("should initially retrieve highest security classification from repository and from cache for subsequent calls")
+        @DisplayName("should initially retrieve highest security classification from repository and from cache for "
+                + "subsequent calls")
         void shouldRetrieveUserRolesFromDecorated() {
             when(userRepository.getHighestUserClassification(JURISDICTION_ID)).thenReturn(PRIVATE);
 

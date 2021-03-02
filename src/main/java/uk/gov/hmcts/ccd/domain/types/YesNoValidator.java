@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -21,19 +21,21 @@ public class YesNoValidator implements BaseTypeValidator {
     @Override
     public List<ValidationResult> validate(final String dataFieldId,
                                            final JsonNode dataValue,
-                                           final CaseField caseFieldDefinition) {
+                                           final CaseFieldDefinition caseFieldDefinition) {
         if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }
 
         if (!dataValue.isTextual()) {
-            return Collections.singletonList(new ValidationResult(dataValue + " is not " + TYPE_ID, dataFieldId));
+            return Collections.singletonList(new ValidationResult(dataValue + " is not " + TYPE_ID,
+                dataFieldId));
         }
 
         final List<ValidationResult> results = new ArrayList<>();
 
         if (!"YES".equalsIgnoreCase(dataValue.textValue()) && !"NO".equalsIgnoreCase(dataValue.textValue())) {
-            results.add(new ValidationResult("YES_NO values needs to be YES or NO.  Given value is " + dataValue.textValue(), dataFieldId));
+            results.add(new ValidationResult("YES_NO values needs to be YES or NO.  Given value is "
+                + dataValue.textValue(), dataFieldId));
         }
 
         return results;

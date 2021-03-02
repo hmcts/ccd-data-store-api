@@ -6,7 +6,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CreateCaseDraftBuilder.newCreateCaseDraft;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.DraftResponseBuilder.newDraftResponse;
@@ -29,7 +33,7 @@ import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
 class CachedDraftGatewayTest {
 
     @Mock
-    private DraftGateway defaultDraftGateway;
+    private uk.gov.hmcts.ccd.data.draft.DraftGateway defaultDraftGateway;
     @Mock
     private DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
 
@@ -42,7 +46,7 @@ class CachedDraftGatewayTest {
     private List<DraftResponse> allDrafts = Lists.newArrayList(newDraftResponse().build());
     private CaseDetails caseDetails = newCaseDetails().build();
 
-    private CachedDraftGateway cachedDraftGateway;
+    private uk.gov.hmcts.ccd.data.draft.CachedDraftGateway cachedDraftGateway;
 
     @BeforeEach
     void setUp() {
@@ -54,7 +58,8 @@ class CachedDraftGatewayTest {
         doReturn(draftResponse).when(defaultDraftGateway).update(updateCaseDraftRequest, draftIdS);
         doReturn(caseDetails).when(draftResponseToCaseDetailsBuilder).build(draftResponse);
 
-        cachedDraftGateway = new CachedDraftGateway(defaultDraftGateway, draftResponseToCaseDetailsBuilder);
+        cachedDraftGateway = new uk.gov.hmcts.ccd.data.draft.CachedDraftGateway(defaultDraftGateway,
+                draftResponseToCaseDetailsBuilder);
     }
 
     @Nested

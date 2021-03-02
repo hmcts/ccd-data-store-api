@@ -1,22 +1,25 @@
 {
-  "title": "must return appropriate negative response when casefields do not start with “case.”",
   "_guid_": "S-542",
   "_extends_": "F-057_Test_Data_Base",
+  "title": "must return appropriate negative response when casefields do not start with “case.”",
+
   "specs": [
     "an active profile in CCD",
     "does not provide a valid case-field which starts with “case.”",
     "has the 400 return code"
   ],
+
   "request": {
     "queryParams": {
       "caseInvalidCaseParam.PersonFirstName": "someInvalidParam"
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_400_Response",
     "headers": {
-      "Content-Length" : "[[ANYTHING_PRESENT]]",
-      "Content-Encoding" : "gzip"
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip"
     },
     "body": {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",

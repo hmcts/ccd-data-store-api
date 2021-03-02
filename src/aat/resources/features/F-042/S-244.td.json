@@ -1,27 +1,30 @@
 {
-  "_guid_": "S-244",
-  "_extends_": "F-042_Test_Data_Base",
-  "title": "must return 401 when request does not provide valid authentication credentials",
-  "specs": [
-    "an active profile in CCD",
-    "does not provide valid authentication credentials in CCD",
-    "contains a HTTP 403 Forbidden"
-  ],
-  "request": {
-    "pathVariables": {
-      "uid": "someInvalidUserID"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_403_Response",
-    "headers": {
-      "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Encoding" : "gzip"
-    },
-    "body": {
-      "timestamp": "[[ANYTHING_PRESENT]]",
-      "message": "Access Denied",
-      "path": "[[ANYTHING_PRESENT]]"
-    }
-  }
+	"_guid_": "S-244",
+	"_extends_": "F-042_Test_Data_Base",
+	"title": "must return 401 when request does not provide valid authentication credentials",
+
+	"specs": [
+		"an active profile in CCD",
+		"does not provide valid authentication credentials in CCD",
+		"contains a HTTP 403 Forbidden"
+	],
+
+	"request": {
+		"pathVariables": {
+			"uid": "someInvalidUserID"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_403_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding" : "gzip"
+		},
+		"body": {
+			"timestamp": "[[ANYTHING_PRESENT]]",
+			"message": "Access Denied",
+			"path": "[[ANYTHING_PRESENT]]"
+		}
+	}
 }

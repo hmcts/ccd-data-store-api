@@ -1,14 +1,13 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import com.fasterxml.jackson.databind.JsonNode;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 @Named
 @Singleton
@@ -25,7 +24,8 @@ public class DynamicListValidator implements BaseTypeValidator {
     }
 
     @Override
-    public List<ValidationResult> validate(String dataFieldId, JsonNode dataValue, CaseField caseFieldDefinition) {
+    public List<ValidationResult> validate(String dataFieldId, JsonNode dataValue,
+                                           CaseFieldDefinition caseFieldDefinition) {
         if (isNullOrEmpty(dataValue)) {
             return Collections.emptyList();
         }
@@ -33,14 +33,24 @@ public class DynamicListValidator implements BaseTypeValidator {
 
         dataValue.get(LIST_ITEMS).elements().forEachRemaining(node -> validateLength(results, node, dataFieldId));
         JsonNode value = dataValue.get(VALUE);
-        if (value != null) {
-            validateLength(results, value, dataFieldId);
-        }
-
+        validateValueField(value, dataFieldId, results);
         return results;
     }
 
-    private void validateLength(List<ValidationResult> results, JsonNode node, String dataFieldId) {
+    protected void validateValueField(JsonNode value,
+                                      String dataFieldId,
+                                      List<ValidationResult> results) {
+        if (value != null) {
+            if (value.isArray()) {
+                results.add(new ValidationResult(
+                    String.format("Array values are not supported for '%s' type", getType()), dataFieldId));
+                return;
+            }
+            validateLength(results, value, dataFieldId);
+        }
+    }
+
+    protected void validateLength(List<ValidationResult> results, JsonNode node, String dataFieldId) {
         final String code = node.get(CODE).textValue();
         final String value = node.get(LABEL).textValue();
         if (StringUtils.isNotEmpty(code) && code.length() > 150) {

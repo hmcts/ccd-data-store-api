@@ -1,0 +1,14 @@
+{
+  "_guid_": "S-111.16_Verify_User_Count_Unchanged",
+  "_extends_": "S-111.16_Check_Orgs_assigned_Users_Base",
+
+  "specs": [
+    "to verify the count of users assigned to a case has NOT changed"
+  ],
+
+  "expectedResponse": {
+    "body": {
+      "supplementary_data": "${[scenarioContext][customValues][orgsAssignedUsers_siblingContexts.S-111\\.16_Add_Case_Assigned_User_Roles_for_Case_C1.childContexts.F-111_Prerequisite_Counter_Check_Call.childContexts.F-111_Get_Organisation_Identifier_Dil|siblingContexts.S-111\\.16_Add_Case_Assigned_User_Roles_for_Case_C1.childContexts.F-111_Prerequisite_Counter_Check_Call|2]}"
+    }
+  }
+}

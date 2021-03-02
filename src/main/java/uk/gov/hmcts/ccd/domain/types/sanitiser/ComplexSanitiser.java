@@ -8,13 +8,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 @Named
 @Singleton
@@ -40,11 +40,11 @@ public class ComplexSanitiser implements Sanitiser {
     }
 
     @Override
-    public JsonNode sanitise(FieldType fieldType, JsonNode fieldData) {
+    public JsonNode sanitise(FieldTypeDefinition fieldTypeDefinition, JsonNode fieldData) {
         final ObjectNode sanitisedData = JSON_NODE_FACTORY.objectNode();
-        final Map<String, CaseField> fieldsMap = new HashMap<>();
+        final Map<String, CaseFieldDefinition> fieldsMap = new HashMap<>();
 
-        fieldType.getComplexFields().forEach(field -> {
+        fieldTypeDefinition.getComplexFields().forEach(field -> {
             fieldsMap.put(field.getId(), field);
         });
 
@@ -57,8 +57,8 @@ public class ComplexSanitiser implements Sanitiser {
             final JsonNode value = field.getValue();
 
             if (fieldsMap.containsKey(key)) {
-                final CaseField caseField = fieldsMap.get(key);
-                final FieldType childType = caseField.getFieldType();
+                final CaseFieldDefinition caseFieldDefinition = fieldsMap.get(key);
+                final FieldTypeDefinition childType = caseFieldDefinition.getFieldTypeDefinition();
 
                 if (sanitisers.containsKey(childType.getType())) {
                     final Sanitiser sanitiser = sanitisers.get(childType.getType());

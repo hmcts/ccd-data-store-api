@@ -1,35 +1,39 @@
 {
-  "_guid_": "S-201",
-  "_extends_": "F-036_Base_Test_Data",
-  "title": "must return 401 when request does not provide valid authentication credentials",
-  "specs": [
-    "an active profile in CCD",
-    "does not provide valid authentication credentials in CCD",
-    "contains HTTP 403 Unauthorized"
-  ],
-  "users": {
-    "invokingUser" : {
-      "password": "InvalidPassword"
-    }
-  },
-  "request": {
-    "headers" : {
-      "Authorization": "TokenId"
-    },
-    "pathVariables": {
-      "triggerId": "CREATE"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_403_Response",
-    "headers": {
-      "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Encoding" : "gzip"
-    },
-    "body": {
-      "timestamp": "[[ANYTHING_PRESENT]]",
-      "message": "Access Denied",
-      "path": "[[ANYTHING_PRESENT]]"
-    }
-  }
+	"_guid_": "S-201",
+	"_extends_": "F-036_Base_Test_Data",
+	"title": "must return 401 when request does not provide valid authentication credentials",
+
+	"specs": [
+		"an active profile in CCD",
+		"does not provide valid authentication credentials in CCD",
+		"contains HTTP 403 Unauthorized"
+	],
+
+	"users": {
+		"invokingUser" : {
+			"password": "InvalidPassword"
+		}
+	},
+
+	"request": {
+		"headers" : {
+			"Authorization": "TokenId"
+		},
+		"pathVariables": {
+			"triggerId": "CREATE"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_403_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding" : "gzip"
+		},
+		"body": {
+			"timestamp": "[[ANYTHING_PRESENT]]",
+			"message": "Access Denied",
+			"path": "[[ANYTHING_PRESENT]]"
+		}
+	}
 }

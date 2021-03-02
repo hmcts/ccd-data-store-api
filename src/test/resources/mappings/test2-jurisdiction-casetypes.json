@@ -36,7 +36,11 @@
             "pre_states": [
               "string"
             ],
-            "post_state": "string"
+            "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "string"
+          }]
           }
         ],
         "states": [

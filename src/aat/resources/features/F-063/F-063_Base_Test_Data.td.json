@@ -8,10 +8,9 @@
 	"uri": "/internal/case-types/{ctid}/search-inputs",
 
 	"users": {
-    "invokingUser": {
-      "username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
-      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
-    }
+		"invokingUser": {
+      "_extends_": "CaseworkerAutotest"
+		}
 	},
 
 	"request": {
@@ -24,9 +23,9 @@
 		}
 	},
 
-  "expectedResponse": {
-    "headers": {
-      "Content-Length": "[[ANYTHING_PRESENT]]"
-    }
-  }
+	"expectedResponse": {
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		}
+	}
 }

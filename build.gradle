@@ -1,9 +1,9 @@
 buildscript {
     ext {
-        springBootVersion = '2.2.5.RELEASE'
+        springBootVersion = '2.3.4.RELEASE'
     }
     dependencies {
-        classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:0.5.1'
+        classpath 'org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:1.0.2'
     }
     dependencies {
         classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2'
@@ -22,14 +22,14 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'org.sonarqube' version '2.6.2'
     id 'jacoco'
-    id 'checkstyle'
     id 'com.github.kt3k.coveralls' version '2.8.2'
     id 'se.patrikerdes.use-latest-versions' version '0.2.7'
-    id 'org.owasp.dependencycheck' version '5.1.0'
-    id 'com.github.spotbugs' version '1.6.9'
     id 'net.ltgt.apt' version '0.21'
-    id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.14'
+    id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.22'
+    id "org.jetbrains.gradle.plugin.idea-ext" version "0.7"
     id "info.solidsoft.pitest" version '1.4.0'
+    id "io.freefair.lombok" version "5.1.0"
+    id 'uk.gov.hmcts.java' version '0.12.0'
 }
 
 apply plugin: 'java'
@@ -42,18 +42,11 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'org.sonarqube'
 apply plugin: 'jsonschema2pojo'
 apply plugin: 'jacoco'
-apply plugin: 'checkstyle'
-apply plugin: 'pmd'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'se.patrikerdes.use-latest-versions'
-apply plugin: 'org.owasp.dependencycheck'
 
 apply from: 'liquibase.gradle'
-
-pmd {
-    toolVersion = '6.11.0'
-}
 
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
@@ -67,18 +60,9 @@ dependencyUpdates.resolutionStrategy = {
         }
     }
 }
-// https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
+
 dependencyCheck {
-    // Specifies if the build should be failed if a CVSS score above a specified level is identified.
-    // range of 0-10 fails the build, anything greater and it doesn't fail the build
-    failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'false' ? 11 : 0
     suppressionFile = 'dependency-check-suppressions.xml'
-    analyzers {
-        // Disable scanning of .NET related binaries
-        assemblyEnabled = false
-    }
-    // These are non-runtime configurations used during the build.
-    skipConfigurations = ['codacy', 'spotbugs', 'checkstyle']
 }
 
 mainClassName = 'uk.gov.hmcts.ccd.CoreCaseDataApplication'
@@ -98,11 +82,12 @@ repositories {
 ext {
     junitJupiterVersion = '5.5.2'
     junitVintageVersion = '5.5.2'
-    hibernateVersion = '5.2.18.Final'
-    powermockVersion = '2.0.0-beta.5'
+    powermockVersion = '2.0.7'
     reformLogging = '5.1.0'
     appInsightsVersion = '2.4.1'
-    swagger2Version = '3.0.0-SNAPSHOT'
+    swagger2Version = '3.0.0'
+    hibernateVersion = '5.4.24.Final!!'
+    hazelcastVersion = '4.0.3'
     limits = [
             'instruction': 90,
             'branch'     : 85,
@@ -111,7 +96,6 @@ ext {
             'method'     : 90,
             'class'      : 98
     ]
-    appInsights = '2.0.1'
     springCloudVersion = 'Hoxton.RELEASE'
 }
 
@@ -128,8 +112,8 @@ bootJar {
 }
 
 // tag::dependencies[]
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 configurations {
     providedRuntime
@@ -141,51 +125,23 @@ configurations {
     cucumberRuntime.extendsFrom(functionalRuntime)
 }
 
-checkstyle {
-    maxWarnings = 2970 // In the Ideal world this should be 0
-    toolVersion = '8.18'
-}
-
-checkstyleMain.shouldRunAfter(compileJava)
-test.shouldRunAfter(checkstyleTest)
-
-tasks.withType(com.github.spotbugs.SpotBugsTask) {
-    reports {
-        xml.enabled = false
-        html.enabled = true
-    }
-}
-
-spotbugs {
-    ignoreFailures = true
+//This is to exclude generated files from build/generated-sources/js2p/uk/gov/hmcts/ccd/domain/types/sanitiser/document
+tasks.withType(Checkstyle) {
+    exclude 'uk/gov/hmcts/ccd/domain/types/sanitiser/document/**'
 }
 
 dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'logging', version: reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: reformLogging
 
-    // redefining with version 2.4.1 as applicationinsights-agent-2.5.0 has an open issue
-    // https://github.com/glowroot/instrumentation/issues/1
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: appInsightsVersion
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: appInsightsVersion
-
     compile 'uk.gov.hmcts.reform:properties-volume-spring-boot-starter:0.0.4'
-    compile 'uk.gov.hmcts.reform:health-spring-boot-starter:0.0.3'
-    compile 'org.projectlombok:lombok:1.18.4'
     implementation 'org.mapstruct:mapstruct-jdk8:1.3.0.Final'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.2.0.Final', 'org.projectlombok:lombok:1.18.4'
-    testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.2.0.Final', 'org.projectlombok:lombok:1.18.4'
-
-//     Needs to explicitly bring in a different hibernate version as in pom.xml
-    compile "org.hibernate:hibernate-core:${hibernateVersion}"
-    compile "org.hibernate:hibernate-entitymanager:${hibernateVersion}"
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.2.0.Final', 'org.projectlombok:lombok:1.18.12'
+    testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.2.0.Final', 'org.projectlombok:lombok:1.18.12'
 
     compile('org.springframework.boot:spring-boot-starter-actuator')
 
-    compile("org.springframework.boot:spring-boot-starter-data-jpa") {
-        exclude group: 'org.hibernate', module: 'hibernate-core'
-        exclude group: 'org.hibernate', module: 'hibernate-entitymanager'
-    }
+    compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile('org.springframework.boot:spring-boot-starter-hateoas')
     compile group: 'org.springframework.plugin', name: 'spring-plugin-core', version: '2.0.0.RELEASE'
     compile(group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc') {
@@ -195,22 +151,27 @@ dependencies {
     compile('org.springframework.cloud:spring-cloud-starter-openfeign')
     compile('org.springframework.retry:spring-retry')
     compile('org.springframework.boot:spring-boot-starter-cache')
-    compile group: 'com.hazelcast', name: 'hazelcast'
-    compile group: 'com.hazelcast', name: 'hazelcast-spring'
+    compile group: 'com.hazelcast', name: 'hazelcast', version: hazelcastVersion
+    compile group: 'com.hazelcast', name: 'hazelcast-spring', version: hazelcastVersion
 
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
-    compile group: 'io.springfox', name: 'springfox-swagger2', version: swagger2Version
-    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swagger2Version
-    compile group: 'io.springfox', name: 'springfox-spring-webmvc', version: swagger2Version
-    compile group: 'org.liquibase', name: 'liquibase-core', version: '3.6.3'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.2'
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+    implementation group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
 
-    compile (group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.3') {
-        // TODO remove when auth-checker-lib upgrades its dependency to spring boot 2.0.x
-        exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
-    }
-    compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '2.0.0'
+    compile group: 'org.liquibase', name: 'liquibase-core', version: '3.10.3'
+    compile group: 'org.yaml', name: 'snakeyaml', version: '1.26'
+    compile group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
+    compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.1'
+    compile group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '1.3.1'
+    compile "org.bouncycastle:bcprov-jdk15on:1.61", "org.bouncycastle:bcpkix-jdk15on:1.61"
+    compile "org.springframework.boot:spring-boot-starter-oauth2-client"
+    compile "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
+    compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '7.9'
+
+    implementation "io.github.openfeign:feign-httpclient:10.7.0"
+
     compile group: 'com.sun.mail', name: 'mailapi', version: '1.6.1'
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
     compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
@@ -220,29 +181,30 @@ dependencies {
     compile group: 'org.awaitility', name: 'awaitility', version: '3.1.6'
 
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.3'
-    compile "com.fasterxml.jackson.core:jackson-databind:2.10.3"
+    compile "com.fasterxml.jackson.core:jackson-databind:2.11.1"
 
     // use the latest org.springframework.security
-    compile group: 'org.springframework.security', name: 'spring-security-core', version: '5.3.0.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-core', version: '5.3.4.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.3.4.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-web', version: '5.3.4.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.3.4.RELEASE'
 
-    compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.3.0.RELEASE'
-
-    compile group: 'org.springframework.security', name: 'spring-security-web', version: '5.3.0.RELEASE'
-
-    compile group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.3.0.RELEASE'
-
-
+    compile group: 'com.vladmihalcea', name: 'hibernate-types-52', version: '2.9.13'
+    compile "org.hibernate:hibernate-core:${hibernateVersion}"
+    compile group: 'org.apache.commons', name: 'commons-jexl3', version: '3.1'
+    compile group: 'pl.jalokim.propertiestojson', name: 'java-properties-to-json', version: '5.1.3'
 
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
-    runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+    runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.16'
     runtime group: 'com.zaxxer', name: 'HikariCP', version: '2.7.9'
 
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
     testCompile ('com.opentable.components:otj-pg-embedded:0.12.0')
     testCompile ('com.github.tomakehurst:wiremock-jre8:2.25.1')
-    testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.2.1.RELEASE')
+    testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE')
     // To avoid compiler warnings about @API annotations in JUnit5 code.
     testCompileOnly 'org.apiguardian:apiguardian-api:1.0.0'
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
@@ -252,9 +214,10 @@ dependencies {
     testCompile group:'org.mockito', name: 'mockito-junit-jupiter', version:'2.24.0'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: powermockVersion
     testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: powermockVersion
-    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.0'
+    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '4.3.0'
     testCompile group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
     testCompile 'io.github.openfeign:feign-jackson:9.7.0'
+    testCompile 'pl.allegro.tech:embedded-elasticsearch:2.7.0'
 
     // for sonar analysis
     testCompile group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
@@ -265,12 +228,12 @@ dependencies {
     compile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
     }
-    compile(group: 'org.elasticsearch', name: 'elasticsearch', version: '6.4.2') {
+    compile(group: 'org.elasticsearch', name: 'elasticsearch', version: '6.8.14') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '2.9.1'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.10.0'
 }
 // end::dependencies[]
 
@@ -280,11 +243,11 @@ dependencyManagement {
     }
 
     dependencies {
-        // Versions prior to 24.1.1 vulnerable to CVE-2018-10237
-        dependency 'com.google.guava:guava:24.1.1-jre'
+        // Versions prior to 30.0 vulnerable to CVE-2020-8908
+        dependency 'com.google.guava:guava:30.1-jre'
 
         // CVE-2019-0232 - Java and Command Line injections in Windows
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.31') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.40') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -292,6 +255,20 @@ dependencyManagement {
          // CVE-2019-10086
         dependencySet(group: 'commons-beanutils', version: '1.9.4') {
             entry 'commons-beanutils'
+        }
+
+        // Required for Embedded ES with Java 11
+        dependency 'org.rauschig:jarchivelib:1.0.0'
+
+        // Remove once BEFTA rest-assured is updated
+        dependencySet(group: 'io.rest-assured', version: '4.3.0') {
+            entry 'json-path'
+            entry 'xml-path'
+        }
+        dependencySet(group: 'org.codehaus.groovy', version: '3.0.2') {
+            entry 'groovy'
+            entry 'groovy-xml'
+            entry 'groovy-json'
         }
     }
 }
@@ -532,14 +509,11 @@ jsonSchema2Pojo {
     // Whether to make the generated types Serializable
     serializable = false
 
-    // Whether to include getters/setters or to omit these accessor methods and create public fields instead.
-    includeAccessors = true
-
     // Whether to include getters or to omit these accessor methods and create public fields instead.
-    includeGetters = false
+    includeGetters = true
 
     // Whether to include setters or to omit these accessor methods and create public fields instead.
-    includeSetters = false
+    includeSetters = true
 
     // Whether to include dynamic getters, setters, and builders or to omit these methods.
     includeDynamicAccessors = false
@@ -560,13 +534,9 @@ jsonSchema2Pojo {
     dateTimeType = "java.time.LocalDateTime"
 }
 
-jacoco {
-    toolVersion = "0.8.0"
-}
-
 sonarqube {
     properties {
-        property "sonar.exclusions", "build/generated-sources/**/*.java,**/service/doclink/**"
+        property "sonar.exclusions", "build/generated-sources/**/*.java,**/AuditRepository.java"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
@@ -577,8 +547,22 @@ compileJava {
     options.annotationProcessorPath = configurations.annotationProcessor
 }
 
+configurations {
+    all.collect { configuration ->
+        configuration.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+    }
+}
+
 compileTestJava {
     options.annotationProcessorPath = configurations.annotationProcessor
+}
+
+idea.project.settings {
+    compiler {
+        javac {
+            javacAdditionalOptions "-parameters"
+        }
+    }
 }
 
 // adopted from
@@ -595,12 +579,12 @@ jacocoTestReport {
     }
 
     afterEvaluate {
-        classDirectories = files(classDirectories.files.collect {
+        classDirectories.setFrom((classDirectories.files.collect {
             fileTree(dir: it, exclude: ['uk/gov/hmcts/ccd/domain/types/sanitiser/document/**',
                                         '**/service/doclink/**',
                                         '**/domain/model/definition/CaseEventFieldComplex**',
                                         '**/domain/model/definition/DisplayContext**'])
-        })
+        }))
     }
 
     doLast {
@@ -652,8 +636,10 @@ jacocoTestReport {
 }
 
 test {
+    timeout = Duration.ofMinutes(30)
     environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     generateCucumberReports.enabled = false
+    systemProperty 'java.locale.providers', 'COMPAT'
 
     useJUnitPlatform()
 
@@ -676,6 +662,16 @@ test {
     reports {
         html.enabled = true
     }
+
+    jvmArgs = [
+        '--add-modules', 'java.se',
+        '--add-exports', 'java.base/jdk.internal.ref=ALL-UNNAMED',
+        '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
+        '--add-opens', 'java.base/java.nio=ALL-UNNAMED',
+        '--add-opens', 'java.base/sun.nio.ch=ALL-UNNAMED',
+        '--add-opens', 'java.management/sun.management=ALL-UNNAMED',
+        '--add-opens', 'jdk.management/com.sun.management.internal=ALL-UNNAMED'
+    ]
 }
 
 check.dependsOn jacocoTestReport
@@ -692,78 +688,86 @@ sourceSets {
         }
     }
 }
-task smoke(type: Test) {
-    systemProperty "http.proxyHost", System.getProperty('http.proxyHost')
-    systemProperty "http.proxyPort", System.getProperty('http.proxyPort')
-    systemProperty "https.proxyHost", System.getProperty('https.proxyHost')
-    systemProperty "https.proxyPort", System.getProperty('https.proxyPort')
 
-    environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-    group = 'Delivery pipeline'
-    description = 'Executes smoke tests against an AAT CCD Data Store instance'
-    setTestClassesDirs(sourceSets.aat.output.classesDirs)
-    setClasspath(sourceSets.aat.runtimeClasspath)
-    include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
-    include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
-    useJUnitPlatform {
-        includeTags 'smoke'
+task smoke() {
+    description = 'Executes smoke tests against an the CCD Data Store API instance just deployed'
+    dependsOn aatClasses
+
+    new File("$buildDir/test-results/test").mkdirs()
+    copy {
+        from "src/aat/resources/DummyTest.xml"
+        into "$buildDir/test-results/test"
     }
 
-    doFirst {
+    doLast {
+        generateCucumberReports.enabled = true
         javaexec {
-            main = "uk.gov.hmcts.ccd.datastore.befta.TestDataLoaderMain"
-            classpath += sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['']
+            main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
+            classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
+            args = ['--plugin', "json:${rootDir}/target/cucumber.json", '--tags', '@Smoke and not @Ignore', '--glue',
+                    'uk.gov.hmcts.befta.player', '--glue', "uk.gov.hmcts.ccd.datastore.befta", 'src/aat/resources/features']
+            jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
         }
     }
 
+    finalizedBy {
+        generateCucumberReports {
+            doLast{
+                delete "${rootDir}/BEFTA Report for Smoke Tests/"
+                new File("${rootDir}/BEFTA Report for Smoke Tests").mkdirs()
+                file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Smoke Tests"))
+                logger.quiet("Smoke test report moved to ---> file://${rootDir}/BEFTA%20Report%20for%20Smoke%20Tests/overview-features.html")
+            }
+        }
+    }
+
+    outputs.upToDateWhen { false }
 }
 
-task functional(type: Test) {
-    systemProperty "http.proxyHost", System.getProperty('http.proxyHost')
-    systemProperty "http.proxyPort", System.getProperty('http.proxyPort')
-    systemProperty "https.proxyHost", System.getProperty('https.proxyHost')
-    systemProperty "https.proxyPort", System.getProperty('https.proxyPort')
-
-    environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
-
-    group = 'Delivery pipeline'
-    description = 'Executes functional tests against an AAT CCD Data Store instance'
-    setTestClassesDirs(sourceSets.aat.output.classesDirs)
-    setClasspath(sourceSets.aat.runtimeClasspath)
-    include "uk/gov/hmcts/ccd/datastore/tests/functional/**"
-    include "uk/gov/hmcts/ccd/datastore/tests/v2/**"
-    useJUnitPlatform()
+task functional() {
+    description = 'Executes functional tests against an the CCD Data Store API instance just deployed'
+    dependsOn aatClasses
+    new File("$buildDir/test-results/test").mkdirs()
+    copy {
+        from "src/aat/resources/DummyTest.xml"
+        into "$buildDir/test-results/test"
+    }
 
     doFirst {
         generateCucumberReports.enabled = true
         javaexec {
             main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', "json:${projectDir}/target/cucumber.json", '--tags', 'not @Ignore', '--glue',
-                    'uk.gov.hmcts.befta.player', 'src/aat/resources/features']
+            args = [
+                     '--threads', '10',
+                     '--plugin', "json:${rootDir}/target/cucumber.json",
+                     '--tags', 'not @Ignore',
+                     '--glue', 'uk.gov.hmcts.befta.player',
+                     '--glue', 'uk.gov.hmcts.ccd.datastore.befta', 'src/aat/resources/features'
+                   ]
+            jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
+        }
+
+    }
+
+    finalizedBy {
+        generateCucumberReports {
+            doLast{
+                delete "${rootDir}/BEFTA Report for Functional Tests/"
+                new File("${rootDir}/BEFTA Report for Functional Tests").mkdirs()
+                file("${rootDir}/target/cucumber/cucumber-html-reports").renameTo(file("${rootDir}/BEFTA Report for Functional Tests"))
+                logger.quiet("Functional test report moved to ---> file://${rootDir}/BEFTA%20Report%20for%20Functional%20Tests/overview-features.html")
+            }
         }
     }
-}
 
+    outputs.upToDateWhen { false }
+}
 
 def timestamp() {
     def date = new Date()
     return date.format('yyyy-MM-dd HH:mm:ss')
 }
-
-//distributions {
-//    main {
-//        contents {
-//            from(file("$projectDir/src/main/resources/AI-Agent.xml")) {
-//                into "lib"
-//            }
-//        }
-//    }
-//}
-
-// for cnp pipeline
-task dependencyCheck(dependsOn: dependencyCheckAnalyze)
 
 configurations { codacy }
 repositories {
@@ -788,9 +792,5 @@ task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
 cucumberReports {
     outputDir = file("${projectDir}/target/cucumber")
     reports = files("${projectDir}/target/cucumber.json")
-}
-
-task installDist(overwrite: true) {
-    // This task must be overwritten to do as it's breaking JAR packaging and it's a mandatory step of swagger
-    // documentation publication.
+    notFailingStatuses = ["skipped", "passed"]
 }

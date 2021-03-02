@@ -20,14 +20,15 @@ public interface IdamApi {
 
     @RequestLine("POST /oauth2/token")
     @Headers("Content-Type: application/x-www-form-urlencoded")
-    @Body("code={code}&grant_type={grant_type}&client_id={client_id}&client_secret={client_secret}&redirect_uri={redirect_uri}")
+    @Body("code={code}&grant_type={grant_type}&client_id={client_id}&client_secret={client_secret}"
+        + "&redirect_uri={redirect_uri}")
     TokenExchangeResponse exchangeCode(@Param("code") String code,
                                        @Param("grant_type") String grantType,
                                        @Param("client_id") String clientId,
                                        @Param("client_secret") String clientSecret,
                                        @Param("redirect_uri") String redirectUri);
 
-    @RequestLine("GET /details")
+    @RequestLine("GET /o/userinfo")
     @Headers("Authorization: Bearer {access_token}")
     IdamUser getUser(@Param("access_token") String accessToken);
 
@@ -51,14 +52,14 @@ public interface IdamApi {
     }
 
     class IdamUser {
-        @JsonProperty("id")
-        private String id;
+        @JsonProperty("uid")
+        private String uid;
 
         @JsonProperty("roles")
         private List<String> roles;
 
-        public String getId() {
-            return id;
+        public String getUid() {
+            return uid;
         }
 
         public List<String> getRoles() {

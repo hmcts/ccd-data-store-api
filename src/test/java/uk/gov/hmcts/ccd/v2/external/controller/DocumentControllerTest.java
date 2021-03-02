@@ -72,9 +72,9 @@ class DocumentControllerTest {
             () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
             () -> assertThat(response.getBody().getDocumentResources(), hasSize(1)),
             () -> assertThat(response.getBody().getDocumentResources(), hasItems(allOf(hasProperty("name", is("name1")),
-                                                                                 hasProperty("description", is("desc1")),
-                                                                                 hasProperty("type", is("type1")),
-                                                                                 hasProperty("url", is("url1")))))
+                                                                                hasProperty("description", is("desc1")),
+                                                                                hasProperty("type", is("type1")),
+                                                                                hasProperty("url", is("url1")))))
         );
     }
 
@@ -83,8 +83,7 @@ class DocumentControllerTest {
     void caseReferenceNotValid() {
         when(caseReferenceService.validateUID(CASE_REFERENCE)).thenReturn(FALSE);
 
-        assertThrows(BadRequestException.class,
-                     () -> documentController.getDocuments(CASE_REFERENCE));
+        assertThrows(BadRequestException.class, () -> documentController.getDocuments(CASE_REFERENCE));
     }
 
     @Test
@@ -92,8 +91,7 @@ class DocumentControllerTest {
     void shouldPropagateExceptionWhenThrown() {
         when(documentController.getDocuments(CASE_REFERENCE)).thenThrow(RuntimeException.class);
 
-        assertThrows(RuntimeException.class,
-                     () -> documentController.getDocuments(CASE_REFERENCE));
+        assertThrows(RuntimeException.class, () -> documentController.getDocuments(CASE_REFERENCE));
     }
 
 }

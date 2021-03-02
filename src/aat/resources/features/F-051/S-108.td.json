@@ -5,6 +5,7 @@
 
 	"productName": "CCD Data Store",
 	"operationName": "Get default settings for user",
+
 	"method": "GET",
 	"uri": "/caseworkers/{uid}/profile",
 
@@ -14,6 +15,7 @@
 		"uses the invalid authorization",
 		"has the 403 return code"
 	],
+
 	"request": {
 		"headers": {
 			"Authorization": "TEST"
@@ -22,6 +24,7 @@
 			"uid": "[[DEFAULT_AUTO_VALUE]]"
 		}
 	},
+
 	"expectedResponse": {
 		"headers": {
 			"Content-Encoding": "gzip",

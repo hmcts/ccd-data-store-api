@@ -1,29 +1,32 @@
 {
-  "title": "Trigger the aboutToStart callback event for a caseworker for an invalid Jurisdiction ID",
-  "_guid_": "S-248",
-  "_extends_": "F-042_Test_Data_Base",
-  "specs": [
-    "an active profile in CCD",
-    "is prepared with an invalid Jurisdiction ID",
-    "contains a HTTP 403 Forbidden"
-  ],
-  "request": {
-    "pathVariables": {
-      "jid": "invalidJurisdictionID"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_403_Response",
-    "headers": {
-      "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Encoding": "gzip"
-    },
-    "body" : {
-      "timestamp" : "[[ANYTHING_PRESENT]]",
-      "status" : 403,
-      "error" : "Forbidden",
-      "message" : "Access Denied",
-      "path" : "[[ANYTHING_PRESENT]]"
-    }
-  }
+	"_guid_": "S-248",
+	"_extends_": "F-042_Test_Data_Base",
+	"title": "Trigger the aboutToStart callback event for a caseworker for an invalid Jurisdiction ID",
+
+	"specs": [
+		"an active profile in CCD",
+		"is prepared with an invalid Jurisdiction ID",
+		"contains a HTTP 403 Forbidden"
+	],
+
+	"request": {
+		"pathVariables": {
+			"jid": "invalidJurisdictionID"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_403_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "gzip"
+		},
+		"body" : {
+			"timestamp" : "[[ANYTHING_PRESENT]]",
+			"status" : 403,
+			"error" : "Forbidden",
+			"message" : "Access Denied",
+			"path" : "[[ANYTHING_PRESENT]]"
+		}
+	}
 }

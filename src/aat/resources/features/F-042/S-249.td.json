@@ -1,33 +1,36 @@
 {
-  "title": "Trigger the aboutToStart callback event for a caseworker for an existing case which has not started yet.",
-  "_guid_": "S-249",
-  "_extends_": "F-042_Test_Data_Base",
-  "specs": [
-    "an active profile in CCD",
-    "is prepared with an invalid START_EVENT",
-    "contains a HTTP 422 Forbidden"
-  ],
-  "request": {
-    "_extends_": "Common_Request",
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "cid": "${[scenarioContext][childContexts][Case_Creation_Using_Caseworker1_Role][testData][actualResponse][body][id]}",
-      "jid": "BEFTA_JURISDICTION_1",
-      "ctid": "BEFTA_CASETYPE_1_1",
-      "etid": "CREATE"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_422_Response",
-    "headers": {
-      "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Encoding": "gzip"
-    },
-    "body": {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
-      "error": "Unprocessable Entity",
-      "message": "The case status did not qualify for the event",
-      "details": null
-    }
-  }
+	"_guid_": "S-249",
+	"_extends_": "F-042_Test_Data_Base",
+	"title": "Trigger the aboutToStart callback event for a caseworker for an existing case which has not started yet.",
+
+	"specs": [
+		"an active profile in CCD",
+		"is prepared with an invalid START_EVENT",
+		"contains a HTTP 422 Forbidden"
+	],
+
+	"request": {
+		"_extends_": "Common_Request",
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"cid": "${[scenarioContext][childContexts][Case_Creation_Using_Caseworker1_Role][testData][actualResponse][body][id]}",
+			"jid": "BEFTA_JURISDICTION_1",
+			"ctid": "BEFTA_CASETYPE_1_1",
+			"etid": "CREATE"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_422_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "gzip"
+		},
+		"body": {
+			"exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
+			"error": "Unprocessable Entity",
+			"message": "The case status did not qualify for the event",
+			"details": null
+		}
+	}
 }

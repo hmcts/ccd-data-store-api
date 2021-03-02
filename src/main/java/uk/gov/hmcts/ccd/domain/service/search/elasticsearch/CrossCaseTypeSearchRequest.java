@@ -1,17 +1,18 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import uk.gov.hmcts.ccd.domain.model.definition.SearchAliasField;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest.QUERY;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import uk.gov.hmcts.ccd.domain.model.definition.SearchAliasField;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SOURCE;
 
 /**
  * Sample ES json search request.
@@ -31,18 +32,19 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
  */
 public class CrossCaseTypeSearchRequest {
 
-    private static final String SOURCE = "_source";
     private static final String SEARCH_ALIAS_FIELD_PREFIX = "alias.";
 
     private final List<String> caseTypeIds = new ArrayList<>();
-    private final JsonNode searchRequestJsonNode;
+    private final ElasticsearchRequest elasticsearchRequest;
     private final boolean multiCaseTypeSearch;
     private final List<String> aliasFields = new ArrayList<>();
 
-    private CrossCaseTypeSearchRequest(List<String> caseTypeIds, JsonNode searchRequestJsonNode, boolean multiCaseTypeSearch,
+    private CrossCaseTypeSearchRequest(List<String> caseTypeIds,
+                                       ElasticsearchRequest elasticsearchRequest,
+                                       boolean multiCaseTypeSearch,
                                        List<String> aliasFields) {
         this.caseTypeIds.addAll(caseTypeIds);
-        this.searchRequestJsonNode = searchRequestJsonNode;
+        this.elasticsearchRequest = elasticsearchRequest;
         this.multiCaseTypeSearch = multiCaseTypeSearch;
         this.aliasFields.addAll(aliasFields);
         validateJsonSearchRequest();
@@ -52,8 +54,12 @@ public class CrossCaseTypeSearchRequest {
         return Collections.unmodifiableList(caseTypeIds);
     }
 
+    public ElasticsearchRequest getElasticSearchRequest() {
+        return elasticsearchRequest;
+    }
+
     public JsonNode getSearchRequestJsonNode() {
-        return searchRequestJsonNode;
+        return elasticsearchRequest.getNativeSearchRequest();
     }
 
     public boolean isMultiCaseTypeSearch() {
@@ -61,7 +67,7 @@ public class CrossCaseTypeSearchRequest {
     }
 
     private void validateJsonSearchRequest() {
-        if (!searchRequestJsonNode.has(QUERY)) {
+        if (!getElasticSearchRequest().hasQuery()) {
             throw new BadSearchRequest("missing required field 'query'");
         }
     }
@@ -77,7 +83,7 @@ public class CrossCaseTypeSearchRequest {
     public static class Builder {
 
         private final List<String> caseTypeIds = new ArrayList<>();
-        private JsonNode searchRequestJsonNode;
+        private ElasticsearchRequest elasticsearchRequest;
         private boolean multiCaseTypeSearch;
         private final List<String> sourceFilterAliasFields = new ArrayList<>();
 
@@ -89,8 +95,8 @@ public class CrossCaseTypeSearchRequest {
             return this;
         }
 
-        public Builder withSearchRequest(JsonNode searchRequestJsonNode) {
-            this.searchRequestJsonNode = searchRequestJsonNode;
+        public Builder withSearchRequest(ElasticsearchRequest elasticsearchRequest) {
+            this.elasticsearchRequest = elasticsearchRequest;
             return this;
         }
 
@@ -107,8 +113,8 @@ public class CrossCaseTypeSearchRequest {
         }
 
         private void setSourceFilterAliasFields() {
-            if (multiCaseTypeSearch && searchRequestJsonNode != null) {
-                JsonNode multiCaseTypeSearchSourceNode = searchRequestJsonNode.get(SOURCE);
+            if (multiCaseTypeSearch && elasticsearchRequest.getNativeSearchRequest() != null) {
+                JsonNode multiCaseTypeSearchSourceNode = elasticsearchRequest.getSource();
                 if (multiCaseTypeSearchSourceNode != null && multiCaseTypeSearchSourceNode.isArray()) {
                     sourceFilterAliasFields.addAll(sourceFilterToAliasFields(multiCaseTypeSearchSourceNode));
                     removeSourceFilter();
@@ -125,12 +131,13 @@ public class CrossCaseTypeSearchRequest {
         }
 
         private void removeSourceFilter() {
-            ((ObjectNode) this.searchRequestJsonNode).remove(SOURCE);
+            ((ObjectNode) this.elasticsearchRequest.getNativeSearchRequest()).remove(SOURCE);
         }
 
         public CrossCaseTypeSearchRequest build() {
             setSourceFilterAliasFields();
-            return new CrossCaseTypeSearchRequest(caseTypeIds, searchRequestJsonNode, multiCaseTypeSearch, sourceFilterAliasFields);
+            return new CrossCaseTypeSearchRequest(caseTypeIds, elasticsearchRequest, multiCaseTypeSearch,
+                                                  sourceFilterAliasFields);
         }
 
     }

@@ -2,11 +2,7 @@ package uk.gov.hmcts.ccd.endpoint.ui;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -19,19 +15,13 @@ import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
 import javax.inject.Inject;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class SearchInputEndpointTest extends WireMockBaseTest {
-    private static final String URL = "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/inputs";
-
-    @Mock
-    private Authentication authentication;
-
-    @Mock
-    private SecurityContext securityContext;
+    private static final String URL =
+            "/aggregated/caseworkers/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/inputs";
 
     @Inject
     private WebApplicationContext wac;
@@ -40,9 +30,6 @@ public class SearchInputEndpointTest extends WireMockBaseTest {
 
     @Before
     public void setUp() {
-        doReturn(authentication).when(securityContext).getAuthentication();
-        SecurityContextHolder.setContext(securityContext);
-
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
@@ -58,7 +45,8 @@ public class SearchInputEndpointTest extends WireMockBaseTest {
                 .andExpect(status().is(200))
                 .andReturn();
 
-        final SearchInput[] searchInputs = mapper.readValue(result.getResponse().getContentAsString(), SearchInput[].class);
+        final SearchInput[] searchInputs =
+                mapper.readValue(result.getResponse().getContentAsString(), SearchInput[].class);
 
         assertEquals("First Name", searchInputs[0].getLabel());
         assertEquals(1, searchInputs[0].getOrder());

@@ -1,0 +1,129 @@
+{
+  "case_type_id": "SECURITY",
+  "created_date": "2020-05-01T12:01:40.257Z",
+  "data": {
+    "AddressUKField": {
+      "AddressLine1": "StreetValue",
+      "AddressLine2": "AddressLine2Value",
+      "AddressLine3": "AddressLine3Value",
+      "Country": "CountryValue",
+      "County": "CountyValue",
+      "PostCode": "PST CDE",
+      "PostTown": "TownValue"
+    },
+    "CollectionField": [
+      {
+        "id": "2c6da07c-1dfb-4765-88f6-96cd5d5f33b1",
+        "value": "CollectionTextValue2"
+      },
+      {
+        "id": "f7d67f03-172d-4adb-85e5-ca958ad442ce",
+        "value": "CollectionTextValue1"
+      }
+    ],
+    "ComplexField": {
+      "ComplexFixedListField": "VALUE3",
+      "ComplexNestedField": {
+        "NestedCollectionTextField": [
+          {
+            "id": "8e19ccb3-2d8c-42f0-abe1-fa585cc2d8c8",
+            "value": "NestedCollectionTextValue1"
+          },
+          {
+            "id": "95f337e8-5f17-4b25-a795-b7f84f4b2855",
+            "value": "NestedCollectionTextValue2"
+          }
+        ],
+        "NestedNumberField": "567"
+      },
+      "ComplexTextField": "ComplexTextValue"
+    },
+    "DateField": "2007-12-17",
+    "DateTimeField": "2003-02-01T12:30:00.000",
+    "EmailField": "email1@gmail.com",
+    "FixedListField": "VALUE2",
+    "FixedRadioListField": null,
+    "MoneyGBPField": "98700",
+    "MultiSelectListField": [
+      "OPTION2",
+      "OPTION4"
+    ],
+    "NumberField": "12345",
+    "PhoneUKField": "01234567890",
+    "TextAreaField": "TextArea\nValue",
+    "TextField": "AAA TextValue",
+    "YesOrNoField": "No"
+  },
+  "data_classification": {
+    "AddressUKField": {
+      "classification": "PUBLIC",
+      "value": {
+        "AddressLine1": "PUBLIC",
+        "AddressLine2": "PUBLIC",
+        "AddressLine3": "PUBLIC",
+        "Country": "PUBLIC",
+        "County": "PUBLIC",
+        "PostCode": "PUBLIC",
+        "PostTown": "PUBLIC"
+      }
+    },
+    "CollectionField": {
+      "classification": "PUBLIC",
+      "value": [
+        {
+          "classification": "PUBLIC",
+          "id": "2c6da07c-1dfb-4765-88f6-96cd5d5f33b1"
+        },
+        {
+          "classification": "PUBLIC",
+          "id": "f7d67f03-172d-4adb-85e5-ca958ad442ce"
+        }
+      ]
+    },
+    "ComplexField": {
+      "classification": "PUBLIC",
+      "value": {
+        "ComplexFixedListField": "PUBLIC",
+        "ComplexNestedField": {
+          "classification": "PUBLIC",
+          "value": {
+            "NestedCollectionTextField": {
+              "classification": "PUBLIC",
+              "value": [
+                {
+                  "classification": "PUBLIC",
+                  "id": "8e19ccb3-2d8c-42f0-abe1-fa585cc2d8c8"
+                },
+                {
+                  "classification": "PUBLIC",
+                  "id": "95f337e8-5f17-4b25-a795-b7f84f4b2855"
+                }
+              ]
+            },
+            "NestedNumberField": "PUBLIC"
+          }
+        },
+        "ComplexTextField": "PUBLIC"
+      }
+    },
+    "DateField": "PUBLIC",
+    "DateTimeField": "PUBLIC",
+    "EmailField": "PUBLIC",
+    "FixedListField": "PUBLIC",
+    "FixedRadioListField": "PUBLIC",
+    "MoneyGBPField": "PUBLIC",
+    "MultiSelectListField": "PUBLIC",
+    "NumberField": "PUBLIC",
+    "PhoneUKField": "PUBLIC",
+    "TextAreaField": "PUBLIC",
+    "TextField": "PUBLIC",
+    "YesOrNoField": "PUBLIC"
+  },
+  "id": 1,
+  "jurisdiction": "AUTOTEST1",
+  "last_modified": "2020-06-09T13:17:06.542Z",
+  "last_state_modified_date": "2020-05-07T15:53:40.974Z",
+  "reference": 1588870649839697,
+  "security_classification": "PRIVATE",
+  "state": "TODO"
+}

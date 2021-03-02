@@ -1,22 +1,21 @@
 {
-  "title": "must return 404 if case is not found",
+	"_guid_": "S-254",
+	"_extends_": "F-055_Base_Test_Data",
+	"title": "must return 404 if case is not found",
 
-  "_guid_": "S-254",
-  "_extends_": "F-055_Base_Test_Data",
+	"specs": [
+		"an active profile in CCD",
+		"includes an invalid case id",
+		"contains a HTTP 404 Not Found"
+	],
 
-  "specs": [
-    "an active profile in CCD",
-    "includes an invalid case id",
-    "contains a HTTP 404 Not Found"
-  ],
+	"request": {
+		"pathVariables": {
+			"cid": "1234567890123456"
+		}
+	},
 
-  "request": {
-    "pathVariables": {
-      "cid": "1234567890123456"
-    }
-  },
-
-  "expectedResponse": {
-    "_extends_": "Common_404_Response"
-  }
+	"expectedResponse": {
+		"_extends_": "Common_404_Response"
+	}
 }

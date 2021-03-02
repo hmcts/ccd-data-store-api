@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.infrastructure.user;
 
+import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,13 +8,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
-
-import java.util.Arrays;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -27,13 +24,12 @@ class UserAuthorisationConfigurationTest {
     private static final UserAuthorisation.AccessLevel ACCESS_LEVEL = UserAuthorisation.AccessLevel.GRANTED;
 
     @Mock
-    private SecurityContext securityContext;
+    private SecurityUtils securityUtils;
 
     @Mock
     private Authentication authentication;
 
-    @Mock
-    private ServiceAndUserDetails serviceAndUser;
+    private UserInfo userInfo;
 
     @Mock
     private CaseAccessService caseAccessService;
@@ -45,17 +41,16 @@ class UserAuthorisationConfigurationTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        SecurityContextHolder.setContext(securityContext);
+        userInfo = UserInfo.builder()
+            .uid(USER_ID)
+            .sub("uid@mail.com")
+            .name("aName")
+            .roles(Lists.newArrayList("role1", "role2"))
+            .build();
 
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(serviceAndUser);
+        when(securityUtils.getUserInfo()).thenReturn(userInfo);
 
-        when(serviceAndUser.getUsername()).thenReturn(USER_ID);
-        when(serviceAndUser.getAuthorities()).thenReturn(Arrays.asList(
-            new SimpleGrantedAuthority("role1"),
-            new SimpleGrantedAuthority("role2")
-        ));
-        when(caseAccessService.getAccessLevel(serviceAndUser)).thenReturn(ACCESS_LEVEL);
+        when(caseAccessService.getAccessLevel(userInfo)).thenReturn(ACCESS_LEVEL);
     }
 
     @Test

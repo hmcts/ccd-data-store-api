@@ -1,0 +1,19 @@
+{
+  "_guid_": "F-109_test_Data_Base_ES_internal",
+  "title": "Internal Elastic Search Endpoint",
+  "productName": "CCD Data Store api",
+  "operationName": "internal/searchCases",
+  "method": "POST",
+  "uri": "internal/searchCases",
+  "user" : {
+    "_extends_": "BeftaCaseworkerCaa"
+  },
+  "request": {
+    "_extends_": "Common_Request"
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response"
+  }
+}
+

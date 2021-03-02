@@ -1,0 +1,41 @@
+{
+  "_guid_": "S-105.14_Repeated_Call_to_Add_Case_Assigned_Users_and_Roles_Hemanth",
+  "_extends_": "F-105_Add_Case_Assigned_User_Roles_Base",
+
+  "specs": [
+    "to repeat the same request as above this time with a different user, Hemanth"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "F-105_User_Dil"
+    }
+  },
+
+  "prerequisites": [
+    "F-105_Get_Organisation_Identifier_Hemanth"
+  ],
+
+  "request": {
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][parentContext][testData][users][userHemanth][id]}",
+          "case_role": "[CR-1]",
+          "organisation_id": "${[scenarioContext][childContexts][F-105_Get_Organisation_Identifier_Hemanth][testData][actualResponse][body][organisationIdentifier]}"
+        },
+        {
+          "case_id": "${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][parentContext][testData][users][userHemanth][id]}",
+          "case_role": "[CR-2]",
+          "organisation_id": "${[scenarioContext][childContexts][F-105_Get_Organisation_Identifier_Hemanth][testData][actualResponse][body][organisationIdentifier]}"
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "F-105_Add_Case_Assigned_User_Roles_201_response"
+  }
+}

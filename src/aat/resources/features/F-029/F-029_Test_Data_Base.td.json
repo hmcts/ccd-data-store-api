@@ -1,25 +1,30 @@
 {
 	"_guid_": "F-029_Test_Data_Base",
+
 	"productName": "CCD Data Store",
-  "operationName": "Fetch an event trigger in the context of a case type for Case Worker",
-  "method": "GET",
-  "uri": "/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}",
+	"operationName": "Fetch an event trigger in the context of a case type for Case Worker",
+
+	"method": "GET",
+	"uri": "/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}",
+
 	"user": {
 		"_extends_": "Common_User_For_Request"
 	},
-  "request": {
-    "_extends_": "Common_Request",
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "AUTOTEST1",
-      "ctid": "AAT",
-      "etid": "CREATE"
-    }
-  },
-  "expectedResponse": {
-    "headers": {
-      "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Content-Encoding" : "gzip"
-    }
-  }
+
+	"request": {
+		"_extends_": "Common_Request",
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "AUTOTEST1",
+			"ctid": "AAT",
+			"etid": "CREATE"
+		}
+	},
+
+	"expectedResponse": {
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding" : "gzip"
+		}
+	}
 }

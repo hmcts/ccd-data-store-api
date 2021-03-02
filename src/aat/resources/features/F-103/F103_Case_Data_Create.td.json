@@ -1,0 +1,14 @@
+{
+	"_guid_": "F103_Case_Data_Create",
+	"_extends_": "Befta_Jurisdiction2_Default_Full_Case_Creation_Data_solicitor_1",
+
+	"specs": [
+		"to create a full case"
+	],
+
+	"users": {
+		"invokingUser": {
+			"_extends_": "F-103_User_Richard"
+		}
+	}
+}

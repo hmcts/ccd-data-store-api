@@ -4,41 +4,60 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import uk.gov.hmcts.ccd.BaseTest;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-
-import javax.inject.Inject;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.mockito.Mock;
+import uk.gov.hmcts.ccd.BaseTest;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+
+// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+@SuppressWarnings("checkstyle:OperatorWrap")
 public class CaseDataValidatorTest extends WireMockBaseTest {
     private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
     private static final String CASE_FIELD_JSON = "/tests/CaseDataValidator_CaseField.json";
+    private static final String CASE_FIELD_DYNAMIC_JSON = "/tests/CaseDataValidator_DynamicLists.json";
+    private static final String CASE_FIELD_DYNAMIC_DATA_JSON = "/tests/CaseDataValidator_DynamicLists_Data.json";
     private static String CASE_FIELDS_STRING;
+    private static String CASE_FIELDS_DYNAMIC_STRING;
 
     @Inject
     private CaseDataValidator caseDataValidator;
-    private List<CaseField> caseFields;
+    private List<CaseFieldDefinition> caseFields;
+    private List<CaseFieldDefinition> dynamicCaseFields;
+
+    @Mock
+    private TextCaseReferenceCaseLinkValidator textCaseReferenceCaseLinkValidator;
+
 
     @BeforeClass
-    public static void setUpClass() throws IOException {
+    public static void setUpClass() {
         CASE_FIELDS_STRING = BaseTest.getResourceAsString(CASE_FIELD_JSON);
+        CASE_FIELDS_DYNAMIC_STRING = BaseTest.getResourceAsString(CASE_FIELD_DYNAMIC_JSON);
     }
 
     @Before
     public void setUp() throws IOException {
         caseFields = BaseTest.getCaseFieldsFromJson(CASE_FIELDS_STRING);
+        dynamicCaseFields = BaseTest.getCaseFieldsFromJson(CASE_FIELDS_DYNAMIC_STRING);
     }
 
     @Test
@@ -57,9 +76,24 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
-        final List<ValidationResult> result = caseDataValidator.validate(values, caseFields);
+
+        final ValidationContext validationContext = getValidationContext(values);
+        final List<ValidationResult> result = caseDataValidator.validate(validationContext);
         assertEquals(result.toString(), 0, result.size());
     }
+
+    private ValidationContext getValidationContext(Map<String, JsonNode> values) {
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(caseFields);
+        return new ValidationContext(caseTypeDefinition, values);
+    }
+
+    private ValidationContext getValidationContextDynamicFields(Map<String, JsonNode> values) {
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(dynamicCaseFields);
+        return new ValidationContext(caseTypeDefinition, values);
+    }
+
 
     @Test
     public void unrecognisedValueComplex() throws Exception {
@@ -77,7 +111,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
                 "}";
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
-        final List<ValidationResult> result = caseDataValidator.validate(values, caseFields);
+        final ValidationContext validationContext = getValidationContext(values);
+        final List<ValidationResult> result = caseDataValidator.validate(validationContext);
         assertEquals(result.toString(), 2, result.size());
     }
 
@@ -94,7 +129,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
                 "}";
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
-        final List<ValidationResult> result = caseDataValidator.validate(values, caseFields);
+        final ValidationContext validationContext = getValidationContext(values);
+        final List<ValidationResult> result = caseDataValidator.validate(validationContext);
         assertEquals(result.toString(), 1, result.size());
 
         final ValidationResult error = result.get(0);
@@ -115,7 +151,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
                 "}";
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
-        final List<ValidationResult> result = caseDataValidator.validate(values, caseFields);
+        final ValidationContext validationContext = getValidationContext(values);
+        final List<ValidationResult> result = caseDataValidator.validate(validationContext);
         assertEquals(result.toString(), 1, result.size());
 
         final ValidationResult error = result.get(0);
@@ -131,7 +168,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
                 "}";
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
-        final List<ValidationResult> result = caseDataValidator.validate(values, caseFields);
+        final ValidationContext validationContext = getValidationContext(values);
+        final List<ValidationResult> result = caseDataValidator.validate(validationContext);
         assertEquals(result.toString(), 1, result.size());
 
         final ValidationResult error = result.get(0);
@@ -149,7 +187,7 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
                 "    }\n" +
                 "  }\n" +
                 "]\n";
-        final List<CaseField> caseFields = BaseTest.getCaseFieldsFromJson(unknownType);
+        final List<CaseFieldDefinition> caseFields = BaseTest.getCaseFieldsFromJson(unknownType);
         final String data =
             "{\n" +
                 "  \"Person\" : {\n" +
@@ -163,8 +201,9 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
                 "}";
         final Map<String, JsonNode> values = MAPPER.readValue(data, new TypeReference<HashMap<String, JsonNode>>() {
         });
-        final List<ValidationResult> result = caseDataValidator.validate(values, caseFields);
-        assertEquals(result.toString(), 1, result.size());
+        final ValidationContext validationContext = getValidationContext(values);
+        final List<ValidationResult> result = caseDataValidator.validate(validationContext);
+        assertEquals(result.toString(), 2, result.size());
     }
 
     @Test
@@ -185,7 +224,212 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
-        final List<ValidationResult> result = caseDataValidator.validate(values, caseFields);
+        final ValidationContext validationContext = getValidationContext(values);
+        final List<ValidationResult> result = caseDataValidator.validate(validationContext);
+        assertEquals(result.toString(), 0, result.size());
+    }
+
+    @Test
+    public void validDynamicListInCollection() throws Exception {
+        final String DATA = "{\n"
+            + "        \"TextAreaField\": \"textAreaField1\",\n"
+            + "        \"TextField\": \"textField1\",\n"
+            + "        \"EmailField\": \"test@hmcts.net\",\n"
+            + "        \"DynamicListsComplexField\": {\n"
+            + "            \"DynamicRadioListComplex\": {\n"
+            + "                \"value\": {\n"
+            + "                    \"code\": \"JUDGESMITH\",\n"
+            + "                    \"label\": \"Judge Smith\"\n"
+            + "                },\n"
+            + "                \"list_items\": [{\n"
+            + "                    \"code\": \"JUDGEJUDY\",\n"
+            + "                    \"label\": \"Judge Judy\"\n"
+            + "                }, {\n"
+            + "                    \"code\": \"JUDGERINDER\",\n"
+            + "                    \"label\": \"Judge Rinder\"\n"
+            + "                }, {\n"
+            + "                    \"code\": \"JUDGESMITH\",\n"
+            + "                    \"label\": \"Judge Smith\"\n"
+            + "                }, {\n"
+            + "                    \"code\": \"JUDGEDREDD\",\n"
+            + "                    \"label\": \"Judge Dredd\"\n"
+            + "                }]\n"
+            + "            },\n"
+            + "            \"DynamicMultiSelectComplex\": {\n"
+            + "                \"value\": [{\n"
+            + "                    \"code\": \"MONDAYFIRSTOFMAY\",\n"
+            + "                    \"label\": \"Monday, May 1st\"\n"
+            + "                }, {\n"
+            + "\n"
+            + "                    \"code\": \"THURSDAYFOURTHOFMAY\",\n"
+            + "                    \"label\": \"Thursday, May 4th\"\n"
+            + "                }],\n"
+            + "                \"list_items\": [{\n"
+            + "                    \"code\": \"MONDAYFIRSTOFMAY\",\n"
+            + "                    \"label\": \"Monday, May 1st\"\n"
+            + "                }, {\n"
+            + "                    \"code\": \"TUESDAYSECONDOFMAY\",\n"
+            + "                    \"label\": \"Tuesday, May 2nd\"\n"
+            + "                }, {\n"
+            + "                    \"code\": \"WEDNESDAYTHIRDOFMAY\",\n"
+            + "                    \"label\": \"Wednesday, May 3rd\"\n"
+            + "                }, {\n"
+            + "                    \"code\": \"THURSDAYFOURTHOFMAY\",\n"
+            + "                    \"label\": \"Thursday, May 4th\"\n"
+            + "                }]\n"
+            + "            }\n"
+            + "\n"
+            + "\n"
+            + "        },\n"
+            + "        \"CollectionDynamicMultiSelectList\": [\n"
+            + "            {\n"
+            + "                \"id\": \"MultiSelect1\",\n"
+            + "                \"value\": {\n"
+            + "                    \"value\": [{\n"
+            + "                        \"code\": \"MONDAYFIRSTOFMAY\",\n"
+            + "                        \"label\": \"Monday, May 1st\"\n"
+            + "                    }, {\n"
+            + "\n"
+            + "                        \"code\": \"THURSDAYFOURTHOFMAY\",\n"
+            + "                        \"label\": \"Thursday, May 4th\"\n"
+            + "                    }],\n"
+            + "                    \"list_items\": [{\n"
+            + "                        \"code\": \"MONDAYFIRSTOFMAY\",\n"
+            + "                        \"label\": \"Monday, May 1st\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"TUESDAYSECONDOFMAY\",\n"
+            + "                        \"label\": \"Tuesday, May 2nd\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"WEDNESDAYTHIRDOFMAY\",\n"
+            + "                        \"label\": \"Wednesday, May 3rd\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"THURSDAYFOURTHOFMAY\",\n"
+            + "                        \"label\": \"Thursday, May 4th\"\n"
+            + "                    }]\n"
+            + "                }\n"
+            + "            },\n"
+            + "            {\n"
+            + "                \"id\": \"MultiSelect2\",\n"
+            + "                \"value\": {\n"
+            + "                    \"value\": [{\n"
+            + "                        \"code\": \"TUESDAYSECONDOFMAY\",\n"
+            + "                        \"label\": \"Tuesday, May 2nd\"\n"
+            + "                    }, {\n"
+            + "\n"
+            + "                        \"code\": \"WEDNESDAYTHIRDOFMAY\",\n"
+            + "                        \"label\": \"Wednesday, May 3rd\"\n"
+            + "                    }],\n"
+            + "                    \"list_items\": [{\n"
+            + "                        \"code\": \"MONDAYFIRSTOFMAY\",\n"
+            + "                        \"label\": \"Monday, May 1st\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"TUESDAYSECONDOFMAY\",\n"
+            + "                        \"label\": \"Tuesday, May 2nd\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"WEDNESDAYTHIRDOFMAY\",\n"
+            + "                        \"label\": \"Wednesday, May 3rd\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"THURSDAYFOURTHOFMAY\",\n"
+            + "                        \"label\": \"Thursday, May 4th\"\n"
+            + "                    }]\n"
+            + "                }\n"
+            + "            }\n"
+            + "\n"
+            + "        ],\n"
+            + "        \"CollectionDynamicRadioList\": [\n"
+            + "            {\n"
+            + "                \"id\": \"RadioList1\",\n"
+            + "                \"value\": {\n"
+            + "                    \"value\": {\n"
+            + "                        \"code\": \"JUDGESMITH\",\n"
+            + "                        \"label\": \"Judge Smith\"\n"
+            + "                    },\n"
+            + "                    \"list_items\": [{\n"
+            + "                        \"code\": \"JUDGEJUDY\",\n"
+            + "                        \"label\": \"Judge Judy\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"JUDGERINDER\",\n"
+            + "                        \"label\": \"Judge Rinder\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"JUDGESMITH\",\n"
+            + "                        \"label\": \"Judge Smith\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"JUDGEDREDD\",\n"
+            + "                        \"label\": \"Judge Dredd\"\n"
+            + "                    }]\n"
+            + "                }\n"
+            + "            },\n"
+            + "            {\n"
+            + "                \"id\": \"RadioList2\",\n"
+            + "                \"value\": {\n"
+            + "                    \"value\": {\n"
+            + "                        \"code\": \"JUDGESMITH\",\n"
+            + "                        \"label\": \"Judge Smith\"\n"
+            + "                    },\n"
+            + "                    \"list_items\": [{\n"
+            + "                        \"code\": \"JUDGEJUDY\",\n"
+            + "                        \"label\": \"Judge Judy\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"JUDGERINDER\",\n"
+            + "                        \"label\": \"Judge Rinder\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"JUDGESMITH\",\n"
+            + "                        \"label\": \"Judge Smith\"\n"
+            + "                    }, {\n"
+            + "                        \"code\": \"JUDGEDREDD\",\n"
+            + "                        \"label\": \"Judge Dredd\"\n"
+            + "                    }]\n"
+            + "                }\n"
+            + "            }\n"
+            + "        ],\n"
+            + "        \"DynamicRadioList\": {\n"
+            + "            \"value\": {\n"
+            + "                \"code\": \"JUDGESMITH\",\n"
+            + "                \"label\": \"Judge Smith\"\n"
+            + "            },\n"
+            + "            \"list_items\": [{\n"
+            + "                \"code\": \"JUDGEJUDY\",\n"
+            + "                \"label\": \"Judge Judy\"\n"
+            + "            }, {\n"
+            + "                \"code\": \"JUDGERINDER\",\n"
+            + "                \"label\": \"Judge Rinder\"\n"
+            + "            }, {\n"
+            + "                \"code\": \"JUDGESMITH\",\n"
+            + "                \"label\": \"Judge Smith\"\n"
+            + "            }, {\n"
+            + "                \"code\": \"JUDGEDREDD\",\n"
+            + "                \"label\": \"Judge Dredd\"\n"
+            + "            }]\n"
+            + "        },\n"
+            + "        \"DynamicMultiSelectList\": {\n"
+            + "            \"value\": [{\n"
+            + "                \"code\": \"MONDAYFIRSTOFMAY\",\n"
+            + "                \"label\": \"Monday, May 1st\"\n"
+            + "            }, {\n"
+            + "\n"
+            + "                \"code\": \"THURSDAYFOURTHOFMAY\",\n"
+            + "                \"label\": \"Thursday, May 4th\"\n"
+            + "            }],\n"
+            + "            \"list_items\": [{\n"
+            + "                \"code\": \"MONDAYFIRSTOFMAY\",\n"
+            + "                \"label\": \"Monday, May 1st\"\n"
+            + "            }, {\n"
+            + "                \"code\": \"TUESDAYSECONDOFMAY\",\n"
+            + "                \"label\": \"Tuesday, May 2nd\"\n"
+            + "            }, {\n"
+            + "                \"code\": \"WEDNESDAYTHIRDOFMAY\",\n"
+            + "                \"label\": \"Wednesday, May 3rd\"\n"
+            + "            }, {\n"
+            + "                \"code\": \"THURSDAYFOURTHOFMAY\",\n"
+            + "                \"label\": \"Thursday, May 4th\"\n"
+            + "            }]\n"
+            + "        }\n"
+            + "    }";
+
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
+        });
+        final ValidationContext validationContext = getValidationContextDynamicFields(values);
+        final List<ValidationResult> result = caseDataValidator.validate(validationContext);
         assertEquals(result.toString(), 0, result.size());
     }
 
@@ -207,7 +451,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
-        final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
+        final ValidationContext validationContext = getValidationContext(values);
+        final List<ValidationResult> results = caseDataValidator.validate(validationContext);
         assertEquals(results.toString(), 1, results.size());
 
         final ValidationResult result = results.get(0);
@@ -239,7 +484,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
-        final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
+        final ValidationContext validationContext = getValidationContext(values);
+        final List<ValidationResult> results = caseDataValidator.validate(validationContext);
         assertEquals(results.toString(), 1, results.size());
 
         final ValidationResult result = results.get(0);
@@ -256,7 +502,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
-        final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
+        final ValidationContext validationContext = getValidationContext(values);
+        final List<ValidationResult> results = caseDataValidator.validate(validationContext);
         assertEquals(results.toString(), 0, results.size());
     }
 
@@ -270,7 +517,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
-        final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
+        final ValidationContext validationContext = getValidationContext(values);
+        final List<ValidationResult> results = caseDataValidator.validate(validationContext);
         assertEquals(results.toString(), 1, results.size());
 
         final ValidationResult result = results.get(0);
@@ -287,7 +535,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
-        final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
+        final ValidationContext validationContext = getValidationContext(values);
+        final List<ValidationResult> results = caseDataValidator.validate(validationContext);
         assertEquals(results.toString(), 2, results.size());
 
         final ValidationResult result0 = results.get(0);
@@ -307,7 +556,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
-        final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
+        final ValidationContext validationContext = getValidationContext(values);
+        final List<ValidationResult> results = caseDataValidator.validate(validationContext);
         assertEquals(results.toString(), 2, results.size());
 
         final ValidationResult result0 = results.get(0);
@@ -327,7 +577,8 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
-        final List<ValidationResult> results = caseDataValidator.validate(values, caseFields);
+        final ValidationContext validationContext = getValidationContext(values);
+        final List<ValidationResult> results = caseDataValidator.validate(validationContext);
         assertEquals(results.toString(), 2, results.size());
 
         final ValidationResult result0 = results.get(0);
@@ -335,6 +586,79 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
 
         final ValidationResult result1 = results.get(1);
         assertThat(result1.getFieldId(), equalTo("Initials.1"));
+    }
+
+    @Test
+    public void shouldFailForPredefinedType() throws Exception {
+        final String DATA = "{\n" +
+            "        \"CaseReference\": \"1596XXXXX1048-4059XXXOOOO\"\n" +
+            "      }";
+
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
+        });
+        final ValidationContext validationContext = getValidationContext(values);
+        final List<ValidationResult> results = caseDataValidator.validate(validationContext);
+        assertEquals(results.toString(), 1, results.size());
+
+        final ValidationResult result0 = results.get(0);
+        assertThat(result0.getFieldId(), equalTo("CaseReference"));
+        assertThat(result0.getErrorMessage(),
+            equalTo("The data entered is not valid for this type of field, please delete and re-enter using only valid"
+                + " data")
+        );
+    }
+
+    @Test
+    public void shouldInvokeForPredefinedTypea() throws Exception {
+        List<FieldValidator> fieldValidators = new ArrayList<>();
+        fieldValidators.add(textCaseReferenceCaseLinkValidator);
+        CaseDataValidator caseDataValidator = new CaseDataValidator(fieldValidators);
+
+        when(textCaseReferenceCaseLinkValidator.getCustomTypeId()).thenReturn("TextCaseReference");
+
+        final String DATA = "{\n" +
+            "        \"CaseReference\": \"1596104840593131\"\n" +
+            "      }";
+
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
+        });
+        final ValidationContext validationContext = getValidationContext(values);
+        final List<ValidationResult> results = caseDataValidator.validate(validationContext);
+
+        assertEquals(results.toString(), 0, results.size());
+        verify(textCaseReferenceCaseLinkValidator).validate(any(ValidationContext.class));
+    }
+
+    @Test
+    public void shouldInvokeForPredefinedTypea2() throws Exception {
+        List<FieldValidator> fieldValidators = new ArrayList<>();
+        fieldValidators.add(textCaseReferenceCaseLinkValidator);
+        fieldValidators.add(new CollectionValidator());
+        CaseDataValidator caseDataValidator = new CaseDataValidator(fieldValidators);
+
+        when(textCaseReferenceCaseLinkValidator.getCustomTypeId()).thenReturn("TextCaseReference");
+
+        final String DATA =
+            "{\n" +
+                "  \"CaseLink\" : [\n" +
+                "    {\n" +
+                "      \"value\": " +
+                "        {\n" +
+                "          \"CaseLink1\": \"1596104840593131\",\n" +
+                "          \"CaseLink2\": \"1596104840593131\"\n" +
+                "        }\n" +
+                "    }" +
+                "  ]\n" +
+                "}";
+
+        final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
+        });
+        final ValidationContext validationContext = getValidationContext(values);
+        final List<ValidationResult> results = caseDataValidator.validate(validationContext);
+
+        assertEquals(results.toString(), 0, results.size());
+        verify(textCaseReferenceCaseLinkValidator, times(2))
+            .validate(any(ValidationContext.class));
     }
 
     @Test
@@ -350,17 +674,24 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
                 "    \"min\": 10\n" +
                 "  }\n" +
                 "}]";
-        final List<CaseField> caseFields = MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseField.class));
+        final List<CaseFieldDefinition> caseFields =
+            MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class,
+                CaseFieldDefinition.class));
         final String DATA = "{\"PersonFirstName\" : \"Test Name Test Name\"}";
         final Map<String, JsonNode> values = MAPPER.readValue(DATA, new TypeReference<HashMap<String, JsonNode>>() {
         });
 
-        assertEquals(0, caseDataValidator.validate(values, caseFields).size());
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(caseFields);
+        final ValidationContext validationContext = new ValidationContext(caseTypeDefinition, values);
+        assertEquals(0, caseDataValidator.validate(validationContext).size());
     }
 
     /**
-     * This test is only meant to ensure that validators are invoked and not to test the TextValidator which has it own test
+     * This test is only meant to ensure that validators are invoked and not to test the TextValidator which has
+     * it own test.
      */
+    @Test
     public void textFieldWithInvalidMaxMin() throws Exception {
         final String caseFieldString =
             "[{\n" +
@@ -373,14 +704,24 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
                 "    \"min\": 5\n" +
                 "  }\n" +
                 "}]";
-        final List<CaseField> caseFields = MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseField.class));
+        final List<CaseFieldDefinition> caseFields =
+            MAPPER.readValue(caseFieldString, TypeFactory.defaultInstance().constructCollectionType(List.class,
+                CaseFieldDefinition.class));
 
-        final Map<String, JsonNode> invalidMaxVal = MAPPER.readValue("{\"PersonFirstName\" : \"Test Name Test Name\"}", new TypeReference<HashMap<String, JsonNode>>() {
-        });
-        assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(invalidMaxVal, caseFields).size());
+        final Map<String, JsonNode> invalidMaxVal =
+            MAPPER.readValue("{\"PersonFirstName\" : \"Test Name Test Name\"}",
+                new TypeReference<HashMap<String, JsonNode>>() {
+                });
 
-        final Map<String, JsonNode> invalidMinVal = MAPPER.readValue("{\"PersonFirstName\" : \"Test\"}", new TypeReference<HashMap<String, JsonNode>>() {
-        });
-        assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(invalidMinVal, caseFields).size());
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setCaseFieldDefinitions(caseFields);
+        final ValidationContext validationContext = new ValidationContext(caseTypeDefinition, invalidMaxVal);
+        assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(validationContext).size());
+
+        final Map<String, JsonNode> invalidMinVal =
+            MAPPER.readValue("{\"PersonFirstName\" : \"Test\"}", new TypeReference<HashMap<String, JsonNode>>() {
+            });
+        final ValidationContext validationContext1 = new ValidationContext(caseTypeDefinition, invalidMinVal);
+        assertEquals("Did not catch invalid max", 1, caseDataValidator.validate(validationContext1).size());
     }
 }

@@ -16,7 +16,7 @@ public class Banner implements Serializable {
 
     private String bannerUrl;
 
-    private Jurisdiction jurisdiction;
+    private JurisdictionDefinition jurisdictionDefinition;
 
     public String getId() {
         return id;
@@ -58,12 +58,12 @@ public class Banner implements Serializable {
         this.bannerUrl = bannerUrl;
     }
 
-    public Jurisdiction getJurisdiction() {
-        return jurisdiction;
+    public JurisdictionDefinition getJurisdictionDefinition() {
+        return jurisdictionDefinition;
     }
 
-    public void setJurisdiction(Jurisdiction jurisdiction) {
-        this.jurisdiction = jurisdiction;
+    public void setJurisdictionDefinition(JurisdictionDefinition jurisdictionDefinition) {
+        this.jurisdictionDefinition = jurisdictionDefinition;
     }
 
 }

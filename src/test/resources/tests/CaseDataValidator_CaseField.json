@@ -13,6 +13,47 @@
     }
   },
   {
+    "id": "CaseReference",
+    "case_type_id": "CaseReference",
+    "field_type": {
+      "type": "Text",
+      "id": "TextCaseReference",
+      "regular_expression": "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)"
+    }
+  },
+  {
+    "id": "CaseLink",
+    "case_type_id": "TestAddressBookCase",
+    "field_type": {
+      "type": "Collection",
+      "id": "Address",
+      "max": 1,
+      "collection_field_type": {
+        "type": "Complex",
+        "complex_fields": [
+          {
+            "id": "CaseLink1",
+            "label": "Line1",
+            "field_type": {
+              "type": "Text",
+              "id": "TextCaseReference",
+              "regular_expression": "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)"
+            }
+          },
+          {
+            "id": "CaseLink2",
+            "field_type": {
+              "type": "Text",
+              "id": "TextCaseReference",
+              "regular_expression": "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)"
+            }
+          }
+        ]
+      }
+    }
+  },
+
+  {
     "id": "OtherAddresses",
     "case_type_id": "TestAddressBookCase",
     "field_type": {

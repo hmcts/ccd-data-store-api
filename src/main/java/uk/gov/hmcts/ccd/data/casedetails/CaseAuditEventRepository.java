@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -41,10 +42,13 @@ public class CaseAuditEventRepository {
     }
 
     public List<AuditEvent> findByCase(final CaseDetails caseDetails) {
-        final Query query = em.createNamedQuery(CaseAuditEventEntity.FIND_BY_CASE);
-        query.setParameter(CaseAuditEventEntity.CASE_DATA_ID, Long.valueOf(caseDetails.getId()));
+        final List<CaseAuditEventEntity> resultList = em.createNamedQuery(CaseAuditEventEntity.FIND_BY_CASE)
+            .setParameter(CaseAuditEventEntity.CASE_DATA_ID, Long.valueOf(caseDetails.getId()))
+            .unwrap(org.hibernate.query.Query.class)
+            .setResultTransformer(Transformers.aliasToBean(CaseAuditEventEntity.class))
+            .getResultList();
 
-        return caseAuditEventMapper.entityToModel(query.getResultList());
+        return caseAuditEventMapper.entityToModel(resultList);
     }
 
     public Optional<AuditEvent> getCreateEvent(CaseDetails caseDetails) {
@@ -53,8 +57,9 @@ public class CaseAuditEventRepository {
         query.setParameter(CaseAuditEventEntity.CASE_DATA_ID, Long.valueOf(caseDetails.getId()));
         List<CaseAuditEventEntity> auditEvents = query.getResultList();
 
-        return (auditEvents == null || auditEvents.size() == 0) ?
-                Optional.empty() : Optional.of(caseAuditEventMapper.entityToModel(auditEvents.get(0)));
+        return (auditEvents == null || auditEvents.size() == 0)
+              ? Optional.empty()
+              : Optional.of(caseAuditEventMapper.entityToModel(auditEvents.get(0)));
     }
 
     public Optional<AuditEvent> findByEventId(Long eventId) {

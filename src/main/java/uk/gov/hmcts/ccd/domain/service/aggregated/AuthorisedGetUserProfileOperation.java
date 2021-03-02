@@ -13,7 +13,7 @@ import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 @Service
@@ -27,7 +27,8 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
 
     public AuthorisedGetUserProfileOperation(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                                              AccessControlService accessControlService,
-                                             @Qualifier(DefaultGetUserProfileOperation.QUALIFIER) GetUserProfileOperation getUserProfileOperation) {
+                                             @Qualifier(DefaultGetUserProfileOperation.QUALIFIER)
+                                                 GetUserProfileOperation getUserProfileOperation) {
         this.accessControlService = accessControlService;
         this.getUserProfileOperation = getUserProfileOperation;
         this.userRepository = userRepository;
@@ -41,8 +42,8 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
     private UserProfile filterCaseTypes(UserProfile userProfile, Predicate<AccessControlList> access) {
         final Set<String> userRoles = getUserRoles();
         Arrays.stream(userProfile.getJurisdictions()).forEach(
-            jurisdiction -> jurisdiction.setCaseTypes(
-                jurisdiction.getCaseTypes()
+            jurisdiction -> jurisdiction.setCaseTypeDefinitions(
+                jurisdiction.getCaseTypeDefinitions()
                     .stream()
                     .map(caseType -> verifyAccess(caseType, userRoles, access))
                     .filter(Optional::isPresent)
@@ -57,14 +58,17 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
         return userRepository.getUserRoles();
     }
 
-    private Optional<CaseType> verifyAccess(CaseType caseType, Set<String> userRoles, Predicate<AccessControlList> access) {
-        if (caseType == null || CollectionUtils.isEmpty(userRoles)
-            || !accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, access)) {
+    private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles,
+                                                      Predicate<AccessControlList> access) {
+        if (caseTypeDefinition == null || CollectionUtils.isEmpty(userRoles)
+            || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, access)) {
             return Optional.empty();
         }
-        caseType.setStates(accessControlService.filterCaseStatesByAccess(caseType.getStates(), userRoles, access));
-        caseType.setEvents(accessControlService.filterCaseEventsByAccess(caseType.getEvents(), userRoles, access));
+        caseTypeDefinition.setStates(accessControlService.filterCaseStatesByAccess(caseTypeDefinition.getStates(),
+            userRoles, access));
+        caseTypeDefinition.setEvents(accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
+            userRoles, access));
 
-        return Optional.of(caseType);
+        return Optional.of(caseTypeDefinition);
     }
 }

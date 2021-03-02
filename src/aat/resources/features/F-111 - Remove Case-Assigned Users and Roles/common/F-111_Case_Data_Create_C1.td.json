@@ -1,0 +1,20 @@
+{
+  "_guid_": "F-111_Case_Data_Create_C1",
+  "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Creation_Data_solicitor_1",
+
+  "specs": [
+    "C1, which Richard has just"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "F-111_User_Richard"
+    }
+  },
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][siblingContexts][F-111_Case_Data_Create_C1_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+}

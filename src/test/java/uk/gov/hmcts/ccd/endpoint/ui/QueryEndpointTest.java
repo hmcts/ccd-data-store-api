@@ -29,7 +29,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.search.FieldMapSanitizeOperation;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
@@ -84,8 +84,7 @@ class QueryEndpointTest {
 
     @Test
     void shouldFailIfAccessParamInvalid() {
-        assertThrows(ResourceNotFoundException.class,
-                     () -> queryEndpoint.getCaseTypes(JURISDICTION_ID, "INVALID"));
+        assertThrows(ResourceNotFoundException.class, () -> queryEndpoint.getCaseTypes(JURISDICTION_ID, "INVALID"));
     }
 
     @Test
@@ -98,9 +97,9 @@ class QueryEndpointTest {
 
     @Test
     void shouldCallGetEventTriggerOperationForDraft() {
-        CaseEventTrigger caseEventTrigger = new CaseEventTrigger();
-        doReturn(caseEventTrigger).when(getEventTriggerOperation).executeForDraft(any(), any());
-        queryEndpoint.getEventTriggerForDraft("userId", "jurisdictionId", "caseTypeId", "draftId", "eventTriggerId", false);
+        CaseUpdateViewEvent caseUpdateViewEvent = new CaseUpdateViewEvent();
+        doReturn(caseUpdateViewEvent).when(getEventTriggerOperation).executeForDraft(any(), any());
+        queryEndpoint.getEventTriggerForDraft("userId", "jurisdictionId", "caseTypeId", "draftId", "eventId", false);
         verify(getEventTriggerOperation).executeForDraft("draftId", false);
     }
 
@@ -158,7 +157,8 @@ class QueryEndpointTest {
             Map<String, String> sanitised = new HashMap<>();
             SearchResultView searchResultView = new SearchResultView();
             when(fieldMapSanitizerOperation.execute(params)).thenReturn(sanitised);
-            when(searchQueryOperation.execute(eq(null), any(MetaData.class), eq(sanitised))).thenReturn(searchResultView);
+            when(searchQueryOperation.execute(eq(null), any(MetaData.class), eq(sanitised)))
+                    .thenReturn(searchResultView);
 
             SearchResultView result = queryEndpoint.searchNew("DIVORCE", "DIVORCE", params);
 

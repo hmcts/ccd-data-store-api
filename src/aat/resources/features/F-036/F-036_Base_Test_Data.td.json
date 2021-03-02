@@ -1,20 +1,24 @@
 {
-  "_guid_": "F-036_Base_Test_Data",
-  "productName": "CCD Data Store",
-  "operationName": "Retrieve a trigger for case by ID",
-  "method": "GET",
-  "uri": "cases/{caseId}/event-triggers/{triggerId}",
-  "user": {
-    "_extends_": "Common_User_For_Request"
-  },
-  "request": {
-    "_extends_": "Common_Request",
-    "headers": {
-      "experimental": "true"
-    },
-    "pathVariables": {
-      "caseId": "${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
-      "triggerId": "START_PROGRESS"
-    }
-  }
+	"_guid_": "F-036_Base_Test_Data",
+
+	"productName": "CCD Data Store",
+	"operationName": "Retrieve a trigger for case by ID",
+
+	"method": "GET",
+	"uri": "cases/{caseId}/event-triggers/{triggerId}",
+
+	"user": {
+		"_extends_": "Common_User_For_Request"
+	},
+
+	"request": {
+		"_extends_": "Common_Request",
+		"headers": {
+			"experimental": "true"
+		},
+		"pathVariables": {
+			"caseId": "${[scenarioContext][childContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
+			"triggerId": "START_PROGRESS"
+		}
+	}
 }

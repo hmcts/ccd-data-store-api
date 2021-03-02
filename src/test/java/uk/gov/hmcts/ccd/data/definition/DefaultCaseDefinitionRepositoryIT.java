@@ -1,5 +1,23 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
+import org.hamcrest.collection.IsCollectionWithSize;
+import org.junit.Assert;
+import org.junit.Test;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
+import javax.inject.Inject;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.serverError;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -7,50 +25,39 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
+import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COLLECTION;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.COMPLEX;
-
-import org.hamcrest.collection.IsCollectionWithSize;
-import org.junit.Test;
-
-import javax.inject.Inject;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
-import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
 public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
     @Inject
-    private CaseDefinitionRepository caseDefinitionRepository;
+    private uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository caseDefinitionRepository;
 
     @Test
     public void shouldGetCaseTypesForJurisdiction() {
-        final List<CaseType> caseTypes = caseDefinitionRepository.getCaseTypesForJurisdiction("probate");
-        assertEquals("HTTP call results failed", 2, caseTypes.size());
-
+        final List<CaseTypeDefinition> caseTypeDefinitions =
+            caseDefinitionRepository.getCaseTypesForJurisdiction("probate");
+        assertEquals("HTTP call results failed", 2, caseTypeDefinitions.size());
     }
 
     @Test
     public void shouldGetCaseType() {
-        final CaseType caseType = caseDefinitionRepository.getCaseType("TestAddressBookCase");
-        assertEquals("Incorrect Case Type", "TestAddressBookCase", caseType.getId());
+        final CaseTypeDefinition caseTypeDefinition =
+            caseDefinitionRepository.getCaseType("TestAddressBookCase");
+        assertEquals("Incorrect Case Type", "TestAddressBookCase", caseTypeDefinition.getId());
     }
 
     @Test
     public void shouldGetBaseTypes() {
-        final List<FieldType> baseTypes = caseDefinitionRepository.getBaseTypes();
+        final List<FieldTypeDefinition> baseTypes = caseDefinitionRepository.getBaseTypes();
 
         assertAll(
             "Assert All of these",
-            () -> assertThat(baseTypes, IsCollectionWithSize.hasSize(15)),
+            () -> assertThat(baseTypes, IsCollectionWithSize.hasSize(17)),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("Text")))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("Number")))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("Email")))),
@@ -64,6 +71,8 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("TextArea")))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is(COLLECTION)))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("MultiSelectList")))),
+            () -> assertThat(baseTypes, hasItem(hasProperty("type", is("DynamicRadioList")))),
+            () -> assertThat(baseTypes, hasItem(hasProperty("type", is("DynamicMultiSelectList")))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is(COMPLEX)))),
             () -> assertThat(baseTypes, hasItem(hasProperty("type", is("Document"))))
         );
@@ -103,13 +112,52 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
 
     @Test
     public void shouldGetJurisdictionsDefinition() {
-        List<Jurisdiction> allJurisdictions = newArrayList("PROBATE", "DIVORCE", "SSCS").stream()
+        List<JurisdictionDefinition> allJurisdictionDefinitions =
+            newArrayList("PROBATE", "DIVORCE", "SSCS").stream()
                 .map(id -> caseDefinitionRepository.getJurisdiction(id)).collect(Collectors.toList());
 
         assertAll(
-                () -> assertThat(allJurisdictions, hasSize(3)),
-                () -> assertThat(allJurisdictions, hasItem(hasProperty("id", is("SSCS")))),
-                () -> assertThat(allJurisdictions, hasItem(hasProperty("id", is("PROBATE"))))
+            () -> assertThat(allJurisdictionDefinitions, hasSize(3)),
+            () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("SSCS")))),
+            () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("PROBATE"))))
         );
+    }
+
+    @Test
+    public void shouldFailToGetCaseTypesForJurisdiction() {
+        stubFor(WireMock.get(urlMatching("/api/data/jurisdictions/server_error/case-type")).willReturn(serverError()));
+        final ServiceException exception = assertThrows(ServiceException.class,
+            () -> caseDefinitionRepository.getCaseTypesForJurisdiction("server_error"));
+        assertThat(exception.getMessage(), startsWith("Problem getting case types for the Jurisdiction:server_error "
+            + "because of "));
+    }
+
+    @Test
+    public void shouldFailToGetCaseType() {
+        stubFor(WireMock.get(urlMatching("/api/data/case-type/anything")).willReturn(serverError()));
+        final ServiceException exception = assertThrows(ServiceException.class,
+            () -> caseDefinitionRepository.getCaseType("anything"));
+        assertThat(exception.getMessage(), startsWith("Problem getting case type definition for anything because of "));
+    }
+
+    @Test
+    public void shouldFailToGetBaseTypes() {
+        when(caseDefinitionRepository.getBaseTypes()).thenCallRealMethod();
+        stubFor(WireMock.get(urlMatching("/api/base-types")).willReturn(serverError()));
+        final ServiceException exception = assertThrows(ServiceException.class,
+            () -> caseDefinitionRepository.getBaseTypes());
+        assertThat(exception.getMessage(), startsWith("Problem getting base types definition from definition store "
+            + "because of "));
+    }
+
+    @Test
+    public void shouldFailToGetClassificationsForUserRoleList() {
+        List<String> userRoles = Arrays.asList("neither_defined", "nor_defined");
+        stubFor(WireMock.get(urlMatching("/api/user-roles/neither_defined,nor_defined"))
+            .willReturn(serverError()));
+        final ServiceException exception = assertThrows(ServiceException.class,
+            () -> caseDefinitionRepository.getClassificationsForUserRoleList(userRoles));
+        Assert.assertThat(exception.getMessage(),
+            startsWith("Error while retrieving classification for user roles " + userRoles + " because of "));
     }
 }

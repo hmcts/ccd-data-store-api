@@ -1,6 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,24 +14,30 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
-import uk.gov.hmcts.ccd.domain.model.definition.*;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.EventPostStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.validator.EventValidator;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
@@ -57,11 +68,11 @@ class DefaultCreateEventOperationTest {
     private Event event;
 
     private Map<String, JsonNode> data;
-    private CaseType caseType;
-    private CaseEvent eventTrigger;
+    private CaseTypeDefinition caseTypeDefinition;
+    private CaseEventDefinition caseEventDefinition;
     private CaseDetails caseDetails;
     private CaseDetails caseDetailsBefore;
-    private CaseState postState;
+    private CaseStateDefinition postState;
     private CaseDataContent caseDataContent;
 
     private static Event buildEvent() {
@@ -78,53 +89,69 @@ class DefaultCreateEventOperationTest {
 
         event = buildEvent();
         data = buildJsonNodeData();
-        caseDataContent = newCaseDataContent().withEvent(event).withData(data).withToken(TOKEN).withIgnoreWarning(IGNORE_WARNING).build();
-        final Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setId(JURISDICTION_ID);
+        caseDataContent = newCaseDataContent().withEvent(event).withData(data).withToken(TOKEN)
+            .withIgnoreWarning(IGNORE_WARNING).build();
+        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setId(JURISDICTION_ID);
         final Version version = new Version();
         version.setNumber(VERSION_NUMBER);
-        caseType = new CaseType();
-        caseType.setId(CASE_TYPE_ID);
-        caseType.setJurisdiction(jurisdiction);
-        caseType.setVersion(version);
+        caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId(CASE_TYPE_ID);
+        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
+        caseTypeDefinition.setVersion(version);
 
-        eventTrigger = new CaseEvent();
-        eventTrigger.setPostState(POST_STATE);
+        caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setPostStates(getEventPostStates(POST_STATE));
 
         caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setState(PRE_STATE_ID);
         caseDetails.setLastModified(LAST_MODIFIED);
         caseDetailsBefore = mock(CaseDetails.class);
-        postState = new CaseState();
+        postState = new CaseStateDefinition();
         postState.setId(POST_STATE);
 
+        mockCaseEventResult();
+    }
+
+    private void mockCaseEventResult() {
         CreateCaseEventResult caseEventResult =  CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsBefore)
             .savedCaseDetails(caseDetails)
-            .eventTrigger(eventTrigger)
+            .eventTrigger(caseEventDefinition)
             .build();
-
         given(createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent)).willReturn(caseEventResult);
+    }
 
+    private List<EventPostStateDefinition> getEventPostStates(String... postStateReferences) {
+        List<EventPostStateDefinition> postStates = new ArrayList<>();
+        int i = 0;
+        for (String reference : postStateReferences) {
+            EventPostStateDefinition definition = new EventPostStateDefinition();
+            definition.setPostStateReference(reference);
+            definition.setPriority(++i);
+            postStates.add(definition);
+        }
+        return postStates;
     }
 
     @Test
     @DisplayName("should invoke after submit callback")
     void shouldInvokeAfterSubmitCallback() {
-        eventTrigger.setCallBackURLSubmittedEvent(CALLBACK_URL);
+        caseEventDefinition.setCallBackURLSubmittedEvent(CALLBACK_URL);
         AfterSubmitCallbackResponse response = new AfterSubmitCallbackResponse();
         response.setConfirmationHeader("Header");
         response.setConfirmationBody("Body");
         doReturn(ResponseEntity.ok(response)).when(callbackInvoker)
-            .invokeSubmittedCallback(eventTrigger,
+            .invokeSubmittedCallback(caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails);
 
         final CaseDetails caseDetails = createEventOperation.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
         assertAll(
-            () -> verify(callbackInvoker).invokeSubmittedCallback(eventTrigger, caseDetailsBefore, this.caseDetails),
+            () -> verify(callbackInvoker).invokeSubmittedCallback(caseEventDefinition, caseDetailsBefore,
+                this.caseDetails),
             () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationHeader(), is("Header")),
             () -> assertThat(caseDetails.getAfterSubmitCallbackResponse().getConfirmationBody(), is("Body")),
             () -> assertThat(caseDetails.getCallbackResponseStatusCode(), is(SC_OK)),
@@ -135,9 +162,9 @@ class DefaultCreateEventOperationTest {
     @Test
     @DisplayName("should return incomplete response status if remote endpoint is down")
     void shouldReturnIncomplete() {
-        eventTrigger.setCallBackURLSubmittedEvent(CALLBACK_URL);
+        caseEventDefinition.setCallBackURLSubmittedEvent(CALLBACK_URL);
         doThrow(new CallbackException("Testing failure")).when(callbackInvoker)
-            .invokeSubmittedCallback(eventTrigger,
+            .invokeSubmittedCallback(caseEventDefinition,
                 caseDetailsBefore,
                 caseDetails);
 
@@ -148,6 +175,19 @@ class DefaultCreateEventOperationTest {
             () -> assertThat(caseDetails.getCallbackResponseStatusCode(), is(SC_OK)),
             () -> assertThat(caseDetails.getCallbackResponseStatus(), is("INCOMPLETE_CALLBACK"))
         );
+    }
+
+    @Test
+    @DisplayName("should return incomplete response status if remote endpoint is down")
+    void shouldReturnInvokeSettingProxiedUser() {
+        caseDataContent = newCaseDataContent().withEvent(event).withData(data).withToken(TOKEN)
+            .withIgnoreWarning(IGNORE_WARNING)
+            .withOnBehalfOfUserToken("Test_Token").build();
+        mockCaseEventResult();
+
+        final CaseDetails caseDetails = createEventOperation.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        assertNotNull(caseDetails);
     }
 
     private Map<String, JsonNode> buildJsonNodeData() {

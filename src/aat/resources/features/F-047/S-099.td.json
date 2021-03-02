@@ -1,19 +1,21 @@
 {
-  "title": "must return 401 when request does not provide valid authentication credentials",
-  "_guid_": "S-099",
-  "_extends_": "F-047_Test_Data_Base",
-  "specs": [
-    "an active profile in CCD",
-    "does not provide valid authentication credentials",
-    "contains an HTTP-401 Unauthorized"
-  ],
+	"_guid_": "S-099",
+	"_extends_": "F-047_Test_Data_Base",
+	"title": "must return 401 when request does not provide valid authentication credentials",
 
-  "request": {
-    "pathVariables": {
-      "uid": "dummyAuthentication"
-    }
-  },
-  "expectedResponse": {
-    "_extends_": "Common_401_Response"
-  }
+	"specs": [
+		"an active profile in CCD",
+		"does not provide valid authentication credentials",
+		"contains an HTTP-401 Unauthorized"
+	],
+
+	"request": {
+		"pathVariables": {
+			"uid": "dummyAuthentication"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_401_Response"
+	}
 }

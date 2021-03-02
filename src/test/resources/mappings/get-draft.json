@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/drafts/5"
+    "url": "/drafts/4444333322221111"
   },
   "response": {
     "status": 200,
@@ -14,7 +14,7 @@
         "userId":"25",
         "jurisdictionId":"PROBATE",
         "caseTypeId":"TestAddressBookCase",
-        "eventTriggerId":"createCase",
+        "eventId":"createCase",
         "caseDataContent" : {
           "event": {
             "id": "createCase",

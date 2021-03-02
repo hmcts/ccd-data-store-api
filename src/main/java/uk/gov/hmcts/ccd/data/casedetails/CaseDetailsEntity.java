@@ -1,10 +1,24 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import javax.persistence.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import uk.gov.hmcts.ccd.data.JsonDataConverter;
+
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Version;
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
+@SuppressWarnings("checkstyle:OperatorWrap")
+// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 @NamedQueries({
     @NamedQuery(name = CaseDetailsEntity.FIND_BY_METADATA, query =
         "SELECT cd FROM CaseDetailsEntity cd " +
@@ -60,11 +74,14 @@ public class CaseDetailsEntity {
     public static final String LAST_MODIFIED_FIELD_COL = "last_modified";
     public static final String LAST_STATE_MODIFIED_DATE_FIELD_COL = "last_state_modified_date";
     public static final String SECURITY_CLASSIFICATION_FIELD_COL = "security_classification";
+    public static final String DATA_COL = "data";
+    public static final String DATA_CLASSIFICATION_COL = "data_classification";
+    public static final String SUPPLEMENTARY_DATA_COL = "supplementary_data";
 
 
 
     @Id
-    @Column(name = "id")
+    @Column(name = ID_FIELD_COL)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = REFERENCE_FIELD_COL, nullable = false)
@@ -85,12 +102,15 @@ public class CaseDetailsEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = SECURITY_CLASSIFICATION_FIELD_COL, nullable = false)
     private SecurityClassification securityClassification;
-    @Column(name = "data", nullable = false)
-    @Convert(converter = uk.gov.hmcts.ccd.data.JSONBConverter.class)
+    @Column(name = DATA_COL, nullable = false)
+    @Convert(converter = JsonDataConverter.class)
     private JsonNode data;
-    @Column(name = "data_classification", nullable = false)
-    @Convert(converter = uk.gov.hmcts.ccd.data.JSONBConverter.class)
+    @Column(name = DATA_CLASSIFICATION_COL, nullable = false)
+    @Convert(converter = JsonDataConverter.class)
     private JsonNode dataClassification;
+    @Column(name = SUPPLEMENTARY_DATA_COL)
+    @Convert(converter = JsonDataConverter.class)
+    private JsonNode supplementaryData;
 
     @Version
     private Integer version;
@@ -173,6 +193,14 @@ public class CaseDetailsEntity {
 
     public void setDataClassification(JsonNode dataClassification) {
         this.dataClassification = dataClassification;
+    }
+
+    public JsonNode getSupplementaryData() {
+        return supplementaryData;
+    }
+
+    public void setSupplementaryData(JsonNode supplementaryData) {
+        this.supplementaryData = supplementaryData;
     }
 
     public Integer getVersion() {

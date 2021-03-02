@@ -25,7 +25,7 @@ public class Version implements Serializable {
     }
 
     /**
-     * Date and time from when this version is valid from
+     * Date and time from when this version is valid from.
      **/
     @ApiModelProperty(required = true, value = "Date and time from when this version is valid from")
     @JsonProperty("live_from")
@@ -38,7 +38,7 @@ public class Version implements Serializable {
     }
 
     /**
-     * Date and time this version is to be retired
+     * Date and time this version is to be retired.
      **/
     @ApiModelProperty(value = "Date and time this version is to be retired")
     @JsonProperty("live_until")

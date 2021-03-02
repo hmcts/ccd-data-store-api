@@ -4,8 +4,7 @@
 
 	"users": {
 		"invokingUser": {
-			"username": "befta.caseworker.1@gmail.com",
-			"password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
+      "_extends_": "BeftaCaseworker1"
 		}
 	},
 
@@ -36,6 +35,7 @@
 				"EmailField": "PUBLIC",
 				"TextField": "PUBLIC"
 			},
+			"supplementary_data": null,
 			"security_classifications": {
 				"MoneyGBPField": "PUBLIC",
 				"PhoneUKField": "PUBLIC",

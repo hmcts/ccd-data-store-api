@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.domain.model.callbacks;
 
 public final class EventTokenProperties {
 
-    public static final String TRIGGER_EVENT_ID = "event-id";
+    public static final String EVENT_ID = "event-id";
     public static final String JURISDICTION_ID = "jurisdiction-id";
     public static final String CASE_TYPE_ID = "case-type-id";
     public static final String CASE_ID = "case-id";

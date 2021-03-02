@@ -1,0 +1,37 @@
+{
+  "title": "Retrieve users in invoker's organisation (+ organisationIdentifier)",
+
+  "_guid_": "F-105_Get_Organisation_Identifier_Base",
+
+  "specs": [
+    "As a prerequisite"
+  ],
+
+  "productName": "RD Professional API",
+  "operationName": "Retrieves the Users of an Active Organisation",
+
+  "method": "GET",
+  "uri": "{{RD_PROFESSIONAL_API_BASE_URL}}/refdata/external/v1/organisations/users",
+
+  "s2sClientId": "aac_manage_case_assignment",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "status": "Active",
+      "returnRoles": false
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Content-Type": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "organisationIdentifier": "[[ANYTHING_PRESENT]]",
+      "users": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

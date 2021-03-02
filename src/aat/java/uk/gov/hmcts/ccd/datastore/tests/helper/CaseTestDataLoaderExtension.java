@@ -10,7 +10,8 @@ import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.datastore.tests.AATHelper;
 import uk.gov.hmcts.ccd.datastore.tests.BaseTest;
 
-public class CaseTestDataLoaderExtension extends BaseTest implements BeforeAllCallback, ExtensionContext.Store.CloseableResource {
+public class CaseTestDataLoaderExtension extends BaseTest implements BeforeAllCallback,
+                                            ExtensionContext.Store.CloseableResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaseTestDataLoaderExtension.class);
 
@@ -26,7 +27,8 @@ public class CaseTestDataLoaderExtension extends BaseTest implements BeforeAllCa
             // one time setup code for all test classes extending this extension
             testExecutionStarted = true;
             LOG.info("Executing before all block for test data loader : CaseTestDataLoaderExtension");
-            // Registers the close method callback on completion of test execution of all tests running with this extension
+            // Registers the close method callback on completion of test execution of all tests running
+            // with this extension
             context.getRoot().getStore(GLOBAL).put(CaseTestDataLoaderExtension.class, this);
         }
     }

@@ -6,7 +6,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CAS
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaType;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -40,8 +40,10 @@ public class AuthorisedGetCriteriaOperation implements GetCriteriaOperation {
         this.userRepository = userRepository;
     }
 
-    public <T> List<? extends CriteriaInput> execute(final String caseTypeId, Predicate<AccessControlList> access, CriteriaType criteriaType) {
-        Optional<CaseType> caseType = this.getCaseTypeOperation.execute(caseTypeId, access);
+    public <T> List<? extends CriteriaInput> execute(final String caseTypeId,
+                                                     Predicate<AccessControlList> access,
+                                                     CriteriaType criteriaType) {
+        Optional<CaseTypeDefinition> caseType = this.getCaseTypeOperation.execute(caseTypeId, access);
 
         if (!caseType.isPresent()) {
             ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
@@ -55,14 +57,16 @@ public class AuthorisedGetCriteriaOperation implements GetCriteriaOperation {
             .collect(Collectors.toList());
     }
 
-    private boolean criteriaAllowedByCRUD(CaseType caseType, CriteriaInput criteriaInput) {
-        return caseType
-            .getCaseFields()
+    private boolean criteriaAllowedByCRUD(CaseTypeDefinition caseTypeDefinition, CriteriaInput criteriaInput) {
+        return caseTypeDefinition
+            .getCaseFieldDefinitions()
             .stream()
             .anyMatch(caseField -> caseField.getId().equalsIgnoreCase(criteriaInput.getField().getId()));
     }
 
-    private boolean filterDistinctFieldsByRole(final Set<String> addedFields, final CriteriaInput criteriaInput, final Set<String> userRoles) {
+    private boolean filterDistinctFieldsByRole(final Set<String> addedFields,
+                                               final CriteriaInput criteriaInput,
+                                               final Set<String> userRoles) {
         String id = criteriaInput.buildCaseFieldId();
         if (addedFields.contains(id)) {
             return false;

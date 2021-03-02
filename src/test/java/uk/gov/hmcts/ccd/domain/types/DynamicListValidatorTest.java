@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.test.CaseFieldBuilder;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.test.CaseFieldDefinitionBuilder;
 
 @DisplayName("DynamicListValidator")
 class DynamicListValidatorTest {
@@ -30,7 +30,7 @@ class DynamicListValidatorTest {
     private CaseDefinitionRepository definitionRepository;
 
     private DynamicListValidator validator;
-    private CaseField caseField;
+    private CaseFieldDefinition caseFieldDefinition;
 
     @BeforeEach
     public void setUp() {
@@ -46,7 +46,7 @@ class DynamicListValidatorTest {
 
         validator = new DynamicListValidator();
 
-        caseField = caseField().build();
+        caseFieldDefinition = caseField().build();
     }
 
     @Test
@@ -82,11 +82,12 @@ class DynamicListValidatorTest {
 
         final List<ValidationResult> result01 = validator.validate(TEST_FIELD_ID,
             dataValue,
-            caseField);
+                caseFieldDefinition);
         assertEquals(0, result01.size());
     }
 
     @Test
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break long regex expressions
     public void invalidValue() throws Exception {
         JsonNode dataValue = new ObjectMapper().readTree("{\n" + "          \"default\": {\n"
             + "            \"code\": \"FixedList1\",\n"
@@ -121,8 +122,47 @@ class DynamicListValidatorTest {
 
         final List<ValidationResult> result01 = validator.validate(TEST_FIELD_ID,
             dataValue,
-            caseField);
+                caseFieldDefinition);
         assertEquals(1, result01.size(), result01.toString());
+    }
+
+    @Test
+    public void emptyCodeAndValue() throws Exception {
+        JsonNode dataValue = new ObjectMapper().readTree("{\n" + "          \"default\": {\n"
+            + "            \"code\": \"FixedList1\",\n"
+            + "            \"label\": \"Fixed List 1\"\n"
+            + "          },\n"
+            + "          \"list_items\": [{\n"
+            + "          \"code\": \"FixedList1Fixed"
+            + "            FixedList1Fixed\",\n"
+            + "            \"label\": \"Fixed List 1\"\n"
+            + "          }, {\n"
+            + "            \"code\": \"\",\n"
+            + "            \"label\": \"Fixed List 2\"\n"
+            + "          }, {\n"
+            + "            \"code\": \"FixedList3\",\n"
+            + "            \"label\": \"\"\n"
+            + "          }, {\n"
+            + "            \"code\": \"FixedList4\",\n"
+            + "            \"label\": \"Fixed List 4\"\n"
+            + "          }, {\n"
+            + "            \"code\": \"FixedList5\",\n"
+            + "            \"label\": \"Fixed List 5\"\n"
+            + "          }, {\n"
+            + "            \"code\": \"FixedList6\",\n"
+            + "            \"label\": \"Fixed List 6\"\n"
+            + "          }, {\n"
+            + "            \"code\": \"FixedList7\",\n"
+            + "            \"label\": \"Fixed List 7\"\n"
+            + "          }\n"
+            + "          ]\n"
+            + "        }");
+
+
+        final List<ValidationResult> result01 = validator.validate(TEST_FIELD_ID,
+            dataValue,
+            caseFieldDefinition);
+        assertEquals(0, result01.size(), result01.toString());
     }
 
     @Test
@@ -135,8 +175,8 @@ class DynamicListValidatorTest {
         assertEquals(validator.getType(), BaseType.get(DYNAMIC_LIST), "Type is incorrect");
     }
 
-    private CaseFieldBuilder caseField() {
-        return new CaseFieldBuilder(FIELD_ID).withType(DYNAMIC_LIST)
+    private CaseFieldDefinitionBuilder caseField() {
+        return new CaseFieldDefinitionBuilder(FIELD_ID).withType(DYNAMIC_LIST)
             .withDynamicListItem("AAAAAA", "A Value")
             .withDynamicListItem("BBBBBB", "B Value")
             .withDynamicListItem("CCCCCC", "C Value");

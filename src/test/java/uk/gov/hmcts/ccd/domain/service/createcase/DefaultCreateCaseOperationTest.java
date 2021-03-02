@@ -2,6 +2,9 @@ package uk.gov.hmcts.ccd.domain.service.createcase;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,15 +20,16 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseState;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
+import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
@@ -34,9 +38,6 @@ import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -60,7 +61,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventB
 class DefaultCreateCaseOperationTest {
 
     @Mock
-    private CaseState caseEventState;
+    private CaseStateDefinition caseEventState;
     @Mock
     private CaseDetails savedCaseType;
     @Mock
@@ -90,6 +91,9 @@ class DefaultCreateCaseOperationTest {
     @Mock
     private DraftGateway draftGateway;
 
+    @Mock
+    private CasePostStateService casePostStateService;
+
     private DefaultCreateCaseOperation defaultCreateCaseOperation;
 
     private static final String UID = "244";
@@ -105,8 +109,8 @@ class DefaultCreateCaseOperationTest {
     private static final String DRAFT_ID = "1";
 
     private static final IdamUser IDAM_USER = buildIdamUser();
-    private static final CaseType CASE_TYPE = buildCaseType();
-    private CaseEvent eventTrigger;
+    private static final CaseTypeDefinition CASE_TYPE = buildCaseType();
+    private CaseEventDefinition eventTrigger;
 
     @BeforeEach
     void setup() throws Exception {
@@ -121,6 +125,7 @@ class DefaultCreateCaseOperationTest {
                                                                     caseTypeService,
                                                                     callbackInvoker,
                                                                     validateCaseFieldsOperation,
+                casePostStateService,
                                                                     draftGateway);
         data = buildJsonNodeData();
         given(userRepository.getUser()).willReturn(IDAM_USER);
@@ -305,19 +310,22 @@ class DefaultCreateCaseOperationTest {
         final ArgumentCaptor<CaseDetails> caseDetailsArgumentCaptor = ArgumentCaptor.forClass(CaseDetails.class);
 
 
-        assertAll(() -> assertThat(caseDetails, IsInstanceOf.instanceOf(CaseDetails.class)),
-                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
-                  () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
-                  () -> order.verify(submitCaseTransaction).submitCase(same(event),
-                                                                       same(CASE_TYPE),
-                                                                       same(IDAM_USER),
-                                                                       same(eventTrigger),
-                                                                       caseDetailsArgumentCaptor.capture(),
-                                                                       same(IGNORE_WARNING)),
-                  () -> order.verify(draftGateway).delete(DRAFT_ID),
-                  () -> verifyZeroInteractions(callbackInvoker),
-                  () -> assertCaseDetails(caseDetailsArgumentCaptor.getValue()),
-                  () -> assertThat(caseDetails, is(savedCaseType)));
+        assertAll(
+            () -> assertThat(caseDetails, IsInstanceOf.instanceOf(CaseDetails.class)),
+            () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger,
+                CASE_TYPE.getJurisdictionDefinition(), CASE_TYPE),
+            () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+            () -> order.verify(submitCaseTransaction).submitCase(same(event),
+                                                                 same(CASE_TYPE),
+                                                                 same(IDAM_USER),
+                                                                 same(eventTrigger),
+                                                                 caseDetailsArgumentCaptor.capture(),
+                                                                 same(IGNORE_WARNING)),
+            () -> order.verify(draftGateway).delete(DRAFT_ID),
+            () -> verifyZeroInteractions(callbackInvoker),
+            () -> assertCaseDetails(caseDetailsArgumentCaptor.getValue()),
+            () -> assertThat(caseDetails, is(savedCaseType))
+        );
     }
 
     @Test
@@ -331,8 +339,8 @@ class DefaultCreateCaseOperationTest {
         given(savedCaseType.getState()).willReturn(caseEventStateId);
         given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
         eventTrigger.setCallBackURLSubmittedEvent("http://localhost/submittedcallback");
-        given(callbackInvoker.invokeSubmittedCallback(eventTrigger, null, savedCaseType)).willThrow(new CallbackException(
-            "call back exception"));
+        given(callbackInvoker.invokeSubmittedCallback(eventTrigger, null, savedCaseType))
+            .willThrow(new CallbackException("call back exception"));
         given(
             validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData))
             .willReturn(data);
@@ -360,17 +368,20 @@ class DefaultCreateCaseOperationTest {
             draftGateway);
 
         assertAll("case details saved when call back fails",
-                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
-                  () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
-                  () -> order.verify(submitCaseTransaction).submitCase(same(event),
-                                                                       same(CASE_TYPE),
-                                                                       same(IDAM_USER),
-                                                                       same(eventTrigger),
-                                                                       any(CaseDetails.class),
-                                                                       same(IGNORE_WARNING)),
-                  () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class), same(savedCaseType)),
-                  () -> order.verify(savedCaseType).setIncompleteCallbackResponse(),
-                  () -> order.verify(draftGateway).delete(DRAFT_ID));
+            () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger,
+                CASE_TYPE.getJurisdictionDefinition(), CASE_TYPE),
+            () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+            () -> order.verify(submitCaseTransaction).submitCase(same(event),
+                                                                 same(CASE_TYPE),
+                                                                 same(IDAM_USER),
+                                                                 same(eventTrigger),
+                                                                 any(CaseDetails.class),
+                                                                 same(IGNORE_WARNING)),
+            () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class),
+                same(savedCaseType)),
+            () -> order.verify(savedCaseType).setIncompleteCallbackResponse(),
+            () -> order.verify(draftGateway).delete(DRAFT_ID)
+        );
     }
 
     @Test
@@ -416,18 +427,21 @@ class DefaultCreateCaseOperationTest {
                                       draftGateway);
 
         assertAll("Call back response returned successfully",
-                  () -> assertThat(caseDetails.getCaseTypeId(), is(mockCaseTypeId)),
-                  () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger, CASE_TYPE.getJurisdiction(), CASE_TYPE),
-                  () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
-                  () -> order.verify(submitCaseTransaction).submitCase(same(event),
-                                                                       same(CASE_TYPE),
-                                                                       same(IDAM_USER),
-                                                                       same(eventTrigger),
-                                                                       any(CaseDetails.class),
-                                                                       same(IGNORE_WARNING)),
-                  () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class), same(savedCaseType)),
-                  () -> order.verify(savedCaseType).setAfterSubmitCallbackResponseEntity(response),
-                  () -> order.verify(draftGateway).delete(DRAFT_ID));
+            () -> assertThat(caseDetails.getCaseTypeId(), is(mockCaseTypeId)),
+            () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger,
+                CASE_TYPE.getJurisdictionDefinition(), CASE_TYPE),
+            () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+            () -> order.verify(submitCaseTransaction).submitCase(same(event),
+                                                                 same(CASE_TYPE),
+                                                                 same(IDAM_USER),
+                                                                 same(eventTrigger),
+                                                                 any(CaseDetails.class),
+                                                                 same(IGNORE_WARNING)),
+            () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class),
+                same(savedCaseType)),
+            () -> order.verify(savedCaseType).setAfterSubmitCallbackResponseEntity(response),
+            () -> order.verify(draftGateway).delete(DRAFT_ID)
+        );
     }
 
     private void assertCaseDetails(final CaseDetails details) {
@@ -444,7 +458,14 @@ class DefaultCreateCaseOperationTest {
     }
 
     private Map<String, JsonNode> buildJsonNodeData() throws IOException {
-        final JsonNode node = new ObjectMapper().readTree("{\n" + "  \"PersonFirstName\": \"ccd-First Name\",\n" + "  \"PersonLastName\": \"Last Name\",\n" + "  " + "\"PersonAddress\": {\n" + "    \"AddressLine1\": \"Address Line 1\",\n" + "    \"AddressLine2\": " + "\"Address Line 2\"\n" + "  }\n" + "}\n");
+        final JsonNode node = new ObjectMapper().readTree("{\n"
+            + "  \"PersonFirstName\": \"ccd-First Name\",\n"
+            + "  \"PersonLastName\": \"Last Name\",\n"
+            + "  \"PersonAddress\": {\n"
+            + "    \"AddressLine1\": \"Address Line 1\",\n"
+            + "    \"AddressLine2\": " + "\"Address Line 2\"\n"
+            + "  }\n"
+            + "}\n");
         final Map<String, JsonNode> map = new HashMap<>();
         map.put("xyz", node);
         return map;
@@ -459,20 +480,20 @@ class DefaultCreateCaseOperationTest {
         return properties;
     }
 
-    private static CaseType buildCaseType() {
-        final Jurisdiction j = buildJurisdiction();
+    private static CaseTypeDefinition buildCaseType() {
+        final JurisdictionDefinition j = buildJurisdiction();
         final Version version = new Version();
         version.setNumber(67);
-        final CaseType caseType = new CaseType();
-        caseType.setId("caseTypeId");
-        caseType.setName("case type name");
-        caseType.setJurisdiction(j);
-        caseType.setVersion(version);
-        return caseType;
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId("caseTypeId");
+        caseTypeDefinition.setName("case type name");
+        caseTypeDefinition.setJurisdictionDefinition(j);
+        caseTypeDefinition.setVersion(version);
+        return caseTypeDefinition;
     }
 
-    private static Jurisdiction buildJurisdiction() {
-        final Jurisdiction j = new Jurisdiction();
+    private static JurisdictionDefinition buildJurisdiction() {
+        final JurisdictionDefinition j = new JurisdictionDefinition();
         j.setId(JURISDICTION_ID);
         return j;
     }

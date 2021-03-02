@@ -1,13 +1,17 @@
 {
-	"_guid_": "F-064_Test_Data_Base",
-	"productName": "CCD Data Store",
-	"operationName": "retrieve workbasket input details for dynamic display",
-	"method": "GET",
-	"uri": "/internal/case-types/{ctid}/work-basket-inputs",
-	"user": {
-		"_extends_": "Common_User_For_Request"
-	},
-	"request": {
+  "_guid_": "F-064_Test_Data_Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "retrieve workbasket input details for dynamic display",
+
+  "method": "GET",
+  "uri": "/internal/case-types/{ctid}/work-basket-inputs",
+
+  "user": {
+    "_extends_": "Common_User_For_Request"
+  },
+
+  "request": {
     "headers": {
       "_extends_": "Common_Request_Headers",
       "experimental": true
@@ -15,7 +19,8 @@
     "pathVariables": {
       "ctid": "AAT"
     }
-	},
+  },
+
   "expectedResponse": {
     "headers": {
       "Content-Type": "[[ANYTHING_PRESENT]]",

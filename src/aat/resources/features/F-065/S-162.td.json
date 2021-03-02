@@ -1,17 +1,20 @@
 {
-	"title": "must return 400 when case reference is invalid",
 	"_guid_": "S-162",
 	"_extends_": "F-065_Test_Data_Base",
+	"title": "must return 400 when case reference is invalid",
+
 	"specs": [
 		"an active profile in CCD",
 		"uses an invalid case-reference",
 		"has an HTTP-400 code"
 	],
+
 	"request": {
 		"pathVariables": {
 			"cid": "dummyid"
 		}
 	},
+
 	"expectedResponse": {
 		"_extends_": "Common_400_Response",
 		"headers": {

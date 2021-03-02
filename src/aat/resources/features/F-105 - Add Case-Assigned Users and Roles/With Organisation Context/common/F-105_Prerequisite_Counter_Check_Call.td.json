@@ -1,0 +1,18 @@
+{
+  "_guid_": "F-105_Prerequisite_Counter_Check_Call",
+  "_extends_": "F-105_Check_Orgs_Assigned_Users_Base",
+
+  "specs": [
+    "to check the number of users having access to C1 in its supplementary data"
+  ],
+
+  "prerequisites": [
+    "F-105_Get_Organisation_Identifier_Olawale"
+  ],
+
+  "expectedResponse": {
+    "body": {
+      "supplementary_data": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

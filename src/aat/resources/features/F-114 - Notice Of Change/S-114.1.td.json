@@ -1,0 +1,136 @@
+{
+  "title": "must successfully create a case with a case type containing ChangeOrganisationRequest Complex Fields",
+  "_guid_": "S-114.1",
+  "_extends_": "F-114_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains some ChangeOrganisationRequest Complex Fields with all correct values"
+  ],
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "gzip",
+      "Vary": "accept-encoding",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]"
+    },
+    "body" : {
+      "id" : "[[ANYTHING_PRESENT]]",
+      "jurisdiction" : "BEFTA_MASTER",
+      "state" : "CaseCreated",
+      "version" : 0,
+      "case_type_id" : "FT_ComplexOrganisation",
+      "created_date" : "[[ANYTHING_PRESENT]]",
+      "last_modified" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_date" : "[[ANYTHING_PRESENT]]",
+      "security_classification" : "PUBLIC",
+      "case_data" : {
+        "ChangeOrganisationRequestField" : {
+          "CaseRoleId" : null,
+          "Reason" : null,
+          "RequestTimestamp" : null,
+          "ApprovalStatus" : "1",
+          "ApprovalRejectionTimestamp" : null,
+          "NotesReason" : null,
+          "OrganisationToAdd" : {
+            "OrganisationID" : null,
+            "OrganisationName" : null
+          },
+          "OrganisationToRemove" : {
+            "OrganisationID" : null,
+            "OrganisationName" : null
+          }
+        },
+        "OrganisationPolicyField" : {
+          "OrgPolicyCaseAssignedRole" : "[Claimant]",
+          "OrgPolicyReference" : null,
+          "Organisation" : {
+            "OrganisationID" : null,
+            "OrganisationName" : null
+          }
+        },
+        "OrganisationField" : {
+          "OrganisationID" : null,
+          "OrganisationName" : null
+        }
+      },
+      "data_classification" : {
+        "ChangeOrganisationRequestField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "CaseRoleId" : "PUBLIC",
+            "Reason" : "PUBLIC",
+            "RequestTimestamp" : "PUBLIC",
+            "ApprovalStatus" : "PUBLIC",
+            "ApprovalRejectionTimestamp" : "PUBLIC",
+            "NotesReason" : "PUBLIC",
+            "OrganisationToAdd" : {
+              "classification" : "PUBLIC",
+              "value" : {
+                "OrganisationID" : "PUBLIC",
+                "OrganisationName" : "PUBLIC"
+              }
+            },
+            "OrganisationToRemove" : {
+              "classification" : "PUBLIC",
+              "value" : {
+                "OrganisationID" : "PUBLIC",
+                "OrganisationName" : "PUBLIC"
+              }
+            }
+          }
+        },
+        "OrganisationField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "OrganisationID" : "PUBLIC",
+            "OrganisationName" : "PUBLIC"
+          }
+        }
+      },
+      "supplementary_data": null,
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null,
+      "security_classifications" : {
+        "ChangeOrganisationRequestField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "CaseRoleId" : "PUBLIC",
+            "Reason" : "PUBLIC",
+            "RequestTimestamp" : "PUBLIC",
+            "ApprovalStatus" : "PUBLIC",
+            "ApprovalRejectionTimestamp" : "PUBLIC",
+            "NotesReason" : "PUBLIC",
+            "OrganisationToAdd" : {
+              "classification" : "PUBLIC",
+              "value" : {
+                "OrganisationID" : "PUBLIC",
+                "OrganisationName" : "PUBLIC"
+              }
+            },
+            "OrganisationToRemove" : {
+              "classification" : "PUBLIC",
+              "value" : {
+                "OrganisationID" : "PUBLIC",
+                "OrganisationName" : "PUBLIC"
+              }
+            }
+          }
+        },
+        "OrganisationField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "OrganisationID" : "PUBLIC",
+            "OrganisationName" : "PUBLIC"
+          }
+        }
+      }
+    }
+  }
+}

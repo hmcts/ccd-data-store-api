@@ -6,16 +6,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.ApiModelProperty;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 import static java.util.Optional.ofNullable;
 import static org.apache.http.HttpStatus.SC_OK;
@@ -27,9 +27,11 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_M
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.LAST_STATE_MODIFIED_DATE;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.CASE_PAYMENT_HISTORY_VIEWER;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldType.LABEL;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_PAYMENT_HISTORY_VIEWER;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
+// partial javadoc attributes added prior to checkstyle implementation in module
+@SuppressWarnings("checkstyle:SummaryJavadoc")
 public class CaseDetails implements Cloneable {
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
     public static final String DRAFT_ID = "DRAFT%s";
@@ -66,36 +68,40 @@ public class CaseDetails implements Cloneable {
     private Map<String, JsonNode> data;
 
     @JsonProperty("data_classification")
-    @ApiModelProperty("Same structure as `case_data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) as field's value.")
+    @ApiModelProperty("Same structure as `case_data` with classification (`PUBLIC`, `PRIVATE`, `RESTRICTED`) "
+        + "as field's value.")
     private Map<String, JsonNode> dataClassification;
 
+    @JsonProperty("supplementary_data")
+    private Map<String, JsonNode> supplementaryData;
+
     /**
-     * Attribute passed to UI layer, does not need persistence
+     * Attribute passed to UI layer, does not need persistence.
      */
     @JsonProperty("after_submit_callback_response")
     private AfterSubmitCallbackResponse afterSubmitCallbackResponse;
 
     /**
-     * Attribute passed to UI layer, does not need persistence
+     * Attribute passed to UI layer, does not need persistence.
      */
     @JsonProperty("callback_response_status_code")
     private Integer callbackResponseStatusCode;
 
     /**
-     * Attribute passed to UI layer, does not need persistence
+     * Attribute passed to UI layer, does not need persistence.
      */
     @JsonProperty("callback_response_status")
     private String callbackResponseStatus;
 
     /**
-     * Attribute passed to UI layer, does not need persistence
+     * Attribute passed to UI layer, does not need persistence.
      */
     @JsonProperty("delete_draft_response_status_code")
     private Integer deleteDraftResponseStatusCode;
 
 
     /**
-     * Attribute passed to UI layer, does not need persistence
+     * Attribute passed to UI layer, does not need persistence.
      */
     @JsonProperty("delete_draft_response_status")
     private String deleteDraftResponseStatus;
@@ -225,19 +231,16 @@ public class CaseDetails implements Cloneable {
         this.dataClassification = dataClassification;
     }
 
+    public Map<String, JsonNode> getSupplementaryData() {
+        return supplementaryData;
+    }
+
+    public void setSupplementaryData(Map<String, JsonNode> supplementaryData) {
+        this.supplementaryData = supplementaryData;
+    }
+
     public AfterSubmitCallbackResponse getAfterSubmitCallbackResponse() {
         return afterSubmitCallbackResponse;
-    }
-
-    private void setAfterSubmitCallbackResponseEntity(final AfterSubmitCallbackResponse response) {
-        this.afterSubmitCallbackResponse = response;
-        this.callbackResponseStatusCode = SC_OK;
-        this.callbackResponseStatus = "CALLBACK_COMPLETED";
-    }
-
-    private void setDeleteDraftResponseEntity() {
-        this.deleteDraftResponseStatusCode =  SC_OK;
-        this.deleteDraftResponseStatus = "DELETE_DRAFT_COMPLETED";
     }
 
     public void setIncompleteCallbackResponse() {
@@ -253,16 +256,18 @@ public class CaseDetails implements Cloneable {
     public boolean existsInData(CaseTypeTabField caseTypeTabField) {
         return isFieldWithNoValue(caseTypeTabField)
             || hasDataForTabField(caseTypeTabField)
-            || getMetadata().containsKey(caseTypeTabField.getCaseField().getId());
+            || getMetadata().containsKey(caseTypeTabField.getCaseFieldDefinition().getId());
     }
 
     private boolean hasDataForTabField(CaseTypeTabField caseTypeTabField) {
-        return data.keySet().contains(caseTypeTabField.getCaseField().getId());
+        return data.keySet().contains(caseTypeTabField.getCaseFieldDefinition().getId());
     }
 
     private boolean isFieldWithNoValue(CaseTypeTabField caseTypeTabField) {
-        return caseTypeTabField.getCaseField().getFieldType().getType().equals(LABEL)
-            || caseTypeTabField.getCaseField().getFieldType().getType().equals(CASE_PAYMENT_HISTORY_VIEWER);
+        return caseTypeTabField.getCaseFieldDefinition()
+            .getFieldTypeDefinition().getType().equals(LABEL)
+            || caseTypeTabField.getCaseFieldDefinition()
+            .getFieldTypeDefinition().getType().equals(CASE_PAYMENT_HISTORY_VIEWER);
     }
 
     @JsonIgnore
@@ -283,7 +288,13 @@ public class CaseDetails implements Cloneable {
         }
     }
 
+    private void setDeleteDraftResponseEntity() {
+        this.deleteDraftResponseStatusCode =  SC_OK;
+        this.deleteDraftResponseStatus = "DELETE_DRAFT_COMPLETED";
+    }
+
     @JsonIgnore
+    @SuppressWarnings("java:S2259")
     public void setAfterSubmitCallbackResponseEntity(final ResponseEntity<AfterSubmitCallbackResponse>
                                                          callBackResponse) {
         if (SC_OK == callBackResponse.getStatusCodeValue()) {
@@ -296,6 +307,12 @@ public class CaseDetails implements Cloneable {
                      callBackResponse.getBody().toJson());
             setIncompleteCallbackResponse();
         }
+    }
+
+    private void setAfterSubmitCallbackResponseEntity(final AfterSubmitCallbackResponse response) {
+        this.afterSubmitCallbackResponse = response;
+        this.callbackResponseStatusCode = SC_OK;
+        this.callbackResponseStatus = "CALLBACK_COMPLETED";
     }
 
     @JsonIgnore
@@ -337,6 +354,20 @@ public class CaseDetails implements Cloneable {
     @JsonIgnore
     public boolean hasCaseReference() {
         return getReference() != null;
+    }
+
+    @JsonIgnore
+    public Map<String, JsonNode> getCaseEventData(Set<String> caseFieldIds) {
+        Map<String, JsonNode> caseEventData = new HashMap<>();
+        if (this.data != null) {
+            for (String caseFieldId : caseFieldIds) {
+                JsonNode value = this.data.get(caseFieldId);
+                if (value != null) {
+                    caseEventData.put(caseFieldId, value);
+                }
+            }
+        }
+        return caseEventData;
     }
 
 }

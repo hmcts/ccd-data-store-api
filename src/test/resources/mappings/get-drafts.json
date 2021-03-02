@@ -11,12 +11,12 @@
     "jsonBody": {
       "data": [
         {
-          "id": "5",
+          "id": "4444333322221111",
           "document": {
             "userId":"25",
             "jurisdictionId":"PROBATE",
             "caseTypeId":"TestAddressBookCase",
-            "eventTriggerId":"createCase",
+            "eventId":"createCase",
             "caseDataContent" : {
               "event": {
                 "id": "createCase",

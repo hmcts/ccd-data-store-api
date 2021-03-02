@@ -1,0 +1,32 @@
+{
+  "_guid_": "S-112.1",
+  "_extends_": "F-112-TestData_Base",
+  "specs": [
+    "an active profile in CCD",
+    "with a non searchable 'Homeless' field",
+    "is searching for the previously created case by the 'Homeless' field",
+    "contains no cases"
+  ],
+  "request": {
+    "body": {
+      "query": {
+        "match": {
+          "data.Homeless": "Yes"
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 200,
+    "responseMessage": "OK",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Vary": "Accept-Encoding"
+    },
+    "body" : {
+      "total": 0,
+      "cases": [],
+      "case_types_results": []
+    }
+  }
+}

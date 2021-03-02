@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,7 +19,8 @@ public class UserProfileEndpoint {
     private final GetUserProfileOperation getUserProfileOperation;
 
     @Inject
-    public UserProfileEndpoint(@Qualifier(AuthorisedGetUserProfileOperation.QUALIFIER) final GetUserProfileOperation getUserProfileOperation) {
+    public UserProfileEndpoint(@Qualifier(AuthorisedGetUserProfileOperation.QUALIFIER)
+                                   final GetUserProfileOperation getUserProfileOperation) {
         this.getUserProfileOperation = getUserProfileOperation;
     }
 

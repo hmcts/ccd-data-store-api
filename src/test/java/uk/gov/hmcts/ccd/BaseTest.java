@@ -8,19 +8,27 @@ import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseRoleRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -33,11 +41,12 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -54,11 +63,12 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
@@ -66,6 +76,8 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:test.properties")
+// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+@SuppressWarnings("checkstyle:OperatorWrap")
 public abstract class BaseTest {
     protected static final ObjectMapper mapper = JacksonUtils.MAPPER;
     protected static final Slf4jNotifier slf4jNotifier = new Slf4jNotifier(true);
@@ -88,6 +100,9 @@ public abstract class BaseTest {
     @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
     private CaseDefinitionRepository caseDefinitionRepository;
     @Inject
+    @Qualifier(DefaultCaseRoleRepository.QUALIFIER)
+    private CaseRoleRepository caseRoleRepository;
+    @Inject
     private HttpUIDefinitionGateway uiDefinitionRepository;
     @Inject
     @Qualifier(DefaultUserRepository.QUALIFIER)
@@ -103,14 +118,19 @@ public abstract class BaseTest {
     private DocumentManagementRestClient documentManagementRestClient;
     @Inject
     private DocumentsOperation documentsOperation;
+    @Inject
+    protected SecurityUtils securityUtils;
+
+    @Mock
+    protected Authentication authentication;
+    @Mock
+    protected SecurityContext securityContext;
 
     @Before
+    @BeforeEach
     public void initMock() throws IOException {
-
-        // IDAM
-        final SecurityUtils securityUtils = mock(SecurityUtils.class);
-        Mockito.when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
-        Mockito.when(securityUtils.userAuthorizationHeaders()).thenReturn(new HttpHeaders());
+        MockitoAnnotations.initMocks(this);
+        ReflectionTestUtils.setField(caseRoleRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(caseDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(uiDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(userRepository, "securityUtils", securityUtils);
@@ -123,6 +143,10 @@ public abstract class BaseTest {
         ReflectionTestUtils.setField(BaseType.class, "caseDefinitionRepository", caseDefinitionRepository);
 
         setupUIDService();
+
+        doReturn(authentication).when(securityContext).getAuthentication();
+        SecurityContextHolder.setContext(securityContext);
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_TEST_PUBLIC);
     }
 
     private void setupUIDService() {
@@ -134,6 +158,7 @@ public abstract class BaseTest {
     }
 
     @BeforeClass
+    @BeforeAll
     public static void init() {
         mapper.registerModule(new JavaTimeModule());
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -143,21 +168,41 @@ public abstract class BaseTest {
     }
 
     @After
+    @AfterEach
     public void clearDownData() {
-
         JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
-        jdbcTemplate.queryForList(
-            "SELECT " +
-                "'TRUNCATE TABLE \"' || tablename || '\" CASCADE;' as truncate_statement " +
-                "FROM pg_tables " +
-                "WHERE schemaname = 'public' " +
-                "AND tablename NOT IN ('databasechangeloglock','databasechangelog')"
-        ).stream()
-            .map(resultRow -> resultRow.get("truncate_statement"))
-            .forEach(truncateStatement ->
-                jdbcTemplate.execute(truncateStatement.toString())
-            );
+        List<String> tables = determineTables(jdbcTemplate);
+        List<String> sequences = determineSequences(jdbcTemplate);
 
+        String truncateTablesQuery =
+            "START TRANSACTION;\n" +
+                tables.stream()
+                    .map(record -> String.format("TRUNCATE TABLE %s CASCADE;", record))
+                    .collect(Collectors.joining("\n")) +
+                "\nCOMMIT;";
+        jdbcTemplate.execute(truncateTablesQuery);
+
+        sequences.forEach(sequence -> jdbcTemplate.execute("ALTER SEQUENCE " + sequence + " RESTART WITH 1"));
+    }
+
+    private List<String> determineTables(JdbcTemplate jdbcTemplate) {
+        return jdbcTemplate.queryForList("SELECT * FROM pg_catalog.pg_tables").stream()
+            .filter(tableInfo -> tableInfo.get("schemaname").equals("public"))
+            .map(tableInfo -> (String)tableInfo.get("tablename"))
+            .filter(BaseTest::notLiquibase)
+            .collect(Collectors.toList());
+    }
+
+    private static boolean notLiquibase(String tableName) {
+        return !tableName.equals("databasechangelog") && !tableName.equals("databasechangeloglock");
+    }
+
+    private List<String> determineSequences(JdbcTemplate jdbcTemplate) {
+        final String sequenceNameKey = "relname";
+        String query = "SELECT c.relname FROM pg_class c WHERE c.relkind = 'S'";
+        return jdbcTemplate.queryForList(query).stream()
+            .map(sequenceInfo -> (String) sequenceInfo.get(sequenceNameKey))
+            .collect(Collectors.toList());
     }
 
     protected CaseDetails mapCaseData(ResultSet resultSet, Integer i) throws SQLException {
@@ -165,7 +210,8 @@ public abstract class BaseTest {
         caseDetails.setId(String.valueOf(resultSet.getLong("id")));
         caseDetails.setReference(resultSet.getLong("reference"));
         caseDetails.setState(resultSet.getString("state"));
-        caseDetails.setSecurityClassification(SecurityClassification.valueOf(resultSet.getString("security_classification")));
+        caseDetails.setSecurityClassification(SecurityClassification.valueOf(resultSet
+            .getString("security_classification")));
         caseDetails.setCaseTypeId(resultSet.getString("case_type_id"));
         final Timestamp createdAt = resultSet.getTimestamp("created_date");
         if (null != createdAt) {
@@ -175,7 +221,8 @@ public abstract class BaseTest {
         if (null != modifiedAt) {
             caseDetails.setLastModified(modifiedAt.toLocalDateTime());
         }
-        final Timestamp lastStateModified = resultSet.getTimestamp(CaseDetailsEntity.LAST_STATE_MODIFIED_DATE_FIELD_COL);
+        final Timestamp lastStateModified =
+            resultSet.getTimestamp(CaseDetailsEntity.LAST_STATE_MODIFIED_DATE_FIELD_COL);
         if (null != lastStateModified) {
             caseDetails.setLastStateModifiedDate(lastStateModified.toLocalDateTime());
         }
@@ -205,6 +252,28 @@ public abstract class BaseTest {
         return significantItem;
     }
 
+    protected MessageQueueCandidate mapMessageCandidate(ResultSet resultSet, Integer i) throws SQLException {
+        final MessageQueueCandidate messageQueueCandidate = new MessageQueueCandidate();
+        messageQueueCandidate.setId(resultSet.getLong("id"));
+        messageQueueCandidate.setMessageType(resultSet.getString("message_type"));
+        final Timestamp createdAt = resultSet.getTimestamp("time_stamp");
+        if (null != createdAt) {
+            messageQueueCandidate.setTimeStamp(createdAt.toLocalDateTime());
+        }
+        final Timestamp published = resultSet.getTimestamp("published");
+        if (null != published) {
+            messageQueueCandidate.setPublished(published.toLocalDateTime());
+        }
+        try {
+            messageQueueCandidate.setMessageInformation(mapper.readTree(resultSet.getString("message_information")));
+        } catch (IOException e) {
+            fail("Incorrect JSON structure: " + resultSet.getString("DATA"));
+        }
+
+
+        return messageQueueCandidate;
+    }
+
     protected AuditEvent mapAuditEvent(ResultSet resultSet, Integer i) throws SQLException {
         final AuditEvent auditEvent = new AuditEvent();
         auditEvent.setId(resultSet.getLong("id"));
@@ -224,7 +293,8 @@ public abstract class BaseTest {
         auditEvent.setEventName(resultSet.getString("event_name"));
         auditEvent.setDescription(resultSet.getString("description"));
         auditEvent.setSummary(resultSet.getString("summary"));
-        auditEvent.setSecurityClassification(SecurityClassification.valueOf(resultSet.getString("security_classification")));
+        auditEvent.setSecurityClassification(SecurityClassification.valueOf(resultSet
+            .getString("security_classification")));
 
         try {
             auditEvent.setData(JacksonUtils.convertValue(mapper.readTree(resultSet.getString("data"))));
@@ -244,34 +314,38 @@ public abstract class BaseTest {
         return auditEvent;
     }
 
-    protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId, String caseReference, String eventId) {
+    protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId,
+                                        String caseReference, String eventId) {
         return generateEventToken(template, userId, jurisdictionId, caseTypeId, new Long(caseReference), eventId);
     }
 
-    protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId, Long caseReference, String eventId) {
-        final Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setId(jurisdictionId);
+    protected String generateEventToken(JdbcTemplate template, String userId, String jurisdictionId, String caseTypeId,
+                                        Long caseReference, String eventId) {
+        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setId(jurisdictionId);
 
-        final CaseType caseType = new CaseType();
-        caseType.setId(caseTypeId);
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId(caseTypeId);
 
-        final CaseEvent eventTrigger = new CaseEvent();
-        eventTrigger.setId(eventId);
+        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setId(eventId);
 
-        return eventTokenService.generateToken(userId, getCase(template, caseReference), eventTrigger, jurisdiction, caseType);
+        return eventTokenService.generateToken(userId, getCase(template, caseReference), caseEventDefinition,
+            jurisdictionDefinition, caseTypeDefinition);
     }
 
-    protected String generateEventTokenNewCase(String userId, String jurisdictionId, String caseTypeId, String eventId) {
-        final Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setId(jurisdictionId);
+    protected String generateEventTokenNewCase(String userId, String jurisdictionId,
+                                               String caseTypeId, String eventId) {
+        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setId(jurisdictionId);
 
-        final CaseType caseType = new CaseType();
-        caseType.setId(caseTypeId);
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId(caseTypeId);
 
-        final CaseEvent eventTrigger = new CaseEvent();
-        eventTrigger.setId(eventId);
+        final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setId(eventId);
 
-        return eventTokenService.generateToken(userId, eventTrigger, jurisdiction, caseType);
+        return eventTokenService.generateToken(userId, caseEventDefinition, jurisdictionDefinition, caseTypeDefinition);
     }
 
     protected CaseDetails getCase(JdbcTemplate template, String caseReference) {
@@ -292,7 +366,8 @@ public abstract class BaseTest {
             .next();
     }
 
-    public static List<CaseField> getCaseFieldsFromJson(String json) throws IOException {
-        return mapper.readValue(json, TypeFactory.defaultInstance().constructCollectionType(List.class, CaseField.class));
+    public static List<CaseFieldDefinition> getCaseFieldsFromJson(String json) throws IOException {
+        return mapper.readValue(json, TypeFactory.defaultInstance().constructCollectionType(List.class,
+            CaseFieldDefinition.class));
     }
 }

@@ -1,17 +1,19 @@
 {
-  "_guid_": "S-222",
-  "_extends_": "F-046_Base_Request_Data",
-  "title": "must return 204 if access is successfully revoked for a user on a case ID",
-  "specs": [
-    "an active profile in CCD",
-    "contains a valid case id",
-    "has a 204 no content code"
-  ],
-  "expectedResponse": {
-    "_extends_": "Common_204_Response",
-    "headers": {
-      "Content-Type": "[[ANY_STRING_NULLABLE]]",
-      "Vary" : "[[ANYTHING_PRESENT]]"
-    }
-  }
+	"_guid_": "S-222",
+	"_extends_": "F-046_Base_Request_Data",
+	"title": "must return 204 if access is successfully revoked for a user on a case ID",
+
+	"specs": [
+		"an active profile in CCD",
+		"contains a valid case id",
+		"has a 204 no content code"
+	],
+
+	"expectedResponse": {
+		"_extends_": "Common_204_Response",
+		"headers": {
+			"Content-Type": "[[ANY_STRING_NULLABLE]]",
+			"Vary" : "[[ANYTHING_PRESENT]]"
+		}
+	}
 }

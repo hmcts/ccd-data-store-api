@@ -2,11 +2,14 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +22,6 @@ import uk.gov.hmcts.ccd.domain.service.createevent.MidEventCallback;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseDataResource;
-import uk.gov.hmcts.ccd.v2.internal.resource.UICaseViewResource;
 
 @RestController
 @RequestMapping(path = "/case-types")
@@ -36,6 +38,7 @@ public class CaseDataValidatorController {
         this.midEventCallback = midEventCallback;
     }
 
+    @Transactional
     @PostMapping(
         path = "/{caseTypeId}/validate",
         headers = {
@@ -49,11 +52,14 @@ public class CaseDataValidatorController {
         value = "Validate case data",
         notes = V2.EXPERIMENTAL_WARNING
     )
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = V2.EXPERIMENTAL_HEADER, value = "'true' to use this endpoint", paramType = "header")
+    })
     @ApiResponses({
         @ApiResponse(
             code = 200,
             message = "Success",
-            response = UICaseViewResource.class
+            response = CaseDataResource.class
         ),
         @ApiResponse(
             code = 404,

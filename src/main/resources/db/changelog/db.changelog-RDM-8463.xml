@@ -1,0 +1,25 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="rdm-8463" author="suman.sreenivasan@hmcts.net">
+        <sql dbms="postgresql"
+             endDelimiter="\nGO"
+             splitStatements="true"
+             stripComments="true">
+            CREATE INDEX IF NOT EXISTS idx_case_data_d8petitionerfirstname ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{D8PetitionerFirstName}'))));
+            CREATE INDEX IF NOT EXISTS idx_case_data_interlocreviewstate ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{interlocReviewState}'))));
+            CREATE INDEX IF NOT EXISTS idx_case_data_generatedemail ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{generatedEmail}'))));
+            CREATE INDEX IF NOT EXISTS idx_case_data_dwpstate ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{dwpState}'))));
+            CREATE INDEX IF NOT EXISTS idx_case_data_hearingcentre ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{hearingCentre}'))));
+            CREATE INDEX IF NOT EXISTS idx_case_data_containspayments ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{containsPayments}'))));
+            CREATE INDEX IF NOT EXISTS idx_case_data_caselocalauthority ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{caseLocalAuthority}'))));
+            CREATE INDEX IF NOT EXISTS idx_case_data_containspayments ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{containsPayments}'))));
+            CREATE INDEX IF NOT EXISTS idx_case_data_caveatorsurname ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{caveatorSurname}'))));
+            CREATE INDEX IF NOT EXISTS idx_case_data_dwpfurtherevidencestates ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{dwpFurtherEvidenceStates}'))));
+            CREATE INDEX IF NOT EXISTS idx_case_data_dwpregionalcentre ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{dwpRegionalCentre}'))));
+            CREATE INDEX IF NOT EXISTS idx_case_data_region ON public.case_data USING BTREE ((TRIM(UPPER(data#>>'{region}'))));
+        </sql>
+    </changeSet>
+</databaseChangeLog>

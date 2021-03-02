@@ -1,17 +1,17 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseEventTrigger;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 
 public interface GetEventTriggerOperation {
 
-    CaseEventTrigger executeForCaseType(String caseTypeId,
-                                        String eventTriggerId,
+    CaseUpdateViewEvent executeForCaseType(String caseTypeId,
+                                           String eventId,
+                                           Boolean ignoreWarning);
+
+    CaseUpdateViewEvent executeForCase(String caseReference,
+                                       String eventId,
+                                       Boolean ignoreWarning);
+
+    CaseUpdateViewEvent executeForDraft(String draftReference,
                                         Boolean ignoreWarning);
-
-    CaseEventTrigger executeForCase(String caseReference,
-                                    String eventTriggerId,
-                                    Boolean ignoreWarning);
-
-    CaseEventTrigger executeForDraft(String draftReference,
-                                     Boolean ignoreWarning);
 }

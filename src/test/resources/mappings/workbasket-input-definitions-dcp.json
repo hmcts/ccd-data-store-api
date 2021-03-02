@@ -1,0 +1,80 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/display/work-basket-input-definition/DCP?version=33"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "case_type_id": "DCP",
+      "fields": [
+        {
+          "case_field_id": "DateField",
+          "case_field_element_path": null,
+          "label": "Date field",
+          "order": 1,
+          "role": null,
+          "display_context_parameter": "#DATETIMEENTRY(MM-yyyy)",
+          "show_condition": null
+        },
+        {
+          "case_field_id": "DateTimeField",
+          "case_field_element_path": null,
+          "label": "DateTime Field",
+          "order": 2,
+          "role": null,
+          "display_context_parameter": "#DATETIMEENTRY(yyyy)",
+          "show_condition": null
+        },
+        {
+          "case_field_id": "CollectionField",
+          "case_field_element_path": null,
+          "label": "Collection Field",
+          "order": 3,
+          "role": null,
+          "display_context_parameter": "#DATETIMEENTRY(ddMMyyyy)",
+          "show_condition": null
+        },
+        {
+          "case_field_id": "ComplexField",
+          "case_field_element_path": "ComplexDateTimeField",
+          "label": "ListElementCode",
+          "order": 5,
+          "role": null,
+          "display_context_parameter": null,
+          "show_condition": null
+        },
+        {
+          "case_field_id": "[LAST_MODIFIED_DATE]",
+          "case_field_element_path": null,
+          "label": "Last Modified Date",
+          "order": 4,
+          "role": null,
+          "display_context_parameter": "#DATETIMEENTRY(dd-MM-yy)",
+          "show_condition": null
+        },
+        {
+          "case_field_id": "[CREATED_DATE]",
+          "case_field_element_path": null,
+          "label": "Created Date",
+          "order": 6,
+          "role": null,
+          "display_context_parameter": "#DATETIMEENTRY(yyyy)",
+          "show_condition": null
+        },
+        {
+          "case_field_id": "[LAST_STATE_MODIFIED_DATE]",
+          "case_field_element_path": null,
+          "label": "Last State Modified Date",
+          "order": 7,
+          "role": null,
+          "display_context_parameter": "#DATETIMEENTRY(MM)",
+          "show_condition": null
+        }
+      ]
+    }
+  }
+}

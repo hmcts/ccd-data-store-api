@@ -1,20 +1,20 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import java.util.List;
-
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
+import java.util.List;
+
 public interface CaseDefinitionRepository {
-    List<CaseType> getCaseTypesForJurisdiction(String jurisdictionId);
+    List<CaseTypeDefinition> getCaseTypesForJurisdiction(String jurisdictionId);
 
-    CaseType getCaseType(String caseTypeId);
+    CaseTypeDefinition getCaseType(String caseTypeId);
 
-    CaseType getCaseType(int version, String caseTypeId);
+    CaseTypeDefinition getCaseType(int version, String caseTypeId);
 
-    List<FieldType> getBaseTypes();
+    List<FieldTypeDefinition> getBaseTypes();
 
     UserRole getUserRoleClassifications(String userRole);
 
@@ -22,6 +22,9 @@ public interface CaseDefinitionRepository {
 
     CaseTypeDefinitionVersion getLatestVersion(String caseTypeId);
 
-    Jurisdiction getJurisdiction(String jurisdictionId);
-    
+    JurisdictionDefinition getJurisdiction(String jurisdictionId);
+
+    List<String> getCaseTypesIDsByJurisdictions(List<String> jurisdictionIds);
+
+    List<String> getAllCaseTypesIDs();
 }

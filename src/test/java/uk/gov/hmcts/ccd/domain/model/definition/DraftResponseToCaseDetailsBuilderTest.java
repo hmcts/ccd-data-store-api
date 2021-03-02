@@ -50,7 +50,7 @@ class DraftResponseToCaseDetailsBuilderTest {
         .withUpdated(UPDATED)
         .withType(TYPE)
         .withDocument(newCaseDraft()
-                          .withEventTriggerId(EVENT_TRIGGER_ID)
+                          .withEventId(EVENT_TRIGGER_ID)
                           .withCaseTypeId(CASE_TYPE_ID)
                           .withJurisdictionId(JURISDICTION_ID)
                           .withUserId(USER_ID)
@@ -69,7 +69,8 @@ class DraftResponseToCaseDetailsBuilderTest {
                           .build())
         .build();
 
-    private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder = new DraftResponseToCaseDetailsBuilder();
+    private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder =
+        new DraftResponseToCaseDetailsBuilder();
 
     @Test
     public void shouldBuildCaseDetailsFromDraftResponse() {

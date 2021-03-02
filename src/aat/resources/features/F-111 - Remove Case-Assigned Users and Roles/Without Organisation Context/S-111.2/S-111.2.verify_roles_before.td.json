@@ -1,0 +1,33 @@
+{
+  "_guid_": "S-111.2_Get_Case_Roles_for_Case_C1_And_C2_After_Add",
+  "_extends_": "S-111.2_Get_Case_Roles_for_Case_C1_And_C2",
+
+  "specs": [
+    "to verify Olawale's reception of the roles CR1 and CR2 on both C1 and C2"
+  ],
+
+  "users": {
+    "_extends_": "F-111_Users"
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_users": [
+        {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "case_id,user_id,case_role"
+        },
+        {
+          "case_id": "${}${[scenarioContext][siblingContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
+          "case_role": "[CR-1]"
+        },
+        {
+          "case_id": "${}${[scenarioContext][siblingContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment_C2][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
+          "case_role": "[CR-2]"
+        }
+      ]
+    }
+  }
+}

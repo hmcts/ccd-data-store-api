@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/idam/details",
+    "url": "/idam/o/userinfo",
     "headers": {
       "Authorization": {
         "equalTo": "Bearer user1"
@@ -14,11 +14,14 @@
       "Content-Type": "application/json"
     },
     "jsonBody": {
-      "id": "user1",
-      "email": "user1@test.com",
-      "forename": "User",
-      "surname": "One",
-      "roles": "probate_caseworker"
+      "sub": "user1@test.com",
+      "uid": "user1",
+      "roles": [
+        "probate_caseworker"
+      ],
+      "name": "User One",
+      "given_name": "User",
+      "family_name": "One"
     }
   }
 }

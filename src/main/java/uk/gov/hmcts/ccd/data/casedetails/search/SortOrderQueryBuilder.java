@@ -22,23 +22,25 @@ public class SortOrderQueryBuilder {
             if (sortOrderField.isMetadata()) {
                 sb.append(getMataFieldName(sortOrderField.getCaseFieldId()));
             } else {
-                sb.append(convertFieldNameToJSONBsqlFormat(sortOrderField.getCaseFieldId()));
+                sb.append(convertFieldNameToJsonbSqlFormat(sortOrderField.getCaseFieldId()));
             }
             sb.append(SPACE);
             sb.append(fromOptionalString(ofNullable(sortOrderField.getDirection())));
             sb.append(COMMA);
             sb.append(SPACE);
         });
-        // always sort with creation_date as a last order so that it supports cases where no values at all for the configured fields and also default fallback.
+        // always sort with creation_date as a last order so that it supports cases where
+        // no values at all for the configured fields and also default fallback.
         return sb.append(CREATED_DATE + SPACE + fromOptionalString(metaData.getSortDirection())).toString();
     }
 
     private String getMataFieldName(String fieldName) {
-        String metaFieldName = fieldName.startsWith("[") ? StringUtils.substringBetween(fieldName, "[", "]") : fieldName;
+        String metaFieldName = fieldName.startsWith("[")
+            ? StringUtils.substringBetween(fieldName, "[", "]") : fieldName;
         return CaseField.valueOf(metaFieldName).getDbColumnName();
     }
 
-    private static String convertFieldNameToJSONBsqlFormat(final String in) {
+    private static String convertFieldNameToJsonbSqlFormat(final String in) {
         return DATA_FIELD + " #>> '{" + StringUtils.replace(in, ".", ",") + "}'";
     }
 

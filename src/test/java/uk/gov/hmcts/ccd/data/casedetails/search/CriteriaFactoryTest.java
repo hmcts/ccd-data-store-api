@@ -52,7 +52,7 @@ public class CriteriaFactoryTest {
         assertTrue(criterion instanceof FieldDataCriterion);
         assertEquals(FIELD_DATA_1, FIELD_DATA_1);
         assertEquals(criterion.getSoughtValue(), FIELD_DATA_1_VALUE);
-        assertTrue(criterion.buildClauseString(1, "AND").contains(FIELD_DATA_1_CONVERTED));
+        assertTrue(criterion.buildClauseString("AND").contains(FIELD_DATA_1_CONVERTED));
     }
 
     @Test
@@ -83,7 +83,7 @@ public class CriteriaFactoryTest {
 
         List<Criterion> result = subject.build(metaData, params);
         assertEquals(3, result.size());
-        assertThat(result).filteredOn(m -> m.getField() == "date(last_state_modified_date)")
+        assertThat(result).filteredOn(m -> m.getField().equals("date(last_state_modified_date)"))
             .hasSize(1)
             .extracting(e -> e.getSoughtValue())
             .containsOnly(LAST_STATE_MODIFIED_VALUE);

@@ -1,0 +1,41 @@
+{
+  "_guid_": "S-105.15_Grant_Access",
+
+  "productName": "CCD Data Store",
+  "operationName": "to grant access on a case",
+
+  "specs": [
+    "to grant access for Olawale with a case role CR-1 over the case C1"
+  ],
+
+  "method": "POST",
+
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "F-105_User_Richard"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "uid": "${[scenarioContext][parentContext][testData][users][userRichard][id]}",
+      "jid": "${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][jurisdiction]}",
+      "ctid": "${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][case_type_id]}",
+      "cid": "${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "id": "${[scenarioContext][parentContext][testData][users][userOlawale][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Vary": "Accept-Encoding",
+      "Content-Type": "[[ANY_STRING_NULLABLE]]"
+    }
+  }
+}

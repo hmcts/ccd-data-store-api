@@ -19,10 +19,12 @@ public class ElasticSearchCaseDetailsDTO {
     private String caseTypeId;
     private LocalDateTime createdDate;
     private LocalDateTime lastModified;
+    private LocalDateTime lastStateModifiedDate;
     private String state;
     private SecurityClassification securityClassification;
     private Map<String, JsonNode> data;
     private Map<String, JsonNode> dataClassification;
+    private Map<String, JsonNode> supplementaryData;
 
     public String getId() {
         return id;
@@ -72,6 +74,14 @@ public class ElasticSearchCaseDetailsDTO {
         this.lastModified = lastModified;
     }
 
+    public LocalDateTime getLastStateModifiedDate() {
+        return lastStateModifiedDate;
+    }
+
+    public void setLastStateModifiedDate(LocalDateTime lastStateModifiedDate) {
+        this.lastStateModifiedDate = lastStateModifiedDate;
+    }
+
     public String getState() {
         return state;
     }
@@ -102,5 +112,13 @@ public class ElasticSearchCaseDetailsDTO {
 
     public void setDataClassification(Map<String, JsonNode> dataClassification) {
         this.dataClassification = dataClassification;
+    }
+
+    public Map<String, JsonNode> getSupplementaryData() {
+        return supplementaryData;
+    }
+
+    public void setSupplementaryData(Map<String, JsonNode> supplementaryData) {
+        this.supplementaryData = supplementaryData;
     }
 }

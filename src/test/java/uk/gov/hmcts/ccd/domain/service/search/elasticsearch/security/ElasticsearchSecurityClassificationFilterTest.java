@@ -20,8 +20,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
 class ElasticsearchSecurityClassificationFilterTest {
@@ -42,14 +42,14 @@ class ElasticsearchSecurityClassificationFilterTest {
 
     @Test
     void shouldCreateTermsQueryBuilder() {
-        String caseTypeId = "caseType";
-        String jurisdictionId = "jurisdiction";
+        final String jurisdictionId = "jurisdiction";
         when(userRepository.getHighestUserClassification(jurisdictionId)).thenReturn(PRIVATE);
-        CaseType caseType = new CaseType();
-        Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setId(jurisdictionId);
-        caseType.setJurisdiction(jurisdiction);
-        when(caseTypeService.getCaseType(caseTypeId)).thenReturn(caseType);
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setId(jurisdictionId);
+        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
+        String caseTypeId = "caseType";
+        when(caseTypeService.getCaseType(caseTypeId)).thenReturn(caseTypeDefinition);
 
         Optional<QueryBuilder> optQueryBuilder = filter.getFilter(caseTypeId);
 

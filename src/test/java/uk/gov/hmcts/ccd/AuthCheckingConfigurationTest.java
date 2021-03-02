@@ -1,19 +1,39 @@
 package uk.gov.hmcts.ccd;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.when;
 
 class AuthCheckingConfigurationTest {
-    private AuthCheckerConfiguration authCheckerConfiguration = new AuthCheckerConfiguration();
+
+    @Mock
+    private ApplicationParams applicationParams;
+
+    private AuthCheckerConfiguration authCheckerConfiguration;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
+
+        authCheckerConfiguration = new AuthCheckerConfiguration(applicationParams);
+    }
 
     @Test
     @DisplayName("should return authorised roles for caseworker endpoint with jurisdiction")
@@ -33,11 +53,13 @@ class AuthCheckingConfigurationTest {
     void shouldAuthoriseRolesForCitizenEndpoint() {
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         Mockito.when(request.getRequestURI()).thenReturn("http://citizens/123/jurisdictions/test/cases");
-        final Collection<String> roles = authCheckerConfiguration.authorizedRolesExtractor().apply(request);
+
+        when(applicationParams.getCcdAccessControlCitizenRoles()).thenReturn(Arrays.asList("citizen", "letter-holder"));
+        final Collection<String> response = authCheckerConfiguration.authorizedRolesExtractor().apply(request);
 
         assertAll(
-            () -> assertThat(roles, hasSize(2)),
-            () -> assertThat(roles, hasItems(authCheckerConfiguration.getCitizenRoles()))
+            () -> assertThat(response, hasSize(2)),
+            () -> assertThat(response, hasItems(authCheckerConfiguration.getCitizenRoles()))
         );
     }
 

@@ -1,0 +1,8 @@
+{
+  "_extends_": "BaseCaseViewField",
+  "_guid_": "CaseViewFieldMetadataFalse",
+
+  "metadata": false,
+  "display_context": "OPTIONAL",
+  "show_summary_change_option": true
+}

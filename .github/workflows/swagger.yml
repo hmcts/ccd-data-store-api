@@ -14,10 +14,10 @@ jobs:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle-
-      - name: Set up JDK 8
+      - name: Set up JDK 11
         uses: actions/setup-java@v1
         with:
-          java-version: 8
+          java-version: 11
       - name: Run Swagger Publisher
         run: ./gradlew test --tests uk.gov.hmcts.ccd.swagger.SwaggerGeneratorTest
       - name: Commit to repository
@@ -30,9 +30,13 @@ jobs:
           git remote add upstream "https://jenkins-reform-hmcts:${{ secrets.GH_TOKEN }}@github.com/hmcts/reform-api-docs.git"
           git pull upstream master
           repo=`echo "$GITHUB_REPOSITORY" | cut -f2- -d/`
-          echo "$(cat /tmp/ccd-data-store-api.v1.json)" > "docs/specs/ccd-data-store-api.v1.json"
-          echo "$(cat /tmp/ccd-data-store-api.v2.json)" > "docs/specs/ccd-data-store-api.v2.json"
-          git add "docs/specs/ccd-data-store-api.v1.json"
-          git add "docs/specs/ccd-data-store-api.v2.json"
+          echo "$(cat /tmp/ccd-data-store-api.v1_internal.json)" > "docs/specs/ccd-data-store-api.v1_internal.json"
+          echo "$(cat /tmp/ccd-data-store-api.v1_external.json)" > "docs/specs/ccd-data-store-api.v1_external.json"
+          echo "$(cat /tmp/ccd-data-store-api.v2_internal.json)" > "docs/specs/ccd-data-store-api.v2_internal.json"
+          echo "$(cat /tmp/ccd-data-store-api.v2_external.json)" > "docs/specs/ccd-data-store-api.v2_external.json"
+          git add "docs/specs/ccd-data-store-api.v1_internal.json"
+          git add "docs/specs/ccd-data-store-api.v1_external.json"
+          git add "docs/specs/ccd-data-store-api.v2_internal.json"
+          git add "docs/specs/ccd-data-store-api.v2_external.json"
           # Only commit and push if we have changes.
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update spec for $repo#${GITHUB_SHA:7}"; git push --set-upstream upstream master)

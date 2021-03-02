@@ -63,7 +63,11 @@
             }
           ],
           "pre_states": [],
-          "post_state": "CaseCreated",
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "CaseCreated"
+          }],
           "security_classification": "PRIVATE",
           "acls": [
             {

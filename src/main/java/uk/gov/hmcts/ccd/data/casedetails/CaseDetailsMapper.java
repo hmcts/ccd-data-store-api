@@ -34,7 +34,16 @@ public class CaseDetailsMapper {
             caseDetails.setData(JacksonUtils.convertValue(caseDetailsEntity.getData()));
             caseDetails.setDataClassification(JacksonUtils.convertValue(caseDetailsEntity.getDataClassification()));
         }
+        if (caseDetailsEntity.getSupplementaryData() != null) {
+            caseDetails.setSupplementaryData(JacksonUtils.convertValue(caseDetailsEntity.getSupplementaryData()));
+        }
         return caseDetails;
+    }
+
+    public List<CaseDetails> entityToModel(final List<CaseDetailsEntity> caseDataEntities) {
+        return caseDataEntities.stream()
+            .map(this::entityToModel)
+            .collect(Collectors.toList());
     }
 
     public CaseDetailsEntity modelToEntity(final CaseDetails caseDetails) {
@@ -56,7 +65,12 @@ public class CaseDetailsMapper {
             newCaseDetailsEntity.setData(MAPPER.createObjectNode());
         } else {
             newCaseDetailsEntity.setData(JacksonUtils.convertValueJsonNode(caseDetails.getData()));
-            newCaseDetailsEntity.setDataClassification(JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()));
+            newCaseDetailsEntity.setDataClassification(
+                JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()));
+        }
+        if (caseDetails.getSupplementaryData() != null) {
+            newCaseDetailsEntity.setSupplementaryData(JacksonUtils.convertValueJsonNode(caseDetails
+                    .getSupplementaryData()));
         }
         return newCaseDetailsEntity;
     }
@@ -64,11 +78,5 @@ public class CaseDetailsMapper {
     private Long getLongId(CaseDetails caseDetails) {
         String id = caseDetails.getId();
         return id == null ? null : Long.valueOf(id);
-    }
-
-    public List<CaseDetails> entityToModel(final List<CaseDetailsEntity> caseDataEntities) {
-        return caseDataEntities.stream()
-            .map(this::entityToModel)
-            .collect(Collectors.toList());
     }
 }

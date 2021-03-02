@@ -3,7 +3,7 @@ package uk.gov.hmcts.ccd.domain.types;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,12 +16,13 @@ public class BaseType {
     private final String type;
     private final String regularExpression;
 
-    public BaseType(final FieldType fieldType) {
-        type = fieldType.getType();
-        regularExpression = fieldType.getRegularExpression();
+    public BaseType(final FieldTypeDefinition fieldTypeDefinition) {
+        type = fieldTypeDefinition.getType();
+        regularExpression = fieldTypeDefinition.getRegularExpression();
     }
 
-    public static void setCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository) {
+    public static void setCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
+                                                   final CaseDefinitionRepository caseDefinitionRepository) {
         BaseType.caseDefinitionRepository = caseDefinitionRepository;
     }
 

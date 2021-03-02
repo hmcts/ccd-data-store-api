@@ -5,13 +5,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Enumerations of reserved global case roles:
+ * Enumerations of reserved global case roles.
  * <ul>
  *  <li>[CREATOR]: Generic author of a cause, automatically assigned at case creation</li>
  * </ul>
  */
 public enum GlobalCaseRole {
-    CREATOR("[CREATOR]");
+    CREATOR("[CREATOR]"),
+    COLLABORATOR("[COLLABORATOR]");
 
     private final String role;
 
@@ -26,6 +27,8 @@ public enum GlobalCaseRole {
     }
 
     /**
+     * Get Role.
+     *
      * @return String representation of the role as stored in database
      */
     public String getRole() {

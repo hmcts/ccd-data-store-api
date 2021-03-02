@@ -48,8 +48,6 @@ public class WizardPageCollection {
         this.eventId = eventId;
     }
 
-    /**
-     **/
     @ApiModelProperty(required = true, value = "")
     @JsonProperty("wizard_pages")
     public List<WizardPage> getWizardPages() {

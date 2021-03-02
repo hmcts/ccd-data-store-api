@@ -1,6 +1,13 @@
 package uk.gov.hmcts.ccd.v2;
 
+// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+@SuppressWarnings("checkstyle:OperatorWrap")
 public class CaseRolesTestData {
+
+    private CaseRolesTestData() {
+        // Hide Utility Class Constructor : Utility classes should not have a public or default constructor
+    }
+
     public static String getTestDefinition(final Integer portNumber) {
 
         final String port = portNumber.toString();
@@ -50,7 +57,13 @@ public class CaseRolesTestData {
                 "      \"pre_states\": [\n" +
                 "        \"CaseCreated\"\n" +
                 "      ],\n" +
-                "      \"post_state\": \"CaseUpdated\",\n" +
+                "      \"post_states\": [\n" +
+                "         {" +
+                "            \"enabling_condition\": null,\n" +
+                "            \"priority\": 99,\n" +
+                "            \"post_state_reference\": \"CaseUpdated\"\n" +
+                "         }" +
+                "      ],\n" +
                 "      \"security_classification\": \"PUBLIC\",\n" +
                 "      \"acls\": [\n" +
                 "        {\n" +
@@ -86,7 +99,13 @@ public class CaseRolesTestData {
                 "        \"OtherState\",\n" +
                 "        \"OtherStateTwo\"\n" +
                 "      ],\n" +
-                "      \"post_state\": \"CaseUpdated\",\n" +
+                "      \"post_states\": [\n" +
+                "         {" +
+                "            \"enabling_condition\": null,\n" +
+                "            \"priority\": 99,\n" +
+                "            \"post_state_reference\": \"CaseUpdated\"\n" +
+                "         }" +
+                "      ],\n" +
                 "      \"security_classification\": \"PUBLIC\",\n" +
                 "      \"acls\": [\n" +
                 "        {\n" +
@@ -120,7 +139,13 @@ public class CaseRolesTestData {
                 "      ],\n" +
                 "      \"pre_states\": [\n" +
                 "      ],\n" +
-                "      \"post_state\": \"CaseCreated\",\n" +
+                "      \"post_states\": [\n" +
+                "         {" +
+                "            \"enabling_condition\": null,\n" +
+                "            \"priority\": 99,\n" +
+                "            \"post_state_reference\": \"CaseCreated\"\n" +
+                "         }" +
+                "      ],\n" +
                 "      \"security_classification\": \"PUBLIC\",\n" +
                 "      \"acls\": [\n" +
                 "        {\n" +
@@ -153,7 +178,13 @@ public class CaseRolesTestData {
                 "         }" +
                 "      ],\n" +
                 "      \"pre_states\": null,\n" +
-                "      \"post_state\": \"CaseCreated\",\n" +
+                "      \"post_states\": [\n" +
+                "         {" +
+                "            \"enabling_condition\": null,\n" +
+                "            \"priority\": 99,\n" +
+                "            \"post_state_reference\": \"CaseCreated\"\n" +
+                "         }" +
+                "      ],\n" +
                 "      \"security_classification\": \"PUBLIC\",\n" +
                 "      \"acls\": [\n" +
                 "        {\n" +

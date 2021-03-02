@@ -1,0 +1,9 @@
+{
+  "_guid_": "F-103_User_Steve",
+  "_extends_": "BeftaCaseworker2Solicitor1",
+
+  "specs": [
+    "Steve - with an active profile",
+    "Steve - who is not a privileged user and does not have permissions to access the case assignments of other users"
+  ]
+}

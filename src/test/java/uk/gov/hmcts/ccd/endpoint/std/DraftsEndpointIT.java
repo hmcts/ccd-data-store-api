@@ -4,24 +4,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewJurisdiction;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
@@ -38,7 +32,6 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -48,11 +41,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
+// too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
+@SuppressWarnings("checkstyle:OperatorWrap")
 public class DraftsEndpointIT extends WireMockBaseTest {
     private static final String CTID = "TestAddressBookCase";
     private static final String ETID = "CreateCase";
-    private static final String DID = "5";
-    private static final String WRONG_DID = "6";
+    private static final String DID = "4444333322221111";
+    private static final String WRONG_DID = "7578590391163133";
+    private static final String BAD_DID = "7";
     private static final String JID = "PROBATE";
     private static final String TEST_EVENT_ID = "TEST_EVENT";
     private static final String UID = "0";
@@ -62,32 +58,20 @@ public class DraftsEndpointIT extends WireMockBaseTest {
     private WebApplicationContext wac;
     private MockMvc mockMvc;
 
-    @Mock
-    private Authentication authentication;
-
-    @Mock
-    private SecurityContext securityContext;
-
     @Before
     public void setUp() throws IOException {
-        MockitoAnnotations.initMocks(this);
-
-        doReturn(authentication).when(securityContext).getAuthentication();
-        SecurityContextHolder.setContext(securityContext);
-
-        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
-
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 
         data = mapper.readTree("{\n" +
-            "    \"PersonFirstName\": \"John\",\n" +
-            "    \"PersonLastName\": \"Smith\"\n" +
-            " }\n");
+                                "    \"PersonFirstName\": \"John\",\n" +
+                                "    \"PersonLastName\": \"Smith\"\n" +
+                                " }\n");
     }
 
     @Test
     public void shouldReturn201WhenSaveDraftForCaseworker() throws Exception {
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/" + ETID + "/drafts";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/"
+            + ETID + "/drafts";
         CaseDataContent caseDetailsToSave = newCaseDataContent()
             .withData(getData(data))
             .withEvent(anEvent()
@@ -102,7 +86,8 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals("Incorrect Response Status Code", 201, mvcResult.getResponse().getStatus());
-        Draft actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).toString(), Draft.class);
+        Draft actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).toString(),
+            Draft.class);
 
         Assertions.assertAll(
             () -> assertThat(actualData, hasProperty("id", is("4")))
@@ -111,7 +96,8 @@ public class DraftsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn400WhenSaveDraftForCaseworkerWithMalformedData() throws Exception {
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/" + ETID + "/drafts";
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/"
+            + ETID + "/drafts";
 
         {
             mockMvc.perform(post(URL)
@@ -123,7 +109,8 @@ public class DraftsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn200WhenUpdateDraftForCaseworker() throws Exception {
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/" + ETID + "/drafts/" + DID;
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/"
+            + ETID + "/drafts/" + DID;
         CaseDataContent caseDetailsToUpdate = newCaseDataContent()
             .withData(getData(data))
             .withEvent(anEvent()
@@ -138,14 +125,38 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         ).andReturn();
 
         assertEquals("Incorrect Response Status Code", 200, mvcResult.getResponse().getStatus());
-        Draft actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).toString(), Draft.class);
+        Draft actualData = mapper.readValue(mapper.readTree(mvcResult.getResponse().getContentAsString()).toString(),
+            Draft.class);
 
         assertThat(actualData, hasProperty("id", is(DID)));
     }
 
     @Test
+    public void shouldReturn400WhenUpdateDraftForCaseworkerWithInvalidDraftId() throws Exception {
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/"
+            + ETID + "/drafts/" + BAD_DID;
+        CaseDataContent caseDetailsToUpdate = newCaseDataContent()
+            .withData(getData(data))
+            .withEvent(anEvent()
+                .withEventId(TEST_EVENT_ID)
+                .build())
+            .withToken(generateEventTokenNewCase(UID, JID, CTID, TEST_EVENT_ID))
+            .build();
+
+        final MvcResult mvcResult = mockMvc.perform(put(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToUpdate))
+        ).andReturn();
+
+        assertEquals("Incorrect Response Status Code", 400, mvcResult.getResponse().getStatus());
+        String actualResponse = mapper.readTree(mvcResult.getResponse().getContentAsString()).toString();
+        assertThat(actualResponse, containsString("\"message\":\"Invalid Draft Id\""));
+    }
+
+    @Test
     public void shouldReturn400WhenUpdateDraftForCaseworkerWithMalformedData() throws Exception {
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/" + ETID + "/drafts/" + DID;
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/"
+            + ETID + "/drafts/" + DID;
 
         {
             mockMvc.perform(put(URL)
@@ -157,7 +168,8 @@ public class DraftsEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn404WhenUpdateDraftForCaseworkerWithDraftIdNotFound() throws Exception {
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/" + ETID + "/drafts/" + WRONG_DID;
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/"
+            + ETID + "/drafts/" + WRONG_DID;
         CaseDataContent caseDetailsToUpdate = newCaseDataContent()
             .withData(getData(data))
             .withEvent(anEvent()
@@ -173,7 +185,8 @@ public class DraftsEndpointIT extends WireMockBaseTest {
 
         assertEquals("Incorrect Response Status Code", 404, mvcResult.getResponse().getStatus());
         String actualResponse = mapper.readTree(mvcResult.getResponse().getContentAsString()).toString();
-        assertThat(actualResponse, containsString("\"message\":\"No draft found ( draft reference = '6' )\""));
+        assertThat(actualResponse, containsString("\"message\":" +
+            "\"No draft found ( draft reference = '7578590391163133' )\""));
     }
 
     @Test
@@ -199,7 +212,8 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         assertNotNull("Case View Jurisdiction is null", caseViewJurisdiction);
         assertEquals("Unexpected Jurisdiction Id", JID, caseViewJurisdiction.getId());
         assertEquals("Unexpected Jurisdiction name", "Test", caseViewJurisdiction.getName());
-        assertEquals("Unexpected Jurisdiction description", "Test Jurisdiction", caseViewJurisdiction.getDescription());
+        assertEquals("Unexpected Jurisdiction description", "Test Jurisdiction", caseViewJurisdiction
+            .getDescription());
 
         final String[] channels = caseView.getChannels();
         assertNotNull("Channel is null", channels);
@@ -227,7 +241,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field label", "First Name", firstNameField.getLabel());
         assertEquals("Unexpected Field order", 1, firstNameField.getOrder().intValue());
         assertEquals("Unexpected Field show condition", "PersonLastName=\"Jones\"", firstNameField.getShowCondition());
-        assertEquals("Unexpected Field field type", "Text", firstNameField.getFieldType().getType());
+        assertEquals("Unexpected Field field type", "Text", firstNameField.getFieldTypeDefinition().getType());
         assertEquals("Unexpected Field value", "John", firstNameField.getValue());
 
         final CaseViewField lastNameField = nameFields[1];
@@ -236,7 +250,7 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Field label", "Last Name", lastNameField.getLabel());
         assertEquals("Unexpected Field order", 2, lastNameField.getOrder().intValue());
         assertEquals("Unexpected Field show condition", "PersonFirstName=\"Tom\"", lastNameField.getShowCondition());
-        assertEquals("Unexpected Field field type", "Text", lastNameField.getFieldType().getType());
+        assertEquals("Unexpected Field field type", "Text", lastNameField.getFieldTypeDefinition().getType());
         assertEquals("Unexpected Field value", "Smith", lastNameField.getValue());
 
         final CaseViewTab addressTab = caseViewTabs[1];
@@ -274,24 +288,25 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         assertEquals("Event State Name", "Draft", events[1].getStateName());
         assertEquals("Event State ID", "Draft", events[1].getStateId());
 
-        final CaseViewTrigger[] triggers = caseView.getTriggers();
-        assertNotNull("Triggers are null", triggers);
-        assertEquals("Should only get resume and delete triggers", 2, triggers.length);
+        final CaseViewActionableEvent[] actionableEvents = caseView.getActionableEvents();
+        assertNotNull("Triggers are null", actionableEvents);
+        assertEquals("Should only get resume and delete triggers", 2, actionableEvents.length);
 
-        assertEquals("Trigger ID", "createCase", triggers[0].getId());
-        assertEquals("Trigger Name", "Resume", triggers[0].getName());
-        assertEquals("Trigger Description", "This event will create a new case", triggers[0].getDescription());
-        assertEquals("Trigger Order", Integer.valueOf(1), triggers[0].getOrder());
+        assertEquals("Trigger ID", "createCase", actionableEvents[0].getId());
+        assertEquals("Trigger Name", "Resume", actionableEvents[0].getName());
+        assertEquals("Trigger Description", "This event will create a new case", actionableEvents[0].getDescription());
+        assertEquals("Trigger Order", Integer.valueOf(1), actionableEvents[0].getOrder());
 
-        assertEquals("Trigger ID", "DELETE", triggers[1].getId());
-        assertEquals("Trigger Name", "Delete", triggers[1].getName());
-        assertEquals("Trigger Description", "Delete draft", triggers[1].getDescription());
-        assertEquals("Trigger Order", Integer.valueOf(2), triggers[1].getOrder());
+        assertEquals("Trigger ID", "DELETE", actionableEvents[1].getId());
+        assertEquals("Trigger Name", "Delete", actionableEvents[1].getName());
+        assertEquals("Trigger Description", "Delete draft", actionableEvents[1].getDescription());
+        assertEquals("Trigger Order", Integer.valueOf(2), actionableEvents[1].getOrder());
     }
 
     @Test
     public void shouldReturn404WhenGetInvalidDraft() throws Exception {
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/drafts/" + WRONG_DID;
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/drafts/"
+            + WRONG_DID;
         CaseDataContent caseDetailsToUpdate = newCaseDataContent()
             .withData(getData(data))
             .withEvent(anEvent()
@@ -307,7 +322,8 @@ public class DraftsEndpointIT extends WireMockBaseTest {
 
         assertEquals("Incorrect Response Status Code", 404, mvcResult.getResponse().getStatus());
         String actualResponse = mapper.readTree(mvcResult.getResponse().getContentAsString()).toString();
-        assertThat(actualResponse, containsString("\"message\":\"No draft found ( draft reference = '6' )\""));
+        assertThat(actualResponse, containsString("\"message\":" +
+            "\"No draft found ( draft reference = '7578590391163133' )\""));
     }
 
     @Test
@@ -320,8 +336,19 @@ public class DraftsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    public void shouldReturn400WhenDeleteInvalidDraftIdForCaseworker() throws Exception {
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID
+            + "/drafts/" + BAD_DID;
+
+        final MvcResult mvcResult = mockMvc.perform(delete(URL).contentType(JSON_CONTENT_TYPE)).andReturn();
+
+        assertEquals("Incorrect Response Status Code", 400, mvcResult.getResponse().getStatus());
+    }
+
+    @Test
     public void shouldReturn404WhenDeleteInvalidDraftForCaseworker() throws Exception {
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/drafts/" + WRONG_DID;
+        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/drafts/"
+            + WRONG_DID;
 
         final MvcResult mvcResult = mockMvc.perform(delete(URL).contentType(JSON_CONTENT_TYPE)).andReturn();
 

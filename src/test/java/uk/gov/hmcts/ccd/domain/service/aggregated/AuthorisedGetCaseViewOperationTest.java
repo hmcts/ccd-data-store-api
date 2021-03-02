@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,19 +12,24 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTrigger;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEvent;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.valueOf;
@@ -45,13 +47,14 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewActionableEventBuilder.aViewTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewBuilder.aCaseView;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTabBuilder.newCaseViewTab;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewTriggerBuilder.aViewTrigger;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.JurisdictionBuilder.newJurisdiction;
 
 class AuthorisedGetCaseViewOperationTest {
@@ -70,22 +73,29 @@ class AuthorisedGetCaseViewOperationTest {
     private static final String ROLE_IN_CASE_ROLES_2 = "[DEFENDANT]";
     private static final Set<String> USER_ROLES = newHashSet(ROLE_IN_USER_ROLES, ROLE_IN_USER_ROLES_2);
     private static final String EVENT_ID_STRING = valueOf(EVENT_ID);
-    private static final CaseViewTrigger[] EMPTY_TRIGGERS = new CaseViewTrigger[]{};
-    private static final CaseEvent CASE_EVENT = newCaseEvent().withId(EVENT_ID_STRING).build();
-    private static final CaseEvent CASE_EVENT_2 = newCaseEvent().withId("event2").build();
-    private static final CaseViewTrigger CASE_VIEW_TRIGGER = aViewTrigger().withId(EVENT_ID_STRING).build();
-    private static final CaseViewTrigger CASE_VIEW_TRIGGER_2 = aViewTrigger().withId("event2").build();
-    private static final CaseViewTrigger[] AUTH_CASE_VIEW_TRIGGERS = new CaseViewTrigger[]{CASE_VIEW_TRIGGER};
+    private static final CaseViewActionableEvent[] EMPTY_TRIGGERS = new CaseViewActionableEvent[]{};
+    private static final CaseEventDefinition CASE_EVENT = newCaseEvent().withId(EVENT_ID_STRING).build();
+    private static final CaseEventDefinition CASE_EVENT_2 = newCaseEvent().withId("event2").build();
+    private static final CaseViewActionableEvent CASE_VIEW_TRIGGER = aViewTrigger().withId(EVENT_ID_STRING).build();
+    private static final CaseViewActionableEvent CASE_VIEW_TRIGGER_2 = aViewTrigger().withId("event2").build();
+    private static final CaseViewActionableEvent[] AUTH_CASE_VIEW_TRIGGERS =
+        new CaseViewActionableEvent[]{CASE_VIEW_TRIGGER};
     private static final CaseDetails CASE_DETAILS = newCaseDetails().withId(CASE_ID).build();
-    private static final Jurisdiction jurisdiction = newJurisdiction()
+    private static final JurisdictionDefinition jurisdiction = newJurisdiction()
         .withJurisdictionId(JURISDICTION_ID)
         .withName(JURISDICTION_ID)
         .build();
-    private static final CaseType TEST_CASE_TYPE = newCaseType()
+    private static final AccessControlList acl1 = anAcl().withRole("caseworker-sscs")
+        .withCreate(true).withRead(true).withUpdate(true).withDelete(true).build();
+    private static final AccessControlList acl2 = anAcl().withRole("caseworker-sscs-clerk")
+        .withCreate(false).withRead(true).withUpdate(false).withDelete(false).build();
+    private static final CaseTypeDefinition TEST_CASE_TYPE = newCaseType()
         .withId(CASE_TYPE_ID)
         .withJurisdiction(jurisdiction)
         .withEvent(CASE_EVENT)
         .withEvent(CASE_EVENT_2)
+        .withAcl(acl1)
+        .withAcl(acl2)
         .build();
     private static final CaseViewType TEST_CASE_VIEW_TYPE = CaseViewType.createFrom(TEST_CASE_TYPE);
     private static final CaseViewField FIELD_1 = aViewField().withId("FIELD_1").build();
@@ -99,7 +109,8 @@ class AuthorisedGetCaseViewOperationTest {
         .addCaseViewField(FIELD_2)
         .addCaseViewField(FIELD_3)
         .build();
-    private static final CaseViewTab CASE_VIEW_TAB_WITH_UNALLOWED_FIELD = newCaseViewTab().withId("cvt2").addCaseViewField(FIELD_4).build();
+    private static final CaseViewTab CASE_VIEW_TAB_WITH_UNALLOWED_FIELD =
+        newCaseViewTab().withId("cvt2").addCaseViewField(FIELD_4).build();
     private static final CaseViewTab CASE_VIEW_TAB_WITH_ROLE_ALLOWED = newCaseViewTab().withId("cvt3")
         .addCaseViewField(FIELD_5)
         .withRole(ROLE_IN_USER_ROLES_2)
@@ -112,8 +123,8 @@ class AuthorisedGetCaseViewOperationTest {
         .withCaseId(CASE_REFERENCE)
         .withState(caseState)
         .withCaseViewType(TEST_CASE_VIEW_TYPE)
-        .withCaseViewTrigger(CASE_VIEW_TRIGGER)
-        .withCaseViewTrigger(CASE_VIEW_TRIGGER_2)
+        .withCaseViewActionableEvent(CASE_VIEW_TRIGGER)
+        .withCaseViewActionableEvent(CASE_VIEW_TRIGGER_2)
         .addCaseViewTab(CASE_VIEW_TAB_WITH_MIXED_FIELDS)
         .addCaseViewTab(CASE_VIEW_TAB_WITH_UNALLOWED_FIELD)
         .addCaseViewTab(CASE_VIEW_TAB_WITH_ROLE_ALLOWED)
@@ -227,67 +238,79 @@ class AuthorisedGetCaseViewOperationTest {
     @DisplayName("should remove all case view triggers when no UPDATE access type on case type")
     void shouldRemoveCaseViewTriggersWhenNoUpdateAccessForCaseType() {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES,
+            CAN_UPDATE);
 
         CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
 
-        assertThat(caseView.getTriggers(), arrayWithSize(0));
+        assertThat(caseView.getActionableEvents(), arrayWithSize(0));
     }
 
     @Test
     @DisplayName("should remove all case view triggers when no UPDATE access type on case state")
     void shouldRemoveCaseViewTriggersWhenNoUpdateAccessForState() {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
-        doReturn(false).when(accessControlService).canAccessCaseStateWithCriteria(STATE, TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES,
+            CAN_UPDATE);
+        doReturn(false).when(accessControlService).canAccessCaseStateWithCriteria(STATE, TEST_CASE_TYPE, USER_ROLES,
+            CAN_UPDATE);
 
         CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
 
-        assertThat(caseView.getTriggers(), arrayWithSize(0));
+        assertThat(caseView.getActionableEvents(), arrayWithSize(0));
     }
 
     @Test
     @DisplayName("should return case view triggers when there is CREATE access for relevant events")
     void shouldReturnCaseViewTriggersAuthorisedByAccess() {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
-        doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(STATE, TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
-        doReturn(AUTH_CASE_VIEW_TRIGGERS).when(accessControlService).filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getTriggers(), TEST_CASE_TYPE.getEvents(), USER_ROLES);
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES,
+            CAN_UPDATE);
+        doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(STATE, TEST_CASE_TYPE, USER_ROLES,
+            CAN_UPDATE);
+        doReturn(AUTH_CASE_VIEW_TRIGGERS)
+            .when(accessControlService).filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getActionableEvents(),
+            TEST_CASE_TYPE.getEvents(), USER_ROLES);
 
         CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
-        assertThat(caseView.getTriggers(), arrayWithSize(1));
-        assertThat(caseView.getTriggers(), arrayContaining(CASE_VIEW_TRIGGER));
+        assertThat(caseView.getActionableEvents(), arrayWithSize(1));
+        assertThat(caseView.getActionableEvents(), arrayContaining(CASE_VIEW_TRIGGER));
     }
 
     @Test
     @DisplayName("returns empty case view triggers when no CREATE access for relevant events")
     void shouldReturnEmptyCaseViewTriggersWhenNotAuthorisedByAccess() {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_UPDATE);
-        doReturn(EMPTY_TRIGGERS).when(accessControlService).filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getTriggers(), TEST_CASE_TYPE.getEvents(), USER_ROLES);
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES,
+            CAN_UPDATE);
+        doReturn(EMPTY_TRIGGERS)
+            .when(accessControlService).filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getActionableEvents(),
+            TEST_CASE_TYPE.getEvents(), USER_ROLES);
 
         CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
 
-        assertThat(caseView.getTriggers(), arrayWithSize(0));
+        assertThat(caseView.getActionableEvents(), arrayWithSize(0));
     }
 
     @Test
     @DisplayName("get User Roles must merge user roles and case roles")
     void shouldMergeRoles() {
-        doReturn(Arrays.asList(ROLE_IN_CASE_ROLES, ROLE_IN_CASE_ROLES_2)).when(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
+        doReturn(Arrays.asList(ROLE_IN_CASE_ROLES, ROLE_IN_CASE_ROLES_2)).when(caseUserRepository)
+            .findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
 
         Set<String> userRoles = authorisedGetCaseViewOperation.getUserRoles(CASE_REFERENCE);
 
         assertAll(
             () -> assertThat(userRoles.size(), is(4)),
-            () -> assertThat(userRoles, hasItems(ROLE_IN_USER_ROLES, ROLE_IN_USER_ROLES, ROLE_IN_CASE_ROLES, ROLE_IN_CASE_ROLES_2))
+            () -> assertThat(userRoles, hasItems(ROLE_IN_USER_ROLES, ROLE_IN_USER_ROLES, ROLE_IN_CASE_ROLES,
+                ROLE_IN_CASE_ROLES_2))
         );
     }
 
     @Test
     @DisplayName("should return Case Type")
     void shouldReturnCaseType() {
-        CaseType caseType = authorisedGetCaseViewOperation.getCaseType(CASE_TYPE_ID);
+        CaseTypeDefinition caseType = authorisedGetCaseViewOperation.getCaseType(CASE_TYPE_ID);
 
         assertThat(caseType, is(TEST_CASE_TYPE));
     }

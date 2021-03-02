@@ -3,14 +3,14 @@
 	"method": "PUT",
 	"uri": "/cases/{cid}/users/{uid}",
 	"users": {
-    "invokingUser": {
-      "username": "befta.caseworker.2.solicitor.2@gmail.com",
-      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
-    },
-    "solicitor3": {
-      "username": "befta.caseworker.2.solicitor.3@gmail.com",
-      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
-    }
+		"invokingUser": {
+			"username": "befta.caseworker.2.solicitor.2@gmail.com",
+			"password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+		},
+		"solicitor3": {
+			"username": "befta.caseworker.2.solicitor.3@gmail.com",
+			"password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+		}
 	},
 	"request": {
 		"_extends_": "Common_Request",

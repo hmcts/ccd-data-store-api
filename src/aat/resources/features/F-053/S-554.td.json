@@ -1,21 +1,24 @@
 {
-  "_guid_": "S-554",
-  "_extends_": "F-053_Test_Data_Base",
-  "title": "must return negative response HTTP-403 when request contains a non-existing user ID",
-  "specs": [
-    "an inactive profile in CCD",
-    "contains a non-existing user ID",
-    "code is HTTP-403"
-  ],
-  "request": {
-    "pathVariables": {
-      "uid": "non-existing user ID"
-    }
-},
-  "expectedResponse": {
-    "_extends_": "Common_403_Response",
-    "body": {
-      "message" : "Access Denied"
-    }
-  }
+	"_guid_": "S-554",
+	"_extends_": "F-053_Test_Data_Base",
+	"title": "must return negative response HTTP-403 when request contains a non-existing user ID",
+
+	"specs": [
+		"an inactive profile in CCD",
+		"contains a non-existing user ID",
+		"code is HTTP-403"
+	],
+
+	"request": {
+		"pathVariables": {
+			"uid": "non-existing user ID"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_403_Response",
+		"body": {
+			"message" : "Access Denied"
+		}
+	}
 }

@@ -1,0 +1,29 @@
+{
+	"_guid_": "F-103_Case_Role_Assign_Base",
+
+
+	"productName": "CCD Data Store Api",
+	"operationName": "Add Case-Assigned Users and Roles",
+	"method": "POST",
+	"uri": "/case-users",
+
+	"s2sClientId": "aac_manage_case_assignment",
+
+	"request": {
+		"_extends_": "Common_Request"
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_201_Response",
+
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Type": "[[ANYTHING_PRESENT]]",
+			"Content-Encoding": "[[ANYTHING_PRESENT]]"
+		},
+
+		"body": {
+			"status_message": "Case-User-Role assignments created successfully"
+		}
+	}
+}

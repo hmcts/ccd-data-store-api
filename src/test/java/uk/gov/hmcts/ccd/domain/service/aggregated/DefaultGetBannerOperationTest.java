@@ -21,7 +21,7 @@ class DefaultGetBannerOperationTest {
     private UIDefinitionRepository uiDefinitionRepository;
 
     @InjectMocks
-    private DefaultGetBannerOperation defaultGetBannerOperation;
+    private uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetBannerOperation defaultGetBannerOperation;
 
     private List<String> jurisdictionReferences = Lists.newArrayList("TEST", "FAMILY LAW");
 
@@ -33,7 +33,8 @@ class DefaultGetBannerOperationTest {
     @Test
     @DisplayName("return empty list of banners for the passed jurisdictions")
     void shouldReturnEmptyBannerList() {
-        doReturn(createBannersResultWithEmptyCollection()).when(uiDefinitionRepository).getBanners(jurisdictionReferences);
+        doReturn(createBannersResultWithEmptyCollection()).when(uiDefinitionRepository)
+                .getBanners(jurisdictionReferences);
 
         List<Banner> banners = defaultGetBannerOperation.execute(jurisdictionReferences);
         assertEquals(0, banners.size());
@@ -47,7 +48,8 @@ class DefaultGetBannerOperationTest {
     @Test
     @DisplayName("return list  of banners for the passed jurisdictions")
     void shouldReturnBannerList() {
-        doReturn(createBannersResultWithCollection()).when(uiDefinitionRepository).getBanners(jurisdictionReferences);
+        doReturn(createBannersResultWithCollection()).when(uiDefinitionRepository)
+                .getBanners(jurisdictionReferences);
 
         List<Banner> banners = defaultGetBannerOperation.execute(jurisdictionReferences);
         assertEquals(2, banners.size());

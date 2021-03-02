@@ -11,7 +11,7 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -25,15 +25,17 @@ public class AuthorisedGetCaseTypeOperation implements GetCaseTypeOperation {
 
     @Autowired
     public AuthorisedGetCaseTypeOperation(final AccessControlService accessControlService,
-                                          @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                          @Qualifier(DefaultGetCaseTypeOperation.QUALIFIER) final GetCaseTypeOperation getCaseTypeOperation) {
+                                          @Qualifier(CachedUserRepository.QUALIFIER)
+                                              final UserRepository userRepository,
+                                          @Qualifier(DefaultGetCaseTypeOperation.QUALIFIER)
+                                              final GetCaseTypeOperation getCaseTypeOperation) {
         this.accessControlService = accessControlService;
         this.userRepository = userRepository;
         this.getCaseTypeOperation = getCaseTypeOperation;
     }
 
     @Override
-    public Optional<CaseType> execute(String caseTypeId, Predicate<AccessControlList> access) {
+    public Optional<CaseTypeDefinition> execute(String caseTypeId, Predicate<AccessControlList> access) {
         final Set<String> userRoles = getUserRoles();
         return getCaseTypeOperation.execute(caseTypeId, access)
             .flatMap(caseType -> verifyAccess(caseType, userRoles, access));
@@ -47,29 +49,32 @@ public class AuthorisedGetCaseTypeOperation implements GetCaseTypeOperation {
         return userRoles;
     }
 
-    private Optional<CaseType> verifyAccess(CaseType caseType, Set<String> userRoles, Predicate<AccessControlList> access) {
+    private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition,
+                                                      Set<String> userRoles,
+                                                      Predicate<AccessControlList> access) {
 
         if (CollectionUtils.isEmpty(userRoles)) {
             return Optional.empty();
         }
 
-        if (!accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, access)) {
+        if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, access)) {
             return Optional.empty();
         }
 
-        caseType.setStates(accessControlService.filterCaseStatesByAccess(caseType.getStates(),
+        caseTypeDefinition.setStates(accessControlService.filterCaseStatesByAccess(caseTypeDefinition.getStates(),
                                                                          userRoles,
                                                                          access));
-        caseType.setEvents(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
+        caseTypeDefinition.setEvents(accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
                                                                          userRoles,
                                                                          access));
 
-        caseType.setCaseFields(accessControlService.filterCaseFieldsByAccess(caseType.getCaseFields(),
-                                                                             userRoles,
-                                                                             access));
+        caseTypeDefinition.setCaseFieldDefinitions(accessControlService.filterCaseFieldsByAccess(
+                                                    caseTypeDefinition.getCaseFieldDefinitions(),
+                                                    userRoles,
+                                                    access));
 
 
-        return Optional.of(caseType);
+        return Optional.of(caseTypeDefinition);
     }
 
 }

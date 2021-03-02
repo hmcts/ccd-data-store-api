@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 
 public class CaseViewJurisdiction {
     private String id;
@@ -41,9 +41,9 @@ public class CaseViewJurisdiction {
         this.description = description;
     }
 
-    public static CaseViewJurisdiction createFrom(Jurisdiction jurisdiction) {
-        return new CaseViewJurisdiction(jurisdiction.getId(),
-            jurisdiction.getName(),
-            jurisdiction.getDescription());
+    public static CaseViewJurisdiction createFrom(JurisdictionDefinition jurisdictionDefinition) {
+        return new CaseViewJurisdiction(jurisdictionDefinition.getId(),
+            jurisdictionDefinition.getName(),
+            jurisdictionDefinition.getDescription());
     }
 }

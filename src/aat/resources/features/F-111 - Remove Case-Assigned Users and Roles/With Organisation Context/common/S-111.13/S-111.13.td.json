@@ -1,0 +1,38 @@
+{
+  "title": "Must successfully decrease Assigned User Count when removing a user and case role for a specific case",
+
+  "_guid_": "S-111.13",
+  "_extends_": "F-111_Remove_Case_Assigned_User_Roles_Base",
+
+  "specs": [
+    "Richard - who can create a case",
+    "Dil - who is to add and remove some case role assignment for a case",
+    "Olawale - with an active solicitor profile",
+    "Hemanth - with an active solicitor profile",
+    "is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale, proper Case Role CR-1 and the Organisation ID of Olawale"
+  ],
+
+  "users": {
+    "_extends_": "F-111_Users"
+  },
+
+  "request": {
+    "headers": {
+      "Authorization": "Bearer ${[scenarioContext][testData][users][userDil][accessToken]}"
+    },
+    "body": {
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][childContexts][F-111_Prerequisite_Case_Creation_Call_for_Case_Assignment][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][testData][users][userOlawale][id]}",
+          "case_role": "[CR-1]",
+          "organisation_id": "${[scenarioContext][childContexts][S-111.13_Add_Case_Assigned_User_Roles_for_Case_C1_With_Organisation][childContexts][F-111_Prerequisite_Counter_Check_Call][childContexts][F-111_Get_Organisation_Identifier_Dil][testData][actualResponse][body][organisationIdentifier]}"
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "F-111_Remove_Case_Assigned_User_Roles_200_response"
+  }
+}

@@ -36,6 +36,8 @@ import java.util.Optional;
 @Named
 @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
 @Singleton
+@SuppressWarnings("checkstyle:SummaryJavadoc")
+// partial javadoc attributes added prior to checkstyle implementation in module
 public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCaseDetailsRepository.class);
@@ -92,6 +94,22 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         return find(jurisdiction, id, null).map(this.caseDetailsMapper::entityToModel);
     }
 
+    /**
+     * @param id Internal case ID
+     * @return Case details if found; null otherwise
+     * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
+     */
+    @Override
+    @Deprecated
+    public CaseDetails findById(final Long id) {
+        return findById(null, id).orElse(null);
+    }
+
+    @Override
+    public List<Long> findCaseReferencesByIds(final List<Long> ids) {
+        return findReferencesByIds(ids);
+    }
+
     @Override
     public Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference) {
         return findByReference(jurisdiction, caseReference.toString());
@@ -105,17 +123,6 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     public Optional<CaseDetails> findByReference(String caseReference) {
         return findByReference(null, caseReference);
-    }
-
-    /**
-     * @param id Internal case ID
-     * @return Case details if found; null otherwise
-     * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
-     */
-    @Override
-    @Deprecated
-    public CaseDetails findById(final Long id) {
-        return findById(null, id).orElse(null);
     }
 
     /**
@@ -145,14 +152,16 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-    public List<CaseDetails> findByMetaDataAndFieldData(final MetaData metadata, final Map<String, String> dataSearchParams) {
+    public List<CaseDetails> findByMetaDataAndFieldData(final MetaData metadata,
+                                                        final Map<String, String> dataSearchParams) {
         final Query query = getQuery(metadata, dataSearchParams, false);
         paginate(query, metadata.getPage());
         return caseDetailsMapper.entityToModel(query.getResultList());
     }
 
     @Override
-    public PaginatedSearchMetadata getPaginatedSearchMetadata(MetaData metaData, Map<String, String> dataSearchParams) {
+    public PaginatedSearchMetadata getPaginatedSearchMetadata(MetaData metaData,
+                                                              Map<String, String> dataSearchParams) {
         final Query query = getQuery(metaData, dataSearchParams, true);
         Integer totalResults = ((Number) query.getSingleResult()).intValue();
         int pageSize = applicationParams.getPaginationPageSize();
@@ -165,7 +174,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     // TODO This accepts null values for backward compatibility. Once deprecated methods are removed, parameters should
     // be annotated with @NotNull
     private Optional<CaseDetailsEntity> find(String jurisdiction, Long id, String reference) {
-        final CaseDetailsQueryBuilder<CaseDetailsEntity> qb = queryBuilderFactory.select(em);
+        final CaseDetailsQueryBuilder<CaseDetailsEntity> qb = queryBuilderFactory.selectSecured(em);
 
         if (null != jurisdiction) {
             qb.whereJurisdiction(jurisdiction);
@@ -174,7 +183,28 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         return getCaseDetailsEntity(id, reference, qb);
     }
 
-    private Optional<CaseDetailsEntity> getCaseDetailsEntity(Long id, String reference, CaseDetailsQueryBuilder<CaseDetailsEntity> qb) {
+    private List<Long> findReferencesByIds(List<Long> ids) {
+        final CaseDetailsQueryBuilder<Long> qb = queryBuilderFactory.selectByReferenceSecured(em);
+        qb.whereIdsAreIn(ids);
+
+        return qb.build().getResultList();
+    }
+
+    /**
+     * Finds a case using a query builder that doesn't secure the query.
+     * Required in some corner cases but {@link CaseDetailsRepository#findByReference(String, Long)}
+     * should be used most of the times
+     */
+    @Override
+    public Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference) {
+        CaseDetailsQueryBuilder<CaseDetailsEntity> qb = queryBuilderFactory.selectUnsecured(em);
+        qb.whereReference(String.valueOf(reference));
+        return qb.getSingleResult().map(this.caseDetailsMapper::entityToModel);
+    }
+
+    private Optional<CaseDetailsEntity> getCaseDetailsEntity(Long id,
+                                                             String reference,
+                                                             CaseDetailsQueryBuilder<CaseDetailsEntity> qb) {
         if (null != reference) {
             qb.whereReference(reference);
         } else {

@@ -4,8 +4,7 @@
 
 	"users": {
 		"invokingUser": {
-			"username": "[[$CCD_CASEWORKER_AUTOTEST_EMAIL]]",
-			"password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+      "_extends_": "CaseworkerAutotest"
 		}
 	},
 
@@ -66,6 +65,7 @@
 					]
 				}
 			},
+			"supplementary_data": null,
 			"security_classifications": {
 				"MoneyGBPField": "PUBLIC",
 				"FixedListField": "PUBLIC",

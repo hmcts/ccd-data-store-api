@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldType;
-import uk.gov.hmcts.ccd.domain.model.definition.Jurisdiction;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
@@ -33,7 +33,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Ignore("for now")
 public class DefaultCaseDefinitionRepositoryTest {
-    private final String JURISDICTION_ID = "Some Jurisdiction";
+    private static final String JURISDICTION_ID = "Some Jurisdiction";
 
     @Mock
     private ApplicationParams applicationParams;
@@ -67,7 +67,9 @@ public class DefaultCaseDefinitionRepositoryTest {
         HttpClientErrorException httpException = new HttpClientErrorException(HttpStatus.NOT_FOUND);
         doThrow(httpException).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID));
+        ResourceNotFoundException exception =
+            assertThrows(ResourceNotFoundException.class, () ->
+                caseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID));
         assertThat(exception.getMessage(), startsWith("Resource not found when getting case types for Jurisdiction"));
     }
 
@@ -76,7 +78,9 @@ public class DefaultCaseDefinitionRepositoryTest {
         HttpClientErrorException httpException = new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
         doThrow(httpException).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID));
+        ResourceNotFoundException exception =
+            assertThrows(ResourceNotFoundException.class, () ->
+                caseDefinitionRepository.getCaseTypesForJurisdiction(JURISDICTION_ID));
         assertThat(exception.getMessage(), startsWith("Problem getting case types for the Jurisdiction"));
     }
 
@@ -93,8 +97,10 @@ public class DefaultCaseDefinitionRepositoryTest {
         HttpClientErrorException httpException = new HttpClientErrorException(HttpStatus.NOT_FOUND);
         doThrow(httpException).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getBaseTypes());
-        assertThat(exception.getMessage(), startsWith("Problem getting base types definition from definition store because of"));
+        ResourceNotFoundException exception =
+            assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getBaseTypes());
+        assertThat(exception.getMessage(), startsWith("Problem getting base types definition from definition store "
+            + "because of"));
     }
 
     @Test
@@ -102,16 +108,18 @@ public class DefaultCaseDefinitionRepositoryTest {
         HttpClientErrorException httpException = new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
         doThrow(httpException).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getBaseTypes());
-        assertThat(exception.getMessage(), startsWith("Problem getting base types definition from definition store because of"));
+        ResourceNotFoundException exception =
+            assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getBaseTypes());
+        assertThat(exception.getMessage(), startsWith("Problem getting base types definition from definition store"
+            + " because of"));
     }
 
     @Test(expected = ResourceNotFoundException.class)
     public void shouldReturnFieldTypeListWhenGetBaseTypesIsCalled() {
-        FieldType[] fieldTypeArr = {new FieldType(), new FieldType()};
-        doReturn(fieldTypeArr).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
-        List<FieldType> fieldTypes = caseDefinitionRepository.getBaseTypes();
-        assertEquals(2, fieldTypes.size());
+        FieldTypeDefinition[] fieldTypeDefinitionArr = {new FieldTypeDefinition(), new FieldTypeDefinition()};
+        doReturn(fieldTypeDefinitionArr).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
+        List<FieldTypeDefinition> fieldTypeDefinitions = caseDefinitionRepository.getBaseTypes();
+        assertEquals(2, fieldTypeDefinitions.size());
     }
 
     @Test
@@ -119,8 +127,10 @@ public class DefaultCaseDefinitionRepositoryTest {
         HttpClientErrorException httpException = new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
         doThrow(httpException).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
-        ServiceException exception = assertThrows(ServiceException.class, () -> caseDefinitionRepository.getUserRoleClassifications("nor_defined"));
-        assertThat(exception.getMessage(), startsWith("Error while retrieving classification for user role nor_defined because of "));
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+            caseDefinitionRepository.getUserRoleClassifications("nor_defined"));
+        assertThat(exception.getMessage(), startsWith("Error while retrieving classification for user role nor_defined"
+            + " because of "));
     }
 
 
@@ -129,8 +139,11 @@ public class DefaultCaseDefinitionRepositoryTest {
         HttpClientErrorException httpException = new HttpClientErrorException(HttpStatus.NOT_FOUND);
         doThrow(httpException).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getUserRoleClassifications("nor_defined"));
-        assertThat(exception.getMessage(), startsWith("No classification found for user role nor_defined because of "));
+        ResourceNotFoundException exception =
+            assertThrows(ResourceNotFoundException.class, () ->
+                caseDefinitionRepository.getUserRoleClassifications("nor_defined"));
+        assertThat(exception.getMessage(), startsWith("No classification found for user role nor_defined because "
+            + "of "));
     }
 
     @Test
@@ -138,7 +151,9 @@ public class DefaultCaseDefinitionRepositoryTest {
         HttpClientErrorException httpException = new HttpClientErrorException(HttpStatus.NOT_FOUND);
         doThrow(httpException).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getLatestVersion("case_type_id"));
+        ResourceNotFoundException exception =
+            assertThrows(ResourceNotFoundException.class, () ->
+                caseDefinitionRepository.getLatestVersion("case_type_id"));
         assertThat(exception.getMessage(), startsWith("Resource not found when getting case type version for"));
     }
 
@@ -147,7 +162,8 @@ public class DefaultCaseDefinitionRepositoryTest {
         RuntimeException runtimeException = new RuntimeException();
         doThrow(runtimeException).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
-        ServiceException exception = assertThrows(ServiceException.class, () -> caseDefinitionRepository.getLatestVersion("case_type_id"));
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+            caseDefinitionRepository.getLatestVersion("case_type_id"));
         assertThat(exception.getMessage(), startsWith("Problem getting case type version for"));
     }
 
@@ -163,8 +179,11 @@ public class DefaultCaseDefinitionRepositoryTest {
         HttpClientErrorException httpException = new HttpClientErrorException(HttpStatus.NOT_FOUND);
         doThrow(httpException).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> caseDefinitionRepository.getJurisdiction("jurisdiction_id_1"));
-        assertThat(exception.getMessage(), startsWith("Resource not found when retrieving jurisdictions definition because of"));
+        ResourceNotFoundException exception =
+            assertThrows(ResourceNotFoundException.class, () ->
+                caseDefinitionRepository.getJurisdiction("jurisdiction_id_1"));
+        assertThat(exception.getMessage(), startsWith("Resource not found when retrieving jurisdictions definition "
+            + "because of"));
     }
 
     @Test
@@ -172,16 +191,18 @@ public class DefaultCaseDefinitionRepositoryTest {
         RuntimeException runtimeException = new RuntimeException();
         doThrow(runtimeException).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
 
-        ServiceException exception = assertThrows(ServiceException.class, () -> caseDefinitionRepository.getJurisdiction("case_type_id"));
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+            caseDefinitionRepository.getJurisdiction("case_type_id"));
         assertThat(exception.getMessage(), startsWith("Problem retrieving jurisdictions definition because of "));
     }
 
     @Test
     public void shouldGetNullJurisdictionsDefinition() {
-        List<Jurisdiction> emptyJurisdictions = Lists.newArrayList();
-        doReturn(emptyJurisdictions).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class));
+        List<JurisdictionDefinition> emptyJurisdictionDefinitions = Lists.newArrayList();
+        doReturn(emptyJurisdictionDefinitions).when(restTemplate).exchange(anyString(), any(), any(),
+            any(Class.class));
 
-        Jurisdiction jurisdiction = caseDefinitionRepository.getJurisdiction("PROBATE_NOT_FOUND");
-        assertThat(jurisdiction, nullValue());
+        JurisdictionDefinition jurisdictionDefinition = caseDefinitionRepository.getJurisdiction("PROBATE_NOT_FOUND");
+        assertThat(jurisdictionDefinition, nullValue());
     }
 }

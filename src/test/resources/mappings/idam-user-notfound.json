@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/idam/details",
+    "url": "/idam/o/userinfo",
     "headers": {
       "Authorization": {
         "equalTo": "Bearer not-found"

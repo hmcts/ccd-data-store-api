@@ -11,7 +11,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.BaseTest;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Transactional
-public class DefaultCaseDetailsRepositoryTest extends BaseTest {
+public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
     private static final long CASE_REFERENCE = 999999L;
     private static final String JURISDICTION_ID = "JeyOne";
@@ -55,7 +55,6 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
     private static final String WRONG_JURISDICTION = "DIVORCE";
     private static final Long REFERENCE = 1504259907353529L;
     private static final Long WRONG_REFERENCE = 9999999999999999L;
-    public static final int NUMBER_OF_CASES = 18;
 
     private JdbcTemplate template;
 
@@ -138,32 +137,39 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
             () -> assertThat(byReference.getData().get("PersonFirstName").asText(), is("Janet")),
             () -> assertThat(byReference.getData().get("PersonLastName").asText(), is("Parker")),
             () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine1").asText(), is("123")),
-            () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine2").asText(), is("Fake Street")),
+            () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine2").asText(),
+                    is("Fake Street")),
             () -> assertThat(byReference.getData().get("PersonAddress").get("AddressLine3").asText(), is("Hexton"))
         );
     }
 
+
     @Test
     public void sanitisesInputsCountQuery() {
         String evil = "foo');insert into case users values(1,2,3);--";
-        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase", CAN_READ))
+        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE",
+                "TestAddressBookCase", CAN_READ))
             .thenReturn(asList(evil));
 
         when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
         when(userAuthorisation.getUserId()).thenReturn(evil);
 
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
-        final PaginatedSearchMetadata byMetaData = caseDetailsRepository.getPaginatedSearchMetadata(metadata, Maps.newHashMap());
+        final PaginatedSearchMetadata byMetaData =
+            caseDetailsRepository.getPaginatedSearchMetadata(metadata, Maps.newHashMap());
 
-        // If any input is not correctly sanitized it will cause an exception since query result structure will not be as hibernate expects.
+        // If any input is not correctly sanitized it will cause an exception since query result structure will not be
+        // as hibernate expects.
         assertThat(byMetaData.getTotalResultsCount(), is(0));
     }
 
+//CHECKSTYLE.OFF: CommentsIndentation
 //  This test should be uncommented as part of future RDM-7408
 //    @Test(expected = IllegalArgumentException.class)
 //    public void validateInputsMainQuerySortOrder() {
 //        String evil = "foo');insert into case users values(1,2,3);--";
-//        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase", CAN_READ))
+//        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase",
+//        CAN_READ))
 //            .thenReturn(asList(evil));
 //
 //        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
@@ -176,9 +182,11 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 //                                       .direction("DESC")
 //                                       .build());
 //
-//        // If any input is not correctly validated it will pass the query to jdbc driver creating potential sql injection vulnerability
-//        caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
+//        // If any input is not correctly validated it will pass the query to jdbc driver creating potential sql
+//        injection vulnerability. caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
 //    }
+    //CHECKSTYLE.ON: CommentsIndentation
+
 
     @Test
     public void sanitiseInputMainQuerySortOrderForDirection() {
@@ -192,9 +200,11 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
             .direction(evil)
             .build());
 
-        final List<CaseDetails> byMetaData = caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
+        final List<CaseDetails> byMetaData =
+            caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
 
-        // If any input is not correctly sanitized it will cause an exception since query result structure will not be as hibernate expects.
+        // If any input is not correctly sanitized it will cause an exception since query result structure will not be
+        // as hibernate expects.
         assertThat(byMetaData.size(), is(0));
     }
 
@@ -210,7 +220,8 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
             .direction("DESC")
             .build());
 
-        // If any input is not correctly validated it will pass the query to jdbc driver creating potential sql injection vulnerability
+        // If any input is not correctly validated it will pass the query to jdbc driver creating potential sql
+        // injection vulnerability
         caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
     }
 
@@ -233,7 +244,8 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         assumeDataInitialised();
 
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
-        final PaginatedSearchMetadata byMetaData = caseDetailsRepository.getPaginatedSearchMetadata(metadata, Maps.newHashMap());
+        final PaginatedSearchMetadata byMetaData =
+            caseDetailsRepository.getPaginatedSearchMetadata(metadata, Maps.newHashMap());
         assertThat(byMetaData.getTotalResultsCount(), is(7));
     }
 
@@ -306,14 +318,19 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
             () -> assertThat(byMetaDataAndFieldData.get(0).getJurisdiction(), is("PROBATE")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getState(), is("CaseCreated")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getCaseTypeId(), is("TestAddressBookCase")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getSecurityClassification(), is(SecurityClassification.PUBLIC)),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getSecurityClassification(),
+                is(SecurityClassification.PUBLIC)),
             () -> assertThat(byMetaDataAndFieldData.get(0).getReference(), is(1504259907353529L)),
             () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonFirstName").asText(), is("Janet")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonLastName").asText(), is("Parker")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine1").asText(), is("123")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine2").asText(), is("Fake Street")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine3").asText(), is("Hexton")),
-            () -> verify(authorisedCaseDefinitionDataService).getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase", CAN_READ)
+            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine1").asText(),
+                is("123")),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine2").asText(),
+                is("Fake Street")),
+            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine3").asText(),
+                is("Hexton")),
+            () -> verify(authorisedCaseDefinitionDataService).getUserAuthorisedCaseStateIds("PROBATE",
+                "TestAddressBookCase", CAN_READ)
         );
     }
 
@@ -325,7 +342,8 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
 
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
         metadata.setState(Optional.of("CaseCreated"));
-        final PaginatedSearchMetadata paginatedSearchMetadata = caseDetailsRepository.getPaginatedSearchMetadata(metadata,
+        final PaginatedSearchMetadata paginatedSearchMetadata =
+            caseDetailsRepository.getPaginatedSearchMetadata(metadata,
             new HashMap<>());
         assertAll(
             () -> assertThat(paginatedSearchMetadata.getTotalResultsCount(), is(5)),
@@ -341,8 +359,8 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
         HashMap<String, String> searchParams = new HashMap<>();
         searchParams.put("PersonFirstName", "Janet");
-        final PaginatedSearchMetadata paginatedSearchMetadata = caseDetailsRepository.getPaginatedSearchMetadata(metadata,
-            searchParams);
+        final PaginatedSearchMetadata paginatedSearchMetadata =
+            caseDetailsRepository.getPaginatedSearchMetadata(metadata, searchParams);
         assertAll(
             () -> assertThat(paginatedSearchMetadata.getTotalResultsCount(), is(2)),
             () -> assertThat(paginatedSearchMetadata.getTotalPagesCount(), is(1))
@@ -400,7 +418,8 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
                 hasProperty("reference", equalTo(1504254784737847L))
             )))
         );
-        assertThat(caseDetailsRepository.getPaginatedSearchMetadata(metadata, searchParams).getTotalResultsCount(), is(1));
+        assertThat(caseDetailsRepository.getPaginatedSearchMetadata(metadata, searchParams).getTotalResultsCount(),
+            is(1));
     }
 
     @Test
@@ -409,7 +428,8 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
         "classpath:sql/insert_case_with_restricted_state.sql"
     })
     public void searchWithParams_restrictedStates() {
-        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE", "TestAddressBookCase", CAN_READ))
+        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE",
+            "TestAddressBookCase", CAN_READ))
             .thenReturn(asList("CaseRestricted"));
 
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
@@ -449,6 +469,17 @@ public class DefaultCaseDetailsRepositoryTest extends BaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void findByReferenceWithoutJurisdiction() {
         final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(REFERENCE.toString());
+
+        final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new AssertionError("No case found"));
+
+        assertCaseDetails(caseDetails, "1", JURISDICTION, REFERENCE);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void findByReferenceWithNoAccessControl() {
+        final Optional<CaseDetails> maybeCase =
+            caseDetailsRepository.findByReferenceWithNoAccessControl(REFERENCE.toString());
 
         final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new AssertionError("No case found"));
 
