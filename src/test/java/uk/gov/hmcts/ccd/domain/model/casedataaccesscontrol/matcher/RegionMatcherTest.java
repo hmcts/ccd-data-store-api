@@ -12,7 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.BaseFilter;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class RegionMatcherTest extends BaseFilter {
 
@@ -32,8 +32,7 @@ class RegionMatcherTest extends BaseFilter {
         RoleAssignmentFilteringResult result = new RoleAssignmentFilteringResult(roleAssignment,
             new RoleMatchingResult());
         CaseDetails caseDetails = mockCaseDetails();
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertTrue(matched);
+        classUnderTest.matchAttribute(result, caseDetails);
         assertTrue(result.getRoleMatchingResult().isRegionMatched());
     }
 
@@ -46,8 +45,7 @@ class RegionMatcherTest extends BaseFilter {
         RoleAssignmentFilteringResult result = new RoleAssignmentFilteringResult(roleAssignment,
             new RoleMatchingResult());
         CaseDetails caseDetails = mockCaseDetails();
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertTrue(matched);
+        classUnderTest.matchAttribute(result, caseDetails);
         assertTrue(result.getRoleMatchingResult().isRegionMatched());
     }
 
@@ -60,8 +58,7 @@ class RegionMatcherTest extends BaseFilter {
         RoleAssignmentFilteringResult result = new RoleAssignmentFilteringResult(roleAssignment,
             new RoleMatchingResult());
         CaseDetails caseDetails = mockCaseDetails();
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertFalse(matched);
+        classUnderTest.matchAttribute(result, caseDetails);
         assertFalse(result.getRoleMatchingResult().isRegionMatched());
     }
 

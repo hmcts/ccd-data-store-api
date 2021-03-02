@@ -31,8 +31,7 @@ class SecurityClassificationMatcherTest extends BaseFilter {
         RoleAssignmentFilteringResult result = new RoleAssignmentFilteringResult(roleAssignment,
             new RoleMatchingResult());
         CaseDetails caseDetails = mockCaseDetails();
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertTrue(matched);
+        classUnderTest.matchAttribute(result, caseDetails);
         assertTrue(result.getRoleMatchingResult().isClassificationMatched());
     }
 
@@ -44,8 +43,7 @@ class SecurityClassificationMatcherTest extends BaseFilter {
         RoleAssignmentFilteringResult result = new RoleAssignmentFilteringResult(roleAssignment,
             new RoleMatchingResult());
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED);
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertFalse(matched);
+        classUnderTest.matchAttribute(result, caseDetails);
         assertFalse(result.getRoleMatchingResult().isClassificationMatched());
     }
 
@@ -58,8 +56,7 @@ class SecurityClassificationMatcherTest extends BaseFilter {
         RoleAssignmentFilteringResult result = new RoleAssignmentFilteringResult(roleAssignment,
             new RoleMatchingResult());
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED);
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertFalse(matched);
+        classUnderTest.matchAttribute(result, caseDetails);
         assertFalse(result.getRoleMatchingResult().isClassificationMatched());
     }
 
@@ -71,8 +68,7 @@ class SecurityClassificationMatcherTest extends BaseFilter {
         RoleAssignmentFilteringResult result = new RoleAssignmentFilteringResult(roleAssignment,
             new RoleMatchingResult());
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED);
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertFalse(matched);
+        classUnderTest.matchAttribute(result, caseDetails);
         assertFalse(result.getRoleMatchingResult().isClassificationMatched());
     }
 

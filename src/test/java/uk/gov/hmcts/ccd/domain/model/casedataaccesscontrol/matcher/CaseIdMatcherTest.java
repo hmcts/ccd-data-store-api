@@ -13,7 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.BaseFilter;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class CaseIdMatcherTest extends BaseFilter {
 
@@ -35,8 +35,7 @@ class CaseIdMatcherTest extends BaseFilter {
             new RoleMatchingResult());
 
         CaseDetails caseDetails = mockCaseDetails();
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertTrue(matched);
+        classUnderTest.matchAttribute(result, caseDetails);
         assertTrue(result.getRoleMatchingResult().isCaseIdMatched());
     }
 
@@ -51,8 +50,7 @@ class CaseIdMatcherTest extends BaseFilter {
             new RoleMatchingResult());
 
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED, JURISDICTION_2);
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertFalse(matched);
+        classUnderTest.matchAttribute(result, caseDetails);
         assertFalse(result.getRoleMatchingResult().isCaseIdMatched());
     }
 
@@ -68,8 +66,7 @@ class CaseIdMatcherTest extends BaseFilter {
             new RoleMatchingResult());
 
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED, JURISDICTION_2);
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertTrue(matched);
+        classUnderTest.matchAttribute(result, caseDetails);
         assertTrue(result.getRoleMatchingResult().isCaseIdMatched());
     }
 
@@ -85,8 +82,7 @@ class CaseIdMatcherTest extends BaseFilter {
             new RoleMatchingResult());
 
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED, JURISDICTION_2);
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertFalse(matched);
+        classUnderTest.matchAttribute(result, caseDetails);
         assertFalse(result.getRoleMatchingResult().isCaseIdMatched());
     }
 }

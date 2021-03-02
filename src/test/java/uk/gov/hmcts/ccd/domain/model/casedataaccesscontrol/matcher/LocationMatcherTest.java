@@ -34,8 +34,7 @@ class LocationMatcherTest extends BaseFilter {
             new RoleMatchingResult());
 
         CaseDetails caseDetails = mockCaseDetails();
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertTrue(matched);
+        classUnderTest.matchAttribute(result, caseDetails);
         assertTrue(result.getRoleMatchingResult().isLocationMatched());
     }
 
@@ -50,8 +49,7 @@ class LocationMatcherTest extends BaseFilter {
             new RoleMatchingResult());
 
         CaseDetails caseDetails = mockCaseDetails();
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertTrue(matched);
+        classUnderTest.matchAttribute(result, caseDetails);
         assertTrue(result.getRoleMatchingResult().isLocationMatched());
     }
 
@@ -66,8 +64,7 @@ class LocationMatcherTest extends BaseFilter {
             new RoleMatchingResult());
 
         CaseDetails caseDetails = mockCaseDetails();
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertFalse(matched);
+        classUnderTest.matchAttribute(result, caseDetails);
         assertFalse(result.getRoleMatchingResult().isLocationMatched());
     }
 }

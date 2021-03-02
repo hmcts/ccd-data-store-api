@@ -12,7 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.BaseFilter;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class BeginDateEndDateMatcherTest extends BaseFilter {
 
@@ -34,15 +34,13 @@ class BeginDateEndDateMatcherTest extends BaseFilter {
             new RoleMatchingResult());
 
         CaseDetails caseDetails = mockCaseDetails();
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertTrue(matched);
+        classUnderTest.matchAttribute(result, caseDetails);
         assertTrue(result.getRoleMatchingResult().isDateMatched());
     }
 
     @Test
     void shouldNotMatchWhenBeginDateIsNull() {
-        RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_2, JURISDICTION_1,
-           null,
+        RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_2, JURISDICTION_1, null,
             Instant.now().plus(2, ChronoUnit.DAYS),
             "PRIVATE", null, null);
 
@@ -50,8 +48,7 @@ class BeginDateEndDateMatcherTest extends BaseFilter {
             new RoleMatchingResult());
 
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED, JURISDICTION_2);
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertFalse(matched);
+        classUnderTest.matchAttribute(result, caseDetails);
         assertFalse(result.getRoleMatchingResult().isDateMatched());
     }
 
@@ -66,8 +63,7 @@ class BeginDateEndDateMatcherTest extends BaseFilter {
             new RoleMatchingResult());
 
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED, JURISDICTION_2);
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertFalse(matched);
+        classUnderTest.matchAttribute(result, caseDetails);
         assertFalse(result.getRoleMatchingResult().isDateMatched());
     }
 
@@ -82,8 +78,7 @@ class BeginDateEndDateMatcherTest extends BaseFilter {
             new RoleMatchingResult());
 
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED, JURISDICTION_2);
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertFalse(matched);
+        classUnderTest.matchAttribute(result, caseDetails);
         assertFalse(result.getRoleMatchingResult().isDateMatched());
     }
 
@@ -98,8 +93,7 @@ class BeginDateEndDateMatcherTest extends BaseFilter {
             new RoleMatchingResult());
 
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED, JURISDICTION_2);
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertFalse(matched);
+        classUnderTest.matchAttribute(result, caseDetails);
         assertFalse(result.getRoleMatchingResult().isDateMatched());
     }
 }
