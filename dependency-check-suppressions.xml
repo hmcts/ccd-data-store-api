@@ -21,5 +21,12 @@
     <cve>CVE-2020-26939</cve>
 		<cve>CVE-2020-8908</cve>
 	</suppress>
-  
+
+	<suppress>
+		<notes><![CDATA[
+   file name: elasticsearch-6.8.13.jar
+   ]]></notes>
+		<packageUrl regex="true">^pkg:maven/org\.elasticsearch/elasticsearch@.*$</packageUrl>
+		<vulnerabilityName>CVE-2020-7021</vulnerabilityName>
+	</suppress>
 </suppressions>
