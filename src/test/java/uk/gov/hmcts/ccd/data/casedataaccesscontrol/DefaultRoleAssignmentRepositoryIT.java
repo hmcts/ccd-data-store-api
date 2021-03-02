@@ -1,15 +1,15 @@
 package uk.gov.hmcts.ccd.data.casedataaccesscontrol;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
+import java.time.Instant;
+import java.util.Optional;
+import javax.inject.Inject;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
-
-import javax.inject.Inject;
-import java.time.Instant;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.badRequest;
 import static com.github.tomakehurst.wiremock.client.WireMock.notFound;
@@ -45,6 +45,7 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
     private static final String ATTRIBUTES_LOCATION = "south-east-cornwall";
     private static final String AUTHORISATIONS_AUTH_1 = "auth1";
     private static final String AUTHORISATIONS_AUTH_2 = "auth2";
+    private static final String POST_CODE = "EC12 3LN";
 
     @Inject
     private RoleAssignmentRepository roleAssignmentRepository;
@@ -54,32 +55,7 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
     public void shouldReturnRoleAssignments() {
         stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).willReturn(okJson(jsonBody())));
 
-        RoleAssignmentResponse roleAssignments = roleAssignmentRepository.getRoleAssignments(ACTOR_ID);
-
-        assertThat(roleAssignments.getRoleAssignments().size(), is(1));
-        RoleAssignmentResource roleAssignmentResource = roleAssignments.getRoleAssignments().get(0);
-        assertThat(roleAssignmentResource.getId(), is(ID));
-        assertThat(roleAssignmentResource.getActorIdType(), is(ACTOR_ID_TYPE));
-        assertThat(roleAssignmentResource.getActorId(), is(ACTOR_ID));
-        assertThat(roleAssignmentResource.getRoleType(), is(ROLE_TYPE));
-        assertThat(roleAssignmentResource.getRoleName(), is(ROLE_NAME));
-        assertThat(roleAssignmentResource.getClassification(), is(CLASSIFICATION));
-        assertThat(roleAssignmentResource.getGrantType(), is(GRANT_TYPE));
-        assertThat(roleAssignmentResource.getRoleCategory(), is(ROLE_CATEGORY));
-        assertThat(roleAssignmentResource.getReadOnly(), is(READ_ONLY));
-        assertThat(roleAssignmentResource.getBeginTime(), is(EXPECTED_BEGIN_TIME));
-        assertThat(roleAssignmentResource.getEndTime(), is(EXPECTED_END_TIME));
-        assertThat(roleAssignmentResource.getCreated(), is(EXPECTED_CREATED));
-
-        assertThat(roleAssignmentResource.getAttributes().getContractType(), is(ATTRIBUTES_CONTRACT_TYPE));
-        assertThat(roleAssignmentResource.getAttributes().getJurisdiction(), is(ATTRIBUTES_JURISDICTION));
-        assertThat(roleAssignmentResource.getAttributes().getCaseId(), is(ATTRIBUTES_CASE_ID));
-        assertThat(roleAssignmentResource.getAttributes().getLocation(), is(ATTRIBUTES_LOCATION));
-        assertThat(roleAssignmentResource.getAttributes().getRegion(), is(ATTRIBUTES_REGION));
-
-        assertThat(roleAssignmentResource.getAuthorisations().size(), is(2));
-        assertThat(roleAssignmentResource.getAuthorisations().get(0), is(AUTHORISATIONS_AUTH_1));
-        assertThat(roleAssignmentResource.getAuthorisations().get(1), is(AUTHORISATIONS_AUTH_2));
+        validateRoleAssignments();
     }
 
     @DisplayName("should error on 404 when GET roleAssignments")
@@ -119,6 +95,15 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
                    startsWith("Problem getting Role Assignments from Role Assignment Service because of "));
     }
 
+    @DisplayName("should return roleAssignments")
+    @Test
+    public void shouldReturnRoleAssignmentsWhenUnknownFieldsOnRequest() {
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID))
+            .willReturn(okJson(jsonBodyUnknownFields())));
+
+        validateRoleAssignments();
+    }
+
     private static String jsonBody() {
         return "{\n"
             + "  \"roleAssignmentResponse\": [\n"
@@ -141,6 +126,66 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
             + "        \"caseId\": \"" + ATTRIBUTES_CASE_ID + "\",\n"
             + "        \"location\": \"" + ATTRIBUTES_LOCATION + "\",\n"
             + "        \"region\": \"" + ATTRIBUTES_REGION + "\"\n"
+            + "      },\n"
+            + "      \"authorisations\": [\"" + AUTHORISATIONS_AUTH_1 + "\", \"" + AUTHORISATIONS_AUTH_2 + "\"]\n"
+            + "    }\n"
+            + "  ]\n"
+            + "}";
+    }
+
+    private void validateRoleAssignments() {
+        RoleAssignmentResponse roleAssignments = roleAssignmentRepository.getRoleAssignments(ACTOR_ID);
+
+        assertThat(roleAssignments.getRoleAssignments().size(), is(1));
+        RoleAssignmentResource roleAssignmentResource = roleAssignments.getRoleAssignments().get(0);
+        assertThat(roleAssignmentResource.getId(), is(ID));
+        assertThat(roleAssignmentResource.getActorIdType(), is(ACTOR_ID_TYPE));
+        assertThat(roleAssignmentResource.getActorId(), is(ACTOR_ID));
+        assertThat(roleAssignmentResource.getRoleType(), is(ROLE_TYPE));
+        assertThat(roleAssignmentResource.getRoleName(), is(ROLE_NAME));
+        assertThat(roleAssignmentResource.getClassification(), is(CLASSIFICATION));
+        assertThat(roleAssignmentResource.getGrantType(), is(GRANT_TYPE));
+        assertThat(roleAssignmentResource.getRoleCategory(), is(ROLE_CATEGORY));
+        assertThat(roleAssignmentResource.getReadOnly(), is(READ_ONLY));
+        assertThat(roleAssignmentResource.getBeginTime(), is(EXPECTED_BEGIN_TIME));
+        assertThat(roleAssignmentResource.getEndTime(), is(EXPECTED_END_TIME));
+        assertThat(roleAssignmentResource.getCreated(), is(EXPECTED_CREATED));
+
+        assertThat(roleAssignmentResource.getAttributes().getContractType().get(), is(ATTRIBUTES_CONTRACT_TYPE));
+        assertThat(roleAssignmentResource.getAttributes().getJurisdiction().get(), is(ATTRIBUTES_JURISDICTION));
+        assertThat(roleAssignmentResource.getAttributes().getCaseId().get(), is(ATTRIBUTES_CASE_ID));
+        assertThat(roleAssignmentResource.getAttributes().getLocation().get(), is(ATTRIBUTES_LOCATION));
+        assertThat(roleAssignmentResource.getAttributes().getRegion().get(), is(ATTRIBUTES_REGION));
+
+        assertThat(roleAssignmentResource.getAuthorisations().size(), is(2));
+        assertThat(roleAssignmentResource.getAuthorisations().get(0), is(AUTHORISATIONS_AUTH_1));
+        assertThat(roleAssignmentResource.getAuthorisations().get(1), is(AUTHORISATIONS_AUTH_2));
+    }
+
+    private static String jsonBodyUnknownFields() {
+        return "{\n"
+            + "  \"roleAssignmentResponse\": [\n"
+            + "    {\n"
+            + "      \"id\": \"" + ID + "\",\n"
+            + "      \"actorIdType\": \"" + ACTOR_ID_TYPE + "\",\n"
+            + "      \"actorId\": \"" + ACTOR_ID + "\",\n"
+            + "      \"roleType\": \"" + ROLE_TYPE + "\",\n"
+            + "      \"roleName\": \"" + ROLE_NAME + "\",\n"
+            + "      \"classification\": \"" + CLASSIFICATION + "\",\n"
+            + "      \"grantType\": \"" + GRANT_TYPE + "\",\n"
+            + "      \"roleCategory\": \"" + ROLE_CATEGORY + "\",\n"
+            + "      \"readOnly\": " + READ_ONLY + ",\n"
+            + "      \"beginTime\": \"" + BEGIN_TIME + "\",\n"
+            + "      \"endTime\": \"" + END_TIME + "\",\n"
+            + "      \"created\": \"" + CREATED + "\",\n"
+            + "      \"fieldA\": \"" + CREATED + "\",\n"
+            + "      \"attributes\": {\n"
+            + "        \"contractType\": \"" + ATTRIBUTES_CONTRACT_TYPE + "\",\n"
+            + "        \"jurisdiction\": \"" + ATTRIBUTES_JURISDICTION + "\",\n"
+            + "        \"caseId\": \"" + ATTRIBUTES_CASE_ID + "\",\n"
+            + "        \"location\": \"" + ATTRIBUTES_LOCATION + "\",\n"
+            + "        \"region\": \"" + ATTRIBUTES_REGION + "\",\n"
+            + "        \"postCode\": \"" + POST_CODE + "\"\n"
             + "      },\n"
             + "      \"authorisations\": [\"" + AUTHORISATIONS_AUTH_1 + "\", \"" + AUTHORISATIONS_AUTH_2 + "\"]\n"
             + "    }\n"
