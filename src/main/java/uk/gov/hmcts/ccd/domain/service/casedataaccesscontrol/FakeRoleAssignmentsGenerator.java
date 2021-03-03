@@ -4,12 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
@@ -19,14 +17,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.SPECIFIC;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.STANDARD;
+
 @Component
 @ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "true")
 public class FakeRoleAssignmentsGenerator {
 
-    public static final String IDAM_PREFIX = "idam:";
-    public static final String GRANT_TYPE_SPECIFIC = "SPECIFIC";
-    public static final String GRANT_TYPE_STANDARD = "STANDARD";
-    public static final String CLASSIFICATION_RESTRICTED = "RESTRICTED";
+    protected static final String IDAM_PREFIX = "idam:";
 
     private final UserRepository userRepository;
     private final CaseDefinitionRepository caseDefinitionRepository;
@@ -61,8 +60,8 @@ public class FakeRoleAssignmentsGenerator {
         return idamRoles.stream()
             .map(role -> RoleAssignment.builder()
                 .roleName(IDAM_PREFIX + role)
-                .grantType(GrantType.SPECIFIC.name())
-                .classification(SecurityClassification.RESTRICTED.name())
+                .grantType(SPECIFIC.name())
+                .classification(RESTRICTED.name())
                 .build())
             .collect(Collectors.toList());
     }
@@ -78,7 +77,7 @@ public class FakeRoleAssignmentsGenerator {
         return idamRoles.stream()
             .map(role -> RoleAssignment.builder()
                 .roleName(IDAM_PREFIX + role)
-                .grantType(GrantType.STANDARD.name())
+                .grantType(STANDARD.name())
                 .classification(roleToClassification.get(role))
                 .build())
             .collect(Collectors.toList());

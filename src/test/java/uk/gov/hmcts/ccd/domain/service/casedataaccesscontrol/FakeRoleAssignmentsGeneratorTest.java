@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
@@ -27,9 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.FakeRoleAssignmentsGenerator.CLASSIFICATION_RESTRICTED;
-import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.FakeRoleAssignmentsGenerator.GRANT_TYPE_SPECIFIC;
-import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.FakeRoleAssignmentsGenerator.GRANT_TYPE_STANDARD;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
+import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.SPECIFIC;
 import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.FakeRoleAssignmentsGenerator.IDAM_PREFIX;
 
 @DisplayName("FakeRoleAssignmentsGenerator")
@@ -59,18 +61,15 @@ class FakeRoleAssignmentsGeneratorTest {
     @DisplayName("addFakeRoleAssignments()")
     class AddFakeRoleAssignments {
 
-        public static final String JURISDICTION = "DIVORCE";
-        public static final String ROLE_SOLICITOR = "caseworker-divorce-solicitor";
-        public static final String EXPECTED_ROLE_SOLICITOR = IDAM_PREFIX + "caseworker-divorce-solicitor";
-        public static final String ROLE_LOCAL_AUTHORITY = "caseworker-divorce-localAuthority";
-        public static final String EXPECTED_ROLE_LOCAL_AUTHORITY = IDAM_PREFIX + "caseworker-divorce-localAuthority";
-        public static final String ROLE_PROVIDED = "provided";
-        public static final String ROLE_CASEWORKER_1 = "caseworker";
-        public static final String EXPECTED_ROLE_CASEWORKER_1 = IDAM_PREFIX + "caseworker";
-        public static final String CASEWORKER_1_CLASSIFICATION = "PUBLIC";
-        public static final String ROLE_CASEWORKER_2 = "caseworker-divorce";
-        public static final String EXPECTED_ROLE_CASEWORKER_2 = IDAM_PREFIX + "caseworker-divorce";
-        public static final String CASEWORKER_2_CLASSIFICATION = "PRIVATE";
+        private static final String ROLE_PROVIDED = "provided";
+        private static final String ROLE_SOLICITOR = "caseworker-divorce-solicitor";
+        private static final String EXPECTED_ROLE_SOLICITOR = IDAM_PREFIX + "caseworker-divorce-solicitor";
+        private static final String ROLE_LOCAL_AUTHORITY = "caseworker-divorce-localAuthority";
+        private static final String EXPECTED_ROLE_LOCAL_AUTHORITY = IDAM_PREFIX + "caseworker-divorce-localAuthority";
+        private static final String ROLE_CASEWORKER_1 = "caseworker";
+        private static final String EXPECTED_ROLE_CASEWORKER_1 = IDAM_PREFIX + "caseworker";
+        private static final String ROLE_CASEWORKER_2 = "caseworker-divorce";
+        private static final String EXPECTED_ROLE_CASEWORKER_2 = IDAM_PREFIX + "caseworker-divorce";
 
         @Test
         @DisplayName("should add fake RoleAssignments for granted user roles")
@@ -109,20 +108,20 @@ class FakeRoleAssignmentsGeneratorTest {
                 () -> assertNull(providedRoleAssignment.get().getClassification()),
 
                 () -> assertThat(caseworker1RoleAssignment.get().getRoleName(), is(EXPECTED_ROLE_CASEWORKER_1)),
-                () -> assertThat(caseworker1RoleAssignment.get().getGrantType(), is(GRANT_TYPE_SPECIFIC)),
-                () -> assertThat(caseworker1RoleAssignment.get().getClassification(), is(CLASSIFICATION_RESTRICTED)),
+                () -> assertThat(caseworker1RoleAssignment.get().getGrantType(), is(SPECIFIC.name())),
+                () -> assertThat(caseworker1RoleAssignment.get().getClassification(), is(RESTRICTED.name())),
 
                 () -> assertThat(caseworker2RoleAssignment.get().getRoleName(), is(EXPECTED_ROLE_CASEWORKER_2)),
-                () -> assertThat(caseworker2RoleAssignment.get().getGrantType(), is(GRANT_TYPE_SPECIFIC)),
-                () -> assertThat(caseworker2RoleAssignment.get().getClassification(), is(CLASSIFICATION_RESTRICTED)),
+                () -> assertThat(caseworker2RoleAssignment.get().getGrantType(), is(SPECIFIC.name())),
+                () -> assertThat(caseworker2RoleAssignment.get().getClassification(), is(RESTRICTED.name())),
 
                 () -> assertThat(solicitorRoleAssignment.get().getRoleName(), is(EXPECTED_ROLE_SOLICITOR)),
-                () -> assertThat(solicitorRoleAssignment.get().getGrantType(), is(GRANT_TYPE_SPECIFIC)),
-                () -> assertThat(solicitorRoleAssignment.get().getClassification(), is(CLASSIFICATION_RESTRICTED)),
+                () -> assertThat(solicitorRoleAssignment.get().getGrantType(), is(SPECIFIC.name())),
+                () -> assertThat(solicitorRoleAssignment.get().getClassification(), is(RESTRICTED.name())),
 
                 () -> assertThat(localAuthorityRoleAssignment.get().getRoleName(), is(EXPECTED_ROLE_LOCAL_AUTHORITY)),
-                () -> assertThat(localAuthorityRoleAssignment.get().getGrantType(), is(GRANT_TYPE_SPECIFIC)),
-                () -> assertThat(localAuthorityRoleAssignment.get().getClassification(), is(CLASSIFICATION_RESTRICTED)),
+                () -> assertThat(localAuthorityRoleAssignment.get().getGrantType(), is(SPECIFIC.name())),
+                () -> assertThat(localAuthorityRoleAssignment.get().getClassification(), is(RESTRICTED.name())),
 
                 () -> verify(userRepository).getUserRoles()
             );
@@ -154,8 +153,8 @@ class FakeRoleAssignmentsGeneratorTest {
             List<String> userRoles = asList(ROLE_CASEWORKER_2, ROLE_CASEWORKER_1);
             given(userRepository.getUserRoles()).willReturn(new HashSet<>(userRoles));
             List<UserRole> userRolesWithClassification =
-                asList(createUserRole(ROLE_CASEWORKER_1, CASEWORKER_1_CLASSIFICATION),
-                       createUserRole(ROLE_CASEWORKER_2, CASEWORKER_2_CLASSIFICATION));
+                asList(createUserRole(ROLE_CASEWORKER_1, PUBLIC.name()),
+                       createUserRole(ROLE_CASEWORKER_2, PRIVATE.name()));
             given(caseDefinitionRepository.getClassificationsForUserRoleList(anyList()))
                 .willReturn(userRolesWithClassification);
             given(caseAccessService.canOnlyViewExplicitlyGrantedCases()).willReturn(false);
@@ -184,12 +183,12 @@ class FakeRoleAssignmentsGeneratorTest {
                 () -> assertNull(providedRoleAssignment.get().getClassification()),
 
                 () -> assertThat(caseworker1RoleAssignment.get().getRoleName(), is(EXPECTED_ROLE_CASEWORKER_1)),
-                () -> assertThat(caseworker1RoleAssignment.get().getGrantType(), is(GRANT_TYPE_STANDARD)),
-                () -> assertThat(caseworker1RoleAssignment.get().getClassification(), is(CASEWORKER_1_CLASSIFICATION)),
+                () -> assertThat(caseworker1RoleAssignment.get().getGrantType(), is(GrantType.STANDARD.name())),
+                () -> assertThat(caseworker1RoleAssignment.get().getClassification(), is(PUBLIC.name())),
 
                 () -> assertThat(caseworker2RoleAssignment.get().getRoleName(), is(EXPECTED_ROLE_CASEWORKER_2)),
-                () -> assertThat(caseworker2RoleAssignment.get().getGrantType(), is(GRANT_TYPE_STANDARD)),
-                () -> assertThat(caseworker2RoleAssignment.get().getClassification(), is(CASEWORKER_2_CLASSIFICATION)),
+                () -> assertThat(caseworker2RoleAssignment.get().getGrantType(), is(GrantType.STANDARD.name())),
+                () -> assertThat(caseworker2RoleAssignment.get().getClassification(), is(PRIVATE.name())),
 
                 () -> verify(userRepository).getUserRoles()
             );
