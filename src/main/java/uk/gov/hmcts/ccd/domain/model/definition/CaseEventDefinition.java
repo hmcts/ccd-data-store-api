@@ -49,6 +49,8 @@ public class CaseEventDefinition implements Serializable {
     private Boolean publish;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
+    @JsonProperty("event_enabling_condition")
+    private String eventEnablingCondition;
 
     public String getId() {
         return id;
@@ -215,5 +217,13 @@ public class CaseEventDefinition implements Serializable {
         return getCaseFields().stream()
             .filter(f -> f.getCaseFieldId().equals(caseFieldId))
             .findFirst();
+    }
+
+    public String getEventEnablingCondition() {
+        return eventEnablingCondition;
+    }
+
+    public void setEventEnablingCondition(String eventEnablingCondition) {
+        this.eventEnablingCondition = eventEnablingCondition;
     }
 }

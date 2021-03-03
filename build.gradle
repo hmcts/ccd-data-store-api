@@ -197,7 +197,7 @@ dependencies {
     // FIXME 0.6 doesn't support jsonb; 0.7 doesn't work on Windows
 //    runtime group: 'com.impossibl.pgjdbc-ng', name: 'pgjdbc-ng', version: '0.6'
     runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.16'
-    runtime group: 'com.zaxxer', name: 'HikariCP', version: '2.7.9'
+    runtime group: 'com.zaxxer', name: 'HikariCP', version: '4.0.2'
 
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     testImplementation('org.springframework.boot:spring-boot-starter-test')
@@ -228,7 +228,7 @@ dependencies {
     compile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
     }
-    compile(group: 'org.elasticsearch', name: 'elasticsearch', version: '6.8.13') {
+    compile(group: 'org.elasticsearch', name: 'elasticsearch', version: '6.8.14') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
@@ -244,7 +244,7 @@ dependencyManagement {
 
     dependencies {
         // Versions prior to 30.0 vulnerable to CVE-2020-8908
-        dependency 'com.google.guava:guava:30.0-jre'
+        dependency 'com.google.guava:guava:30.1-jre'
 
         // CVE-2019-0232 - Java and Command Line injections in Windows
         dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.40') {
