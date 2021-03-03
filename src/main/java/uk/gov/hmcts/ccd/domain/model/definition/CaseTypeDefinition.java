@@ -4,17 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.TextNode;
-import lombok.ToString;
-import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.ToString;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
@@ -38,6 +37,7 @@ public class CaseTypeDefinition implements Serializable {
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
     private final List<SearchAliasField> searchAliasFields = new ArrayList<>();
+    private List<RoleToAccessProfileDefinition> roleToAccessProfiles = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -191,5 +191,13 @@ public class CaseTypeDefinition implements Serializable {
             .filter(caseField -> LABEL.equals(caseField.getFieldTypeDefinition().getType()))
             .collect(Collectors.toMap(CaseFieldDefinition::getId, caseField ->
                 JsonNodeFactory.instance.textNode(caseField.getLabel())));
+    }
+
+    public List<RoleToAccessProfileDefinition> getRoleToAccessProfiles() {
+        return roleToAccessProfiles;
+    }
+
+    public void setRoleToAccessProfiles(List<RoleToAccessProfileDefinition> roleToAccessProfiles) {
+        this.roleToAccessProfiles = roleToAccessProfiles;
     }
 }
