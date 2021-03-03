@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.enablingcondition.jexl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -49,7 +48,7 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
     }
 
     @Override
-    public Boolean evaluate(String enablingCondition, Map<String, JsonNode> caseEventData) {
+    public Boolean evaluate(String enablingCondition, Map<String, ?> caseEventData) {
         try {
             String expression = this.enablingConditionConverter.convert(enablingCondition);
             if (expression != null) {
@@ -63,11 +62,12 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
         return false;
     }
 
-    private Map<String, Object> retrieveContextData(Map<String, JsonNode> caseEventData,
+    private Map<String, Object> retrieveContextData(Map<String, ?> caseEventData,
                                                     Set<List<String>> variableLists) {
         Set<String> variables = getVariableNames(variableLists);
+        Map<String, ?> convertedCaseData = convertMetaDataKeys(caseEventData);
+        DocumentContext context = JsonPath.parse(caseDataToJsonString(convertedCaseData));
         Map<String, Object> contextData = new HashMap<>();
-        DocumentContext context = JsonPath.parse(caseDataToJsonString(caseEventData));
         for (String variable : variables) {
             Optional<Object> value = getValueFromContext(context, variable);
             if (value.isPresent()) {
@@ -84,12 +84,25 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
             .collect(Collectors.toSet());
     }
 
-    private String caseDataToJsonString(Map<String, JsonNode> caseData) {
+    private String caseDataToJsonString(Map<String, ?> caseData) {
         try {
             return this.objectMapper.writeValueAsString(caseData);
         } catch (JsonProcessingException e) {
             throw new ServiceException("Unable to convert case data to JSON string", e);
         }
+    }
+
+    private Map<String, ?> convertMetaDataKeys(Map<String, ?> caseData) {
+        Map<String, Object> newCaseData = new HashMap<>();
+        caseData.keySet()
+            .forEach(key -> {
+                    String newKey = key.trim()
+                        .replace("[", "")
+                        .replaceAll("]", "");
+                    newCaseData.put(newKey, caseData.get(key));
+                }
+            );
+        return newCaseData;
     }
 
     private Optional<Object> getValueFromContext(DocumentContext context, String variable) {

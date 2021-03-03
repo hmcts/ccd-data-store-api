@@ -1,0 +1,9 @@
+{
+  "_guid_": "F-103_User_Dil",
+  "_extends_": "BeftaCaseworker2Solicitor3",
+
+  "specs": [
+    "Dil - with an active profile",
+    "Dil - with a valid User ID"
+  ]
+}
