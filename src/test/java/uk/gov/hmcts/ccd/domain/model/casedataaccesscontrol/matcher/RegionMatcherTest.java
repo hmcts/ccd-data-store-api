@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
@@ -29,11 +30,11 @@ class RegionMatcherTest extends BaseFilter {
             Instant.now().minus(1, ChronoUnit.DAYS),
             Instant.now().plus(2, ChronoUnit.DAYS),
             "PRIVATE", null, Optional.of(""));
-        RoleAssignmentFilteringResult result = new RoleAssignmentFilteringResult(roleAssignment,
+        Pair<RoleAssignment, RoleMatchingResult> result = Pair.of(roleAssignment,
             new RoleMatchingResult());
         CaseDetails caseDetails = mockCaseDetails();
         classUnderTest.matchAttribute(result, caseDetails);
-        assertTrue(result.getRoleMatchingResult().isRegionMatched());
+        assertTrue(result.getRight().isRegionMatched());
     }
 
     @Test
@@ -42,11 +43,11 @@ class RegionMatcherTest extends BaseFilter {
             Instant.now().minus(1, ChronoUnit.DAYS),
             Instant.now().plus(2, ChronoUnit.DAYS),
             "PRIVATE", Optional.of(""), Optional.of(""));
-        RoleAssignmentFilteringResult result = new RoleAssignmentFilteringResult(roleAssignment,
+        Pair<RoleAssignment, RoleMatchingResult> result = Pair.of(roleAssignment,
             new RoleMatchingResult());
         CaseDetails caseDetails = mockCaseDetails();
         classUnderTest.matchAttribute(result, caseDetails);
-        assertTrue(result.getRoleMatchingResult().isRegionMatched());
+        assertTrue(result.getRight().isRegionMatched());
     }
 
     @Test
@@ -55,11 +56,11 @@ class RegionMatcherTest extends BaseFilter {
             Instant.now().minus(1, ChronoUnit.DAYS),
             Instant.now().plus(2, ChronoUnit.DAYS),
             "PRIVATE", Optional.of("England"), Optional.of(""));
-        RoleAssignmentFilteringResult result = new RoleAssignmentFilteringResult(roleAssignment,
+        Pair<RoleAssignment, RoleMatchingResult> result = Pair.of(roleAssignment,
             new RoleMatchingResult());
         CaseDetails caseDetails = mockCaseDetails();
         classUnderTest.matchAttribute(result, caseDetails);
-        assertFalse(result.getRoleMatchingResult().isRegionMatched());
+        assertFalse(result.getRight().isRegionMatched());
     }
 
 }

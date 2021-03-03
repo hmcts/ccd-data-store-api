@@ -1,11 +1,17 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import java.util.List;
+import org.apache.commons.lang3.tuple.Pair;
 
-@Data
-@AllArgsConstructor
 public class RoleAssignmentFilteringResult {
-    private final RoleAssignment roleAssignment;
-    private final RoleMatchingResult roleMatchingResult;
+
+    private final List<Pair<RoleAssignment, RoleMatchingResult>> roleAssignmentRoleMatchingResults;
+
+    public RoleAssignmentFilteringResult(List<Pair<RoleAssignment, RoleMatchingResult>> roleAssignmentMatchPairs) {
+        this.roleAssignmentRoleMatchingResults = roleAssignmentMatchPairs;
+    }
+
+    public List<Pair<RoleAssignment, RoleMatchingResult>> getRoleAssignmentRoleMatchingResults() {
+        return roleAssignmentRoleMatchingResults;
+    }
 }
