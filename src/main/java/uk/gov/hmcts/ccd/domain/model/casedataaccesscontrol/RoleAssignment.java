@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 
 @Builder
 @Data
@@ -27,6 +26,6 @@ public class RoleAssignment {
     public boolean isCaseRoleAssignment() {
         return this.getAttributes() != null
             && this.getAttributes().getCaseId() != null
-            && StringUtils.isNotBlank(this.getAttributes().getCaseId().orElse(""));
+            && !this.getAttributes().getCaseId().isEmpty();
     }
 }
