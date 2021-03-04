@@ -1,15 +1,20 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentsFilteringService;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.FakeRoleAssignmentsGenerator;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 
 @Component
@@ -19,17 +24,23 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     private final RoleAssignmentService roleAssignmentService;
     private final SecurityUtils securityUtils;
     private final CaseService caseService;
-    private RoleAssignmentsFilteringService roleAssignmentsFilteringService;
+    private final RoleAssignmentsFilteringService roleAssignmentsFilteringService;
+    private final FakeRoleAssignmentsGenerator fakeRoleAssignmentsGenerator;
+    private final ApplicationParams applicationParams;
 
     @Autowired
     public DefaultCaseDataAccessControl(RoleAssignmentService roleAssignmentService,
                                         SecurityUtils securityUtils,
                                         CaseService caseService,
-                                        RoleAssignmentsFilteringService roleAssignmentsFilteringService) {
+                                        RoleAssignmentsFilteringService roleAssignmentsFilteringService,
+                                        FakeRoleAssignmentsGenerator fakeRoleAssignmentsGenerator,
+                                        ApplicationParams applicationParams) {
         this.roleAssignmentService = roleAssignmentService;
         this.securityUtils = securityUtils;
         this.caseService = caseService;
         this.roleAssignmentsFilteringService = roleAssignmentsFilteringService;
+        this.fakeRoleAssignmentsGenerator = fakeRoleAssignmentsGenerator;
+        this.applicationParams = applicationParams;
     }
 
     // Returns Optional<CaseDetails>. If this is not enough think of wrapping it in a AccessControlResponse
@@ -42,8 +53,10 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         RoleAssignmentFilteringResult filteringResults = roleAssignmentsFilteringService
             .filter(roleAssignments, caseDetails);
 
-        // 3.) Augment - Add to the list of filtered roles entries corresponding to the users Idam roles prefixed
-        // by 'idam:' (subject to a column that states whether these roles apply to case specific roles)
+        if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
+            List<RoleAssignment> augmentedRoleAssignments = fakeRoleAssignmentsGenerator
+                .addFakeRoleAssignments(filteringResults);
+        }
 
         // 4.) determine AccessProfiles from the new RoleToAccessProfiles Tab
         // https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1460559903#AccessControlScopeofDelivery-NewRoleToAccessProfilesTab

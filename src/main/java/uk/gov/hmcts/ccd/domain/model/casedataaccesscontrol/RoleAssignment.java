@@ -22,4 +22,10 @@ public class RoleAssignment {
     private Instant created;
     private List<String> authorisations;
     private RoleAssignmentAttributes attributes;
+
+    public boolean isCaseRoleAssignment() {
+        return this.getAttributes() != null
+            && this.getAttributes().getCaseId() != null
+            && !this.getAttributes().getCaseId().isEmpty();
+    }
 }

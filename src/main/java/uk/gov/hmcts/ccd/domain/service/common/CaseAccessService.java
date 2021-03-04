@@ -47,7 +47,7 @@ public class CaseAccessService {
     }
 
     public Boolean canUserAccess(CaseDetails caseDetails) {
-        if (canOnlyViewExplicitlyGrantedCases()) {
+        if (userCanOnlyAccessExplicitlyGrantedCases()) {
             return isExplicitAccessGranted(caseDetails);
         } else {
             return true;
@@ -64,7 +64,7 @@ public class CaseAccessService {
     }
 
     public Optional<List<Long>> getGrantedCaseIdsForRestrictedRoles() {
-        if (canOnlyViewExplicitlyGrantedCases()) {
+        if (userCanOnlyAccessExplicitlyGrantedCases()) {
             return Optional.of(caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId()));
         }
 
@@ -113,7 +113,7 @@ public class CaseAccessService {
         return Boolean.FALSE;
     }
 
-    public Boolean canOnlyViewExplicitlyGrantedCases() {
+    public Boolean userCanOnlyAccessExplicitlyGrantedCases() {
         return userRepository.anyRoleMatches(RESTRICT_GRANTED_ROLES_PATTERN);
     }
 
