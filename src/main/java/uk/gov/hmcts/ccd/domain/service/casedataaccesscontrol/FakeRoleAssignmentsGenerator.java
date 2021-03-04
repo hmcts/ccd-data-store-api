@@ -8,6 +8,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 
@@ -39,12 +40,13 @@ public class FakeRoleAssignmentsGenerator {
         this.caseAccessService = caseAccessService;
     }
 
-    public List<RoleAssignment> addFakeRoleAssignments(List<RoleAssignment> roleAssignments) {
+    public List<RoleAssignment> addFakeRoleAssignments(RoleAssignmentFilteringResult roleAssignmentsFilteringResult) {
         List<String> idamUserRoles = new ArrayList<>(userRepository.getUserRoles());
-        List<RoleAssignment> augmentedRoleAssignments = new ArrayList<>(roleAssignments);
+        List<RoleAssignment> augmentedRoleAssignments = new ArrayList<>(
+            roleAssignmentsFilteringResult.getRoleAssignments());
 
         if (caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()) {
-            if (atLeastOneCaseRoleExists(roleAssignments)) {
+            if (roleAssignmentsFilteringResult.atLeastOneCaseRoleExists()) {
                 augmentedRoleAssignments.addAll(createFakeRoleAssignmentsForGrantedOnlyAccess(idamUserRoles));
             }
         } else {
@@ -79,10 +81,5 @@ public class FakeRoleAssignmentsGenerator {
                 .classification(roleToClassification.get(role))
                 .build())
             .collect(Collectors.toList());
-    }
-
-    private boolean atLeastOneCaseRoleExists(List<RoleAssignment> roleAssignments) {
-        return roleAssignments.stream()
-            .anyMatch(RoleAssignment::isCaseRoleAssignment);
     }
 }

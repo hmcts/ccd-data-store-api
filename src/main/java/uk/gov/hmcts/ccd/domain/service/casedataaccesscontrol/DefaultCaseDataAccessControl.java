@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -23,7 +24,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     private final RoleAssignmentService roleAssignmentService;
     private final SecurityUtils securityUtils;
     private final CaseService caseService;
-    private RoleAssignmentsFilteringService roleAssignmentsFilteringService;
+    private final RoleAssignmentsFilteringService roleAssignmentsFilteringService;
     private final FakeRoleAssignmentsGenerator fakeRoleAssignmentsGenerator;
     private final ApplicationParams applicationParams;
 
@@ -54,7 +55,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
 
         if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
             List<RoleAssignment> augmentedRoleAssignments = fakeRoleAssignmentsGenerator
-                .addFakeRoleAssignments(roleAssignments.getRoleAssignments());
+                .addFakeRoleAssignments(filteringResults);
         }
 
         // 4.) determine AccessProfiles from the new RoleToAccessProfiles Tab
