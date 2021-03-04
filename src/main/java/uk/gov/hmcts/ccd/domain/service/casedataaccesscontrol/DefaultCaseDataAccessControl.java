@@ -11,7 +11,6 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentsFilteringService;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.mapper.RoleAssignmentToAccessProfileMapper;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
