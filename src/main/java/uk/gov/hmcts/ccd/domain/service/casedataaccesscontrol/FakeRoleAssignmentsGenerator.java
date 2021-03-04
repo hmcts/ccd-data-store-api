@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -22,7 +21,6 @@ import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.SPEC
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.STANDARD;
 
 @Component
-@ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "true")
 public class FakeRoleAssignmentsGenerator {
 
     protected static final String IDAM_PREFIX = "idam:";
@@ -45,7 +43,7 @@ public class FakeRoleAssignmentsGenerator {
         List<String> idamUserRoles = new ArrayList<>(userRepository.getUserRoles());
         List<RoleAssignment> augmentedRoleAssignments = new ArrayList<>(roleAssignments);
 
-        if (caseAccessService.canOnlyViewExplicitlyGrantedCases()) {
+        if (caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()) {
             if (atLeastOneCaseRoleExists(roleAssignments)) {
                 augmentedRoleAssignments.addAll(createFakeRoleAssignmentsForGrantedOnlyAccess(idamUserRoles));
             }

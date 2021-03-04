@@ -78,7 +78,7 @@ class FakeRoleAssignmentsGeneratorTest {
                                                                                  ROLE_CASEWORKER_2,
                                                                                  ROLE_SOLICITOR,
                                                                                  ROLE_LOCAL_AUTHORITY)));
-            given(caseAccessService.canOnlyViewExplicitlyGrantedCases()).willReturn(true);
+            given(caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()).willReturn(true);
 
             List<RoleAssignment> roleAssignments = singletonList(caseRoleAssignment());
 
@@ -134,7 +134,7 @@ class FakeRoleAssignmentsGeneratorTest {
                                                                                  ROLE_CASEWORKER_2,
                                                                                  ROLE_SOLICITOR,
                                                                                  ROLE_LOCAL_AUTHORITY)));
-            given(caseAccessService.canOnlyViewExplicitlyGrantedCases()).willReturn(true);
+            given(caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()).willReturn(true);
 
             List<RoleAssignment> roleAssignments = singletonList(organisationRoleAssignment());
 
@@ -157,7 +157,7 @@ class FakeRoleAssignmentsGeneratorTest {
                        createUserRole(ROLE_CASEWORKER_2, PRIVATE.name()));
             given(caseDefinitionRepository.getClassificationsForUserRoleList(anyList()))
                 .willReturn(userRolesWithClassification);
-            given(caseAccessService.canOnlyViewExplicitlyGrantedCases()).willReturn(false);
+            given(caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()).willReturn(false);
 
             List<RoleAssignment> roleAssignments = singletonList(organisationRoleAssignment());
 

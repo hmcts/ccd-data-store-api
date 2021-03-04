@@ -17,7 +17,7 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.FakeRoleAssignments
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 
 @Component
-@ConditionalOnProperty(name = "ccd.new-access-control-enabled", havingValue = "true")
+@ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "true")
 public class DefaultCaseDataAccessControl implements CaseDataAccessControl, AccessControl {
 
     private final RoleAssignmentService roleAssignmentService;
