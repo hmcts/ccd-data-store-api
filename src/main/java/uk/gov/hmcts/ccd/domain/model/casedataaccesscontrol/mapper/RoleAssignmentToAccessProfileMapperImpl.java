@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
@@ -12,11 +13,12 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteri
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 
-public class RoleAssignmentMapperImpl implements RoleAssignmentMapper {
+@Component
+public class RoleAssignmentToAccessProfileMapperImpl implements RoleAssignmentToAccessProfileMapper {
 
     @Override
-    public List<AccessProfile> map(RoleAssignmentFilteringResult filteringResult,
-                                   CaseTypeDefinition caseTypeDefinition) {
+    public List<AccessProfile> toAccessProfiles(RoleAssignmentFilteringResult filteringResult,
+                                                CaseTypeDefinition caseTypeDefinition) {
         List<RoleAssignment> roleAssignments = extractRoleAssignments(filteringResult);
 
         if (hasGrantTypeExcluded(roleAssignments)) {
@@ -33,7 +35,7 @@ public class RoleAssignmentMapperImpl implements RoleAssignmentMapper {
                     List<String> roleAssignmentAuthorisation = roleAssignment.getAuthorisations();
 
                     if (roleAssignmentAuthorisation != null && roleAssignmentAuthorisation.size() > 0) {
-                        for(String authorisation : authorisationsList) {
+                        for (String authorisation : authorisationsList) {
                             if (roleAssignmentAuthorisation.contains(authorisation)) {
                                 accessProfiles.add(createAccessProfile(roleAssignment, roleToAccessProfile));
                             }
