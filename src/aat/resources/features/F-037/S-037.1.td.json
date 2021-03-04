@@ -129,6 +129,9 @@
 			"security_classification": "[[ANYTHING_PRESENT]]",
 			"data": {
 				"CollectionComplexDateTime": [
+          {
+            "__elementId__": "value.DateField"
+          },
 					{
 						"value": {
 							"DateField": "1970-02-01",
@@ -197,6 +200,9 @@
 				"CollectionComplexDateTime": {
 					"classification": "PUBLIC",
 					"value": [
+            {
+              "__ordering__": "ordered"
+            },
 						{
 							"value": {
 								"DateField": "PUBLIC",
@@ -256,6 +262,9 @@
 				"CollectionDate": {
 					"classification": "PUBLIC",
 					"value": [
+            {
+              "__ordering__": "ordered"
+            },
 						{
 							"id": "[[ANY_STRING_NOT_NULLABLE]]",
 							"classification": "PUBLIC"
