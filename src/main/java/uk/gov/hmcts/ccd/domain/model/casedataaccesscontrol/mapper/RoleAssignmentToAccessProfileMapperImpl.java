@@ -65,7 +65,7 @@ public class RoleAssignmentToAccessProfileMapperImpl implements RoleAssignmentTo
                                               RoleToAccessProfileDefinition roleToAccessProfile) {
         AccessProfile accessProfile = new AccessProfile();
 
-        accessProfile.setReadOnly(roleToAccessProfile.getReadOnly() || roleToAccessProfile.getReadOnly());
+        accessProfile.setReadOnly(roleToAccessProfile.getReadOnly() || roleAssignment.getReadOnly());
         accessProfile.setClassification(roleAssignment.getClassification());
 
         String caseTypeAccessProfiles = roleToAccessProfile.getAccessProfiles();

@@ -15,7 +15,7 @@ public interface RoleAttributeMatcher {
         if (roleAssignmentValue == null) {
             return true;
         }
-        return roleAssignmentValue.get() == null
+        return !roleAssignmentValue.isPresent()
             || roleAssignmentValue.get().equals(caseDataValue);
     }
 }
