@@ -66,8 +66,8 @@ public class BaseFilter {
         // role assignment attributes
         RoleAssignmentAttributes roleAssignmentAttributes = createRoleAssignmentAttributes(Optional.of(caseId),
             Optional.of(jurisdiction),
-            location,
-            region);
+            region,
+            location);
         roleAssignment.setAttributes(roleAssignmentAttributes);
 
         return roleAssignment;
