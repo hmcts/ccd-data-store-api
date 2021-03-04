@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionUiConfigResult;
@@ -20,6 +21,7 @@ public class DefaultGetJurisdictionUiConfigOperation implements GetJurisdictionU
         this.repository = repository;
     }
 
+    @Transactional
     @Override
     public List<JurisdictionUiConfigDefinition> execute(List<String> jurisdictionReferences) {
         JurisdictionUiConfigResult jurisdictionUiConfigResult =

@@ -65,6 +65,10 @@ public class SecurityUtils {
         return userInfo;
     }
 
+    public UserInfo getUserInfo(String userToken) {
+        return idamRepository.getUserInfo(userToken);
+    }
+
     public String getUserId() {
         return getUserInfo().getUid();
     }
