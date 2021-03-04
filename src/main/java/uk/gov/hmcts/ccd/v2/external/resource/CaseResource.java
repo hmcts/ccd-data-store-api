@@ -95,7 +95,8 @@ public class CaseResource extends RepresentationModel<RepresentationModel<?>> {
                         Boolean ignoreWarning) {
         copyProperties(caseDetails);
 
-        add(linkTo(methodOn(CaseController.class).createCase(caseType, caseDataContent, ignoreWarning)).withSelfRel());
+        add(linkTo(methodOn(CaseController.class)
+            .createCaseV3(caseType, caseDataContent, ignoreWarning)).withSelfRel());
     }
 
     private void copyProperties(CaseDetails caseDetails) {

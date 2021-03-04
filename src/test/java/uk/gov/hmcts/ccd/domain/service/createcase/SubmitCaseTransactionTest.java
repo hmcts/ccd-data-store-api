@@ -1,28 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.isNotNull;
-import static org.mockito.Matchers.notNull;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
-import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,30 +35,37 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentAttacher;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
-import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentAttacher;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
+import uk.gov.hmcts.ccd.v3.V3;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
-import uk.gov.hmcts.ccd.v3.V3;
 
 class SubmitCaseTransactionTest {
 
@@ -171,8 +155,7 @@ class SubmitCaseTransactionTest {
                                                           securityClassificationService,
                                                           caseUserRepository,
                                                           userAuthorisation,
-                                                          messageService
-                                                          userAuthorisation,
+                                                          messageService,
                                                           request,
                                                           restTemplate,
                                                           applicationParams,
@@ -270,16 +253,17 @@ class SubmitCaseTransactionTest {
         CaseDetails inputCaseDetails = new CaseDetails();
         inputCaseDetails.setState("SomeState");
         AboutToSubmitCallbackResponse response = buildResponse();
-        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
+        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition,
                                                                              null,
-                                                                             inputCaseDetails, caseType, IGNORE_WARNING
-                                                                            );
+                                                                             inputCaseDetails,
+                                                                             caseTypeDefinition,
+                                                                             IGNORE_WARNING);
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
         inputCaseDetails.setData(dataMap);
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
         ResponseEntity<Boolean> responseEntity = new ResponseEntity<>(true, HttpStatus.OK);
-        doReturn(state).when(caseTypeService).findState(caseType, "SomeState");
+        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
         doReturn(responseEntity).when(restTemplate).exchange(
             ArgumentMatchers.anyString(),
             ArgumentMatchers.any(HttpMethod.class),
@@ -287,19 +271,18 @@ class SubmitCaseTransactionTest {
             ArgumentMatchers.<Class<String>>any());
 
         submitCaseTransaction.submitCase(event,
-                                         caseType,
+                                         caseTypeDefinition,
                                          idamUser,
-                                         eventTrigger,
+                                         caseEventDefinition,
                                          inputCaseDetails,
                                          IGNORE_WARNING);
 
 
-        verify(restTemplate , times(1)).exchange(
+        verify(restTemplate, times(1)).exchange(
             ArgumentMatchers.anyString(),
             ArgumentMatchers.any(HttpMethod.class),
             ArgumentMatchers.any(),
             ArgumentMatchers.<Class<String>>any());
-
     }
 
     @Test
@@ -309,16 +292,17 @@ class SubmitCaseTransactionTest {
         CaseDetails inputCaseDetails = new CaseDetails();
         inputCaseDetails.setState("SomeState");
         AboutToSubmitCallbackResponse response = buildResponse();
-        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
+        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition,
                                                                              null,
-                                                                             inputCaseDetails, caseType, IGNORE_WARNING
-                                                                            );
+                                                                             inputCaseDetails,
+                                                                             caseTypeDefinition,
+                                                                             IGNORE_WARNING);
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
         inputCaseDetails.setData(dataMap);
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
         ResponseEntity<Boolean> responseEntity = new ResponseEntity<>(true, HttpStatus.OK);
-        doReturn(state).when(caseTypeService).findState(caseType, "SomeState");
+        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
         doReturn(responseEntity).when(restTemplate).exchange(
             ArgumentMatchers.anyString(),
             ArgumentMatchers.any(HttpMethod.class),
@@ -326,13 +310,13 @@ class SubmitCaseTransactionTest {
             ArgumentMatchers.<Class<String>>any());
 
         submitCaseTransaction.submitCase(event,
-                                         caseType,
+                                         caseTypeDefinition,
                                          idamUser,
-                                         eventTrigger,
+                                         caseEventDefinition,
                                          inputCaseDetails,
                                          IGNORE_WARNING);
 
-        verify(restTemplate , times(1)).exchange(
+        verify(restTemplate, times(1)).exchange(
             ArgumentMatchers.anyString(),
             ArgumentMatchers.any(HttpMethod.class),
             ArgumentMatchers.any(),
@@ -345,25 +329,26 @@ class SubmitCaseTransactionTest {
         CaseDetails inputCaseDetails = new CaseDetails();
         inputCaseDetails.setState("SomeState");
         AboutToSubmitCallbackResponse response = buildResponse();
-        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(eventTrigger,
+        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition,
                                                                              null,
-                                                                             inputCaseDetails, caseType, IGNORE_WARNING
-                                                                            );
+                                                                             inputCaseDetails,
+                                                                             caseTypeDefinition,
+                                                                             IGNORE_WARNING);
 
         Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
         inputCaseDetails.setData(dataMap);
         doReturn(dataMap).when(this.caseDetails).getData();
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
-        doReturn(state).when(caseTypeService).findState(caseType, "SomeState");
+        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
 
         submitCaseTransaction.submitCase(event,
-                                         caseType,
+                                         caseTypeDefinition,
                                          idamUser,
-                                         eventTrigger,
+                                         caseEventDefinition,
                                          inputCaseDetails,
                                          IGNORE_WARNING);
 
-        verify(restTemplate , times(0)).exchange(
+        verify(restTemplate, times(0)).exchange(
             ArgumentMatchers.anyString(),
             ArgumentMatchers.any(HttpMethod.class),
             ArgumentMatchers.any(),
@@ -450,11 +435,10 @@ class SubmitCaseTransactionTest {
 
     private void assertCaseData(final CaseDetails caseDetails) {
         assertAll("Assert Casedetails",
-                  () -> assertThat(caseDetails.getData().get("DocumentField4"), isNotNull()),
-                  () -> assertThat(caseDetails.getData().get("DocumentField4").get("document_url"), isNotNull()),
-                  () -> assertThat(caseDetails.getData().get("DocumentField4").get("document_binary_url"), isNotNull())
-
-                 );
+            () -> assertThat(caseDetails.getData().get("DocumentField4"), isNotNull()),
+            () -> assertThat(caseDetails.getData().get("DocumentField4").get("document_url"), isNotNull()),
+            () -> assertThat(caseDetails.getData().get("DocumentField4").get("document_binary_url"), isNotNull())
+        );
     }
 
     private void assertAuditEventWithSignificantDocument(final AuditEvent auditEvent) {

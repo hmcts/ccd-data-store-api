@@ -36,7 +36,6 @@ import uk.gov.hmcts.ccd.v3.V3;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
@@ -59,7 +58,7 @@ class SubmitCaseTransaction {
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
 
-   @Inject
+    @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                      final CaseDetailsRepository caseDetailsRepository,
                                  final CaseAuditEventRepository caseAuditEventRepository,
@@ -70,7 +69,7 @@ class SubmitCaseTransaction {
                                  final @Qualifier(CachedCaseUserRepository.QUALIFIER)
                                          CaseUserRepository caseUserRepository,
                                  final UserAuthorisation userAuthorisation,
-                                 final @Qualifier("caseEventMessageService") MessageService messageService
+                                 final @Qualifier("caseEventMessageService") MessageService messageService,
                                  final HttpServletRequest request,
                                  final RestTemplate restTemplate,
                                  final ApplicationParams applicationParams,
@@ -140,7 +139,8 @@ class SubmitCaseTransaction {
         }
 
         if (isApiVersion3) {
-            caseDocumentAttacher.caseDocumentAttachOperation(newCaseDetails,  aboutToSubmitCallbackResponse.getState().isPresent());
+            caseDocumentAttacher.caseDocumentAttachOperation(newCaseDetails,
+                aboutToSubmitCallbackResponse.getState().isPresent());
             caseDocumentAttacher.restCallToAttachCaseDocuments();
         }
 

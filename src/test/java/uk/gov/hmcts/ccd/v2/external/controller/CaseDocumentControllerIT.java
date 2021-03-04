@@ -77,7 +77,8 @@ public class CaseDocumentControllerIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        final CaseDocumentResource caseDocumentResource = mapper.readValue(result.getResponse().getContentAsString(), CaseDocumentResource.class);
+        final CaseDocumentResource caseDocumentResource
+            = mapper.readValue(result.getResponse().getContentAsString(), CaseDocumentResource.class);
 
         CaseDocumentMetadata caseDocumentMetadata = caseDocumentResource.getDocumentMetadata();
         Optional<Link> self = caseDocumentResource.getLink("self");

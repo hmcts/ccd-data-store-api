@@ -125,13 +125,12 @@ public class CreateCaseEventService {
                                   final FieldProcessorService fieldProcessorService,
                                   final CasePostStateService casePostStateService,
                                   @Qualifier("utcClock") final Clock clock,
-                                  @Qualifier("caseEventMessageService") final MessageService messageService) {
+                                  @Qualifier("caseEventMessageService") final MessageService messageService,
                                   @Qualifier("restTemplate") final RestTemplate restTemplate,
                                   ApplicationParams applicationParams,
                                   SecurityUtils securityUtils,
-                                  HttpServletRequest request,
-                                  final FieldProcessorService fieldProcessorService
-                                  ) {
+                                  HttpServletRequest request
+    ) {
         this.request = request;
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -178,7 +177,6 @@ public class CreateCaseEventService {
         validatePreState(caseDetails, caseEventDefinition);
 
         content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, caseEventDefinition));
-        String oldState = caseDetails.getState();
 
         // Logic start from here to attach document with case ID
         boolean isApiVersion3 = request.getContentType() != null
@@ -186,9 +184,10 @@ public class CreateCaseEventService {
 
         CaseDocumentAttacher caseDocumentAttacher = null;
         if (isApiVersion3) {
-            validateCaseFieldsOperation.validateData(content.getData(), caseType);
+            validateCaseFieldsOperation.validateData(content.getData(), caseTypeDefinition, content);
             caseDocumentAttacher = new CaseDocumentAttacher(restTemplate, applicationParams, securityUtils);
-            caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallbackForUpdate(content.getData(), caseDetailsBefore);
+            caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallbackForUpdate(content.getData(),
+                caseDetailsBefore);
         }
 
         mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, caseEventDefinition, caseTypeDefinition);
@@ -205,9 +204,11 @@ public class CreateCaseEventService {
         LocalDateTime timeNow = now();
 
         if (isApiVersion3) {
-            caseDocumentAttacher.caseDocumentAttachOperation(caseDetails,  newState.isPresent());
+            caseDocumentAttacher.caseDocumentAttachOperation(caseDetails, newState.isPresent());
             caseDocumentAttacher.findDifferenceWithExistingCaseDetail(caseDetailsBefore,caseDetails);
         }
+
+        String oldState = caseDetails.getState();
         final CaseDetails savedCaseDetails =
             saveCaseDetails(caseDetailsBefore,
                 caseDetails,
@@ -322,7 +323,6 @@ public class CreateCaseEventService {
                                               final LocalDateTime timeNow,
                                               final String oldState,
                                               final String onBehalfOfUserToken) {
-
         final CaseStateDefinition caseStateDefinition =
             caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
         final AuditEvent auditEvent = new AuditEvent();

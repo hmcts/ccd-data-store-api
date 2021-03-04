@@ -68,6 +68,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
@@ -311,7 +312,8 @@ class CreateCaseEventDefinitionServiceTest {
         CreateCaseEventResult caseEventResult = createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
         assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
-        assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate()).isEqualTo(LocalDateTime.now(clock));
+        assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate())
+            .isEqualTo(LocalDateTime.now(clock));
 
     }
 
@@ -324,7 +326,8 @@ class CreateCaseEventDefinitionServiceTest {
 
         createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
-        //verify(caseDocumentAttacher, times(0)).extractDocumentsWithHashTokenBeforeCallbackForUpdate(caseDataContent.getData());
+        //verify(caseDocumentAttacher,
+        //  times(0)).extractDocumentsWithHashTokenBeforeCallbackForUpdate(caseDataContent.getData());
         verify(caseDocumentAttacher, times(0)).extractDocumentsAfterCallBack(caseDetails,false);
         verify(caseDocumentAttacher, times(0)).restCallToAttachCaseDocuments();
 

@@ -11,8 +11,8 @@ import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
@@ -93,23 +93,25 @@ public class GetCaseDocumentOperation {
 
         String caseTypeId = caseDetails.getCaseTypeId();
         String jurisdictionId = caseDetails.getJurisdiction();
-        final CaseType caseType = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
+        final CaseTypeDefinition caseType = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdictionId);
 
-        List<CaseField> documentCaseFields = new ArrayList<>();
-        List<CaseField> documentAndComplexFields = caseType.getCaseFields()
+        List<CaseFieldDefinition> documentCaseFields = new ArrayList<>();
+        List<CaseFieldDefinition> documentAndComplexFields = caseType.getCaseFieldDefinitions()
             .stream()
-            .filter(caseField -> (DOCUMENT.equalsIgnoreCase(caseField.getFieldType().getType()))
-                    || (COMPLEX.equalsIgnoreCase(caseField.getFieldType().getType()))
-                    || (COLLECTION.equalsIgnoreCase(caseField.getFieldType().getType())))
+            .filter(caseField -> (DOCUMENT.equalsIgnoreCase(caseField.getFieldTypeDefinition().getType()))
+                    || (COMPLEX.equalsIgnoreCase(caseField.getFieldTypeDefinition().getType()))
+                    || (COLLECTION.equalsIgnoreCase(caseField.getFieldTypeDefinition().getType())))
             .collect(Collectors.toList());
 
         if (documentAndComplexFields.isEmpty()) {
-            throw new CaseDocumentNotFoundException(String.format("No document field found for CaseType : %s", caseType.getId()));
+            throw new CaseDocumentNotFoundException(
+                String.format("No document field found for CaseType : %s", caseType.getId()));
         }
 
         extractDocumentFieldsFromCaseDefinition(documentAndComplexFields, documentCaseFields);
         JsonNode documentFieldsWithReadPermission = getDocumentFieldsWithReadPermission(caseDetails, documentCaseFields)
-            .orElseThrow((() -> new CaseDocumentNotFoundException("User does not has read permissions on any document field")));
+            .orElseThrow((() ->
+                new CaseDocumentNotFoundException("User does not has read permissions on any document field")));
 
 
         if (Boolean.TRUE.equals(isDocumentPresent(documentId, documentFieldsWithReadPermission))) {
@@ -137,39 +139,46 @@ public class GetCaseDocumentOperation {
         return false;
     }
 
-     void extractDocumentFieldsFromCaseDefinition(List<CaseField> complexCaseFieldList, List<CaseField> documentCaseFields) {
+    void extractDocumentFieldsFromCaseDefinition(List<CaseFieldDefinition> complexCaseFieldList,
+                                                  List<CaseFieldDefinition> documentCaseFields) {
         if (complexCaseFieldList != null && !complexCaseFieldList.isEmpty()) {
-            for (CaseField caseField : complexCaseFieldList) {
+            for (CaseFieldDefinition caseField : complexCaseFieldList) {
                 getDocumentFields(documentCaseFields, caseField);
             }
         }
     }
 
-    private void getDocumentFields(List<CaseField> documentCaseFields, CaseField caseField) {
-        switch (caseField.getFieldType().getType()) {
+    private void getDocumentFields(List<CaseFieldDefinition> documentCaseFields, CaseFieldDefinition caseField) {
+        switch (caseField.getFieldTypeDefinition().getType()) {
             case DOCUMENT:
                 documentCaseFields.add(caseField);
                 break;
             case COMPLEX:
             case COLLECTION:
-                if (caseField.getFieldType().getCollectionFieldType() != null) {
-                    if (caseField.getFieldType().getCollectionFieldType().getComplexFields() != null) {
+                if (caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition() != null) {
+                    if (caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields()
+                            != null) {
                         extractDocumentFieldsFromCaseDefinition(
-                            caseField.getFieldType().getCollectionFieldType().getComplexFields(), documentCaseFields);
+                            caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition().getComplexFields(),
+                            documentCaseFields);
                     }
-                    if (caseField.getFieldType().getCollectionFieldType().getCollectionFieldType() != null) {
+                    if (caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition()
+                            .getCollectionFieldTypeDefinition() != null) {
                         extractDocumentFieldsFromCaseDefinition(
-                            caseField.getFieldType().getCollectionFieldType().getCollectionFieldType().getComplexFields(), documentCaseFields);
+                            caseField.getFieldTypeDefinition().getCollectionFieldTypeDefinition()
+                                .getCollectionFieldTypeDefinition().getComplexFields(), documentCaseFields);
                     }
                 }
-                extractDocumentFieldsFromCaseDefinition(caseField.getFieldType().getComplexFields(), documentCaseFields);
+                extractDocumentFieldsFromCaseDefinition(caseField.getFieldTypeDefinition().getComplexFields(),
+                                                        documentCaseFields);
                 break;
             default:
                 break;
         }
     }
 
-    private Optional<JsonNode> getDocumentFieldsWithReadPermission(CaseDetails caseDetails, List<CaseField> documentFields) {
+    private Optional<JsonNode> getDocumentFieldsWithReadPermission(CaseDetails caseDetails,
+                                                                   List<CaseFieldDefinition> documentFields) {
         Set<String> roles = getUserRoles(caseDetails.getId());
         return Optional.of(accessControlService.filterCaseFieldsByAccess(
             MAPPER.convertValue(caseDetails.getData(), JsonNode.class),

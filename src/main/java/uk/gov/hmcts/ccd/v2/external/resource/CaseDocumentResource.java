@@ -20,8 +20,9 @@ public class CaseDocumentResource extends RepresentationModel<CaseDocumentResour
     @JsonProperty("documentMetadata")
     private CaseDocumentMetadata documentMetadata;
 
-    public CaseDocumentResource(@NonNull String caseId, @NonNull String documentId, CaseDocumentMetadata documentMetadata) {
-
+    public CaseDocumentResource(@NonNull String caseId,
+                                @NonNull String documentId,
+                                CaseDocumentMetadata documentMetadata) {
         this.documentMetadata = documentMetadata;
         add(linkTo(methodOn(CaseDocumentController.class).getCaseDocumentMetadata(caseId, documentId)).withSelfRel());
     }

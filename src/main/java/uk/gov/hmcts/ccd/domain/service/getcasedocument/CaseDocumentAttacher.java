@@ -71,7 +71,8 @@ public class CaseDocumentAttacher {
             if (!jsonNode.isNull() && isDocumentField(jsonNode)) {
                 String documentId = extractDocumentId(jsonNode);
                 if (jsonNode.get(HASH_TOKEN_STRING) == null) {
-                    throw new BadRequestException(String.format("The document %s does not has the hashToken", documentId));
+                    throw new BadRequestException(String.format("The document %s does not has the hashToken",
+                        documentId));
                 }
                 documentsBeforeCallback.put(documentId, jsonNode.get(HASH_TOKEN_STRING).asText());
                 ((ObjectNode) jsonNode).remove(HASH_TOKEN_STRING);
@@ -80,7 +81,8 @@ public class CaseDocumentAttacher {
                     Iterator<JsonNode> arrayNode = ((ArrayNode) jsonNode).elements();
                     while (arrayNode.hasNext()) {
                         JsonNode arrayNodeElement = arrayNode.next();
-                        arrayNodeElement.fields().forEachRemaining(node -> extractDocumentsWithHashTokenBeforeCallbackForCreateCase(
+                        arrayNodeElement.fields().forEachRemaining(node ->
+                            extractDocumentsWithHashTokenBeforeCallbackForCreateCase(
                             Collections.singletonMap(node.getKey(), node.getValue())));
 
                     }
@@ -93,7 +95,9 @@ public class CaseDocumentAttacher {
         });
     }
 
-    public void extractDocumentsWithHashTokenBeforeCallbackForUpdate(Map<String, JsonNode> data, CaseDetails caseDetailsBefore) {
+    public void extractDocumentsWithHashTokenBeforeCallbackForUpdate(Map<String,
+                                                                     JsonNode> data,
+                                                                     CaseDetails caseDetailsBefore) {
         data.forEach((field, jsonNode) -> {
             if (!jsonNode.isNull() && isDocumentField(jsonNode)) {
                 String documentId = extractDocumentId(jsonNode);
@@ -103,7 +107,8 @@ public class CaseDocumentAttacher {
                 } else {
                     isExistingDocumentInCase(caseDetailsBefore.getData(), documentId);
                     if (existingDocumentsInCase.isEmpty()) {
-                        throw new BadRequestException(String.format("The document %s does not has the hashToken", documentId));
+                        throw new BadRequestException(String.format("The document %s does not has the hashToken",
+                            documentId));
                     } else {
                         existingDocumentsInCase.clear();
                     }
@@ -184,7 +189,8 @@ public class CaseDocumentAttacher {
             restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
 
             try {
-                restTemplate.exchange(applicationParams.getCaseDocumentAmApiHost().concat(applicationParams.getAttachDocumentPath()),
+                restTemplate.exchange(applicationParams.getCaseDocumentAmApiHost()
+                        .concat(applicationParams.getAttachDocumentPath()),
                     HttpMethod.PATCH, requestEntity, Void.class);
 
             } catch (HttpClientErrorException restClientException) {
@@ -193,10 +199,13 @@ public class CaseDocumentAttacher {
                 }
                 String badDocument = restClientException.getResponseBodyAsString();
 
-                if (documentAfterCallbackOriginalCopy.size() > 0 && documentAfterCallbackOriginalCopy.get(badDocument) != null) {
-                    throw new ServiceException(String.format("The document %s introduced by Services has invalid hashToken", badDocument));
+                if (documentAfterCallbackOriginalCopy.size() > 0
+                        && documentAfterCallbackOriginalCopy.get(badDocument) != null) {
+                    throw new ServiceException(
+                        String.format("The document %s introduced by Services has invalid hashToken", badDocument));
                 } else {
-                    throw new DocumentTokenException(String.format("The user has provided an invalid hashToken for document %s", badDocument));
+                    throw new DocumentTokenException(
+                        String.format("The user has provided an invalid hashToken for document %s", badDocument));
                 }
             }
         }
@@ -220,7 +229,8 @@ public class CaseDocumentAttacher {
                 ? jsonNode.get(DOCUMENT_BINARY_URL) :
                 jsonNode.get(DOCUMENT_URL);
             if (documentField.asText().contains(BINARY)) {
-                documentId = documentField.asText().substring(documentField.asText().length() - 43, documentField.asText().length() - 7);
+                documentId = documentField.asText().substring(documentField.asText().length() - 43,
+                                    documentField.asText().length() - 7);
             } else {
                 documentId = documentField.asText().substring(documentField.asText().length() - 36);
             }
@@ -232,7 +242,8 @@ public class CaseDocumentAttacher {
     }
 
 
-    void consolidateDocumentsWithHashTokenAfterCallBack(CaseDocumentsMetadata caseDocumentsMetadata, Map<String, String> documentsBeforeCallback,
+    void consolidateDocumentsWithHashTokenAfterCallBack(CaseDocumentsMetadata caseDocumentsMetadata,
+                                                        Map<String, String> documentsBeforeCallback,
                                                         Map<String, String> documentsAfterCallback) {
 
         Map<String, String> consolidatedDocumentsWithHashToken;
@@ -246,12 +257,14 @@ public class CaseDocumentAttacher {
             // Check tempered hashToken by call back service
             List<String> temperHashTokenDocumentIds =
                 commonDocumentIds.stream()
-                    //documentsAfterCallback is a Map and service should not introduce their own hashtoken for a document.
+                    //documentsAfterCallback is a Map and service should not introduce their own hashtoken for a
+                    // document.
                     .filter(documentId -> StringUtils.isNotEmpty(documentsAfterCallback.get(documentId)))
                     .collect(Collectors.toList());
 
             if (!temperHashTokenDocumentIds.isEmpty()) {
-                throw new ServiceException("call back attempted to change the hashToken of the following documents:" + temperHashTokenDocumentIds);
+                throw new ServiceException("call back attempted to change the hashToken of the following documents:"
+                    + temperHashTokenDocumentIds);
             }
 
             //find Hash token of documents which belong to before call back and present in After callback Map
@@ -276,7 +289,8 @@ public class CaseDocumentAttacher {
                 .add(DocumentHashToken.builder().id(key).hashToken(value).build()));
     }
 
-    Set<String> differenceBeforeAndAfterInCaseDetails(final Map<String, JsonNode> caseDataBefore, final Map<String, JsonNode> caseData) {
+    Set<String> differenceBeforeAndAfterInCaseDetails(final Map<String, JsonNode> caseDataBefore,
+                                                      final Map<String, JsonNode> caseData) {
 
         final Map<String, JsonNode> documentsDifference = new HashMap<>();
         final Set<String> filterDocumentSet = new HashSet<>();
@@ -286,7 +300,8 @@ public class CaseDocumentAttacher {
         }
         //Comparing two jsonNode entities at nested child level
         checkDocumentFieldsDifference(caseDataBefore, caseData, documentsDifference);
-        //Find documentId based on filter Map. So that we can filter the DocumentMetaData Object before calling the case document am Api.
+        //Find documentId based on filter Map. So that we can filter the DocumentMetaData Object before calling
+        // the case document am Api.
         findDocumentsId(documentsDifference, filterDocumentSet);
         return filterDocumentSet;
     }
@@ -304,7 +319,10 @@ public class CaseDocumentAttacher {
         });
     }
 
-    private void extractDocumentFieldsWithDelta(Map<String, JsonNode> caseDataBefore, Map<String, JsonNode> documentsDifference, String key, JsonNode value) {
+    private void extractDocumentFieldsWithDelta(Map<String, JsonNode> caseDataBefore,
+                                                Map<String, JsonNode> documentsDifference,
+                                                String key,
+                                                JsonNode value) {
         caseBeforeNode = caseDataBefore.get(key);
         if (!value.isNull() && isDocumentField(value)) {
             if (!value.equals(caseDataBefore.get(key))) {
@@ -317,12 +335,11 @@ public class CaseDocumentAttacher {
                 Iterator<JsonNode> arrayNode = ((ArrayNode) value).elements();
                 while (arrayNode.hasNext()) {
                     JsonNode arrayNodeElement = arrayNode.next();
-                    arrayNodeElement.fields().forEachRemaining(node -> checkDocumentFieldsDifference(recursiveMapForCaseDetailsBefore,
-                        Collections.singletonMap(node.getKey(), node.getValue()),
-                        documentsDifference));
-
+                    arrayNodeElement.fields().forEachRemaining(node ->
+                        checkDocumentFieldsDifference(recursiveMapForCaseDetailsBefore,
+                            Collections.singletonMap(node.getKey(), node.getValue()),
+                            documentsDifference));
                 }
-
             } else {
                 checkNodeTypeAndExtractDocuments(documentsDifference, value);
             }
@@ -364,13 +381,16 @@ public class CaseDocumentAttacher {
 
     public void caseDocumentAttachOperation(CaseDetails caseDetails,  boolean callBackWasCalled) {
         extractDocumentsAfterCallBack(caseDetails, callBackWasCalled);
-        consolidateDocumentsWithHashTokenAfterCallBack(caseDocumentsMetadata, documentsBeforeCallback, documentsAfterCallback);
+        consolidateDocumentsWithHashTokenAfterCallBack(caseDocumentsMetadata,
+            documentsBeforeCallback,
+            documentsAfterCallback);
 
     }
 
     public void findDifferenceWithExistingCaseDetail(CaseDetails caseDetailsBefore,CaseDetails caseDetails) {
 
-        final Set<String> filterDocumentSet = differenceBeforeAndAfterInCaseDetails(caseDetailsBefore.getData(), caseDetails.getData());
+        final Set<String> filterDocumentSet =
+            differenceBeforeAndAfterInCaseDetails(caseDetailsBefore.getData(), caseDetails.getData());
 
         //to filter the DocumentMetaData based on filterDocumentSet.
         filterDocumentMetaData(filterDocumentSet);

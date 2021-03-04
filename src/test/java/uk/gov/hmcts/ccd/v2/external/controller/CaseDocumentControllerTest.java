@@ -54,7 +54,8 @@ class CaseDocumentControllerTest {
                 .permissions(Arrays.asList(Permission.READ, Permission.UPDATE))
                 .build())
             .build();
-        when(getCaseDocumentOperation.getCaseDocumentMetadata(CASE_REFERENCE,CASE_DOCUMENT_ID)).thenReturn(caseDocumentMetadata);
+        when(getCaseDocumentOperation.getCaseDocumentMetadata(CASE_REFERENCE,CASE_DOCUMENT_ID))
+            .thenReturn(caseDocumentMetadata);
     }
 
     @Test
@@ -68,7 +69,8 @@ class CaseDocumentControllerTest {
             () -> assertThat(response.getBody().getDocumentMetadata().getCaseId(), is(CASE_REFERENCE)),
             () -> assertThat(response.getBody().getDocumentMetadata().getDocumentPermissions(),
                 allOf(hasProperty("id", is(CASE_DOCUMENT_ID)))),
-            () -> assertThat(response.getBody().getDocumentMetadata().getDocumentPermissions().getPermissions(), hasSize(2)),
+            () -> assertThat(response.getBody().getDocumentMetadata().getDocumentPermissions().getPermissions(),
+                    hasSize(2)),
             () -> assertThat(response.getBody().getDocumentMetadata().getDocumentPermissions().getPermissions(),
                 hasItems(Permission.READ, Permission.UPDATE))
         );

@@ -16,7 +16,8 @@ public final class V2 {
         public static final String CASE = "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8";
         public static final String CASE_DOCUMENTS =
             "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-documents.v2+json;charset=UTF-8";
-        public static final String CASE_DOCUMENT = "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-document+json;charset=UTF-8;version=1.0";
+        public static final String CASE_DOCUMENT = "application/vnd.uk.gov.hmcts.ccd-data-store-api."
+            + "case-document+json;charset=UTF-8;version=1.0";
         public static final String CREATE_EVENT =
             "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json;charset=UTF-8";
         public static final String CREATE_CASE =

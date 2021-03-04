@@ -35,8 +35,8 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseField;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -72,13 +72,13 @@ public class GetCaseDocumentsOperationTest {
     private static final String CASE_DOCUMENT_ID_NOT_IN_CASE_DETAILS = "a780ee98-3136-4be9-bf56-a46f8da1bc85";
     private static final String CASE_DOCUMENT_FIELD_2_ID = "e16f2ae0-d6ce-4bd0-a652-47b3c4d86292";
 
-    private final CaseType caseType = new CaseType();
-    List<CaseField>  inputCaseField = new ArrayList<>();
-    private CaseField documentCaseField;
-    private CaseField complexCaseField;
-    private CaseField collectionCaseField;
-    private CaseField documentInComplexCaseField;
-    private List<CaseField> caseFields;
+    private final CaseTypeDefinition caseType = new CaseTypeDefinition();
+    List<CaseFieldDefinition>  inputCaseField = new ArrayList<>();
+    private CaseFieldDefinition documentCaseField;
+    private CaseFieldDefinition complexCaseField;
+    private CaseFieldDefinition collectionCaseField;
+    private CaseFieldDefinition documentInComplexCaseField;
+    private List<CaseFieldDefinition> caseFields;
     private CaseDetails caseDetails;
     private Optional<CaseDetails> caseDetailsOptional;
     private HashMap<String,JsonNode> caseDetailsData;
@@ -91,14 +91,15 @@ public class GetCaseDocumentsOperationTest {
     public void setUp() throws IOException {
 
         MockitoAnnotations.initMocks(this);
-        caseDocumentsOperation = new GetCaseDocumentOperation(getCaseOperation, caseTypeService, userRepository, caseUserRepository,
-            documentIdValidationService, accessControlService);
+        caseDocumentsOperation = new GetCaseDocumentOperation(getCaseOperation,
+            caseTypeService, userRepository, caseUserRepository, documentIdValidationService, accessControlService);
 
         prepareCaseField();
         prepareCaseDetails();
         doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID);
         doReturn(caseType).when(caseTypeService).getCaseTypeForJurisdiction(CASE_TYPE_ID, JURISDICTION_ID);
-        doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID_NOT_IN_CASE_DETAILS);
+        doReturn(Boolean.TRUE)
+            .when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID_NOT_IN_CASE_DETAILS);
     }
 
 
@@ -107,7 +108,8 @@ public class GetCaseDocumentsOperationTest {
     void shouldThrowBadRequestWhenDocumentIdInvalid() {
         doReturn(Boolean.FALSE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID_INVALID);
         assertAll(
-            () -> assertThrows(BadRequestException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID_INVALID)),
+            () -> assertThrows(BadRequestException.class,
+                () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID_INVALID)),
             () -> verify(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_ID_INVALID)
         );
     }
@@ -116,64 +118,72 @@ public class GetCaseDocumentsOperationTest {
     @DisplayName("should throw Bad Request exception when document Id is null")
     void shouldThrowBadRequestWhenDocumentIdNull() {
         doReturn(Boolean.FALSE).when(documentIdValidationService).validateDocumentUUID(null);
-        assertThrows(BadRequestException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, null));
+        assertThrows(BadRequestException.class,
+            () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, null));
     }
 
     @Test
     @DisplayName("should throw CaseNotFoundException when case does not exist")
     void shouldThrowCaseNotFoundWhenCaseNotExist() {
         doReturn(caseDetailsOptional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
-        assertThrows(CaseNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID));
-
+        assertThrows(CaseNotFoundException.class,
+            () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID));
     }
 
     @Test
     @DisplayName("should throw CaseNotFoundException when case reference  is null ")
     void shouldThrowCaseNotFoundWhenCaseReferenceIsNull() {
         doReturn(caseDetailsOptional).when(getCaseOperation).execute(null);
-        assertThrows(CaseNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(null, CASE_DOCUMENT_ID));
-
+        assertThrows(CaseNotFoundException.class,
+            () -> caseDocumentsOperation.getCaseDocumentMetadata(null, CASE_DOCUMENT_ID));
     }
 
     @Test
     @DisplayName("should return CaseDocumentMetadata")
-    void shouldReturnGetCaseDocumentMetadata() throws IOException {
-        CaseDocumentMetadata caseDocumentMetadata = caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID);
+    void shouldReturnGetCaseDocumentMetadata() {
+        CaseDocumentMetadata caseDocumentMetadata =
+            caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID);
         assertAll(
             () -> assertThat(caseDocumentMetadata.getCaseId(), is(caseDetails.getReferenceAsString())),
             () -> assertThat(caseDocumentMetadata.getDocumentPermissions(), is(documentPermissions)),
             () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getId(), is(documentPermissions.getId())),
-            () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getPermissions(), is(documentPermissions.getPermissions()))
+            () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getPermissions(),
+                                is(documentPermissions.getPermissions()))
         );
     }
 
     @Test
     @DisplayName("should throw CaseDocumentMetadataException when given document id not have read permission")
     void  shouldThrowExceptionWhenDocumentHaveNoReadPermission() throws IOException {
-        assertThrows(CaseDocumentNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,
+        assertThrows(CaseDocumentNotFoundException.class,
+            () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,
             CASE_DOCUMENT_ID_NOT_IN_CASE_DETAILS));
     }
 
     @Test
     @DisplayName("should throw CaseDocumentMetadataException when passing collection case type field only")
     void  shouldThrowExceptionWhenCollectionTypeField() throws IOException {
-        caseType.setCaseFields(Arrays.asList(collectionCaseField));
-        assertThrows(CaseDocumentNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,
+        caseType.setCaseFieldDefinitions(Arrays.asList(collectionCaseField));
+        assertThrows(CaseDocumentNotFoundException.class,
+            () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,
             CASE_DOCUMENT_ID_NOT_IN_CASE_DETAILS));
     }
 
 
     @Test
     @DisplayName("should throw CaseDocumentNotFoundException when case type have empty case fields")
-    void shouldThrowCaseDocumentNotFoundException() throws IOException {
-        caseType.setCaseFields(Collections.emptyList());
-        assertThrows(CaseDocumentNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID));
+    void shouldThrowCaseDocumentNotFoundException() {
+        caseType.setCaseFieldDefinitions(Collections.emptyList());
+        assertThrows(CaseDocumentNotFoundException.class,
+            () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID));
     }
 
     @Test
     @DisplayName("should extract the document fields once passing the document type case fields")
-    void shouldExtractDocumentFieldsFromCaseType() throws IOException {
-        List<CaseField>  expectedCaseField = Arrays.asList(documentCaseField,documentInComplexCaseField.getFieldType().getComplexFields().get(3));
+    void shouldExtractDocumentFieldsFromCaseType() {
+        List<CaseFieldDefinition> expectedCaseField =
+            Arrays.asList(documentCaseField,documentInComplexCaseField.getFieldTypeDefinition()
+                .getComplexFields().get(3));
         caseDocumentsOperation.extractDocumentFieldsFromCaseDefinition(caseFields,inputCaseField);
         assertAll(
             () -> assertEquals(inputCaseField,expectedCaseField)
@@ -184,43 +194,44 @@ public class GetCaseDocumentsOperationTest {
     @Test
     @DisplayName("should extract the document fields from Collection case type field")
     void shouldExtractDocumentFieldsFromCollectionTypeCaseField() throws IOException {
-        List<CaseField> caseFields = Arrays.asList(buildCaseField("collection-type-with-document-case-field.json"));
-        List<CaseField>  expectedCaseField = Arrays.asList(caseFields.get(0).getFieldType().getComplexFields().get(0));
+        List<CaseFieldDefinition> caseFields =
+            Arrays.asList(buildCaseField("collection-type-with-document-case-field.json"));
+        List<CaseFieldDefinition> expectedCaseField =
+            Arrays.asList(caseFields.get(0).getFieldTypeDefinition().getComplexFields().get(0));
         caseDocumentsOperation.extractDocumentFieldsFromCaseDefinition(caseFields,inputCaseField);
         assertAll(
             () -> assertEquals(inputCaseField,expectedCaseField)
-
         );
     }
 
     @Test
     @DisplayName("should not extract any document fields when list of Case Field is  empty ")
-    void shouldNotExtractAnyFieldsInCaseOfListEmpty() throws IOException {
-        List<CaseField> caseFields = Collections.EMPTY_LIST;
-        List<CaseField>  expectedCaseField = Collections.EMPTY_LIST;
+    void shouldNotExtractAnyFieldsInCaseOfListEmpty() {
+        List<CaseFieldDefinition> caseFields = Collections.EMPTY_LIST;
+        List<CaseFieldDefinition>  expectedCaseField = Collections.EMPTY_LIST;
 
         caseDocumentsOperation.extractDocumentFieldsFromCaseDefinition(caseFields,inputCaseField);
-        assertAll(
-            () -> assertEquals(inputCaseField,expectedCaseField)
-
-        );
+        assertAll(() -> assertEquals(inputCaseField,expectedCaseField));
     }
 
 
     @Test
     @DisplayName("should return CaseDocumentMetadata")
-    void shouldReturnCaseDocumentMetadata() throws IOException {
-        CaseDocumentMetadata caseDocumentMetadata = caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID);
+    void shouldReturnCaseDocumentMetadata() {
+        CaseDocumentMetadata caseDocumentMetadata =
+            caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID);
         assertAll(
             () -> assertThat(caseDocumentMetadata.getCaseId(), is(caseDetails.getReferenceAsString())),
             () -> assertThat(caseDocumentMetadata.getDocumentPermissions(), is(documentPermissions)),
             () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getId(), is(documentPermissions.getId())),
-            () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getPermissions(), is(documentPermissions.getPermissions()))
+            () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getPermissions(),
+                                is(documentPermissions.getPermissions()))
         );
     }
 
     @Test
-    @DisplayName("should throw CaseDocumentNotFoundException when  binary and document url is missing for given document id")
+    @DisplayName("should throw CaseDocumentNotFoundException when  binary and document url is missing for given "
+        +  "document id")
     void shouldThrowExceptionIfUrlIsMissing() throws IOException {
         JsonNode expectedNode = buildJsonNode("document-fields-without-url.json");
         doReturn(Boolean.TRUE).when(documentIdValidationService).validateDocumentUUID(CASE_DOCUMENT_FIELD_2_ID);
@@ -231,12 +242,14 @@ public class GetCaseDocumentsOperationTest {
             eq(AccessControlService.CAN_READ),
             anyBoolean());
 
-        assertThrows(CaseDocumentNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,
+        assertThrows(CaseDocumentNotFoundException.class,
+            () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,
             CASE_DOCUMENT_FIELD_2_ID));
     }
 
     @Test
-    @DisplayName("should return CaseDocumentMetaData when Binary url is  missing for given document id and  having read permission")
+    @DisplayName("should return CaseDocumentMetaData when Binary url is  missing for given document id and"
+        + " having read permission")
     void shouldReturnCaseDocumentMetaData() throws IOException {
         JsonNode expectedNode = buildJsonNode("document-fields-without-url.json");
         doReturn(expectedNode).when(accessControlService).filterCaseFieldsByAccess(
@@ -246,12 +259,14 @@ public class GetCaseDocumentsOperationTest {
             eq(AccessControlService.CAN_READ),
             anyBoolean());
 
-        CaseDocumentMetadata caseDocumentMetadata = caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID);
+        CaseDocumentMetadata caseDocumentMetadata =
+            caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID);
         assertAll(
             () -> assertThat(caseDocumentMetadata.getCaseId(), is(caseDetails.getReferenceAsString())),
             () -> assertThat(caseDocumentMetadata.getDocumentPermissions(), is(documentPermissions)),
             () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getId(), is(documentPermissions.getId())),
-            () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getPermissions(), is(documentPermissions.getPermissions()))
+            () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getPermissions(),
+                                is(documentPermissions.getPermissions()))
         );
 
 
@@ -262,32 +277,32 @@ public class GetCaseDocumentsOperationTest {
     void shouldReturnCaseDocumentMetaDataWithoutCollectionField() throws IOException {
 
         caseFields = Arrays.asList(documentCaseField,complexCaseField);
-        caseType.setCaseFields(caseFields);
-        CaseDocumentMetadata caseDocumentMetadata = caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID);
+        caseType.setCaseFieldDefinitions(caseFields);
+        CaseDocumentMetadata caseDocumentMetadata
+            = caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID);
         assertAll(
             () -> assertThat(caseDocumentMetadata.getCaseId(), is(caseDetails.getReferenceAsString())),
             () -> assertThat(caseDocumentMetadata.getDocumentPermissions(), is(documentPermissions)),
             () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getId(), is(documentPermissions.getId())),
-            () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getPermissions(), is(documentPermissions.getPermissions()))
+            () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getPermissions(),
+                                is(documentPermissions.getPermissions()))
         );
-
-
     }
-
 
     @Test
     @DisplayName("should return CaseDocumentMetaData  when passing document and collection type case fields")
     void shouldReturnCaseDocumentMetaDataWithoutComplexField() throws IOException {
         caseFields = Arrays.asList(documentCaseField,collectionCaseField);
-        caseType.setCaseFields(caseFields);
-        CaseDocumentMetadata caseDocumentMetadata = caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID);
+        caseType.setCaseFieldDefinitions(caseFields);
+        CaseDocumentMetadata caseDocumentMetadata
+            = caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID);
         assertAll(
             () -> assertThat(caseDocumentMetadata.getCaseId(), is(caseDetails.getReferenceAsString())),
             () -> assertThat(caseDocumentMetadata.getDocumentPermissions(), is(documentPermissions)),
             () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getId(), is(documentPermissions.getId())),
-            () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getPermissions(), is(documentPermissions.getPermissions()))
+            () -> assertThat(caseDocumentMetadata.getDocumentPermissions().getPermissions(),
+                                    is(documentPermissions.getPermissions()))
         );
-
     }
 
     @Test
@@ -295,40 +310,36 @@ public class GetCaseDocumentsOperationTest {
     void shouldThrowExceptionWithoutDocumentField() throws IOException {
 
         caseFields = Arrays.asList(complexCaseField,collectionCaseField);
-        caseType.setCaseFields(caseFields);
+        caseType.setCaseFieldDefinitions(caseFields);
 
-        assertThrows(CaseDocumentNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,
+        assertThrows(CaseDocumentNotFoundException.class,
+            () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,
             CASE_DOCUMENT_ID_NOT_IN_CASE_DETAILS));
-
     }
 
     @Test
     @DisplayName("collection don't have complex field")
     void shouldNotExtractDocumentFieldWhenComplexFieldNullInCollection() throws IOException {
-        List<CaseField> caseFields = Arrays.asList(buildCaseField("collection-type-without-complexfield.json"));
-        List<CaseField>  expectedCaseField = Arrays.asList();
+        List<CaseFieldDefinition> caseFields
+            = Arrays.asList(buildCaseField("collection-type-without-complexfield.json"));
+        List<CaseFieldDefinition> expectedCaseField = Arrays.asList();
         caseDocumentsOperation.extractDocumentFieldsFromCaseDefinition(caseFields,inputCaseField);
-        assertAll(
-            () -> assertEquals(inputCaseField,expectedCaseField)
-
-        );
+        assertAll(() -> assertEquals(inputCaseField,expectedCaseField));
     }
 
     @Test
     @DisplayName("should throw CaseDocumentMetadataException  in case of  text field")
     void  shouldThrowCaseDocumentNotFoundExceptionWhenTextField() throws IOException {
-        caseType.setCaseFields(Arrays.asList(buildCaseField("text-type-case-field.json")));
-        assertThrows(CaseDocumentNotFoundException.class, () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE,
-            CASE_DOCUMENT_ID));
+        caseType.setCaseFieldDefinitions(Arrays.asList(buildCaseField("text-type-case-field.json")));
+        assertThrows(CaseDocumentNotFoundException.class,
+            () -> caseDocumentsOperation.getCaseDocumentMetadata(CASE_REFERENCE, CASE_DOCUMENT_ID));
     }
 
-
-    static CaseField buildCaseField(String fileName) throws IOException {
+    static CaseFieldDefinition buildCaseField(String fileName) throws IOException {
         InputStream inputStream =
             GetCaseDocumentsOperationTest.class.getClassLoader().getResourceAsStream("tests/".concat(fileName));
         return
-            new ObjectMapper().readValue(inputStream, new TypeReference<CaseField>() {
-            });
+            new ObjectMapper().readValue(inputStream, new TypeReference<CaseFieldDefinition>() {});
     }
 
 
@@ -363,7 +374,7 @@ public class GetCaseDocumentsOperationTest {
             eq(AccessControlService.CAN_READ),
             anyBoolean());
     }
-    
+
     private void prepareCaseDetails() {
         caseDetails = new CaseDetails();
         caseDetails.setJurisdiction(JURISDICTION_ID);
@@ -371,7 +382,7 @@ public class GetCaseDocumentsOperationTest {
         caseDetails.setId(CASE_REFERENCE);
         caseDetails.setReference(new Long(CASE_REFERENCE));
         caseDetails.setData(caseDetailsData);
-        caseType.setCaseFields(caseFields);
+        caseType.setCaseFieldDefinitions(caseFields);
         doReturn(Optional.of(caseDetails)).when(getCaseOperation).execute(CASE_REFERENCE);
         caseDetailsOptional = Optional.of(new CaseDetails());
     }

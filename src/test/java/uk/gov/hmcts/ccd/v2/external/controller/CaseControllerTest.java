@@ -159,8 +159,9 @@ class CaseControllerTest {
 
         @Test
         @DisplayName("should call V3 endpoint and return 201 when case event created")
-        void caseEventCreatedV21() {
-            final ResponseEntity<CaseResource> response = caseController.createEventV3(CASE_REFERENCE, CASE_DATA_CONTENT);
+        void caseEventCreatedV3() {
+            final ResponseEntity<CaseResource> response
+                = caseController.createEventV3(CASE_REFERENCE, CASE_DATA_CONTENT);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.CREATED)),
@@ -199,8 +200,9 @@ class CaseControllerTest {
             LocalDateTime stateModified = LocalDateTime.now();
             when(caseDetails.getLastStateModifiedDate()).thenReturn(stateModified);
 
-            final ResponseEntity<CaseResource> response =
-                caseController.createCase(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING);
+            final ResponseEntity<CaseResource> response = caseController.createCase(CASE_TYPE_ID,
+                                                                                    CASE_DATA_CONTENT,
+                                                                                    IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.CREATED)),
@@ -215,13 +217,13 @@ class CaseControllerTest {
             LocalDateTime stateModified = LocalDateTime.now();
             when(caseDetails.getLastStateModifiedDate()).thenReturn(stateModified);
 
-            final ResponseEntity<CaseResource> response = caseController.createCaseV3(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING);
+            final ResponseEntity<CaseResource> response
+                = caseController.createCaseV3(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.CREATED)),
                 () -> assertThat(response.getBody().getReference(), is(CASE_REFERENCE)),
-                () -> assertThat(response.getBody().getLastStateModifiedOn(), is(stateModified))
-                     );
+                () -> assertThat(response.getBody().getLastStateModifiedOn(), is(stateModified)));
         }
 
         @Test

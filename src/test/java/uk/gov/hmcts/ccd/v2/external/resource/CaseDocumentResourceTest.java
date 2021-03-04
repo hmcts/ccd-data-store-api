@@ -20,7 +20,8 @@ class CaseDocumentResourceTest {
     private static final String CASE_REFERENCE = "1234123412341238";
     private static final String CASE_DOCUMENT_ID = "a780ee98-3136-4be9-bf56-a46f8da1bc97";
 
-    private final String linkSelfForCaseDocument = String.format("/cases/%s/documents/%s", CASE_REFERENCE, CASE_DOCUMENT_ID);
+    private final String linkSelfForCaseDocument
+        = String.format("/cases/%s/documents/%s", CASE_REFERENCE, CASE_DOCUMENT_ID);
     private final CaseDocumentMetadata caseDocumentMetadata = CaseDocumentMetadata.builder()
         .caseId(CASE_REFERENCE)
             .documentPermissions(DocumentPermissions.builder()
@@ -32,36 +33,31 @@ class CaseDocumentResourceTest {
     @Test
     @DisplayName("should copy case document metadata unwrapped")
     void shouldCopyUnwrappedCaseDocumentMetadataContent() {
-        final CaseDocumentResource result = new CaseDocumentResource(CASE_REFERENCE, CASE_DOCUMENT_ID, caseDocumentMetadata);
+        final CaseDocumentResource result
+            = new CaseDocumentResource(CASE_REFERENCE, CASE_DOCUMENT_ID, caseDocumentMetadata);
 
-        assertAll(
-            () -> assertThat(result.getDocumentMetadata(), equalTo(caseDocumentMetadata))
-        );
+        assertAll(() -> assertThat(result.getDocumentMetadata(), equalTo(caseDocumentMetadata)));
     }
 
     @Test
     @DisplayName("should throw Null Pointer Exception  when case id is null")
     void shouldThrowNullPointerExceptionWhenCaseIdNull() {
-        assertThrows(NullPointerException .class, () -> new CaseDocumentResource(null, CASE_DOCUMENT_ID, caseDocumentMetadata));
-
-
+        assertThrows(NullPointerException.class,
+            () -> new CaseDocumentResource(null, CASE_DOCUMENT_ID, caseDocumentMetadata));
     }
 
     @Test
     @DisplayName("should throw Null Pointer Exception  when document id is null")
     void shouldThrowNullPointerExceptionWhenDocumentIdNull() {
-        assertThrows(NullPointerException .class, () -> new CaseDocumentResource(CASE_REFERENCE, null, caseDocumentMetadata));
-
-
+        assertThrows(NullPointerException.class,
+            () -> new CaseDocumentResource(CASE_REFERENCE, null, caseDocumentMetadata));
     }
-
-
-
 
     @Test
     @DisplayName("should link to itself")
     void shouldLinkToSelf() {
-        final CaseDocumentResource result = new CaseDocumentResource(CASE_REFERENCE, CASE_DOCUMENT_ID, caseDocumentMetadata);
+        final CaseDocumentResource result
+            = new CaseDocumentResource(CASE_REFERENCE, CASE_DOCUMENT_ID, caseDocumentMetadata);
 
         Optional<Link> self = (Optional<Link>) result.getLink("self");
         if (self.isPresent()) {
