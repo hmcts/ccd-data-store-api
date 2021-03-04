@@ -152,6 +152,9 @@ public class ApplicationParams {
     @Value("${enable-attribute-based-access-control}")
     private boolean enableAttributeBasedAccessControl;
 
+    @Value("${enable-pseudo-role-assignments-generation}")
+    private boolean enablePseudoRoleAssignmentsGeneration;
+
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
 
@@ -411,6 +414,10 @@ public class ApplicationParams {
 
     public boolean getEnableAttributeBasedAccessControl() {
         return enableAttributeBasedAccessControl;
+    }
+
+    public boolean getEnablePseudoRoleAssignmentsGeneration() {
+        return enablePseudoRoleAssignmentsGeneration;
     }
 
     public List<String> getCcdAccessControlCitizenRoles() {
