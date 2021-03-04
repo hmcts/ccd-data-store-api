@@ -15,5 +15,5 @@ public class RoleAssignmentAttributes {
     private Optional<String> caseId;
     private Optional<String> region;
     private Optional<String> location;
-    private Optional<String> contractType; // SALARIED, FEEPAY
+    private Optional<String> contractType;
 }

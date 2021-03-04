@@ -6,7 +6,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.service.common.DefaultCaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.DefaultCaseDataAccessControl;
 
 import java.util.Optional;
 
@@ -44,7 +44,7 @@ class AccessControlledGetCaseOperationTest {
 
     @Test
     public void shouldGetCaseWithAppliedAccessControl() {
-        given(applicationParams.getCcdNewAccessControlEnabled()).willReturn(true);
+        given(applicationParams.getEnableAttributeBasedAccessControl()).willReturn(true);
         given(getCaseOperation.execute(CASE_REFERENCE)).willReturn(Optional.of(caseDetails));
         given(defaultCaseDataAccessControl.applyAccessControl(caseDetails))
             .willReturn(Optional.of(accessControlledCaseDetails));
@@ -57,7 +57,7 @@ class AccessControlledGetCaseOperationTest {
 
     @Test
     public void shouldGetCaseWithAppliedAccessControlReturnsEmptyCaseDetails() {
-        given(applicationParams.getCcdNewAccessControlEnabled()).willReturn(true);
+        given(applicationParams.getEnableAttributeBasedAccessControl()).willReturn(true);
         given(getCaseOperation.execute(CASE_REFERENCE)).willReturn(Optional.of(caseDetails));
         given(defaultCaseDataAccessControl.applyAccessControl(caseDetails)).willReturn(Optional.empty());
 
@@ -68,7 +68,7 @@ class AccessControlledGetCaseOperationTest {
 
     @Test
     public void shouldDelegateToCreatorGetCaseOperationAndIgnoreJurisdictionAndCaseType() {
-        given(applicationParams.getCcdNewAccessControlEnabled()).willReturn(false);
+        given(applicationParams.getEnableAttributeBasedAccessControl()).willReturn(false);
 
         instance.execute("j", "ct", CASE_REFERENCE);
 
@@ -77,7 +77,7 @@ class AccessControlledGetCaseOperationTest {
 
     @Test
     public void shouldDelegateToCreatorGetCaseOperation() {
-        given(applicationParams.getCcdNewAccessControlEnabled()).willReturn(false);
+        given(applicationParams.getEnableAttributeBasedAccessControl()).willReturn(false);
 
         instance.execute(CASE_REFERENCE);
 

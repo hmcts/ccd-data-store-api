@@ -1,7 +1,8 @@
-package uk.gov.hmcts.ccd.domain.service.accessprofile.filter.matcher;
+package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
@@ -28,12 +29,11 @@ class SecurityClassificationMatcherTest extends BaseFilter {
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
             Instant.now().minus(1, ChronoUnit.DAYS),
             Instant.now().plus(2, ChronoUnit.DAYS), "PRIVATE");
-        RoleAssignmentFilteringResult result = new RoleAssignmentFilteringResult(roleAssignment,
+        Pair<RoleAssignment, RoleMatchingResult> result = Pair.of(roleAssignment,
             new RoleMatchingResult());
         CaseDetails caseDetails = mockCaseDetails();
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertTrue(matched);
-        assertTrue(result.getRoleMatchingResult().isValidClassification());
+        classUnderTest.matchAttribute(result, caseDetails);
+        assertTrue(result.getRight().isClassificationMatched());
     }
 
     @Test
@@ -41,12 +41,11 @@ class SecurityClassificationMatcherTest extends BaseFilter {
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
             Instant.now().minus(1, ChronoUnit.DAYS),
             Instant.now().plus(2, ChronoUnit.DAYS), "PUBLIC");
-        RoleAssignmentFilteringResult result = new RoleAssignmentFilteringResult(roleAssignment,
+        Pair<RoleAssignment, RoleMatchingResult> result = Pair.of(roleAssignment,
             new RoleMatchingResult());
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED);
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertFalse(matched);
-        assertFalse(result.getRoleMatchingResult().isValidClassification());
+        classUnderTest.matchAttribute(result, caseDetails);
+        assertFalse(result.getRight().isClassificationMatched());
     }
 
 
@@ -55,12 +54,11 @@ class SecurityClassificationMatcherTest extends BaseFilter {
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
             Instant.now().minus(1, ChronoUnit.DAYS),
             Instant.now().plus(2, ChronoUnit.DAYS), "INVALID");
-        RoleAssignmentFilteringResult result = new RoleAssignmentFilteringResult(roleAssignment,
+        Pair<RoleAssignment, RoleMatchingResult> result = Pair.of(roleAssignment,
             new RoleMatchingResult());
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED);
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertFalse(matched);
-        assertFalse(result.getRoleMatchingResult().isValidClassification());
+        classUnderTest.matchAttribute(result, caseDetails);
+        assertFalse(result.getRight().isClassificationMatched());
     }
 
     @Test
@@ -68,12 +66,11 @@ class SecurityClassificationMatcherTest extends BaseFilter {
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
             Instant.now().minus(1, ChronoUnit.DAYS),
             Instant.now().plus(2, ChronoUnit.DAYS), null);
-        RoleAssignmentFilteringResult result = new RoleAssignmentFilteringResult(roleAssignment,
+        Pair<RoleAssignment, RoleMatchingResult> result = Pair.of(roleAssignment,
             new RoleMatchingResult());
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED);
-        boolean matched = classUnderTest.matchAttribute(result, caseDetails);
-        assertFalse(matched);
-        assertFalse(result.getRoleMatchingResult().isValidClassification());
+        classUnderTest.matchAttribute(result, caseDetails);
+        assertFalse(result.getRight().isClassificationMatched());
     }
 
 }

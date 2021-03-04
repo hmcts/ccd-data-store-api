@@ -4,26 +4,19 @@ import lombok.Data;
 
 @Data
 public class RoleMatchingResult {
-    boolean validDate;
-    boolean validCaseId;
-    boolean validJurisdiction;
-    boolean validRegion;
-    boolean validLocation;
-    boolean validClassification;
+    boolean dateMatched;
+    boolean caseIdMatched;
+    boolean jurisdictionMatched;
+    boolean regionMatched;
+    boolean locationMatched;
+    boolean classificationMatched;
 
     public boolean matchedAllValues() {
-        return isValidDate()
-            && isValidCaseId()
-            && isValidJurisdiction()
-            && isValidClassification()
-            && isValidRegion()
-            && isValidLocation();
-    }
-
-    public boolean matchedAExceptRegionAndLocation() {
-        return isValidDate()
-            && isValidCaseId()
-            && isValidJurisdiction()
-            && isValidClassification();
+        return isDateMatched()
+            && isCaseIdMatched()
+            && isJurisdictionMatched()
+            && isClassificationMatched()
+            && isRegionMatched()
+            && isLocationMatched();
     }
 }

@@ -1,28 +1,17 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import java.util.List;
+import org.apache.commons.lang3.tuple.Pair;
 
-import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.CHALLENGED;
-import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.SPECIFIC;
-import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.STANDARD;
-
-@Data
-@AllArgsConstructor
 public class RoleAssignmentFilteringResult {
-    private final RoleAssignment roleAssignment;
-    private final RoleMatchingResult roleMatchingResult;
 
-    public AccessProcess getAccessProcess(String grantType) {
-        if (STANDARD.name().equals(grantType)
-            && SPECIFIC.name().equals(grantType)
-            && CHALLENGED.name().equals(grantType)
-            && roleMatchingResult.matchedAllValues()) {
-            return AccessProcess.NONE;
-        } else if (STANDARD.name().equals(grantType)
-            && roleMatchingResult.matchedAExceptRegionAndLocation()) {
-            return AccessProcess.CHALLENGED;
-        }
-        return AccessProcess.SPECIFIC;
+    private final List<Pair<RoleAssignment, RoleMatchingResult>> roleAssignmentRoleMatchingResults;
+
+    public RoleAssignmentFilteringResult(List<Pair<RoleAssignment, RoleMatchingResult>> roleAssignmentMatchPairs) {
+        this.roleAssignmentRoleMatchingResults = roleAssignmentMatchPairs;
+    }
+
+    public List<Pair<RoleAssignment, RoleMatchingResult>> getRoleAssignmentRoleMatchingResults() {
+        return roleAssignmentRoleMatchingResults;
     }
 }

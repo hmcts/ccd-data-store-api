@@ -149,8 +149,8 @@ public class ApplicationParams {
     @Value("${ccd.access-control.caseworker.role.regex}")
     private String ccdAccessControlCaseworkerRoleRegex;
 
-    @Value("${ccd.new-access-control-enabled}")
-    private boolean ccdNewAccessControlEnabled;
+    @Value("${enable-attribute-based-access-control}")
+    private boolean enableAttributeBasedAccessControl;
 
     @Value("${enable-pseudo-role-assignments-generation}")
     private boolean enablePseudoRoleAssignmentsGeneration;
@@ -412,8 +412,8 @@ public class ApplicationParams {
         return ccdAccessControlCaseworkerRoleRegex;
     }
 
-    public boolean getCcdNewAccessControlEnabled() {
-        return ccdNewAccessControlEnabled;
+    public boolean getEnableAttributeBasedAccessControl() {
+        return enableAttributeBasedAccessControl;
     }
 
     public boolean getEnablePseudoRoleAssignmentsGeneration() {
