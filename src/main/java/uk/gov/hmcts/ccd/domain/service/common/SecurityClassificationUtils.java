@@ -46,15 +46,8 @@ public class SecurityClassificationUtils {
 
 
     public static JsonNode getDataClassificationForData(JsonNode data, Iterator<JsonNode> dataIterator) {
-        Boolean found = false;
-        JsonNode dataClassificationValue = null;
-        while (dataIterator.hasNext() && !found) {
-            dataClassificationValue = dataIterator.next();
-            if (null != dataClassificationValue.get(ID)
-                && dataClassificationValue.get(ID).equals(data.get(ID))) {
-                found = true;
-            }
-        }
-        return found ? dataClassificationValue : JSON_NODE_FACTORY.nullNode();
+       //All the elements of a collection will have the same security classification
+       //We can then just return the first element as a representative of the collection's elements security classification
+        return dataIterator.hasNext()? dataIterator.next(): JSON_NODE_FACTORY.nullNode();
     }
 }

@@ -128,7 +128,7 @@ public class SecurityClassificationService {
             } else if (dataClassificationElement.has(VALUE)) {
                 JsonNode dataClassificationValue = dataClassificationElement.get(VALUE);
                 JsonNode dataElementValue = dataElement.getValue();
-                if (dataClassificationValue.isObject() || dataClassificationValue.isArray()) {
+                if (dataClassificationValue.isObject()) {
                     filterObject(userClassification, dataIterator, dataClassificationElement, dataElementValue);
                 } else {
                     filterCollection(userClassification,
