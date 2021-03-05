@@ -8,6 +8,8 @@ public class AccessProfile {
 
     private String classification;
 
+    private String roleName;
+
     private List<String> accessProfiles;
 
     public Boolean getReadOnly() {
@@ -24,6 +26,14 @@ public class AccessProfile {
 
     public void setClassification(String classification) {
         this.classification = classification;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 
     public List<String> getAccessProfiles() {

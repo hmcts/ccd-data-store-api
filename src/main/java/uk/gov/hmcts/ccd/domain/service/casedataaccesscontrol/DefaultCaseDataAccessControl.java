@@ -25,11 +25,12 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     private final RoleAssignmentService roleAssignmentService;
     private final SecurityUtils securityUtils;
     private final CaseService caseService;
-    private CaseTypeService caseTypeService;
-    private RoleAssignmentsFilteringService roleAssignmentsFilteringService;
-    private RoleAssignmentToAccessProfileMapper roleAssignmentToAccessProfileMapper;
+    private final CaseTypeService caseTypeService;
+    private final RoleAssignmentsFilteringService roleAssignmentsFilteringService;
+    private final RoleAssignmentToAccessProfileMapper roleAssignmentToAccessProfileMapper;
     private final FakeRoleAssignmentsGenerator fakeRoleAssignmentsGenerator;
     private final ApplicationParams applicationParams;
+    private final RoleToAccessProfilesMappingsGenerator roleToAccessProfilesMappingsGenerator;
 
     @Autowired
     public DefaultCaseDataAccessControl(RoleAssignmentService roleAssignmentService,
@@ -39,7 +40,8 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
                                         RoleAssignmentsFilteringService roleAssignmentsFilteringService,
                                         FakeRoleAssignmentsGenerator fakeRoleAssignmentsGenerator,
                                         ApplicationParams applicationParams,
-                                        RoleAssignmentToAccessProfileMapper roleAssignmentToAccessProfileMapper) {
+                                        RoleAssignmentToAccessProfileMapper roleAssignmentToAccessProfileMapper,
+                                        RoleToAccessProfilesMappingsGenerator roleToAccessProfilesMappingsGenerator) {
         this.roleAssignmentService = roleAssignmentService;
         this.securityUtils = securityUtils;
         this.caseService = caseService;
@@ -48,6 +50,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         this.fakeRoleAssignmentsGenerator = fakeRoleAssignmentsGenerator;
         this.applicationParams = applicationParams;
         this.roleAssignmentToAccessProfileMapper = roleAssignmentToAccessProfileMapper;
+        this.roleToAccessProfilesMappingsGenerator = roleToAccessProfilesMappingsGenerator;
     }
 
     // Returns Optional<CaseDetails>. If this is not enough think of wrapping it in a AccessControlResponse
@@ -61,14 +64,15 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
             .filter(roleAssignments, caseDetails);
         CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseDetails.getCaseTypeId());
 
-        List<AccessProfile> accessProfiles = roleAssignmentToAccessProfileMapper
-            .toAccessProfiles(filteringResults, caseTypeDefinition);
-
         if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
             List<RoleAssignment> augmentedRoleAssignments = fakeRoleAssignmentsGenerator
                 .addFakeRoleAssignments(filteringResults);
         }
 
+        List<AccessProfile> accessProfiles = roleAssignmentToAccessProfileMapper
+            .toAccessProfiles(filteringResults, caseTypeDefinition);
+
+        List<AccessProfile> generatedAccessProfiles = roleToAccessProfilesMappingsGenerator.generate(caseTypeDefinition);
         // 4.) determine AccessProfiles from the new RoleToAccessProfiles Tab
         // https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1460559903#AccessControlScopeofDelivery-NewRoleToAccessProfilesTab
         // as a result we identify the AccessProfiles that the user has on the case

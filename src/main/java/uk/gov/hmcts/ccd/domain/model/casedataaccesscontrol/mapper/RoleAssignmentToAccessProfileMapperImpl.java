@@ -76,8 +76,7 @@ public class RoleAssignmentToAccessProfileMapperImpl implements RoleAssignmentTo
 
     private boolean hasGrantTypeExcluded(List<RoleAssignment> roleAssignments) {
         return roleAssignments.stream()
-            .filter(roleAssignment -> roleAssignment.getGrantType().equals(GrantType.EXCLUDED.name()))
-            .findFirst().isPresent();
+            .anyMatch(roleAssignment -> roleAssignment.getGrantType().equals(GrantType.EXCLUDED.name()));
     }
 
     private List<RoleAssignment> filterRoleAssignments(List<RoleAssignment> roleAssignments) {
