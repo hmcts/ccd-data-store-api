@@ -28,17 +28,6 @@
       "state" : "TODO",
       "security_classification" : "PUBLIC",
       "data" : {
-        "MoneyGBPField" : null,
-        "FixedListField" : "VALUE2",
-        "AddressUKField" : {
-          "County" : null,
-          "Country" : null,
-          "PostCode" : null,
-          "PostTown" : null,
-          "AddressLine1" : null,
-          "AddressLine2" : null,
-          "AddressLine3" : null
-        },
         "DocumentField1" : {
           "document_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
           "document_filename" : "${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
@@ -73,26 +62,7 @@
           "document_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_06][customValues][documentIdInTheResponse]}",
           "document_filename" : "${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_06][testData][actualResponse][body][documents][0][originalDocumentName]}",
           "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][parentContext][childContexts][Default_Document_Upload_Data_06][customValues][documentIdInTheResponse]}/binary"
-        },
-        "ComplexField" : {
-          "ComplexTextField" : "aefaefa",
-          "ComplexNestedField" : {
-            "NestedNumberField" : null,
-            "NestedCollectionTextField" : [ ]
-          },
-          "ComplexFixedListField" : "VALUE2"
-        },
-        "FixedRadioListField" : "RADIOVALUE3",
-        "DateTimeField" : null,
-        "PhoneUKField" : "08888899999",
-        "NumberField" : "11111",
-        "MultiSelectListField" : [ "OPTION5", "OPTION4", "OPTION3" ],
-        "YesOrNoField" : "No",
-        "EmailField" : "a@b.com",
-        "TextField" : "A text fields",
-        "DateField" : null,
-        "TextAreaField" : "fqeadadfTSFGsfs`f`sfs`f",
-        "CollectionField" : [ ]
+        }
       },
       "data_classification" : {
         "MoneyGBPField" : "PUBLIC",
@@ -130,12 +100,7 @@
           "value" : [ ],
           "classification" : "PUBLIC"
         }
-      },
-      "after_submit_callback_response" : null,
-      "callback_response_status_code" : null,
-      "callback_response_status" : null,
-      "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null
+      }
     }
   }
 }

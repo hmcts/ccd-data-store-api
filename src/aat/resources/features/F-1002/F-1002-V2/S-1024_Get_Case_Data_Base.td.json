@@ -17,7 +17,7 @@
           "href": "{{TEST_URL}}/cases/${[scenarioContext][parentContext][childContexts][S-1024-V2_Update_Event_Token_Creation][testData][Request][pathVariables][cid]}"
         }
       },
-      "id": "${[scenarioContext][parentContext][childContexts][S-1024-V2_Update_Event_Token_Creation][testData][Request][pathVariables][cid]}",
+      "id": "${}${[scenarioContext][parentContext][childContexts][S-1024-V2_Update_Event_Token_Creation][testData][Request][pathVariables][cid]}",
       "data": {
         "MoneyGBPField" : "10121012",
         "EmailField" : "S1012NonDocumentFieldsUpdate@gmail.com",
