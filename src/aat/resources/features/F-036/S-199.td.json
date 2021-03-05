@@ -97,16 +97,7 @@
 					"DateField": "PUBLIC",
 					"TextAreaField": "PUBLIC",
 					"CollectionField": {
-						"value": [
-							{
-								"id": "[[ANYTHING_PRESENT]]",
-								"classification": "PUBLIC"
-							},
-							{
-								"id": "[[ANYTHING_PRESENT]]",
-								"classification": "PUBLIC"
-							}
-						],
+						"value": "[[ANYTHING_PRESENT]]",
 						"classification": "PUBLIC"
 					}
 				},
@@ -141,16 +132,7 @@
 					"DateField": "PUBLIC",
 					"TextAreaField": "PUBLIC",
 					"CollectionField": {
-						"value": [
-							{
-								"id": "[[ANYTHING_PRESENT]]",
-								"classification": "PUBLIC"
-							},
-							{
-								"id": "[[ANYTHING_PRESENT]]",
-								"classification": "PUBLIC"
-							}
-						],
+            "value": "[[ANYTHING_PRESENT]]",
 						"classification": "PUBLIC"
 					}
 				}
