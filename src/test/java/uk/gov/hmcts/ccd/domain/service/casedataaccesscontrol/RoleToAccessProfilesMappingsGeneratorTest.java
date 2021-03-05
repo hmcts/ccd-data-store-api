@@ -25,6 +25,7 @@ import java.util.Set;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
@@ -112,7 +113,9 @@ class RoleToAccessProfilesMappingsGeneratorTest {
 
             assertAll(
                 () -> assertThat("Expected number of access profiles to be 12", generated, hasSize(12)),
-                () -> assertTrue(creatorAccessProfile.isPresent())
+                () -> assertTrue(creatorAccessProfile.isPresent()),
+                () -> assertThat("Expected to match the caseTypeId",
+                                 creatorAccessProfile.get().getCaseTypeId(), is(CASE_TYPE_ID))
             );
         }
     }

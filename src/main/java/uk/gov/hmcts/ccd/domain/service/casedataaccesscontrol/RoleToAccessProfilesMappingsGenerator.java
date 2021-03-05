@@ -36,8 +36,8 @@ public class RoleToAccessProfilesMappingsGenerator {
         Set<String> idamRoles = generateIdamRoles(caseTypeDefinition);
 
         List<AccessProfile> accessProfiles = new ArrayList<>();
-        accessProfiles.addAll(createAccessProfiles(caseRoles, false));
-        accessProfiles.addAll(createAccessProfiles(idamRoles, true));
+        accessProfiles.addAll(createAccessProfiles(caseTypeDefinition.getId(), caseRoles, false));
+        accessProfiles.addAll(createAccessProfiles(caseTypeDefinition.getId(), idamRoles, true));
 
         return accessProfiles;
     }
@@ -109,16 +109,17 @@ public class RoleToAccessProfilesMappingsGenerator {
             .collect(Collectors.toList());
     }
 
-    private List<AccessProfile> createAccessProfiles(Set<String> roles, boolean addIdamPrefix) {
+    private List<AccessProfile> createAccessProfiles(String ctId, Set<String> roles, boolean addIdamPrefix) {
         return roles.stream()
-            .map(role -> createAccessProfile(role, addIdamPrefix))
+            .map(role -> createAccessProfile(ctId, role, addIdamPrefix))
             .collect(Collectors.toList());
     }
 
-    private AccessProfile createAccessProfile(String role, boolean addIdamPrefix) {
+    private AccessProfile createAccessProfile(String ctId, String role, boolean addIdamPrefix) {
         AccessProfile accessProfile = new AccessProfile();
         accessProfile.setAccessProfiles(Collections.singletonList(role));
         accessProfile.setRoleName(addIdamPrefix ? IDAM_PREFIX + role : role);
+        accessProfile.setCaseTypeId(ctId);
         accessProfile.setReadOnly(false);
         return accessProfile;
     }

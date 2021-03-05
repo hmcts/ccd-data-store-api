@@ -4,6 +4,8 @@ import java.util.List;
 
 public class AccessProfile {
 
+    private String caseTypeId;
+
     private Boolean readOnly;
 
     private String classification;
@@ -11,6 +13,14 @@ public class AccessProfile {
     private String roleName;
 
     private List<String> accessProfiles;
+
+    public String getCaseTypeId() {
+        return caseTypeId;
+    }
+
+    public void setCaseTypeId(String caseTypeId) {
+        this.caseTypeId = caseTypeId;
+    }
 
     public Boolean getReadOnly() {
         return readOnly;
