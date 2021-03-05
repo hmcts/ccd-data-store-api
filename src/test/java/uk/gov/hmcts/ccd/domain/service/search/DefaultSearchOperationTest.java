@@ -12,12 +12,10 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
@@ -55,50 +53,6 @@ class DefaultSearchOperationTest {
         assertAll(
             () -> verify(caseDetailsRepository).findByMetaDataAndFieldData(metaData, criteria),
             () -> assertThat(output, sameInstance(results))
-        );
-    }
-
-    @Test
-    @DisplayName("should search against repository")
-    void shouldSearchAgainstRepositoryCorrectReference() {
-        final ArrayList<CaseDetails> results = new ArrayList<>();
-        doReturn(results).when(caseDetailsRepository).findByMetaDataAndFieldData(metaData, criteria);
-        metaData.setCaseReference(Optional.of("1614249749110028"));
-
-        final List<CaseDetails> output = searchOperation.execute(metaData, criteria);
-
-        assertAll(
-            () -> verify(caseDetailsRepository).findByMetaDataAndFieldData(metaData, criteria),
-            () -> assertThat(output, sameInstance(results))
-        );
-    }
-
-    @Test
-    @DisplayName("should search against repository")
-    void shouldSearchAgainstRepositoryCorrectReferenceWithHyphen() {
-        final ArrayList<CaseDetails> results = new ArrayList<>();
-        doReturn(results).when(caseDetailsRepository).findByMetaDataAndFieldData(metaData, criteria);
-        metaData.setCaseReference(Optional.of("1614-2497-4911-0028"));
-
-        final List<CaseDetails> output = searchOperation.execute(metaData, criteria);
-
-        assertAll(
-            () -> verify(caseDetailsRepository).findByMetaDataAndFieldData(metaData, criteria),
-            () -> assertThat(output, sameInstance(results))
-        );
-    }
-
-    @Test
-    @DisplayName("should search against repository for incorrect case reference")
-    void shouldSearchAgainstRepositoryForIncorrectCaseReference() {
-        final ArrayList<CaseDetails> results = new ArrayList<>();
-        doReturn(results).when(caseDetailsRepository).findByMetaDataAndFieldData(metaData, criteria);
-        metaData.setCaseReference(Optional.of("BBBBBB"));
-
-        final List<CaseDetails> output = searchOperation.execute(metaData, criteria);
-
-        assertAll(
-            () -> assertTrue(output.size() == 0)
         );
     }
 

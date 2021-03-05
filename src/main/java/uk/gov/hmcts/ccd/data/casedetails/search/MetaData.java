@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.data.casedetails.search;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.ImmutableList;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
-import uk.gov.hmcts.ccd.domain.model.common.CaseReferenceUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -232,16 +231,6 @@ public class MetaData {
 
     private String getMethodName(CaseField metadataField, String prefix) {
         return prefix + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, metadataField.getParameterName());
-    }
-
-    public boolean validateAndConvertReference() {
-        return caseReference.map(reference -> {
-            boolean valid = CaseReferenceUtils.isAValidCaseReference(reference);
-            if (valid) {
-                caseReference = Optional.of(CaseReferenceUtils.removeHyphens(reference));
-            }
-            return valid;
-        }).orElse(true);
     }
 
     @Override

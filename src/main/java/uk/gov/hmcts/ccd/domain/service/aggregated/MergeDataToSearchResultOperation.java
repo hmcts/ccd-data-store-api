@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
 import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedCaseFieldByPath;
 
 @Named
@@ -122,18 +121,11 @@ public class MergeDataToSearchResultOperation {
                                                            final SearchResultDefinition searchResult) {
         Map<String, JsonNode> caseData = new HashMap<>(caseDetails.getData());
         Map<String, Object> caseMetadata = new HashMap<>(caseDetails.getMetadata());
-        convertReferenceToString(caseMetadata);
         Map<String, TextNode> labels = caseTypeDefinition.getLabelsFromCaseFields();
         Map<String, Object> caseFields = prepareData(searchResult, caseData, caseMetadata, labels);
+
         String caseId = caseDetails.hasCaseReference() ? caseDetails.getReferenceAsString() : caseDetails.getId();
         return new SearchResultViewItem(caseId, caseFields, new HashMap<>(caseFields));
-    }
-
-
-    private Map<String, Object> convertReferenceToString(Map<String, Object> caseMetadata) {
-        final String convertedCaseReference = caseMetadata.get(CASE_REFERENCE.getReference()).toString();
-        caseMetadata.put(CASE_REFERENCE.getReference(), convertedCaseReference);
-        return caseMetadata;
     }
 
     private Map<String, Object> prepareData(SearchResultDefinition searchResult,

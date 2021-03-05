@@ -15,7 +15,7 @@ import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.List;
 
-import static uk.gov.hmcts.ccd.domain.model.common.CaseReferenceUtils.removeHyphens;
+import static uk.gov.hmcts.ccd.domain.model.common.CaseReferenceUtils.formatCaseReference;
 
 @Named
 @Singleton
@@ -50,7 +50,7 @@ public class TextCaseReferenceCaseLinkValidator implements CustomTypeValidator {
 
     private List<ValidationResult> isAnExistingCase(final String value, final String dataFieldId) {
         try {
-            this.caseService.getCaseDetailsByCaseReference(removeHyphens(value));
+            this.caseService.getCaseDetailsByCaseReference(formatCaseReference(value));
             return Collections.emptyList();
         } catch (ResourceNotFoundException resourceNotFoundException) {
             return Collections.singletonList(
