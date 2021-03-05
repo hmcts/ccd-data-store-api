@@ -141,7 +141,6 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                         "testData.actualResponse.body.documents[0]._links.self.href");
                 return href.substring(href.length() - 36);
             } catch (Exception exception) {
-//                logger.error("Exception while getting the Document ID from the response :{}", exception.getMessage());
                 return "Error extracting the Document Id";
             }
         } else if (key.toString().equalsIgnoreCase("validSelfLink")) {
