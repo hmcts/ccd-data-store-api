@@ -218,7 +218,7 @@
           "label": "Case Reference",
           "value": "[[ANY_NUMBER_NOT_NULLABLE]]",
           "field_type": {
-            "_extends_": "BaseNumberFieldType"
+            "_extends_": "BaseTextFieldType"
           },
           "validation_expr": null,
           "security_label": "PUBLIC",
