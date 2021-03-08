@@ -11,13 +11,19 @@
 	</suppress>
 
 	<suppress>
-		<notes>Analysis: No fix or work around available</notes>
-		<cve>CVE-2007-1652</cve>
-		<cve>CVE-2007-1651</cve>
+		<notes>These CVE's are coming from Dhowden tag library and it impacts only MP3/MP4/OGG/FLAC metadata parsing
+			library. Also it is declared as false positive in https://github.com/jeremylong/DependencyCheck/issues/3043
+		</notes>
 		<cve>CVE-2020-29242</cve>
 		<cve>CVE-2020-29243</cve>
 		<cve>CVE-2020-29244</cve>
 		<cve>CVE-2020-29245</cve>
+	</suppress>
+
+	<suppress>
+		<notes>Analysis: No fix or work around available</notes>
+		<cve>CVE-2007-1651</cve>
+		<cve>CVE-2007-1652</cve>
 	</suppress>
 
 </suppressions>
