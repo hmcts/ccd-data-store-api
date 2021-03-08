@@ -11,6 +11,7 @@ public class PaginatedSearchMetadata implements Serializable {
     private static final long serialVersionUID = 3129236643198519380L;
     private Integer totalResultsCount;
     private Integer totalPagesCount;
+    public static final PaginatedSearchMetadata EMPTY = new PaginatedSearchMetadata();
 
 
     public void setTotalResultsCount(Integer totalResultsCount) {
