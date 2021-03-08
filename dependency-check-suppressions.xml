@@ -21,7 +21,8 @@
 	</suppress>
 
 	<suppress>
-		<notes>Analysis: No fix or work around available</notes>
+		<notes>Declared as False Positive on com.nimbusds:oauth2-oidc-sdk #2866
+			https://github.com/jeremylong/DependencyCheck/issues/2866</notes>
 		<cve>CVE-2007-1651</cve>
 		<cve>CVE-2007-1652</cve>
 	</suppress>
