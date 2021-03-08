@@ -11,7 +11,6 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.mapper.RoleAssignmentToAccessProfileMapper;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
@@ -27,7 +26,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     private final CaseService caseService;
     private CaseTypeService caseTypeService;
     private RoleAssignmentsFilteringService roleAssignmentsFilteringService;
-    private RoleAssignmentToAccessProfileMapper roleAssignmentToAccessProfileMapper;
+    private AccessProfileService accessProfileService;
     private final FakeRoleAssignmentsGenerator fakeRoleAssignmentsGenerator;
     private final ApplicationParams applicationParams;
 
@@ -39,7 +38,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
                                         RoleAssignmentsFilteringService roleAssignmentsFilteringService,
                                         FakeRoleAssignmentsGenerator fakeRoleAssignmentsGenerator,
                                         ApplicationParams applicationParams,
-                                        RoleAssignmentToAccessProfileMapper roleAssignmentToAccessProfileMapper) {
+                                        AccessProfileService accessProfileService) {
         this.roleAssignmentService = roleAssignmentService;
         this.securityUtils = securityUtils;
         this.caseService = caseService;
@@ -47,7 +46,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         this.roleAssignmentsFilteringService = roleAssignmentsFilteringService;
         this.fakeRoleAssignmentsGenerator = fakeRoleAssignmentsGenerator;
         this.applicationParams = applicationParams;
-        this.roleAssignmentToAccessProfileMapper = roleAssignmentToAccessProfileMapper;
+        this.accessProfileService = accessProfileService;
     }
 
     // Returns Optional<CaseDetails>. If this is not enough think of wrapping it in a AccessControlResponse
@@ -59,15 +58,20 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
 
         RoleAssignmentFilteringResult filteringResults = roleAssignmentsFilteringService
             .filter(roleAssignments, caseDetails);
-        CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseDetails.getCaseTypeId());
 
-        List<AccessProfile> accessProfiles = roleAssignmentToAccessProfileMapper
-            .toAccessProfiles(filteringResults, caseTypeDefinition);
+        if (filteringResults.hasGrantTypeExcluded()) {
+            filteringResults = filteringResults.getBasicAndStandardGrantTypeRoles();
+        }
 
         if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
             List<RoleAssignment> augmentedRoleAssignments = fakeRoleAssignmentsGenerator
                 .addFakeRoleAssignments(filteringResults);
         }
+
+        CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseDetails.getCaseTypeId());
+
+        List<AccessProfile> accessProfiles = accessProfileService
+            .generateAccessProfiles(filteringResults, caseTypeDefinition);
 
         // 4.) determine AccessProfiles from the new RoleToAccessProfiles Tab
         // https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1460559903#AccessControlScopeofDelivery-NewRoleToAccessProfilesTab
