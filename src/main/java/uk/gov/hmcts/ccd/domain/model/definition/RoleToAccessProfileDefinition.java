@@ -1,13 +1,17 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class RoleToAccessProfileDefinition {
 
     private String caseTypeId;
     private Boolean disabled;
     private Boolean readOnly;
-    private String authorisation;
+    private String authorisations;
     private String accessProfiles;
     private Date liveFrom;
     private Date liveTo;
@@ -37,12 +41,22 @@ public class RoleToAccessProfileDefinition {
         this.readOnly = readOnly;
     }
 
-    public String getAuthorisation() {
-        return authorisation;
+    public String getAuthorisations() {
+        return authorisations;
     }
 
-    public void setAuthorisation(String authorisation) {
-        this.authorisation = authorisation;
+    public List<String> getAuthorisationList() {
+        if (getAuthorisations() != null) {
+            return Arrays.asList(getAuthorisations().split(","))
+                .stream()
+                .filter(str -> str.length() > 0)
+                .collect(Collectors.toList());
+        }
+        return new ArrayList<>();
+    }
+
+    public void setAuthorisations(String authorisations) {
+        this.authorisations = authorisations;
     }
 
     public String getAccessProfiles() {
