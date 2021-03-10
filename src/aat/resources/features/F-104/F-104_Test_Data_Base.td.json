@@ -6,9 +6,8 @@
 	"method": "POST",
 	"uri": "/internal/searchCases",
 	"user" : {
-		"username": "[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
-		"password": "[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
-	},
+    "_extends_": "PrivateCaseworker"
+  },
 	"request": {
 		"_extends_": "Common_Request",
 		"queryParams": {

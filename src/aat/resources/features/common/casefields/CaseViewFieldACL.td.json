@@ -1,0 +1,13 @@
+{
+  "_guid_": "CaseViewFieldACL",
+  "_extends_": "CaseViewFieldMetadataFalse",
+
+  "acls": [
+    {
+      "_extends_": "AllGrantedAccessControlList"
+    },
+    {
+      "_extends_": "AllGrantedAccessControlList"
+    }
+  ]
+}

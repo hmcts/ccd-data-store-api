@@ -30,15 +30,10 @@
       "total": 1,
       "cases": [
         {
+          "_extends_" : "F-109_Base_Case_Fields_expected",
           "id": "${[scenarioContext][customValues][caseIdAsIntegerFrom_F-109-Befta_Jurisdiction2_Case_Type1_Creation]}",
           "jurisdiction": "BEFTA_JURISDICTION_2",
-          "state": "TODO",
-          "version": null,
           "case_type_id": "BEFTA_CASETYPE_2_1",
-          "created_date": "[[ANYTHING_PRESENT]]",
-          "last_modified": "[[ANYTHING_PRESENT]]",
-          "last_state_modified_date": "[[ANYTHING_PRESENT]]",
-          "security_classification": "PUBLIC",
           "case_data": {
             "FixedListField": null,
             "MoneyGBPField": null,
@@ -118,12 +113,6 @@
               "classification": "PUBLIC"
             }
           },
-          "supplementary_data": null,
-          "after_submit_callback_response": null,
-          "callback_response_status_code": null,
-          "callback_response_status": null,
-          "delete_draft_response_status_code": null,
-          "delete_draft_response_status": null,
           "security_classifications": {
             "FixedListField": "PUBLIC",
             "MoneyGBPField": "PUBLIC",

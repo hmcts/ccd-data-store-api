@@ -88,7 +88,9 @@
             "max" : null,
             "regular_expression" : null,
             "fixed_list_items" : [ ],
-            "complex_fields" : [ {
+            "complex_fields" : [
+
+              {
               "id" : "AddressLine1",
               "label" : "Building and Street",
               "hidden" : null,
@@ -110,7 +112,12 @@
               "live_from" : null,
               "live_until" : null,
               "show_condition" : null,
-              "acls" : [ {
+              "acls" : [
+                {
+                  "__operator__": "equivalent",
+                  "__ordering__": "unordered",
+                  "__elementId__": "role"
+                },{
                 "role" : "caseworker-befta_jurisdiction_2",
                 "create" : true,
                 "read" : true,
@@ -150,6 +157,7 @@
               "complexACLs" : [ ],
               "display_context" : null,
               "display_context_parameter" : null,
+              "retain_hidden_value" : null,
               "formatted_value" : null
             }, {
               "id" : "AddressLine2",
@@ -173,7 +181,12 @@
               "live_from" : null,
               "live_until" : null,
               "show_condition" : null,
-              "acls" : [ {
+              "acls" : [
+                {
+                  "__operator__": "equivalent",
+                  "__ordering__": "unordered",
+                  "__elementId__": "role"
+                },{
                 "role" : "caseworker-befta_jurisdiction_2",
                 "create" : true,
                 "read" : true,
@@ -213,6 +226,7 @@
               "complexACLs" : [ ],
               "display_context" : null,
               "display_context_parameter" : null,
+              "retain_hidden_value" : null,
               "formatted_value" : null
             }, {
               "id" : "AddressLine3",
@@ -236,7 +250,12 @@
               "live_from" : null,
               "live_until" : null,
               "show_condition" : null,
-              "acls" : [ {
+              "acls" : [
+                {
+                  "__operator__": "equivalent",
+                  "__ordering__": "unordered",
+                  "__elementId__": "role"
+                },{
                 "role" : "caseworker-befta_jurisdiction_2",
                 "create" : true,
                 "read" : true,
@@ -276,6 +295,7 @@
               "complexACLs" : [ ],
               "display_context" : null,
               "display_context_parameter" : null,
+              "retain_hidden_value" : null,
               "formatted_value" : null
             }, {
               "id" : "PostTown",
@@ -299,7 +319,12 @@
               "live_from" : null,
               "live_until" : null,
               "show_condition" : null,
-              "acls" : [ {
+              "acls" : [
+                {
+                  "__operator__": "equivalent",
+                  "__ordering__": "unordered",
+                  "__elementId__": "role"
+                },{
                 "role" : "caseworker-befta_jurisdiction_2",
                 "create" : true,
                 "read" : true,
@@ -339,6 +364,7 @@
               "complexACLs" : [ ],
               "display_context" : null,
               "display_context_parameter" : null,
+              "retain_hidden_value" : null,
               "formatted_value" : null
             }, {
               "id" : "County",
@@ -362,7 +388,12 @@
               "live_from" : null,
               "live_until" : null,
               "show_condition" : null,
-              "acls" : [ {
+              "acls" : [
+                {
+                  "__operator__": "equivalent",
+                  "__ordering__": "unordered",
+                  "__elementId__": "role"
+                },{
                 "role" : "caseworker-befta_jurisdiction_2",
                 "create" : true,
                 "read" : true,
@@ -402,6 +433,7 @@
               "complexACLs" : [ ],
               "display_context" : null,
               "display_context_parameter" : null,
+              "retain_hidden_value" : null,
               "formatted_value" : null
             }, {
               "id" : "PostCode",
@@ -425,7 +457,12 @@
               "live_from" : null,
               "live_until" : null,
               "show_condition" : null,
-              "acls" : [ {
+              "acls" : [
+                {
+                  "__operator__": "equivalent",
+                  "__ordering__": "unordered",
+                  "__elementId__": "role"
+                },{
                 "role" : "caseworker-befta_jurisdiction_2",
                 "create" : true,
                 "read" : true,
@@ -465,6 +502,7 @@
               "complexACLs" : [ ],
               "display_context" : null,
               "display_context_parameter" : null,
+              "retain_hidden_value" : null,
               "formatted_value" : null
             }, {
               "id" : "Country",
@@ -488,7 +526,12 @@
               "live_from" : null,
               "live_until" : null,
               "show_condition" : null,
-              "acls" : [ {
+              "acls" : [
+                {
+                  "__operator__": "equivalent",
+                  "__ordering__": "unordered",
+                  "__elementId__": "role"
+                },{
                 "role" : "caseworker-befta_jurisdiction_2",
                 "create" : true,
                 "read" : true,
@@ -528,6 +571,7 @@
               "complexACLs" : [ ],
               "display_context" : null,
               "display_context_parameter" : null,
+              "retain_hidden_value" : null,
               "formatted_value" : null
             } ],
             "collection_field_type" : null
@@ -567,7 +611,12 @@
               "live_from" : null,
               "live_until" : null,
               "show_condition" : null,
-              "acls" : [ {
+              "acls" : [
+                {
+                  "__operator__": "equivalent",
+                  "__ordering__": "unordered",
+                  "__elementId__": "role"
+                },{
                 "role" : "citizen",
                 "create" : true,
                 "read" : true,
@@ -611,6 +660,7 @@
               "complexACLs" : [ ],
               "display_context" : null,
               "display_context_parameter" : null,
+              "retain_hidden_value" : null,
               "formatted_value" : null
             }, {
               "id" : "ComplexFixedListField",
@@ -646,7 +696,12 @@
               "live_from" : null,
               "live_until" : null,
               "show_condition" : null,
-              "acls" : [ {
+              "acls" : [
+                {
+                  "__operator__": "equivalent",
+                  "__ordering__": "unordered",
+                  "__elementId__": "role"
+                },{
                 "role" : "citizen",
                 "create" : true,
                 "read" : true,
@@ -690,6 +745,7 @@
               "complexACLs" : [ ],
               "display_context" : null,
               "display_context_parameter" : null,
+              "retain_hidden_value" : null,
               "formatted_value" : null
             }, {
               "id" : "ComplexNestedField",
@@ -728,7 +784,12 @@
                   "live_from" : null,
                   "live_until" : null,
                   "show_condition" : null,
-                  "acls" : [ {
+                  "acls" : [
+                    {
+                      "__operator__": "equivalent",
+                      "__ordering__": "unordered",
+                      "__elementId__": "role"
+                    },{
                     "role" : "citizen",
                     "create" : true,
                     "read" : true,
@@ -768,6 +829,7 @@
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
+                  "retain_hidden_value" : null,
                   "formatted_value" : null
                 }, {
                   "id" : "NestedCollectionTextField",
@@ -800,7 +862,12 @@
                   "live_from" : null,
                   "live_until" : null,
                   "show_condition" : null,
-                  "acls" : [ {
+                  "acls" : [
+                    {
+                      "__operator__": "equivalent",
+                      "__ordering__": "unordered",
+                      "__elementId__": "role"
+                    },{
                     "role" : "citizen",
                     "create" : true,
                     "read" : true,
@@ -840,6 +907,7 @@
                   "complexACLs" : [ ],
                   "display_context" : null,
                   "display_context_parameter" : null,
+                  "retain_hidden_value" : null,
                   "formatted_value" : null
                 } ],
                 "collection_field_type" : null
@@ -848,7 +916,12 @@
               "live_from" : null,
               "live_until" : null,
               "show_condition" : null,
-              "acls" : [ {
+              "acls" : [
+                {
+                  "__operator__": "equivalent",
+                  "__ordering__": "unordered",
+                  "__elementId__": "role"
+                },{
                 "role" : "citizen",
                 "create" : true,
                 "read" : true,
@@ -892,6 +965,7 @@
               "complexACLs" : [ ],
               "display_context" : null,
               "display_context_parameter" : null,
+              "retain_hidden_value" : null,
               "formatted_value" : null
             } ],
             "collection_field_type" : null
@@ -1274,6 +1348,7 @@
         "cases" : "[[ANYTHING_PRESENT]]"
       } ],
       "cases" : [ {
+        "_extends_" : "F-109_Base_Case_Fields_internal_expected",
         "fields" : {
           "MoneyGBPField" : null,
           "FixedListField" : null,
@@ -1287,8 +1362,6 @@
             "PostCode" : null
           },
           "[JURISDICTION]" : "BEFTA_JURISDICTION_2",
-          "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
-          "[CREATED_DATE]" : "[[ANYTHING_PRESENT]]",
           "ComplexField" : {
             "ComplexNestedField" : {
               "NestedCollectionTextField" : [ ],
@@ -1302,8 +1375,6 @@
           "PhoneUKField" : null,
           "NumberField" : null,
           "[CASE_REFERENCE]" : "${[scenarioContext][customValues][caseIdAsIntegerFrom_F-109-Befta_Jurisdiction2_Case_Type1_Creation]}",
-          "[STATE]" : "TODO",
-          "[SECURITY_CLASSIFICATION]" : "PUBLIC",
           "MultiSelectListField" : [ ],
           "YesOrNoField" : null,
           "[CASE_TYPE]" : "BEFTA_CASETYPE_2_1",
@@ -1311,7 +1382,6 @@
           "TextField" : "text",
           "DateField" : null,
           "TextAreaField" : null,
-          "[LAST_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
           "CollectionField" : [ ]
         },
         "case_id" : "${[scenarioContext][customValues][caseIdAsStringFrom_F-109-Befta_Jurisdiction2_Case_Type1_Creation]}",
@@ -1328,8 +1398,6 @@
             "PostCode" : null
           },
           "[JURISDICTION]" : "BEFTA_JURISDICTION_2",
-          "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
-          "[CREATED_DATE]" : "[[ANYTHING_PRESENT]]",
           "ComplexField" : {
             "ComplexNestedField" : {
               "NestedCollectionTextField" : [ ],
@@ -1343,8 +1411,6 @@
           "PhoneUKField" : null,
           "NumberField" : null,
           "[CASE_REFERENCE]" : "${[scenarioContext][customValues][caseIdAsIntegerFrom_F-109-Befta_Jurisdiction2_Case_Type1_Creation]}",
-          "[STATE]" : "TODO",
-          "[SECURITY_CLASSIFICATION]" : "PUBLIC",
           "MultiSelectListField" : [ ],
           "YesOrNoField" : null,
           "[CASE_TYPE]" : "BEFTA_CASETYPE_2_1",
@@ -1352,7 +1418,6 @@
           "TextField" : "text",
           "DateField" : null,
           "TextAreaField" : null,
-          "[LAST_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
           "CollectionField" : [ ]
         }
       } ],
