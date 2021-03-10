@@ -1,15 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseRoleRepository;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,31 +14,24 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 @Component
-public class RoleToAccessProfilesMappingsGenerator {
+public class PseudoRoleToAccessProfileGenerator {
 
     protected static final String IDAM_PREFIX = "idam:";
     private static final String CASE_ROLE_ID_REGEX = "^(\\[[A-Za-z]+\\])$";
 
-    private final CaseRoleRepository caseRoleRepository;
+    public List<RoleToAccessProfileDefinition> generate(CaseTypeDefinition caseTypeDefinition) {
 
-    public RoleToAccessProfilesMappingsGenerator(@Qualifier(CachedCaseRoleRepository.QUALIFIER)
-                                                     CaseRoleRepository caseRoleRepository) {
-        this.caseRoleRepository = caseRoleRepository;
+        Set<String> caseRoles = extractCaseRoles(caseTypeDefinition);
+        Set<String> idamRoles = extractIdamRoles(caseTypeDefinition);
+
+        List<RoleToAccessProfileDefinition> roleToAccessProfiles = new ArrayList<>();
+        roleToAccessProfiles.addAll(createRoleToAccessProfiles(caseTypeDefinition.getId(), caseRoles, false));
+        roleToAccessProfiles.addAll(createRoleToAccessProfiles(caseTypeDefinition.getId(), idamRoles, true));
+
+        return roleToAccessProfiles;
     }
 
-    public List<AccessProfile> generate(CaseTypeDefinition caseTypeDefinition) {
-
-        Set<String> caseRoles = generateCaseRoles(caseTypeDefinition);
-        Set<String> idamRoles = generateIdamRoles(caseTypeDefinition);
-
-        List<AccessProfile> accessProfiles = new ArrayList<>();
-        accessProfiles.addAll(createAccessProfiles(caseTypeDefinition.getId(), caseRoles, false));
-        accessProfiles.addAll(createAccessProfiles(caseTypeDefinition.getId(), idamRoles, true));
-
-        return accessProfiles;
-    }
-
-    private Set<String> generateIdamRoles(CaseTypeDefinition caseTypeDefinition) {
+    private Set<String> extractIdamRoles(CaseTypeDefinition caseTypeDefinition) {
         Set<String> idamRoles = new HashSet<>();
 
         idamRoles.addAll(getIdamRolesFromAcls(caseTypeDefinition.getAccessControlLists()));
@@ -54,14 +43,10 @@ public class RoleToAccessProfilesMappingsGenerator {
         return idamRoles;
     }
 
-    private Set<String> generateCaseRoles(CaseTypeDefinition caseTypeDefinition) {
-        final Set<String> validCaseRoles = caseRoleRepository.getCaseRoles(caseTypeDefinition.getId());
-        boolean containsCreator = validCaseRoles.contains(CREATOR.getRole());
-
+    private Set<String> extractCaseRoles(CaseTypeDefinition caseTypeDefinition) {
         Set<String> caseRoles = new HashSet<>();
-        if (!containsCreator) {
-            caseRoles.add(CREATOR.getRole());
-        }
+
+        caseRoles.add(CREATOR.getRole());
         caseRoles.addAll(getCaseRolesFromAcls(caseTypeDefinition.getAccessControlLists()));
         caseRoles.addAll(getCaseRolesFromAcls(eventAcls(caseTypeDefinition)));
         caseRoles.addAll(getCaseRolesFromAcls(stateAcls(caseTypeDefinition)));
@@ -109,18 +94,23 @@ public class RoleToAccessProfilesMappingsGenerator {
             .collect(Collectors.toList());
     }
 
-    private List<AccessProfile> createAccessProfiles(String ctId, Set<String> roles, boolean addIdamPrefix) {
+    private List<RoleToAccessProfileDefinition> createRoleToAccessProfiles(String ctId,
+                                                                           Set<String> roles,
+                                                                           boolean addIdamPrefix) {
         return roles.stream()
-            .map(role -> createAccessProfile(ctId, role, addIdamPrefix))
+            .map(role -> createRoleToAccessProfile(ctId, role, addIdamPrefix))
             .collect(Collectors.toList());
     }
 
-    private AccessProfile createAccessProfile(String ctId, String role, boolean addIdamPrefix) {
-        AccessProfile accessProfile = new AccessProfile();
-        accessProfile.setAccessProfiles(Collections.singletonList(role));
+    private RoleToAccessProfileDefinition createRoleToAccessProfile(String ctId, String role, boolean addIdamPrefix) {
+        RoleToAccessProfileDefinition accessProfile = new RoleToAccessProfileDefinition();
+        accessProfile.setAccessProfiles(role);
         accessProfile.setRoleName(addIdamPrefix ? IDAM_PREFIX + role : role);
         accessProfile.setCaseTypeId(ctId);
         accessProfile.setReadOnly(false);
+        accessProfile.setAuthorisations(null);
+        accessProfile.setReadOnly(false);
+        accessProfile.setDisabled(false);
         return accessProfile;
     }
 }

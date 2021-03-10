@@ -35,12 +35,12 @@ public class RoleAssignmentFilteringResult implements Iterator {
             .anyMatch(roleAssignment -> roleAssignment.getGrantType().equals(GrantType.EXCLUDED.name()));
     }
 
-    public RoleAssignmentFilteringResult getBasicAndStandardGrantTypeRoles() {
+    public RoleAssignmentFilteringResult getBasicAndSpecificGrantTypeRoles() {
         return new RoleAssignmentFilteringResult(roleAssignmentRoleMatchingResults
             .stream()
             .filter(pair ->
                 pair.getKey().getGrantType().equals(GrantType.BASIC.name())
-            || pair.getKey().getGrantType().equals(GrantType.STANDARD.name()))
+            || pair.getKey().getGrantType().equals(GrantType.SPECIFIC.name()))
             .collect(Collectors.toList()));
     }
 

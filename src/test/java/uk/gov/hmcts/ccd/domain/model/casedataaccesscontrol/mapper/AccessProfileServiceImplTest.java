@@ -167,7 +167,6 @@ class AccessProfileServiceImplTest {
 
     private CaseTypeDefinition mockCaseTypeDefinitionWithRoleAssignments(String roleName1, String roleName2,
                                                                          String authorisation1, String authorisation2) {
-        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         RoleToAccessProfileDefinition roleToAccessProfileDefinition = mock(RoleToAccessProfileDefinition.class);
         when(roleToAccessProfileDefinition.getRoleName()).thenReturn(roleName1);
         when(roleToAccessProfileDefinition.getAuthorisations()).thenReturn(authorisation1);
@@ -184,6 +183,7 @@ class AccessProfileServiceImplTest {
         when(roleToAccessProfileDefinition1.getAuthorisationList()).thenCallRealMethod();
         when(roleToAccessProfileDefinition1.getAccessProfiles()).thenReturn("citizen,caseworker-befta-solicitor");
 
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setRoleToAccessProfiles(Lists.newArrayList(
             roleToAccessProfileDefinition,
             roleToAccessProfileDefinition1));

@@ -27,7 +27,6 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
@@ -36,10 +35,10 @@ import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.SPECIFIC;
-import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.FakeRoleAssignmentsGenerator.IDAM_PREFIX;
+import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.PseudoRoleAssignmentsGenerator.IDAM_PREFIX;
 
-@DisplayName("FakeRoleAssignmentsGenerator")
-class FakeRoleAssignmentsGeneratorTest {
+@DisplayName("PseudoRoleAssignmentsGenerator")
+class PseudoRoleAssignmentsGeneratorTest {
 
     @Mock
     private UserRepository userRepository;
@@ -50,20 +49,20 @@ class FakeRoleAssignmentsGeneratorTest {
     @Mock
     private CaseAccessService caseAccessService;
 
-    private FakeRoleAssignmentsGenerator fakeRoleAssignmentsGenerator;
+    private PseudoRoleAssignmentsGenerator pseudoRoleAssignmentsGenerator;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        fakeRoleAssignmentsGenerator = new FakeRoleAssignmentsGenerator(userRepository,
-                                                                        caseDefinitionRepository,
-                                                                        caseAccessService);
+        pseudoRoleAssignmentsGenerator = new PseudoRoleAssignmentsGenerator(userRepository,
+                                                                            caseDefinitionRepository,
+                                                                            caseAccessService);
     }
 
     @Nested
-    @DisplayName("addFakeRoleAssignments()")
-    class AddFakeRoleAssignments {
+    @DisplayName("createPseudoRoleAssignments()")
+    class CreatePseudoRoleAssignments {
 
         private static final String ROLE_PROVIDED = "provided";
         private static final String ROLE_SOLICITOR = "caseworker-divorce-solicitor";
@@ -76,7 +75,7 @@ class FakeRoleAssignmentsGeneratorTest {
         private static final String EXPECTED_ROLE_CASEWORKER_2 = IDAM_PREFIX + "caseworker-divorce";
 
         @Test
-        @DisplayName("should add fake RoleAssignments for granted user roles")
+        @DisplayName("should create pseudo RoleAssignments for granted user roles")
         public void shouldAddFakeRoleAssignmentsForGrantedUserRoles() {
             given(userRepository.getUserRoles()).willReturn(new HashSet<>(asList(ROLE_CASEWORKER_1,
                                                                                  ROLE_CASEWORKER_2,
@@ -86,11 +85,9 @@ class FakeRoleAssignmentsGeneratorTest {
 
             List<RoleAssignment> roleAssignments = singletonList(caseRoleAssignment());
 
-            List<RoleAssignment> augmentedRoleAssignments = fakeRoleAssignmentsGenerator
-                .addFakeRoleAssignments(createRoleAssignmentFilteringResult(roleAssignments));
+            List<RoleAssignment> augmentedRoleAssignments = pseudoRoleAssignmentsGenerator
+                .createPseudoRoleAssignments(createRoleAssignmentFilteringResult(roleAssignments));
 
-            Optional<RoleAssignment> providedRoleAssignment = augmentedRoleAssignments
-                .stream().filter(ra -> ROLE_PROVIDED.equals(ra.getRoleName())).findFirst();
             Optional<RoleAssignment> caseworker1RoleAssignment = augmentedRoleAssignments
                 .stream().filter(ra -> EXPECTED_ROLE_CASEWORKER_1.equals(ra.getRoleName())).findFirst();
             Optional<RoleAssignment> caseworker2RoleAssignment = augmentedRoleAssignments
@@ -101,15 +98,10 @@ class FakeRoleAssignmentsGeneratorTest {
                 .stream().filter(ra -> EXPECTED_ROLE_LOCAL_AUTHORITY.equals(ra.getRoleName())).findFirst();
 
             assertAll(
-                () -> assertThat(augmentedRoleAssignments.size(), is(5)),
+                () -> assertThat(augmentedRoleAssignments.size(), is(4)),
 
-                () -> assertTrue(providedRoleAssignment.isPresent()),
                 () -> assertTrue(solicitorRoleAssignment.isPresent()),
                 () -> assertTrue(localAuthorityRoleAssignment.isPresent()),
-
-                () -> assertThat(providedRoleAssignment.get().getRoleName(), is(ROLE_PROVIDED)),
-                () -> assertNull(providedRoleAssignment.get().getGrantType()),
-                () -> assertNull(providedRoleAssignment.get().getClassification()),
 
                 () -> assertThat(caseworker1RoleAssignment.get().getRoleName(), is(EXPECTED_ROLE_CASEWORKER_1)),
                 () -> assertThat(caseworker1RoleAssignment.get().getGrantType(), is(SPECIFIC.name())),
@@ -132,7 +124,8 @@ class FakeRoleAssignmentsGeneratorTest {
         }
 
         @Test
-        @DisplayName("should not add fake RoleAssignments for granted roles when no single case RoleAssignment present")
+        @DisplayName("should not create pseudo RoleAssignments for granted roles"
+            + " when no single case RoleAssignment present")
         public void shouldNotAddFakeRoleAssignmentsForGrantedUserRolesWhenNoSingleCaseRoleAssignmentPresent() {
             given(userRepository.getUserRoles()).willReturn(new HashSet<>(asList(ROLE_CASEWORKER_1,
                                                                                  ROLE_CASEWORKER_2,
@@ -142,17 +135,16 @@ class FakeRoleAssignmentsGeneratorTest {
 
             List<RoleAssignment> roleAssignments = singletonList(organisationRoleAssignment());
 
-            List<RoleAssignment> augmentedRoleAssignments = fakeRoleAssignmentsGenerator
-                .addFakeRoleAssignments(createRoleAssignmentFilteringResult(roleAssignments));
+            List<RoleAssignment> augmentedRoleAssignments = pseudoRoleAssignmentsGenerator
+                .createPseudoRoleAssignments(createRoleAssignmentFilteringResult(roleAssignments));
 
             assertAll(
-                () -> assertThat(augmentedRoleAssignments.size(), is(1)),
-                () -> assertThat(augmentedRoleAssignments.get(0).getRoleName(), is(ROLE_PROVIDED))
+                () -> assertThat(augmentedRoleAssignments.size(), is(0))
             );
         }
 
         @Test
-        @DisplayName("should add fake RoleAssignments for non-granted user roles")
+        @DisplayName("should create pseudo RoleAssignments for non-granted user roles")
         public void shouldAddFakeRoleAssignmentsForNonGrantedUserRoles() {
             List<String> userRoles = asList(ROLE_CASEWORKER_2, ROLE_CASEWORKER_1);
             given(userRepository.getUserRoles()).willReturn(new HashSet<>(userRoles));
@@ -165,26 +157,19 @@ class FakeRoleAssignmentsGeneratorTest {
 
             List<RoleAssignment> roleAssignments = singletonList(organisationRoleAssignment());
 
-            List<RoleAssignment> augmentedRoleAssignments = fakeRoleAssignmentsGenerator
-                .addFakeRoleAssignments(createRoleAssignmentFilteringResult(roleAssignments));
+            List<RoleAssignment> augmentedRoleAssignments = pseudoRoleAssignmentsGenerator
+                .createPseudoRoleAssignments(createRoleAssignmentFilteringResult(roleAssignments));
 
-            Optional<RoleAssignment> providedRoleAssignment = augmentedRoleAssignments
-                .stream().filter(ra -> ROLE_PROVIDED.equals(ra.getRoleName())).findFirst();
             Optional<RoleAssignment> caseworker1RoleAssignment = augmentedRoleAssignments
                 .stream().filter(ra -> EXPECTED_ROLE_CASEWORKER_1.equals(ra.getRoleName())).findFirst();
             Optional<RoleAssignment> caseworker2RoleAssignment = augmentedRoleAssignments
                 .stream().filter(ra -> EXPECTED_ROLE_CASEWORKER_2.equals(ra.getRoleName())).findFirst();
 
             assertAll(
-                () -> assertThat(augmentedRoleAssignments.size(), is(3)),
+                () -> assertThat(augmentedRoleAssignments.size(), is(2)),
 
-                () -> assertTrue(providedRoleAssignment.isPresent()),
                 () -> assertTrue(caseworker1RoleAssignment.isPresent()),
                 () -> assertTrue(caseworker2RoleAssignment.isPresent()),
-
-                () -> assertThat(providedRoleAssignment.get().getRoleName(), is(ROLE_PROVIDED)),
-                () -> assertNull(providedRoleAssignment.get().getGrantType()),
-                () -> assertNull(providedRoleAssignment.get().getClassification()),
 
                 () -> assertThat(caseworker1RoleAssignment.get().getRoleName(), is(EXPECTED_ROLE_CASEWORKER_1)),
                 () -> assertThat(caseworker1RoleAssignment.get().getGrantType(), is(GrantType.STANDARD.name())),
