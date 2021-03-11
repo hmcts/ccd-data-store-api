@@ -276,7 +276,8 @@ public class CompoundAccessControlService {
                     && !oldNode.get(VALUE).get(field.getId()).equals(newNode.get(VALUE).get(field.getId()))
                     && !hasAccessControlList(userRoles, CAN_UPDATE, field.getAccessControlLists())) {
                     updateDenied = true;
-                    LOG.info(SIMPLE_CHILD_OF_HAS_DATA_UPDATE_BUT_NO_UPDATE_ACL, field.getId(), caseFieldDefinition.getId());
+                    LOG.info(SIMPLE_CHILD_OF_HAS_DATA_UPDATE_BUT_NO_UPDATE_ACL, field.getId(),
+                        caseFieldDefinition.getId());
                 } else if (field.isCompoundFieldType() && oldNode.get(VALUE).get(field.getId()) != null
                     && newNode.get(VALUE).get(field.getId()) != null
                     && isUpdateDeniedForCaseField(oldNode.get(VALUE).get(field.getId()),
@@ -287,7 +288,7 @@ public class CompoundAccessControlService {
                 if (updateDenied) {
                     break;
                 }
-           }
+            }
         }
         return updateDenied;
     }

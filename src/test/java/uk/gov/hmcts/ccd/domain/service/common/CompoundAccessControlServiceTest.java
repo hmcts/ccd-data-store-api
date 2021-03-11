@@ -1142,46 +1142,54 @@ class CompoundAccessControlServiceTest {
                         .build())
                     .build())
                 .build();
-            JsonNode newDataNode = getJsonNode("{\n" +
-                "  \"Documents\": [\n" +
-                "    {\n" +
-                "      \"id\": \"CollectionField1\",\n" +
-                "      \"value\": {\n" +
-                "        \"document_url\": \"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943\",\n" +
-                "        \"document_binary_url\": \"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary\",\n" +
-                "        \"document_filename\": \"Elastic Search test Case.png --> updated by Solicitor 1\"\n" +
-                "      }\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"id\": \"CollectionField2\",\n" +
-                "      \"value\": {\n" +
-                "        \"document_url\": \"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943\",\n" +
-                "        \"document_binary_url\": \"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary\",\n" +
-                "        \"document_filename\": \"Elastic Search test Case.png --> updated by Solicitor 1\"\n" +
-                "      }\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}");
-            JsonNode existingDataNode = getJsonNode("{\n" +
-                "  \"Documents\": [\n" +
-                "    {\n" +
-                "      \"id\": \"CollectionField1\",\n" +
-                "      \"value\": {\n" +
-                "        \"document_url\": \"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75yfhgfhg\",\n" +
-                "        \"document_binary_url\": \"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75yfhgfhg/binary\",\n" +
-                "        \"document_filename\": \"Elastic Search test Case.png --> updated by Solicitor 1\"\n" +
-                "      }\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"id\": \"CollectionField2\",\n" +
-                "      \"value\": {\n" +
-                "        \"document_url\": \"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943\",\n" +
-                "        \"document_binary_url\": \"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary\",\n" +
-                "        \"document_filename\": \"Elastic Search test Case.png --> updated by Solicitor 1\"\n" +
-                "      }\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}");
+            JsonNode newDataNode = getJsonNode("{\n"
+                + "  \"Documents\": [\n"
+                + "    {\n"
+                + "      \"id\": \"CollectionField1\",\n"
+                + "      \"value\": {\n"
+                + "        \"document_url\": \"{{DM_STORE_BASE_URL}}/documents/"
+                + "ae5c9e4b-1385-483e-b1b7-607e75dd3943\",\n"
+                + "        \"document_binary_url\": \"{{DM_STORE_BASE_URL}}/documents/"
+                + "ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary\",\n"
+                + "        \"document_filename\": \"Elastic Search test Case.png --> updated by Solicitor 1\"\n"
+                + "      }\n"
+                + "    },\n"
+                + "    {\n"
+                + "      \"id\": \"CollectionField2\",\n"
+                + "      \"value\": {\n"
+                + "        \"document_url\": \"{{DM_STORE_BASE_URL}}/documents/"
+                + "ae5c9e4b-1385-483e-b1b7-607e75dd3943\",\n"
+                + "        \"document_binary_url\": \"{{DM_STORE_BASE_URL}}/documents/"
+                + "ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary\",\n"
+                + "        \"document_filename\": \"Elastic Search test Case.png --> updated by Solicitor 1\"\n"
+                + "      }\n"
+                + "    }\n"
+                + "  ]\n"
+                + "}");
+            JsonNode existingDataNode = getJsonNode("{\n"
+                + "  \"Documents\": [\n"
+                + "    {\n"
+                + "      \"id\": \"CollectionField1\",\n"
+                + "      \"value\": {\n"
+                + "        \"document_url\": \"{{DM_STORE_BASE_URL}}/documents/"
+                + "ae5c9e4b-1385-483e-b1b7-607e75yfhgfhg\",\n"
+                + "        \"document_binary_url\": \"{{DM_STORE_BASE_URL}}/documents/"
+                + "ae5c9e4b-1385-483e-b1b7-607e75yfhgfhg/binary\",\n"
+                + "        \"document_filename\": \"Elastic Search test Case.png --> updated by Solicitor 1\"\n"
+                + "      }\n"
+                + "    },\n"
+                + "    {\n"
+                + "      \"id\": \"CollectionField2\",\n"
+                + "      \"value\": {\n"
+                + "        \"document_url\": \"{{DM_STORE_BASE_URL}}/documents/"
+                + "ae5c9e4b-1385-483e-b1b7-607e75dd3943\",\n"
+                + "        \"document_binary_url\": \"{{DM_STORE_BASE_URL}}/documents/"
+                + "ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary\",\n"
+                + "        \"document_filename\": \"Elastic Search test Case.png --> updated by Solicitor 1\"\n"
+                + "      }\n"
+                + "    }\n"
+                + "  ]\n"
+                + "}");
 
             assertThat(compoundAccessControlService.hasAccessForAction(
                 newDataNode, existingDataNode, caseType.getCaseFieldDefinitions().get(0), USER_ROLES), is(false));
