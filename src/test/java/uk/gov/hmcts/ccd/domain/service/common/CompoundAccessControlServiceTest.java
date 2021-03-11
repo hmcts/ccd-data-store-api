@@ -1289,7 +1289,8 @@ class CompoundAccessControlServiceTest {
                 + "}");
 
             assertThat(compoundAccessControlService.hasAccessForAction(
-                newDataNode, existingDataNode, caseTypeDefinition.getCaseFieldDefinitions().get(0), USER_ROLES), is(false));
+                newDataNode, existingDataNode, caseTypeDefinition.getCaseFieldDefinitions().get(0),
+                USER_ROLES), is(false));
 
         }
     }
