@@ -5,8 +5,8 @@
 
   "specs": [
     "an active profile in CCD",
-    "does not provide valid caseType",
-    "has an HTTP-404 return code"
+    "provides an invalid case type id",
+    "has an HTTP-400 return code"
   ],
 
   "request": {
@@ -16,9 +16,9 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_404_Response",
+    "_extends_": "Common_400_Response",
     "body": {
-      "message": "No message available"
+      "message": "Case Type is not valid"
     }
   }
 }

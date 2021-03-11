@@ -83,12 +83,11 @@ Scenario: must return appropriate negative response when request contains invali
     Given a user with [an active profile in CCD],
 
      When a request is prepared with appropriate values,
-      And the request [does not provide valid caseType],
+      And the request [provides an invalid case type id],
       And it is submitted to call the [Fetch an event trigger in the context of a case type for Case Worker] operation of [CCD Data Store],
 
      Then a negative response is received,
-      And the response [has the 404 return code],
-      And the response has all other details as expected.
+      And the response [has the 400 return code].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-551
