@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -10,10 +11,20 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +50,7 @@ import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
 import static uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinitionTest.findNestedField;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DOCUMENT;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
@@ -54,35 +66,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACL
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageComplexFieldOverrideBuilder.newWizardPageComplexFieldOverride;
-
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.collect.Sets;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
 
 @SuppressWarnings("checkstyle:TypeName") // too many legacy TypeName occurrences on '@Nested' classes
 public class AccessControlServiceTest {
@@ -928,6 +911,73 @@ public class AccessControlServiceTest {
                 .build();
             JsonNode newDataNode = getJsonNode("{ \"addresses\" : null }\n");
             JsonNode existingDataNode = getJsonNode("{ \"Addresses\": \"SomeText\" }");
+
+            assertFieldsAccess(false, caseType, newDataNode, existingDataNode);
+        }
+
+        @Test
+        @DisplayName("Should not grant access to case field if ACL false for collection of Document Type")
+        void shouldNotGrantAccessToFieldWithAclAccessNotGrantedForCollectionOfDocuments() throws IOException {
+            CaseTypeDefinition caseType = newCaseType()
+                .withField(newCaseField()
+                    .withId("Documents")
+                    .withFieldType(aFieldType()
+                        .withType(COLLECTION)
+                        .withCollectionFieldType(aFieldType()
+                            .withType(DOCUMENT)
+                            .withId(DOCUMENT)
+                            .build())
+                        .build())
+                    .withOrder(1)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(false)
+                        .withUpdate(false)
+                        .withDelete(false)
+                        .withRead(true)
+                        .build())
+                    .build())
+                .build();
+            JsonNode newDataNode = getJsonNode("{\n" +
+                "  \"Documents\": [\n" +
+                "    {\n" +
+                "      \"id\": \"CollectionField1\",\n" +
+                "      \"value\": {\n" +
+                "        \"document_url\": \"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943\",\n" +
+                "        \"document_binary_url\": \"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary\",\n" +
+                "        \"document_filename\": \"Elastic Search test Case.png --> updated by Solicitor 1\"\n" +
+                "      }\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"id\": \"CollectionField2\",\n" +
+                "      \"value\": {\n" +
+                "        \"document_url\": \"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943\",\n" +
+                "        \"document_binary_url\": \"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary\",\n" +
+                "        \"document_filename\": \"Elastic Search test Case.png --> updated by Solicitor 1\"\n" +
+                "      }\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}");
+            JsonNode existingDataNode = getJsonNode("{\n" +
+                "  \"Documents\": [\n" +
+                "    {\n" +
+                "      \"id\": \"CollectionField1\",\n" +
+                "      \"value\": {\n" +
+                "        \"document_url\": \"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75yfhgfhg\",\n" +
+                "        \"document_binary_url\": \"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75yfhgfhg/binary\",\n" +
+                "        \"document_filename\": \"Elastic Search test Case.png --> updated by Solicitor 1\"\n" +
+                "      }\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"id\": \"CollectionField2\",\n" +
+                "      \"value\": {\n" +
+                "        \"document_url\": \"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943\",\n" +
+                "        \"document_binary_url\": \"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary\",\n" +
+                "        \"document_filename\": \"Elastic Search test Case.png --> updated by Solicitor 1\"\n" +
+                "      }\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}");
 
             assertFieldsAccess(false, caseType, newDataNode, existingDataNode);
         }
@@ -3837,6 +3887,19 @@ public class AccessControlServiceTest {
             .build());
         return notes;
     }
+
+    private CaseFieldDefinition simpleField(final String id, final Integer order) {
+        return newCaseField()
+            .withId(id)
+            .withFieldType(simpleType())
+            .withOrder(order)
+            .build();
+    }
+
+    private FieldTypeDefinition simpleType() {
+        return aFieldType().withType("Text").build();
+    }
+
 
     static CaseFieldDefinition getTagFieldDefinition() {
         CaseFieldDefinition tagsField = newCaseField()
