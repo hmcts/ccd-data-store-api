@@ -11,22 +11,15 @@
 
   "request": {
     "pathVariables": {
-      "cid": "9999999999999999"
+      "cid": "1234123412341238"
     }
   },
 
   "expectedResponse": {
     "_extends_": "Common_404_Response",
-    "headers": {
-      "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
-    },
     "body": {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
       "message": "No case found",
-      "path": "/internal/cases/9999999999999999",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
+      "path" : "/internal/cases/1234123412341238"
     }
   }
 }
