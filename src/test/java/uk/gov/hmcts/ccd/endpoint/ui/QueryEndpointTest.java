@@ -146,6 +146,13 @@ class QueryEndpointTest {
         assertThrows(BadRequestException.class, () -> queryEndpoint.getJurisdictions("creat"));
     }
 
+    @Test
+    @DisplayName("Should throw bad request Exception for invalid case type id")
+    void shouldThrowBadRequestForInvalidCaseType() {
+        assertThrows(BadRequestException.class, () -> queryEndpoint.findWorkbasketInputDetails("22",
+            "TEST", "TEST<input>"));
+    }
+
     @Nested
     @DisplayName("search")
     class Search {
