@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.search;
 
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,10 @@ public class DefaultSearchOperation implements SearchOperation {
 
     @Override
     public List<CaseDetails> execute(MetaData metaData, Map<String, String> criteria) {
+
+        if (!metaData.validateAndConvertReference()) {
+            return Lists.newArrayList();
+        }
         return caseDetailsRepository.findByMetaDataAndFieldData(metaData, criteria);
     }
 }
