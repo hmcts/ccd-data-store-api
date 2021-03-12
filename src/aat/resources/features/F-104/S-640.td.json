@@ -88,8 +88,8 @@
               "metadata": true,
               "case_field_id": "[CASE_REFERENCE]",
               "case_field_type": {
-                "id": "Number",
-                "type": "Number",
+                "id": "Text",
+                "type": "Text",
                 "min": null,
                 "max": null,
                 "regular_expression": null,
