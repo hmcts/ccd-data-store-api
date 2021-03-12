@@ -18,7 +18,7 @@
   "expectedResponse": {
     "_extends_": "Common_400_Response",
     "body": {
-      "message": "Case Type is not valid"
+      "message": "Case Type Id is not valid"
     }
   }
 }
