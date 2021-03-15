@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -76,6 +78,10 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         // 4.) determine AccessProfiles from the new RoleToAccessProfiles Tab
         // https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1460559903#AccessControlScopeofDelivery-NewRoleToAccessProfilesTab
         // as a result we identify the AccessProfiles that the user has on the case
+
+        Set<String> accessProfileValues = accessProfiles.stream()
+            .map(accessProfile -> accessProfile.getAccessProfile())
+            .collect(Collectors.toSet());
 
         return Optional.of(cloned);
     }

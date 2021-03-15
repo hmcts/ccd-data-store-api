@@ -65,24 +65,9 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.collect.Sets;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
 
 @SuppressWarnings("checkstyle:TypeName") // too many legacy TypeName occurrences on '@Nested' classes
 public class AccessControlServiceTest {
@@ -248,7 +233,7 @@ public class AccessControlServiceTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        accessControlService = new AccessControlService(new CompoundAccessControlService());
+        accessControlService = new AccessControlServiceImpl(new CompoundAccessControlService());
     }
 
     @Nested
@@ -1165,7 +1150,7 @@ public class AccessControlServiceTest {
             CaseEventDefinition eventDefinition = new CaseEventDefinition();
             eventDefinition.setId(EVENT_ID);
             AccessControlList accessControlList = new AccessControlList();
-            accessControlList.setRole(ROLE_NOT_IN_USER_ROLES);
+            accessControlList.setAccessProfile(ROLE_NOT_IN_USER_ROLES);
             accessControlList.setCreate(true);
             List<AccessControlList> accessControlLists = newArrayList(accessControlList);
             eventDefinition.setAccessControlLists(accessControlLists);

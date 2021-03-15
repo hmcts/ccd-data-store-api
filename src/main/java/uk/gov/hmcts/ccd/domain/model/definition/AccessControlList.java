@@ -7,18 +7,18 @@ import java.io.Serializable;
 
 public class AccessControlList implements Serializable {
 
-    private String role;
+    private String accessProfile;
     private boolean create;
     private boolean read;
     private boolean update;
     private boolean delete;
 
-    public String getRole() {
-        return role;
+    public String getAccessProfile() {
+        return accessProfile;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setAccessProfile(String accessProfile) {
+        this.accessProfile = accessProfile;
     }
 
     public boolean isCreate() {
@@ -56,7 +56,7 @@ public class AccessControlList implements Serializable {
     @JsonIgnore
     public AccessControlList duplicate() {
         AccessControlList dup = new AccessControlList();
-        dup.setRole(role);
+        dup.setAccessProfile(accessProfile);
         dup.setCreate(create);
         dup.setRead(read);
         dup.setUpdate(update);
@@ -67,7 +67,7 @@ public class AccessControlList implements Serializable {
     @Override
     public String toString() {
         return "ACL{"
-            + "role='" + role + '\''
+            + "role='" + accessProfile + '\''
             + ", crud=" + (isCreate() ? "C" : "") + (isRead() ? "R" : "")
             + (isUpdate() ? "U" : "") + (isDelete() ? "D" : "")
             + '}';

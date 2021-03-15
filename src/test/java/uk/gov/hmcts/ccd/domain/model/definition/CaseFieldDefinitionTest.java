@@ -27,20 +27,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACLBuilder.aComplexACL;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
-import org.hamcrest.MatcherAssert;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameter;
 import uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterType;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-
-import java.util.List;
-import java.util.Optional;
-
-import org.hamcrest.CoreMatchers;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 
 public class CaseFieldDefinitionTest {
 
@@ -286,7 +274,7 @@ public class CaseFieldDefinitionTest {
             assertThrows(RuntimeException.class, () ->
                 findNestedField(family, MEMBERS + "." + PERSON + "." + SURNAME).getAccessControlLists()
                     .stream()
-                .filter(el -> el.getRole().equalsIgnoreCase(ROLE1))
+                .filter(el -> el.getAccessProfile().equalsIgnoreCase(ROLE1))
                 .findFirst()
                 .orElseThrow(RuntimeException::new));
         }
@@ -508,7 +496,7 @@ public class CaseFieldDefinitionTest {
 
     void validateACL(List<AccessControlList> acls, AccessControlList expected) {
         final AccessControlList acl1 = acls.stream()
-            .filter(el -> el.getRole().equalsIgnoreCase(expected.getRole()))
+            .filter(el -> el.getAccessProfile().equalsIgnoreCase(expected.getAccessProfile()))
             .findFirst()
             .orElseThrow(RuntimeException::new);
         assertAll(

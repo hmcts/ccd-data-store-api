@@ -66,7 +66,7 @@ class AccessControlServiceFilterTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        accessControlService = new AccessControlService(new CompoundAccessControlService());
+        accessControlService = new AccessControlServiceImpl(new CompoundAccessControlService());
     }
 
     @Nested
