@@ -34,12 +34,12 @@ public class RoleAssignmentFilteringResult {
             .anyMatch(roleAssignment -> roleAssignment.getGrantType().equals(GrantType.EXCLUDED.name()));
     }
 
-    public RoleAssignmentFilteringResult retainBasicAndStandardGrantTypeRolesOnly() {
+    public RoleAssignmentFilteringResult retainBasicAndSpecificGrantTypeRolesOnly() {
         return new RoleAssignmentFilteringResult(roleMatchingResults
             .stream()
             .filter(pair ->
                 pair.getKey().getGrantType().equals(GrantType.BASIC.name())
-            || pair.getKey().getGrantType().equals(GrantType.STANDARD.name()))
+            || pair.getKey().getGrantType().equals(GrantType.SPECIFIC.name()))
             .collect(Collectors.toList()));
     }
 }

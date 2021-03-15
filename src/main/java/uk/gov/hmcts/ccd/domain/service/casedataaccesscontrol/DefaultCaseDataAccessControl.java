@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
-import java.util.List;
-import java.util.Optional;
+import org.apache.commons.lang3.tuple.Pair;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +12,17 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleMatchingResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "true")
@@ -26,11 +31,12 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     private final RoleAssignmentService roleAssignmentService;
     private final SecurityUtils securityUtils;
     private final CaseService caseService;
-    private CaseTypeService caseTypeService;
-    private RoleAssignmentsFilteringService roleAssignmentsFilteringService;
-    private AccessProfileService accessProfileService;
-    private final FakeRoleAssignmentsGenerator fakeRoleAssignmentsGenerator;
+    private final CaseTypeService caseTypeService;
+    private final RoleAssignmentsFilteringService roleAssignmentsFilteringService;
+    private final AccessProfileService accessProfileService;
+    private final PseudoRoleAssignmentsGenerator pseudoRoleAssignmentsGenerator;
     private final ApplicationParams applicationParams;
+    private final PseudoRoleToAccessProfileGenerator pseudoRoleToAccessProfileGenerator;
 
     @Autowired
     public DefaultCaseDataAccessControl(RoleAssignmentService roleAssignmentService,
@@ -38,17 +44,19 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
                                         CaseService caseService,
                                         CaseTypeService caseTypeService,
                                         RoleAssignmentsFilteringService roleAssignmentsFilteringService,
-                                        FakeRoleAssignmentsGenerator fakeRoleAssignmentsGenerator,
+                                        PseudoRoleAssignmentsGenerator pseudoRoleAssignmentsGenerator,
                                         ApplicationParams applicationParams,
-                                        AccessProfileService accessProfileService) {
+                                        AccessProfileService accessProfileService,
+                                        PseudoRoleToAccessProfileGenerator pseudoRoleToAccessProfileGenerator) {
         this.roleAssignmentService = roleAssignmentService;
         this.securityUtils = securityUtils;
         this.caseService = caseService;
         this.caseTypeService = caseTypeService;
         this.roleAssignmentsFilteringService = roleAssignmentsFilteringService;
-        this.fakeRoleAssignmentsGenerator = fakeRoleAssignmentsGenerator;
+        this.pseudoRoleAssignmentsGenerator = pseudoRoleAssignmentsGenerator;
         this.applicationParams = applicationParams;
         this.accessProfileService = accessProfileService;
+        this.pseudoRoleToAccessProfileGenerator = pseudoRoleToAccessProfileGenerator;
     }
 
     // Returns Optional<CaseDetails>. If this is not enough think of wrapping it in a AccessControlResponse
@@ -56,34 +64,48 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     @Override
     public Optional<CaseDetails> applyAccessControl(CaseDetails caseDetails) {
         RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
-        CaseDetails cloned = caseService.clone(caseDetails);
 
         RoleAssignmentFilteringResult filteringResults = roleAssignmentsFilteringService
             .filter(roleAssignments, caseDetails);
 
-        if (filteringResults.hasGrantTypeExcludedRole()) {
-            filteringResults = filteringResults.retainBasicAndStandardGrantTypeRolesOnly();
-        }
-
         if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
-            List<RoleAssignment> augmentedRoleAssignments = fakeRoleAssignmentsGenerator
-                .addFakeRoleAssignments(filteringResults);
+            List<RoleAssignment> pseudoRoleAssignments = pseudoRoleAssignmentsGenerator
+                .createPseudoRoleAssignments(filteringResults);
+            filteringResults = augment(filteringResults, pseudoRoleAssignments);
         }
 
         CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseDetails.getCaseTypeId());
 
+        if (applicationParams.getEnablePseudoAccessProfilesGeneration()) {
+            List<RoleToAccessProfileDefinition> pseudoAccessProfilesMappings =
+                pseudoRoleToAccessProfileGenerator.generate(caseTypeDefinition);
+
+            List<RoleToAccessProfileDefinition> roleToAccessProfiles = caseTypeDefinition.getRoleToAccessProfiles();
+            roleToAccessProfiles.addAll(pseudoAccessProfilesMappings);
+            caseTypeDefinition.setRoleToAccessProfiles(roleToAccessProfiles);
+        }
+
+        if (filteringResults.hasGrantTypeExcludedRole()) {
+            filteringResults = filteringResults.retainBasicAndSpecificGrantTypeRolesOnly();
+        }
+
         List<AccessProfile> accessProfiles = accessProfileService
             .generateAccessProfiles(filteringResults, caseTypeDefinition);
 
-        // 4.) determine AccessProfiles from the new RoleToAccessProfiles Tab
-        // https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1460559903#AccessControlScopeofDelivery-NewRoleToAccessProfilesTab
-        // as a result we identify the AccessProfiles that the user has on the case
-
-        Set<String> accessProfileValues = accessProfiles.stream()
-            .map(accessProfile -> accessProfile.getAccessProfile())
-            .collect(Collectors.toSet());
-
+        CaseDetails cloned = caseService.clone(caseDetails);
         return Optional.of(cloned);
+    }
+
+    private RoleAssignmentFilteringResult augment(RoleAssignmentFilteringResult filteringResults,
+                                                  List<RoleAssignment> pseudoRoleAssignments) {
+        List<Pair<RoleAssignment, RoleMatchingResult>> augmented = pseudoRoleAssignments
+            .stream()
+            .map(roleAssignment -> Pair.of(roleAssignment, new RoleMatchingResult()))
+            .collect(Collectors.toList());
+
+        augmented.addAll(filteringResults.getRoleMatchingResults());
+        filteringResults = new RoleAssignmentFilteringResult(augmented);
+        return filteringResults;
     }
 
     @Override

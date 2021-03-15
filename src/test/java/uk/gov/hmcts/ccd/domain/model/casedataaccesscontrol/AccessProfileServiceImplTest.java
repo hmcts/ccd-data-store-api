@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.mapper;
+package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol;
 
 import com.google.common.collect.Lists;
 import java.util.List;
@@ -155,7 +155,7 @@ class AccessProfileServiceImplTest {
         when(roleAssignment.getRoleName()).thenReturn("RoleName");
 
         RoleAssignment roleAssignment1 = mock(RoleAssignment.class);
-        when(roleAssignment1.getGrantType()).thenReturn(GrantType.STANDARD.name());
+        when(roleAssignment1.getGrantType()).thenReturn(GrantType.SPECIFIC.name());
         when(roleAssignment1.getRoleName()).thenReturn("RoleName1");
 
         RoleAssignmentFilteringResult filteringResult = new RoleAssignmentFilteringResult(Lists.newArrayList(
@@ -184,7 +184,7 @@ class AccessProfileServiceImplTest {
         when(roleToAccessProfileDefinition1.isDisabled()).thenReturn(false);
         when(roleToAccessProfileDefinition1.getAuthorisationList()).thenCallRealMethod();
         when(roleToAccessProfileDefinition1.getAccessProfiles()).thenReturn("citizen,caseworker-befta-solicitor");
-        when(roleToAccessProfileDefinition.getAccessProfileList()).thenReturn(
+        when(roleToAccessProfileDefinition1.getAccessProfileList()).thenReturn(
             Lists.newArrayList("citizen", "caseworker-befta-solicitor"));
 
         CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
@@ -203,7 +203,7 @@ class AccessProfileServiceImplTest {
         when(roleAssignment.getReadOnly()).thenReturn(false);
 
         RoleAssignment roleAssignment1 = mock(RoleAssignment.class);
-        when(roleAssignment1.getGrantType()).thenReturn(GrantType.STANDARD.name());
+        when(roleAssignment1.getGrantType()).thenReturn(GrantType.SPECIFIC.name());
         when(roleAssignment1.getRoleName()).thenReturn("RoleName1");
         when(roleAssignment1.getAuthorisations()).thenReturn(authorisations2);
         when(roleAssignment1.getReadOnly()).thenReturn(false);
@@ -227,7 +227,7 @@ class AccessProfileServiceImplTest {
         when(roleAssignment.getReadOnly()).thenReturn(false);
 
         RoleAssignment roleAssignment1 = mock(RoleAssignment.class);
-        when(roleAssignment1.getGrantType()).thenReturn(GrantType.STANDARD.name());
+        when(roleAssignment1.getGrantType()).thenReturn(GrantType.SPECIFIC.name());
         when(roleAssignment1.getRoleName()).thenReturn("RoleName1");
         when(roleAssignment1.getAuthorisations()).thenReturn(authorisations2);
         when(roleAssignment1.getReadOnly()).thenReturn(false);

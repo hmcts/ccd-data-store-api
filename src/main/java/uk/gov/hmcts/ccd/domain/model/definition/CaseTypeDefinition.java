@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
@@ -204,7 +205,7 @@ public class CaseTypeDefinition implements Serializable {
         this.roleToAccessProfilesMap = this.roleToAccessProfiles
             .stream()
             .collect(Collectors.toMap(RoleToAccessProfileDefinition::getRoleName,
-                roleToAccessProfileDefinition -> roleToAccessProfileDefinition));
+                                      Function.identity()));
     }
 
     public RoleToAccessProfileDefinition getRoleToAccessProfileMapping(String roleName) {
