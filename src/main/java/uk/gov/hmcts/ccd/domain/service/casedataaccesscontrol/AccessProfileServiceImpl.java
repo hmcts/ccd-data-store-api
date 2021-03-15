@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,7 +39,8 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
         return accessProfiles;
     }
 
-    private boolean authorisationsAllowMappingToAccessProfiles(List<String> authorisations, List<String> roleAssignmentAuthorisations) {
+    private boolean authorisationsAllowMappingToAccessProfiles(List<String> authorisations,
+                                                               List<String> roleAssignmentAuthorisations) {
         if (roleAssignmentAuthorisations != null
             && authorisations.size() > 0) {
             Collection<String> filterAuthorisations = CollectionUtils
@@ -53,8 +53,8 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
 
     private List<AccessProfile> createAccessProfiles(RoleAssignment roleAssignment,
                                                      RoleToAccessProfileDefinition roleToAccessProfileDefinition) {
-        String caseTypeAccessProfiles = roleToAccessProfileDefinition.getAccessProfiles();
-        return Arrays.asList(caseTypeAccessProfiles.split(","))
+        List<String> accessProfileList = roleToAccessProfileDefinition.getAccessProfileList();
+        return accessProfileList
             .stream()
             .map(accessProfileValue -> {
                 AccessProfile accessProfile = new AccessProfile();

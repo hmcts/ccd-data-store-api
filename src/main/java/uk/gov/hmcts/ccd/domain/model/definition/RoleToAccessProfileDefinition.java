@@ -67,6 +67,16 @@ public class RoleToAccessProfileDefinition {
         this.accessProfiles = accessProfiles;
     }
 
+    public List<String> getAccessProfileList() {
+        if (getAccessProfiles() != null) {
+            return Arrays.asList(getAccessProfiles().split(","))
+                .stream()
+                .filter(str -> str.length() > 0)
+                .collect(Collectors.toList());
+        }
+        return new ArrayList<>();
+    }
+
     public Date getLiveFrom() {
         return liveFrom;
     }
