@@ -75,11 +75,11 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseDetails.getCaseTypeId());
 
         if (applicationParams.getEnablePseudoAccessProfilesGeneration()) {
-            List<RoleToAccessProfileDefinition> generatedAccessProfiles =
+            List<RoleToAccessProfileDefinition> pseudoAccessProfilesMappings =
                 pseudoRoleToAccessProfileGenerator.generate(caseTypeDefinition);
 
             List<RoleToAccessProfileDefinition> roleToAccessProfiles = caseTypeDefinition.getRoleToAccessProfiles();
-            roleToAccessProfiles.addAll(generatedAccessProfiles);
+            roleToAccessProfiles.addAll(pseudoAccessProfilesMappings);
             caseTypeDefinition.setRoleToAccessProfiles(roleToAccessProfiles);
         }
 
@@ -96,13 +96,13 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
 
     private RoleAssignmentFilteringResult augment(RoleAssignmentFilteringResult filteringResults,
                                                   List<RoleAssignment> pseudoRoleAssignments) {
-        List<Pair<RoleAssignment, RoleMatchingResult>> collect = pseudoRoleAssignments
+        List<Pair<RoleAssignment, RoleMatchingResult>> augmented = pseudoRoleAssignments
             .stream()
             .map(roleAssignment -> Pair.of(roleAssignment, new RoleMatchingResult()))
             .collect(Collectors.toList());
 
-        collect.addAll(filteringResults.getRoleMatchingResults());
-        filteringResults = new RoleAssignmentFilteringResult(collect);
+        augmented.addAll(filteringResults.getRoleMatchingResults());
+        filteringResults = new RoleAssignmentFilteringResult(augmented);
         return filteringResults;
     }
 
