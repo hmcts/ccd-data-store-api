@@ -27,7 +27,7 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
             List<String> roleAssignmentAuthorisations = roleAssignment.getAuthorisations();
 
             RoleToAccessProfileDefinition roleToAccessProfileDefinition = caseTypeDefinition
-                .getRoleToAccessProfile(roleAssignment.getRoleName());
+                .getRoleToAccessProfileMapping(roleAssignment.getRoleName());
 
             if (roleToAccessProfileDefinition != null && !roleToAccessProfileDefinition.getDisabled()) {
                 List<String> authorisations = roleToAccessProfileDefinition.getAuthorisationList();

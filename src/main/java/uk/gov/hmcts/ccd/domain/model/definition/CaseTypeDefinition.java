@@ -207,7 +207,7 @@ public class CaseTypeDefinition implements Serializable {
                 roleToAccessProfileDefinition -> roleToAccessProfileDefinition));
     }
 
-    public RoleToAccessProfileDefinition getRoleToAccessProfile(String roleName) {
+    public RoleToAccessProfileDefinition getRoleToAccessProfileMapping(String roleName) {
         return this.roleToAccessProfilesMap.get(roleName);
     }
 }

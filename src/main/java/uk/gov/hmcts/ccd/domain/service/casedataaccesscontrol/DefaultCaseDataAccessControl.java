@@ -59,8 +59,8 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         RoleAssignmentFilteringResult filteringResults = roleAssignmentsFilteringService
             .filter(roleAssignments, caseDetails);
 
-        if (filteringResults.hasGrantTypeExcluded()) {
-            filteringResults = filteringResults.getBasicAndStandardGrantTypeRoles();
+        if (filteringResults.hasGrantTypeExcludedRole()) {
+            filteringResults = filteringResults.retainBasicAndStandardGrantTypeRolesOnly();
         }
 
         if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
