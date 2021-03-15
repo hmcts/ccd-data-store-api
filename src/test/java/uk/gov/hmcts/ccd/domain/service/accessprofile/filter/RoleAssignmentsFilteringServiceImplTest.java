@@ -45,7 +45,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
         CaseDetails caseDetails = mockCaseDetails();
         RoleAssignmentFilteringResult filteredRoleAssignments = classUnderTest
             .filter(roleAssignments, caseDetails);
-        assertEquals(1, filteredRoleAssignments.getRoleAssignmentRoleMatchingResults().size());
+        assertEquals(1, filteredRoleAssignments.getRoleMatchingResults().size());
     }
 
 
@@ -55,7 +55,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
         CaseDetails caseDetails = mockCaseDetails();
         RoleAssignmentFilteringResult filteredRoleAssignments = classUnderTest
             .filter(roleAssignments, caseDetails);
-        assertEquals(2, filteredRoleAssignments.getRoleAssignmentRoleMatchingResults().size());
+        assertEquals(2, filteredRoleAssignments.getRoleMatchingResults().size());
     }
 
     @Test
@@ -64,7 +64,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.PRIVATE);
         RoleAssignmentFilteringResult filteredRoleAssignments = classUnderTest
             .filter(roleAssignments, caseDetails);
-        assertEquals(2, filteredRoleAssignments.getRoleAssignmentRoleMatchingResults().size());
+        assertEquals(2, filteredRoleAssignments.getRoleMatchingResults().size());
     }
 
     @Test
@@ -73,7 +73,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED);
         RoleAssignmentFilteringResult filteredRoleAssignments = classUnderTest
             .filter(roleAssignments, caseDetails);
-        assertEquals(1, filteredRoleAssignments.getRoleAssignmentRoleMatchingResults().size());
+        assertEquals(1, filteredRoleAssignments.getRoleMatchingResults().size());
     }
 
     @Test
@@ -82,7 +82,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
         CaseDetails caseDetails = mockCaseDetails();
         RoleAssignmentFilteringResult filteredRoleAssignments = classUnderTest
             .filter(roleAssignments, caseDetails);
-        assertEquals(0, filteredRoleAssignments.getRoleAssignmentRoleMatchingResults().size());
+        assertEquals(0, filteredRoleAssignments.getRoleMatchingResults().size());
     }
 
     private RoleAssignments mockRoleAssignments() {
