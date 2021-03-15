@@ -83,8 +83,8 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
             caseTypeDefinition.setRoleToAccessProfiles(roleToAccessProfiles);
         }
 
-        if (filteringResults.hasGrantTypeExcluded()) {
-            filteringResults = filteringResults.getBasicAndSpecificGrantTypeRoles();
+        if (filteringResults.hasGrantTypeExcludedRole()) {
+            filteringResults = filteringResults.retainBasicAndSpecificGrantTypeRolesOnly();
         }
 
         List<AccessProfile> accessProfiles = accessProfileService
@@ -101,7 +101,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
             .map(roleAssignment -> Pair.of(roleAssignment, new RoleMatchingResult()))
             .collect(Collectors.toList());
 
-        collect.addAll(filteringResults.getRoleAssignmentRoleMatchingResults());
+        collect.addAll(filteringResults.getRoleMatchingResults());
         filteringResults = new RoleAssignmentFilteringResult(collect);
         return filteringResults;
     }

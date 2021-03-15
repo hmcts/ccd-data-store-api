@@ -1,56 +1,45 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 
-public class RoleAssignmentFilteringResult implements Iterator {
+public class RoleAssignmentFilteringResult {
 
-    private final List<Pair<RoleAssignment, RoleMatchingResult>> roleAssignmentRoleMatchingResults;
+    private final List<Pair<RoleAssignment, RoleMatchingResult>> roleMatchingResults;
 
     public RoleAssignmentFilteringResult(List<Pair<RoleAssignment, RoleMatchingResult>> roleAssignmentMatchPairs) {
-        this.roleAssignmentRoleMatchingResults = roleAssignmentMatchPairs;
+        this.roleMatchingResults = roleAssignmentMatchPairs;
     }
 
-    public List<Pair<RoleAssignment, RoleMatchingResult>> getRoleAssignmentRoleMatchingResults() {
-        return roleAssignmentRoleMatchingResults;
+    public List<Pair<RoleAssignment, RoleMatchingResult>> getRoleMatchingResults() {
+        return roleMatchingResults;
     }
 
     public List<RoleAssignment> getRoleAssignments() {
-        return roleAssignmentRoleMatchingResults.stream()
+        return roleMatchingResults.stream()
             .map(Pair::getKey)
             .collect(Collectors.toList());
     }
 
     public boolean atLeastOneCaseRoleExists() {
-        return roleAssignmentRoleMatchingResults.stream()
-            .map(Pair::getKey)
+        return getRoleAssignments()
+            .stream()
             .anyMatch(RoleAssignment::isCaseRoleAssignment);
     }
 
 
-    public boolean hasGrantTypeExcluded() {
+    public boolean hasGrantTypeExcludedRole() {
         return getRoleAssignments().stream()
             .anyMatch(roleAssignment -> roleAssignment.getGrantType().equals(GrantType.EXCLUDED.name()));
     }
 
-    public RoleAssignmentFilteringResult getBasicAndSpecificGrantTypeRoles() {
-        return new RoleAssignmentFilteringResult(roleAssignmentRoleMatchingResults
+    public RoleAssignmentFilteringResult retainBasicAndSpecificGrantTypeRolesOnly() {
+        return new RoleAssignmentFilteringResult(roleMatchingResults
             .stream()
             .filter(pair ->
                 pair.getKey().getGrantType().equals(GrantType.BASIC.name())
             || pair.getKey().getGrantType().equals(GrantType.SPECIFIC.name()))
             .collect(Collectors.toList()));
-    }
-
-    @Override
-    public boolean hasNext() {
-        return false;
-    }
-
-    @Override
-    public Object next() {
-        return null;
     }
 }
