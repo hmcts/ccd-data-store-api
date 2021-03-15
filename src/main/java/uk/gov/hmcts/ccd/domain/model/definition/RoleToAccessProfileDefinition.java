@@ -25,7 +25,7 @@ public class RoleToAccessProfileDefinition {
         this.caseTypeId = caseTypeId;
     }
 
-    public Boolean getDisabled() {
+    public Boolean isDisabled() {
         return disabled;
     }
 
@@ -33,7 +33,7 @@ public class RoleToAccessProfileDefinition {
         this.disabled = disabled;
     }
 
-    public Boolean getReadOnly() {
+    public Boolean isReadOnly() {
         return readOnly;
     }
 

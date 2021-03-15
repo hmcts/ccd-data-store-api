@@ -24,29 +24,31 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
         List<AccessProfile> accessProfiles = new ArrayList<>();
 
         for (RoleAssignment roleAssignment : filteringResults.getRoleAssignments()) {
-            List<String> roleAssignmentAuthorisations = roleAssignment.getAuthorisations();
 
             RoleToAccessProfileDefinition roleToAccessProfileDefinition = caseTypeDefinition
                 .getRoleToAccessProfileMapping(roleAssignment.getRoleName());
 
-            if (roleToAccessProfileDefinition != null && !roleToAccessProfileDefinition.getDisabled()) {
+            if (roleToAccessProfileDefinition != null && !roleToAccessProfileDefinition.isDisabled()) {
                 List<String> authorisations = roleToAccessProfileDefinition.getAuthorisationList();
+                List<String> roleAssignmentAuthorisations = roleAssignment.getAuthorisations();
 
-                if (roleAssignmentAuthorisations != null && roleAssignmentAuthorisations.size() > 0
-                    && authorisations.size() > 0) {
-                    Collection<String> filterAuthorisations = CollectionUtils
-                        .intersection(roleAssignmentAuthorisations, authorisations);
-
-                    if (filterAuthorisations.size() > 0) {
-                        accessProfiles.addAll(createAccessProfiles(roleAssignment, roleToAccessProfileDefinition));
-                    }
-                } else if ((roleAssignmentAuthorisations == null || roleAssignmentAuthorisations.size() == 0)
-                    && authorisations.size() == 0) {
+                if (authorisationsAllowMappingToAccessProfiles(authorisations, roleAssignmentAuthorisations)) {
                     accessProfiles.addAll(createAccessProfiles(roleAssignment, roleToAccessProfileDefinition));
                 }
             }
         }
         return accessProfiles;
+    }
+
+    private boolean authorisationsAllowMappingToAccessProfiles(List<String> authorisations, List<String> roleAssignmentAuthorisations) {
+        if (roleAssignmentAuthorisations != null
+            && authorisations.size() > 0) {
+            Collection<String> filterAuthorisations = CollectionUtils
+                .intersection(roleAssignmentAuthorisations, authorisations);
+
+            return filterAuthorisations.size() > 0;
+        }
+        return authorisations.size() == 0;
     }
 
     private List<AccessProfile> createAccessProfiles(RoleAssignment roleAssignment,
@@ -57,7 +59,7 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
             .map(accessProfileValue -> {
                 AccessProfile accessProfile = new AccessProfile();
 
-                accessProfile.setReadOnly(roleToAccessProfileDefinition.getReadOnly()
+                accessProfile.setReadOnly(roleToAccessProfileDefinition.isReadOnly()
                     || roleAssignment.getReadOnly());
                 accessProfile.setClassification(roleAssignment.getClassification());
                 accessProfile.setAccessProfile(accessProfileValue);
