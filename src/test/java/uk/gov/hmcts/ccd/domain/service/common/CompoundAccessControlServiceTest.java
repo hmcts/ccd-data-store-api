@@ -9,10 +9,8 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import static java.util.Arrays.asList;
@@ -21,7 +19,6 @@ import static org.hamcrest.Matchers.is;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DOCUMENT;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ROLE_IN_USER_ROLES;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.USER_ROLES;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.addressesStart;
@@ -604,7 +601,8 @@ class CompoundAccessControlServiceTest {
 
             JsonNode dataNode = generatePeopleDataWithPerson(existingPersonStart + name + personEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(existingPersonStart
+            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(
+                existingPersonStart
                     + nameUpdated + personEnd),
                 dataNode, people, USER_ROLES), is(true));
         }
@@ -624,7 +622,8 @@ class CompoundAccessControlServiceTest {
 
             JsonNode dataNode = generatePeopleDataWithPerson(existingPersonStart + name + personEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(existingPersonStart
+            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(
+                existingPersonStart
                     + nameUpdated + personEnd),
                 dataNode, people, USER_ROLES), is(false));
         }
@@ -643,12 +642,15 @@ class CompoundAccessControlServiceTest {
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
-            JsonNode dataNode = generatePeopleDataWithPerson(existingPersonStart + addressesStart + existingAddress1
+            JsonNode dataNode = generatePeopleDataWithPerson(existingPersonStart + addressesStart
+                + existingAddress1
                 + addressEnd + personEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(existingPersonStart
+            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(
+                existingPersonStart
                 + addressesStart
-                + existingAddress1Line1Updated + addressEnd + personEnd), dataNode, people, USER_ROLES), is(true));
+                + existingAddress1Line1Updated + addressEnd + personEnd), dataNode, people, USER_ROLES),
+                is(true));
         }
 
         @Test
@@ -1193,104 +1195,6 @@ class CompoundAccessControlServiceTest {
 
             assertThat(compoundAccessControlService.hasAccessForAction(
                 newDataNode, existingDataNode, caseType.getCaseFieldDefinitions().get(0), USER_ROLES), is(false));
-
-        }
-
-        @Test
-        @DisplayName("Should not grant access to case field if ACL false for Complex with Collection")
-        void shouldNotGrantAccessToFieldWithAclAccessNotGrantedForComplexWithCollection() throws IOException {
-            CaseTypeDefinition caseTypeDefinition = newCaseType()
-                .withCaseFields(List.of(
-                    newCaseField()
-                        .withId("FieldId")
-                        .withFieldType(
-                            aFieldType()
-                                .withId("ComplexType1")
-                                .withType(COMPLEX)
-                                .withComplexField(complexField("NestedField1", TEXT))
-                                .withComplexField(
-                                    newCaseField()
-                                        .withId("NestedField2")
-                                        .withFieldType(
-                                            aFieldType()
-                                                .withId("ComplexType2")
-                                                .withType(COLLECTION)
-                                                .withCollectionFieldType(
-                                                    aFieldType()
-                                                        .withId("SomeOtherType")
-                                                        .withType(COMPLEX)
-                                                        .withComplexField(complexField("SubNestedField1", TEXT))
-                                                        .withComplexField(complexField("SubNestedField2", TEXT))
-                                                        .build()
-                                                )
-                                                .build()
-                                        )
-                                        .withAcl(anAcl()
-                                            .withCreate(true)
-                                            .withDelete(true)
-                                            .withUpdate(true)
-                                            .withRead(true)
-                                            .withRole(ROLE_IN_USER_ROLES).build())
-                                        .build()
-
-                                )
-                                .build()
-                        )
-                        .withComplexACL(aComplexACL()
-                            .withCreate(true)
-                            .withDelete(true)
-                            .withUpdate(true)
-                            .withRead(true)
-                            .withRole(ROLE_IN_USER_ROLES).build())
-                        .build()
-                ))
-                .build();
-
-
-            JsonNode newDataNode = getJsonNode("{\n"
-                + "  \"FieldId\": {\n"
-                + "     \"NestedField2\": [\n"
-                + "        {\n"
-                + "            \"id\": \"123\",\n"
-                + "            \"value\": {\n"
-                + "                \"SubNestedField1\": \"CollectionValue1\",\n"
-                + "                \"SubNestedField2\": \"SomethingToChanged\"\n"
-                + "            }\n"
-                + "        },\n"
-                + "        {\n"
-                + "            \"id\": \"456\",\n"
-                + "            \"value\": {\n"
-                + "                \"SubNestedField1\": \"CollectionValue2\",\n"
-                + "                \"SubNestedField2\": \"SomethingToBeIgnored\"\n"
-                + "            }\n"
-                + "        }\n"
-                + "    ]\n"
-                + "  }\n"
-                + "}");
-            JsonNode existingDataNode = getJsonNode("{\n"
-                + "  \"FieldId\": {\n"
-                + "     \"NestedField2\": [\n"
-                + "        {\n"
-                + "            \"id\": \"123\",\n"
-                + "            \"value\": {\n"
-                + "                \"SubNestedField1\": \"CollectionValue1\",\n"
-                + "                \"SubNestedField2\": \"SomethingToBeIgnored\"\n"
-                + "            }\n"
-                + "        },\n"
-                + "        {\n"
-                + "            \"id\": \"456\",\n"
-                + "            \"value\": {\n"
-                + "                \"SubNestedField1\": \"CollectionValue2\",\n"
-                + "                \"SubNestedField2\": \"SomethingToBeIgnored\"\n"
-                + "            }\n"
-                + "        }\n"
-                + "    ]\n"
-                + "  }\n"
-                + "}");
-
-            assertThat(compoundAccessControlService.hasAccessForAction(
-                newDataNode, existingDataNode, caseTypeDefinition.getCaseFieldDefinitions().get(0),
-                USER_ROLES), is(false));
 
         }
     }
@@ -1992,19 +1896,5 @@ class CompoundAccessControlServiceTest {
     private JsonNode getJsonNode(String content) throws IOException {
         final Map<String, JsonNode> newData = JacksonUtils.convertValue(MAPPER.readTree(content));
         return JacksonUtils.convertValueJsonNode(newData);
-    }
-
-    private CaseFieldDefinition complexField(String id, String type) {
-        return newCaseField()
-            .withId(id)
-            .withFieldType(fieldType(type))
-            .build();
-    }
-
-    private FieldTypeDefinition fieldType(String type) {
-        return aFieldType()
-            .withId(type)
-            .withType(type)
-            .build();
     }
 }
