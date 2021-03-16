@@ -7,6 +7,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -32,6 +33,8 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
         "Client error when getting Role Assignments from Role Assignment Service because of %s";
     public static final String ROLE_ASSIGNMENT_SERVICE_ERROR =
         "Problem getting Role Assignments from Role Assignment Service because of %s";
+    public static final String ROLE_ASSIGNMENT_ID_NOT_FOUND = "No Role Assignment found with the assignmentId %s when "
+        + "getting from Role Assignment Service because of %s";
 
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
@@ -64,6 +67,61 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
                 && ((HttpClientErrorException) e).getRawStatusCode() == HttpStatus.NOT_FOUND.value()) {
                 throw new ResourceNotFoundException(String.format(ROLE_ASSIGNMENTS_NOT_FOUND,
                                                                   userId, e.getMessage()));
+            } else if (e instanceof HttpClientErrorException
+                && HttpStatus.valueOf(((HttpClientErrorException) e).getRawStatusCode()).is4xxClientError()) {
+                throw new BadRequestException(String.format(ROLE_ASSIGNMENTS_CLIENT_ERROR, e.getMessage()));
+            } else {
+                throw new ServiceException(String.format(ROLE_ASSIGNMENT_SERVICE_ERROR, e.getMessage()));
+            }
+        }
+    }
+
+
+    @Override
+    public RoleAssignmentResponse getRoleAssignmentDetails(RoleAssignmentQueryRequest request) {
+        try {
+            MultiValueMap<String, Object> requestBody = request.getQueryParamsMap();
+            final HttpEntity<Object> requestEntity = new HttpEntity<>(requestBody,
+                securityUtils.authorizationHeaders());
+            final String encodedUrl = applicationParams.getRoleAssignmentQueryURL();
+            return restTemplate.exchange(new URI(encodedUrl),
+                HttpMethod.POST, requestEntity,
+                RoleAssignmentResponse.class).getBody();
+
+        } catch (Exception e) {
+            LOG.warn("Error while retrieving Role Assignment", e);
+            if (e instanceof HttpClientErrorException
+                && ((HttpClientErrorException) e).getRawStatusCode() == HttpStatus.NOT_FOUND.value()) {
+                throw new ResourceNotFoundException(String.format(ROLE_ASSIGNMENTS_NOT_FOUND,
+                    request.getActorId(), e.getMessage()));
+            } else if (e instanceof HttpClientErrorException
+                && HttpStatus.valueOf(((HttpClientErrorException) e).getRawStatusCode()).is4xxClientError()) {
+                throw new BadRequestException(String.format(ROLE_ASSIGNMENTS_CLIENT_ERROR, e.getMessage()));
+            } else {
+                throw new ServiceException(String.format(ROLE_ASSIGNMENT_SERVICE_ERROR, e.getMessage()));
+            }
+        }
+
+    }
+
+    @Override
+    public void deleteRoleAssignment(String assignmentId) {
+        try {
+            final HttpEntity<Object> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
+            final Map<String, String> queryParams = new HashMap<>();
+            queryParams.put("assignmentId", ApplicationParams.encode(assignmentId.toLowerCase()));
+
+            final String encodedUrl = UriComponentsBuilder.fromHttpUrl(applicationParams.deleteAssignmentURL())
+                .buildAndExpand(queryParams).toUriString();
+            restTemplate.exchange(String.valueOf(new URI(encodedUrl)),
+                HttpMethod.DELETE, requestEntity, String.class);
+
+        } catch (Exception e) {
+            LOG.warn("Error while deleting Role Assignment", e);
+            if (e instanceof HttpClientErrorException
+                && ((HttpClientErrorException) e).getRawStatusCode() == HttpStatus.NOT_FOUND.value()) {
+                throw new ResourceNotFoundException(String.format(ROLE_ASSIGNMENT_ID_NOT_FOUND,
+                    assignmentId, e.getMessage()));
             } else if (e instanceof HttpClientErrorException
                 && HttpStatus.valueOf(((HttpClientErrorException) e).getRawStatusCode()).is4xxClientError()) {
                 throw new BadRequestException(String.format(ROLE_ASSIGNMENTS_CLIENT_ERROR, e.getMessage()));

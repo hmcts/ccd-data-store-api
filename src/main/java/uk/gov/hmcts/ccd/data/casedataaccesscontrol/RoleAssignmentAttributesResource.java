@@ -15,7 +15,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 /**
- * Used Optional<Striing> in this class, this will help to have three different values for the object when
+ * Used Optional<String> in this class, this will help to have three different values for the object when
  * JSON de-serialisation is invoked.
  *
  * eeg:
@@ -32,6 +32,7 @@ public class RoleAssignmentAttributesResource implements Serializable {
     private static final long serialVersionUID = -7106266789404292869L;
 
     Optional<String> jurisdiction;
+    Optional<String> caseType;
     Optional<String> caseId;
     Optional<String> region;
     Optional<String> location;

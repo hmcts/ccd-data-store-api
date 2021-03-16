@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.caseaccess;
 
 import com.google.common.collect.Lists;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,12 +22,17 @@ import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentAttributesResource;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentQueryRequest;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResource;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidCaseRoleException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
@@ -42,17 +48,20 @@ public class CaseAccessOperation {
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseRoleRepository caseRoleRepository;
     private final SupplementaryDataRepository supplementaryDataRepository;
+    private final RoleAssignmentService roleAssignmentService;
 
     public CaseAccessOperation(final @Qualifier(CachedCaseUserRepository.QUALIFIER)
                                    CaseUserRepository caseUserRepository,
                                @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                    final CaseDetailsRepository caseDetailsRepository,
                                @Qualifier(CachedCaseRoleRepository.QUALIFIER) CaseRoleRepository caseRoleRepository,
-                               @Qualifier("default") SupplementaryDataRepository supplementaryDataRepository) {
+                               @Qualifier("default") SupplementaryDataRepository supplementaryDataRepository,
+                               RoleAssignmentService roleAssignmentService) {
         this.caseUserRepository = caseUserRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseRoleRepository = caseRoleRepository;
         this.supplementaryDataRepository = supplementaryDataRepository;
+        this.roleAssignmentService = roleAssignmentService;
     }
 
     @Transactional
@@ -66,10 +75,15 @@ public class CaseAccessOperation {
 
     @Transactional
     public void revokeAccess(final String jurisdictionId, final String caseReference, final String userId) {
-        final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(jurisdictionId,
-            Long.valueOf(caseReference));
-        final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
-        caseUserRepository.revokeAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
+        RoleAssignmentAttributesResource attributes = new RoleAssignmentAttributesResource();
+        attributes.setCaseId(Optional.of(caseReference));
+        attributes.setJurisdiction(Optional.of(jurisdictionId));
+        RoleAssignmentQueryRequest request = new RoleAssignmentQueryRequest(Optional.of(userId),Optional.of("CASE"),
+            Optional.of("[CREATOR]"), null, null, null, Optional.of(Instant.now().toString()),
+            null, Optional.of(attributes));
+        RoleAssignmentResponse response = roleAssignmentService.getRoleAssignmentDetails(request);
+        List<RoleAssignmentResource> list = response.getRoleAssignments();
+        roleAssignmentService.revokeRoleAssignment(list.get(0).getId());
     }
 
     @Transactional

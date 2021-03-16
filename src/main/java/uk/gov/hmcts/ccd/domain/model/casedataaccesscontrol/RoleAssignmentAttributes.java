@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RoleAssignmentAttributes {
     private Optional<String> jurisdiction;
+    private Optional<String> caseType;
     private Optional<String> caseId;
     private Optional<String> region;
     private Optional<String> location;
