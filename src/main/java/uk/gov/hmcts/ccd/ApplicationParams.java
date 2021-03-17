@@ -155,6 +155,9 @@ public class ApplicationParams {
     @Value("${enable-pseudo-role-assignments-generation}")
     private boolean enablePseudoRoleAssignmentsGeneration;
 
+    @Value("${enable-pseudo-access-profiles-generation}")
+    private boolean enablePseudoAccessProfilesGeneration;
+
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
 
@@ -418,6 +421,10 @@ public class ApplicationParams {
 
     public boolean getEnablePseudoRoleAssignmentsGeneration() {
         return enablePseudoRoleAssignmentsGeneration;
+    }
+
+    public boolean getEnablePseudoAccessProfilesGeneration() {
+        return enablePseudoAccessProfilesGeneration;
     }
 
     public List<String> getCcdAccessControlCitizenRoles() {

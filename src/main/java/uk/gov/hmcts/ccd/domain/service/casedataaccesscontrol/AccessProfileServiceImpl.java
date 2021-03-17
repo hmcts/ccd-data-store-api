@@ -1,31 +1,35 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class AccessProfileServiceImpl implements AccessProfileService, AccessControl {
 
     @Override
     public List<AccessProfile> generateAccessProfiles(RoleAssignmentFilteringResult filteringResults,
-                                                      CaseTypeDefinition caseTypeDefinition) {
+                                                      List<RoleToAccessProfileDefinition> roleToAccessProfilesMappings) {
 
         List<AccessProfile> accessProfiles = new ArrayList<>();
+        Map<String, RoleToAccessProfileDefinition> roleToAccessProfileDefinitionMap =
+            toRoleNameAsKeyMap(roleToAccessProfilesMappings);
 
         for (RoleAssignment roleAssignment : filteringResults.getRoleAssignments()) {
 
-            RoleToAccessProfileDefinition roleToAccessProfileDefinition = caseTypeDefinition
-                .getRoleToAccessProfileMapping(roleAssignment.getRoleName());
+            RoleToAccessProfileDefinition roleToAccessProfileDefinition =
+                roleToAccessProfileDefinitionMap.get(roleAssignment.getRoleName());
 
             if (roleToAccessProfileDefinition != null && !roleToAccessProfileDefinition.isDisabled()) {
                 List<String> authorisations = roleToAccessProfileDefinition.getAuthorisationList();
@@ -37,6 +41,14 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
             }
         }
         return accessProfiles;
+    }
+
+    private Map<String, RoleToAccessProfileDefinition> toRoleNameAsKeyMap(
+        List<RoleToAccessProfileDefinition> roleToAccessProfiles) {
+        return roleToAccessProfiles
+            .stream()
+            .collect(Collectors.toMap(RoleToAccessProfileDefinition::getRoleName,
+                                      Function.identity()));
     }
 
     private boolean authorisationsAllowMappingToAccessProfiles(List<String> authorisations,
