@@ -50,19 +50,6 @@ Scenario: must return negative response when request provides authentic credenti
       And the response has all the details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-047
-Scenario: must return negative response when request provides invalid caseType
-
-    Given a user with [an active profile in CCD],
-
-     When a request is prepared with appropriate values,
-      And the request [provides an invalid case type id],
-      And it is submitted to call the [Fetch an event trigger in the context of a case for Case Worker] operation of [CCD Data Store],
-
-     Then a negative response is received,
-      And the response [has the 400 return code].
-
-#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-547
 Scenario: must return appropriate negative response when case-reference does not exists
 

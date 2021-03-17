@@ -151,6 +151,12 @@ class QueryEndpointTest {
     void shouldThrowBadRequestForInvalidCaseType() {
         assertThrows(BadRequestException.class, () -> queryEndpoint.findWorkbasketInputDetails("22",
             "TEST", "TEST<input>"));
+        assertThrows(BadRequestException.class, () -> queryEndpoint.findWorkbasketInputDetails("22",
+            "TEST", "TEST-123"));
+        assertThrows(BadRequestException.class, () -> queryEndpoint.findWorkbasketInputDetails("22",
+            "TEST", "TEST£$%+*"));
+        assertThrows(BadRequestException.class, () -> queryEndpoint.findWorkbasketInputDetails("22",
+            "TEST", "\'TEST\'"));
     }
 
     @Nested

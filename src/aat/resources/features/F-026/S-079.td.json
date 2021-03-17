@@ -5,8 +5,7 @@
 
   "specs": [
     "an active profile in CCD",
-    "provides an invalid case type id",
-    "has an HTTP-400 return code"
+    "provides an invalid case type id"
   ],
 
   "request": {
@@ -18,7 +17,11 @@
   "expectedResponse": {
     "_extends_": "Common_400_Response",
     "body": {
-      "message": "Case Type Id is not valid"
+      "exception": "[[ANYTHING_PRESENT]]",
+      "message": "Case Type Id is not valid",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
     }
   }
 }

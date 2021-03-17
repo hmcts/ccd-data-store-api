@@ -79,14 +79,14 @@ Scenario: must return 412 when the case type is not present in Definition store 
 @S-079
 Scenario: must return appropriate negative response when request does not provide valid caseType
 
-   Given  a user with     [an active profile in CCD],
+   Given a user with [an active profile in CCD],
 
      When a request is prepared with appropriate values,
-      And the request     [provides an invalid case type id],
-      And it is submitted to call the    [Get case data with UI layout]    operation of    [CCD Data Store],
+      And the request [provides an invalid case type id],
+      And it is submitted to call the [Get case data with UI layout] operation of [CCD Data Store],
 
      Then a negative response is received,
-      And the response    [has an HTTP-400 return code].
+      And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-587 @RDM-7793 # Get cases with Last State Modified Date field as a column # Also update this with data ordering when FW support is available

@@ -87,7 +87,7 @@ Scenario: must return appropriate negative response when request contains invali
       And it is submitted to call the [Fetch an event trigger in the context of a case type for Case Worker] operation of [CCD Data Store],
 
      Then a negative response is received,
-      And the response [has the 400 return code].
+      And the response has all other details as expected.
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-551
