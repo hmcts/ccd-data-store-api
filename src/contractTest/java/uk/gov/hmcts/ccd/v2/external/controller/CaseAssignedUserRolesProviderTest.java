@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import au.com.dius.pact.provider.junit.IgnoreNoPactsToVerify;
 import au.com.dius.pact.provider.junit.Provider;
 import au.com.dius.pact.provider.junit.State;
 import au.com.dius.pact.provider.junit.loader.PactBroker;
@@ -25,11 +26,12 @@ import static org.mockito.Mockito.when;
 @Provider("ccdDataStoreAPI_caseAssignedUserRoles")
 @RunWith(SpringRestPactRunner.class)
 @PactBroker(scheme = "${pact.broker.scheme}", host = "${pact.broker.baseUrl}",
-    port = "${pact.broker.port}", tags = {"${pact.broker.consumer.tag}"})
+    port = "${pact.broker.port}", tags = {"master"})
 @TestPropertySource(locations = "/application.properties")
 @WebMvcTest({CaseAssignedUserRolesController.class})
 @AutoConfigureMockMvc(addFilters = false)
 @ContextConfiguration(classes = {CaseAssignedUserRolesProviderTestContext.class})
+@IgnoreNoPactsToVerify
 public class CaseAssignedUserRolesProviderTest {
 
     @Autowired
@@ -45,12 +47,10 @@ public class CaseAssignedUserRolesProviderTest {
     CaseAssignedUserRolesController caseAssignedUserRolesController;
 
     @TestTarget
-    //Create a new instance of the MockMvcTarget and annotate it as the TestTarget for PactRunner
     public final MockMvcTarget target = new MockMvcTarget();
 
     @Before
     public void setUp() {
-        System.getProperties().setProperty("pact.verifier.publishResults", "true");
         target.setControllers(caseAssignedUserRolesController);
     }
 

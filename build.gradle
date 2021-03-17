@@ -788,11 +788,21 @@ task functional() {
     outputs.upToDateWhen { false }
 }
 
+project.ext {
+    pactVersion = getCheckedOutGitCommitHash()
+}
+
+def getCheckedOutGitCommitHash() {
+    'git rev-parse --verify --short HEAD'.execute().text.trim()
+}
+
 task contractTest(type: Test) {
     logger.lifecycle("Runnning contract Tests")
     useJUnitPlatform()
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
+    //systemProperty 'pact.verifier.publishResults', true
+    systemProperty 'pact.provider.version', project.pactVersion
 
 }
 
