@@ -39,11 +39,12 @@ public class AccessControlledGetCaseOperation implements GetCaseOperation, Acces
 
     @Override
     public Optional<CaseDetails> execute(String caseReference) {
-        if (applicationParams.getEnableAttributeBasedAccessControl()) {
-            return getCaseOperation.execute(caseReference)
-                .flatMap(caseDataAccessControl::applyAccessControl);
-        } else {
-            return creatorGetCaseOperation.execute(caseReference);
-        }
+//        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+//            return getCaseOperation.execute(caseReference)
+//                .flatMap(caseDataAccessControl::applyAccessControl);
+//        } else {
+//            return creatorGetCaseOperation.execute(caseReference);
+//        }
+        return creatorGetCaseOperation.execute(caseReference);
     }
 }

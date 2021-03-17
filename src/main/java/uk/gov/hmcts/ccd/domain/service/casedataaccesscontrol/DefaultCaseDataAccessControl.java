@@ -62,11 +62,11 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     // Returns Optional<CaseDetails>. If this is not enough think of wrapping it in a AccessControlResponse
     // that contains the additional information about the operation result
     @Override
-    public Optional<CaseDetails> applyAccessControl(CaseDetails caseDetails) {
+    public List<AccessProfile> applyAccessControl(RoleAssignmentFilteringResult filteringResults, CaseTypeDefinition caseTypeDefinition ) {
         RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
 
-        RoleAssignmentFilteringResult filteringResults = roleAssignmentsFilteringService
-            .filter(roleAssignments, caseDetails);
+//        RoleAssignmentFilteringResult filteringResults = roleAssignmentsFilteringService
+//            .filter(roleAssignments, caseDetails);
 
         if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
             List<RoleAssignment> pseudoRoleAssignments = pseudoRoleAssignmentsGenerator
@@ -74,7 +74,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
             filteringResults = augment(filteringResults, pseudoRoleAssignments);
         }
 
-        CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseDetails.getCaseTypeId());
+//        CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseDetails.getCaseTypeId());
 
         if (applicationParams.getEnablePseudoAccessProfilesGeneration()) {
             List<RoleToAccessProfileDefinition> pseudoAccessProfilesMappings =
@@ -92,8 +92,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         List<AccessProfile> accessProfiles = accessProfileService
             .generateAccessProfiles(filteringResults, caseTypeDefinition);
 
-        CaseDetails cloned = caseService.clone(caseDetails);
-        return Optional.of(cloned);
+        return accessProfiles;
     }
 
     private RoleAssignmentFilteringResult augment(RoleAssignmentFilteringResult filteringResults,

@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
@@ -35,7 +34,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceImpl.QU
 
 @Service
 @Qualifier(QUALIFIER)
-@ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "false")
 public class AccessControlServiceImpl implements AccessControlService {
 
     private static final Logger LOG = LoggerFactory.getLogger(AccessControlServiceImpl.class);

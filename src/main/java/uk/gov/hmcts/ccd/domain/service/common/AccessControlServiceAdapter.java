@@ -6,12 +6,14 @@ import java.util.Set;
 import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -19,6 +21,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.DefaultCaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentsFilteringService;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceAdapter.QUALIFIER;
 
@@ -26,26 +30,36 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceAdapter
 @Service
 @Qualifier(QUALIFIER)
 @Primary
-@ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "true")
 public class AccessControlServiceAdapter implements AccessControlService {
 
 
     public static final String QUALIFIER = "ACCESS_CONTROL_ADAPTER";
+    private RoleAssignmentService roleAssignmentService;
     private DefaultCaseDataAccessControl defaultCaseDataAccessControl;
     private AccessControlService accessControlService;
+    private final RoleAssignmentsFilteringService roleAssignmentsFilteringService;
 
     @Autowired
-    public AccessControlServiceAdapter(final DefaultCaseDataAccessControl defaultCaseDataAccessControl,
+    public AccessControlServiceAdapter(final RoleAssignmentService roleAssignmentService,
+                                       final DefaultCaseDataAccessControl defaultCaseDataAccessControl,
                                        final @Qualifier(AccessControlServiceImpl.QUALIFIER)
-                                           AccessControlService accessControlService) {
+                                           AccessControlService accessControlService,
+                                       final RoleAssignmentsFilteringService roleAssignmentsFilteringService) {
+        this.roleAssignmentService = roleAssignmentService;
         this.defaultCaseDataAccessControl = defaultCaseDataAccessControl;
         this.accessControlService = accessControlService;
+        this.roleAssignmentsFilteringService = roleAssignmentsFilteringService;
     }
 
     @Override
     public boolean canAccessCaseTypeWithCriteria(CaseTypeDefinition caseType,
                                                  Set<String> userRoles,
                                                  Predicate<AccessControlList> criteria) {
+        RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments("userid");
+                RoleAssignmentFilteringResult filteringResults = roleAssignmentsFilteringService
+            .filter(roleAssignments, caseType);
+        List<AccessProfile> accessProfiles = defaultCaseDataAccessControl.applyAccessControl(filteringResults, caseType);
+
         return accessControlService.canAccessCaseTypeWithCriteria(caseType,
             userRoles,
             criteria);
