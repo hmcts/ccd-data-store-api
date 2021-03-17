@@ -31,6 +31,7 @@ import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
@@ -110,14 +111,16 @@ class DefaultCreateEventOperationTest {
         postState = new CaseStateDefinition();
         postState.setId(POST_STATE);
 
+        mockCaseEventResult();
+    }
+
+    private void mockCaseEventResult() {
         CreateCaseEventResult caseEventResult =  CreateCaseEventResult.caseEventWith()
             .caseDetailsBefore(caseDetailsBefore)
             .savedCaseDetails(caseDetails)
             .eventTrigger(caseEventDefinition)
             .build();
-
         given(createEventService.createCaseEvent(CASE_REFERENCE, caseDataContent)).willReturn(caseEventResult);
-
     }
 
     private List<EventPostStateDefinition> getEventPostStates(String... postStateReferences) {
@@ -172,6 +175,19 @@ class DefaultCreateEventOperationTest {
             () -> assertThat(caseDetails.getCallbackResponseStatusCode(), is(SC_OK)),
             () -> assertThat(caseDetails.getCallbackResponseStatus(), is("INCOMPLETE_CALLBACK"))
         );
+    }
+
+    @Test
+    @DisplayName("should return incomplete response status if remote endpoint is down")
+    void shouldReturnInvokeSettingProxiedUser() {
+        caseDataContent = newCaseDataContent().withEvent(event).withData(data).withToken(TOKEN)
+            .withIgnoreWarning(IGNORE_WARNING)
+            .withOnBehalfOfUserToken("Test_Token").build();
+        mockCaseEventResult();
+
+        final CaseDetails caseDetails = createEventOperation.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        assertNotNull(caseDetails);
     }
 
     private Map<String, JsonNode> buildJsonNodeData() {

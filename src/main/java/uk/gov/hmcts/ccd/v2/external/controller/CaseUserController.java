@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,6 +45,7 @@ public class CaseUserController {
         this.caseAccessOperation = caseAccessOperation;
     }
 
+    @Transactional
     @PutMapping(
         path = "/{userId}",
         consumes = MediaType.APPLICATION_JSON_VALUE
