@@ -802,16 +802,14 @@ task contractTest(type: Test) {
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
     //systemProperty 'pact.verifier.publishResults', true
-    systemProperty 'pact.provider.version', project.pactVersion
-
 }
 
 task runProviderPactVerification(type: Test) {
     logger.lifecycle("Runs pact Tests")
     testClassesDirs = sourceSets.contractTest.output.classesDirs
+    classpath = sourceSets.contractTest.runtimeClasspath
+    systemProperty 'pact.provider.version', project.pactVersion
 }
-
-runProviderPactVerification.dependsOn contractTest
 
 runProviderPactVerification.finalizedBy pactVerify
 

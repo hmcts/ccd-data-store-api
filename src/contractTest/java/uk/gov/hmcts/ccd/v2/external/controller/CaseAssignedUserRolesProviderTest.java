@@ -25,13 +25,13 @@ import static org.mockito.Mockito.when;
 
 @Provider("ccdDataStoreAPI_caseAssignedUserRoles")
 @RunWith(SpringRestPactRunner.class)
+@IgnoreNoPactsToVerify
 @PactBroker(scheme = "${pact.broker.scheme}", host = "${pact.broker.baseUrl}",
     port = "${pact.broker.port}", tags = {"master"})
 @TestPropertySource(locations = "/application.properties")
 @WebMvcTest({CaseAssignedUserRolesController.class})
 @AutoConfigureMockMvc(addFilters = false)
 @ContextConfiguration(classes = {CaseAssignedUserRolesProviderTestContext.class})
-@IgnoreNoPactsToVerify
 public class CaseAssignedUserRolesProviderTest {
 
     @Autowired
