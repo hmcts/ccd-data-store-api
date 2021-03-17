@@ -76,23 +76,29 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
 
 //        CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseDetails.getCaseTypeId());
 
-        if (applicationParams.getEnablePseudoAccessProfilesGeneration()) {
-            List<RoleToAccessProfileDefinition> pseudoAccessProfilesMappings =
-                pseudoRoleToAccessProfileGenerator.generate(caseTypeDefinition);
-
-            List<RoleToAccessProfileDefinition> roleToAccessProfiles = caseTypeDefinition.getRoleToAccessProfiles();
-            roleToAccessProfiles.addAll(pseudoAccessProfilesMappings);
-            caseTypeDefinition.setRoleToAccessProfiles(roleToAccessProfiles);
-        }
-
         if (filteringResults.hasGrantTypeExcludedRole()) {
             filteringResults = filteringResults.retainBasicAndSpecificGrantTypeRolesOnly();
         }
 
-        List<AccessProfile> accessProfiles = accessProfileService
-            .generateAccessProfiles(filteringResults, caseTypeDefinition);
+        List<AccessProfile> accessProfiles = generateAccessProfiles(filteringResults, caseTypeDefinition);
 
         return accessProfiles;
+    }
+
+    private List<AccessProfile> generateAccessProfiles(RoleAssignmentFilteringResult filteringResults,
+                                                       CaseTypeDefinition caseTypeDefinition) {
+        if (applicationParams.getEnablePseudoAccessProfilesGeneration()) {
+            List<RoleToAccessProfileDefinition> pseudoAccessProfilesMappings =
+                pseudoRoleToAccessProfileGenerator.generate(caseTypeDefinition);
+
+            pseudoAccessProfilesMappings.addAll(caseTypeDefinition.getRoleToAccessProfiles());
+
+            return accessProfileService
+                .generateAccessProfiles(filteringResults, pseudoAccessProfilesMappings);
+        } else {
+            return accessProfileService
+                .generateAccessProfiles(filteringResults, caseTypeDefinition.getRoleToAccessProfiles());
+        }
     }
 
     private RoleAssignmentFilteringResult augment(RoleAssignmentFilteringResult filteringResults,
