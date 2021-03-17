@@ -9,5 +9,5 @@ import java.util.List;
 public interface AccessProfileService {
 
     List<AccessProfile> generateAccessProfiles(RoleAssignmentFilteringResult filteringResults,
-                                               List<RoleToAccessProfileDefinition> roleToAccessProfilesMap);
+                                               List<RoleToAccessProfileDefinition> roleToAccessProfilesMappings);
 }
