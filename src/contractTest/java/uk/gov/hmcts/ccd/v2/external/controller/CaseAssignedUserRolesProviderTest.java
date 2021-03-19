@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
 import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
@@ -63,7 +62,6 @@ public class CaseAssignedUserRolesProviderTest {
             context.setTarget(testTarget);
         }
     }
-
 
     @State("A User Role exists for a Case")
     public void setUpUserRoleExists() {
