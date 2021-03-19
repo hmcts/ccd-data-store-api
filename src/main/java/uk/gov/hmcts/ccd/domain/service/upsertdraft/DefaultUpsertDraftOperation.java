@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -46,6 +47,7 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
         this.userAuthorisation = userAuthorisation;
     }
 
+    @Transactional
     @Override
     public DraftResponse executeSave(final String caseTypeId, final CaseDataContent caseDataContent) {
         final DraftResponse draftResponse = new DraftResponse();
