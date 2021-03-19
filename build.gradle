@@ -50,7 +50,7 @@ apply plugin: 'se.patrikerdes.use-latest-versions'
 apply from: 'liquibase.gradle'
 
 def versions = [
-        pact_version: '3.5.25'
+        pact_version: '4.1.7'
 ]
 
 
@@ -86,8 +86,8 @@ repositories {
 // end::repositories[]
 
 ext {
-    junitJupiterVersion = '5.5.2'
-    junitVintageVersion = '5.5.2'
+    junitJupiterVersion = '5.7.0'
+    junitVintageVersion = '5.7.0'
     powermockVersion = '2.0.7'
     reformLogging = '5.1.0'
     appInsightsVersion = '2.4.1'
@@ -218,6 +218,7 @@ dependencies {
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
     testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
+    testRuntime "org.junit.platform:junit-platform-commons:1.7.0"
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.24.0'
     testCompile group:'org.mockito', name: 'mockito-junit-jupiter', version:'2.24.0'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: powermockVersion
@@ -243,11 +244,9 @@ dependencies {
 
     testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.6.0-RDM-7165-2'
 
-    contractTestCompile group: 'au.com.dius', name: 'pact-jvm-provider-spring_2.12', version: versions.pact_version
-    contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    contractTestRuntime group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    contractTestRuntime group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
-
+    contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
+    contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
+    contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
 }
 // end::dependencies[]
 
@@ -796,16 +795,9 @@ def getCheckedOutGitCommitHash() {
     'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
 
-task contractTest(type: Test) {
-    logger.lifecycle("Runnning contract Tests")
-    useJUnitPlatform()
-    testClassesDirs = sourceSets.contractTest.output.classesDirs
-    classpath = sourceSets.contractTest.runtimeClasspath
-    //systemProperty 'pact.verifier.publishResults', true
-}
-
 task runProviderPactVerification(type: Test) {
     logger.lifecycle("Runs pact Tests")
+    useJUnitPlatform()
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
     systemProperty 'pact.provider.version', project.pactVersion
