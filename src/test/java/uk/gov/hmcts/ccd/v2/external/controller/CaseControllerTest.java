@@ -371,4 +371,45 @@ class CaseControllerTest {
         }
 
     }
+
+    @Nested
+    @DisplayName("GET /cases/{caseId}/events proxied by user")
+    class GetEventsForCaseIdWithProxiedByUser {
+
+        @Test
+        @DisplayName("should return proxied by user details when exists")
+        void shouldReturnProxiedByUserDetails() {
+            AuditEvent auditEvent = createAuditEvent();
+            List<AuditEvent> auditEvents = Lists.newArrayList(auditEvent);
+            when(getEventsOperation.getEvents(CASE_REFERENCE)).thenReturn(auditEvents);
+
+            final ResponseEntity<CaseEventsResource> response = caseController.getCaseEvents(CASE_REFERENCE);
+
+            assertAll(
+                () -> assertThat(response.getStatusCode(), is(HttpStatus.OK)),
+                () -> assertThat(response.getBody().getAuditEvents().size(), is(1)),
+                () -> assertThat(response.getBody().getAuditEvents().get(0).getProxiedBy(), is("Proxied")),
+                () -> assertThat(response.getBody().getAuditEvents().get(0)
+                    .getProxiedByFirstName(), is("Proxied_First_Name")),
+                () -> assertThat(response.getBody().getAuditEvents().get(0)
+                    .getProxiedByLastName(), is("Proxied_Last_Name")),
+                () -> assertThat(response.getBody().getAuditEvents().get(0).getUserId(), is("UserId")),
+                () -> assertThat(response.getBody().getAuditEvents().get(0)
+                    .getUserFirstName(), is("First_Name")),
+                () -> assertThat(response.getBody().getAuditEvents().get(0)
+                    .getUserLastName(), is("Last_Name"))
+            );
+        }
+
+        private AuditEvent createAuditEvent() {
+            AuditEvent auditEvent = new AuditEvent();
+            auditEvent.setProxiedByFirstName("Proxied_First_Name");
+            auditEvent.setProxiedByLastName("Proxied_Last_Name");
+            auditEvent.setProxiedBy("Proxied");
+            auditEvent.setUserId("UserId");
+            auditEvent.setUserFirstName("First_Name");
+            auditEvent.setUserLastName("Last_Name");
+            return auditEvent;
+        }
+    }
 }

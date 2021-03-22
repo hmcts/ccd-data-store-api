@@ -1,10 +1,10 @@
 {
 	"_guid_": "S-122.1",
   "_extends_": "F-122-UpdateEventBase",
-  "title": "must submit the event creation successfully for TextField and EmailField inputs",
+  "title": "Defaults the state when none of post state conditions resolves using AND operator (End state: CaseDeleted)",
 
   "productName": "CCD data store",
-  "operationName": "submit updateCase2 event with TextField and EmailField values",
+  "operationName": "submit updateCase event with TextField and EmailField values",
 
   "specs": [
     "contains state: CaseDeleted, updated values for TextField, EmailField along with an HTTP-201 Created"
@@ -30,7 +30,7 @@
     "responseMessage": "OK",
     "body": {
       "state": "CaseDeleted",
-      "data": {
+      "case_data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
         "TextField": "non-matching text",
         "EmailField": "test@test.com"
