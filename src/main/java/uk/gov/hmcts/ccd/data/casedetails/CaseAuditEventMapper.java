@@ -1,15 +1,14 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.SignificantItemEntity;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 
@@ -30,6 +29,9 @@ public class CaseAuditEventMapper {
         auditEvent.setUserId(caseAuditEventEntity.getUserId());
         auditEvent.setUserFirstName(caseAuditEventEntity.getUserFirstName());
         auditEvent.setUserLastName(caseAuditEventEntity.getUserLastName());
+        auditEvent.setProxiedBy(caseAuditEventEntity.getProxiedBy());
+        auditEvent.setProxiedByLastName(caseAuditEventEntity.getProxiedByLastName());
+        auditEvent.setProxiedByFirstName(caseAuditEventEntity.getProxiedByFirstName());
         auditEvent.setSecurityClassification(caseAuditEventEntity.getSecurityClassification());
         if (caseAuditEventEntity.getData() != null) {
             auditEvent.setData(JacksonUtils.convertValue(caseAuditEventEntity.getData()));
@@ -68,6 +70,9 @@ public class CaseAuditEventMapper {
         newCaseAuditEventEntity.setUserId(auditEvent.getUserId());
         newCaseAuditEventEntity.setUserLastName(auditEvent.getUserLastName());
         newCaseAuditEventEntity.setUserFirstName(auditEvent.getUserFirstName());
+        newCaseAuditEventEntity.setProxiedBy(auditEvent.getProxiedBy());
+        newCaseAuditEventEntity.setProxiedByLastName(auditEvent.getProxiedByLastName());
+        newCaseAuditEventEntity.setProxiedByFirstName(auditEvent.getProxiedByFirstName());
         newCaseAuditEventEntity.setSecurityClassification(auditEvent.getSecurityClassification());
         if (auditEvent.getData() == null) {
             newCaseAuditEventEntity.setData(MAPPER.createObjectNode());
