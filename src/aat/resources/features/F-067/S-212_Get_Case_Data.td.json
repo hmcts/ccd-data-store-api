@@ -14,8 +14,7 @@
 
   "users": {
     "invokingUser": {
-      "username": "befta.caseworker.1@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
+      "_extends_": "BeftaCaseworker1"
     }
   },
 
@@ -71,7 +70,10 @@
           "user_first_name": "[[ANYTHING_PRESENT]]",
           "state_name": "To do",
           "state_id": "TODO",
-          "significant_item": null
+          "significant_item": null,
+          "proxied_by" : null,
+          "proxied_by_last_name" : null,
+          "proxied_by_first_name" : null
         }
       ]
     }
