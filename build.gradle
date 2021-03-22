@@ -253,6 +253,7 @@ dependencies {
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
+    contractTestCompile group: 'org.springframework.security', name: 'spring-security-web', version: '5.3.8.RELEASE'
 }
 // end::dependencies[]
 
