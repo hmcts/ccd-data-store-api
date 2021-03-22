@@ -5,6 +5,7 @@ import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
+import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
 import au.com.dius.pact.provider.junitsupport.target.Target;
 import au.com.dius.pact.provider.junitsupport.target.TestTarget;
 import au.com.dius.pact.provider.spring.SpringRestPactRunner;
@@ -43,8 +44,10 @@ import static org.mockito.Mockito.when;
 
 @Provider("ccdDataStoreAPI_Cases")
 @RunWith(SpringRestPactRunner.class)
-@PactBroker(scheme = "${pact.broker.scheme}", host = "${pact.broker.baseUrl}",
-    port = "${pact.broker.port}", tags = {"${pact.broker.consumer.tag}"})
+@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
+    host = "${PACT_BROKER_URL:localhost}",
+    port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
+    @VersionSelector(tag = "Dev")})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
     "server.port=8123", "spring.application.name=PACT_TEST",
     "ccd.dm.domain=http://dm-store-aat.service.core-compute-aat.internal"
@@ -123,7 +126,7 @@ public class CasesControllerProviderTest {
 
     @Before
     public void setUp() {
-        System.getProperties().setProperty("pact.verifier.publishResults", "true");
+        // System.getProperties().setProperty("pact.verifier.publishResults", "true");
         BaseType.setCaseDefinitionRepository(contractTestCaseDefinitionRepository);
         when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
         when(userAuthorisation.getUserId()).thenReturn("userId");

@@ -86,8 +86,8 @@ repositories {
 // end::repositories[]
 
 ext {
-    junitJupiterVersion = '5.7.0'
-    junitVintageVersion = '5.7.0'
+    junitJupiterVersion = '5.7.1'
+    junitVintageVersion = '5.7.1'
     powermockVersion = '2.0.7'
     reformLogging = '5.1.0'
     appInsightsVersion = '2.4.1'
@@ -814,6 +814,7 @@ task runProviderPactVerification(type: Test) {
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
     systemProperty 'pact.provider.version', project.pactVersion
+    include "uk/gov/hmcts/ccd/v2/external/controller/**"
 }
 
 runProviderPactVerification.finalizedBy pactVerify
