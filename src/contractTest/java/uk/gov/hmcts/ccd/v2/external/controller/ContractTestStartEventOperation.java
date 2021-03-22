@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -40,10 +41,11 @@ public class ContractTestStartEventOperation extends DefaultStartEventOperation 
                                            UserAuthorisation userAuthorisation,
                                            CallbackInvoker callbackInvoker,
                                            UIDService uidService,
-                                           ContractTestSecurityUtils contractTestSecurityUtils) {
+                                           ContractTestSecurityUtils contractTestSecurityUtils,
+                                           CaseDataService caseDataService) {
         super(eventTokenService, caseDefinitionRepository, caseDetailsRepository, draftGateway,
             eventTriggerService, caseService, userAuthorisation,
-            callbackInvoker, uidService);
+            callbackInvoker, uidService, caseDataService);
         this.contractTestSecurityUtils = contractTestSecurityUtils;
     }
 
