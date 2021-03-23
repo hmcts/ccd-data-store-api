@@ -247,18 +247,17 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.6.0-RDM-7165-2'
     testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.10.0'
 
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
     contractTestRuntime group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
-    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.3.8.RELEASE'
-    contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.3.8.RELEASE'
-    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server', version: '5.3.8.RELEASE'
-    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: '5.3.8.RELEASE'
-    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: '5.3.8.RELEASE'
+    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-client'
+    contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
+    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server'
+    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-core'
+    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
 }
 // end::dependencies[]
 
