@@ -1,22 +1,23 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import au.com.dius.pact.provider.junit.target.HttpTarget;
+import au.com.dius.pact.provider.junit5.HttpTestTarget;
+import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
-import au.com.dius.pact.provider.junitsupport.target.Target;
-import au.com.dius.pact.provider.junitsupport.target.TestTarget;
-import au.com.dius.pact.provider.spring.SpringRestPactRunner;
+import au.com.dius.pact.provider.spring.junit5.PactVerificationSpringProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.applicationinsights.TelemetryClient;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ccd.auditlog.AuditService;
 import uk.gov.hmcts.ccd.data.casedetails.query.UserAuthorisationSecurity;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -41,9 +42,8 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-
+@ExtendWith(SpringExtension.class)
 @Provider("ccdDataStoreAPI_Cases")
-@RunWith(SpringRestPactRunner.class)
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
     host = "${PACT_BROKER_URL:localhost}",
     port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
@@ -119,17 +119,24 @@ public class CasesControllerProviderTest {
     @MockBean
     MessageService messageService;
 
-    @TestTarget
-    @SuppressWarnings(value = "VisibilityModifier")
-    public final Target target = new HttpTarget("http", "localhost", 8123, "/");
+    @TestTemplate
+    @ExtendWith(PactVerificationSpringProvider.class)
+    void pactVerificationTestTemplate(PactVerificationContext context) {
+        if (context != null) {
+            context.verifyInteraction();
+        }
+    }
 
 
-    @Before
-    public void setUp() {
-        // System.getProperties().setProperty("pact.verifier.publishResults", "true");
+    @BeforeEach
+    void before(PactVerificationContext context) {
+        if (context != null) {
+            context.setTarget(new HttpTestTarget("localhost", 8123, "/"));
+        }
         BaseType.setCaseDefinitionRepository(contractTestCaseDefinitionRepository);
         when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
         when(userAuthorisation.getUserId()).thenReturn("userId");
+
     }
 
     @State({"A Get Case is requested"})
