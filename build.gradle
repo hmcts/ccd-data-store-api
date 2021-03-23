@@ -808,7 +808,7 @@ def getCheckedOutGitCommitHash() {
 }
 
 task runProviderPactVerification(type: Test) {
-    logger.lifecycle("Runs pact Tests")
+    logger.lifecycle("Runs provider pact Tests")
     useJUnitPlatform()
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
