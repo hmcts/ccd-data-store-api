@@ -1,4 +1,4 @@
-name: Add a Dummy commit to trigger build
+name: Add a Dummy commit to trigger dev build
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
     paths-ignore:
       - .github/workflows/dummy.yml
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "30 7 * * *"
   workflow_dispatch:
   
 jobs:
@@ -16,15 +16,11 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: develop
-      - name: Modify Dummy file
-        run: |
-          date=`date '+%Y-%m-%dT%H:%M:%SZ'`
-          echo $date > Dummy_File
       
-      - name: Commit Dummy_File and push to develop branch
+      - name: Push Dummy Commit to develop branch
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: 'Update Dummy_File'
+          skip_dirty_check: true
+          commit_message: "Trigger build"
+          commit_options: "--allow-empty"
           branch: 'develop'
-          file_pattern: Dummy_File
-          commit_author: Dummy-Commit <actions@github.com>
