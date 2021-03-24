@@ -106,9 +106,9 @@ class QueryEndpointTest {
     @Test
     void shouldCallFindWorkBasketOperation() {
         List<WorkbasketInput> workBasketResults = new ArrayList<>();
-        doReturn(workBasketResults).when(getCriteriaOperation).execute("TEST-CASE-TYPE", CAN_READ, WORKBASKET);
-        queryEndpoint.findWorkbasketInputDetails("22", "TEST", "TEST-CASE-TYPE");
-        verify(getCriteriaOperation, times(1)).execute("TEST-CASE-TYPE", CAN_READ, WORKBASKET);
+        doReturn(workBasketResults).when(getCriteriaOperation).execute("TEST_CASE_TYPE", CAN_READ, WORKBASKET);
+        queryEndpoint.findWorkbasketInputDetails("22", "TEST", "TEST_CASE_TYPE");
+        verify(getCriteriaOperation, times(1)).execute("TEST_CASE_TYPE", CAN_READ, WORKBASKET);
     }
 
     @Test
@@ -144,6 +144,19 @@ class QueryEndpointTest {
     @DisplayName("Should throw bad request Exception when access is not correct")
     void shouldThrowBadRequest() {
         assertThrows(BadRequestException.class, () -> queryEndpoint.getJurisdictions("creat"));
+    }
+
+    @Test
+    @DisplayName("Should throw bad request Exception for invalid case type id")
+    void shouldThrowBadRequestForInvalidCaseType() {
+        assertThrows(BadRequestException.class, () -> queryEndpoint.findWorkbasketInputDetails("22",
+            "TEST", "TEST<input>"));
+        assertThrows(BadRequestException.class, () -> queryEndpoint.findWorkbasketInputDetails("22",
+            "TEST", "TEST-123"));
+        assertThrows(BadRequestException.class, () -> queryEndpoint.findWorkbasketInputDetails("22",
+            "TEST", "TEST£$%+*"));
+        assertThrows(BadRequestException.class, () -> queryEndpoint.findWorkbasketInputDetails("22",
+            "TEST", "\'TEST\'"));
     }
 
     @Nested
