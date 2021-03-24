@@ -1,10 +1,6 @@
 name: Add a Dummy commit to trigger dev build
 
 on:
-  push:
-    branches: master
-    paths-ignore:
-      - .github/workflows/dummy.yml
   schedule:
     - cron: "30 7 * * *"
   workflow_dispatch:
