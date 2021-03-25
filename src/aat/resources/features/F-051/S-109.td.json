@@ -39,10 +39,6 @@
           "forename": "testfirstname",
           "surname": "testsurname",
           "roles": [
-            {
-              "__operator__": "equivalent",
-              "__ordering__": "unordered"
-            },
             "caseworker-befta_jurisdiction_1",
             "caseworker"
           ],
@@ -52,17 +48,10 @@
       "channels": null,
       "jurisdictions": [
         {
-          "__operator__": "equivalent",
-          "__ordering__": "unordered"
-        },
-        {
           "id": "BEFTA_JURISDICTION_1",
           "name": "BEFTA_JURISDICTION_1",
           "description": "Content for the Test Jurisdiction.",
           "caseTypes": [
-            {
-              "__ordering__": "unordered"
-            },
             {
               "id": "BEFTA_CASETYPE_1_1",
               "description": "Create a case of type BEFTA_CASETYPE_1_1",
@@ -70,9 +59,6 @@
               "name": "BEFTA Case Type 1 1",
               "jurisdiction": null,
               "events": [
-                {
-                  "__ordering__": "unordered"
-                },
                 {
                   "id": "REVIEW",
                   "name": "Review",
@@ -97,10 +83,6 @@
                   "event_enabling_condition": null,
                   "publish": null,
                   "acls": [
-                    {
-                      "__ordering__": "unordered",
-                      "__elementId__": "role"
-                    },
                     {
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
                     }
@@ -130,10 +112,6 @@
                   "event_enabling_condition": null,
                   "publish": null,
                   "acls": [
-                    {
-                      "__ordering__": "unordered",
-                      "__elementId__": "role"
-                    },
                     {
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
                     },
@@ -167,10 +145,6 @@
                   "publish": null,
                   "acls": [
                     {
-                      "__ordering__": "unordered",
-                      "__elementId__": "role"
-                    },
-                    {
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
                     }
                   ]
@@ -199,10 +173,6 @@
                   "event_enabling_condition": null,
                   "publish": null,
                   "acls": [
-                    {
-                      "__ordering__": "unordered",
-                      "__elementId__": "role"
-                    },
                     {
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
                     }
@@ -233,10 +203,6 @@
                   "publish": null,
                   "acls": [
                     {
-                      "__ordering__": "unordered",
-                      "__elementId__": "role"
-                    },
-                    {
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
                     }
                   ]
@@ -264,10 +230,6 @@
                   "publish": null,
                   "acls": [
                     {
-                      "__ordering__": "unordered",
-                      "__elementId__": "role"
-                    },
-                    {
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
                     }
                   ]
@@ -281,10 +243,6 @@
                   "order": 1,
                   "title_display": null,
                   "acls": [
-                    {
-                      "__ordering__": "unordered",
-                      "__elementId__": "role"
-                    },
                     {
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
                     },
@@ -301,10 +259,6 @@
                   "title_display": null,
                   "acls": [
                     {
-                      "__ordering__": "unordered",
-                      "__elementId__": "role"
-                    },
-                    {
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
                     },
                     {
@@ -320,10 +274,6 @@
                   "title_display": null,
                   "acls": [
                     {
-                      "__ordering__": "unordered",
-                      "__elementId__": "role"
-                    },
-                    {
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
                     },
                     {
@@ -337,10 +287,6 @@
               "case_fields": [],
               "printable_document_url": null,
               "acls": [
-                {
-                  "__ordering__": "unordered",
-                  "__elementId__": "role"
-                },
                 {
                   "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
                 },
@@ -356,9 +302,6 @@
               "name": "CT With No Cases -Don't Create",
               "jurisdiction": null,
               "events": [
-                {
-                  "__ordering__": "unordered"
-                },
                 {
                   "id": "REVIEW",
                   "name": "Review",
@@ -533,9 +476,6 @@
                 }
               ],
               "states": [
-                {
-                  "__ordering__": "unordered"
-                },
                 {
                   "id": "TODO",
                   "name": "To do",
