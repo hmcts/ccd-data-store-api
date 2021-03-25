@@ -5,7 +5,7 @@
   "operationName": "to grant access on a case",
 
   "specs": [
-    "to grant access for Olawale with a case role CR-1 over the case C1"
+    "to grant access for Olawale with a case role CREATOR over the case C1"
   ],
 
   "method": "POST",
