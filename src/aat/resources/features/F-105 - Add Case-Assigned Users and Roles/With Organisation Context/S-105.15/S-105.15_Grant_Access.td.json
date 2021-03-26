@@ -10,32 +10,35 @@
 
   "method": "POST",
 
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
-
-  "users": {
-    "invokingUser": {
-      "_extends_": "F-105_User_Richard"
-    }
-  },
-
+  "s2sClientId": "aac_manage_case_assignment",
+  
+  "uri": "/case-users",
+  
   "request": {
-    "_extends_": "Common_Request",
-    "pathVariables": {
-      "uid": "${[scenarioContext][parentContext][testData][users][userRichard][id]}",
-      "jid": "${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][jurisdiction]}",
-      "ctid": "${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][case_type_id]}",
-      "cid": "${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}"
+    "headers": {
+      "Authorization": "Bearer ${[scenarioContext][parentContext][testData][users][userDil][accessToken]}",
+      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]"
     },
     "body": {
-      "id": "${[scenarioContext][parentContext][testData][users][userOlawale][id]}"
+      "case_users": [
+        {
+          "case_id": "${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}",
+          "user_id": "${[scenarioContext][parentContext][testData][users][userOlawale][id]}",
+          "case_role": "[CR-1]"
+        }
+      ]
     }
   },
+  
   "expectedResponse": {
     "_extends_": "Common_201_Response",
     "headers": {
       "Content-Length": "[[ANYTHING_PRESENT]]",
-      "Vary": "Accept-Encoding",
+      "Content-Encoding": "[[ANYTHING_PRESENT]]",
       "Content-Type": "[[ANY_STRING_NULLABLE]]"
+    },
+    "body": {
+      "status_message": "Case-User-Role assignments created successfully"
     }
   }
 }
