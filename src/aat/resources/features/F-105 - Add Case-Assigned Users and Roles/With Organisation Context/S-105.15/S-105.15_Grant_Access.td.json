@@ -15,14 +15,15 @@
   "uri": "/case-users",
 
   "users": {
-    "_extends_": "F-105_Users"
+    "invokingUser": {
+      "_extends_": "F-105_User_Richard"
+    }
   },
   
   "request": {
     "headers": {
-      "Authorization": "Bearer ${[scenarioContext][parentContext][testData][users][userDil][accessToken]}",
-      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]",
-      "Content-Type": "application/json"
+      "_extends_": "Common_Request_Headers",
+      "Authorization": "Bearer ${[scenarioContext][parentContext][testData][users][userDil][accessToken]}"
     },
     
     "body": {
