@@ -807,11 +807,12 @@ def getCheckedOutGitCommitHash() {
     'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
 
-task runProviderPactVerification(type: Test) {
+task runProviderPactVerification(type:Test) {
     logger.lifecycle("Runs provider pact Tests")
     useJUnitPlatform()
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
+    systemProperty 'pact.verifier.publishResults', System.getProperty('pact.verifier.publishResults')
     systemProperty 'pact.provider.version', project.pactVersion
     include "uk/gov/hmcts/ccd/v2/external/controller/**"
 }
