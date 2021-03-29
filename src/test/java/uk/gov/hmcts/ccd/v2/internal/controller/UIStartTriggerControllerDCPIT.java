@@ -119,7 +119,7 @@ public class UIStartTriggerControllerDCPIT extends WireMockBaseTest {
                 "1987-11-15T12:30:00.000", "1987-15"),
 
             () -> assertCollectionField(collectionField, COLLECTION_FIELD,
-                "#DATETIMEENTRY(yyyyHHmm),#COLLECTION(allowDelete,allowInsert)",
+                "#DATETIMEENTRY(yyyyHHmm),#COLLECTION(allowInsert)",
                 new String[]{"2004-03-02T05:06:07.000", "2010-09-08T11:12:13.000"},
                 new String[]{"20040506", "20101112"}),
 
