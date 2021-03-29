@@ -39,12 +39,8 @@
           "forename": "testfirstname",
           "surname": "testsurname",
           "roles": [
-            {
-              "__operator__": "equivalent",
-              "__ordering__": "unordered"
-            },
-            "caseworker-befta_jurisdiction_1",
-            "caseworker"
+            "caseworker",
+            "caseworker-befta_jurisdiction_1"
           ],
           "defaultService": null
         }
@@ -103,9 +99,6 @@
                     },
                     {
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-                    },
-                    {
-                      "_extends_": "CaseworkerCaaAccessControlList"
                     }
                   ]
                 },
@@ -175,9 +168,6 @@
                     },
                     {
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-                    },
-                    {
-                      "_extends_": "CaseworkerCaaAccessControlList"
                     }
                   ]
                 },
@@ -211,9 +201,6 @@
                     },
                     {
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-                    },
-                    {
-                      "_extends_": "CaseworkerCaaAccessControlList"
                     }
                   ]
                 },
@@ -247,9 +234,6 @@
                     },
                     {
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-                    },
-                    {
-                      "_extends_": "CaseworkerCaaAccessControlList"
                     }
                   ]
                 },
@@ -281,9 +265,6 @@
                     },
                     {
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-                    },
-                    {
-                      "_extends_": "CaseworkerCaaAccessControlList"
                     }
                   ]
                 }
