@@ -224,7 +224,7 @@ public class CaseSearchResultViewGenerator {
     }
 
     private Map<String, Object> convertReferenceToString(Map<String, Object> caseMetadata) {
-        final String convertedCaseReference = caseMetadata.get(CASE_REFERENCE.getReference()).toString();
+        final String convertedCaseReference = String.valueOf(caseMetadata.get(CASE_REFERENCE.getReference()));
         caseMetadata.put(CASE_REFERENCE.getReference(), convertedCaseReference);
         return caseMetadata;
     }
