@@ -12,9 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ToString
-@ApiModel(description = "")
+@ApiModel
 public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
 
+    private static final long serialVersionUID = 4373185086786876522L;
+    
     private String caseFieldId = null;
     private String displayContext = null;
     private String displayContextParameter = null;
@@ -38,7 +40,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
         this.caseFieldId = caseFieldId;
     }
 
-    @ApiModelProperty(value = "whether this field is optional, mandatory or read only for this event")
+    @ApiModelProperty(value = "whether this field is optional, mandatory, read only or complex for this event")
     @JsonProperty("display_context")
     public String getDisplayContext() {
         return displayContext;
@@ -96,7 +98,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
     /**
      * event case field label.
      **/
-    @ApiModelProperty(value = "")
+    @ApiModelProperty
     @JsonProperty("label")
     public String getLabel() {
         return label;
@@ -109,7 +111,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
     /**
      * event case field hint text.
      **/
-    @ApiModelProperty(value = "")
+    @ApiModelProperty
     @JsonProperty("hint_text")
     public String getHintText() {
         return hintText;
@@ -119,7 +121,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
         this.hintText = hintText;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty
     @JsonProperty("case_fields_complex")
     public List<CaseEventFieldComplexDefinition> getCaseEventFieldComplexDefinitions() {
         return caseEventFieldComplexDefinitions;

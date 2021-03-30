@@ -8,9 +8,13 @@ import java.io.Serializable;
 @Builder
 public class CaseEventFieldComplexDefinition implements Serializable, CommonDCPModel {
 
+    private static final long serialVersionUID = 6448149392051594121L;
+    
     private String reference;
 
     private Integer order;
+
+    private String displayContext;
 
     private String displayContextParameter;
 
@@ -27,12 +31,14 @@ public class CaseEventFieldComplexDefinition implements Serializable, CommonDCPM
 
     public CaseEventFieldComplexDefinition(String reference,
                                            Integer order,
+                                           String displayContext,
                                            String defaultValue,
                                            Boolean retainHiddenValue,
                                            Boolean publish,
                                            String publishAs) {
         this.reference = reference;
         this.order = order;
+        this.displayContext = displayContext;
         this.defaultValue = defaultValue;
         this.retainHiddenValue = retainHiddenValue;
         this.publish = publish;
@@ -41,6 +47,7 @@ public class CaseEventFieldComplexDefinition implements Serializable, CommonDCPM
 
     public CaseEventFieldComplexDefinition(String reference,
                                            Integer order,
+                                           String displayContext,
                                            String displayContextParameter,
                                            String defaultValue,
                                            Boolean retainHiddenValue,
@@ -49,6 +56,7 @@ public class CaseEventFieldComplexDefinition implements Serializable, CommonDCPM
 
         this.reference = reference;
         this.order = order;
+        this.displayContext = displayContext;
         this.displayContextParameter = displayContextParameter;
         this.defaultValue = defaultValue;
         this.retainHiddenValue = retainHiddenValue;
@@ -70,6 +78,14 @@ public class CaseEventFieldComplexDefinition implements Serializable, CommonDCPM
 
     public void setOrder(Integer order) {
         this.order = order;
+    }
+
+    public String getDisplayContext() {
+        return displayContext;
+    }
+
+    public void setDisplayContext(String displayContext) {
+        this.displayContext = displayContext;
     }
 
     public String getDisplayContextParameter() {
