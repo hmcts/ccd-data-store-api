@@ -57,7 +57,8 @@ public class RestExceptionHandlerTest {
     // url to trigger chosen test controller
     private static final String TEST_URL = "/caseworkers/123/profile";
 
-    private static final String SQL_EXCEPTION_MESSAGE = "SQL Exception thrown during API operation, 500 INTERNAL_SERVER_ERROR";
+    private static final String SQL_EXCEPTION_MESSAGE =
+        "SQL Exception thrown during API operation, 500 INTERNAL_SERVER_ERROR";
 
     // service used by chosen test controller which we will use to throw exceptions
     @Mock
