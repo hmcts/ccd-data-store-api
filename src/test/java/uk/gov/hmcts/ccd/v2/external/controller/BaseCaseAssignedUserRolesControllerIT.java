@@ -63,8 +63,8 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
 
     protected static final String CASE_ID_EXTRA = "1983927457663329";
 
-    protected static final String CASE_ROLE_1 = "[case-role-1]";
-    protected static final String CASE_ROLE_2 = "[case-role-2]";
+    protected static final String CASE_ROLE_1 = "[CASE-ROLE-1]";
+    protected static final String CASE_ROLE_2 = "[CASE-ROLE-2]";
     protected static final String INVALID_CASE_ROLE = "bad-role";
 
     protected static final String USER_IDS_1 = "89000";

@@ -113,7 +113,7 @@ public class CaseAccessOperation {
         cauRolesByCaseId.forEach((caseId, requestedAssignments) ->
             requestedAssignments.forEach(requestedAssignment ->
                 caseUserRepository.grantAccess(caseId, requestedAssignment.getUserId(),
-                                               requestedAssignment.getCaseRole())
+                                               requestedAssignment.getCaseRole().toUpperCase())
             )
         );
 
@@ -139,7 +139,7 @@ public class CaseAccessOperation {
         filteredCauRolesByCaseId.forEach((caseId, requestedAssignments) ->
             requestedAssignments.forEach(requestedAssignment ->
                 caseUserRepository.revokeAccess(caseId, requestedAssignment.getUserId(),
-                    requestedAssignment.getCaseRole())
+                    requestedAssignment.getCaseRole().toUpperCase())
             )
         );
 
