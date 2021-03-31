@@ -290,22 +290,6 @@ class CaseAccessOperationTest {
         }
 
         @Test
-        @DisplayName("should capitalise case role while adding")
-        void shouldCapitaliseCaseUserRole() {
-            // ARRANGE
-            String caseRole = "[defendant]";
-            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, caseRole)
-            );
-
-            // ACT
-            caseAccessOperation.addCaseUserRoles(caseUserRoles);
-
-            // ASSERT
-            verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, "[DEFENDANT]");
-        }
-
-        @Test
         @DisplayName("should add multiple case user roles")
         void shouldAddMultipleCaseUserRoles() {
             // ARRANGE
@@ -611,31 +595,6 @@ class CaseAccessOperationTest {
             // ASSERT
             verify(caseUserRepository, times(1)).revokeAccess(CASE_ID, USER_ID, CASE_ROLE);
         }
-
-        @Test
-        @DisplayName("should remove case user role with case insensitive")
-        void shouldRemoveCaseUserRoleWithCaseInsensitive() {
-            // ARRANGE
-            String caseRole = "[defenDAnt]";
-            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, caseRole)
-            );
-
-            // for an existing relation and then after removal
-            when(caseUserRepository.findCaseUserRoles(
-                argThat(arg -> arg.contains(CASE_ID)),
-                argThat(arg -> arg.contains(USER_ID))
-            )).thenReturn(List.of(
-                createCaseUserEntity(CASE_ID, CASE_ROLE, USER_ID)
-            )).thenReturn(new ArrayList<>());
-
-            // ACT
-            caseAccessOperation.removeCaseUserRoles(caseUserRoles);
-
-            // ASSERT
-            verify(caseUserRepository).revokeAccess(CASE_ID, USER_ID, "[DEFENDANT]");
-        }
-
 
         @Test
         @DisplayName("should remove single [CREATOR] case user role")
