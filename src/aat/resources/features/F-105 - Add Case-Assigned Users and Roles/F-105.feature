@@ -275,3 +275,21 @@ Feature: F-105: Add Case-Assigned Users and Roles
      And the response has all the details as expected,
      And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.17_Verify_Case_Roles_for_Case_C1],
      And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
+        
+   # RDM-8842 AC-5
+   @S-105.18
+   Scenario: Must increment Assigned User Count when assigning a user and case role for a specific case if there was only [CREATOR] case user role assignment with the respective values in the request (by a user calling through/from an authorised application)
+     Given an appropriate test context as detailed in the test data source,
+     And a user [Richard - who can create a case],
+     And a user [Dil - who is to add some case role assignment for a case],
+     And a user [Olawale - with an active solicitor profile and valid User ID],
+     And a case [C1, which Richard has just] created as in [F-105_Case_Data_Create_C1],
+     And a successful call [to grant access for Olawale with a case role CREATOR over the case C1] as in [S-105.18_Grant_Access],
+     And a successful call [to check the number of users having access to C1 in its supplementary data] as in [F-105_Prerequisite_Counter_Check_Call],
+     When a request is prepared with appropriate values,
+     And the request [is made from an authorised application, by Dil, with the Case ID of C1, User ID of Olawale, proper Case Role CR-2 and the Organisation ID of Olawale],
+     And it is submitted to call the [Add Case-Assigned Users and Roles] operation of [CCD Data Store Api],
+     Then a positive response is received,
+     And the response has all the details as expected,
+     And a call [to verify Olawale's reception of the role CR-2 over the case C1] will get the expected response as in [S-105.18_Verify_Case_Roles_for_Case_C1],
+     And a call [to verify the count of users assigned to a case has changed] will get the expected response as in [F-105_Verify_Counter_Changed].
