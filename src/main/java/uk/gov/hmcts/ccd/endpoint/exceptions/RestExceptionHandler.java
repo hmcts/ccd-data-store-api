@@ -78,8 +78,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(SQLException.class)
     @ResponseBody
-    public ResponseEntity<String> handleSQLException(final HttpServletRequest request,
-                                                        final SQLException exception) {
+    public ResponseEntity<String> handleSQLException(final SQLException exception) {
         final String errorMsg = "SQL Exception thrown during API operation, " + HttpStatus.INTERNAL_SERVER_ERROR;
         appInsights.trackException(exception);
 

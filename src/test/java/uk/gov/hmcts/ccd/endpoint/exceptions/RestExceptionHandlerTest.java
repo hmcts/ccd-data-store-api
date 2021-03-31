@@ -57,6 +57,8 @@ public class RestExceptionHandlerTest {
     // url to trigger chosen test controller
     private static final String TEST_URL = "/caseworkers/123/profile";
 
+    private static final String SQL_EXCEPTION_MESSAGE = "SQL Exception thrown during API operation, 500 INTERNAL_SERVER_ERROR";
+
     // service used by chosen test controller which we will use to throw exceptions
     @Mock
     private GetUserProfileOperation mockService;
@@ -402,9 +404,9 @@ public class RestExceptionHandlerTest {
 
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
 
-        result.andExpect(status().is(500));
+        result.andExpect(status().isInternalServerError());
         result.andExpect(content()
-            .string("SQL Exception thrown during API operation, 500 INTERNAL_SERVER_ERROR"));
+            .string(SQL_EXCEPTION_MESSAGE));
     }
 
     @Test
@@ -423,12 +425,11 @@ public class RestExceptionHandlerTest {
         ILoggingEvent lastLogEntry = logsList.get(logsList.size() - 1);
         assertThat(lastLogEntry.getLevel(), is(equalTo(Level.ERROR)));
         assertThat(lastLogEntry.getMessage(),
-            containsString("SQL Exception thrown during API operation, 500 INTERNAL_SERVER_ERROR"));
+            containsString(SQL_EXCEPTION_MESSAGE));
     }
 
     @Test
     public void handleSQLException_shouldTrackExceptionToAppInsights() throws Exception {
-        String myUniqueExceptionMessage = "SQL Exception thrown during API operation, 500 INTERNAL_SERVER_ERROR";
         SQLException expectedException = new SQLException();
 
         doAnswer(
@@ -440,7 +441,7 @@ public class RestExceptionHandlerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
 
-        verify(appInsights, times(1)).trackException(expectedException);
+        verify(appInsights).trackException(expectedException);
     }
 
     private void assertHttpErrorResponse(ResultActions result, Exception expectedException) throws Exception {
