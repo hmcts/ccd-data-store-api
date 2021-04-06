@@ -58,8 +58,9 @@ public class RestExceptionHandlerTest {
     private static final String TEST_URL = "/caseworkers/123/profile";
 
     private static final String SQL_EXCEPTION_MESSAGE =
-        "SQL Exception thrown during API operation, 500 INTERNAL_SERVER_ERROR";
-
+        "SQL Exception thrown during API operation";
+    private static final String ERROR_RESPONSE_BODY =
+        "{\"errorMessage\":\"SQL Exception thrown during API operation\"}";
     // service used by chosen test controller which we will use to throw exceptions
     @Mock
     private GetUserProfileOperation mockService;
@@ -407,7 +408,7 @@ public class RestExceptionHandlerTest {
 
         result.andExpect(status().isInternalServerError());
         result.andExpect(content()
-            .string(SQL_EXCEPTION_MESSAGE));
+            .string(ERROR_RESPONSE_BODY));
     }
 
     @Test

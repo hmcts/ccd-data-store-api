@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.common.HttpError;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,14 +79,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(SQLException.class)
     @ResponseBody
-    public ResponseEntity<String> handleSQLException(final SQLException exception) {
-        final String errorMsg = "SQL Exception thrown during API operation, " + HttpStatus.INTERNAL_SERVER_ERROR;
+    public ResponseEntity<Map> handleSQLException(final SQLException exception) {
+        final String errorMsg = "SQL Exception thrown during API operation";
         appInsights.trackException(exception);
 
         LOG.error(errorMsg);
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(errorMsg);
+            .body(Collections.singletonMap("errorMessage", errorMsg));
     }
 
     @ExceptionHandler(Exception.class)
