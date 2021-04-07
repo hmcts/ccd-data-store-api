@@ -151,6 +151,7 @@ dependencies {
     compile('org.springframework.cloud:spring-cloud-starter-openfeign')
     compile('org.springframework.retry:spring-retry')
     compile('org.springframework.boot:spring-boot-starter-cache')
+    compile group: 'com.hazelcast', name: 'hazelcast', version: hazelcastVersion
     compile group: 'com.hazelcast', name: 'hazelcast-all', version: hazelcastVersion
 
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
