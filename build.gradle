@@ -130,6 +130,10 @@ tasks.withType(Checkstyle) {
     exclude 'uk/gov/hmcts/ccd/domain/types/sanitiser/document/**'
 }
 
+tasks.withType(Test) {
+    maxParallelForks = 6
+}
+
 dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'logging', version: reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: reformLogging
