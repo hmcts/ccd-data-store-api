@@ -13,14 +13,15 @@ import uk.gov.hmcts.ccd.domain.model.draft.CreateCaseDraftRequest;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
 
-import javax.inject.Singleton;
-
 @Service
-@Singleton
 @Qualifier(CachedDraftGateway.QUALIFIER)
 public class CachedDraftGateway implements DraftGateway {
 
     public static final String QUALIFIER = "cached";
+
+    @Autowired
+    @SuppressWarnings("checkstyle:MemberName")
+    private CachedDraftGateway _this;
 
     private final DraftGateway draftGateway;
     private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
@@ -47,7 +48,7 @@ public class CachedDraftGateway implements DraftGateway {
     @Override
     @Cacheable("draftResponseCaseDetailsCache")
     public CaseDetails getCaseDetails(String draftId) {
-        DraftResponse draftResponse = this.get(draftId);
+        DraftResponse draftResponse = _this.get(draftId);
         return draftResponseToCaseDetailsBuilder.build(draftResponse);
     }
 

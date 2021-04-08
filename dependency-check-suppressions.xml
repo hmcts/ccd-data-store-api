@@ -27,10 +27,4 @@
 		<cve>CVE-2007-1652</cve>
 	</suppress>
 
-    <suppress until="2021-04-23">
-        <notes>RDM-10564</notes>
-        <cve>CVE-2016-10750</cve>
-        <cve>CVE-2020-26168</cve>
-    </suppress>
-    
 </suppressions>

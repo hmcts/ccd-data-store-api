@@ -5,12 +5,11 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-
-import javax.inject.Singleton;
+import org.springframework.web.context.annotation.RequestScope;
 
 @Service
-@Singleton
 @Qualifier(CachedCaseRoleRepository.QUALIFIER)
+@RequestScope
 public class CachedCaseRoleRepository implements CaseRoleRepository {
 
     public static final String QUALIFIER = "cached";

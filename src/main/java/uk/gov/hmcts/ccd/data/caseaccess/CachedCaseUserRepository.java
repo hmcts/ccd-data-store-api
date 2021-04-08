@@ -4,12 +4,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-
-import javax.inject.Singleton;
+import org.springframework.web.context.annotation.RequestScope;
 
 @Service
-@Singleton
 @Qualifier(CachedCaseUserRepository.QUALIFIER)
+@RequestScope
 public class CachedCaseUserRepository implements CaseUserRepository {
 
     private final CaseUserRepository caseUserRepository;
