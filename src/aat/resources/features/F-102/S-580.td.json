@@ -2,29 +2,33 @@
 	"_guid_": "S-580",
 	"_extends_": "F-102_Test_Data_Base",
 	"title": "Get jurisdictions available to the user",
+
 	"specs": [
 		"appropriate idam roles but no CCD user profile",
 		"has CREATE as case access parameter",
 		"contains HTTP 200 Ok status code",
 		"contains the list of jurisdictions a user has access to"
 	],
+
 	"user": {
 		"username": "befta.caseworker.1.noprofile@gmail.com",
 		"password": "[[$CCD_BEFTA_CASEWORKER_1_NO_PROFILE_PWD]]"
 	},
+
 	"request": {
 		"_extends_": "Common_Request",
 		"queryParams": {
 			"access": "create"
 		}
 	},
+
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"body": {
 			"arrayInMap": [
-        {
-          "__ordering__": "unordered"
-        },
+				{
+					"__ordering__": "unordered"
+				},
 				{
 					"id": "BEFTA_JURISDICTION_1",
 					"name": "BEFTA_JURISDICTION_1",
@@ -64,8 +68,8 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "publish": null,
+									"event_enabling_condition": null,
+									"publish": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -97,18 +101,18 @@
                   "show_event_notes": null,
                   "end_button_label": null,
                   "can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "publish": null,
+									"event_enabling_condition": null,
+									"publish": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
 											"__elementId__": "role"
 										},
 										{
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+											"_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										},
 										{
-                      "_extends_": "CaseworkerCaaAccessControlList"
+											"_extends_": "CaseworkerCaaAccessControlList"
 										}
 									]
 								},
@@ -133,8 +137,8 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "publish": null,
+									"event_enabling_condition": null,
+									"publish": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -166,8 +170,8 @@
                   "show_event_notes": null,
                   "end_button_label": null,
                   "can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "publish": null,
+									"event_enabling_condition": null,
+									"publish": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -199,8 +203,8 @@
                   "show_event_notes": null,
                   "end_button_label": null,
                   "can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "publish": null,
+									"event_enabling_condition": null,
+									"publish": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -230,8 +234,8 @@
                   "show_event_notes": null,
                   "end_button_label": null,
                   "can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "publish": null,
+									"event_enabling_condition": null,
+									"publish": null,
 									"acls": [
 										{
 											"__ordering__": "unordered",
@@ -256,10 +260,10 @@
                       "__elementId__": "role"
                     },
                     {
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+											"_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										},
 										{
-                      "_extends_": "CaseworkerCaaAccessControlList"
+											"_extends_": "CaseworkerCaaAccessControlList"
 										}
 									]
 								},
@@ -275,10 +279,10 @@
 											"__elementId__": "role"
 										},
 										{
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+											"_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										},
 										{
-                      "_extends_": "CaseworkerCaaAccessControlList"
+											"_extends_": "CaseworkerCaaAccessControlList"
 										}
 									]
 								},
@@ -294,10 +298,10 @@
 											"__elementId__": "role"
 										},
 										{
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+											"_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										},
 										{
-                      "_extends_": "CaseworkerCaaAccessControlList"
+											"_extends_": "CaseworkerCaaAccessControlList"
 										}
 									]
 								}
@@ -312,10 +316,10 @@
 									"__elementId__": "role"
 								},
 								{
-                  "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+									"_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 								},
 								{
-                  "_extends_": "CaseworkerCaaAccessControlList"
+									"_extends_": "CaseworkerCaaAccessControlList"
 								}
 							]
 						},
@@ -350,11 +354,11 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "publish": null,
+									"event_enabling_condition": null,
+									"publish": null,
 									"acls": [
 										{
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+											"_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										}
 									]
 								},
@@ -379,11 +383,11 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "publish": null,
+									"event_enabling_condition": null,
+									"publish": null,
 									"acls": [
 										{
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+											"_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										}
 									]
 								},
@@ -408,11 +412,11 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "publish": null,
+									"event_enabling_condition": null,
+									"publish": null,
 									"acls": [
 										{
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+											"_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										}
 									]
 								},
@@ -437,11 +441,11 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "publish": null,
+									"event_enabling_condition": null,
+									"publish": null,
 									"acls": [
 										{
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+											"_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										}
 									]
 								},
@@ -466,11 +470,11 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "publish": null,
+									"event_enabling_condition": null,
+									"publish": null,
 									"acls": [
 										{
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+											"_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										}
 									]
 								},
@@ -493,19 +497,19 @@
 									"show_event_notes": null,
 									"end_button_label": null,
 									"can_save_draft": null,
-                  "event_enabling_condition": null,
-                  "publish": null,
+									"event_enabling_condition": null,
+									"publish": null,
 									"acls": [
 										{
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+											"_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										}
 									]
 								}
 							],
 							"states": [
-                {
-                  "__ordering__": "unordered"
-                },
+								{
+									"__ordering__": "unordered"
+								},
 								{
 									"id": "TODO",
 									"name": "To do",
@@ -514,7 +518,7 @@
 									"title_display": null,
 									"acls": [
 										{
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+											"_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										}
 									]
 								},
@@ -526,7 +530,7 @@
 									"title_display": null,
 									"acls": [
 										{
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+											"_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										}
 									]
 								},
@@ -538,7 +542,7 @@
 									"title_display": null,
 									"acls": [
 										{
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+											"_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										}
 									]
 								}
@@ -549,7 +553,7 @@
 							"printable_document_url": null,
 							"acls": [
 								{
-                  "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+									"_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 								}
 							]
 						}
