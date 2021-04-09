@@ -130,9 +130,9 @@ tasks.withType(Checkstyle) {
     exclude 'uk/gov/hmcts/ccd/domain/types/sanitiser/document/**'
 }
 
-tasks.withType(Test) {
-    maxParallelForks = System.getenv('PARALLEL_THREADS') ?: 6
-}
+//tasks.withType(Test) {
+//    maxParallelForks = System.getenv('PARALLEL_THREADS') ?: 6
+//}
 
 dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'logging', version: reformLogging
