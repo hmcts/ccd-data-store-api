@@ -127,12 +127,13 @@ public class CasesControllerProviderTest {
         }
     }
 
-
     @BeforeEach
     void before(PactVerificationContext context) {
         if (context != null) {
             context.setTarget(new HttpTestTarget("localhost", 8123, "/"));
         }
+        // Uncomment the line below in order to pubish verification to pact broker
+        //System.getProperties().setProperty("pact.verifier.publishResults", "true");
         BaseType.setCaseDefinitionRepository(contractTestCaseDefinitionRepository);
         when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
         when(userAuthorisation.getUserId()).thenReturn("userId");
