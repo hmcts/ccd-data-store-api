@@ -24,6 +24,13 @@
 	</suppress>
 
 	<suppress>
+		<notes>Temp Suppression</notes>
+		<cve>CVE-2020-9484</cve>
+		<cve>CVE-2021-25122</cve>
+		<cve>CVE-2021-25329</cve>
+	</suppress>
+
+	<suppress>
 		<notes><![CDATA[
    file name: elasticsearch-6.8.13.jar
    ]]></notes>
