@@ -25,6 +25,9 @@
 	"expectedResponse": {
 		"body": {
 			"headers" : [
+        {
+          "__ordering__": "ordered"
+        },
 				{
 					"metadata" : {
 						"jurisdiction" : "AUTOTEST1",
@@ -76,8 +79,8 @@
 							"metadata" : true,
 							"case_field_id" : "[CASE_REFERENCE]",
 							"case_field_type" : {
-								"id" : "Number",
-								"type" : "Number",
+								"id" : "Text",
+								"type" : "Text",
 								"min" : null,
 								"max" : null,
 								"regular_expression" : null,
