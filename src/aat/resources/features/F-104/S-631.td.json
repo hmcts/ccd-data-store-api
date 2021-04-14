@@ -30,6 +30,9 @@
     "body": {
       "headers": [
         {
+          "__ordering__": "ordered"
+        },
+        {
           "metadata": {
             "jurisdiction": "AUTOTEST1",
             "case_type_id": "AAT_PRIVATE"

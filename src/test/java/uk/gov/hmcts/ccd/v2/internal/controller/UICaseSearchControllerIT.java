@@ -626,7 +626,7 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             () -> assertThat(data.get(MetaData.CaseField.LAST_STATE_MODIFIED_DATE.getReference()),
                 is(LAST_STATE_MODIFIED_DATE_VALUE)),
             () -> assertThat(data.get(MetaData.CaseField.CASE_REFERENCE.getReference()),
-                is(Long.parseLong(DEFAULT_CASE_REFERENCE))),
+                is(DEFAULT_CASE_REFERENCE)),
             () -> assertThat(data.get(MetaData.CaseField.STATE.getReference()), is(STATE_VALUE)),
             () -> assertThat(data.get(MetaData.CaseField.SECURITY_CLASSIFICATION.getReference()),
                 is(SecurityClassification.PUBLIC.name()))
