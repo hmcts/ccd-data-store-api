@@ -46,7 +46,7 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-    @Cacheable(value = "caseDetailsByIDCache", key = "#id")
+    @Cacheable(value = "caseDetailsByIDCache", key = "#id", unless = "#result == null")
     public CaseDetails findById(final Long id) {
         return caseDetailsRepository.findById(id);
     }
@@ -57,7 +57,7 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-    @Cacheable(value = "caseDetailsByReferenceCache", key = "#caseReference")
+    @Cacheable(value = "caseDetailsByReferenceCache", key = "#caseReference", unless = "#result == null")
     public CaseDetails findByReference(final Long caseReference) {
         return caseDetailsRepository.findByReference(caseReference);
     }
