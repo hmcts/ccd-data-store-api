@@ -7,7 +7,7 @@ import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
 @Component
-class UserAuthorisationSecurity implements CaseDetailsAuthorisationSecurity {
+public class UserAuthorisationSecurity implements CaseDetailsAuthorisationSecurity {
 
     private final UserAuthorisation userAuthorisation;
 

@@ -10,8 +10,10 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
@@ -41,6 +43,42 @@ class PaginatedSearchMetaDataOperationTest {
     void shouldReturnCorrectPaginationMetadata() {
         doReturn(paginatedSearchMetadata).when(caseDetailsRepository).getPaginatedSearchMetadata(metadata, criteria);
 
+        PaginatedSearchMetadata paginatedSearchMetadata = paginatedSearchMetaDataOperation.execute(metadata, criteria);
+
+        assertAll(
+            () -> assertThat(paginatedSearchMetadata.getTotalResultsCount(), is(60)),
+            () -> assertThat(paginatedSearchMetadata.getTotalPagesCount(), is(3))
+        );
+    }
+
+    @Test
+    void shouldReturnEmptyCorrectPaginationMetadata() {
+        doReturn(paginatedSearchMetadata).when(caseDetailsRepository).getPaginatedSearchMetadata(metadata, criteria);
+        metadata.setCaseReference(Optional.of("BBBBBB"));
+        PaginatedSearchMetadata paginatedSearchMetadata = paginatedSearchMetaDataOperation.execute(metadata, criteria);
+
+        assertAll(
+            () -> assertNull(paginatedSearchMetadata.getTotalResultsCount()),
+            () -> assertNull(paginatedSearchMetadata.getTotalPagesCount())
+        );
+    }
+
+    @Test
+    void shouldReturnCorrectPaginationMetadataForValidCaseReference() {
+        doReturn(paginatedSearchMetadata).when(caseDetailsRepository).getPaginatedSearchMetadata(metadata, criteria);
+        metadata.setCaseReference(Optional.of("1614249749110028"));
+        PaginatedSearchMetadata paginatedSearchMetadata = paginatedSearchMetaDataOperation.execute(metadata, criteria);
+
+        assertAll(
+            () -> assertThat(paginatedSearchMetadata.getTotalResultsCount(), is(60)),
+            () -> assertThat(paginatedSearchMetadata.getTotalPagesCount(), is(3))
+        );
+    }
+
+    @Test
+    void shouldReturnCorrectPaginationMetadataForValidCaseReferenceWithHyphen() {
+        doReturn(paginatedSearchMetadata).when(caseDetailsRepository).getPaginatedSearchMetadata(metadata, criteria);
+        metadata.setCaseReference(Optional.of("1614-2497-4911-0028"));
         PaginatedSearchMetadata paginatedSearchMetadata = paginatedSearchMetaDataOperation.execute(metadata, criteria);
 
         assertAll(

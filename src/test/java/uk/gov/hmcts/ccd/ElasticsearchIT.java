@@ -351,8 +351,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     is(DEFAULT_CASE_REFERENCE)),
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(1)),
                 () -> expectedFields.forEach(f -> assertThat(caseSearchResultViewResource.getHeaders().get(0)
-                        .getFields(),
-                    hasItem(hasProperty(CASE_FIELD_ID, is(f))))),
+                        .getFields(), hasItem(hasProperty(CASE_FIELD_ID, is(f))))),
 
                 () -> assertThat(caseDetails.getFields().get(EMAIL_FIELD), is(EMAIL_VALUE)),
                 () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
@@ -588,8 +587,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         void shouldReturnErrorWithMissingQueryField() throws Exception {
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder().build();
 
-            JsonNode exceptionNode = executeErrorRequest(searchRequest, CASE_TYPE_A,
-                null, 400);
+            JsonNode exceptionNode = executeErrorRequest(searchRequest, CASE_TYPE_A, null,
+                400);
 
             assertAll(
                 () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
@@ -604,8 +603,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 .sort("invalid.keyword")
                 .build();
 
-            JsonNode exceptionNode = executeErrorRequest(searchRequest, CASE_TYPE_A,
-                null, 400);
+            JsonNode exceptionNode = executeErrorRequest(searchRequest, CASE_TYPE_A, null, 400);
 
             assertAll(
                 () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
@@ -614,8 +612,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         private void assertDefaultUseCaseHeaders(List<SearchResultViewHeaderGroup> headers) {
-            List<String> expectedFields = Arrays.asList(HISTORY_COMPONENT_FIELD, FIXED_RADIO_LIST_FIELD, DOCUMENT_FIELD,
-                ADDRESS_FIELD, COMPLEX_FIELD,
+            List<String> expectedFields = Arrays.asList(HISTORY_COMPONENT_FIELD, FIXED_RADIO_LIST_FIELD,
+                DOCUMENT_FIELD, ADDRESS_FIELD, COMPLEX_FIELD,
                 COLLECTION_FIELD, MULTI_SELECT_LIST_FIELD, FIXED_LIST_FIELD, TEXT_AREA_FIELD, DATE_TIME_FIELD,
                 DATE_FIELD, EMAIL_FIELD, PHONE_FIELD, YES_OR_NO_FIELD, NUMBER_FIELD, TEXT_FIELD,
                 MetaData.CaseField.LAST_STATE_MODIFIED_DATE.getReference(), MetaData.CaseField.LAST_MODIFIED_DATE
@@ -632,7 +630,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(headers.get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
                 () -> assertThat(headers.get(0).getFields().size(), is(24)),
                 () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(),
-                    hasItem(hasProperty(CASE_FIELD_ID, is(f)))))
+                    hasItem(hasProperty(CASE_FIELD_ID,
+                    is(f)))))
             );
         }
 
@@ -648,7 +647,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(headers.get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
                 () -> assertThat(headers.get(0).getFields().size(), is(5)),
                 () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(),
-                    hasItem(hasProperty(CASE_FIELD_ID, is(f)))))
+                    hasItem(hasProperty(CASE_FIELD_ID,
+                    is(f)))))
             );
         }
 
@@ -666,7 +666,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(headers.get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
                 () -> assertThat(headers.get(0).getFields().size(), is(10)),
                 () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(),
-                    hasItem(hasProperty(CASE_FIELD_ID, is(f)))))
+                    hasItem(hasProperty(CASE_FIELD_ID,
+                    is(f)))))
             );
         }
 
@@ -715,7 +716,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(data.get(MetaData.CaseField.LAST_STATE_MODIFIED_DATE.getReference()),
                     is(LAST_STATE_MODIFIED_DATE_VALUE)),
                 () -> assertThat(data.get(MetaData.CaseField.CASE_REFERENCE.getReference()),
-                    is(Long.parseLong(DEFAULT_CASE_REFERENCE))),
+                    is(DEFAULT_CASE_REFERENCE)),
                 () -> assertThat(data.get(MetaData.CaseField.STATE.getReference()), is(STATE_VALUE)),
                 () -> assertThat(data.get(MetaData.CaseField.SECURITY_CLASSIFICATION.getReference()),
                     is(SecurityClassification.PUBLIC.name()))
