@@ -61,8 +61,7 @@ public class DocumentValidator implements BaseTypeValidator {
         }
 
         final String documentUrlValue = documentUrl.textValue();
-        final String urlPatternString =
-            applicationParams.getValidDMDomain() + applicationParams.getDocumentURLPattern();
+        final String urlPatternString = applicationParams.getDocumentURLPattern();
         final Pattern urlPattern = Pattern.compile(urlPatternString);
         final Matcher documentUrlMatcher = urlPattern.matcher(documentUrlValue);
 
