@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.casedetails;
 
 import static java.util.Optional.ofNullable;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
@@ -29,13 +30,15 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
 
     @Inject
     public CachedCaseDetailsRepository(@Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
-                                           final CaseDetailsRepository caseDetailsRepository) {
+                                       final CaseDetailsRepository caseDetailsRepository) {
         this.caseDetailsRepository = caseDetailsRepository;
     }
 
     @Override
     public CaseDetails set(final CaseDetails caseDetails) {
-        return caseDetailsRepository.set(caseDetails);
+        CaseDetails updatedCaseDetails = caseDetailsRepository.set(caseDetails);
+        evictSingleCacheValue(updatedCaseDetails.getReferenceAsString());
+        return updatedCaseDetails;
     }
 
     @Override
@@ -64,7 +67,7 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     @Cacheable(value = "caseDetailsByReferenceCache", key = "#reference")
     public Optional<CaseDetails> findByReference(String jurisdiction, Long reference) {
-        return caseDetailsRepository.findByReference(jurisdiction, reference);
+        return caseDetailsRepository.findByReference(jurisdiction, reference.toString());
     }
 
     @Override
@@ -106,4 +109,9 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
                                                               Map<String, String> dataSearchParams) {
         return caseDetailsRepository.getPaginatedSearchMetadata(metadata, dataSearchParams);
     }
+
+    @CacheEvict(value = {"caseDetailsByReferenceCache"}, key = "#reference", allEntries = true)
+    public void evictSingleCacheValue(String reference) {
+    }
+
 }

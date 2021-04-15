@@ -40,13 +40,13 @@ public class CachedDraftGateway implements DraftGateway {
     }
 
     @Override
-    @Cacheable("draftResponseCache")
+    @Cacheable(value = "draftResponseCache", key = "#draftId")
     public DraftResponse get(String draftId) {
         return draftGateway.get(draftId);
     }
 
     @Override
-    @Cacheable("draftResponseCaseDetailsCache")
+    @Cacheable(value = "draftResponseCaseDetailsCache", key = "#draftId")
     public CaseDetails getCaseDetails(String draftId) {
         DraftResponse draftResponse = _this.get(draftId);
         return draftResponseToCaseDetailsBuilder.build(draftResponse);
@@ -58,19 +58,15 @@ public class CachedDraftGateway implements DraftGateway {
     }
 
     @Override
+    @CacheEvict(value = {"draftResponseCache", "draftResponseCaseDetailsCache"}, key = "#draftId", allEntries = true)
     public DraftResponse update(UpdateCaseDraftRequest draft, String draftId) {
-        DraftResponse response = draftGateway.update(draft, draftId);
-        evictSingleCacheValue(draftId);
-        return response;
+        return draftGateway.update(draft, draftId);
     }
 
     @Override
+    @CacheEvict(value = {"draftResponseCache", "draftResponseCaseDetailsCache"}, key = "#draftId", allEntries = true)
     public void delete(String draftId) {
         draftGateway.delete(draftId);
-        evictSingleCacheValue(draftId);
     }
 
-    @CacheEvict(value = {"draftResponseCache", "draftResponseCaseDetailsCache"}, allEntries = true)
-    public void evictSingleCacheValue(String draftId) {
-    }
 }

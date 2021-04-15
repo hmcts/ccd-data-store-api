@@ -11,11 +11,13 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
+@Singleton
 @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
 // TODO: Make this repository return copies of the maps https://tools.hmcts.net/jira/browse/RDM-1459
 public class CachedCaseDefinitionRepository implements CaseDefinitionRepository {
