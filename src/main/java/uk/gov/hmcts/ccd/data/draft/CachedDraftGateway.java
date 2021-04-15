@@ -48,7 +48,7 @@ public class CachedDraftGateway implements DraftGateway {
     @Override
     @Cacheable(value = "draftResponseCaseDetailsCache", key = "#draftId")
     public CaseDetails getCaseDetails(String draftId) {
-        DraftResponse draftResponse = this.get(draftId);
+        DraftResponse draftResponse = _this.get(draftId);
         return draftResponseToCaseDetailsBuilder.build(draftResponse);
     }
 

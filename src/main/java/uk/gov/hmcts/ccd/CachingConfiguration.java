@@ -71,8 +71,6 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithMaxIdle("userRoleClassificationsCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("jurisdictionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("baseTypesCache", definitionCacheMaxIdle));
-        config.addMapConfig(newMapConfigWithMaxIdle(
-                "caseTypeDefinitionLatestVersionCache", definitionCacheMaxIdle));
     }
 
     private void configCachesForUIDefinitionGateway(Config config) {
@@ -120,9 +118,8 @@ public class CachingConfiguration {
                 .setEvictionPolicy(applicationParams.getDefinitionCacheEvictionPolicy())
                 .setMaxSizePolicy(MaxSizePolicy.PER_NODE)
                 .setSize(applicationParams.getDefinitionCacheMaxSize());
-        MapConfig mapConfig = new MapConfig().setName(name)
+        return new MapConfig().setName(name)
                 .setEvictionConfig(evictionConfig);
-        return mapConfig;
     }
 
 }

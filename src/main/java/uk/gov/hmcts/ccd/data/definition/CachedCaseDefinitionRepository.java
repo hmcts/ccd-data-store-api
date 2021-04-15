@@ -44,7 +44,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     @Override
     public CaseTypeDefinition getCaseType(final String caseTypeId) {
         CaseTypeDefinitionVersion latestVersion = this.getLatestVersion(caseTypeId);
-        return this.getCaseType(latestVersion.getVersion(), caseTypeId);
+        return _this.getCaseType(latestVersion.getVersion(), caseTypeId);
     }
 
     @Override
@@ -62,13 +62,12 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     @Override
     public List<UserRole> getClassificationsForUserRoleList(List<String> userRoles) {
         return userRoles.stream()
-            .map(this::getUserRoleClassifications)
+            .map(_this::getUserRoleClassifications)
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
 
     @Override
-    @Cacheable("caseTypeDefinitionLatestVersionCache")
     public CaseTypeDefinitionVersion getLatestVersion(String caseTypeId) {
         return caseDefinitionRepository.getLatestVersion(caseTypeId);
     }
