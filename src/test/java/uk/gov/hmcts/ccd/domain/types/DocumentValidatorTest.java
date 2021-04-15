@@ -38,6 +38,9 @@ public class DocumentValidatorTest implements IVallidatorTest {
             + "    }\n"
             + "}";
     private static final String VALID_DOCUMENT_URL = "https://dm.reform.hmcts.net/documents/a1-2Z-3-x";
+    private static final String VALID_EM_HRS_API_DOCUMENT_URL =
+        "https://em-hrs-api.service.core-compute-aat.internal/hearing-recordings/123456789012/segments/3";
+
     private static final String MISSING_DOCUMENT_PATH_URL = "https://dm.reform.hmcts.net/docs/a1-2Z-3-x";
     private static final String UNKNOWN_DOCUMENT_DOMAIN_URL = "https://example.com/documents/a1-2Z-3-x";
     private static final String DOCUMENT_URL_WITH_PORT = "https://ng.reform.hmcts.net:6789/documents/a1-2Z-3-x-ngitb";
@@ -84,6 +87,8 @@ public class DocumentValidatorTest implements IVallidatorTest {
     private DocumentValidator buildDocumentValidator(final String url) {
         final ApplicationParams ap = mock(ApplicationParams.class);
         when(ap.getValidDMDomain()).thenReturn(url);
+        when(ap.getDocumentURLPattern()).thenReturn("/documents/[A-Za-z0-9-]+(?:/binary)?");
+
         return new DocumentValidator(ap);
     }
 
@@ -91,6 +96,8 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public void setUp() throws Exception {
         final ApplicationParams applicationParams = mock(ApplicationParams.class);
         when(applicationParams.getValidDMDomain()).thenReturn("https://dm.reform.hmcts.net");
+        when(applicationParams.getDocumentURLPattern()).thenReturn("/documents/[A-Za-z0-9-]+(?:/binary)?");
+
         validator = new DocumentValidator(applicationParams);
         caseFieldDefinition = MAPPER.readValue(CASE_FIELD_STRING, CaseFieldDefinition.class);
     }
@@ -125,6 +132,20 @@ public class DocumentValidatorTest implements IVallidatorTest {
     @Test
     public void shouldValidateDocumentWithValidUrlAndDomain() {
         ObjectNode data = createDoc(VALID_DOCUMENT_URL);
+        final List<ValidationResult> validDocumentUrlResult =
+            validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
+        assertEquals(validDocumentUrlResult.toString(), 0, validDocumentUrlResult.size());
+    }
+
+    @Test
+    public void shouldValidateDocumentWithValidEMHRSUrlAndDomain() {
+        final ApplicationParams applicationParams = mock(ApplicationParams.class);
+
+        when(applicationParams.getValidDMDomain()).thenReturn("https://em-hrs-api.service.core-compute-aat.internal");
+        when(applicationParams.getDocumentURLPattern()).thenReturn("/hearing-recordings/[0-9]+/segments/[0-9]+");
+        validator = new DocumentValidator(applicationParams);
+
+        ObjectNode data = createDoc(VALID_EM_HRS_API_DOCUMENT_URL);
         final List<ValidationResult> validDocumentUrlResult =
             validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertEquals(validDocumentUrlResult.toString(), 0, validDocumentUrlResult.size());
