@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.casedetails;
 
 import static java.util.Optional.ofNullable;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -27,6 +28,10 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     public static final String QUALIFIER = "cached";
 
     private final CaseDetailsRepository caseDetailsRepository;
+
+    @Autowired
+    @SuppressWarnings("checkstyle:MemberName")
+    private CachedCaseDetailsRepository _this;
 
     @Inject
     public CachedCaseDetailsRepository(@Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
@@ -65,9 +70,8 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-    @Cacheable(value = "caseDetailsByReferenceCache", key = "#reference")
     public Optional<CaseDetails> findByReference(String jurisdiction, Long reference) {
-        return findByReference(jurisdiction, reference.toString());
+        return _this.findByReference(jurisdiction, reference.toString());
     }
 
     @Override
