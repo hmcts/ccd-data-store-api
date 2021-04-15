@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
-import static java.util.Optional.ofNullable;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -29,10 +26,6 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
 
     private final CaseDetailsRepository caseDetailsRepository;
 
-    @Autowired
-    @SuppressWarnings("checkstyle:MemberName")
-    private CachedCaseDetailsRepository _this;
-
     @Inject
     public CachedCaseDetailsRepository(@Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
                                        final CaseDetailsRepository caseDetailsRepository) {
@@ -55,7 +48,7 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     @Cacheable(value = "caseDetailsByIDCache", key = "#id")
     public CaseDetails findById(final Long id) {
-        return ofNullable(caseDetailsRepository.findById(id)).orElse(null);
+        return caseDetailsRepository.findById(id);
     }
 
     @Override
@@ -66,12 +59,13 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     @Cacheable(value = "caseDetailsByReferenceCache", key = "#caseReference")
     public CaseDetails findByReference(final Long caseReference) {
-        return ofNullable(caseDetailsRepository.findByReference(caseReference)).orElse(null);
+        return caseDetailsRepository.findByReference(caseReference);
     }
 
     @Override
+    @Cacheable(value = "caseDetailsByReferenceCache", key = "#reference")
     public Optional<CaseDetails> findByReference(String jurisdiction, Long reference) {
-        return _this.findByReference(jurisdiction, reference.toString());
+        return this.findByReference(jurisdiction, reference.toString());
     }
 
     @Override
