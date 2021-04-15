@@ -277,9 +277,11 @@ public class ApplicationParams {
     public String getValidDMDomain() {
         return validDMDomain;
     }
+
     public String getDocumentURLPattern() {
         return documentURLPattern;
     }
+
     public String getDefaultPrintUrl() {
         return defaultPrintUrl;
     }
