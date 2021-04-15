@@ -13,12 +13,17 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -140,6 +145,20 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
     private static final String DATA_DIR = "elasticsearch/data";
 
+    @Inject
+    private WebApplicationContext wac;
+
+    @Mock
+    private Authentication authentication;
+
+    @Mock
+    private SecurityContext securityContext;
+
+    @Inject
+    private ApplicationParams applicationParams;
+
+    private MockMvc mockMvc;
+
     @BeforeAll
     public static void initElastic(@Autowired EmbeddedElastic embeddedElastic) throws IOException,
         InterruptedException {
@@ -165,24 +184,11 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     }
 
     @Nested
-    class UICaseSearchControllerIT extends ElasticsearchBaseTest {
+    class UICaseSearchControllerIT {
 
         private static final String POST_SEARCH_CASES = "/internal/searchCases";
         private static final String CASE_FIELD_ID = "caseFieldId";
         private static final String ERROR_MESSAGE = "message";
-
-        @Inject
-        private WebApplicationContext wac;
-        private MockMvc mockMvc;
-
-        @Mock
-        private Authentication authentication;
-
-        @Mock
-        private SecurityContext securityContext;
-
-        @Inject
-        private ApplicationParams applicationParams;
 
         @BeforeEach
         void setUp() {
@@ -735,21 +741,16 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
     }
 
+    @AutoConfigureWireMock(port = 0)
+    @ActiveProfiles("test")
+    @RunWith(SpringRunner.class)
+    @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+    @TestPropertySource(locations = "classpath:test.properties")
     @Nested
-    class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
+    class CaseSearchEndpointESSecurityIT {
 
         private static final String POST_SEARCH_CASES = "/searchCases";
         private static final String SECURITY_CASE_2 = "1589460125872336";
-
-        @Inject
-        private WebApplicationContext wac;
-        private MockMvc mockMvc;
-
-        @Mock
-        private Authentication authentication;
-
-        @Mock
-        private SecurityContext securityContext;
 
         @BeforeEach
         void setUp() {
@@ -1115,8 +1116,11 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
         }
 
-        // The following tests require the Spring @SQL annotation, which does not work in @Nested classes (see SPR-15366)
-
+        /* The following tests require the Spring @SQL annotation, which does not work in @Nested classes (see SPR-15366)
+         To use @SQL annotation in @Nested classes is to copy the annotations from the enclosing test class to the nested
+         test class. reason you have to duplicate the configuration is that annotations in Spring are not inherited from
+         enclosing classes. This is a known limitation of the Spring TestContext Framework
+        */
         @Test
         @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
             scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
@@ -1160,19 +1164,9 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     }
 
     @Nested
-    class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
+    class CaseSearchEndpointESIT {
 
         private static final String POST_SEARCH_CASES = "/searchCases";
-
-        @Inject
-        private WebApplicationContext wac;
-        private MockMvc mockMvc;
-
-        @Mock
-        private Authentication authentication;
-
-        @Mock
-        private SecurityContext securityContext;
 
         @BeforeEach
         void setUp() {
