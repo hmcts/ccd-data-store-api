@@ -138,7 +138,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     }
 
     @Test
-    public void shouldValidateDocumentWithValidEMHRSUrlAndDomain() {
+    public void shouldValidateDocumentWithValidEmHrsUrlAndDomain() {
         final ApplicationParams applicationParams = mock(ApplicationParams.class);
 
         when(applicationParams.getValidDMDomain()).thenReturn("https://em-hrs-api.service.core-compute-aat.internal");
