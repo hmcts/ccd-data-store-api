@@ -36,6 +36,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 public class CaseDetailsRepositoryIT {
 
     private static final long CASE_ID = 100000L;
+    private static final long CASE_ID1 = 200000L;
     private static final long CASE_REFERENCE = 999999L;
     private static final String JURISDICTION_ID = "JeyOne";
     private static final String CASE_TYPE_ID = "CaseTypeOne";
@@ -151,13 +152,13 @@ public class CaseDetailsRepositoryIT {
 
     @Test
     public void findByIdAgain1() {
-        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findById(JURISDICTION_ID, CASE_ID);
+        doReturn(Optional.of(caseDetails)).when(caseDetailsRepository).findById(JURISDICTION_ID, CASE_ID1);
 
-        cachedCaseDetailsRepository.findById(JURISDICTION_ID, CASE_ID);
+        cachedCaseDetailsRepository.findById(JURISDICTION_ID, CASE_ID1);
 
-        verify(caseDetailsRepository, times(1)).findById(JURISDICTION_ID, CASE_ID);
+        verify(caseDetailsRepository, times(1)).findById(JURISDICTION_ID, CASE_ID1);
 
-        final CaseDetails returned = cachedCaseDetailsRepository.findById(JURISDICTION_ID, CASE_ID)
+        final CaseDetails returned = cachedCaseDetailsRepository.findById(JURISDICTION_ID, CASE_ID1)
                 .orElseThrow(() -> new AssertionError("Not found"));
 
         assertAll(

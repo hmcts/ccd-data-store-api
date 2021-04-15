@@ -54,7 +54,6 @@ public class CachingConfiguration {
     private void configCachesForCaseDetailsRepository(Config config) {
         final int caseDetailsCacheTTLSecs = applicationParams.getCaseDetailsCacheTTLSecs();
 
-        config.addMapConfig(newMapConfigWithTtl("caseDetailsByJurisdictionAndIDCache", caseDetailsCacheTTLSecs));
         config.addMapConfig(newMapConfigWithTtl("caseDetailsByIDCache", caseDetailsCacheTTLSecs));
         config.addMapConfig(newMapConfigWithTtl("caseDetailsByReferenceCache", caseDetailsCacheTTLSecs));
         config.addMapConfig(newMapConfigWithTtl("uniqueCaseDetailsCache", caseDetailsCacheTTLSecs));
@@ -71,6 +70,8 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithMaxIdle("userRoleClassificationsCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("jurisdictionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("baseTypesCache", definitionCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle(
+                "caseTypeDefinitionLatestVersionCache", definitionCacheMaxIdle));
     }
 
     private void configCachesForUIDefinitionGateway(Config config) {

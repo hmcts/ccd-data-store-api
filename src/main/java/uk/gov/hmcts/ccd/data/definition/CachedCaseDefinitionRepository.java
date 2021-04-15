@@ -43,7 +43,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
 
     @Override
     public CaseTypeDefinition getCaseType(final String caseTypeId) {
-        CaseTypeDefinitionVersion latestVersion = this.getLatestVersion(caseTypeId);
+        CaseTypeDefinitionVersion latestVersion = _this.getLatestVersion(caseTypeId);
         return _this.getCaseType(latestVersion.getVersion(), caseTypeId);
     }
 
@@ -68,6 +68,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
+    @Cacheable("caseTypeDefinitionLatestVersionCache")
     public CaseTypeDefinitionVersion getLatestVersion(String caseTypeId) {
         return caseDefinitionRepository.getLatestVersion(caseTypeId);
     }

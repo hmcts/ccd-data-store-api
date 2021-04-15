@@ -42,13 +42,13 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-    @Cacheable("caseDetailsByJurisdictionAndIDCache")
+    @Cacheable(value = "caseDetailsByIDCache", key = "#id")
     public Optional<CaseDetails> findById(String jurisdiction, Long id) {
         return caseDetailsRepository.findById(jurisdiction, id);
     }
 
     @Override
-    @Cacheable("caseDetailsByIDCache")
+    @Cacheable(value = "caseDetailsByIDCache", key = "#id")
     public CaseDetails findById(final Long id) {
         return ofNullable(caseDetailsRepository.findById(id)).orElse(null);
     }
@@ -67,7 +67,7 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     @Override
     @Cacheable(value = "caseDetailsByReferenceCache", key = "#reference")
     public Optional<CaseDetails> findByReference(String jurisdiction, Long reference) {
-        return caseDetailsRepository.findByReference(jurisdiction, reference.toString());
+        return findByReference(jurisdiction, reference.toString());
     }
 
     @Override
