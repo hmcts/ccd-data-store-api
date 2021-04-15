@@ -56,7 +56,6 @@ public class CachingConfiguration {
 
         config.addMapConfig(newMapConfigWithTtl("caseDetailsByIDCache", caseDetailsCacheTTLSecs));
         config.addMapConfig(newMapConfigWithTtl("caseDetailsByReferenceCache", caseDetailsCacheTTLSecs));
-        config.addMapConfig(newMapConfigWithTtl("uniqueCaseDetailsCache", caseDetailsCacheTTLSecs));
         config.addMapConfig(newMapConfigWithTtl("paginatedSearchMetadataCache", caseDetailsCacheTTLSecs));
         config.addMapConfig(newMapConfigWithTtl(
                 "caseDetailsByMetaDataAndFieldDataCache", caseDetailsCacheTTLSecs));
