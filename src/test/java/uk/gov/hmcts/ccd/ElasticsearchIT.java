@@ -243,7 +243,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     .must(matchQuery(STATE, STATE_VALUE))) // Metadata
                 .build();
 
-            CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, null);
+            CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+                null);
 
             SearchResultViewItem caseDetails = caseSearchResultViewResource.getCases().get(0);
             assertAll(
@@ -268,7 +269,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     .must(matchQuery(STATE, STATE_VALUE))) // Metadata
                 .build();
 
-            CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A, null);
+            CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
+                null);
 
             assertThat(caseSearchResultViewResource.getCases().size(),is(0));
         }
@@ -348,7 +350,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().get(0),
                     is(DEFAULT_CASE_REFERENCE)),
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(1)),
-                () -> expectedFields.forEach(f -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields(),
+                () -> expectedFields.forEach(f -> assertThat(caseSearchResultViewResource.getHeaders().get(0)
+                        .getFields(),
                     hasItem(hasProperty(CASE_FIELD_ID, is(f))))),
 
                 () -> assertThat(caseDetails.getFields().get(EMAIL_FIELD), is(EMAIL_VALUE)),
@@ -499,7 +502,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(10)),
                 () -> assertThat(caseSearchResultViewResource.getCases().get(0).getFields().size(), is(16)),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(), is(2)),
+                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(),
+                    is(2)),
                 () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2")
                     .asText(), is("SDField2Value")),
                 () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField3")
@@ -519,7 +523,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(), is(3)),
+                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(),
+                    is(3)),
                 () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField1")
                     .asText(), is("SDField1Value")),
                 () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2")
@@ -555,7 +560,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(), is(3)),
+                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(),
+                    is(3)),
                 () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField1")
                     .asText(), is("SDField1Value")),
                 () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2")
@@ -582,7 +588,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         void shouldReturnErrorWithMissingQueryField() throws Exception {
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder().build();
 
-            JsonNode exceptionNode = executeErrorRequest(searchRequest, CASE_TYPE_A, null, 400);
+            JsonNode exceptionNode = executeErrorRequest(searchRequest, CASE_TYPE_A,
+                null, 400);
 
             assertAll(
                 () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
@@ -597,7 +604,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 .sort("invalid.keyword")
                 .build();
 
-            JsonNode exceptionNode = executeErrorRequest(searchRequest, CASE_TYPE_A, null, 400);
+            JsonNode exceptionNode = executeErrorRequest(searchRequest, CASE_TYPE_A,
+                null, 400);
 
             assertAll(
                 () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
@@ -608,8 +616,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         private void assertDefaultUseCaseHeaders(List<SearchResultViewHeaderGroup> headers) {
             List<String> expectedFields = Arrays.asList(HISTORY_COMPONENT_FIELD, FIXED_RADIO_LIST_FIELD, DOCUMENT_FIELD,
                 ADDRESS_FIELD, COMPLEX_FIELD,
-                COLLECTION_FIELD, MULTI_SELECT_LIST_FIELD, FIXED_LIST_FIELD, TEXT_AREA_FIELD, DATE_TIME_FIELD, DATE_FIELD,
-                EMAIL_FIELD, PHONE_FIELD, YES_OR_NO_FIELD, NUMBER_FIELD, TEXT_FIELD,
+                COLLECTION_FIELD, MULTI_SELECT_LIST_FIELD, FIXED_LIST_FIELD, TEXT_AREA_FIELD, DATE_TIME_FIELD,
+                DATE_FIELD, EMAIL_FIELD, PHONE_FIELD, YES_OR_NO_FIELD, NUMBER_FIELD, TEXT_FIELD,
                 MetaData.CaseField.LAST_STATE_MODIFIED_DATE.getReference(), MetaData.CaseField.LAST_MODIFIED_DATE
                     .getReference(),
                 MetaData.CaseField.CREATED_DATE.getReference(), MetaData.CaseField.JURISDICTION.getReference(),
@@ -623,8 +631,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(headers.get(0).getCases().size(), is(1)),
                 () -> assertThat(headers.get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
                 () -> assertThat(headers.get(0).getFields().size(), is(24)),
-                () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(), hasItem(hasProperty(CASE_FIELD_ID,
-                    is(f)))))
+                () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(),
+                    hasItem(hasProperty(CASE_FIELD_ID, is(f)))))
             );
         }
 
@@ -639,8 +647,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(headers.get(0).getCases().size(), is(1)),
                 () -> assertThat(headers.get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
                 () -> assertThat(headers.get(0).getFields().size(), is(5)),
-                () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(), hasItem(hasProperty(CASE_FIELD_ID,
-                    is(f)))))
+                () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(),
+                    hasItem(hasProperty(CASE_FIELD_ID, is(f)))))
             );
         }
 
@@ -657,8 +665,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(headers.get(0).getCases().size(), is(1)),
                 () -> assertThat(headers.get(0).getCases().get(0), is(DEFAULT_CASE_REFERENCE)),
                 () -> assertThat(headers.get(0).getFields().size(), is(10)),
-                () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(), hasItem(hasProperty(CASE_FIELD_ID,
-                    is(f)))))
+                () -> expectedFields.forEach(f -> assertThat(headers.get(0).getFields(),
+                    hasItem(hasProperty(CASE_FIELD_ID, is(f)))))
             );
         }
 
@@ -668,15 +676,16 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(asCollection(data.get(COLLECTION_FIELD)).get(1).get(VALUE),
                     is("CollectionTextValue1")),
                 () -> assertThat(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_FIXED_LIST_FIELD), is("VALUE3")),
-                () -> assertThat(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD)).get(NESTED_NUMBER_FIELD),
-                    is(NESTED_NUMBER_FIELD_VALUE)),
+                () -> assertThat(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD))
+                        .get(NESTED_NUMBER_FIELD), is(NESTED_NUMBER_FIELD_VALUE)),
                 () -> assertThat(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_TEXT_FIELD), is(COMPLEX_TEXT_VALUE)),
                 () -> assertThat(asCollection(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD))
                     .get(NESTED_COLLECTION_TEXT_FIELD)).get(0).get(VALUE), is("NestedCollectionTextValue1")),
                 () -> assertThat(asCollection(asMap(asMap(data.get(COMPLEX_FIELD)).get(COMPLEX_NESTED_FIELD))
                     .get(NESTED_COLLECTION_TEXT_FIELD)).get(1).get(VALUE), is("NestedCollectionTextValue2")),
                 () -> assertThat(data.get(DATE_FIELD), is(formatted ? "12/2007" : DATE_VALUE)),
-                () -> assertThat(data.get(DATE_TIME_FIELD), is(formatted ? "Saturday, 1 February 2003" : DATE_TIME_VALUE)),
+                () -> assertThat(data.get(DATE_TIME_FIELD),
+                    is(formatted ? "Saturday, 1 February 2003" : DATE_TIME_VALUE)),
                 () -> assertThat(data.get(EMAIL_FIELD), is(EMAIL_VALUE)),
                 () -> assertThat(data.get(FIXED_LIST_FIELD), is(FIXED_LIST_VALUE)),
                 () -> assertThat(data.get(FIXED_RADIO_LIST_FIELD), is(nullValue())),
@@ -721,8 +730,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             return (List<Map<String, Object>>) obj;
         }
 
-        private CaseSearchResultViewResource executeRequest(ElasticsearchTestRequest searchRequest, String caseTypeParam,
-                                                            String useCase) throws Exception {
+        private CaseSearchResultViewResource executeRequest(ElasticsearchTestRequest searchRequest,
+                                                            String caseTypeParam, String useCase) throws Exception {
             MockHttpServletRequestBuilder postRequest =
                 createPostRequest(POST_SEARCH_CASES, searchRequest, caseTypeParam, useCase);
 
@@ -734,10 +743,11 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                                              String caseTypeParam,
                                              String useCase,
                                              int expectedErrorCode) throws Exception {
-            MockHttpServletRequestBuilder postRequest = createPostRequest(POST_SEARCH_CASES, searchRequest, caseTypeParam,
-                useCase);
+            MockHttpServletRequestBuilder postRequest = createPostRequest(POST_SEARCH_CASES, searchRequest,
+                caseTypeParam, useCase);
 
-            return ElasticsearchTestHelper.executeRequest(postRequest, expectedErrorCode, mapper, mockMvc, JsonNode.class);
+            return ElasticsearchTestHelper.executeRequest(postRequest, expectedErrorCode, mapper, mockMvc,
+                JsonNode.class);
         }
     }
 
@@ -1028,8 +1038,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 Map<String, JsonNode> data = getFirstCaseData(caseSearchResult);
                 assertAll(
-                    () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD).has(NESTED_COLLECTION_TEXT_FIELD),
-                        is(true)), // RESTRICTED
+                    () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD)
+                            .has(NESTED_COLLECTION_TEXT_FIELD), is(true)), // RESTRICTED
                     () -> assertThat(data.get(ADDRESS_FIELD).has(POST_CODE_FIELD), is(true)), // PRIVATE
                     () -> assertThat(data.get(ADDRESS_FIELD).has(ADDRESS_LINE_1), is(true)) // PUBLIC
                 );
@@ -1043,8 +1053,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 Map<String, JsonNode> data = getFirstCaseData(caseSearchResult);
                 assertAll(
-                    () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD).has(NESTED_COLLECTION_TEXT_FIELD),
-                        is(false)), // RESTRICTED
+                    () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD)
+                            .has(NESTED_COLLECTION_TEXT_FIELD), is(false)), // RESTRICTED
                     () -> assertThat(data.get(COMPLEX_FIELD).has(POST_CODE_FIELD), is(false)), // PRIVATE
                     () -> assertThat(data.get(COMPLEX_FIELD).has(COMPLEX_TEXT_FIELD), is(true)) // PUBLIC
                 );
@@ -1059,7 +1069,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
 
                 CaseSearchResult caseSearchResult =
-                    executeRequest(searchRequest, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B, CASE_TYPE_C), AUTOTEST2_PUBLIC);
+                    executeRequest(searchRequest, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B, CASE_TYPE_C),
+                        AUTOTEST2_PUBLIC);
 
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
@@ -1075,12 +1086,13 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     .build();
 
                 CaseSearchResult caseSearchResult =
-                    executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC, AUTOTEST1_PRIVATE, AUTOTEST1_RESTRICTED);
+                    executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC, AUTOTEST1_PRIVATE,
+                        AUTOTEST1_RESTRICTED);
 
                 Map<String, JsonNode> data = getFirstCaseData(caseSearchResult);
-                // Comments for assertions below describe some example scenarios for which a given role would usually NOT
-                // allow data/cases to be returned if a user conducting the search ONLY had that role - expressed in the
-                // form "<Scenario> (<role>)"
+                // Comments for assertions below describe some example scenarios for which a given role would usually
+                // NOT allow data/cases to be returned if a user conducting the search ONLY had that role - expressed in
+                // the form "<Scenario> (<role>)"
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(3L)),
                     () -> assertThat(caseSearchResult.getCases().get(0).getSecurityClassification(),
@@ -1089,10 +1101,12 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                         is(IN_PROGRESS_STATE)), // State CRUD (caseworker-autotest1)
                     () -> assertThat(data.get(COMPLEX_FIELD).has(COMPLEX_TEXT_FIELD),
                         is(true)), // Complex nested field CRUD (caseworker-autotest1-restricted)
-                    () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD).has(NESTED_COLLECTION_TEXT_FIELD),
-                        is(true)), // Complex nested field SC (caseworker-autotest1)
+                    // Complex nested field SC (caseworker-autotest1)
+                    () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD)
+                            .has(NESTED_COLLECTION_TEXT_FIELD), is(true)),
+                    // Case field SC (caseworker-autotest1) & Case field CRUD (caseworker-autotest1-private)
                     () -> assertThat(data.containsKey(MULTI_SELECT_LIST_FIELD),
-                        is(true)) // Case field SC (caseworker-autotest1) & Case field CRUD (caseworker-autotest1-private)
+                        is(true))
                 );
             }
 
@@ -1103,7 +1117,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     .sort(CREATED_DATE)
                     .build();
 
-                CaseSearchResult caseSearchResult = executeRequest(searchRequest, caseTypesParam(CASE_TYPE_B, CASE_TYPE_C),
+                CaseSearchResult caseSearchResult = executeRequest(searchRequest, caseTypesParam(CASE_TYPE_B,
+                    CASE_TYPE_C),
                     AUTOTEST1_PUBLIC, AUTOTEST2_PUBLIC);
 
                 assertAll(
@@ -1116,10 +1131,11 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
         }
 
-        /* The following tests require the Spring @SQL annotation, which does not work in @Nested classes (see SPR-15366)
-         To use @SQL annotation in @Nested classes is to copy the annotations from the enclosing test class to the nested
-         test class. reason you have to duplicate the configuration is that annotations in Spring are not inherited from
-         enclosing classes. This is a known limitation of the Spring TestContext Framework
+        /*
+        The following tests require the Spring @SQL annotation, which does not work in @Nested classes (see SPR-15366)
+         To use @SQL annotation in @Nested classes is to copy the annotations from the enclosing test class to the
+         nested test class. reason you have to duplicate the configuration is that annotations in Spring are not
+         inherited from enclosing classes. This is a known limitation of the Spring TestContext Framework
         */
         @Test
         @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
@@ -1151,8 +1167,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         private CaseSearchResult executeRequest(ElasticsearchTestRequest searchRequest,
                                                 String caseTypeParam, String... roles) throws Exception {
             MockUtils.setSecurityAuthorities(authentication, roles);
-            MockHttpServletRequestBuilder postRequest = createPostRequest(POST_SEARCH_CASES, searchRequest, caseTypeParam,
-                null);
+            MockHttpServletRequestBuilder postRequest = createPostRequest(POST_SEARCH_CASES, searchRequest,
+                caseTypeParam, null);
 
             return ElasticsearchTestHelper.executeRequest(postRequest, 200, mapper, mockMvc,
                 CaseSearchResult.class);
@@ -1183,8 +1199,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         @Nested
         class CrossCaseTypeSearch {
 
+            // Note that cross case type searches do NOT return case data
             @Test
-                // Note that cross case type searches do NOT return case data
             void shouldReturnAllCasesForAllSpecifiedCaseTypes() throws Exception {
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
 
@@ -1285,9 +1301,12 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     () -> assertExampleCaseMetadata(caseDetails),
                     () -> assertExampleCaseData(caseDetails),
                     () -> assertThat(caseDetails.getSupplementaryData().size(), is(3)),
-                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField1").asText(), is("SDField1Value")),
-                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField2").asText(), is("SDField2Value")),
-                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField3").asText(), is("SDField3Value"))
+                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField1").asText(),
+                        is("SDField1Value")),
+                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField2").asText(),
+                        is("SDField2Value")),
+                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField3").asText(),
+                        is("SDField3Value"))
                 );
             }
 
@@ -1306,8 +1325,10 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     () -> assertExampleCaseMetadata(caseDetails),
                     () -> assertExampleCaseData(caseDetails),
                     () -> assertThat(caseDetails.getSupplementaryData().size(), is(2)),
-                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField2").asText(), is("SDField2Value")),
-                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField3").asText(), is("SDField3Value"))
+                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField2").asText(),
+                        is("SDField2Value")),
+                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField3").asText(),
+                        is("SDField3Value"))
                 );
             }
 
@@ -1326,9 +1347,12 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     () -> assertExampleCaseMetadata(caseDetails),
                     () -> assertExampleCaseData(caseDetails),
                     () -> assertThat(caseDetails.getSupplementaryData().size(), is(3)),
-                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField1").asText(), is("SDField1Value")),
-                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField2").asText(), is("SDField2Value")),
-                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField3").asText(), is("SDField3Value"))
+                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField1").asText(),
+                        is("SDField1Value")),
+                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField2").asText(),
+                        is("SDField2Value")),
+                    () -> assertThat(caseDetails.getSupplementaryData().get("SDField3").asText(),
+                        is("SDField3Value"))
                 );
             }
 
@@ -1336,7 +1360,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             void shouldErrorWhenInvalidCaseTypeIsProvided() throws Exception {
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
 
-                JsonNode exceptionNode = executeErrorRequest(searchRequest, "INVALID", 404);
+                JsonNode exceptionNode = executeErrorRequest(searchRequest, "INVALID",
+                    404);
 
                 assertAll(
                     () -> assertThat(exceptionNode.get("message").asText(),
@@ -1374,8 +1399,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_TEXT_FIELD).asText(), is(COMPLEX_TEXT_VALUE)),
                     () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_FIXED_LIST_FIELD).asText(),
                         is(COMPLEX_FIXED_LIST_VALUE)),
-                    () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD).get(NESTED_NUMBER_FIELD).asText(),
-                        is(NESTED_NUMBER_FIELD_VALUE)),
+                    () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD).get(NESTED_NUMBER_FIELD)
+                            .asText(), is(NESTED_NUMBER_FIELD_VALUE)),
                     () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD).get(NESTED_COLLECTION_TEXT_FIELD)
                             .toString(),
                         is("[{\"id\":\"8e19ccb3-2d8c-42f0-abe1-fa585cc2d8c8\","
@@ -1387,7 +1412,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     () -> assertThat(data.get(EMAIL_FIELD).asText(), is(EMAIL_VALUE)),
                     () -> assertThat(data.get(FIXED_LIST_FIELD).asText(), is(FIXED_LIST_VALUE)),
                     () -> assertThat(data.get(FIXED_RADIO_LIST_FIELD).isNull(), is(true)),
-                    () -> assertThat(data.get(MULTI_SELECT_LIST_FIELD).toString(), is("[\"OPTION2\",\"OPTION4\"]")),
+                    () -> assertThat(data.get(MULTI_SELECT_LIST_FIELD).toString(),
+                        is("[\"OPTION2\",\"OPTION4\"]")),
                     () -> assertThat(data.get(NUMBER_FIELD).asText(), is(NUMBER_VALUE)),
                     () -> assertThat(data.get(PHONE_FIELD).asText(), is(PHONE_VALUE)),
                     () -> assertThat(data.get(TEXT_AREA_FIELD).asText(), is(TEXT_AREA_VALUE)),
@@ -1412,7 +1438,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             MockHttpServletRequestBuilder postRequest =
                 createPostRequest(POST_SEARCH_CASES, searchRequest, caseTypeParam, null);
 
-            return ElasticsearchTestHelper.executeRequest(postRequest, expectedErrorCode, mapper, mockMvc, JsonNode.class);
+            return ElasticsearchTestHelper.executeRequest(postRequest, expectedErrorCode, mapper, mockMvc,
+                JsonNode.class);
         }
     }
 
