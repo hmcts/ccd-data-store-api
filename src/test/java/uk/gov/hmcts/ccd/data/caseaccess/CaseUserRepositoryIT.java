@@ -3,9 +3,13 @@ package uk.gov.hmcts.ccd.data.caseaccess;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import uk.gov.hmcts.ccd.WireMockBaseTest;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
@@ -18,7 +22,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-public class CaseUserRepositoryIT extends WireMockBaseTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@AutoConfigureWireMock(port = 0)
+@TestPropertySource(locations = "classpath:test.properties")
+public class CaseUserRepositoryIT {
 
     @SpyBean
     private DefaultCaseUserRepository caseUserRepository;

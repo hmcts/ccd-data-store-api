@@ -11,13 +11,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
-import javax.inject.Singleton;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
-@Singleton
 @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
 // TODO: Make this repository return copies of the maps https://tools.hmcts.net/jira/browse/RDM-1459
 public class CachedCaseDefinitionRepository implements CaseDefinitionRepository {
@@ -45,8 +43,8 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
 
     @Override
     public CaseTypeDefinition getCaseType(final String caseTypeId) {
-        CaseTypeDefinitionVersion latestVersion = _this.getLatestVersion(caseTypeId);
-        return _this.getCaseType(latestVersion.getVersion(), caseTypeId);
+        CaseTypeDefinitionVersion latestVersion = this.getLatestVersion(caseTypeId);
+        return this.getCaseType(latestVersion.getVersion(), caseTypeId);
     }
 
     @Override
@@ -64,7 +62,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     @Override
     public List<UserRole> getClassificationsForUserRoleList(List<String> userRoles) {
         return userRoles.stream()
-            .map(role -> _this.getUserRoleClassifications(role))
+            .map(this::getUserRoleClassifications)
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
