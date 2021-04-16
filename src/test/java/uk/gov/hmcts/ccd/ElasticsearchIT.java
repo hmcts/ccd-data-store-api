@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
@@ -143,6 +145,8 @@ import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.createPostRequest;
 @RunWith(Enclosed.class)
 public class ElasticsearchIT extends ElasticsearchBaseTest {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchIT.class);
+
     private static final String DATA_DIR = "elasticsearch/data";
 
     @Inject
@@ -162,7 +166,9 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     @BeforeAll
     public static void initElastic(@Autowired EmbeddedElastic embeddedElastic) throws IOException,
         InterruptedException {
+        LOG.info("Starting Elastic search...");
         embeddedElastic.start();
+        LOG.info("Elastic search started.");
         initData(embeddedElastic);
     }
 
@@ -180,7 +186,9 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
     @AfterAll
     public static void tearDownElastic(@Autowired EmbeddedElastic embeddedElastic) {
+        LOG.info("Stopping Elastic search");
         embeddedElastic.stop();
+        LOG.info("Elastic search stopped.");
     }
 
     @Nested

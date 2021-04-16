@@ -139,7 +139,7 @@ tasks.withType(Checkstyle) {
 }
 
 tasks.withType(Test) {
-    maxParallelForks = System.getenv('PARALLEL_THREADS') ?: 6
+    maxParallelForks = System.getenv('MAX_NUM_PARALLEL_THREADS') ?: 6
 }
 
 dependencies {
