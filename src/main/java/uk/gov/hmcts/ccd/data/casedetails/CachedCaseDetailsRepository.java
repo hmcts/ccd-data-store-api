@@ -9,17 +9,12 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 import javax.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
-
-import static com.google.common.collect.Maps.newHashMap;
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
 
 @Service
 @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
@@ -28,13 +23,8 @@ import static java.util.Optional.ofNullable;
 public class CachedCaseDetailsRepository implements CaseDetailsRepository {
 
     public static final String QUALIFIER = "cached";
-    private static final String FIND_HASH_FORMAT = "%s%s%s";
 
     private final CaseDetailsRepository caseDetailsRepository;
-
-    private final Map<Long, Optional<CaseDetails>> idToCaseDetails = newHashMap();
-    private final Map<String, Optional<CaseDetails>> referenceToCaseDetails = newHashMap();
-    private final Map<String, CaseDetails> findHashToCaseDetails = newHashMap();
 
     @Inject
     public CachedCaseDetailsRepository(@Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
@@ -56,8 +46,9 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
+    @Cacheable(value = "caseDetailsByIDCache", key = "#id", unless = "#result == null")
     public CaseDetails findById(final Long id) {
-        return idToCaseDetails.computeIfAbsent(id, key -> ofNullable(caseDetailsRepository.findById(id))).orElse(null);
+        return caseDetailsRepository.findById(id);
     }
 
     @Override
@@ -66,10 +57,9 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
+    @Cacheable(value = "caseDetailsByReferenceCache", key = "#caseReference", unless = "#result == null")
     public CaseDetails findByReference(final Long caseReference) {
-        final Function<String, Optional<CaseDetails>> findFunction = key ->
-            ofNullable(caseDetailsRepository.findByReference(caseReference));
-        return referenceToCaseDetails.computeIfAbsent(caseReference.toString(), findFunction).orElse(null);
+        return caseDetailsRepository.findByReference(caseReference);
     }
 
     @Override
@@ -97,12 +87,11 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
+    @Cacheable("uniqueCaseDetailsCache")
     public CaseDetails findUniqueCase(final String jurisdictionId,
                                       final String caseTypeId,
                                       final String caseReference) {
-        return findHashToCaseDetails.computeIfAbsent(
-            format(FIND_HASH_FORMAT, jurisdictionId, caseTypeId, caseReference),
-            hash -> caseDetailsRepository.findUniqueCase(jurisdictionId, caseTypeId, caseReference));
+        return caseDetailsRepository.findUniqueCase(jurisdictionId, caseTypeId, caseReference);
     }
 
     @Override
