@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
@@ -120,6 +121,8 @@ public abstract class BaseTest {
     private DocumentsOperation documentsOperation;
     @Inject
     protected SecurityUtils securityUtils;
+    @Inject
+    protected CacheManager cacheManager;
 
     @Mock
     protected Authentication authentication;
@@ -183,6 +186,8 @@ public abstract class BaseTest {
         jdbcTemplate.execute(truncateTablesQuery);
 
         sequences.forEach(sequence -> jdbcTemplate.execute("ALTER SEQUENCE " + sequence + " RESTART WITH 1"));
+
+        cacheManager.getCacheNames().forEach(cacheName -> cacheManager.getCache(cacheName).clear());
     }
 
     private List<String> determineTables(JdbcTemplate jdbcTemplate) {

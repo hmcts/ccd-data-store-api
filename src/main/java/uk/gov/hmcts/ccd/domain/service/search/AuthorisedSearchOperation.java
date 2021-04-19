@@ -9,6 +9,7 @@ import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -37,10 +38,9 @@ public class AuthorisedSearchOperation implements SearchOperation {
     @Autowired
     public AuthorisedSearchOperation(@Qualifier("classified") final SearchOperation searchOperation,
                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                         final CaseDefinitionRepository caseDefinitionRepository,
+                                     final CaseDefinitionRepository caseDefinitionRepository,
                                      final AccessControlService accessControlService,
-                                     @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                         final UserRepository userRepository) {
+                                     @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository) {
         this.searchOperation = searchOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlService = accessControlService;

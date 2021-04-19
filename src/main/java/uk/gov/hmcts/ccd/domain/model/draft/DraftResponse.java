@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.draft;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -7,7 +8,9 @@ import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 
 @ToString
-public class DraftResponse {
+public class DraftResponse implements Serializable {
+
+    private static final long serialVersionUID = -985369650770430826L;
 
     private String id;
 

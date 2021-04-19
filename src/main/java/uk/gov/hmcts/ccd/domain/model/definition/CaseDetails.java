@@ -6,11 +6,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
+import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -32,9 +35,12 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL
 
 // partial javadoc attributes added prior to checkstyle implementation in module
 @SuppressWarnings("checkstyle:SummaryJavadoc")
-public class CaseDetails implements Cloneable {
+@ToString
+public class CaseDetails implements Cloneable, Serializable {
+
     private static final Logger LOG = LoggerFactory.getLogger(CaseDetails.class);
     public static final String DRAFT_ID = "DRAFT%s";
+    private static final long serialVersionUID = -41923091685233760L;
 
     private String id;
 
@@ -343,12 +349,6 @@ public class CaseDetails implements Cloneable {
         Map<String, Object> allData = new HashMap<>(getMetadata());
         ofNullable(getData()).ifPresent(allData::putAll);
         return allData;
-    }
-
-    @JsonIgnore
-    @Override
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this);
     }
 
     @JsonIgnore

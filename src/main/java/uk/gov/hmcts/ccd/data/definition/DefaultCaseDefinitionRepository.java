@@ -5,9 +5,7 @@ import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -15,8 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import javax.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,13 +46,10 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
-    @Qualifier("restTemplate")
-    @Autowired
     private final RestTemplate restTemplate;
 
-    @Inject
     public DefaultCaseDefinitionRepository(final ApplicationParams applicationParams, final SecurityUtils securityUtils,
-            final RestTemplate restTemplate) {
+                                           @Qualifier("restTemplate") final RestTemplate restTemplate) {
         this.applicationParams = applicationParams;
         this.securityUtils = securityUtils;
         this.restTemplate = restTemplate;
@@ -87,7 +80,6 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
-    @Cacheable("caseTypeDefinitionsCache")
     public CaseTypeDefinition getCaseType(int version, String caseTypeId) {
         return this.getCaseType(caseTypeId);
     }
@@ -140,7 +132,6 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
-    @Cacheable("userRolesCache")
     public UserRole getUserRoleClassifications(String userRole) {
         try {
             final HttpEntity requestEntity = new HttpEntity<CaseTypeDefinition>(securityUtils.authorizationHeaders());
@@ -180,46 +171,13 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
-    @Cacheable("caseTypeDefinitionLatestVersionCache")
     public CaseTypeDefinitionVersion getLatestVersion(String caseTypeId) {
         return getLatestVersionFromDefinitionStore(caseTypeId);
     }
 
-    public CaseTypeDefinitionVersion getLatestVersionFromDefinitionStore(String caseTypeId) {
-        try {
-            final HttpEntity<CaseTypeDefinition> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
-            CaseTypeDefinitionVersion version = restTemplate
-                    .exchange(applicationParams.caseTypeLatestVersionUrl(caseTypeId), HttpMethod.GET, requestEntity,
-                            CaseTypeDefinitionVersion.class)
-                    .getBody();
-            LOG.debug("retrieved latest version for case type: {}: {}", caseTypeId, version);
-            return version;
-
-        } catch (Exception e) {
-            LOG.warn("Error while retrieving case type version", e);
-            if (e instanceof HttpClientErrorException
-                    && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                throw new ResourceNotFoundException(
-                        "Error when getting case type version. Unknown case type '" + caseTypeId + "'.", e);
-            } else {
-                throw new ServiceException("Problem getting case type version for '" + caseTypeId + "'.", e);
-            }
-        }
-    }
-
-    @Cacheable(value = "jurisdictionCache")
     @Override
     public JurisdictionDefinition getJurisdiction(String jurisdictionId) {
         return getJurisdictionFromDefinitionStore(jurisdictionId);
-    }
-
-    public JurisdictionDefinition getJurisdictionFromDefinitionStore(String jurisdictionId) {
-        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(
-                Optional.of(Arrays.asList(jurisdictionId)));
-        if (jurisdictionDefinitions.isEmpty()) {
-            return null;
-        }
-        return jurisdictionDefinitions.get(0);
     }
 
     @Override
@@ -240,6 +198,37 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(
                 Optional.ofNullable(null));
         return getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
+    }
+
+    public JurisdictionDefinition getJurisdictionFromDefinitionStore(String jurisdictionId) {
+        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(
+            Optional.of(Arrays.asList(jurisdictionId)));
+        if (jurisdictionDefinitions.isEmpty()) {
+            return null;
+        }
+        return jurisdictionDefinitions.get(0);
+    }
+
+    public CaseTypeDefinitionVersion getLatestVersionFromDefinitionStore(String caseTypeId) {
+        try {
+            final HttpEntity<CaseTypeDefinition> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
+            CaseTypeDefinitionVersion version = restTemplate
+                .exchange(applicationParams.caseTypeLatestVersionUrl(caseTypeId), HttpMethod.GET, requestEntity,
+                    CaseTypeDefinitionVersion.class)
+                .getBody();
+            LOG.debug("retrieved latest version for case type: {}: {}", caseTypeId, version);
+            return version;
+
+        } catch (Exception e) {
+            LOG.warn("Error while retrieving case type version", e);
+            if (e instanceof HttpClientErrorException
+                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                throw new ResourceNotFoundException(
+                    "Error when getting case type version. Unknown case type '" + caseTypeId + "'.", e);
+            } else {
+                throw new ServiceException("Problem getting case type version for '" + caseTypeId + "'.", e);
+            }
+        }
     }
 
     private List<String> getCaseTypeIdFromJurisdictionDefinition(List<JurisdictionDefinition> jurisdictionDefinitions) {

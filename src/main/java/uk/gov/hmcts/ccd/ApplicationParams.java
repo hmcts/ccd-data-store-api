@@ -86,14 +86,20 @@ public class ApplicationParams {
     @Value("${definition.cache.max-idle.secs}")
     private Integer definitionCacheMaxIdleSecs;
 
-    @Value("${definition.cache.latest-version-ttl}")
+    @Value("${definition.cache.latest-version-ttl.secs}")
     private Integer latestVersionTTLSecs;
 
-    @Value("${definition.cache.jurisdiction-ttl}")
-    private Integer jurisdictionTTL;
+    @Value("${definition.cache.jurisdiction-ttl.secs}")
+    private Integer jurisdictionTTLSecs;
 
-    @Value("${user.cache.ttl.secs}")
+    @Value("${definition.cache.user-ttl.secs}")
     private Integer userCacheTTLSecs;
+
+    @Value("${definition.cache.case-details-ttl.secs}")
+    private Integer caseDetailsCacheTTLSecs;
+
+    @Value("${definition.cache.draft-ttl.secs}")
+    private Integer draftCacheTTLSecs;
 
     @Value("${definition.cache.max.size}")
     private Integer definitionCacheMaxSize;
@@ -304,11 +310,19 @@ public class ApplicationParams {
     }
 
     public int getJurisdictionTTLSecs() {
-        return jurisdictionTTL;
+        return jurisdictionTTLSecs;
     }
 
-    public Integer getUserCacheTTLSecs() {
+    public int getUserCacheTTLSecs() {
         return userCacheTTLSecs;
+    }
+
+    public int getCaseDetailsCacheTTLSecs() {
+        return caseDetailsCacheTTLSecs;
+    }
+
+    public int getDraftCacheTTLSecs() {
+        return draftCacheTTLSecs;
     }
 
     public int getDefinitionCacheMaxSize() {

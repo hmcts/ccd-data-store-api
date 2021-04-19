@@ -20,57 +20,58 @@ import java.util.List;
 public class UIDefinitionRepository {
 
     private final CaseDefinitionRepository caseDefinitionRepository;
-    private final CachedUIDefinitionGateway cachedUiDefinitionGateway;
+    private final UIDefinitionGateway uiDefinitionGateway;
 
     @Inject
     UIDefinitionRepository(@Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                            final CaseDefinitionRepository caseDefinitionRepository,
-                           CachedUIDefinitionGateway cachedUiDefinitionGateway) {
+                           @Qualifier(CachedUIDefinitionGateway.QUALIFIER)
+                           final UIDefinitionGateway uiDefinitionGateway) {
         this.caseDefinitionRepository = caseDefinitionRepository;
-        this.cachedUiDefinitionGateway = cachedUiDefinitionGateway;
+        this.uiDefinitionGateway = uiDefinitionGateway;
     }
 
     public SearchResultDefinition getWorkBasketResult(final String caseTypeId) {
         final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
-        return cachedUiDefinitionGateway.getWorkBasketResult(version.getVersion(), caseTypeId);
+        return uiDefinitionGateway.getWorkBasketResult(version.getVersion(), caseTypeId);
     }
 
     public SearchResultDefinition getSearchResult(final String caseTypeId) {
         final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
-        return cachedUiDefinitionGateway.getSearchResult(version.getVersion(), caseTypeId);
+        return uiDefinitionGateway.getSearchResult(version.getVersion(), caseTypeId);
     }
 
     public SearchResultDefinition getSearchCasesResult(String caseTypeId, String useCase) {
         CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
-        return cachedUiDefinitionGateway.getSearchCasesResultDefinition(version.getVersion(), caseTypeId, useCase);
+        return uiDefinitionGateway.getSearchCasesResultDefinition(version.getVersion(), caseTypeId, useCase);
     }
 
     public SearchInputFieldsDefinition getSearchInputFieldDefinitions(final String caseTypeId) {
         final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
-        return cachedUiDefinitionGateway.getSearchInputFieldDefinitions(version.getVersion(), caseTypeId);
+        return uiDefinitionGateway.getSearchInputFieldDefinitions(version.getVersion(), caseTypeId);
     }
 
     public List<WizardPage> getWizardPageCollection(final String caseTypeId, final String eventId) {
         final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
-        return cachedUiDefinitionGateway.getWizardPageCollection(version.getVersion(), caseTypeId, eventId);
+        return uiDefinitionGateway.getWizardPageCollection(version.getVersion(), caseTypeId, eventId);
     }
 
     public WorkbasketInputFieldsDefinition getWorkbasketInputDefinitions(final String caseTypeId) {
         final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
-        return cachedUiDefinitionGateway.getWorkbasketInputFieldsDefinitions(version.getVersion(), caseTypeId);
+        return uiDefinitionGateway.getWorkbasketInputFieldsDefinitions(version.getVersion(), caseTypeId);
     }
 
     public CaseTypeTabsDefinition getCaseTabCollection(final String caseTypeId) {
         final CaseTypeDefinitionVersion version = caseDefinitionRepository.getLatestVersion(caseTypeId);
-        return cachedUiDefinitionGateway.getCaseTypeTabsCollection(version.getVersion(), caseTypeId);
+        return uiDefinitionGateway.getCaseTypeTabsCollection(version.getVersion(), caseTypeId);
     }
 
     public BannersResult getBanners(final List<String> jurisdictionReferences) {
-        return cachedUiDefinitionGateway.getBanners(jurisdictionReferences);
+        return uiDefinitionGateway.getBanners(jurisdictionReferences);
     }
 
     public JurisdictionUiConfigResult getJurisdictionUiConfigs(final List<String> jurisdictionReferences) {
-        return cachedUiDefinitionGateway.getJurisdictionUiConfigs(jurisdictionReferences);
+        return uiDefinitionGateway.getJurisdictionUiConfigs(jurisdictionReferences);
     }
 
 }

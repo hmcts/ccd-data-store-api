@@ -119,37 +119,37 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testTtlBasedEvictionOfJurisdictionLists() throws InterruptedException {
-        Assert.assertEquals(3, applicationParams.getJurisdictionTTLSecs());
+        Assert.assertEquals(3, applicationParams.getDefinitionCacheMaxIdleSecs());
 
         verify(caseDefinitionRepository, times(0)).getJurisdictionFromDefinitionStore("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
+        cachedCaseDefinitionRepository.getJurisdiction("J2");
         verify(caseDefinitionRepository, times(1)).getJurisdictionFromDefinitionStore("J2");
 
-        caseDefinitionRepository.getJurisdiction("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
-        verify(caseDefinitionRepository, times(1)).getJurisdictionFromDefinitionStore("J2");
-
-        TimeUnit.SECONDS.sleep(1);
-        caseDefinitionRepository.getJurisdiction("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
+        cachedCaseDefinitionRepository.getJurisdiction("J2");
+        cachedCaseDefinitionRepository.getJurisdiction("J2");
+        cachedCaseDefinitionRepository.getJurisdiction("J2");
         verify(caseDefinitionRepository, times(1)).getJurisdictionFromDefinitionStore("J2");
 
         TimeUnit.SECONDS.sleep(1);
-        caseDefinitionRepository.getJurisdiction("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
+        cachedCaseDefinitionRepository.getJurisdiction("J2");
+        cachedCaseDefinitionRepository.getJurisdiction("J2");
+        cachedCaseDefinitionRepository.getJurisdiction("J2");
         verify(caseDefinitionRepository, times(1)).getJurisdictionFromDefinitionStore("J2");
 
         TimeUnit.SECONDS.sleep(1);
+        cachedCaseDefinitionRepository.getJurisdiction("J2");
+        cachedCaseDefinitionRepository.getJurisdiction("J2");
+        cachedCaseDefinitionRepository.getJurisdiction("J2");
         verify(caseDefinitionRepository, times(1)).getJurisdictionFromDefinitionStore("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
+
+        TimeUnit.SECONDS.sleep(4);
+        verify(caseDefinitionRepository, times(1)).getJurisdictionFromDefinitionStore("J2");
+        cachedCaseDefinitionRepository.getJurisdiction("J2");
         verify(caseDefinitionRepository, times(2)).getJurisdictionFromDefinitionStore("J2");
 
-        caseDefinitionRepository.getJurisdiction("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
+        cachedCaseDefinitionRepository.getJurisdiction("J2");
+        cachedCaseDefinitionRepository.getJurisdiction("J2");
+        cachedCaseDefinitionRepository.getJurisdiction("J2");
         verify(caseDefinitionRepository, times(2)).getJurisdictionFromDefinitionStore("J2");
     }
 
@@ -167,40 +167,40 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testTtlBasedEvictionOfCaseDefinitionLatestVersion() throws InterruptedException {
-        Assert.assertEquals(3, applicationParams.getLatestVersionTTLSecs());
+        Assert.assertEquals(3, applicationParams.getDefinitionCacheMaxIdleSecs());
 
         verify(caseDefinitionRepository, times(0)).getLatestVersion(ID_3);
-        caseDefinitionRepository.getLatestVersion(ID_3);
+        cachedCaseDefinitionRepository.getLatestVersion(ID_3);
         verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_3);
 
-        caseDefinitionRepository.getLatestVersion(ID_3);
-        caseDefinitionRepository.getLatestVersion(ID_3);
-        caseDefinitionRepository.getLatestVersion(ID_3);
+        cachedCaseDefinitionRepository.getLatestVersion(ID_3);
+        cachedCaseDefinitionRepository.getLatestVersion(ID_3);
+        cachedCaseDefinitionRepository.getLatestVersion(ID_3);
         verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_3);
 
         TimeUnit.SECONDS.sleep(1);
-        caseDefinitionRepository.getLatestVersion(ID_3);
-        caseDefinitionRepository.getLatestVersion(ID_3);
-        caseDefinitionRepository.getLatestVersion(ID_3);
+        cachedCaseDefinitionRepository.getLatestVersion(ID_3);
+        cachedCaseDefinitionRepository.getLatestVersion(ID_3);
+        cachedCaseDefinitionRepository.getLatestVersion(ID_3);
         verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_3);
 
         TimeUnit.SECONDS.sleep(4);
         verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_3);
-        caseDefinitionRepository.getLatestVersion(ID_3);
+        cachedCaseDefinitionRepository.getLatestVersion(ID_3);
         verify(caseDefinitionRepository, times(2)).getLatestVersion(ID_3);
 
-        caseDefinitionRepository.getLatestVersion(ID_3);
-        caseDefinitionRepository.getLatestVersion(ID_3);
-        caseDefinitionRepository.getLatestVersion(ID_3);
+        cachedCaseDefinitionRepository.getLatestVersion(ID_3);
+        cachedCaseDefinitionRepository.getLatestVersion(ID_3);
+        cachedCaseDefinitionRepository.getLatestVersion(ID_3);
         verify(caseDefinitionRepository, times(2)).getLatestVersion(ID_3);
     }
 
     @Test
     public void testCaseDefinitionAreCached() {
 
-        cachedCaseDefinitionRepository.getCaseType(ID_1);
-        cachedCaseDefinitionRepository.getCaseType(ID_1);
-        cachedCaseDefinitionRepository.getCaseType(ID_1);
+        cachedCaseDefinitionRepository.getCaseType(VERSION_1, ID_1);
+        cachedCaseDefinitionRepository.getCaseType(VERSION_1, ID_1);
+        cachedCaseDefinitionRepository.getCaseType(VERSION_1, ID_1);
 
         verify(caseDefinitionRepository, times(1)).getCaseType(VERSION_1, ID_1);
         verify(caseDefinitionRepository, times(1)).getCaseType(ID_1);
@@ -285,7 +285,6 @@ public class DefinitionsCachingIT {
         ctdv.setVersion(version);
         return ctdv;
     }
-
 
     @Test
     public void testBannersCached() {

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.std;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -8,7 +9,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.ToString;
 
 @ToString
-public class CaseDataContent {
+public class CaseDataContent implements Serializable {
+    private static final long serialVersionUID = 3652409358379864250L;
+
     private Event event;
     private Map<String, JsonNode> data;
 

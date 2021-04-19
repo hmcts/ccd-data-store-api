@@ -27,4 +27,10 @@
 		<cve>CVE-2007-1652</cve>
 	</suppress>
 
+	<suppress until="2021-04-23">
+		<notes>Declared as False Positive on commons-io-2.2.jar
+			(pkg:maven/commons-io/commons-io@2.2, cpe:2.3:a:apache:commons_io:2.2:*:*:*:*:*:*:*)</notes>
+		<cve>CVE-2021-29425</cve>
+	</suppress>
+
 </suppressions>

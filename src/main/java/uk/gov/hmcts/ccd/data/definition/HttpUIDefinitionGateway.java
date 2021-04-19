@@ -32,10 +32,11 @@ import java.util.List;
  * NOTE: We want to cache definitions, so the only client of this class should be CachedUIDefinitionGateway.
  */
 @Named
-@Qualifier("Http")
 @Singleton
+@Qualifier(HttpUIDefinitionGateway.QUALIFIER)
 public class HttpUIDefinitionGateway implements UIDefinitionGateway {
 
+    public static final String QUALIFIER = "http";
     private static final Logger LOG = LoggerFactory.getLogger(UIDefinitionRepository.class);
 
     private final ApplicationParams applicationParams;
@@ -215,17 +216,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
         }
     }
 
-    private URI withVersionQueryParam(String url, int version) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url).queryParam("version", version);
-        return builder.build().encode().toUri();
-    }
-
-    private URI withJurisdictionIds(String url, final List<String> jurisdictionIds) {
-        UriComponentsBuilder builder =
-            UriComponentsBuilder.fromHttpUrl(url).queryParam("ids", String.join(",", jurisdictionIds));
-        return builder.build().encode().toUri();
-    }
-
+    @Override
     public BannersResult getBanners(final List<String> jurisdictionIds) {
         try {
             final Instant start = Instant.now();
@@ -249,6 +240,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
         }
     }
 
+    @Override
     public JurisdictionUiConfigResult getJurisdictionUiConfigs(final List<String> jurisdictionIds) {
         try {
             final Instant start = Instant.now();
@@ -272,4 +264,16 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
                 e.getMessage()));
         }
     }
+
+    private URI withVersionQueryParam(String url, int version) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url).queryParam("version", version);
+        return builder.build().encode().toUri();
+    }
+
+    private URI withJurisdictionIds(String url, final List<String> jurisdictionIds) {
+        UriComponentsBuilder builder =
+            UriComponentsBuilder.fromHttpUrl(url).queryParam("ids", String.join(",", jurisdictionIds));
+        return builder.build().encode().toUri();
+    }
+
 }

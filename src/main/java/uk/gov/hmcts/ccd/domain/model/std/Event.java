@@ -3,8 +3,12 @@ package uk.gov.hmcts.ccd.domain.model.std;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 @ToString
-public class Event {
+public class Event implements Serializable {
+    private static final long serialVersionUID = -930088885120714411L;
+
     @JsonProperty("id")
     private String eventId;
     @JsonProperty("summary")

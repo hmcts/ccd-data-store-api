@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +10,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 
-public class UserDefault {
+public class UserDefault implements Serializable {
+    private static final long serialVersionUID = 5125235196048612983L;
     private String id;
     private List<JurisdictionDefinition> jurisdictionDefinitions;
 

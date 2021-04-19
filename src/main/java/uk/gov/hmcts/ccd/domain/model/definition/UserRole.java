@@ -7,7 +7,9 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.ToString;
 
+@ToString
 @ApiModel(description = "")
 public class UserRole implements Serializable {
 

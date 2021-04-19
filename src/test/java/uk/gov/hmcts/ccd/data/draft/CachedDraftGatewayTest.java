@@ -4,10 +4,8 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -21,7 +19,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -37,14 +34,14 @@ class CachedDraftGatewayTest {
     @Mock
     private DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
 
-    private CreateCaseDraftRequest createCaseDraftRequest = newCreateCaseDraft().build();
-    private UpdateCaseDraftRequest updateCaseDraftRequest = newUpdateCaseDraft().build();
-    private Long draftId = 1L;
-    private Long draftId2 = 2L;
-    private String draftIdS = "1";
-    private DraftResponse draftResponse = newDraftResponse().build();
-    private List<DraftResponse> allDrafts = Lists.newArrayList(newDraftResponse().build());
-    private CaseDetails caseDetails = newCaseDetails().build();
+    private final CreateCaseDraftRequest createCaseDraftRequest = newCreateCaseDraft().build();
+    private final UpdateCaseDraftRequest updateCaseDraftRequest = newUpdateCaseDraft().build();
+    private final Long draftId = 1L;
+    private final Long draftId2 = 2L;
+    private final String draftIdS = "1";
+    private final DraftResponse draftResponse = newDraftResponse().build();
+    private final List<DraftResponse> allDrafts = Lists.newArrayList(newDraftResponse().build());
+    private final CaseDetails caseDetails = newCaseDetails().build();
 
     private uk.gov.hmcts.ccd.data.draft.CachedDraftGateway cachedDraftGateway;
 
@@ -98,62 +95,6 @@ class CachedDraftGatewayTest {
             );
         }
 
-        @Test
-        @DisplayName("should cache drafts for subsequent calls")
-        void shouldCacheDraftsForSubsequentCalls() {
-            cachedDraftGateway.get(draftIdS);
-
-            verify(defaultDraftGateway).get(draftIdS);
-
-            doReturn(newDraftResponse().build()).when(defaultDraftGateway).get(draftIdS);
-
-            DraftResponse result = cachedDraftGateway.get(draftIdS);
-
-            assertAll(
-                () -> assertThat(result, is(draftResponse)),
-                () -> verifyNoMoreInteractions(defaultDraftGateway)
-            );
-
-        }
-    }
-
-    @Nested
-    @DisplayName("getCaseDetails()")
-    class GetCaseDetails {
-
-        @Test
-        @DisplayName("should initially retrieve draft from decorated repository")
-        void shouldRetrieveDraftFromDecorated() {
-
-            CaseDetails result = cachedDraftGateway.getCaseDetails(draftIdS);
-
-            InOrder inOrder = inOrder(defaultDraftGateway, draftResponseToCaseDetailsBuilder);
-            assertAll(
-                () -> assertThat(result, equalTo(caseDetails)),
-                () -> inOrder.verify(defaultDraftGateway).get(draftIdS),
-                () -> inOrder.verify(draftResponseToCaseDetailsBuilder).build(draftResponse),
-                () -> inOrder.verifyNoMoreInteractions()
-            );
-        }
-
-        @Test
-        @DisplayName("should cache drafts for subsequent calls")
-        void shouldCacheDraftsForSubsequentCalls() {
-            cachedDraftGateway.getCaseDetails(draftIdS);
-
-            verify(defaultDraftGateway).get(draftIdS);
-            verify(draftResponseToCaseDetailsBuilder).build(draftResponse);
-
-            doReturn(newDraftResponse().build()).when(defaultDraftGateway).get(draftIdS);
-            CaseDetails result = cachedDraftGateway.getCaseDetails(draftIdS);
-
-            assertAll(
-                () -> assertThat(result, is(caseDetails)),
-                () -> verify(draftResponseToCaseDetailsBuilder, times(2)).build(draftResponse),
-                () -> verifyNoMoreInteractions(defaultDraftGateway)
-            );
-
-        }
     }
 
     @Nested

@@ -13,7 +13,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
-import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
 
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
@@ -94,26 +93,6 @@ class CachedUserRepositoryTest {
                 () -> verify(userRepository, times(1)).getUserDetails()
             );
         }
-
-        @Test
-        @DisplayName("should cache user details for subsequent calls")
-        void shouldCacheUserDetailsForSubsequentCalls() {
-            final IdamProperties expectedUserDetails = new IdamProperties();
-            doReturn(expectedUserDetails).when(userRepository).getUserDetails();
-
-            cachedUserRepository.getUserDetails();
-
-            verify(userRepository, times(1)).getUserDetails();
-
-            doReturn(new IdamProperties()).when(userRepository).getUserDetails();
-
-            final IdamProperties userDetails = cachedUserRepository.getUserDetails();
-
-            assertAll(
-                () -> assertThat(userDetails, is(expectedUserDetails)),
-                () -> verifyNoMoreInteractions(userRepository)
-            );
-        }
     }
 
     @Nested
@@ -131,26 +110,6 @@ class CachedUserRepositoryTest {
             assertAll(
                 () -> assertThat(userRoles, is(expectedUserRoles)),
                 () -> verify(userRepository, times(1)).getUserRoles()
-            );
-        }
-
-        @Test
-        @DisplayName("should cache user roles for subsequent calls")
-        void shouldCacheUserRolesForSubsequentCalls() {
-            final HashSet<String> expectedUserRoles = Sets.newHashSet("role1", "role2");
-            doReturn(expectedUserRoles).when(userRepository).getUserRoles();
-
-            cachedUserRepository.getUserRoles();
-
-            verify(userRepository, times(1)).getUserRoles();
-
-            doReturn(Sets.newHashSet("role3", "role4")).when(userRepository).getUserRoles();
-
-            final Set<String> userRoles = cachedUserRepository.getUserRoles();
-
-            assertAll(
-                () -> assertThat(userRoles, is(expectedUserRoles)),
-                () -> verifyNoMoreInteractions(userRepository)
             );
         }
     }
@@ -172,52 +131,6 @@ class CachedUserRepositoryTest {
             assertAll(
                 () -> assertThat(classifications, is(expectedClassifications)),
                 () -> verify(userRepository, times(1)).getUserClassifications(JURISDICTION_ID)
-            );
-        }
-
-        @Test
-        @DisplayName("should cache classifications for subsequent calls")
-        void shouldCacheClassificationForSubsequentCalls() {
-            final HashSet<SecurityClassification> expectedClassifications = Sets.newHashSet(PUBLIC);
-            doReturn(expectedClassifications).when(userRepository).getUserClassifications(JURISDICTION_ID);
-
-            cachedUserRepository.getUserClassifications(JURISDICTION_ID);
-
-            verify(userRepository, times(1)).getUserClassifications(JURISDICTION_ID);
-
-            doReturn(Sets.newHashSet(PRIVATE, RESTRICTED)).when(userRepository).getUserClassifications(JURISDICTION_ID);
-
-            final Set<SecurityClassification> classifications = cachedUserRepository.getUserClassifications(
-                JURISDICTION_ID);
-
-            assertAll(
-                () -> assertThat(classifications, is(expectedClassifications)),
-                () -> verifyNoMoreInteractions(userRepository)
-            );
-        }
-    }
-
-    @Nested
-    @DisplayName("getHighestUserClassification()")
-    class GetHighestUserClassification {
-        @Test
-        @DisplayName("should initially retrieve highest security classification from repository and from cache for "
-                + "subsequent calls")
-        void shouldRetrieveUserRolesFromDecorated() {
-            when(userRepository.getHighestUserClassification(JURISDICTION_ID)).thenReturn(PRIVATE);
-
-            SecurityClassification classification1 = cachedUserRepository.getHighestUserClassification(JURISDICTION_ID);
-
-            assertAll(
-                () -> assertThat(classification1, is(PRIVATE)),
-                () -> verify(userRepository, times(1)).getHighestUserClassification(JURISDICTION_ID)
-            );
-
-            SecurityClassification classification2 = cachedUserRepository.getHighestUserClassification(JURISDICTION_ID);
-
-            assertAll(
-                () -> assertThat(classification2, is(PRIVATE)),
-                () -> verifyNoMoreInteractions(userRepository)
             );
         }
     }
