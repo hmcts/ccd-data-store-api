@@ -8,12 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 import java.util.Optional;
@@ -152,6 +154,18 @@ class ElasticsearchQueryHelperTest {
             () -> MatcherAssert.assertThat(exception.getMessage(), is("Requested supplementary_data must be an"
                     + " array of text fields."))
         );
+    }
+
+    @Test
+    public void testBadRequestThrowsException() throws Exception {
+
+        String searchRequest = "{\"native_es_query\":{\"query\":,{}},\"supplementary_data\":[{\"array\":\"object\"}]}}";
+
+        BadRequestException exception = assertThrows(BadRequestException.class, () ->
+            elasticsearchQueryHelper.validateJsonRequest(searchRequest));
+
+        assertAll(
+            () -> MatcherAssert.assertThat(exception.getMessage(), is("JSON Request is invalid")));
     }
 
     private String blacklistedQuery() {

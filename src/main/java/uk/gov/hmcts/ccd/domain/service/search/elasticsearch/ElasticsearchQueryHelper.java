@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 import java.util.List;
@@ -38,7 +39,15 @@ public class ElasticsearchQueryHelper {
         validateSupplementaryData(searchRequestNode);
         return new ElasticsearchRequest(searchRequestNode);
     }
-
+    
+    public void validateJsonRequest(String jsonSearchRequest) {
+        try {
+            objectMapperService.convertStringToObject(jsonSearchRequest, JsonNode.class);
+        } catch (Exception ex) {
+            throw new BadRequestException("JSON Request is invalid");
+        }
+    }
+    
     private void rejectBlackListedQuery(String jsonSearchRequest) {
         List<String> blackListedQueries = applicationParams.getSearchBlackList();
         Optional<String> blackListedQueryOpt = blackListedQueries

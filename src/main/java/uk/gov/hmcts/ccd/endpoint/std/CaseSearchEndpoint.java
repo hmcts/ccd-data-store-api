@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
@@ -94,8 +95,10 @@ public class CaseSearchEndpoint {
             required = true)
         @RequestBody String jsonSearchRequest) {
 
+        elasticsearchQueryHelper.validateJsonRequest(jsonSearchRequest);
         Instant start = Instant.now();
         validateCtid(caseTypeIds);
+
         ElasticsearchRequest elasticsearchRequest =
             elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
 
@@ -151,4 +154,5 @@ public class CaseSearchEndpoint {
             .map(c -> String.valueOf(c.getReference()))
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
+
 }
