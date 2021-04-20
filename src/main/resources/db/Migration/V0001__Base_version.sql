@@ -375,12 +375,6 @@ ALTER TABLE ONLY public.case_users
     ADD CONSTRAINT case_users_pkey PRIMARY KEY (case_data_id, user_id, case_role);
 
 
---
--- Name: databasechangeloglock databasechangeloglock_pkey; Type: CONSTRAINT; Schema: public; Owner: ccd
---
-
-ALTER TABLE ONLY public.databasechangeloglock
-    ADD CONSTRAINT databasechangeloglock_pkey PRIMARY KEY (id);
 
 
 --
