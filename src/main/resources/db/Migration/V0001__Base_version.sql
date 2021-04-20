@@ -5,16 +5,6 @@
 -- Dumped from database version 9.6.19
 -- Dumped by pg_dump version 13.1
 
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
 
 --
 -- Name: case_users_audit_action; Type: TYPE; Schema: public; Owner: ccd
@@ -25,8 +15,6 @@ CREATE TYPE public.case_users_audit_action AS ENUM (
     'REVOKE'
 );
 
-
-ALTER TYPE public.case_users_audit_action OWNER TO ccd;
 
 --
 -- Name: securityclassification; Type: TYPE; Schema: public; Owner: ccd
@@ -39,8 +27,6 @@ CREATE TYPE public.securityclassification AS ENUM (
 );
 
 
-ALTER TYPE public.securityclassification OWNER TO ccd;
-
 --
 -- Name: significant_item_type; Type: TYPE; Schema: public; Owner: ccd
 --
@@ -49,8 +35,6 @@ CREATE TYPE public.significant_item_type AS ENUM (
     'DOCUMENT'
 );
 
-
-ALTER TYPE public.significant_item_type OWNER TO ccd;
 
 --
 -- Name: set_case_data_marked_by_logstash(); Type: FUNCTION; Schema: public; Owner: ccd
@@ -66,7 +50,6 @@ CREATE FUNCTION public.set_case_data_marked_by_logstash() RETURNS trigger
             $$;
 
 
-ALTER FUNCTION public.set_case_data_marked_by_logstash() OWNER TO ccd;
 
 SET default_tablespace = '';
 
@@ -92,8 +75,6 @@ CREATE TABLE public.case_data (
 );
 
 
-ALTER TABLE public.case_data OWNER TO ccd;
-
 --
 -- Name: case_data_id_seq; Type: SEQUENCE; Schema: public; Owner: ccd
 --
@@ -105,8 +86,6 @@ CREATE SEQUENCE public.case_data_id_seq
     NO MAXVALUE
     CACHE 1;
 
-
-ALTER TABLE public.case_data_id_seq OWNER TO ccd;
 
 --
 -- Name: case_data_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ccd
@@ -143,8 +122,6 @@ CREATE TABLE public.case_event (
 );
 
 
-ALTER TABLE public.case_event OWNER TO ccd;
-
 --
 -- Name: case_event_case_data_id_seq; Type: SEQUENCE; Schema: public; Owner: ccd
 --
@@ -156,8 +133,6 @@ CREATE SEQUENCE public.case_event_case_data_id_seq
     NO MAXVALUE
     CACHE 1;
 
-
-ALTER TABLE public.case_event_case_data_id_seq OWNER TO ccd;
 
 --
 -- Name: case_event_case_data_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ccd
@@ -177,8 +152,6 @@ CREATE SEQUENCE public.case_event_id_seq
     NO MAXVALUE
     CACHE 1;
 
-
-ALTER TABLE public.case_event_id_seq OWNER TO ccd;
 
 --
 -- Name: case_event_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ccd
@@ -200,8 +173,6 @@ CREATE TABLE public.case_event_significant_items (
 );
 
 
-ALTER TABLE public.case_event_significant_items OWNER TO ccd;
-
 --
 -- Name: case_event_significant_items_case_event_id_seq; Type: SEQUENCE; Schema: public; Owner: ccd
 --
@@ -213,8 +184,6 @@ CREATE SEQUENCE public.case_event_significant_items_case_event_id_seq
     NO MAXVALUE
     CACHE 1;
 
-
-ALTER TABLE public.case_event_significant_items_case_event_id_seq OWNER TO ccd;
 
 --
 -- Name: case_event_significant_items_case_event_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ccd
@@ -235,8 +204,6 @@ CREATE SEQUENCE public.case_event_significant_items_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.case_event_significant_items_id_seq OWNER TO ccd;
-
 --
 -- Name: case_event_significant_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ccd
 --
@@ -255,8 +222,6 @@ CREATE TABLE public.case_users (
 );
 
 
-ALTER TABLE public.case_users OWNER TO ccd;
-
 --
 -- Name: case_users_audit; Type: TABLE; Schema: public; Owner: ccd
 --
@@ -272,8 +237,6 @@ CREATE TABLE public.case_users_audit (
 );
 
 
-ALTER TABLE public.case_users_audit OWNER TO ccd;
-
 --
 -- Name: case_users_audit_id_seq; Type: SEQUENCE; Schema: public; Owner: ccd
 --
@@ -286,54 +249,12 @@ CREATE SEQUENCE public.case_users_audit_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.case_users_audit_id_seq OWNER TO ccd;
-
 --
 -- Name: case_users_audit_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ccd
 --
 
 ALTER SEQUENCE public.case_users_audit_id_seq OWNED BY public.case_users_audit.id;
 
-
---
--- Name: databasechangelog; Type: TABLE; Schema: public; Owner: ccd
---
-
-CREATE TABLE public.databasechangelog (
-    id character varying(255) NOT NULL,
-    author character varying(255) NOT NULL,
-    filename character varying(255) NOT NULL,
-    dateexecuted timestamp without time zone NOT NULL,
-    orderexecuted integer NOT NULL,
-    exectype character varying(10) NOT NULL,
-    md5sum character varying(35),
-    description character varying(255),
-    comments character varying(255),
-    tag character varying(255),
-    liquibase character varying(20),
-    contexts character varying(255),
-    labels character varying(255),
-    deployment_id character varying(10)
-);
-
-
-ALTER TABLE public.databasechangelog OWNER TO ccd;
-
---
--- Name: databasechangeloglock; Type: TABLE; Schema: public; Owner: ccd
---
-
-CREATE TABLE public.databasechangeloglock (
-    id integer NOT NULL,
-    locked boolean NOT NULL,
-    lockgranted timestamp without time zone,
-    lockedby character varying(255)
-);
-
-
-ALTER TABLE public.databasechangeloglock OWNER TO ccd;
-
---
 -- Name: message_queue_candidates; Type: TABLE; Schema: public; Owner: ccd
 --
 
@@ -346,8 +267,6 @@ CREATE TABLE public.message_queue_candidates (
 );
 
 
-ALTER TABLE public.message_queue_candidates OWNER TO ccd;
-
 --
 -- Name: message_queue_candidates_id_seq; Type: SEQUENCE; Schema: public; Owner: ccd
 --
@@ -359,8 +278,6 @@ CREATE SEQUENCE public.message_queue_candidates_id_seq
     NO MAXVALUE
     CACHE 1;
 
-
-ALTER TABLE public.message_queue_candidates_id_seq OWNER TO ccd;
 
 --
 -- Name: message_queue_candidates_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ccd
