@@ -22,11 +22,13 @@
 
 	<suppress until="2021-04-23">
 		<notes>Declared as False Positive on com.nimbusds:oauth2-oidc-sdk #2866
-			https://github.com/jeremylong/DependencyCheck/issues/2866</notes>
+			https://github.com/jeremylong/DependencyCheck/issues/2866
+		</notes>
 		<cve>CVE-2007-1651</cve>
 		<cve>CVE-2007-1652</cve>
 	</suppress>
-
-	<cve>CVE-2021-29425</cve>
+	<suppress>
+		<cve>CVE-2021-29425</cve>
+	</suppress>
 
 </suppressions>
