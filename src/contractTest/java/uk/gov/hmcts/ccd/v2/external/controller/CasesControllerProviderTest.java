@@ -50,9 +50,9 @@ import static org.mockito.Mockito.when;
     @VersionSelector(tag = "master")})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
     "server.port=8123", "spring.application.name=PACT_TEST",
-    "ccd.document.url.pattern=${CCD_DOCUMENT_URL_PATTERN:https?://((dm-store-aat.service.core-compute-aat.internal/documents/[A-Za-z0-9-](?:/binary)?)"
-        + "|(em-hrs-api-aat.service.core-compute-aat.internal/hearing-recordings/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
-        + "[0-9a-fA-F]{12}/segments/[0-9]))}"
+    "ccd.document.url.pattern=${CCD_DOCUMENT_URL_PATTERN:https?://((dm-store-aat.service.core-compute-aat.internal/"
+        + "documents/[A-Za-z0-9-](?:/binary)?)|(em-hrs-api-aat.service.core-compute-aat.internal/hearing-recordings/"
+        + "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/segments/[0-9]))}"
 
 })
 @ActiveProfiles("SECURITY_MOCK")
