@@ -296,7 +296,7 @@ dependencyManagement {
         }
 
         // CVE-2021-29425
-        dependency 'commons-io:commons-io:2.8.0'
+        dependency 'org.commons-io:commons-io:2.8.0'
     }
 }
 
