@@ -27,4 +27,10 @@
 		<cve>CVE-2007-1652</cve>
 	</suppress>
 
+	<suppress until="2021-04-23">
+		<notes>Limited path traversal in the apache commons IO library before version 2.7 -
+   file name: commons-io-2.2.jar</notes>
+		<cve>CVE-2021-29425</cve>
+	</suppress>
+
 </suppressions>
