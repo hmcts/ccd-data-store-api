@@ -6,6 +6,7 @@ public class PaginatedSearchMetadata {
 
     private Integer totalResultsCount;
     private Integer totalPagesCount;
+    public static final PaginatedSearchMetadata EMPTY = new PaginatedSearchMetadata();
 
 
     public void setTotalResultsCount(Integer totalResultsCount) {

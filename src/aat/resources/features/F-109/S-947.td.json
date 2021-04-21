@@ -22,7 +22,11 @@
   },
   "expectedResponse": {
     "body" : {
-      "headers" : [ {
+      "headers" : [
+        {
+          "__ordering__": "ordered"
+        },
+        {
         "metadata" : {
           "jurisdiction" : "BEFTA_JURISDICTION_3",
           "case_type_id" : "BEFTA_CASETYPE_3_1"
@@ -162,8 +166,8 @@
           "metadata" : true,
           "case_field_id" : "[CASE_REFERENCE]",
           "case_field_type" : {
-            "id" : "Number",
-            "type" : "Number",
+            "id" : "Text",
+            "type" : "Text",
             "min" : null,
             "max" : null,
             "regular_expression" : null,
