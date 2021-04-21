@@ -9,9 +9,6 @@ buildscript {
         classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2'
     }
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.2'
-    }
-    dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
 }
@@ -25,7 +22,7 @@ plugins {
     id 'com.github.kt3k.coveralls' version '2.8.2'
     id 'se.patrikerdes.use-latest-versions' version '0.2.7'
     id 'net.ltgt.apt' version '0.21'
-    id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.22'
+    id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.23'
     id "org.jetbrains.gradle.plugin.idea-ext" version "0.7"
     id "info.solidsoft.pitest" version '1.4.0'
     id "io.freefair.lombok" version "5.3.0"
@@ -44,7 +41,6 @@ apply plugin: 'org.sonarqube'
 apply plugin: 'jsonschema2pojo'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
-apply plugin: 'com.jfrog.bintray'
 apply plugin: 'se.patrikerdes.use-latest-versions'
 
 apply from: 'liquibase.gradle'
@@ -79,7 +75,7 @@ repositories {
     mavenCentral()
     jcenter()
     maven {
-        url 'https://dl.bintray.com/hmcts/hmcts-maven'
+        url 'https://jitpack.io'
     }
     maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/' }
 }
@@ -247,7 +243,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.14.0-RDM-9765-3'
+    testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '6.14.0-RDM-9765-3'
 
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
@@ -794,10 +790,7 @@ def timestamp() {
 }
 
 configurations { codacy }
-repositories {
-    maven { url "https://jitpack.io" }
-    maven { url "http://dl.bintray.com/typesafe/maven-releases" }
-}
+
 dependencies {
     codacy 'com.github.codacy:codacy-coverage-reporter:-SNAPSHOT'
 }
