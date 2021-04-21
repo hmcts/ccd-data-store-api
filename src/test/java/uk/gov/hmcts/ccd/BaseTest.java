@@ -194,7 +194,7 @@ public abstract class BaseTest {
     }
 
     private static boolean notFlyaway(String tableName) {
-        return !tableName.equals("databasechangelog") && !tableName.equals("databasechangeloglock");
+        return !tableName.equals("flyway_schema_history");
     }
 
     private List<String> determineSequences(JdbcTemplate jdbcTemplate) {
