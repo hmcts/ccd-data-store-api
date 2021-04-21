@@ -25,6 +25,7 @@
 			https://github.com/jeremylong/DependencyCheck/issues/2866</notes>
 		<cve>CVE-2007-1651</cve>
 		<cve>CVE-2007-1652</cve>
+		<cve>CVE-2021-29425</cve>
 	</suppress>
 
 </suppressions>
