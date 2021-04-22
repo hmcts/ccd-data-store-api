@@ -1,16 +1,16 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
-
-import java.util.Optional;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
@@ -40,7 +40,7 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
     }
 
     @Override
-    public Optional<CaseDetails> applyAccessControl(CaseDetails caseDetails) {
+    public List<AccessProfile> generateAccessProfiles(CaseTypeDefinition caseTypeDefinition) {
         throw new UnsupportedOperationException("Not used. Only here to comply with the interface.");
     }
 }

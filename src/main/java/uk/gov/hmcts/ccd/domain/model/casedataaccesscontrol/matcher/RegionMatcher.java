@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleMatchingResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 @Slf4j
 @Component
@@ -27,5 +28,11 @@ public class RegionMatcher implements RoleAttributeMatcher {
             roleAssignment.getAttributes().getLocation(),
             caseRegion,
             matched);
+    }
+
+    @Override
+    public void matchAttribute(Pair<RoleAssignment, RoleMatchingResult> resultPair,
+                               CaseTypeDefinition caseTypeDefinition) {
+
     }
 }

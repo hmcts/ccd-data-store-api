@@ -13,7 +13,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
@@ -30,10 +29,9 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceImpl.QUALIFIER;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.hasAccessControlList;
 
 @Service
-@Qualifier(QUALIFIER)
 public class AccessControlServiceImpl implements AccessControlService {
 
     private static final Logger LOG = LoggerFactory.getLogger(AccessControlServiceImpl.class);
@@ -190,10 +188,11 @@ public class AccessControlServiceImpl implements AccessControlService {
     }
 
     @Override
-    public CaseUpdateViewEvent setReadOnlyOnCaseViewFieldsIfNoAccess(final CaseUpdateViewEvent caseEventTrigger,
-                                                                     final List<CaseFieldDefinition> caseFieldDefinitions,
-                                                                     final Set<String> userRoles,
-                                                                     final Predicate<AccessControlList> access) {
+    public CaseUpdateViewEvent setReadOnlyOnCaseViewFieldsIfNoAccess(
+        final CaseUpdateViewEvent caseEventTrigger,
+        final List<CaseFieldDefinition> caseFieldDefinitions,
+        final Set<String> userRoles,
+        final Predicate<AccessControlList> access) {
         caseEventTrigger.getCaseFields().stream()
             .forEach(caseViewField -> {
                 Optional<CaseFieldDefinition> caseFieldOpt = findCaseField(caseFieldDefinitions, caseViewField.getId());

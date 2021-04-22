@@ -307,7 +307,8 @@ public class CaseFieldDefinition implements Serializable, CommonField {
 
     @JsonIgnore
     public Optional<AccessControlList> getAccessControlListByRole(String role) {
-        return this.accessControlLists.stream().filter(acl -> acl.getAccessProfile().equalsIgnoreCase(role)).findFirst();
+        return this.accessControlLists.stream().filter(acl -> acl.getAccessProfile().equalsIgnoreCase(role))
+            .findFirst();
     }
 
     private List<String> buildAllDottedComplexFieldPossibilities(List<CaseFieldDefinition> caseFieldEntities) {

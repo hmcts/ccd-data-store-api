@@ -1,24 +1,32 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.io.Serializable;
 
 
 public class AccessControlList implements Serializable {
 
     private String accessProfile;
+    private String role;
     private boolean create;
     private boolean read;
     private boolean update;
     private boolean delete;
 
     public String getAccessProfile() {
-        return accessProfile;
+        return accessProfile == null ? role : accessProfile;
     }
 
     public void setAccessProfile(String accessProfile) {
         this.accessProfile = accessProfile;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public boolean isCreate() {
@@ -57,6 +65,7 @@ public class AccessControlList implements Serializable {
     public AccessControlList duplicate() {
         AccessControlList dup = new AccessControlList();
         dup.setAccessProfile(accessProfile);
+        dup.setRole(role);
         dup.setCreate(create);
         dup.setRead(read);
         dup.setUpdate(update);
@@ -67,7 +76,7 @@ public class AccessControlList implements Serializable {
     @Override
     public String toString() {
         return "ACL{"
-            + "role='" + accessProfile + '\''
+            + "accessProfile='" + accessProfile + '\''
             + ", crud=" + (isCreate() ? "C" : "") + (isRead() ? "R" : "")
             + (isUpdate() ? "U" : "") + (isDelete() ? "D" : "")
             + '}';

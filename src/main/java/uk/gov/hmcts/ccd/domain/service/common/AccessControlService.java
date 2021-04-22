@@ -120,10 +120,9 @@ public interface AccessControlService {
         List<CaseEventDefinition> caseEventDefinitions,
         Set<String> userRoles);
 
-    default Optional<CaseFieldDefinition> findCaseFieldAndVerifyHasAccess(String fieldName,
-                                                                          List<CaseFieldDefinition> caseFieldDefinitions,
-                                                                          Set<String> userRoles,
-                                                                          Predicate<AccessControlList> access) {
+    default Optional<CaseFieldDefinition> findCaseFieldAndVerifyHasAccess(
+        String fieldName, List<CaseFieldDefinition> caseFieldDefinitions,
+        Set<String> userRoles, Predicate<AccessControlList> access) {
         return caseFieldDefinitions.stream().filter(caseField ->
             caseField.getId().equals(fieldName)
                 && hasAccessControlList(userRoles, access, caseField.getAccessControlLists())).findFirst();
@@ -509,7 +508,7 @@ public interface AccessControlService {
             .findAny().orElse(newArrayList());
     }
 
-    default boolean hasAccessControlList(Set<String> userRoles,
+    static boolean hasAccessControlList(Set<String> userRoles,
                                          Predicate<AccessControlList> criteria,
                                          List<AccessControlList> accessControlLists) {
         // scoop out access control roles based on user roles

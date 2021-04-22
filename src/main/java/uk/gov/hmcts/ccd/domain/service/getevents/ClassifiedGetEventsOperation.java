@@ -1,16 +1,15 @@
 package uk.gov.hmcts.ccd.domain.service.getevents;
 
 import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
-import uk.gov.hmcts.ccd.domain.service.getcase.AccessControlledGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
-
-import java.util.List;
-import java.util.Optional;
 
 import static java.util.Collections.singletonList;
 
@@ -24,7 +23,7 @@ public class ClassifiedGetEventsOperation implements GetEventsOperation {
 
     public ClassifiedGetEventsOperation(@Qualifier("default") GetEventsOperation getEventsOperation,
                                         SecurityClassificationService classificationService,
-                                        @Qualifier(AccessControlledGetCaseOperation.QUALIFIER)
+                                        @Qualifier(CreatorGetCaseOperation.QUALIFIER)
                                         final GetCaseOperation getCaseOperation) {
 
         this.getEventsOperation = getEventsOperation;

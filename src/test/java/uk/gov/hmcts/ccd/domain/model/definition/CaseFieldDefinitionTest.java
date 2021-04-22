@@ -242,15 +242,15 @@ public class CaseFieldDefinitionTest {
                 () -> assertThat(findNestedField(family, FAMILY_INFO + "." + FAMILY_NAMES)
                         .getAccessControlLists(),
                     hasItems(
-                        hasProperty("role", CoreMatchers.is(ROLE2)),
-                        hasProperty("role", is(ROLE3)))),
+                        hasProperty("accessProfile", CoreMatchers.is(ROLE2)),
+                        hasProperty("accessProfile", is(ROLE3)))),
                 () -> assertThat(familyName.getAccessControlLists().size(), is(2)),
                 () ->
                     assertThat(findNestedField(family, FAMILY_INFO + "." + FAMILY_NAMES + "." + FAMILY_NAME)
                             .getAccessControlLists(),
                     hasItems(
-                        hasProperty("role", CoreMatchers.is(ROLE2)),
-                        hasProperty("role", is(ROLE3)))),
+                        hasProperty("accessProfile", CoreMatchers.is(ROLE2)),
+                        hasProperty("accessProfile", is(ROLE3)))),
                 () -> assertThat(members.getAccessControlLists().size(), is(3)),
                 () -> assertThat(person.getAccessControlLists().size(), is(3)),
                 () -> assertThat(name.getAccessControlLists().size(), is(3)),

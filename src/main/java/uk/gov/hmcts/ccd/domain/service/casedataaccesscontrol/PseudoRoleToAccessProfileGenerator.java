@@ -58,15 +58,15 @@ public class PseudoRoleToAccessProfileGenerator {
 
     private List<String> getCaseRolesFromAcls(List<AccessControlList> accessControlLists) {
         return accessControlLists.stream()
-            .map(AccessControlList::getRole)
-            .filter(role -> role.matches(CASE_ROLE_ID_REGEX))
+            .map(AccessControlList::getAccessProfile)
+            .filter(accessProfile -> accessProfile.matches(CASE_ROLE_ID_REGEX))
             .collect(Collectors.toList());
     }
 
     private List<String> getIdamRolesFromAcls(List<AccessControlList> accessControlLists) {
         return accessControlLists.stream()
-            .map(AccessControlList::getRole)
-            .filter(role -> !role.matches(CASE_ROLE_ID_REGEX))
+            .map(AccessControlList::getAccessProfile)
+            .filter(accessProfile -> !accessProfile.matches(CASE_ROLE_ID_REGEX))
             .collect(Collectors.toList());
     }
 
