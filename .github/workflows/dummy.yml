@@ -1,0 +1,22 @@
+name: Add a Dummy commit to trigger dev build
+
+on:
+  schedule:
+    - cron: "30 7 * * *"
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: develop
+      
+      - name: Push Dummy Commit to develop branch
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          skip_dirty_check: true
+          commit_message: "Trigger build"
+          commit_options: "--allow-empty"
+          branch: 'develop'

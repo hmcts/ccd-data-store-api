@@ -24,6 +24,9 @@
     "body": {
       "headers": [
         {
+          "__ordering__": "ordered"
+        },
+        {
           "metadata": {
             "jurisdiction": "AUTOTEST1",
             "case_type_id": "AAT_PRIVATE"
@@ -78,8 +81,8 @@
               "metadata": true,
               "case_field_id": "[CASE_REFERENCE]",
               "case_field_type": {
-                "id": "Number",
-                "type": "Number",
+                "id": "Text",
+                "type": "Text",
                 "min": null,
                 "max": null,
                 "regular_expression": null,
@@ -98,36 +101,36 @@
           "_extends_": "104_Base_Case_Fields_expected",
           "fields": {
             "FixedListField": "VALUE1",
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data_Ordering1_1]}"
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering1_1]}"
           },
           "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering1_1]}",
           "fields_formatted": {
             "FixedListField": "VALUE1",
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data_Ordering1_1]}"
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering1_1]}"
           }
         },
         {
           "_extends_": "104_Base_Case_Fields_expected",
           "fields": {
             "FixedListField": "VALUE2",
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data_Ordering1_2]}"
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering1_2]}"
           },
           "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering1_2]}",
           "fields_formatted": {
             "FixedListField": "VALUE2",
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data_Ordering1_2]}"
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering1_2]}"
           }
         },
         {
           "_extends_": "104_Base_Case_Fields_expected",
           "fields": {
             "FixedListField": "VALUE3",
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data_Ordering1_3]}"
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering1_3]}"
           },
           "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering1_3]}",
           "fields_formatted": {
             "FixedListField": "VALUE3",
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data_Ordering1_3]}"
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering1_3]}"
           }
         }
       ],
