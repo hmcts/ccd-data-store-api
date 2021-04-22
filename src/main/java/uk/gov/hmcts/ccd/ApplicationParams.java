@@ -65,8 +65,8 @@ public class ApplicationParams {
     @Value("${ccd.user-profile.host}")
     private String userProfileHost;
 
-    @Value("${ccd.dm.domain}")
-    private String validDMDomain;
+    @Value("${ccd.document.url.pattern}")
+    private String documentURLPattern;
 
     @Value("${ccd.defaultPrintUrl}")
     private String defaultPrintUrl;
@@ -271,8 +271,8 @@ public class ApplicationParams {
         return callbackRetries;
     }
 
-    public String getValidDMDomain() {
-        return validDMDomain;
+    public String getDocumentURLPattern() {
+        return documentURLPattern;
     }
 
     public String getDefaultPrintUrl() {
