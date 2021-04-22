@@ -95,6 +95,9 @@
 		"body": {
 			"data": {
 				"CollectionComplexDateTime": [
+          {
+            "__elementId__": "value.DateField"
+          },
 					{
 						"id": null,
 						"value": {
