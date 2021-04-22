@@ -23,6 +23,9 @@
     "body": {
       "headers": [
         {
+          "__ordering__": "ordered"
+        },
+        {
           "metadata": {
             "jurisdiction": "BEFTA_JURISDICTION_1",
             "case_type_id": "BEFTA_CASETYPE_1_1"
@@ -276,8 +279,8 @@
               "metadata": true,
               "case_field_id": "[CASE_REFERENCE]",
               "case_field_type": {
-                "id": "Number",
-                "type": "Number",
+                "id": "Text",
+                "type": "Text",
                 "min": null,
                 "max": null,
                 "regular_expression": null,
@@ -298,7 +301,7 @@
             "MoneyGBPField": "4200",
             "PhoneUKField": "07123456789",
             "NumberField": "164528",
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_F-109-Befta_Jurisdiction1_Case_Creation]}",
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_F-109-Befta_Jurisdiction1_Case_Creation]}",
             "YesOrNoField": "Yes",
             "EmailField": "ccd@hmcts.net",
             "TextField": "Some Text"
@@ -308,7 +311,7 @@
             "MoneyGBPField": "4200",
             "PhoneUKField": "07123456789",
             "NumberField": "164528",
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_F-109-Befta_Jurisdiction1_Case_Creation]}",
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_F-109-Befta_Jurisdiction1_Case_Creation]}",
             "YesOrNoField": "Yes",
             "EmailField": "ccd@hmcts.net",
             "TextField": "Some Text"

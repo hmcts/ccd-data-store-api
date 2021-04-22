@@ -29,6 +29,7 @@ import uk.gov.hmcts.ccd.endpoint.ui.UserProfileEndpoint;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,12 +39,14 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -54,6 +57,10 @@ public class RestExceptionHandlerTest {
     // url to trigger chosen test controller
     private static final String TEST_URL = "/caseworkers/123/profile";
 
+    private static final String SQL_EXCEPTION_MESSAGE =
+        "SQL Exception thrown during API operation";
+    private static final String ERROR_RESPONSE_BODY =
+        "{\"errorMessage\":\"SQL Exception thrown during API operation\"}";
     // service used by chosen test controller which we will use to throw exceptions
     @Mock
     private GetUserProfileOperation mockService;
@@ -386,6 +393,57 @@ public class RestExceptionHandlerTest {
         // check not logging validation messages
         assertThat(trackedFieldInfo, not(containsString(fieldErrors.get(0).getMessage())));
         assertThat(trackedFieldInfo, not(containsString(fieldErrors.get(1).getMessage())));
+    }
+
+    @Test
+    public void handleSQLException_shouldReturnHttpErrorResponse() throws Exception {
+        doAnswer(
+            apiCall -> {
+                throw new SQLException();
+            })
+            .when(mockService)
+            .execute(AccessControlService.CAN_READ);
+
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
+
+        result.andExpect(status().isInternalServerError());
+        result.andExpect(content()
+            .string(ERROR_RESPONSE_BODY));
+    }
+
+    @Test
+    public void handleSQLException_shouldLogExceptionAsWarning() throws Exception {
+        doAnswer(
+            apiCall -> {
+                throw new SQLException();
+            })
+            .when(mockService)
+            .execute(AccessControlService.CAN_READ);
+
+        mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
+
+        // ASSERT
+        List<ILoggingEvent> logsList = listAppender.list;
+        ILoggingEvent lastLogEntry = logsList.get(logsList.size() - 1);
+        assertThat(lastLogEntry.getLevel(), is(equalTo(Level.ERROR)));
+        assertThat(lastLogEntry.getMessage(),
+            containsString(SQL_EXCEPTION_MESSAGE));
+    }
+
+    @Test
+    public void handleSQLException_shouldTrackExceptionToAppInsights() throws Exception {
+        SQLException expectedException = new SQLException();
+
+        doAnswer(
+            apiCall -> {
+                throw expectedException;
+            })
+            .when(mockService)
+            .execute(AccessControlService.CAN_READ);
+
+        mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
+
+        verify(appInsights).trackException(expectedException);
     }
 
     private void assertHttpErrorResponse(ResultActions result, Exception expectedException) throws Exception {

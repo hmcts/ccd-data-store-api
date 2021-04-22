@@ -43,6 +43,7 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.v2.V2;
 
 import javax.inject.Inject;
 import java.time.Duration;
@@ -79,6 +80,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UP
 public class QueryEndpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(QueryEndpoint.class);
+    public static final String CASE_TYPE_ID_PATTERN = "^[a-zA-Z0-9_.]+$";
+
 
     private final GetCaseViewOperation getCaseViewOperation;
     private final GetCaseHistoryViewOperation getCaseHistoryViewOperation;
@@ -163,8 +166,9 @@ public class QueryEndpoint {
     public SearchResultView searchNew(@PathVariable("jid") final String jurisdictionId,
                                       @PathVariable("ctid") final String caseTypeId,
                                       @RequestParam java.util.Map<String, String> params) {
+        String validCaseTypeId = validateCaseTypeId(caseTypeId);
         final String view = params.get("view");
-        MetaData metadata = new MetaData(caseTypeId, jurisdictionId);
+        MetaData metadata = new MetaData(validCaseTypeId, jurisdictionId);
         metadata.setState(param(params, STATE.getParameterName()));
         metadata.setCaseReference(param(params, CASE_REFERENCE.getParameterName()));
         metadata.setCreatedDate(param(params, CREATED_DATE.getParameterName()));
@@ -194,13 +198,15 @@ public class QueryEndpoint {
     public SearchInput[] findSearchInputDetails(@PathVariable("uid") final String uid,
                                                 @PathVariable("jid") final String jurisdictionId,
                                                 @PathVariable("ctid") final String caseTypeId) {
+        String validCaseTypeId = validateCaseTypeId(caseTypeId);
         return getCriteriaOperation
-            .execute(caseTypeId, CAN_READ, SEARCH)
+            .execute(validCaseTypeId, CAN_READ, SEARCH)
             .toArray(new SearchInput[0]);
     }
 
     @Transactional
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/work-basket-inputs",
+    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/"
+        + "work-basket-inputs",
         method = RequestMethod.GET)
     @ApiOperation(value = "Get Workbasket Input details")
     @ApiResponses(value = {
@@ -210,9 +216,10 @@ public class QueryEndpoint {
     public WorkbasketInput[] findWorkbasketInputDetails(@PathVariable("uid") final String uid,
                                                         @PathVariable("jid") final String jurisdictionId,
                                                         @PathVariable("ctid") final String caseTypeId) {
+        String validCaseTypeId = validateCaseTypeId(caseTypeId);
         Instant start = Instant.now();
         WorkbasketInput[] workbasketInputs = getCriteriaOperation
-            .execute(caseTypeId, CAN_READ, WORKBASKET)
+            .execute(validCaseTypeId, CAN_READ, WORKBASKET)
             .toArray(new WorkbasketInput[0]);
         final Duration between = Duration.between(start, Instant.now());
         LOG.info("findWorkbasketInputDetails has been completed in {} millisecs...", between.toMillis());
@@ -239,7 +246,8 @@ public class QueryEndpoint {
     }
 
     @Transactional
-    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}",
+    @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/"
+        + "event-triggers/{etid}",
         method = RequestMethod.GET)
     @ApiOperation(value = "Fetch an event trigger in the context of a case type")
     @ApiResponses(value = {
@@ -252,12 +260,14 @@ public class QueryEndpoint {
                                                           @PathVariable("etid") String eventTriggerId,
                                                           @RequestParam(value = "ignore-warning",
                                                            required = false) Boolean ignoreWarning) {
-        return getEventTriggerOperation.executeForCaseType(caseTypeId, eventTriggerId, ignoreWarning);
+        String validCaseTypeId = validateCaseTypeId(caseTypeId);
+        return getEventTriggerOperation.executeForCaseType(validCaseTypeId, eventTriggerId, ignoreWarning);
     }
 
     @Transactional
     @RequestMapping(
-        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}",
+        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/"
+            + "event-triggers/{etid}",
         method = RequestMethod.GET)
     @ApiOperation(value = "Fetch an event trigger in the context of a case")
     @ApiResponses(value = {
@@ -270,12 +280,14 @@ public class QueryEndpoint {
                                                       @PathVariable("etid") String eventId,
                                                       @RequestParam(value = "ignore-warning",
                                                        required = false) Boolean ignoreWarning) {
+
         return getEventTriggerOperation.executeForCase(caseId, eventId, ignoreWarning);
     }
 
     @Transactional
     @RequestMapping(
-        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}/event-triggers/{etid}",
+        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}/"
+            + "event-triggers/{etid}",
         method = RequestMethod.GET)
     @ApiOperation(value = "Fetch an event trigger in the context of a case")
     @ApiResponses(value = {
@@ -293,7 +305,8 @@ public class QueryEndpoint {
 
     @Transactional
     @RequestMapping(
-        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events/{eventId}/case-history",
+        value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events/"
+            + "{eventId}/case-history",
         method = RequestMethod.GET)
     @ApiOperation(value = "Fetch case history for the event")
     @ApiResponses(value = {
@@ -315,6 +328,13 @@ public class QueryEndpoint {
         return searchResultView.getSearchResultViewItems().stream().limit(MAX_CASE_IDS_LIST)
             .map(c -> c.getCaseId())
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
+    }
+
+    private String validateCaseTypeId(String caseTypeId) {
+        if (caseTypeId == null || !caseTypeId.matches(CASE_TYPE_ID_PATTERN)) {
+            throw new BadRequestException(V2.Error.CASE_TYPE_INVALID);
+        }
+        return caseTypeId;
     }
 
 }
