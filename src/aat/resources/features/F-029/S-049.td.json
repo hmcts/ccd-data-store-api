@@ -177,6 +177,9 @@
             "_extends_": "BaseFixedListFieldType",
             "fixed_list_items": [
               {
+                "__ordering__": "ordered"
+              },
+              {
                 "code": "[[ANYTHING_PRESENT]]",
                 "label": "[[ANYTHING_PRESENT]]",
                 "order": null
@@ -209,6 +212,9 @@
           "field_type": {
             "_extends_": "BaseMultiSelectListFieldType",
             "fixed_list_items": [
+              {
+                "__ordering__": "ordered"
+              },
               {
                 "code": "[[ANYTHING_PRESENT]]",
                 "label": "[[ANYTHING_PRESENT]]",
@@ -322,6 +328,9 @@
                   "max": null,
                   "regular_expression": null,
                   "fixed_list_items": [
+                    {
+                      "__ordering__": "ordered"
+                    },
                     {
                       "code": "[[ANYTHING_PRESENT]]",
                       "label": "[[ANYTHING_PRESENT]]",

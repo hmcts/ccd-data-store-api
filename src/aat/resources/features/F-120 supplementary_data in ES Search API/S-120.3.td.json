@@ -37,6 +37,9 @@
     "body": {
       "headers": [
         {
+          "__ordering__": "ordered"
+        },
+        {
           "metadata": {
             "jurisdiction": "AUTOTEST1",
             "case_type_id": "AAT_PRIVATE"
@@ -90,8 +93,8 @@
               "metadata": true,
               "case_field_id": "[CASE_REFERENCE]",
               "case_field_type": {
-                "id": "Number",
-                "type": "Number",
+                "id": "Text",
+                "type": "Text",
                 "min": null,
                 "max": null,
                 "regular_expression": null,
@@ -112,7 +115,7 @@
             "[JURISDICTION]": "AUTOTEST1",
             "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
             "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data]}",
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data]}",
             "[STATE]": "TODO",
             "[SECURITY_CLASSIFICATION]": "PRIVATE",
             "[CASE_TYPE]": "AAT_PRIVATE",
@@ -124,7 +127,7 @@
             "[JURISDICTION]": "AUTOTEST1",
             "[LAST_STATE_MODIFIED_DATE]" : "[[ANYTHING_PRESENT]]",
             "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
-            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data]}",
+            "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data]}",
             "[STATE]": "TODO",
             "[SECURITY_CLASSIFICATION]": "PRIVATE",
             "[CASE_TYPE]": "AAT_PRIVATE",

@@ -28,8 +28,9 @@ plugins {
     id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.22'
     id "org.jetbrains.gradle.plugin.idea-ext" version "0.7"
     id "info.solidsoft.pitest" version '1.4.0'
-    id "io.freefair.lombok" version "5.1.0"
+    id "io.freefair.lombok" version "5.3.0"
     id 'uk.gov.hmcts.java' version '0.12.0'
+    id 'au.com.dius.pact' version '4.1.0'
 }
 
 apply plugin: 'java'
@@ -47,6 +48,11 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'se.patrikerdes.use-latest-versions'
 
 apply from: 'liquibase.gradle'
+
+def versions = [
+        pact_version: '4.1.7'
+]
+
 
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
@@ -80,8 +86,8 @@ repositories {
 // end::repositories[]
 
 ext {
-    junitJupiterVersion = '5.5.2'
-    junitVintageVersion = '5.5.2'
+    junitJupiterVersion = '5.7.1'
+    junitVintageVersion = '5.7.1'
     powermockVersion = '2.0.7'
     reformLogging = '5.1.0'
     appInsightsVersion = '2.4.1'
@@ -122,6 +128,8 @@ configurations {
 
     aatCompile.extendsFrom(testCompile)
     aatRuntime.extendsFrom(testRuntime)
+    contractTestCompile.extendsFrom(testCompile)
+    contractTestRuntime.extendsFrom(testRuntime)
     cucumberRuntime.extendsFrom(functionalRuntime)
 }
 
@@ -185,6 +193,9 @@ dependencies {
     compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
     compile group: 'org.awaitility', name: 'awaitility', version: '3.1.6'
 
+    // CVE-2021-29425
+    compile group: 'commons-io', name: 'commons-io', version: '2.8.0'
+
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.3'
     compile "com.fasterxml.jackson.core:jackson-databind:2.11.1"
 
@@ -215,6 +226,7 @@ dependencies {
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
     testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
+    testRuntime "org.junit.platform:junit-platform-commons:1.7.0"
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.24.0'
     testCompile group:'org.mockito', name: 'mockito-junit-jupiter', version:'2.24.0'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: powermockVersion
@@ -238,7 +250,17 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.10.0'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '6.13.3'
+
+    contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
+    contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
+    contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
+    contractTestRuntime group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
+    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-client'
+    contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
+    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server'
+    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-core'
+    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
 }
 // end::dependencies[]
 
@@ -252,7 +274,7 @@ dependencyManagement {
         dependency 'com.google.guava:guava:30.1-jre'
 
         // CVE-2019-0232 - Java and Command Line injections in Windows
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.40') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.43') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -692,6 +714,17 @@ sourceSets {
             srcDir('src/aat/resources')
         }
     }
+
+    contractTest {
+        java {
+            srcDir('src/contractTest/java')
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+        }
+        resources {
+            srcDir('src/contractTest/resources')
+        }
+    }
 }
 
 task smoke() {
@@ -768,6 +801,26 @@ task functional() {
 
     outputs.upToDateWhen { false }
 }
+
+project.ext {
+    pactVersion = getCheckedOutGitCommitHash()
+}
+
+def getCheckedOutGitCommitHash() {
+    'git rev-parse --verify --short HEAD'.execute().text.trim()
+}
+
+task runProviderPactVerification(type:Test) {
+    logger.lifecycle("Runs provider pact Tests")
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.contractTest.output.classesDirs
+    classpath = sourceSets.contractTest.runtimeClasspath
+    systemProperty 'pact.verifier.publishResults', System.getProperty('pact.verifier.publishResults')
+    systemProperty 'pact.provider.version', project.pactVersion
+    include "uk/gov/hmcts/ccd/v2/external/controller/**"
+}
+
+runProviderPactVerification.finalizedBy pactVerify
 
 def timestamp() {
     def date = new Date()

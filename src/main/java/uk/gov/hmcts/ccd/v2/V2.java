@@ -112,5 +112,6 @@ public final class V2 {
         public static final String AUTHENTICATION_TOKEN_INVALID =
             "Authentication failure due to invalid / expired tokens (IDAM / S2S).";
         public static final String UNAUTHORISED_S2S_SERVICE = "Unauthorised S2S service";
+        public static final String CASE_TYPE_INVALID = "Case Type Id is not valid";
     }
 }
