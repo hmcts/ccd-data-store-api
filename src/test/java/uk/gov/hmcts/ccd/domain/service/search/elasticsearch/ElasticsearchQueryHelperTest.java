@@ -162,10 +162,10 @@ class ElasticsearchQueryHelperTest {
         String searchRequest = "{\"native_es_query\":{\"query\":,{}},\"supplementary_data\":[{\"array\":\"object\"}]}}";
 
         BadRequestException exception = assertThrows(BadRequestException.class, () ->
-            elasticsearchQueryHelper.validateJsonRequest(searchRequest));
+            elasticsearchQueryHelper.validateAndConvertRequest(searchRequest));
 
         assertAll(
-            () -> MatcherAssert.assertThat(exception.getMessage(), is("JSON Request is invalid")));
+            () -> MatcherAssert.assertThat(exception.getMessage(), is("Request requires correctly formatted JSON")));
     }
 
     private String blacklistedQuery() {

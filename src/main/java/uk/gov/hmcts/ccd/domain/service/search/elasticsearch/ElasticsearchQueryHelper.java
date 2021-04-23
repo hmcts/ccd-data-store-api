@@ -35,19 +35,16 @@ public class ElasticsearchQueryHelper {
 
     public ElasticsearchRequest validateAndConvertRequest(String jsonSearchRequest) {
         rejectBlackListedQuery(jsonSearchRequest);
-        JsonNode searchRequestNode = objectMapperService.convertStringToObject(jsonSearchRequest, JsonNode.class);
+        JsonNode searchRequestNode;
+        try {
+            searchRequestNode = objectMapperService.convertStringToObject(jsonSearchRequest, JsonNode.class);
+        } catch (Exception ex) {
+            throw new BadRequestException("Request requires correctly formatted JSON");
+        }
         validateSupplementaryData(searchRequestNode);
         return new ElasticsearchRequest(searchRequestNode);
     }
-    
-    public void validateJsonRequest(String jsonSearchRequest) {
-        try {
-            objectMapperService.convertStringToObject(jsonSearchRequest, JsonNode.class);
-        } catch (Exception ex) {
-            throw new BadRequestException("JSON Request is invalid");
-        }
-    }
-    
+
     private void rejectBlackListedQuery(String jsonSearchRequest) {
         List<String> blackListedQueries = applicationParams.getSearchBlackList();
         Optional<String> blackListedQueryOpt = blackListedQueries

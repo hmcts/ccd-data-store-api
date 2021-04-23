@@ -95,7 +95,6 @@ public class CaseSearchEndpoint {
             required = true)
         @RequestBody String jsonSearchRequest) {
 
-        elasticsearchQueryHelper.validateJsonRequest(jsonSearchRequest);
         Instant start = Instant.now();
         validateCtid(caseTypeIds);
 
