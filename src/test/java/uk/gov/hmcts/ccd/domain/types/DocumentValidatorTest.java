@@ -38,6 +38,14 @@ public class DocumentValidatorTest implements IVallidatorTest {
             + "    }\n"
             + "}";
     private static final String VALID_DOCUMENT_URL = "https://dm.reform.hmcts.net/documents/a1-2Z-3-x";
+    private static final String VALID_EM_HRS_API_DOCUMENT_URL =
+        "https://em-hrs-api.service.core-compute-aat.internal/hearing-recordings/"
+            + "b10ea9c4-a116-11eb-bcbc-0242ac130002/segments/3";
+    private static final String INVALID_RECORD_ID_EM_HRS_API_DOCUMENT_URL =
+        "https://em-hrs-api.service.core-compute-aat.internal/hearing-recordings/"
+            + "123456789012/segments/3";
+    private static final String INVALID_EM_HRS_API_DOCUMENT_URL =
+        "https://em-hrs-api.service.core-compute-aat.internal/documents/a1-2Z-3-x";
     private static final String MISSING_DOCUMENT_PATH_URL = "https://dm.reform.hmcts.net/docs/a1-2Z-3-x";
     private static final String UNKNOWN_DOCUMENT_DOMAIN_URL = "https://example.com/documents/a1-2Z-3-x";
     private static final String DOCUMENT_URL_WITH_PORT = "https://ng.reform.hmcts.net:6789/documents/a1-2Z-3-x-ngitb";
@@ -81,16 +89,18 @@ public class DocumentValidatorTest implements IVallidatorTest {
             is(DOCUMENT_URL_WITH_PORT + " does not match Document Management domain or expected URL path"));
     }
 
-    private DocumentValidator buildDocumentValidator(final String url) {
+    private DocumentValidator buildDocumentValidator(final String urlBase) {
         final ApplicationParams ap = mock(ApplicationParams.class);
-        when(ap.getValidDMDomain()).thenReturn(url);
+        when(ap.getDocumentURLPattern()).thenReturn(urlBase + "/documents/[A-Za-z0-9-]+(?:/binary)?");
+
         return new DocumentValidator(ap);
     }
 
     @Before
     public void setUp() throws Exception {
         final ApplicationParams applicationParams = mock(ApplicationParams.class);
-        when(applicationParams.getValidDMDomain()).thenReturn("https://dm.reform.hmcts.net");
+        when(applicationParams.getDocumentURLPattern()).thenReturn("https://dm.reform.hmcts.net/documents/[A-Za-z0-9-]+(?:/binary)?");
+
         validator = new DocumentValidator(applicationParams);
         caseFieldDefinition = MAPPER.readValue(CASE_FIELD_STRING, CaseFieldDefinition.class);
     }
@@ -128,6 +138,36 @@ public class DocumentValidatorTest implements IVallidatorTest {
         final List<ValidationResult> validDocumentUrlResult =
             validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertEquals(validDocumentUrlResult.toString(), 0, validDocumentUrlResult.size());
+    }
+
+    @Test
+    public void shouldValidateDocumentWithValidEmHrsUrlAndDomain() {
+        validator = setUpEmHrsApiValidator();
+
+        ObjectNode data = createDoc(VALID_EM_HRS_API_DOCUMENT_URL);
+        final List<ValidationResult> validDocumentUrlResult =
+            validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
+        assertEquals(validDocumentUrlResult.toString(), 0, validDocumentUrlResult.size());
+    }
+
+    @Test
+    public void shouldNotValidateDocumentWithInValidEmHrsRecordId() {
+        validator = setUpEmHrsApiValidator();
+
+        ObjectNode data = createDoc(INVALID_RECORD_ID_EM_HRS_API_DOCUMENT_URL);
+        final List<ValidationResult> validDocumentUrlResult =
+            validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
+        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+    }
+
+    @Test
+    public void shouldNotValidateDocumentWithInValidEmHrsUrl() {
+        validator = setUpEmHrsApiValidator();
+
+        ObjectNode data = createDoc(INVALID_EM_HRS_API_DOCUMENT_URL);
+        final List<ValidationResult> validDocumentUrlResult =
+            validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
+        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
     }
 
     @Test
@@ -347,5 +387,12 @@ public class DocumentValidatorTest implements IVallidatorTest {
         data.set(DOCUMENT_URL, new TextNode(documentUrl));
         data.set("document_binary_url", new TextNode(documentBinaryUrl));
         return data;
+    }
+
+    private DocumentValidator setUpEmHrsApiValidator() {
+        final ApplicationParams applicationParams = mock(ApplicationParams.class);
+        when(applicationParams.getDocumentURLPattern()).thenReturn("https://em-hrs-api.service.core-compute-aat.internal/hearing-recordings/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/segments/[0-9]");
+        validator = new DocumentValidator(applicationParams);
+        return validator;
     }
 }
