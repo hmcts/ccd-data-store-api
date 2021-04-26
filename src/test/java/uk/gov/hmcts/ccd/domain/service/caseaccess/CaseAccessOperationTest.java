@@ -39,6 +39,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -287,6 +288,23 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(caseUserRepository, times(1)).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
+        }
+
+        @Test
+        @DisplayName("should not add case user role when same role with different case exists")
+        void shouldNotAddCaseUserRoleWhenRoleIsCaseInsensitive() {
+            // ARRANGE
+            String role = "[DEFENDANT]";
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, role)
+            );
+            given(caseUserRepository.findCaseRoles(CASE_ID, USER_ID)).willReturn(List.of("[defendant]"));
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(caseUserRepository, never()).grantAccess(CASE_ID, USER_ID, role);
         }
 
         @Test

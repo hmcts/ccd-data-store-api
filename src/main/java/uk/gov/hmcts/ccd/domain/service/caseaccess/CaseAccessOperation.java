@@ -112,8 +112,7 @@ public class CaseAccessOperation {
 
         cauRolesByCaseId.forEach((caseId, requestedAssignments) ->
             requestedAssignments.forEach(requestedAssignment ->
-                caseUserRepository.grantAccess(caseId, requestedAssignment.getUserId(),
-                                               requestedAssignment.getCaseRole())
+                checkRoleAndPersist(caseId, requestedAssignment)
             )
         );
 
@@ -123,6 +122,16 @@ public class CaseAccessOperation {
                     ORGS_ASSIGNED_USERS_PATH + organisationId, newUserCount)
             )
         );
+    }
+
+    private void checkRoleAndPersist(Long caseId, CaseAssignedUserRoleWithOrganisation requestedAssignment) {
+        List<String> roles = caseUserRepository.findCaseRoles(caseId, requestedAssignment.getUserId());
+        boolean roleExists = roles.stream()
+            .anyMatch(dbRole -> dbRole.equalsIgnoreCase(requestedAssignment.getCaseRole()));
+        if (!roleExists) {
+            caseUserRepository.grantAccess(caseId, requestedAssignment.getUserId(),
+                requestedAssignment.getCaseRole());
+        }
     }
 
     @Transactional
