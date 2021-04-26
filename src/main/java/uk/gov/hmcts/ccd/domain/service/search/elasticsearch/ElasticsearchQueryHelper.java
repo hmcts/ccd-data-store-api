@@ -40,7 +40,7 @@ public class ElasticsearchQueryHelper {
         try {
             searchRequestNode = objectMapperService.convertStringToObject(jsonSearchRequest, JsonNode.class);
         } catch (ServiceException ex) {
-            throw new BadRequestException("Request requires correctly formatted JSON");
+            throw new BadRequestException("Request requires correctly formatted JSON, " + ex.getMessage());
         }
         validateSupplementaryData(searchRequestNode);
         return new ElasticsearchRequest(searchRequestNode);

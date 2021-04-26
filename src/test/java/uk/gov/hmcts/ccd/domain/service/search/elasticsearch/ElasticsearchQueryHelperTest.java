@@ -168,7 +168,8 @@ class ElasticsearchQueryHelperTest {
             elasticsearchQueryHelper.validateAndConvertRequest(searchRequest));
 
         assertAll(
-            () -> MatcherAssert.assertThat(exception.getMessage(), is("Request requires correctly formatted JSON")));
+            () -> MatcherAssert.assertThat(exception.getMessage(), is("Request requires correctly formatted JSON, "
+                + "Unable to map JSON string to object")));
     }
 
     private String blacklistedQuery() {
