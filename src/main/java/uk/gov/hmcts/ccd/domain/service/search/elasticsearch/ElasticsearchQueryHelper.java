@@ -10,6 +10,7 @@ import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +39,7 @@ public class ElasticsearchQueryHelper {
         JsonNode searchRequestNode;
         try {
             searchRequestNode = objectMapperService.convertStringToObject(jsonSearchRequest, JsonNode.class);
-        } catch (Exception ex) {
+        } catch (ServiceException ex) {
             throw new BadRequestException("Request requires correctly formatted JSON");
         }
         validateSupplementaryData(searchRequestNode);
