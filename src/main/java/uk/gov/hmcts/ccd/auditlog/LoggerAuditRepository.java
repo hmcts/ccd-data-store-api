@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.auditlog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,11 +19,6 @@ public class LoggerAuditRepository implements AuditRepository {
 
     @Override
     public void save(final AuditEntry auditEntry) {
-        if (auditEntry.getIdamId() != null && auditEntry.getInvokingService() != null
-            && HttpStatus.resolve(auditEntry.getHttpStatus()) != null  && auditEntry.getHttpMethod() != null
-            && auditEntry.getPath() != null && auditEntry.getRequestId() != null
-            && auditEntry.getDateTime() != null) {
-            LOG.info(logFormatter.format(auditEntry));
-        }
+        LOG.info(logFormatter.format(auditEntry));
     }
 }
