@@ -17,6 +17,8 @@ import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesResponse;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertEquals;
@@ -660,6 +662,53 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         // check data has not been saved
         List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
         assertEquals(0, caseRoles.size());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases_with_valid_case_ids.sql"
+    })
+    @DisplayName(
+        "addCaseUserRoles: should not add another entry for case-user-role mapping when same role "
+            + "exists with lower case letters (case insentisitive)"
+    )
+    void addCaseUserRoles_shouldNotAddCaseUserRoleWhenSameRoleStringExistWithCaseInsensitive() throws Exception {
+        // ARRANGE
+        MockUtils.setSecurityAuthorities(authentication);
+        String userId = "10001"; // don't need the users to exist in the repository but want unique for each AC
+        String role = "[CASE-ROLE-1]";
+        List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+            new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, role)
+        );
+
+        mockMvc.perform(post(postCaseAssignedUserRoles)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(caseUserRoles)))
+            .headers(createHttpHeaders()))
+            .andExpect(status().isCreated())
+            .andReturn();
+        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+        assertThat(caseRoles, hasItems(role));
+
+        // ACT second request with lower case role
+        String roleWithDifferentCaseLetter = "[case-Role-1]";
+
+        MvcResult result = mockMvc.perform(post(postCaseAssignedUserRoles)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(new CaseAssignedUserRolesRequest(Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_ID_1, userId, roleWithDifferentCaseLetter)
+            ))))
+            .headers(createHttpHeaders()))
+            .andExpect(status().isCreated())
+            .andReturn();
+
+        // ASSERT
+        assertEquals(result.getResponse().getContentAsString(), 201, result.getResponse().getStatus());
+        // check data has been saved
+        caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+        assertEquals(1, caseRoles.size());
+        assertThat(caseRoles, hasItem(role));
+        assertThat(caseRoles, not(hasItem(roleWithDifferentCaseLetter)));
     }
 }
 
