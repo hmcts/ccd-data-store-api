@@ -20,6 +20,7 @@ import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.std.UserId;
 import uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 
 import java.util.List;
 
@@ -30,9 +31,11 @@ public class CaseAccessEndpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaseAccessEndpoint.class);
     private final CaseAccessOperation caseAccessOperation;
+    private final RoleAssignmentService roleAssignmentService;
 
-    public CaseAccessEndpoint(CaseAccessOperation caseAccessOperation) {
+    public CaseAccessEndpoint(CaseAccessOperation caseAccessOperation, RoleAssignmentService roleAssignmentService) {
         this.caseAccessOperation = caseAccessOperation;
+        this.roleAssignmentService = roleAssignmentService;
     }
 
     @RequestMapping(
@@ -56,6 +59,9 @@ public class CaseAccessEndpoint {
         @RequestParam(value = "userId") final String idSearchingFor
     ) {
         LOG.debug("Finding cases user: {} has access to", idSearchingFor);
+        if(true){
+            return roleAssignmentService.getCaseIdsForAGivenUser(idSearchingFor);
+        }
         return caseAccessOperation.findCasesUserIdHasAccessTo(idSearchingFor);
     }
 
