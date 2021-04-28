@@ -41,7 +41,6 @@ apply plugin: 'org.sonarqube'
 apply plugin: 'jsonschema2pojo'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
-apply plugin: 'com.jfrog.bintray'
 apply plugin: 'se.patrikerdes.use-latest-versions'
 
 apply from: 'liquibase.gradle'
