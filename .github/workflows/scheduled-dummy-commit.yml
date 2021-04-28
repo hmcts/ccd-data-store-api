@@ -1,0 +1,30 @@
+name: Scheduled Dummy Commit to develop Branch
+
+on:
+  schedule:
+    - cron: "30 7 * * *"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: tibdex/github-app-token@v1
+        id: generate-token
+        with:
+          app_id: ${{ secrets.HMCTS_GITHUB_CCD_APP_ID }}
+          private_key: ${{ secrets.HMCTS_GITHUB_CCD_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+          ref: develop
+
+      - name: Push Dummy Commit to develop Branch
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          skip_dirty_check: true
+          commit_message: "Trigger build with empty commit"
+          commit_options: "--allow-empty"
+          push_options: '--force'
+          branch: 'develop'
