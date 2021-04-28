@@ -8,13 +8,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.util.Optional;
 
@@ -26,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
@@ -152,6 +156,20 @@ class ElasticsearchQueryHelperTest {
             () -> MatcherAssert.assertThat(exception.getMessage(), is("Requested supplementary_data must be an"
                     + " array of text fields."))
         );
+    }
+
+    @Test
+    public void testBadRequestThrowsException() throws Exception {
+        doThrow(new ServiceException("Unable to map JSON string to object"))
+            .when(objectMapperService).convertStringToObject(anyString(), any());
+        String searchRequest = "{\"native_es_query\":{\"query\":,{}},\"supplementary_data\":[{\"array\":\"object\"}]}}";
+
+        BadRequestException exception = assertThrows(BadRequestException.class, () ->
+            elasticsearchQueryHelper.validateAndConvertRequest(searchRequest));
+
+        assertAll(
+            () -> MatcherAssert.assertThat(exception.getMessage(), is("Request requires correctly formatted JSON, "
+                + "Unable to map JSON string to object")));
     }
 
     private String blacklistedQuery() {
