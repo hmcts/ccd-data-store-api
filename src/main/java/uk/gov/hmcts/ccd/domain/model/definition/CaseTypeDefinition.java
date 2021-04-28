@@ -4,17 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.TextNode;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
@@ -39,7 +39,6 @@ public class CaseTypeDefinition implements Serializable {
     private List<AccessControlList> accessControlLists;
     private final List<SearchAliasField> searchAliasFields = new ArrayList<>();
     private List<RoleToAccessProfileDefinition> roleToAccessProfiles = new ArrayList<>();
-    private Map<String, RoleToAccessProfileDefinition> roleToAccessProfilesMap = new HashMap<>();
 
     public String getId() {
         return id;
@@ -201,13 +200,5 @@ public class CaseTypeDefinition implements Serializable {
 
     public void setRoleToAccessProfiles(List<RoleToAccessProfileDefinition> roleToAccessProfiles) {
         this.roleToAccessProfiles = roleToAccessProfiles;
-        this.roleToAccessProfilesMap = this.roleToAccessProfiles
-            .stream()
-            .collect(Collectors.toMap(RoleToAccessProfileDefinition::getRoleName,
-                roleToAccessProfileDefinition -> roleToAccessProfileDefinition));
-    }
-
-    public RoleToAccessProfileDefinition getRoleToAccessProfile(String roleName) {
-        return this.roleToAccessProfilesMap.get(roleName);
     }
 }

@@ -25,7 +25,7 @@ public class RoleToAccessProfileDefinition {
         this.caseTypeId = caseTypeId;
     }
 
-    public Boolean getDisabled() {
+    public Boolean isDisabled() {
         return disabled;
     }
 
@@ -33,7 +33,7 @@ public class RoleToAccessProfileDefinition {
         this.disabled = disabled;
     }
 
-    public Boolean getReadOnly() {
+    public Boolean isReadOnly() {
         return readOnly;
     }
 
@@ -65,6 +65,16 @@ public class RoleToAccessProfileDefinition {
 
     public void setAccessProfiles(String accessProfiles) {
         this.accessProfiles = accessProfiles;
+    }
+
+    public List<String> getAccessProfileList() {
+        if (getAccessProfiles() != null) {
+            return Arrays.asList(getAccessProfiles().split(","))
+                .stream()
+                .filter(str -> str.length() > 0)
+                .collect(Collectors.toList());
+        }
+        return new ArrayList<>();
     }
 
     public Date getLiveFrom() {
