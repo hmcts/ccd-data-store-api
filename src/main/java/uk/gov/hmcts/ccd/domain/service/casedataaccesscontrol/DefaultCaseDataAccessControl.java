@@ -128,8 +128,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
             .collect(Collectors.toList());
 
         augmented.addAll(filteringResults.getRoleMatchingResults());
-        filteringResults = new RoleAssignmentFilteringResult(augmented);
-        return filteringResults;
+        return new RoleAssignmentFilteringResult(augmented);
     }
 
     @Override

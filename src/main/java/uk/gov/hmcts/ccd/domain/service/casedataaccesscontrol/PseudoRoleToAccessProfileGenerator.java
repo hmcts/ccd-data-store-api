@@ -1,15 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
-import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
@@ -103,14 +102,13 @@ public class PseudoRoleToAccessProfileGenerator {
     }
 
     private RoleToAccessProfileDefinition createRoleToAccessProfile(String ctId, String role, boolean addIdamPrefix) {
-        RoleToAccessProfileDefinition accessProfile = new RoleToAccessProfileDefinition();
-        accessProfile.setAccessProfiles(role);
-        accessProfile.setRoleName(addIdamPrefix ? IDAM_PREFIX + role : role);
-        accessProfile.setCaseTypeId(ctId);
-        accessProfile.setReadOnly(false);
-        accessProfile.setAuthorisations(null);
-        accessProfile.setReadOnly(false);
-        accessProfile.setDisabled(false);
-        return accessProfile;
+        return RoleToAccessProfileDefinition.builder()
+            .accessProfiles(role)
+            .roleName(addIdamPrefix ? IDAM_PREFIX + role : role)
+            .caseTypeId(ctId)
+            .readOnly(false)
+            .disabled(false)
+            .authorisations(null)
+            .build();
     }
 }

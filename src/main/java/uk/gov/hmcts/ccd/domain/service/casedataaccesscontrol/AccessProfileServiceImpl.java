@@ -1,5 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
@@ -7,13 +13,6 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Component
 public class AccessProfileServiceImpl implements AccessProfileService, AccessControl {
@@ -31,7 +30,7 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
             RoleToAccessProfileDefinition roleToAccessProfileDefinition =
                 roleToAccessProfileDefinitionMap.get(roleAssignment.getRoleName());
 
-            if (roleToAccessProfileDefinition != null && !roleToAccessProfileDefinition.isDisabled()) {
+            if (roleToAccessProfileDefinition != null && !roleToAccessProfileDefinition.getDisabled()) {
                 List<String> authorisations = roleToAccessProfileDefinition.getAuthorisationList();
                 List<String> roleAssignmentAuthorisations = roleAssignment.getAuthorisations();
 
@@ -58,7 +57,7 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
             Collection<String> filterAuthorisations = CollectionUtils
                 .intersection(roleAssignmentAuthorisations, authorisations);
 
-            return filterAuthorisations.size() > 0;
+            return !filterAuthorisations.isEmpty();
         }
         return authorisations.size() == 0;
     }
@@ -68,14 +67,11 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
         List<String> accessProfileList = roleToAccessProfileDefinition.getAccessProfileList();
         return accessProfileList
             .stream()
-            .map(accessProfileValue -> {
-                AccessProfile accessProfile = new AccessProfile();
-
-                accessProfile.setReadOnly(roleToAccessProfileDefinition.isReadOnly()
-                    || roleAssignment.getReadOnly());
-                accessProfile.setClassification(roleAssignment.getClassification());
-                accessProfile.setAccessProfile(accessProfileValue);
-                return accessProfile;
-            }).collect(Collectors.toList());
+            .map(accessProfileValue -> AccessProfile.builder()
+                .accessProfile(accessProfileValue)
+                .securityClassification(roleAssignment.getClassification())
+                .readOnly(roleToAccessProfileDefinition.getReadOnly()
+                    || roleAssignment.getReadOnly())
+                .build()).collect(Collectors.toList());
     }
 }
