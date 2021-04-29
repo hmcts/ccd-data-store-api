@@ -9,16 +9,18 @@ Feature: F-106: Update Supplementary Data
     Given an appropriate test context as detailed in the test data source,
     And a user [Dil - who can create a case],
     And a case [C1, which has just been] created as in [F106_Case_Data_Create_C1],
+    And a wait time of [10] seconds [to allow for Logstash to index the case just created],
     When a request is prepared with appropriate values,
     And it is submitted to call the [Update Supplementary Data] operation of [CCD Data Store api],
     Then a positive response is received,
     And the response has all the details as expected.
 
-  @S-606 @Ignore
+  @S-606
   Scenario: Need to be able to increment an existing property
     Given an appropriate test context as detailed in the test data source,
     And a user [Dil - who can create a case],
     And a case [C1, which has just been] created as in [F106_Case_Data_Create_C1],
+    And a wait time of [10] seconds [to allow for Logstash to index the case just created],
     And a successful call [by Dil to update supplementary_data] as in [F-106_Update_Supplementary_Data_C1],
     When a request is prepared with appropriate values,
     And the request [contains increments of a specified value to an existing Supplementary Data property],
@@ -31,6 +33,7 @@ Feature: F-106: Update Supplementary Data
     Given an appropriate test context as detailed in the test data source,
     And a user [Dil - who can create a case],
     And a case [C1, which has just been] created as in [F106_Case_Data_Create_C1],
+    And a wait time of [10] seconds [to allow for Logstash to index the case just created],
     And a successful call [by Dil to update supplementary_data] as in [F-106_Update_Supplementary_Data_C1],
     When a request is prepared with appropriate values,
     And the request [replaces the value of an existing supplementary_data property with the provided value],
