@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import com.google.common.collect.Lists;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -31,6 +33,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -54,7 +57,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     private static final String EVENT_ID_STRING = valueOf(EVENT_ID);
     private static final CaseEventDefinition CASE_EVENT = newCaseEvent().withId(EVENT_ID_STRING).build();
     private static final CaseDetails CASE_DETAILS = newCaseDetails().withId(CASE_REFERENCE)
-            .withCaseTypeId(CASE_TYPE_ID).build();
+            .withCaseTypeId(CASE_TYPE_ID).withReference(Long.valueOf(CASE_REFERENCE)).build();
     private static final CaseEventDefinition CASE_EVENT_2 = newCaseEvent().withId("event2").build();
     private static final CaseTypeDefinition TEST_CASE_TYPE = newCaseType().withEvent(CASE_EVENT)
             .withEvent(CASE_EVENT_2).build();
@@ -97,6 +100,8 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     private CaseUserRepository caseUserRepository;
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
+    @Mock
+    private CaseDataAccessControl caseDataAccessControl;
 
     private uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseHistoryViewOperation
             authorisedGetCaseHistoryViewOperation;
@@ -106,15 +111,16 @@ class AuthorisedGetCaseHistoryViewOperationTest {
         MockitoAnnotations.initMocks(this);
 
         doReturn(TEST_CASE_TYPE).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
-        doReturn(USER_ROLES).when(userRepository).getUserRoles();
+        doReturn(Lists.newArrayList()).when(caseDataAccessControl).generateAccessProfilesByCaseTypeId(CASE_TYPE_ID);
+        doReturn(USER_ROLES).when(caseDataAccessControl).extractAccessProfileNames(anyList());
         doReturn(TEST_CASE_HISTORY_VIEW).when(getCaseHistoryViewOperation).execute(CASE_REFERENCE, EVENT_ID);
         doReturn(caseRoles).when(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
         doReturn(Optional.of(CASE_DETAILS)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
         authorisedGetCaseHistoryViewOperation =
                 new uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetCaseHistoryViewOperation(
-                        getCaseHistoryViewOperation, caseDefinitionRepository, accessControlService, userRepository,
-                        caseUserRepository, caseDetailsRepository);
+                    getCaseHistoryViewOperation, caseDefinitionRepository,
+                    accessControlService, caseDetailsRepository, caseDataAccessControl);
     }
 
     @Test
@@ -129,9 +135,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
         verify(getCaseHistoryViewOperation).execute(CASE_REFERENCE, EVENT_ID);
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         verify(caseDetailsRepository).findByReference(CASE_REFERENCE);
-        verify(userRepository).getUserRoles();
-        verify(userRepository).getUserId();
-        verify(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
+        verify(caseDataAccessControl).generateAccessProfilesByCaseReference(CASE_REFERENCE);
         verify(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, USER_ROLES, CAN_READ);
     }
 

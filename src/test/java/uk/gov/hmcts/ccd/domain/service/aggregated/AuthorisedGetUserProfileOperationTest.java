@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 import static org.hamcrest.Matchers.everyItem;
@@ -24,9 +26,12 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 class AuthorisedGetUserProfileOperationTest {
@@ -51,6 +56,9 @@ class AuthorisedGetUserProfileOperationTest {
     private UserRepository userRepository;
 
     @Mock
+    private CaseDataAccessControl caseDataAccessControl;
+
+    @Mock
     private AccessControlService accessControlService;
 
     @Mock
@@ -73,11 +81,14 @@ class AuthorisedGetUserProfileOperationTest {
         test1JurisdictionDisplayProperties.setCaseTypeDefinitions(caseTypes1Definition);
         test2JurisdictionDisplayProperties.setCaseTypeDefinitions(caseTypes2Definition);
 
-        doReturn(userRoles).when(userRepository).getUserRoles();
+        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+            .thenReturn(Lists.newArrayList());
+        when(caseDataAccessControl.extractAccessProfileNames(anyList()))
+            .thenReturn(userRoles);
         doReturn(userProfile).when(getUserProfileOperation).execute(CAN_READ);
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(any(), any(), any());
         classUnderTest =
-            new AuthorisedGetUserProfileOperation(userRepository, accessControlService, getUserProfileOperation);
+            new AuthorisedGetUserProfileOperation(accessControlService, getUserProfileOperation, caseDataAccessControl);
     }
 
     @Test

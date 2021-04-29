@@ -1,22 +1,22 @@
 package uk.gov.hmcts.ccd.domain.service.cauroles.rolevalidator;
 
 import com.google.common.collect.Lists;
+import java.util.Arrays;
+import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.AuthCheckerConfiguration;
-import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
-
-import java.util.Arrays;
-import java.util.Collections;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 class DefaultCaseAssignedUserRoleValidatorTest {
@@ -28,13 +28,10 @@ class DefaultCaseAssignedUserRoleValidatorTest {
     private UserRepository userRepository;
 
     @Mock
-    private DefaultUserRepository defaultUserRepository;
+    private CaseDataAccessControl caseDataAccessControl;
 
     @Mock
     private ApplicationParams applicationParams;
-
-    @Mock
-    private AuthCheckerConfiguration authCheckerConfiguration;
 
     private DefaultCaseAssignedUserRoleValidator caseAssignedUserRoleValidator;
 
@@ -58,16 +55,23 @@ class DefaultCaseAssignedUserRoleValidatorTest {
     @Test
     @DisplayName("Can access self case user roles")
     void canAccessSelfUserCaseRolesWhenSelfUserIdPassed() {
-        when(userRepository.getUserRoles()).thenReturn(Collections.singleton(roleCaseworkerSolicitor));
+        mockAccessProfiles();
         when(userRepository.getUserId()).thenReturn("1234567");
         boolean canAccess = caseAssignedUserRoleValidator.canAccessUserCaseRoles(Lists.newArrayList("1234567"));
         assertTrue(canAccess);
     }
 
+    private void mockAccessProfiles() {
+        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+            .thenReturn(Lists.newArrayList());
+        when(caseDataAccessControl.extractAccessProfileNames(anyList()))
+            .thenReturn(Collections.singleton(roleCaseworkerSolicitor));
+    }
+
     @Test
     @DisplayName("Can access self case user roles even same user id passed more than once")
     void canAccessSelfUserCaseRolesWhenSelfUserIdPassedMoreThanOnce() {
-        when(userRepository.getUserRoles()).thenReturn(Collections.singleton(roleCaseworkerSolicitor));
+        mockAccessProfiles();
         when(userRepository.getUserId()).thenReturn("1234567");
         boolean canAccess = caseAssignedUserRoleValidator.canAccessUserCaseRoles(
                 Lists.newArrayList("1234567", "1234567"));
@@ -77,7 +81,7 @@ class DefaultCaseAssignedUserRoleValidatorTest {
     @Test
     @DisplayName("Can not access other user case roles")
     void canNotAccessOtherUserCaseRolesWhenMoreUserIdsPassedOtherThanSelf() {
-        when(userRepository.getUserRoles()).thenReturn(Collections.singleton(roleCaseworkerSolicitor));
+        mockAccessProfiles();
         when(userRepository.getUserId()).thenReturn("1234567");
         boolean canAccess = caseAssignedUserRoleValidator.canAccessUserCaseRoles(
                 Lists.newArrayList("1234567", "1234568"));
@@ -87,7 +91,7 @@ class DefaultCaseAssignedUserRoleValidatorTest {
     @Test
     @DisplayName("Can not access other user case roles when self id not passed")
     void canNotAccessOtherUserCaseRolesWhenSelfUserIdNotPassed() {
-        when(userRepository.getUserRoles()).thenReturn(Collections.singleton(roleCaseworkerSolicitor));
+        mockAccessProfiles();
         when(userRepository.getUserId()).thenReturn("1234567");
         boolean canAccess = caseAssignedUserRoleValidator.canAccessUserCaseRoles(Lists.newArrayList("1234568"));
         assertFalse(canAccess);

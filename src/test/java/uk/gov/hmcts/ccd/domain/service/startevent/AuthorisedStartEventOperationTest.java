@@ -5,6 +5,10 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,11 +30,6 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -117,6 +116,8 @@ class AuthorisedStartEventOperationTest {
             "classificationTestValue");
 
         classifiedCaseDetails = new CaseDetails();
+        classifiedCaseDetails.setId(CASE_REFERENCE);
+        classifiedCaseDetails.setReference(Long.valueOf(CASE_REFERENCE));
         classifiedCaseDetails.setData(JacksonUtils.convertValue(classifiedCaseDetailsNode));
         classifiedCaseDetails.setDataClassification(JacksonUtils.convertValue(
             classifiedCaseDetailsClassificationNode));
@@ -133,8 +134,10 @@ class AuthorisedStartEventOperationTest {
             draftGateway,
             caseAccessService);
         caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
+        caseTypeDefinition.setId(CASE_TYPE_ID);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
-        when(caseAccessService.getUserRoles()).thenReturn(userRoles);
+        when(caseAccessService.getAccessProfiles(anyString())).thenReturn(userRoles);
+        when(caseAccessService.getAccessRoles(anyString())).thenReturn(userRoles);
         when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ))
             .thenReturn(true);
         when(accessControlService.filterCaseFieldsByAccess(eq(classifiedCaseDetailsNode),
@@ -327,7 +330,7 @@ class AuthorisedStartEventOperationTest {
                     EVENT_TRIGGER_ID,
                     IGNORE_WARNING),
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-                () -> inOrder.verify(caseAccessService).getUserRoles(),
+                () -> inOrder.verify(caseAccessService).getAccessRoles(CASE_REFERENCE),
                 () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
                     eq(userRoles),
                     eq(CAN_READ)),

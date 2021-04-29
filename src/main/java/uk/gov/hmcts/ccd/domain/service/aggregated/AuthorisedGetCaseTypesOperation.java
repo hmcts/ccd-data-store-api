@@ -5,15 +5,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -29,36 +28,34 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 public class AuthorisedGetCaseTypesOperation implements GetCaseTypesOperation {
     public static final String QUALIFIER = "authorised";
     private final AccessControlService accessControlService;
-    private final UserRepository userRepository;
     private final GetCaseTypesOperation getCaseTypesOperation;
+    private final CaseDataAccessControl caseDataAccessControl;
 
     @Autowired
     public AuthorisedGetCaseTypesOperation(final AccessControlService accessControlService,
-                                           @Qualifier(CachedUserRepository.QUALIFIER)
-                                               final UserRepository userRepository,
                                            @Qualifier(DefaultGetCaseTypesOperation.QUALIFIER)
-                                               final GetCaseTypesOperation getCaseTypesOperation) {
+                                               final GetCaseTypesOperation getCaseTypesOperation,
+                                           CaseDataAccessControl caseDataAccessControl) {
         this.accessControlService = accessControlService;
-        this.userRepository = userRepository;
         this.getCaseTypesOperation = getCaseTypesOperation;
+        this.caseDataAccessControl = caseDataAccessControl;
     }
 
     @Override
     public List<CaseTypeDefinition> execute(String jurisdictionId, Predicate<AccessControlList> access) {
-        final Set<String> userRoles = getUserRoles();
         return getCaseTypesOperation.execute(jurisdictionId, access).stream()
-            .map(caseType -> verifyAccess(caseType, userRoles, access))
+            .map(caseType -> verifyAccess(caseType, getAccessProfiles(caseType.getId()), access))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .collect(Collectors.toList());
     }
 
-    private Set<String> getUserRoles() {
-        Set<String> userRoles = userRepository.getUserRoles();
-        if (userRoles == null) {
+    private Set<String> getAccessProfiles(String caseTypeId) {
+        List<AccessProfile> accessProfiles = caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
+        if (accessProfiles == null) {
             throw new ValidationException("Cannot find user roles for the user");
         }
-        return userRoles;
+        return caseDataAccessControl.extractAccessProfileNames(accessProfiles);
     }
 
     private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition,

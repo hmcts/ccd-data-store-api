@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
 import com.google.common.collect.Sets;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
@@ -20,8 +21,6 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.util.Set;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -94,11 +93,12 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
         return caseTypeDefinition;
     }
 
-    private Set<String> getCaseRoles(CaseDetails caseDetails) {
+    private Set<String> getCaseRoles(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition) {
         if (caseDetails == null || caseDetails.getId() == null || Draft.isDraft(caseDetails.getId())) {
-            return caseAccessService.getCaseCreationCaseRoles();
+            return Sets.union(caseAccessService.getAccessProfiles(caseTypeDefinition.getId()),
+                caseAccessService.getCaseCreationCaseRoles());
         } else {
-            return caseAccessService.getCaseRoles(caseDetails.getId());
+            return caseAccessService.getAccessRoles(caseDetails.getReferenceAsString());
         }
     }
 
@@ -106,10 +106,8 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
 
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
 
-        Set<String> userRoles =
-            Sets.union(caseAccessService.getUserRoles(), getCaseRoles(startEventResult.getCaseDetails()));
-
         CaseDetails caseDetails = startEventResult.getCaseDetails();
+        Set<String> userRoles = getCaseRoles(caseDetails, caseTypeDefinition);
 
         if (!accessControlService.canAccessCaseTypeWithCriteria(
             caseTypeDefinition,

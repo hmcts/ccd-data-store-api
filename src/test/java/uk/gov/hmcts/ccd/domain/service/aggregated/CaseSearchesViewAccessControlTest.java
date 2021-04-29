@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
@@ -29,6 +31,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.eq;
@@ -88,6 +92,9 @@ class CaseSearchesViewAccessControlTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private CaseDataAccessControl caseDataAccessControl;
 
     @Mock
     private CaseTypeService caseTypeService;
@@ -154,8 +161,8 @@ class CaseSearchesViewAccessControlTest {
         when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any()))
             .thenReturn(true);
 
-        classUnderTest = new CaseSearchesViewAccessControl(userRepository, caseTypeService,
-            searchResultDefinitionService, securityClassificationService);
+        classUnderTest = new CaseSearchesViewAccessControl(caseTypeService,
+            searchResultDefinitionService, securityClassificationService, caseDataAccessControl);
 
     }
 
@@ -184,7 +191,7 @@ class CaseSearchesViewAccessControlTest {
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .build();
 
-        when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
+        mockAccessProfiles();
         List<String> requestedFields = new ArrayList<>();
 
         assertTrue(classUnderTest
@@ -216,7 +223,7 @@ class CaseSearchesViewAccessControlTest {
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .build();
 
-        when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
+        mockAccessProfiles();
         List<String> requestedFields = new ArrayList<>();
 
         assertTrue(classUnderTest
@@ -248,7 +255,7 @@ class CaseSearchesViewAccessControlTest {
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .build();
 
-        when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
+        mockAccessProfiles();
         List<String> requestedFields = new ArrayList<>();
 
 
@@ -265,8 +272,8 @@ class CaseSearchesViewAccessControlTest {
                 .withRole(ROLE_IN_USER_ROLE_1)
                 .withRead(true)
                 .build()).build();
-        when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
 
+        mockAccessProfiles();
         assertTrue(classUnderTest.filterFieldByAuthorisationAccessOnField(postCode));
     }
 
@@ -279,7 +286,8 @@ class CaseSearchesViewAccessControlTest {
                 .withRole(ROLE_IN_USER_ROLE_1)
                 .withRead(true)
                 .build()).build();
-        when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_2));
+
+        mockAccessProfiles(ROLE_IN_USER_ROLE_2);
 
         assertFalse(classUnderTest.filterFieldByAuthorisationAccessOnField(postCode));
     }
@@ -317,8 +325,7 @@ class CaseSearchesViewAccessControlTest {
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .build();
 
-
-        when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
+        mockAccessProfiles();
 
         assertTrue(classUnderTest.filterResultsBySecurityClassification(caseFieldDefinition1, caseTypeDefinition1));
     }
@@ -356,10 +363,22 @@ class CaseSearchesViewAccessControlTest {
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .build();
 
-        when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_2));
+
+        mockAccessProfiles();
         when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any()))
             .thenReturn(false);
         assertFalse(classUnderTest.filterResultsBySecurityClassification(caseFieldDefinition1, caseTypeDefinition1));
+    }
+
+    private void mockAccessProfiles() {
+        mockAccessProfiles(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2);
+    }
+
+    private void mockAccessProfiles(String... roles) {
+        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+            .thenReturn(Lists.newArrayList());
+        when(caseDataAccessControl.extractAccessProfileNames(anyList()))
+            .thenReturn(Sets.newHashSet(roles));
     }
 
 

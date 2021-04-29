@@ -1,26 +1,24 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND_DETAILS;
-
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
-import uk.gov.hmcts.ccd.domain.model.search.CriteriaType;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
+import uk.gov.hmcts.ccd.domain.model.search.CriteriaType;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND_DETAILS;
 
 @Service
 @Qualifier(AuthorisedGetCriteriaOperation.QUALIFIER)
@@ -29,15 +27,15 @@ public class AuthorisedGetCriteriaOperation implements GetCriteriaOperation {
     public static final String QUALIFIER = "authorised";
     private final GetCriteriaOperation getCriteriaOperation;
     private final GetCaseTypeOperation getCaseTypeOperation;
-    private final UserRepository userRepository;
+    private final CaseDataAccessControl caseDataAccessControl;
 
     public AuthorisedGetCriteriaOperation(
         @Qualifier(ClassifiedGetCriteriaOperation.QUALIFIER) final GetCriteriaOperation getCriteriaOperation,
         @Qualifier(AuthorisedGetCaseTypeOperation.QUALIFIER) final GetCaseTypeOperation getCaseTypeOperation,
-        @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
+        CaseDataAccessControl caseDataAccessControl) {
         this.getCriteriaOperation = getCriteriaOperation;
         this.getCaseTypeOperation = getCaseTypeOperation;
-        this.userRepository = userRepository;
+        this.caseDataAccessControl = caseDataAccessControl;
     }
 
     public <T> List<? extends CriteriaInput> execute(final String caseTypeId,
@@ -53,8 +51,15 @@ public class AuthorisedGetCriteriaOperation implements GetCriteriaOperation {
         final HashSet<String> addedFields = new HashSet<>();
         return getCriteriaOperation.execute(caseTypeId, access, criteriaType).stream()
             .filter(crInput -> criteriaAllowedByCRUD(caseType.get(), crInput))
-            .filter(input -> filterDistinctFieldsByRole(addedFields, input, userRepository.getUserRoles()))
+            .filter(input -> filterDistinctFieldsByRole(addedFields,
+                input,
+                getAccessProfiles(caseTypeId)))
             .collect(Collectors.toList());
+    }
+
+    private Set<String> getAccessProfiles(String caseTypeId) {
+        List<AccessProfile> accessProfiles = caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
+        return caseDataAccessControl.extractAccessProfileNames(accessProfiles);
     }
 
     private boolean criteriaAllowedByCRUD(CaseTypeDefinition caseTypeDefinition, CriteriaInput criteriaInput) {

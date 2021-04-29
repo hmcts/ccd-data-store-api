@@ -1,5 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
+import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -7,27 +13,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-import static org.jooq.lambda.function.Functions.not;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.PathNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
@@ -35,6 +29,11 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchCaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
+
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static org.jooq.lambda.function.Functions.not;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Service
 @Qualifier(AuthorisedCaseSearchOperation.QUALIFIER)
@@ -51,7 +50,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     private final AccessControlService accessControlService;
     private final SecurityClassificationService classificationService;
     private final ObjectMapperService objectMapperService;
-    private final UserRepository userRepository;
+    private final CaseDataAccessControl caseDataAccessControl;
 
     @Autowired
     public AuthorisedCaseSearchOperation(
@@ -60,14 +59,14 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         AccessControlService accessControlService,
         SecurityClassificationService classificationService,
         ObjectMapperService objectMapperService,
-        @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
+        CaseDataAccessControl caseDataAccessControl) {
 
         this.caseSearchOperation = caseSearchOperation;
         this.authorisedCaseDefinitionDataService = authorisedCaseDefinitionDataService;
         this.accessControlService = accessControlService;
         this.classificationService = classificationService;
         this.objectMapperService = objectMapperService;
-        this.userRepository = userRepository;
+        this.caseDataAccessControl = caseDataAccessControl;
     }
 
     @Override
@@ -139,7 +138,8 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         JsonNode caseData = caseDataToJsonNode(caseDetails);
         JsonNode accessFilteredData =
             accessControlService.filterCaseFieldsByAccess(caseData, authorisedCaseType.getCaseFieldDefinitions(),
-                                                          getUserRoles(), CAN_READ, false);
+                                                            getAccessProfiles(caseDetails.getReferenceAsString()),
+                                                            CAN_READ, false);
         caseDetails.setData(jsonNodeToCaseData(accessFilteredData));
     }
 
@@ -225,8 +225,10 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         return path == null ? "" : path.split(SEARCH_ALIAS_CASE_FIELD_PATH_SEPARATOR_REGEX)[0];
     }
 
-    private Set<String> getUserRoles() {
-        return userRepository.getUserRoles();
+    private Set<String> getAccessProfiles(String caseReference) {
+        List<AccessProfile> accessProfileList = caseDataAccessControl
+            .generateAccessProfilesByCaseReference(caseReference);
+        return caseDataAccessControl.extractAccessProfileNames(accessProfileList);
     }
 
     private JsonNode caseDataToJsonNode(CaseDetails caseDetails) {

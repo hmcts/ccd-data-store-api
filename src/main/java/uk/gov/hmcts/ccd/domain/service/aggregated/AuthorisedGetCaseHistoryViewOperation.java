@@ -3,17 +3,14 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 @Service
@@ -29,12 +26,10 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
             GetCaseHistoryViewOperation getCaseHistoryViewOperation,
         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository,
         AccessControlService accessControlService,
-        @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
-        @Qualifier(CachedCaseUserRepository.QUALIFIER)  CaseUserRepository caseUserRepository,
-        @Qualifier(CachedCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository) {
+        @Qualifier(CachedCaseDetailsRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository,
+        final CaseDataAccessControl caseDataAccessControl) {
 
-        super(caseDefinitionRepository, accessControlService, userRepository,
-              caseUserRepository, caseDetailsRepository);
+        super(caseDefinitionRepository, accessControlService, caseDetailsRepository, caseDataAccessControl);
         this.getCaseHistoryViewOperation = getCaseHistoryViewOperation;
     }
 
@@ -42,7 +37,7 @@ public class AuthorisedGetCaseHistoryViewOperation extends AbstractAuthorisedCas
     public CaseHistoryView execute(String caseReference, Long eventId) {
         CaseDetails caseDetails = getCase(caseReference);
         CaseTypeDefinition caseTypeDefinition = getCaseType(caseDetails.getCaseTypeId());
-        Set<String> userRoles = getUserRoles(caseDetails.getId());
+        Set<String> userRoles = getAccessProfiles(caseDetails.getReferenceAsString());
         verifyCaseTypeReadAccess(caseTypeDefinition, userRoles);
         CaseHistoryView caseHistoryView = getCaseHistoryViewOperation.execute(caseReference, eventId);
         filterAllowedTabsWithFields(caseHistoryView, userRoles);

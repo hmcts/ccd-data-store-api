@@ -1,5 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.google.common.collect.Lists;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -11,19 +18,14 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.security.DefaultAuthorisedCaseDefinitionDataService;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -43,6 +45,9 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
     private AccessControlService accessControlService;
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private CaseDataAccessControl caseDataAccessControl;
 
     @InjectMocks
     private DefaultAuthorisedCaseDefinitionDataService authorisedCaseDataService;
@@ -65,9 +70,13 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
 
         @BeforeEach
         void setUp() {
+            when(caseTypeDefinition.getId()).thenReturn(CASE_TYPE);
             when(caseTypeService.getCaseTypeForJurisdiction(CASE_TYPE, JURISDICTION)).thenReturn(caseTypeDefinition);
             when(caseTypeService.getCaseType(CASE_TYPE)).thenReturn(caseTypeDefinition);
-            when(userRepository.getUserRoles()).thenReturn(userRoles);
+            when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+                .thenReturn(Lists.newArrayList());
+            when(caseDataAccessControl.extractAccessProfileNames(anyList()))
+                .thenReturn(userRoles);
             when(accessControlService.filterCaseStatesByAccess(caseTypeDefinition.getStates(), userRoles, CAN_READ))
                 .thenReturn(getCaseStates());
         }
@@ -112,7 +121,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         private void verifyResult(List<String> result) {
             assertAll(
                 () -> assertThat(result, containsInAnyOrder(STATE1, STATE2)),
-                () -> verify(userRepository).getUserRoles(),
+                () -> verify(caseDataAccessControl).generateAccessProfilesByCaseTypeId(anyString()),
                 () -> verify(accessControlService).filterCaseStatesByAccess(caseTypeDefinition.getStates(), userRoles,
                     CAN_READ)
             );
@@ -126,8 +135,12 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
 
         @BeforeEach
         void setUp() {
+            when(caseTypeDefinition.getId()).thenReturn(CASE_TYPE);
             when(caseTypeService.getCaseType(CASE_TYPE)).thenReturn(caseTypeDefinition);
-            when(userRepository.getUserRoles()).thenReturn(userRoles);
+            when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+                .thenReturn(Lists.newArrayList());
+            when(caseDataAccessControl.extractAccessProfileNames(anyList()))
+                .thenReturn(userRoles);
             when(caseTypeDefinition.getSecurityClassification()).thenReturn(SecurityClassification.PRIVATE);
         }
 
@@ -177,7 +190,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
 
         void verifyCalls() {
             verify(caseTypeService).getCaseType(CASE_TYPE);
-            verify(userRepository).getUserRoles();
+            verify(caseDataAccessControl).generateAccessProfilesByCaseTypeId(anyString());
             verify(accessControlService).canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ);
         }
     }

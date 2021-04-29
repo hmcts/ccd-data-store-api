@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,14 +26,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.valueOf;
@@ -43,8 +44,11 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
@@ -144,6 +148,9 @@ class AuthorisedGetCaseViewOperationTest {
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
 
+    @Mock
+    private CaseDataAccessControl caseDataAccessControl;
+
     @Spy
     @InjectMocks
     private AuthorisedGetCaseViewOperation authorisedGetCaseViewOperation;
@@ -153,7 +160,12 @@ class AuthorisedGetCaseViewOperationTest {
         MockitoAnnotations.initMocks(this);
 
         doReturn(TEST_CASE_TYPE).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
-        doReturn(USER_ROLES).when(userRepository).getUserRoles();
+
+        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+            .thenReturn(Lists.newArrayList());
+        when(caseDataAccessControl.extractAccessProfileNames(anyList()))
+            .thenReturn(USER_ROLES);
+
         doReturn(USER_ID).when(userRepository).getUserId();
         doReturn(true).when(accessControlService).canAccessCaseViewFieldWithCriteria(FIELD_1, USER_ROLES, CAN_READ);
         doReturn(true).when(accessControlService).canAccessCaseViewFieldWithCriteria(FIELD_2, USER_ROLES, CAN_READ);
@@ -295,10 +307,16 @@ class AuthorisedGetCaseViewOperationTest {
     @Test
     @DisplayName("get User Roles must merge user roles and case roles")
     void shouldMergeRoles() {
-        doReturn(Arrays.asList(ROLE_IN_CASE_ROLES, ROLE_IN_CASE_ROLES_2)).when(caseUserRepository)
-            .findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
 
-        Set<String> userRoles = authorisedGetCaseViewOperation.getUserRoles(CASE_REFERENCE);
+        Set<String> mergedRoles = Sets.newHashSet(ROLE_IN_CASE_ROLES, ROLE_IN_CASE_ROLES_2);
+        mergedRoles.addAll(USER_ROLES);
+
+        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+            .thenReturn(Lists.newArrayList());
+        when(caseDataAccessControl.extractAccessProfileNames(anyList()))
+            .thenReturn(mergedRoles);
+
+        Set<String> userRoles = authorisedGetCaseViewOperation.getAccessProfiles(CASE_REFERENCE);
 
         assertAll(
             () -> assertThat(userRoles.size(), is(4)),

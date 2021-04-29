@@ -1,7 +1,20 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import com.google.common.collect.Lists;
 import java.util.Optional;
 import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
@@ -13,7 +26,10 @@ import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
@@ -22,19 +38,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 class AuthorisedGetCaseTypeDefinitionOperationTest {
 
@@ -172,9 +175,10 @@ class AuthorisedGetCaseTypeDefinitionOperationTest {
     @Mock
     private AccessControlService accessControlService;
     @Mock
-    private UserRepository userRepository;
-    @Mock
     private GetCaseTypeOperation getCaseTypeOperation;
+
+    @Mock
+    private CaseDataAccessControl caseDataAccessControl;
 
     private AuthorisedGetCaseTypeOperation authorisedGetCaseTypeOperation;
 
@@ -258,7 +262,10 @@ class AuthorisedGetCaseTypeDefinitionOperationTest {
             .withField(CASE_FIELD_3_3)
             .build();
 
-        doReturn(USER_ROLES).when(userRepository).getUserRoles();
+        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+            .thenReturn(Lists.newArrayList());
+        when(caseDataAccessControl.extractAccessProfileNames(anyList()))
+            .thenReturn(USER_ROLES);
 
         doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition1, USER_ROLES,
             CAN_CREATE);
@@ -279,8 +286,8 @@ class AuthorisedGetCaseTypeDefinitionOperationTest {
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition3, USER_ROLES,
             CAN_READ);
         authorisedGetCaseTypeOperation = new AuthorisedGetCaseTypeOperation(accessControlService,
-            userRepository,
-            getCaseTypeOperation);
+            getCaseTypeOperation,
+            caseDataAccessControl);
     }
 
     @Nested

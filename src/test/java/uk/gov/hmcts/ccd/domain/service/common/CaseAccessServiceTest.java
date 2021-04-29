@@ -2,6 +2,11 @@ package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,15 +19,10 @@ import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -34,6 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
@@ -54,6 +56,9 @@ class CaseAccessServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private CaseDataAccessControl caseDataAccessControl;
 
     @Mock
     private CaseUserRepository caseUserRepository;
@@ -495,13 +500,16 @@ class CaseAccessServiceTest {
     class UserRoleTest {
         @BeforeEach
         void setUp() {
-            doReturn(Sets.newHashSet(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID)).when(userRepository).getUserRoles();
+            when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+                .thenReturn(Lists.newArrayList());
+            when(caseDataAccessControl.extractAccessProfileNames(anyList()))
+                .thenReturn(Sets.newHashSet(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID));
         }
 
         @Test
         @DisplayName("should return user roles")
         void getCaseRoles() {
-            Set<String> caseRoles = caseAccessService.getUserRoles();
+            Set<String> caseRoles = caseAccessService.getAccessProfiles("CASE_TYPE_ID");
 
             assertAll(
                 () -> assertThat(caseRoles.size(), Is.is(2)),
@@ -512,7 +520,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should return case creation user roles")
         void getCaseCreationCaseRoles() {
-            Set<String> caseRoles = caseAccessService.getCaseCreationRoles();
+            Set<String> caseRoles = caseAccessService.getCaseCreationRoles("CASE_TYPE_ID");
 
             assertAll(
                 () -> assertThat(caseRoles.size(), Is.is(3)),
@@ -522,9 +530,9 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should throw exception when no user role found")
         void getCaseRolesThrows() {
-            doReturn(null).when(userRepository).getUserRoles();
+            when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString())).thenReturn(null);
 
-            assertThrows(ValidationException.class, () -> caseAccessService.getUserRoles());
+            assertThrows(ValidationException.class, () -> caseAccessService.getAccessProfiles("CASE_TYPE_ID"));
         }
     }
 
@@ -533,13 +541,16 @@ class CaseAccessServiceTest {
     class CreateCaseRolesTest {
         @BeforeEach
         void setUp() {
-            doReturn(Sets.newHashSet(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID)).when(userRepository).getUserRoles();
+            when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+                .thenReturn(Lists.newArrayList());
+            when(caseDataAccessControl.extractAccessProfileNames(anyList()))
+                .thenReturn(Sets.newHashSet(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID));
         }
 
         @Test
         @DisplayName("should return create user roles")
         void getCreateCaseRoles() {
-            Set<String> caseRoles = caseAccessService.getCaseCreationRoles();
+            Set<String> caseRoles = caseAccessService.getCaseCreationRoles("CASE_TYPE_ID");
 
             assertAll(
                 () -> assertThat(caseRoles.size(), Is.is(3)),
@@ -551,9 +562,9 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should throw exception when no user role found")
         void getCreateCaseRolesThrows() {
-            doReturn(null).when(userRepository).getUserRoles();
+            when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString())).thenReturn(null);
 
-            assertThrows(ValidationException.class, () -> caseAccessService.getCaseCreationRoles());
+            assertThrows(ValidationException.class, () -> caseAccessService.getCaseCreationRoles("CASE_TYPE_ID"));
         }
     }
 

@@ -219,7 +219,8 @@ public class AttributeBasedAccessControlService implements AccessControlService,
     }
 
     private void applyAccessProfileRules(CaseTypeDefinition caseTypeDefinition) {
-        List<AccessProfile> accessProfiles = defaultCaseDataAccessControl.generateAccessProfiles(caseTypeDefinition);
+        List<AccessProfile> accessProfiles = defaultCaseDataAccessControl
+            .generateAccessProfilesByCaseTypeId(caseTypeDefinition.getId());
         // @todo Better to deepCopy caseTypeDefinition
         List<AccessControlList> accessControlLists = caseTypeDefinition.getAccessControlLists();
         if (accessControlLists != null) {

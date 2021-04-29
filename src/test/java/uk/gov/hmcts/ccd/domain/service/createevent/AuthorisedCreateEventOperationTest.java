@@ -40,6 +40,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.doReturn;
@@ -136,7 +137,8 @@ class AuthorisedCreateEventOperationTest {
         caseTypeDefinition.setEvents(events);
         caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
-        when(caseAccessService.getUserRoles()).thenReturn(USER_ROLES);
+        when(caseAccessService.getAccessProfiles(anyString())).thenReturn(USER_ROLES);
+        when(caseAccessService.getAccessRoles(anyString())).thenReturn(USER_ROLES);
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(USER_ROLES),
             eq(CAN_UPDATE))).thenReturn(true);
         when(accessControlService.canAccessCaseStateWithCriteria(eq(STATE_ID), eq(caseTypeDefinition), eq(USER_ROLES),
@@ -204,7 +206,7 @@ class AuthorisedCreateEventOperationTest {
             () -> assertThat(output, sameInstance(classifiedCase)),
             () -> assertThat(output.getData(), is(equalTo(JacksonUtils.convertValue(authorisedCaseNode)))),
             () -> inOrder.verify(getCaseOperation).execute(CASE_REFERENCE),
-            () -> inOrder.verify(caseAccessService).getUserRoles(),
+            () -> inOrder.verify(caseAccessService).getAccessRoles(CASE_REFERENCE),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
                 eq(USER_ROLES),
@@ -258,7 +260,7 @@ class AuthorisedCreateEventOperationTest {
     @DisplayName("should fail if user roles not found")
     void shouldFailIfNoUserRolesFound() {
 
-        doReturn(Collections.EMPTY_SET).when(caseAccessService).getUserRoles();
+        doReturn(Collections.EMPTY_SET).when(caseAccessService).getAccessRoles(anyString());
 
         assertThrows(ValidationException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
             CASE_DATA_CONTENT));

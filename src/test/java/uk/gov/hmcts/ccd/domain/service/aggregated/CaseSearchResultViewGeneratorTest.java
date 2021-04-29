@@ -4,8 +4,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -23,6 +31,7 @@ import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeader;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
@@ -32,20 +41,14 @@ import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.IntStream;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -116,6 +119,9 @@ class CaseSearchResultViewGeneratorTest {
     private UserRepository userRepository;
 
     @Mock
+    private CaseDataAccessControl caseDataAccessControl;
+
+    @Mock
     private CaseTypeService caseTypeService;
 
     @Mock
@@ -139,8 +145,8 @@ class CaseSearchResultViewGeneratorTest {
     @BeforeEach
     void setUp() throws IOException {
         MockitoAnnotations.initMocks(this);
-        caseSearchesViewAccessControl = new CaseSearchesViewAccessControl(userRepository,
-            caseTypeService, searchResultDefinitionService, securityClassificationService);
+        caseSearchesViewAccessControl = new CaseSearchesViewAccessControl(caseTypeService,
+            searchResultDefinitionService, securityClassificationService, caseDataAccessControl);
 
         dataMap = buildData(CASE_FIELD_1, CASE_FIELD_2, CASE_FIELD_3, CASE_FIELD_4, CASE_FIELD_5);
         supplementaryDataMap = buildData(SUPPLEMENTARY_DATA_FIELD_1, SUPPLEMENTARY_DATA_FIELD_2);
@@ -301,9 +307,16 @@ class CaseSearchResultViewGeneratorTest {
             caseSearchesViewAccessControl);
     }
 
+    private void mockAccessProfiles() {
+        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+            .thenReturn(Lists.newArrayList());
+        when(caseDataAccessControl.extractAccessProfileNames(anyList()))
+            .thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
+    }
+
     @Test
     void shouldBuildCaseSearchResultHeaders() {
-        when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
+        mockAccessProfiles();
 
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult,
             WORKBASKET, Collections.emptyList());
@@ -381,7 +394,8 @@ class CaseSearchResultViewGeneratorTest {
                     "", ""))
             .build();
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
-        when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
+        mockAccessProfiles();
+
 
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult,
             WORKBASKET, Collections.emptyList());
@@ -442,7 +456,8 @@ class CaseSearchResultViewGeneratorTest {
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition);
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
-        when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
+        mockAccessProfiles();
+
         when(userRepository.anyRoleMatches(any())).thenReturn(true);
         when(userRepository.anyRoleEqualsTo(any())).thenReturn(true);
         when(userRepository.anyRoleEqualsAnyOf(any())).thenReturn(true);
@@ -517,7 +532,8 @@ class CaseSearchResultViewGeneratorTest {
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition);
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
-        when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
+        mockAccessProfiles();
+
         when(userRepository.anyRoleMatches(any())).thenReturn(true);
         when(userRepository.anyRoleEqualsTo(any())).thenReturn(true);
         when(userRepository.anyRoleEqualsAnyOf(any())).thenReturn(true);
@@ -555,7 +571,8 @@ class CaseSearchResultViewGeneratorTest {
             .build();
 
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
-        when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
+        mockAccessProfiles();
+
         doReturn(true).when(userRepository).anyRoleEqualsTo(searchResultFieldWithValidRole.getRole());
 
 
@@ -582,7 +599,7 @@ class CaseSearchResultViewGeneratorTest {
                     "#DCP", ""))
             .build();
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
-        when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
+        mockAccessProfiles();
 
         classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
@@ -611,7 +628,7 @@ class CaseSearchResultViewGeneratorTest {
                 FAMILY_DETAILS, "", ""))
             .build();
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
-        when(userRepository.getUserRoles()).thenReturn(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
+        mockAccessProfiles();
 
         final BadRequestException exception = assertThrows(BadRequestException.class,
             () -> classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList()));

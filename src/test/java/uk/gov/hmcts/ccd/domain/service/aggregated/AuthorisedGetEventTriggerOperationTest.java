@@ -115,8 +115,9 @@ class AuthorisedGetEventTriggerOperationTest {
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setId(CASE_ID);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
-        when(caseAccessService.getUserRoles()).thenReturn(userRoles);
-        when(caseAccessService.getCaseCreationRoles()).thenReturn(createCaseUserRoles);
+        when(caseAccessService.getAccessProfiles(any())).thenReturn(userRoles);
+        when(caseAccessService.getAccessRoles(any())).thenReturn(userRoles);
+        when(caseAccessService.getCaseCreationRoles(CASE_TYPE_ID)).thenReturn(createCaseUserRoles);
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType),
                                                                 eq(userRoles),
                                                                 eq(CAN_CREATE))).thenReturn(true);
@@ -196,7 +197,7 @@ class AuthorisedGetEventTriggerOperationTest {
             assertAll(
                 () -> assertThat(output, sameInstance(caseEventTrigger)),
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-                () -> inOrder.verify(caseAccessService).getCaseCreationRoles(),
+                () -> inOrder.verify(caseAccessService).getCaseCreationRoles(CASE_TYPE_ID),
                 () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
                                                                                          eq(createCaseUserRoles),
                                                                                          eq(CAN_CREATE)),
@@ -320,7 +321,7 @@ class AuthorisedGetEventTriggerOperationTest {
             assertAll(
                 () -> assertThat(output, sameInstance(caseEventTrigger)),
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-                () -> inOrder.verify(caseAccessService).getUserRoles(),
+                () -> inOrder.verify(caseAccessService).getAccessRoles(CASE_REFERENCE),
                 () -> inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(eq(EVENT_TRIGGER_ID),
                                                                                           eq(caseType.getEvents()),
                                                                                           eq(userRoles),
