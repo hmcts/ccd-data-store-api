@@ -35,7 +35,7 @@ public class ElasticsearchITConfiguration {
             .withElasticVersion(elasticVersion)
             .withSetting(HTTP_PORT, httpPortValue)
             .withEsJavaOpts("-Xms128m -Xmx512m")
-            .withStartTimeout(60, TimeUnit.SECONDS);
+            .withStartTimeout(45, TimeUnit.SECONDS);
 
         PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
         for (String idx : INDICES) {
