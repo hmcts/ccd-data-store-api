@@ -20,7 +20,7 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(AuditAspect.class);
 
     public static final String REQUEST_ID = "request-id";
-    public static final String REQUEST_ID_PATTERN = "^[|A-Za-z0-9_.-]+$";
+    public static final String REQUEST_ID_PATTERN = "^[|A-Za-z0-9+/=_.-]+$";
     protected static final List<String> httpMethodList =
         Arrays.asList("GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "TRACE");
     public static final String BAD_VALUE_TOKEN = "<bad value not written to logs>";
