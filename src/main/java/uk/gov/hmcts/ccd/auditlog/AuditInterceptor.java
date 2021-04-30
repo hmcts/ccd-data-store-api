@@ -59,7 +59,7 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
         AuditContext context = (auditContext != null) ? auditContext : new AuditContext();
         context.setHttpStatus(response.getStatus());
 
-        if (request.getMethod() != null && httpMethodList.contains(request.getMethod())) {
+        if (request.getMethod() != null && httpMethodList.contains(request.getMethod().toUpperCase())) {
             context.setHttpMethod(request.getMethod());
         } else {
             context.setHttpMethod(BAD_VALUE_TOKEN);
