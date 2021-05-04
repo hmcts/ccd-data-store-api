@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
@@ -15,7 +17,7 @@ public class RegionMatcher implements RoleAttributeMatcher {
     @Override
     public void matchAttribute(Pair<RoleAssignment, RoleMatchingResult> resultPai, CaseDetails caseDetails) {
         RoleAssignment roleAssignment = resultPai.getLeft();
-        String caseRegion = ""; // Get region from case Details
+        String caseRegion = getRegion(caseDetails).orElse("");
         log.debug("Match role assignment region {} and case details region {} for role assignment {}",
             roleAssignment.getAttributes().getRegion(),
             caseRegion,
@@ -35,4 +37,13 @@ public class RegionMatcher implements RoleAttributeMatcher {
                                CaseTypeDefinition caseTypeDefinition) {
 
     }
+
+    private Optional<String> getRegion(CaseDetails caseDetails) {
+        JsonNode caseManagementLocation = caseDetails.getData().get("caseManagementLocation");
+        if (caseManagementLocation != null) {
+            return Optional.ofNullable(caseManagementLocation.get("region").asText());
+        }
+        return Optional.empty();
+    }
+
 }
