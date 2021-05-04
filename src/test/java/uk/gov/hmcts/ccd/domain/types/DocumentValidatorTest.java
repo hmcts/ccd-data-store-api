@@ -148,11 +148,11 @@ public class DocumentValidatorTest implements IVallidatorTest {
         validator = setUpEmHrsApiValidator();
 
         ObjectNode data = createDoc(VALID_EM_HRS_API_DOCUMENT_URL_1);
-         List<ValidationResult> validDocumentUrlResult =
+        List<ValidationResult> validDocumentUrlResult =
             validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertEquals(validDocumentUrlResult.toString(), 0, validDocumentUrlResult.size());
         data = createDoc(VALID_EM_HRS_API_DOCUMENT_URL_2);
-         validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
+        validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertEquals(validDocumentUrlResult.toString(), 0, validDocumentUrlResult.size());
     }
 
