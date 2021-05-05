@@ -1,10 +1,10 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol;
 
-import java.time.Instant;
-import java.util.Date;
-import java.util.List;
 import lombok.Builder;
 import lombok.Data;
+
+import java.time.Instant;
+import java.util.List;
 
 @Builder
 @Data

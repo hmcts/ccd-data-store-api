@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.cauroles.CaseAssignedUserRolesOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -71,6 +72,9 @@ class CaseAssignedUserRolesControllerTest {
     @Mock
     private SecurityUtils securityUtils;
 
+    @Mock
+    private RoleAssignmentService roleAssignmentService;
+
     private uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController controller;
 
     @BeforeEach
@@ -84,7 +88,8 @@ class CaseAssignedUserRolesControllerTest {
             applicationParams,
             caseReferenceService,
             caseAssignedUserRolesOperation,
-            securityUtils
+            securityUtils,
+            roleAssignmentService
         );
     }
 

@@ -6,6 +6,7 @@ import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
+import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 
 import java.util.List;
@@ -30,20 +31,38 @@ public class RoleAssignmentService implements AccessControl {
         return roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
     }
 
-        public List<String> getCaseIdsForAGivenUser(String userId) {
+    public List<String> getCaseIdsForAGivenUser(String userId) {
         final RoleAssignments roleAssignments = this.getRoleAssignments(userId);
 
         final List<String> result = roleAssignments.getRoleAssignments().stream()
             .filter(roleAssignment -> isAValidRoleAssignments(roleAssignment))
-            .map(
-                roleAssignment -> roleAssignment.getAttributes().getCaseId()
-            ).flatMap(Optional::stream)
+            .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
+            .flatMap(Optional::stream)
             .collect(Collectors.toList());
         return result;
     }
 
-    private boolean isAValidRoleAssignments(RoleAssignment roleAssignment ){
+    private boolean isAValidRoleAssignments(RoleAssignment roleAssignment) {
         final boolean isACaseType = roleAssignment.getRoleType().equals(RoleType.CASE.name());
         return roleAssignment.isAnExpiredRoleAssignment() && isACaseType;
+    }
+
+    public List<CaseAssignedUserRole> findCaseUserRoles(List<String> caseIds, List<String> userIds) {
+        RoleAssignmentResponse roleAssignmentResponse = roleAssignmentRepository.findCaseUserRoles(caseIds, userIds);
+        final RoleAssignments roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
+
+        return roleAssignments.getRoleAssignments().stream()
+            .filter(roleAssignment -> isAValidRoleAssignments(roleAssignment))
+            .map(roleAssignment -> mapToRoleAssignmentResponse(roleAssignment)
+            ).collect(Collectors.toList());
+    }
+
+    //TODO USE MAPPER
+    private CaseAssignedUserRole mapToRoleAssignmentResponse(RoleAssignment roleAssignment) {
+        return new CaseAssignedUserRole(
+            roleAssignment.getAttributes().getCaseId().orElse(""),
+            roleAssignment.getActorId(),
+            roleAssignment.getRoleName()
+        );
     }
 }

@@ -12,12 +12,15 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleType;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -28,6 +31,11 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
     public static final String QUALIFIER = "default";
     public static final String ROLE_ASSIGNMENTS_NOT_FOUND =
         "No Role Assignments found for userId=%s when getting from Role Assignment Service because of %s";
+
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break error messages and add unwanted +
+    public static final String R_A_NOT_FOUND_FOR_CASE_AND_USER =
+        "No Role Assignments found for userIds=%s and casesIds=%s when getting from Role Assignment Service because of %s";
+
     public static final String ROLE_ASSIGNMENTS_CLIENT_ERROR =
         "Client error when getting Role Assignments from Role Assignment Service because of %s";
     public static final String ROLE_ASSIGNMENT_SERVICE_ERROR =
@@ -55,15 +63,15 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
             final String encodedUrl = UriComponentsBuilder.fromHttpUrl(applicationParams.amGetRoleAssignmentsURL())
                 .buildAndExpand(queryParams).toUriString();
             return restTemplate.exchange(new URI(encodedUrl),
-                                         HttpMethod.GET, requestEntity,
-                                         RoleAssignmentResponse.class).getBody();
+                HttpMethod.GET, requestEntity,
+                RoleAssignmentResponse.class).getBody();
 
         } catch (Exception e) {
             LOG.warn("Error while retrieving Role Assignments", e);
             if (e instanceof HttpClientErrorException
                 && ((HttpClientErrorException) e).getRawStatusCode() == HttpStatus.NOT_FOUND.value()) {
                 throw new ResourceNotFoundException(String.format(ROLE_ASSIGNMENTS_NOT_FOUND,
-                                                                  userId, e.getMessage()));
+                    userId, e.getMessage()));
             } else if (e instanceof HttpClientErrorException
                 && HttpStatus.valueOf(((HttpClientErrorException) e).getRawStatusCode()).is4xxClientError()) {
                 throw new BadRequestException(String.format(ROLE_ASSIGNMENTS_CLIENT_ERROR, e.getMessage()));
@@ -72,4 +80,39 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
             }
         }
     }
+
+    @Override
+    public RoleAssignmentResponse findCaseUserRoles(List<String> caseIds, List<String> userIds) {
+        try {
+            final HttpEntity requestEntity =
+                new HttpEntity(getRoleAssignmentQuery(caseIds, userIds), securityUtils.authorizationHeaders());
+            return restTemplate.exchange(applicationParams.amPostRoleAssignmentsQueryURL(),
+                HttpMethod.POST,
+                requestEntity,
+                RoleAssignmentResponse.class).getBody();
+
+        } catch (Exception exception) {
+            LOG.warn("Error while retrieving Role Assignments", exception);
+            if (exception instanceof HttpClientErrorException
+                && ((HttpClientErrorException) exception).getRawStatusCode() == HttpStatus.NOT_FOUND.value()) {
+                throw new ResourceNotFoundException(String.format(R_A_NOT_FOUND_FOR_CASE_AND_USER,
+                    userIds, caseIds, exception.getMessage()));
+            } else if (exception instanceof HttpClientErrorException
+                && HttpStatus.valueOf(((HttpClientErrorException) exception).getRawStatusCode()).is4xxClientError()) {
+                throw new BadRequestException(String.format(ROLE_ASSIGNMENTS_CLIENT_ERROR, exception.getMessage()));
+            } else {
+                throw new ServiceException(String.format(ROLE_ASSIGNMENT_SERVICE_ERROR, exception.getMessage()));
+            }
+        }
+    }
+
+    private RoleAssignmentQuery getRoleAssignmentQuery(List<String> caseIds, List<String> userIds) {
+        final Attributes attribute = Attributes.builder().caseId(caseIds).build();
+        final ArrayList attributes = new ArrayList<Attributes>();
+        final ArrayList roleType = new ArrayList<Attributes>();
+        roleType.add(RoleType.CASE.name());
+        attributes.add(attribute);
+        return RoleAssignmentQuery.builder().actorId(userIds).attributes(attributes).roleType(roleType).build();
+    }
+
 }

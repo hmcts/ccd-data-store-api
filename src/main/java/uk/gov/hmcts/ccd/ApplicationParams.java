@@ -279,6 +279,10 @@ public class ApplicationParams {
         return roleAssignmentBaseURL() + "/actors/{uid}";
     }
 
+    public String amPostRoleAssignmentsQueryURL() {
+        return roleAssignmentBaseURL() + "/query";
+    }
+
     public String userDefaultSettingsURL() {
         return userProfileHost + "/user-profile/users?uid={uid}";
     }

@@ -5,14 +5,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,6 +26,7 @@ import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.cauroles.CaseAssignedUserRolesOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -42,6 +35,14 @@ import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesResponse;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.ADD_CASE_ASSIGNED_USER_ROLES;
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.GET_CASE_ASSIGNED_USER_ROLES;
@@ -64,17 +65,20 @@ public class CaseAssignedUserRolesController {
     private final UIDService caseReferenceService;
     private final CaseAssignedUserRolesOperation caseAssignedUserRolesOperation;
     private final SecurityUtils securityUtils;
+    private final RoleAssignmentService roleAssignmentService;
 
     @Autowired
     public CaseAssignedUserRolesController(ApplicationParams applicationParams,
                                            UIDService caseReferenceService,
                                            @Qualifier("authorised") CaseAssignedUserRolesOperation
-                                                   caseAssignedUserRolesOperation,
-                                           SecurityUtils securityUtils) {
+                                               caseAssignedUserRolesOperation,
+                                           SecurityUtils securityUtils,
+                                           RoleAssignmentService roleAssignmentService) {
         this.applicationParams = applicationParams;
         this.caseReferenceService = caseReferenceService;
         this.caseAssignedUserRolesOperation = caseAssignedUserRolesOperation;
         this.securityUtils = securityUtils;
+        this.roleAssignmentService = roleAssignmentService;
     }
 
     @Transactional
@@ -233,16 +237,22 @@ public class CaseAssignedUserRolesController {
             + ".buildOptionalIds(#optionalUserIds)"
     )
     public ResponseEntity<CaseAssignedUserRolesResource> getCaseUserRoles(@RequestParam("case_ids")
-                                                                                  List<String> caseIds,
+                                                                              List<String> caseIds,
                                                                           @RequestParam(value = "user_ids",
                                                                               required = false)
                                                                               Optional<List<String>> optionalUserIds) {
         List<String> userIds = optionalUserIds.orElseGet(Lists::newArrayList);
         validateRequestParams(caseIds, userIds);
-        List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(caseIds
-            .stream()
-            .map(Long::valueOf)
-            .collect(Collectors.toCollection(ArrayList::new)), userIds);
+        final List<CaseAssignedUserRole> caseAssignedUserRoles;
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            caseAssignedUserRoles = roleAssignmentService.findCaseUserRoles(caseIds, userIds);
+        } else {
+            caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(caseIds
+                .stream()
+                .map(Long::valueOf)
+                .collect(Collectors.toCollection(ArrayList::new)), userIds);
+        }
+
         return ResponseEntity.ok(new CaseAssignedUserRolesResource(caseAssignedUserRoles));
     }
 
