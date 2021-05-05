@@ -23,7 +23,6 @@ java:
         - ccd-ELASTIC-SEARCH-PASSWORD
         - AppInsightsInstrumentationKey
   environment:
-    ENABLE_DB_MIGRATE: false
     DATA_STORE_DB_PORT: 5432
     DATA_STORE_DB_NAME: ccd_data_store
     DATA_STORE_DB_HOST: ccd-data-store-api-postgres-db-{{ .Values.global.environment }}.postgres.database.azure.com

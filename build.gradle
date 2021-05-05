@@ -28,6 +28,7 @@ plugins {
     id "io.freefair.lombok" version "5.3.0"
     id 'uk.gov.hmcts.java' version '0.12.0'
     id 'au.com.dius.pact' version '4.1.0'
+
 }
 
 apply plugin: 'java'
@@ -42,8 +43,6 @@ apply plugin: 'jsonschema2pojo'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'se.patrikerdes.use-latest-versions'
-
-apply from: 'liquibase.gradle'
 
 def versions = [
         pact_version: '4.1.7'
@@ -164,7 +163,7 @@ dependencies {
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
 
-    compile group: 'org.liquibase', name: 'liquibase-core', version: '3.10.3'
+    compile "org.flywaydb:flyway-core:6.5.7"
     compile group: 'org.yaml', name: 'snakeyaml', version: '1.26'
     compile group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.1'
@@ -844,3 +843,4 @@ cucumberReports {
     reports = files("${projectDir}/target/cucumber.json")
     notFailingStatuses = ["skipped", "passed"]
 }
+
