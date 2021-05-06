@@ -59,8 +59,7 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     public List<CaseStateDefinition> getUserAuthorisedCaseStates(String jurisdiction, String caseTypeId,
                                                                  Predicate<AccessControlList> access) {
         CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseTypeForJurisdiction(caseTypeId, jurisdiction);
-        return filterCaseStatesAndUserRolesForUser(caseTypeDefinition.getStates(), access);
-        //  return filterCaseStatesForUser(caseTypeDefinition.getStates(), access);
+        return filterCaseStatesForUser(caseTypeDefinition.getStates(), access);
     }
 
     @Override
@@ -90,7 +89,7 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
 
     private List<CaseStateDefinition> filterCaseStatesForUser(List<CaseStateDefinition> caseStateDefinitions,
                                                               Predicate<AccessControlList> access) {
-        return accessControlService.filterCaseStatesByAccess(caseStateDefinitions, getUserRoles(), access);
+        return accessControlService.filterCaseStatesByAccess(caseStateDefinitions, getCaseAndUserRoles(), access);
     }
 
     private List<String> collectCaseStateIds(List<CaseStateDefinition> caseStateDefinitions) {
@@ -99,11 +98,6 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
 
     private Set<String> getUserRoles() {
         return userRepository.getUserRoles();
-    }
-
-    private List<CaseStateDefinition> filterCaseStatesAndUserRolesForUser(List<CaseStateDefinition> caseStateDefinitions,
-                                                                          Predicate<AccessControlList> access) {
-        return accessControlService.filterCaseStatesByAccess(caseStateDefinitions, getCaseAndUserRoles(), access);
     }
 
     private Set<String> getCaseAndUserRoles() {
