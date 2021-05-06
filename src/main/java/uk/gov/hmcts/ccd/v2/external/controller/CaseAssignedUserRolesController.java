@@ -245,7 +245,7 @@ public class CaseAssignedUserRolesController {
         validateRequestParams(caseIds, userIds);
         final List<CaseAssignedUserRole> caseAssignedUserRoles;
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
-            caseAssignedUserRoles = roleAssignmentService.findCaseUserRoles(caseIds, userIds);
+            caseAssignedUserRoles = roleAssignmentService.findRoleAssignmentsByCasesAndUsers(caseIds, userIds);
         } else {
             caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(caseIds
                 .stream()

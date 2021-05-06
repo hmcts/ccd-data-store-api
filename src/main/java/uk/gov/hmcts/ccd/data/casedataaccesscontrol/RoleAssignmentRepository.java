@@ -6,5 +6,5 @@ public interface RoleAssignmentRepository {
 
     RoleAssignmentResponse getRoleAssignments(String userId);
 
-    RoleAssignmentResponse findCaseUserRoles(List<String> caseIds, List<String> userIds);
+    RoleAssignmentResponse findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds);
 }

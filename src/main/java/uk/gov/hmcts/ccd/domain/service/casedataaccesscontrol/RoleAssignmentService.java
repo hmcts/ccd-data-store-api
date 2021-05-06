@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
@@ -47,22 +48,21 @@ public class RoleAssignmentService implements AccessControl {
         return roleAssignment.isAnExpiredRoleAssignment() && isACaseType;
     }
 
-    public List<CaseAssignedUserRole> findCaseUserRoles(List<String> caseIds, List<String> userIds) {
-        RoleAssignmentResponse roleAssignmentResponse = roleAssignmentRepository.findCaseUserRoles(caseIds, userIds);
+    public List<CaseAssignedUserRole> findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds) {
+        final RoleAssignmentResponse roleAssignmentResponse =
+            roleAssignmentRepository.findRoleAssignmentsByCasesAndUsers(caseIds, userIds);
+
         final RoleAssignments roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
 
         return roleAssignments.getRoleAssignments().stream()
             .filter(roleAssignment -> isAValidRoleAssignments(roleAssignment))
-            .map(roleAssignment -> mapToRoleAssignmentResponse(roleAssignment)
-            ).collect(Collectors.toList());
-    }
-
-    //TODO USE MAPPER
-    private CaseAssignedUserRole mapToRoleAssignmentResponse(RoleAssignment roleAssignment) {
-        return new CaseAssignedUserRole(
-            roleAssignment.getAttributes().getCaseId().orElse(""),
-            roleAssignment.getActorId(),
-            roleAssignment.getRoleName()
-        );
+            .map(roleAssignment ->
+                new CaseAssignedUserRole(
+                    roleAssignment.getAttributes().getCaseId().orElse(RoleAssignmentAttributes.ATTRIBUTE_NOT_DEFINED),
+                    roleAssignment.getActorId(),
+                    roleAssignment.getRoleName()
+                )
+            )
+            .collect(Collectors.toList());
     }
 }
