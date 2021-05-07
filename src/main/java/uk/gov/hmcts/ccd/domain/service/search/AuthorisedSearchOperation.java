@@ -68,11 +68,11 @@ public class AuthorisedSearchOperation implements SearchOperation {
 
     private List<CaseDetails> filterByReadAccess(List<CaseDetails> results, CaseTypeDefinition caseTypeDefinition,
                                                  Set<String> userRoles) {
-        Set<String> CaseAndUserRoles = Sets.union(userRoles,
+        Set<String> caseAndUserRoles = Sets.union(userRoles,
             caseUserRepository.getCaseUserRolesByUserId(userRepository.getUserId()));
         return results.stream()
             .filter(caseDetails -> accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(),
-                caseTypeDefinition, CaseAndUserRoles, CAN_READ))
+                caseTypeDefinition, caseAndUserRoles, CAN_READ))
             .collect(Collectors.toList())
             .stream()
             .map(caseDetails -> verifyFieldReadAccess(caseTypeDefinition, userRoles, caseDetails))

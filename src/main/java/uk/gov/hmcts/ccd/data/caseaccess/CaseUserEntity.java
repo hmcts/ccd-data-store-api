@@ -31,7 +31,7 @@ public class CaseUserEntity implements Serializable {
     protected static final String GET_ALL_CASE_ROLES_USERS_HAS_ACCESS_TO_CASES =
                                                                     "GET_ALL_CASE_ROLES_USERS_HAS_ACCESS_TO_CASES";
     protected static final String GET_ALL_CASE_ROLES_BY_CASE_IDS = "GET_ALL_CASE_ROLES_BY_CASE_IDS";
-    protected static final String GET_ALL_CASE_ROLES_BY_USER_ID ="GET_ALL_CASE_ROLES_BY_USER_ID";
+    protected static final String GET_ALL_CASE_ROLES_BY_USER_ID = "GET_ALL_CASE_ROLES_BY_USER_ID";
     public static final String PARAM_CASE_DATA_IDS = "case_data_ids";
     public static final String PARAM_USER_IDS = "user_ids";
 
