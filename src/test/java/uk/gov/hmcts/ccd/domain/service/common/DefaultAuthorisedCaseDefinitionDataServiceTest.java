@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -43,6 +44,8 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
     private AccessControlService accessControlService;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private CaseUserRepository caseUserRepository;
 
     @InjectMocks
     private DefaultAuthorisedCaseDefinitionDataService authorisedCaseDataService;
@@ -68,6 +71,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
             when(caseTypeService.getCaseTypeForJurisdiction(CASE_TYPE, JURISDICTION)).thenReturn(caseTypeDefinition);
             when(caseTypeService.getCaseType(CASE_TYPE)).thenReturn(caseTypeDefinition);
             when(userRepository.getUserRoles()).thenReturn(userRoles);
+            when(caseUserRepository.getCaseUserRolesByUserId(anyString())).thenReturn(userRoles);
             when(accessControlService.filterCaseStatesByAccess(caseTypeDefinition.getStates(), userRoles, CAN_READ))
                 .thenReturn(getCaseStates());
         }
