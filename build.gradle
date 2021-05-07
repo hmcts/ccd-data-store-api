@@ -128,7 +128,7 @@ configurations {
     cucumberRuntime.extendsFrom(functionalRuntime)
 }
 
-//This is to exclude generated files from build/generated-sources/js2p/uk/gov/hmcts/ccd/domain/types/sanitiser/document
+//This is to exclude generated  files from build/generated-sources/js2p/uk/gov/hmcts/ccd/domain/types/sanitiser/document
 tasks.withType(Checkstyle) {
     exclude 'uk/gov/hmcts/ccd/domain/types/sanitiser/document/**'
 }
