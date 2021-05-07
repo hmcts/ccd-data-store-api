@@ -18,10 +18,7 @@ import static org.hamcrest.Matchers.is;
 @DisplayName("RoleAssignmentResourceTest")
 class RoleAssignmentResourceTest {
 
-    private List<String> caseIds = Arrays.asList(new String[]{"111", "222"});
-    private List<String> userIds = Arrays.asList(new String[]{"111", "222"});
     private static final String CASE_ID = "111111";
-
 
     @Test
     @DisplayName("isAnExpiredRoleAssignment")
@@ -64,5 +61,4 @@ class RoleAssignmentResourceTest {
         );
         return RoleAssignments.builder().roleAssignments(roleAssignments).build();
     }
-
 }
