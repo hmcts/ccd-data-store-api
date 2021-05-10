@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -64,14 +65,16 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         private static final String JURISDICTION = "jurisdiction";
         private static final String STATE1 = "state1";
         private static final String STATE2 = "state2";
+        private static final String USERID = "userId";
         private final Set<String> userRoles = new HashSet<>();
+        private final Set<String> caseUserRoles = Sets.newHashSet("[CREATOR]", "[CLAIMANT]");
 
         @BeforeEach
         void setUp() {
             when(caseTypeService.getCaseTypeForJurisdiction(CASE_TYPE, JURISDICTION)).thenReturn(caseTypeDefinition);
             when(caseTypeService.getCaseType(CASE_TYPE)).thenReturn(caseTypeDefinition);
             when(userRepository.getUserRoles()).thenReturn(userRoles);
-            when(caseUserRepository.getCaseUserRolesByUserId(anyString())).thenReturn(userRoles);
+            when(caseUserRepository.getCaseUserRolesByUserId(USERID)).thenReturn(caseUserRoles);
             when(accessControlService.filterCaseStatesByAccess(caseTypeDefinition.getStates(), userRoles, CAN_READ))
                 .thenReturn(getCaseStates());
         }

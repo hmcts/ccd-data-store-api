@@ -22,7 +22,7 @@ import javax.persistence.Table;
     @NamedQuery(name = CaseUserEntity.GET_ALL_CASE_ROLES_BY_CASE_IDS,
         query = "SELECT cue FROM CaseUserEntity cue WHERE casePrimaryKey.caseDataId IN :case_data_ids"),
     @NamedQuery(name = CaseUserEntity.GET_ALL_CASE_ROLES_BY_USER_ID,
-        query = "SELECT casePrimaryKey.caseRole FROM CaseUserEntity cue WHERE casePrimaryKey.userId = :userId")
+        query = "SELECT DISTINCT casePrimaryKey.caseRole FROM CaseUserEntity cue WHERE casePrimaryKey.userId = :userId")
 })
 public class CaseUserEntity implements Serializable {
 
