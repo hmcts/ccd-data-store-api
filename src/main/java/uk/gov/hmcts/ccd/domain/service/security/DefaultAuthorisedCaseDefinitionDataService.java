@@ -101,7 +101,7 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     }
 
     private Set<String> getCaseAndUserRoles() {
-        return Sets.union(userRepository.getUserRoles(),
+        return Sets.union(getUserRoles(),
             caseUserRepository.getCaseUserRolesByUserId(userRepository.getUserId()));
     }
 }
