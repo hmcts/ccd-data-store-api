@@ -21,7 +21,7 @@ class RoleAssignmentResourceTest {
     private static final String CASE_ID = "111111";
 
     @Test
-    @DisplayName("isAnExpiredRoleAssignment")
+    @DisplayName("shouldPassForIsAnExpiredRoleAssignment")
     void shouldPassForIsAnExpiredRoleAssignment() {
 
         final long oneHour = 3600000;
@@ -32,7 +32,7 @@ class RoleAssignmentResourceTest {
     }
 
     @Test
-    @DisplayName("isAnExpiredRoleAssignment")
+    @DisplayName("shouldNotPassForIsAnExpiredRoleAssignment")
     void shouldNotPassForIsAnExpiredRoleAssignment() {
 
         final long oneHour = 0;
