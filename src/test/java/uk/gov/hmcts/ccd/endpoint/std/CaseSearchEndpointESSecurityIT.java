@@ -451,8 +451,8 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
         CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_SOLICITOR);
 
         assertAll(
-            () -> assertThat(caseSearchResult.getTotal(), is(1L)),
-            () -> assertThat(caseSearchResult.getCases().get(0).getReference(), is(1589460125872336L))
+            () -> assertThat(caseSearchResult.getTotal(), is(2L)),
+            () -> assertThat(caseSearchResult.getCases().get(1).getReference(), is(1589460125872336L))
         );
     }
 
@@ -465,7 +465,22 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
         CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_RESTRICTED);
 
         assertAll(
-            () -> assertThat(caseSearchResult.getTotal(), is(3L))
+            () -> assertThat(caseSearchResult.getTotal(), is(4L))
+        );
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
+    void shouldOnlyReturnCasesUserRolesForAGivenUser() throws Exception {
+        ElasticsearchTestRequest searchRequest = matchAllRequest();
+
+        CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C,  AUTOTEST1_SOLICITOR);
+
+        assertAll(
+            () -> assertThat(caseSearchResult.getTotal(), is(2L)),
+            () -> assertThat(caseSearchResult.getCases().get(0).getReference(), is(1589460099608691L)),
+            () -> assertThat(caseSearchResult.getCases().get(1).getReference(), is(1589460125872336L))
         );
     }
 
