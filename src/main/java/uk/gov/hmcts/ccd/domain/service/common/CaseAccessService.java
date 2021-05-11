@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
@@ -45,7 +46,7 @@ public class CaseAccessService {
 
     public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                              @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
-                             CaseDataAccessControl caseDataAccessControl) {
+                             @Lazy CaseDataAccessControl caseDataAccessControl) {
         this.userRepository = userRepository;
         this.caseUserRepository = caseUserRepository;
         this.caseDataAccessControl = caseDataAccessControl;

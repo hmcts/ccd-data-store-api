@@ -8,11 +8,12 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
-import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.ccd.domain.service.AccessControl;
 
 @Component
 @ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "true")
+@Lazy
 public class DefaultCaseDataAccessControl implements CaseDataAccessControl, AccessControl {
 
     private final RoleAssignmentService roleAssignmentService;
@@ -49,7 +51,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
                                         PseudoRoleToAccessProfileGenerator pseudoRoleToAccessProfileGenerator,
                                         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                             final CaseDefinitionRepository caseDefinitionRepository,
-                                        @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
+                                        @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                                 CaseDetailsRepository caseDetailsRepository) {
         this.roleAssignmentService = roleAssignmentService;
         this.securityUtils = securityUtils;
