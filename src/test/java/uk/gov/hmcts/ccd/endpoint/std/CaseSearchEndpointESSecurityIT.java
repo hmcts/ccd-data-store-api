@@ -24,6 +24,7 @@ import javax.inject.Inject;
 
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.hamcrest.CoreMatchers.is;
@@ -451,7 +452,9 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
         CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_SOLICITOR);
 
         assertAll(
-            () -> assertThat(caseSearchResult.getTotal(), is(2L))
+            () -> assertThat(caseSearchResult.getTotal(), is(2L)),
+            () -> assertThat(caseSearchResult.getCases()).extracting("reference")
+                .contains(1589460125872336L, 1589460099608691L)
         );
     }
 
@@ -478,7 +481,9 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
 
         assertAll(
             () -> assertThat(caseSearchResult.getTotal(), is(2L)),
-            () -> assertThat(caseSearchResult.getCases().get(1).getJurisdiction(), is(AUTOTEST_1))
+            () -> assertThat(caseSearchResult.getCases().get(1).getJurisdiction(), is(AUTOTEST_1)),
+            () -> assertThat(caseSearchResult.getCases()).extracting("reference")
+                .contains(1589460125872336L, 1589460099608691L)
         );
     }
 
