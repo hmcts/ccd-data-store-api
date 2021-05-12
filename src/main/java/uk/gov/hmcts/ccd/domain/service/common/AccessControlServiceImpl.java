@@ -30,7 +30,6 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.hasAccessControlList;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceImpl.QUALIFIER;
 
 @Service

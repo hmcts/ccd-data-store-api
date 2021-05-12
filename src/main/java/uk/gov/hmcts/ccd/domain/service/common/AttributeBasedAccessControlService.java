@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -30,19 +29,18 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.DefaultCaseDataAcce
 @Service
 @Primary
 @ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "true")
-public class AttributeBasedAccessControlService implements AccessControlService, AccessControl {
+public class AttributeBasedAccessControlService extends AccessControlServiceImpl implements AccessControl {
 
     private DefaultCaseDataAccessControl defaultCaseDataAccessControl;
-    private AccessControlService accessControlService;
     private final CaseDefinitionRepository caseDefinitionRepository;
+    protected static final String IDAM_PREFIX = "idam:";
 
     @Autowired
-    public AttributeBasedAccessControlService(final DefaultCaseDataAccessControl defaultCaseDataAccessControl,
-                                              final @Qualifier(AccessControlServiceImpl.QUALIFIER)
-                                                  AccessControlService accessControlService,
+    public AttributeBasedAccessControlService(final CompoundAccessControlService compoundAccessControlService,
+                                              final DefaultCaseDataAccessControl defaultCaseDataAccessControl,
                                               final CaseDefinitionRepository caseDefinitionRepository) {
+        super(compoundAccessControlService);
         this.defaultCaseDataAccessControl = defaultCaseDataAccessControl;
-        this.accessControlService = accessControlService;
         this.caseDefinitionRepository = caseDefinitionRepository;
     }
 
@@ -52,7 +50,7 @@ public class AttributeBasedAccessControlService implements AccessControlService,
                                                  Predicate<AccessControlList> criteria) {
         applyAccessProfileRules(caseType);
 
-        return accessControlService.canAccessCaseTypeWithCriteria(caseType,
+        return super.canAccessCaseTypeWithCriteria(caseType,
             userRoles,
             criteria);
     }
@@ -64,7 +62,7 @@ public class AttributeBasedAccessControlService implements AccessControlService,
                                                   Predicate<AccessControlList> criteria) {
         applyAccessProfileRules(caseType);
 
-        return accessControlService.canAccessCaseStateWithCriteria(caseState,
+        return super.canAccessCaseStateWithCriteria(caseState,
             caseType,
             userRoles,
             criteria);
@@ -75,7 +73,7 @@ public class AttributeBasedAccessControlService implements AccessControlService,
                                                   List<CaseEventDefinition> caseEventDefinitions,
                                                   Set<String> userRoles,
                                                   Predicate<AccessControlList> criteria) {
-        return accessControlService.canAccessCaseEventWithCriteria(eventId,
+        return super.canAccessCaseEventWithCriteria(eventId,
             caseEventDefinitions,
             userRoles,
             criteria);
@@ -88,7 +86,7 @@ public class AttributeBasedAccessControlService implements AccessControlService,
                                                    Predicate<AccessControlList> criteria) {
         applyAccessProfileRules(caseFieldDefinitions);
 
-        return accessControlService.canAccessCaseFieldsWithCriteria(caseFields,
+        return super.canAccessCaseFieldsWithCriteria(caseFields,
             caseFieldDefinitions,
             userRoles,
             criteria);
@@ -98,7 +96,7 @@ public class AttributeBasedAccessControlService implements AccessControlService,
     public boolean canAccessCaseViewFieldWithCriteria(CommonField caseViewField,
                                                       Set<String> userRoles,
                                                       Predicate<AccessControlList> criteria) {
-        return accessControlService.canAccessCaseViewFieldWithCriteria(caseViewField,
+        return super.canAccessCaseViewFieldWithCriteria(caseViewField,
             userRoles,
             criteria);
     }
@@ -109,7 +107,7 @@ public class AttributeBasedAccessControlService implements AccessControlService,
                                                 List<CaseFieldDefinition> caseFieldDefinitions,
                                                 Set<String> userRoles) {
         applyAccessProfileRules(caseFieldDefinitions);
-        return accessControlService.canAccessCaseFieldsForUpsert(newData,
+        return super.canAccessCaseFieldsForUpsert(newData,
             existingData,
             caseFieldDefinitions,
             userRoles);
@@ -122,7 +120,7 @@ public class AttributeBasedAccessControlService implements AccessControlService,
                                                                      Predicate<AccessControlList> access) {
         applyAccessProfileRules(caseFieldDefinitions);
 
-        return accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
+        return super.setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
             caseFieldDefinitions,
             userRoles,
             access);
@@ -131,7 +129,7 @@ public class AttributeBasedAccessControlService implements AccessControlService,
     @Override
     public CaseUpdateViewEvent updateCollectionDisplayContextParameterByAccess(CaseUpdateViewEvent caseEventTrigger,
                                                                                Set<String> userRoles) {
-        return accessControlService.updateCollectionDisplayContextParameterByAccess(caseEventTrigger,
+        return super.updateCollectionDisplayContextParameterByAccess(caseEventTrigger,
             userRoles);
     }
 
@@ -143,7 +141,7 @@ public class AttributeBasedAccessControlService implements AccessControlService,
                                              boolean isClassification) {
         applyAccessProfileRules(caseFieldDefinitions);
 
-        return accessControlService.filterCaseFieldsByAccess(caseFields,
+        return super.filterCaseFieldsByAccess(caseFields,
             caseFieldDefinitions,
             userRoles,
             access,
@@ -156,7 +154,7 @@ public class AttributeBasedAccessControlService implements AccessControlService,
                                                               Predicate<AccessControlList> access) {
         applyAccessProfileRules(caseFieldDefinitions);
 
-        return accessControlService.filterCaseFieldsByAccess(caseFieldDefinitions,
+        return super.filterCaseFieldsByAccess(caseFieldDefinitions,
             userRoles,
             access);
     }
@@ -168,7 +166,7 @@ public class AttributeBasedAccessControlService implements AccessControlService,
                                                             Predicate<AccessControlList> access) {
         applyAccessProfileRules(caseFieldDefinitions);
 
-        return accessControlService.filterCaseViewFieldsByAccess(caseEventTrigger,
+        return super.filterCaseViewFieldsByAccess(caseEventTrigger,
             caseFieldDefinitions,
             userRoles,
             access);
@@ -178,7 +176,7 @@ public class AttributeBasedAccessControlService implements AccessControlService,
     public List<AuditEvent> filterCaseAuditEventsByReadAccess(List<AuditEvent> auditEvents,
                                                               List<CaseEventDefinition> caseEventDefinitions,
                                                               Set<String> userRoles) {
-        return accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
+        return super.filterCaseAuditEventsByReadAccess(auditEvents,
             caseEventDefinitions,
             userRoles);
     }
@@ -187,7 +185,7 @@ public class AttributeBasedAccessControlService implements AccessControlService,
     public List<CaseStateDefinition> filterCaseStatesByAccess(List<CaseStateDefinition> caseStateDefinitions,
                                                               Set<String> userRoles,
                                                               Predicate<AccessControlList> access) {
-        return accessControlService.filterCaseStatesByAccess(caseStateDefinitions,
+        return super.filterCaseStatesByAccess(caseStateDefinitions,
             userRoles,
             access);
     }
@@ -196,7 +194,7 @@ public class AttributeBasedAccessControlService implements AccessControlService,
     public List<CaseEventDefinition> filterCaseEventsByAccess(List<CaseEventDefinition> caseEventDefinitions,
                                                               Set<String> userRoles,
                                                               Predicate<AccessControlList> access) {
-        return accessControlService.filterCaseEventsByAccess(caseEventDefinitions,
+        return super.filterCaseEventsByAccess(caseEventDefinitions,
             userRoles,
             access);
     }
@@ -206,7 +204,7 @@ public class AttributeBasedAccessControlService implements AccessControlService,
         CaseViewActionableEvent[] caseViewTriggers,
         List<CaseEventDefinition> caseEventDefinitions,
         Set<String> userRoles) {
-        return accessControlService.filterCaseViewTriggersByCreateAccess(caseViewTriggers,
+        return super.filterCaseViewTriggersByCreateAccess(caseViewTriggers,
             caseEventDefinitions,
             userRoles);
     }
@@ -263,5 +261,18 @@ public class AttributeBasedAccessControlService implements AccessControlService,
 
     private Optional<CaseTypeDefinition> getCaseEventCaseTypeDefinition(List<CaseEventDefinition> caseEventDefinition) {
         return Optional.empty();
+    }
+
+    public boolean hasAccessControlList(Set<String> userRoles,
+                                        Predicate<AccessControlList> criteria,
+                                        List<AccessControlList> accessControlLists) {
+        return accessControlLists != null && accessControlLists
+            .stream()
+            .filter(acls -> {
+                String accessProfile = acls.getAccessProfile();
+                return userRoles.contains(accessProfile)
+                    || userRoles.contains(IDAM_PREFIX + accessProfile);
+            })
+            .anyMatch(criteria);
     }
 }

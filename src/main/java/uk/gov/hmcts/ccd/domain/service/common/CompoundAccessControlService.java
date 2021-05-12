@@ -5,8 +5,10 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CR
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_DELETE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.VALUE;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.hasAccessControlList;
 
+import java.util.List;
+import java.util.function.Predicate;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import java.util.Optional;
@@ -343,5 +345,16 @@ public class CompoundAccessControlService {
         return newItem.get("id") == null
             || newItem.get("id").equals(NullNode.getInstance())
             || newItem.get("id").asText().equalsIgnoreCase("null");
+    }
+
+    private boolean hasAccessControlList(Set<String> userRoles,
+                                         Predicate<AccessControlList> criteria,
+                                         List<AccessControlList> accessControlLists) {
+        // scoop out access control roles based on user roles
+        // intersect and make sure we have access for given criteria
+        return accessControlLists != null && accessControlLists
+            .stream()
+            .filter(acls -> userRoles.contains(acls.getAccessProfile()))
+            .anyMatch(criteria);
     }
 }

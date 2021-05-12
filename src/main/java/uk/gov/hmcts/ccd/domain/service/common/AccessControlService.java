@@ -508,7 +508,7 @@ public interface AccessControlService {
             .findAny().orElse(newArrayList());
     }
 
-    static boolean hasAccessControlList(Set<String> userRoles,
+    default boolean hasAccessControlList(Set<String> userRoles,
                                          Predicate<AccessControlList> criteria,
                                          List<AccessControlList> accessControlLists) {
         // scoop out access control roles based on user roles
