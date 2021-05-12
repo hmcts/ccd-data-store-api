@@ -840,7 +840,7 @@
         },
         {
           "id": "PENDING",
-          "name": "Done",
+          "name": "Pending",
           "description": null,
           "order": 3,
           "title_display": null,
