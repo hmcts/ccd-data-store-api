@@ -451,8 +451,7 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
         CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_SOLICITOR);
 
         assertAll(
-            () -> assertThat(caseSearchResult.getTotal(), is(2L)),
-            () -> assertThat(caseSearchResult.getCases().get(1).getReference(), is(1589460125872336L))
+            () -> assertThat(caseSearchResult.getTotal(), is(2L))
         );
     }
 
@@ -479,8 +478,7 @@ class CaseSearchEndpointESSecurityIT extends ElasticsearchBaseTest {
 
         assertAll(
             () -> assertThat(caseSearchResult.getTotal(), is(2L)),
-            () -> assertThat(caseSearchResult.getCases().get(0).getReference(), is(1589460099608691L)),
-            () -> assertThat(caseSearchResult.getCases().get(1).getReference(), is(1589460125872336L))
+            () -> assertThat(caseSearchResult.getCases().get(1).getJurisdiction(), is(AUTOTEST_1))
         );
     }
 
