@@ -1,11 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.search;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -33,6 +36,7 @@ public class AuthorisedSearchOperation implements SearchOperation {
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final AccessControlService accessControlService;
     private final UserRepository userRepository;
+    private final CaseUserRepository caseUserRepository;
 
     @Autowired
     public AuthorisedSearchOperation(@Qualifier("classified") final SearchOperation searchOperation,
@@ -40,11 +44,14 @@ public class AuthorisedSearchOperation implements SearchOperation {
                                          final CaseDefinitionRepository caseDefinitionRepository,
                                      final AccessControlService accessControlService,
                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                         final UserRepository userRepository) {
+                                         final UserRepository userRepository,
+                                     @Qualifier(CachedCaseUserRepository.QUALIFIER)
+                                             CaseUserRepository caseUserRepository) {
         this.searchOperation = searchOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlService = accessControlService;
         this.userRepository = userRepository;
+        this.caseUserRepository = caseUserRepository;
     }
 
     @Override
@@ -61,10 +68,11 @@ public class AuthorisedSearchOperation implements SearchOperation {
 
     private List<CaseDetails> filterByReadAccess(List<CaseDetails> results, CaseTypeDefinition caseTypeDefinition,
                                                  Set<String> userRoles) {
-
+        Set<String> caseAndUserRoles = Sets.union(userRoles,
+            caseUserRepository.getCaseUserRolesByUserId(userRepository.getUserId()));
         return results.stream()
             .filter(caseDetails -> accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(),
-                caseTypeDefinition, userRoles, CAN_READ))
+                caseTypeDefinition, caseAndUserRoles, CAN_READ))
             .collect(Collectors.toList())
             .stream()
             .map(caseDetails -> verifyFieldReadAccess(caseTypeDefinition, userRoles, caseDetails))
