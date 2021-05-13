@@ -29,7 +29,7 @@ class SupplementaryDataTest {
 
         Map<String, JsonNode> value = JacksonUtils.convertValue(mapper.readTree(jsonRequest));
         SupplementaryData supplementaryData = new SupplementaryData(
-            value.get("$set"), Collections.singleton(VALID_KEY));
+            "test", value.get("$set"), Collections.singleton(VALID_KEY));
 
         assertNotNull(supplementaryData);
         assertNotNull(supplementaryData.getResponse());
@@ -50,7 +50,7 @@ class SupplementaryDataTest {
 
         Map<String, JsonNode> value = JacksonUtils.convertValue(mapper.readTree(jsonRequest));
         SupplementaryData supplementaryData = new SupplementaryData(
-            value.get("$inc"), Collections.singleton(INVALID_KEY));
+            "test", value.get("$inc"), Collections.singleton(INVALID_KEY));
 
         assertNotNull(supplementaryData);
         assertNotNull(supplementaryData.getResponse());

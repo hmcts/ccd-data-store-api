@@ -1,6 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.supplementarydata;
 
 import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,8 @@ public class AuthorisedSupplementaryDataUpdateOperation implements Supplementary
 
     private final CaseDetailsRepository caseDetailsRepository;
 
+    private static final Logger LOG = LoggerFactory.getLogger(AuthorisedSupplementaryDataUpdateOperation.class);
+
     @Autowired
     public AuthorisedSupplementaryDataUpdateOperation(final @Qualifier("default") SupplementaryDataUpdateOperation
                                                               supplementaryDataUpdateOperation,
@@ -39,9 +44,13 @@ public class AuthorisedSupplementaryDataUpdateOperation implements Supplementary
     @Override
     public SupplementaryData updateSupplementaryData(String caseReference, SupplementaryDataUpdateRequest
         supplementaryData) {
+        LOG.error(String.format("Update supplementary data case reference => %s", caseReference));
         Optional<CaseDetails> caseDetails = this.caseDetailsRepository.findByReference(caseReference);
+
         if (caseDetails.isPresent()) {
+            LOG.error(String.format("case details present for case reference => %s", caseReference));
             if (this.authorisationService.isAccessAllowed(caseDetails.get())) {
+                LOG.error(String.format("Authorised to Update supplementary data case reference => %s", caseReference));
                 return this.supplementaryDataUpdateOperation.updateSupplementaryData(caseReference, supplementaryData);
             }
             throw new CaseAccessException(V2.Error.NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA);

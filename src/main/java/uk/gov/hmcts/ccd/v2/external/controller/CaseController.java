@@ -8,6 +8,9 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ExampleProperty;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -57,6 +60,8 @@ public class CaseController {
     private final GetEventsOperation getEventsOperation;
     private final SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
     private final SupplementaryDataUpdateRequestValidator requestValidator;
+
+    private static final Logger LOG = LoggerFactory.getLogger(CaseController.class);
 
     @Autowired
     public CaseController(
@@ -420,11 +425,12 @@ public class CaseController {
     })
     public ResponseEntity<SupplementaryDataResource> updateCaseSupplementaryData(@PathVariable("caseId") String caseId,
                                            @RequestBody SupplementaryDataUpdateRequest supplementaryDataUpdateRequest) {
-
+        LOG.error(String.format("Supplementary data case id => %s", caseId));
         this.requestValidator.validate(supplementaryDataUpdateRequest);
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
+        LOG.error(String.format("Supplementary data case id => %s is valid", caseId));
         SupplementaryData supplementaryDataUpdated = supplementaryDataUpdateOperation.updateSupplementaryData(caseId,
             supplementaryDataUpdateRequest);
         return status(HttpStatus.OK).body(new SupplementaryDataResource(supplementaryDataUpdated));
