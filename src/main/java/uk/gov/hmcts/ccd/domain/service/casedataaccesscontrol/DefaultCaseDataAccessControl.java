@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import com.google.common.collect.Lists;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,7 +17,10 @@ import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
@@ -82,9 +86,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         if (caseDetails.isEmpty()) {
             return Lists.newArrayList();
         }
-        RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
-        RoleAssignmentFilteringResult filteringResults = roleAssignmentsFilteringService
-            .filter(roleAssignments, caseDetails.get());
+        RoleAssignmentFilteringResult filteringResults = filterRoleAssignmentsWithCaseDetails(caseDetails.get());
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.get().getCaseTypeId());
 
         return filteredAccessProfiles(filteringResults, caseTypeDefinition);
@@ -136,5 +138,58 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     @Override
     public void grantAccess(String caseId, String idamUserId) {
 
+    }
+
+    @Override
+    public CaseAccessMetadata generateAccessMetadata(CaseDetails caseDetails) {
+        CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
+        RoleAssignmentFilteringResult filteringResults = filterRoleAssignmentsWithCaseDetails(caseDetails);
+        caseAccessMetadata.setAccessGrants(generatePostFilteringAccessGrants(filteringResults));
+        caseAccessMetadata.setAccessProcess(generatePostFilteringProcessGrants(filteringResults));
+        return caseAccessMetadata;
+    }
+
+    private RoleAssignmentFilteringResult filterRoleAssignmentsWithCaseDetails(CaseDetails caseDetails) {
+        RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
+        RoleAssignmentFilteringResult filteringResults = roleAssignmentsFilteringService
+            .filter(roleAssignments, caseDetails);
+
+        if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
+            List<RoleAssignment> pseudoRoleAssignments = pseudoRoleAssignmentsGenerator
+                .createPseudoRoleAssignments(filteringResults);
+            filteringResults = augment(filteringResults, pseudoRoleAssignments);
+        }
+
+        return filteringResults;
+    }
+
+    private String generatePostFilteringProcessGrants(RoleAssignmentFilteringResult filteringResult) {
+        String accessProcess = GrantType.SPECIFIC.name();
+
+        boolean userHasAccessToCase = filteringResult.getRoleAssignments().stream()
+            .map(RoleAssignment::getGrantType)
+            .anyMatch(DefaultCaseDataAccessControl::isUserAllowedAccessToCase);
+
+        if (userHasAccessToCase) {
+            accessProcess = "NONE";
+        }
+
+        return accessProcess;
+    }
+
+    private static boolean isUserAllowedAccessToCase(String grantType) {
+        return grantType.equals(GrantType.STANDARD.name())
+            || grantType.equals(GrantType.SPECIFIC.name())
+            || grantType.equals(GrantType.CHALLENGED);
+    }
+
+    private String generatePostFilteringAccessGrants(RoleAssignmentFilteringResult filteringResult) {
+        List<String> collect = filteringResult.getRoleAssignments().stream()
+            .map(RoleAssignment::getGrantType)
+            .distinct()
+            .sorted()
+            .collect(Collectors.toList());
+
+        return String.join(",", collect);
     }
 }

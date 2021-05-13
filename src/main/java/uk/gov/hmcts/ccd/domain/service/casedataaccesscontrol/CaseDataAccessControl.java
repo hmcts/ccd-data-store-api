@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 public interface CaseDataAccessControl {
 
@@ -18,4 +20,6 @@ public interface CaseDataAccessControl {
     }
 
     void grantAccess(String caseId, String idamUserId);
+
+    CaseAccessMetadata generateAccessMetadata(CaseDetails caseDetails);
 }

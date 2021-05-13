@@ -1,12 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.search;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -202,8 +204,16 @@ public class CaseSearchResultViewGenerator {
             caseDetails.getMetadata()
         );
 
+        updateCaseFieldsWithAccessControlMetadata(caseFields, caseDetails);
+
         return new SearchResultViewItem(caseDetails.getReferenceAsString(), caseFields, new HashMap<>(caseFields),
                 caseDetails.getSupplementaryData());
+    }
+
+    private void updateCaseFieldsWithAccessControlMetadata(Map<String, Object> caseFields, CaseDetails caseDetails) {
+        CaseAccessMetadata caseAccessMetadata = caseSearchesViewAccessControl.getCaseAccessMetaData(caseDetails);
+        caseFields.put("[ACCESS_GRANTED]", new TextNode(caseAccessMetadata.getAccessGrants()));
+        caseFields.put("[ACCESS_PROCESS]", new TextNode(caseAccessMetadata.getAccessProcess()));
     }
 
     private Map<String, Object> prepareData(SearchResultDefinition searchResult,
