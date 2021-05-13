@@ -4,7 +4,7 @@ Feature: F-106: Update Supplementary Data
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
-  @S-605 @Ignore
+  @S-605
   Scenario: Must return the updated supplementary data values from Data store
     Given an appropriate test context as detailed in the test data source,
     And a user [Dil - who can create a case],
@@ -26,7 +26,7 @@ Feature: F-106: Update Supplementary Data
     Then a positive response is received,
     And the response has all the details as expected.
 
-  @S-607 @Ignore
+  @S-607
   Scenario: Need to be able to replace an existing property
     Given an appropriate test context as detailed in the test data source,
     And a user [Dil - who can create a case],
