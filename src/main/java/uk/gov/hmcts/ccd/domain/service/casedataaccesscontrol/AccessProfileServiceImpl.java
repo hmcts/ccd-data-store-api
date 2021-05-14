@@ -20,11 +20,11 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
 
     @Override
     public List<AccessProfile> generateAccessProfiles(RoleAssignmentFilteringResult filteringResults,
-                                                      List<RoleToAccessProfileDefinition> roleToAccessProfilesMappings) {
+                                                      List<RoleToAccessProfileDefinition> roleToAccessProfileMappings) {
 
         List<AccessProfile> accessProfiles = new ArrayList<>();
         Map<String, RoleToAccessProfileDefinition> roleToAccessProfileDefinitionMap =
-            toRoleNameAsKeyMap(roleToAccessProfilesMappings);
+            toRoleNameAsKeyMap(roleToAccessProfileMappings);
 
         for (RoleAssignment roleAssignment : filteringResults.getRoleAssignments()) {
 
