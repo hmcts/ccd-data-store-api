@@ -18,6 +18,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.notFound;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.serverError;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.StringStartsWith.startsWith;
@@ -81,16 +82,19 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
     @Test
     public void shouldUseETagToGetRoleAssignmentsFromCache() {
         // store the response and ETag in the cache
-        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID))
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).inScenario("ETag")
+                    .whenScenarioStateIs(STARTED)
                     .willReturn(okJson(jsonBody(ID))
                                     .withHeader(ETAG, "123456789")
-                    ));
-        validateRoleAssignments(ID);
+                    )
+                    .willSetStateTo("Cache populated with RoleAssignments"));
 
-        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID))
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).inScenario("ETag")
+                    .whenScenarioStateIs("Cache populated with RoleAssignments")
                     .withHeader(IF_NONE_MATCH, equalTo("123456789"))
                     .willReturn(aResponse().withStatus(304)));
 
+        validateRoleAssignments(ID);
         validateRoleAssignments(ID);
     }
 
@@ -98,24 +102,30 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
     @Test
     public void shouldUpdateCacheWhenETagDiffersFromTheOneFromTheResponse() {
         // store the response and ETag in the cache
-        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID))
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).inScenario("ETag")
+                    .whenScenarioStateIs(STARTED)
                     .willReturn(okJson(jsonBody(ID))
                                     .withHeader(ETAG, "553456789")
-                    ));
-        validateRoleAssignments(ID);
+                    )
+                    .willSetStateTo("Cache populated with RoleAssignments"));
 
         // data has changed on the server and the response contains a new ETag and body
-        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID))
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).inScenario("ETag")
+                    .whenScenarioStateIs("Cache populated with RoleAssignments")
                     .withHeader(IF_NONE_MATCH, equalTo("553456789"))
                     .willReturn(okJson(jsonBody(ID1))
                                     .withHeader(ETAG, "663456789")
-                    ));
-        validateRoleAssignments(ID1);
+                    )
+                    .willSetStateTo("Cache updated with RoleAssignments"));
 
-        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID))
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).inScenario("ETag")
+                    .whenScenarioStateIs("Cache updated with RoleAssignments")
+                    .whenScenarioStateIs(STARTED)
                     .withHeader(IF_NONE_MATCH, equalTo("663456789"))
                     .willReturn(aResponse().withStatus(304)));
 
+        validateRoleAssignments(ID);
+        validateRoleAssignments(ID1);
         validateRoleAssignments(ID1);
     }
 
