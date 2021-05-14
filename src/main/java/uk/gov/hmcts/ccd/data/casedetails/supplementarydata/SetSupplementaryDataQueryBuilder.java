@@ -4,12 +4,17 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
 @Qualifier("set")
 public class SetSupplementaryDataQueryBuilder implements SupplementaryDataQueryBuilder {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SetSupplementaryDataQueryBuilder.class);
 
     private static final String SET_UPDATE_QUERY = "UPDATE case_data SET "
         + "supplementary_data= (CASE"
@@ -36,6 +41,7 @@ public class SetSupplementaryDataQueryBuilder implements SupplementaryDataQueryB
         query.setParameter("json_value_insert", parentKeyJsonValue);
         query.setParameter("parent_path", Arrays.asList(parentKey));
         query.setParameter("parent_key", "{" + parentKey + "}");
+        LOG.error(String.format("Case reference => %s, Query => %s", caseReference, query.toString()));
         return query;
     }
 
