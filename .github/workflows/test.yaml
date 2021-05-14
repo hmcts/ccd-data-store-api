@@ -1,0 +1,37 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - *
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: tibdex/github-app-token@v1
+        id: generate-token
+        with:
+          app_id: ${{ secrets.HMCTS_GITHUB_CCD_APP_ID }}
+          private_key: ${{ secrets.HMCTS_GITHUB_CCD_PRIVATE_KEY }}
+          
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+          
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      
+      - name: Clean suppressions
+        run: ./gradlew cleanSuppressions
+          
+      - name: Commit
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          skip_dirty_check: true
+          commit_message: "Trigger build with empty commit"
+          commit_options: "--allow-empty"
+          push_options: '--force'
+          if: steps.auto-commit-action.outputs.changes_detected == 'true'
