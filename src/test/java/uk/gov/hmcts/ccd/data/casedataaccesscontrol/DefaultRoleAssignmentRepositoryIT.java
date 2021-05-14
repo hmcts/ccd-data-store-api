@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.data.casedataaccesscontrol;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import java.time.Instant;
-import javax.inject.Inject;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
@@ -10,7 +8,12 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
+import javax.inject.Inject;
+import java.time.Instant;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.badRequest;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.notFound;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.serverError;
@@ -19,10 +22,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.http.HttpHeaders.ETAG;
+import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 
 public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
 
     private static final String ID = "4d96923f-891a-4cb1-863e-9bec44d1689d";
+    private static final String ID1 = "4d96923f-891a-4cb1-863e-9bec44d1612d";
     private static final String ACTOR_ID_TYPE = "IDAM";
     private static final String ACTOR_ID = "567567";
     private static final String ROLE_TYPE = "ORGANISATION";
@@ -52,9 +58,10 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
     @DisplayName("should return roleAssignments")
     @Test
     public void shouldReturnRoleAssignments() {
-        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).willReturn(okJson(jsonBody())));
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID))
+                    .willReturn(okJson(jsonBody(ID))));
 
-        validateRoleAssignments();
+        validateRoleAssignments(ID);
     }
 
     @DisplayName("should error on 404 when GET roleAssignments")
@@ -68,6 +75,48 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
         assertThat(exception.getMessage(),
                    startsWith("No Role Assignments found for userId="
                                   + ACTOR_ID + " when getting from Role Assignment Service because of"));
+    }
+
+    @DisplayName("should GET roleAssignments from cache when ETag found")
+    @Test
+    public void shouldUseETagToGetRoleAssignmentsFromCache() {
+        // store the response and ETag in the cache
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID))
+                    .willReturn(okJson(jsonBody(ID))
+                                    .withHeader(ETAG, "123456789")
+                    ));
+        validateRoleAssignments(ID);
+
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID))
+                    .withHeader(IF_NONE_MATCH, equalTo("123456789"))
+                    .willReturn(aResponse().withStatus(304)));
+
+        validateRoleAssignments(ID);
+    }
+
+    @DisplayName("should update the cache when ETag differs from the one from the response")
+    @Test
+    public void shouldUpdateCacheWhenETagDiffersFromTheOneFromTheResponse() {
+        // store the response and ETag in the cache
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID))
+                    .willReturn(okJson(jsonBody(ID))
+                                    .withHeader(ETAG, "553456789")
+                    ));
+        validateRoleAssignments(ID);
+
+        // data has changed on the server and the response contains a new ETag and body
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID))
+                    .withHeader(IF_NONE_MATCH, equalTo("553456789"))
+                    .willReturn(okJson(jsonBody(ID1))
+                                    .withHeader(ETAG, "663456789")
+                    ));
+        validateRoleAssignments(ID1);
+
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID))
+                    .withHeader(IF_NONE_MATCH, equalTo("663456789"))
+                    .willReturn(aResponse().withStatus(304)));
+
+        validateRoleAssignments(ID1);
     }
 
     @DisplayName("should error on 400 when GET roleAssignments")
@@ -98,16 +147,16 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
     @Test
     public void shouldReturnRoleAssignmentsWhenUnknownFieldsOnRequest() {
         stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID))
-            .willReturn(okJson(jsonBodyUnknownFields())));
+            .willReturn(okJson(jsonBodyUnknownFields(ID))));
 
-        validateRoleAssignments();
+        validateRoleAssignments(ID);
     }
 
-    private static String jsonBody() {
+    private static String jsonBody(String id) {
         return "{\n"
             + "  \"roleAssignmentResponse\": [\n"
             + "    {\n"
-            + "      \"id\": \"" + ID + "\",\n"
+            + "      \"id\": \"" + id + "\",\n"
             + "      \"actorIdType\": \"" + ACTOR_ID_TYPE + "\",\n"
             + "      \"actorId\": \"" + ACTOR_ID + "\",\n"
             + "      \"roleType\": \"" + ROLE_TYPE + "\",\n"
@@ -132,12 +181,12 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
             + "}";
     }
 
-    private void validateRoleAssignments() {
+    private void validateRoleAssignments(String id) {
         RoleAssignmentResponse roleAssignments = roleAssignmentRepository.getRoleAssignments(ACTOR_ID);
 
         assertThat(roleAssignments.getRoleAssignments().size(), is(1));
         RoleAssignmentResource roleAssignmentResource = roleAssignments.getRoleAssignments().get(0);
-        assertThat(roleAssignmentResource.getId(), is(ID));
+        assertThat(roleAssignmentResource.getId(), is(id));
         assertThat(roleAssignmentResource.getActorIdType(), is(ACTOR_ID_TYPE));
         assertThat(roleAssignmentResource.getActorId(), is(ACTOR_ID));
         assertThat(roleAssignmentResource.getRoleType(), is(ROLE_TYPE));
@@ -161,11 +210,11 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
         assertThat(roleAssignmentResource.getAuthorisations().get(1), is(AUTHORISATIONS_AUTH_2));
     }
 
-    private static String jsonBodyUnknownFields() {
+    private static String jsonBodyUnknownFields(String id) {
         return "{\n"
             + "  \"roleAssignmentResponse\": [\n"
             + "    {\n"
-            + "      \"id\": \"" + ID + "\",\n"
+            + "      \"id\": \"" + id + "\",\n"
             + "      \"actorIdType\": \"" + ACTOR_ID_TYPE + "\",\n"
             + "      \"actorId\": \"" + ACTOR_ID + "\",\n"
             + "      \"roleType\": \"" + ROLE_TYPE + "\",\n"
