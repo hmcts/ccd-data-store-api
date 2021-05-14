@@ -279,7 +279,7 @@ public class ApplicationParams {
         return roleAssignmentBaseURL() + "/actors/{uid}";
     }
 
-    public String amPostRoleAssignmentsQueryURL() {
+    public String amQueryRoleAssignmentsURL() {
         return roleAssignmentBaseURL() + "/query";
     }
 

@@ -12,7 +12,6 @@ import java.util.List;
 @Builder
 public class Attributes implements Serializable {
 
-    private static final long serialVersionUID = -3552426127042849422L;
     private List<String> jurisdiction;
     private List<String> caseType;
     private List<String> caseId;

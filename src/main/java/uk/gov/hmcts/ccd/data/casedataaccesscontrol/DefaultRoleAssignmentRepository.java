@@ -12,13 +12,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleType;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,9 +75,10 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
     @Override
     public RoleAssignmentResponse findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds) {
         try {
-            final HttpEntity requestEntity =
-                new HttpEntity(getRoleAssignmentQuery(caseIds, userIds), securityUtils.authorizationHeaders());
-            return restTemplate.exchange(applicationParams.amPostRoleAssignmentsQueryURL(),
+            final var roleAssignmentQuery = new RoleAssignmentQuery(caseIds, userIds);
+            final var requestEntity = new HttpEntity(roleAssignmentQuery, securityUtils.authorizationHeaders());
+            return restTemplate.exchange(
+                applicationParams.amQueryRoleAssignmentsURL(),
                 HttpMethod.POST,
                 requestEntity,
                 RoleAssignmentResponse.class).getBody();
@@ -105,14 +104,4 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
             return new ServiceException(String.format(ROLE_ASSIGNMENT_SERVICE_ERROR, exception.getMessage()));
         }
     }
-
-    private RoleAssignmentQuery getRoleAssignmentQuery(List<String> caseIds, List<String> userIds) {
-        final Attributes attribute = Attributes.builder().caseId(caseIds).build();
-        final ArrayList attributes = new ArrayList<Attributes>();
-        final ArrayList roleType = new ArrayList<Attributes>();
-        roleType.add(RoleType.CASE.name());
-        attributes.add(attribute);
-        return RoleAssignmentQuery.builder().actorId(userIds).attributes(attributes).roleType(roleType).build();
-    }
-
 }

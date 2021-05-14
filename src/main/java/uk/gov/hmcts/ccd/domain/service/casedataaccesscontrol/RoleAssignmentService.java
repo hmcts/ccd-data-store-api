@@ -35,17 +35,16 @@ public class RoleAssignmentService implements AccessControl {
     public List<String> getCaseIdsForAGivenUser(String userId) {
         final RoleAssignments roleAssignments = this.getRoleAssignments(userId);
 
-        final List<String> result = roleAssignments.getRoleAssignments().stream()
+        return roleAssignments.getRoleAssignments().stream()
             .filter(roleAssignment -> isAValidRoleAssignments(roleAssignment))
             .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
             .flatMap(Optional::stream)
             .collect(Collectors.toList());
-        return result;
     }
 
     private boolean isAValidRoleAssignments(RoleAssignment roleAssignment) {
-        final boolean isACaseType = roleAssignment.getRoleType().equals(RoleType.CASE.name());
-        return roleAssignment.isAnExpiredRoleAssignment() && isACaseType;
+        final boolean isCaseRoleType = roleAssignment.getRoleType().equals(RoleType.CASE.name());
+        return roleAssignment.isAnExpiredRoleAssignment() && isCaseRoleType;
     }
 
     public List<CaseAssignedUserRole> findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds) {
@@ -53,12 +52,12 @@ public class RoleAssignmentService implements AccessControl {
             roleAssignmentRepository.findRoleAssignmentsByCasesAndUsers(caseIds, userIds);
 
         final RoleAssignments roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
-
+        var caseIdError = new RuntimeException(RoleAssignmentAttributes.ATTRIBUTE_NOT_DEFINED);
         return roleAssignments.getRoleAssignments().stream()
             .filter(roleAssignment -> isAValidRoleAssignments(roleAssignment))
             .map(roleAssignment ->
                 new CaseAssignedUserRole(
-                    roleAssignment.getAttributes().getCaseId().orElse(RoleAssignmentAttributes.ATTRIBUTE_NOT_DEFINED),
+                    roleAssignment.getAttributes().getCaseId().orElseThrow(() -> caseIdError),
                     roleAssignment.getActorId(),
                     roleAssignment.getRoleName()
                 )
