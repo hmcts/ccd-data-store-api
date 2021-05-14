@@ -123,15 +123,16 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
         CaseUpdateViewEvent caseUpdateViewEvent = filterCaseFieldsByCreateAccess(caseTypeDefinition,
             accessProfiles, getEventTriggerOperation.executeForDraft(draftReference, ignoreWarning));
+        updateWithAccessControlMetadata(caseUpdateViewEvent);
         return accessControlService.updateCollectionDisplayContextParameterByAccess(caseUpdateViewEvent,
             accessProfiles);
     }
 
-    public CaseUpdateViewEvent updateWithAccessControlMetadata(CaseUpdateViewEvent caseUpdateViewEvent) {
-        CaseAccessMetadata caseAccessMetadata = caseDataAccessControl.generateAccessMetadata(caseUpdateViewEvent.getCaseId());
-        caseUpdateViewEvent.setAccessGrants(caseAccessMetadata.getAccessGrants());
-        caseUpdateViewEvent.setAccessProcess(caseAccessMetadata.getAccessProcess());
-        return caseUpdateViewEvent;
+    private void updateWithAccessControlMetadata(CaseUpdateViewEvent caseUpdateViewEvent) {
+        CaseAccessMetadata caseAccessMetadata
+            = caseDataAccessControl.generateAccessMetadata(caseUpdateViewEvent.getCaseId());
+        caseUpdateViewEvent.setAccessGrants(caseAccessMetadata.getAccessGrantsString());
+        caseUpdateViewEvent.setAccessProcess(caseAccessMetadata.getAccessProcessString());
     }
 
     private CaseDetails getCaseDetails(String caseReference) {

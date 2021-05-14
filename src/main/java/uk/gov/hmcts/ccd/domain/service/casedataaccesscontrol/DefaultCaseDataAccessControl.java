@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
@@ -148,7 +149,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         if (caseDetails.isPresent()) {
             RoleAssignmentFilteringResult filteringResults = filterRoleAssignmentsWithCaseDetails(caseDetails.get());
             caseAccessMetadata.setAccessGrants(generatePostFilteringAccessGrants(filteringResults));
-            caseAccessMetadata.setAccessProcess(generatePostFilteringProcessGrants(filteringResults));
+            caseAccessMetadata.setAccessProcess(generatePostFilteringAccessProcess(filteringResults));
         }
         return caseAccessMetadata;
     }
@@ -167,33 +168,27 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         return filteringResults;
     }
 
-    private String generatePostFilteringProcessGrants(RoleAssignmentFilteringResult filteringResult) {
-        String accessProcess = GrantType.SPECIFIC.name();
-
+    private AccessProcess generatePostFilteringAccessProcess(RoleAssignmentFilteringResult filteringResult) {
         boolean userHasAccessToCase = filteringResult.getRoleAssignments().stream()
-            .map(RoleAssignment::getGrantType)
+            .map(roleAssignment -> GrantType.valueOf(roleAssignment.getGrantType()))
             .anyMatch(DefaultCaseDataAccessControl::isUserAllowedAccessToCase);
 
         if (userHasAccessToCase) {
-            accessProcess = "NONE";
+            return AccessProcess.NONE;
+        } else {
+            return AccessProcess.SPECIFIC;
         }
-
-        return accessProcess;
     }
 
-    private static boolean isUserAllowedAccessToCase(String grantType) {
-        return grantType.equals(GrantType.STANDARD.name())
-            || grantType.equals(GrantType.SPECIFIC.name())
+    private static boolean isUserAllowedAccessToCase(GrantType grantType) {
+        return grantType.equals(GrantType.STANDARD)
+            || grantType.equals(GrantType.SPECIFIC)
             || grantType.equals(GrantType.CHALLENGED);
     }
 
-    private String generatePostFilteringAccessGrants(RoleAssignmentFilteringResult filteringResult) {
-        List<String> collect = filteringResult.getRoleAssignments().stream()
-            .map(RoleAssignment::getGrantType)
-            .distinct()
-            .sorted()
+    private List<GrantType> generatePostFilteringAccessGrants(RoleAssignmentFilteringResult filteringResult) {
+        return filteringResult.getRoleAssignments().stream()
+            .map(roleAssignment -> GrantType.valueOf(roleAssignment.getGrantType()))
             .collect(Collectors.toList());
-
-        return String.join(",", collect);
     }
 }

@@ -61,7 +61,20 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
         verifyCaseTypeReadAccess(caseTypeDefinition, accessProfiles);
         filterCaseTabFieldsByReadAccess(caseView, accessProfiles);
         filterAllowedTabsWithFields(caseView, accessProfiles);
+        updateWithAccessControlMetadata(caseView);
         return filterUpsertAccess(caseReference, caseTypeDefinition, accessProfiles, caseView);
+    }
+
+    private void updateWithAccessControlMetadata(CaseView caseView) {
+        CaseAccessMetadata caseAccessMetadata = caseDataAccessControl.generateAccessMetadata(caseView.getCaseId());
+
+        CaseViewField caseViewField = new CaseViewField();
+        caseViewField.setId(ACCESS_GRANTED);
+        caseViewField.setLabel(ACCESS_GRANTED_LABEL);
+        caseViewField.setSecurityLabel(SecurityClassification.PUBLIC.name());
+        caseViewField.setValue(caseAccessMetadata.getAccessGrantsString());
+
+        caseView.addMetadataFields(List.of(caseViewField));
     }
 
     private void filterCaseTabFieldsByReadAccess(CaseView caseView, Set<String> userRoles) {
@@ -116,23 +129,6 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
 
         caseView.setActionableEvents(authorisedActionableEvents);
 
-        return caseView;
-    }
-
-    @Override
-    public CaseView updateWithAccessControlMetadata(CaseView caseView) {
-        List<CaseViewField> metadataFields = caseView.getMetadataFields();
-
-        CaseAccessMetadata caseAccessMetadata = caseDataAccessControl.generateAccessMetadata(caseView.getCaseId());
-
-        CaseViewField caseViewField = new CaseViewField();
-        caseViewField.setId(ACCESS_GRANTED);
-        caseViewField.setLabel(ACCESS_GRANTED_LABEL);
-        caseViewField.setSecurityLabel(SecurityClassification.PUBLIC.name());
-        caseViewField.setValue(caseAccessMetadata.getAccessGrants());
-
-        metadataFields.add(caseViewField);
-        caseView.setMetadataFields(metadataFields);
         return caseView;
     }
 }

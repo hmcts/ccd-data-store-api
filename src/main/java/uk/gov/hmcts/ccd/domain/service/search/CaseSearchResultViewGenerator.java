@@ -214,8 +214,8 @@ public class CaseSearchResultViewGenerator {
 
     private void updateCaseFieldsWithAccessControlMetadata(Map<String, Object> caseFields, String caseReference) {
         CaseAccessMetadata caseAccessMetadata = caseSearchesViewAccessControl.getCaseAccessMetaData(caseReference);
-        caseFields.put(ACCESS_GRANTED, new TextNode(caseAccessMetadata.getAccessGrants()));
-        caseFields.put(ACCESS_PROCESS, new TextNode(caseAccessMetadata.getAccessProcess()));
+        caseFields.put(ACCESS_GRANTED, new TextNode(caseAccessMetadata.getAccessGrantsString()));
+        caseFields.put(ACCESS_PROCESS, new TextNode(caseAccessMetadata.getAccessProcessString()));
     }
 
     private Map<String, Object> prepareData(SearchResultDefinition searchResult,

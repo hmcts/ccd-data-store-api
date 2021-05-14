@@ -132,9 +132,7 @@ public class UIStartTriggerController {
                                                                                                triggerId,
                                                                                                ignoreWarning);
 
-        final CaseUpdateViewEvent caseUpdateViewEventWithAccessControlMetaData
-            = this.getEventTriggerOperation.updateWithAccessControlMetadata(caseUpdateViewEvent);
-        return ResponseEntity.ok(forCase(caseUpdateViewEventWithAccessControlMetaData, caseId, ignoreWarning));
+        return ResponseEntity.ok(forCase(caseUpdateViewEvent, caseId, ignoreWarning));
     }
 
     @Transactional

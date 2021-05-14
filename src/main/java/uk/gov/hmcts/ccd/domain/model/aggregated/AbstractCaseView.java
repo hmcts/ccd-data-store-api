@@ -46,4 +46,8 @@ public abstract class AbstractCaseView {
     public void setMetadataFields(List<CaseViewField> metadataFields) {
         this.metadataFields = metadataFields;
     }
+
+    public void addMetadataFields(List<CaseViewField> metadataFields) {
+        this.metadataFields.addAll(metadataFields);
+    }
 }
