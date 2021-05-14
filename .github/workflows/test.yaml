@@ -1,9 +1,7 @@
 name: Test
 
 on:
-  push:
-    branches:
-      - *
+  [push, pull_request]
 
 jobs:
   build:
@@ -31,7 +29,6 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           skip_dirty_check: true
-          commit_message: "Trigger build with empty commit"
-          commit_options: "--allow-empty"
+          commit_message: "Clean suppressions"
           push_options: '--force'
           if: steps.auto-commit-action.outputs.changes_detected == 'true'
