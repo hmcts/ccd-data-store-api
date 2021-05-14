@@ -141,11 +141,15 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     }
 
     @Override
-    public CaseAccessMetadata generateAccessMetadata(CaseDetails caseDetails) {
+    public CaseAccessMetadata generateAccessMetadata(String caseReference) {
+        Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(caseReference);
+
         CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
-        RoleAssignmentFilteringResult filteringResults = filterRoleAssignmentsWithCaseDetails(caseDetails);
-        caseAccessMetadata.setAccessGrants(generatePostFilteringAccessGrants(filteringResults));
-        caseAccessMetadata.setAccessProcess(generatePostFilteringProcessGrants(filteringResults));
+        if (caseDetails.isPresent()) {
+            RoleAssignmentFilteringResult filteringResults = filterRoleAssignmentsWithCaseDetails(caseDetails.get());
+            caseAccessMetadata.setAccessGrants(generatePostFilteringAccessGrants(filteringResults));
+            caseAccessMetadata.setAccessProcess(generatePostFilteringProcessGrants(filteringResults));
+        }
         return caseAccessMetadata;
     }
 

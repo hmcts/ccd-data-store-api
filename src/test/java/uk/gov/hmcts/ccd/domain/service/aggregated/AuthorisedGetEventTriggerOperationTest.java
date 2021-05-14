@@ -19,6 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
@@ -79,6 +80,9 @@ class AuthorisedGetEventTriggerOperationTest {
     @Mock
     private EventTriggerService eventTriggerService;
 
+    @Mock
+    private CaseDataAccessControl caseDataAccessControl;
+
     private AuthorisedGetEventTriggerOperation authorisedGetEventTriggerOperation;
     private CaseUpdateViewEvent caseEventTrigger;
     private final CaseDetails caseDetails = new CaseDetails();
@@ -104,7 +108,8 @@ class AuthorisedGetEventTriggerOperationTest {
             caseAccessService,
             accessControlService,
             eventTriggerService,
-            draftGateway);
+            draftGateway,
+            caseDataAccessControl);
         caseEventTrigger = new CaseUpdateViewEvent();
 
         caseType.setId(CASE_TYPE_ID);

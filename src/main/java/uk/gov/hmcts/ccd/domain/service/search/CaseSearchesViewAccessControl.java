@@ -7,7 +7,6 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
@@ -70,7 +69,7 @@ public class CaseSearchesViewAccessControl {
     }
 
 
-    public CaseAccessMetadata getCaseAccessMetaData(CaseDetails caseDetails) {
-        return caseDataAccessControl.generateAccessMetadata(caseDetails);
+    public CaseAccessMetadata getCaseAccessMetaData(String caseReference) {
+        return caseDataAccessControl.generateAccessMetadata(caseReference);
     }
 }

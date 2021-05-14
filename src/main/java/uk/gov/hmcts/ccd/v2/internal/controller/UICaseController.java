@@ -84,8 +84,10 @@ public class UICaseController {
         }
 
         final CaseView caseView = getCaseViewOperation.execute(caseId);
+        final CaseView caseViewWithAccessControlMetaData
+            = getCaseViewOperation.updateWithAccessControlMetadata(caseView);
 
-        return ResponseEntity.ok(new CaseViewResource(caseView));
+        return ResponseEntity.ok(new CaseViewResource(caseViewWithAccessControlMetaData));
     }
 
     @Transactional

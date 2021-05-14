@@ -25,6 +25,11 @@ public class CaseUpdateViewEvent {
     private String endButtonLabel;
     @JsonProperty("can_save_draft")
     private Boolean canSaveDraft;
+    @JsonProperty("access_granted")
+    private String accessGrants;
+    @JsonProperty("access_process")
+    private String accessProcess;
+
 
     public String getId() {
         return id;
@@ -112,5 +117,21 @@ public class CaseUpdateViewEvent {
 
     public void setCanSaveDraft(Boolean canSaveDraft) {
         this.canSaveDraft = canSaveDraft;
+    }
+
+    public String getAccessGrants() {
+        return accessGrants;
+    }
+
+    public void setAccessGrants(String accessGrants) {
+        this.accessGrants = accessGrants;
+    }
+
+    public String getAccessProcess() {
+        return accessProcess;
+    }
+
+    public void setAccessProcess(String accessProcess) {
+        this.accessProcess = accessProcess;
     }
 }

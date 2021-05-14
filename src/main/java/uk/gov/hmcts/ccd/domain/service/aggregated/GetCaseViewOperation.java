@@ -5,4 +5,8 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 public interface GetCaseViewOperation {
 
     CaseView execute(String caseReference);
+
+    default CaseView updateWithAccessControlMetadata(CaseView caseView) {
+        return caseView;
+    }
 }

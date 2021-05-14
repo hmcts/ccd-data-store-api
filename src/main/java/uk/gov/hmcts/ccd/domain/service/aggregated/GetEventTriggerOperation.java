@@ -14,4 +14,8 @@ public interface GetEventTriggerOperation {
 
     CaseUpdateViewEvent executeForDraft(String draftReference,
                                         Boolean ignoreWarning);
+
+    default CaseUpdateViewEvent updateWithAccessControlMetadata(CaseUpdateViewEvent caseUpdateViewEvent) {
+        return caseUpdateViewEvent;
+    }
 }

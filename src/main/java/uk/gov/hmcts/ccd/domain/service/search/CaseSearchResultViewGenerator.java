@@ -35,6 +35,8 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_GRANTED;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_PROCESS;
 import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedCaseFieldByPath;
 
 @Service
@@ -204,16 +206,16 @@ public class CaseSearchResultViewGenerator {
             caseDetails.getMetadata()
         );
 
-        updateCaseFieldsWithAccessControlMetadata(caseFields, caseDetails);
+        updateCaseFieldsWithAccessControlMetadata(caseFields, caseDetails.getReference().toString());
 
         return new SearchResultViewItem(caseDetails.getReferenceAsString(), caseFields, new HashMap<>(caseFields),
                 caseDetails.getSupplementaryData());
     }
 
-    private void updateCaseFieldsWithAccessControlMetadata(Map<String, Object> caseFields, CaseDetails caseDetails) {
-        CaseAccessMetadata caseAccessMetadata = caseSearchesViewAccessControl.getCaseAccessMetaData(caseDetails);
-        caseFields.put("[ACCESS_GRANTED]", new TextNode(caseAccessMetadata.getAccessGrants()));
-        caseFields.put("[ACCESS_PROCESS]", new TextNode(caseAccessMetadata.getAccessProcess()));
+    private void updateCaseFieldsWithAccessControlMetadata(Map<String, Object> caseFields, String caseReference) {
+        CaseAccessMetadata caseAccessMetadata = caseSearchesViewAccessControl.getCaseAccessMetaData(caseReference);
+        caseFields.put(ACCESS_GRANTED, new TextNode(caseAccessMetadata.getAccessGrants()));
+        caseFields.put(ACCESS_PROCESS, new TextNode(caseAccessMetadata.getAccessProcess()));
     }
 
     private Map<String, Object> prepareData(SearchResultDefinition searchResult,
