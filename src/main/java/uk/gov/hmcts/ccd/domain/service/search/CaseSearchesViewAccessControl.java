@@ -10,19 +10,19 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 
 @Service
 public class CaseSearchesViewAccessControl {
 
     private final CaseTypeService caseTypeService;
     private final SearchResultDefinitionService searchResultDefinitionService;
-    private final SecurityClassificationService securityClassificationService;
+    private final SecurityClassificationServiceImpl securityClassificationService;
     private final CaseDataAccessControl caseDataAccessControl;
 
     public CaseSearchesViewAccessControl(CaseTypeService caseTypeService,
                                          SearchResultDefinitionService searchResultDefinitionService,
-                                         SecurityClassificationService securityClassificationService,
+                                         SecurityClassificationServiceImpl securityClassificationService,
                                          CaseDataAccessControl caseDataAccessControl) {
         this.caseTypeService = caseTypeService;
         this.searchResultDefinitionService = searchResultDefinitionService;

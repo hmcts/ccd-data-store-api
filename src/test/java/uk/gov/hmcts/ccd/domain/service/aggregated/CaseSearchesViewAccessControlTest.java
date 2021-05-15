@@ -18,7 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.CaseSearchesViewAccessControl;
 import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
@@ -103,7 +103,7 @@ class CaseSearchesViewAccessControlTest {
     private SearchResultDefinitionService searchResultDefinitionService;
 
     @Mock
-    private SecurityClassificationService securityClassificationService;
+    private SecurityClassificationServiceImpl securityClassificationService;
 
     @Mock
     private DateTimeSearchResultProcessor dateTimeSearchResultProcessor;

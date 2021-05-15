@@ -33,7 +33,7 @@ import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeader;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultViewGenerator;
 import uk.gov.hmcts.ccd.domain.service.search.CaseSearchesViewAccessControl;
@@ -128,7 +128,7 @@ class CaseSearchResultViewGeneratorTest {
     private SearchResultDefinitionService searchResultDefinitionService;
 
     @Mock
-    private SecurityClassificationService securityClassificationService;
+    private SecurityClassificationServiceImpl securityClassificationService;
 
 
     private CaseSearchesViewAccessControl caseSearchesViewAccessControl;

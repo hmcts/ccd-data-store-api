@@ -266,20 +266,20 @@ class AuthorisedGetEventsOperationTest {
     @Test
     @DisplayName("should apply authorization when jurisdiction, case type id and event id is received")
     void shouldApplyAuthorisationForJurisdictionCaseTypeIdAndEvent() {
-        doReturn(Optional.of(event)).when(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        doReturn(Optional.of(event)).when(getEventsOperation).getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID);
         doReturn(singletonList(event)).when(accessControlService)
             .filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), anyListOf(CaseEventDefinition.class),
                 eq(CASE_USER_ROLES));
 
         Optional<AuditEvent> optionalAuditEvent =
-            authorisedOperation.getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+            authorisedOperation.getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID);
 
         assertThat(optionalAuditEvent.isPresent(), is(true));
         AuditEvent output = optionalAuditEvent.get();
         InOrder inOrder =
             inOrder(caseDefinitionRepository, getEventsOperation, accessControlService, caseAccessService);
         assertAll(
-            () -> inOrder.verify(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
+            () -> inOrder.verify(getEventsOperation).getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
             () -> inOrder.verify(caseAccessService).getAccessRoles(CASE_ID),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES,

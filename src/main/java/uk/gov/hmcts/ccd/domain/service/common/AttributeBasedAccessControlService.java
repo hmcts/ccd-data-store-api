@@ -9,7 +9,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
@@ -27,7 +26,6 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.DefaultCaseDataAcce
 
 
 @Service
-@Primary
 @ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "true")
 public class AttributeBasedAccessControlService extends AccessControlServiceImpl implements AccessControl {
 
@@ -49,6 +47,7 @@ public class AttributeBasedAccessControlService extends AccessControlServiceImpl
                                                  Set<String> userRoles,
                                                  Predicate<AccessControlList> criteria) {
         applyAccessProfileRules(caseType);
+
 
         return super.canAccessCaseTypeWithCriteria(caseType,
             userRoles,
