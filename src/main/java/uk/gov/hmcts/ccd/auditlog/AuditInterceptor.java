@@ -12,12 +12,18 @@ import uk.gov.hmcts.ccd.auditlog.aop.AuditContextHolder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.List;
 
 public class AuditInterceptor extends HandlerInterceptorAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuditAspect.class);
 
     public static final String REQUEST_ID = "request-id";
+    public static final String REQUEST_ID_PATTERN = "^[|A-Za-z0-9+/=_.-]+$";
+    protected static final List<String> httpMethodList =
+        Arrays.asList("GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "TRACE");
+    public static final String BAD_VALUE_TOKEN = "<bad value not written to logs>";
 
     private final AuditService auditService;
     private final ApplicationParams applicationParams;
@@ -52,9 +58,25 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
                                                HttpServletRequest request, HttpServletResponse response) {
         AuditContext context = (auditContext != null) ? auditContext : new AuditContext();
         context.setHttpStatus(response.getStatus());
-        context.setHttpMethod(request.getMethod());
+
+        if (request.getMethod() != null && httpMethodList.contains(request.getMethod().toUpperCase())) {
+            context.setHttpMethod(request.getMethod());
+        } else {
+            context.setHttpMethod(BAD_VALUE_TOKEN);
+            LOG.error("Error while validating Http Method with value {} as it did not meet validation criteria:{}",
+                request.getMethod(), httpMethodList);
+        }
+
         context.setRequestPath(request.getRequestURI());
-        context.setRequestId(request.getHeader(REQUEST_ID));
+
+        if (request.getHeader(REQUEST_ID) != null && request.getHeader(REQUEST_ID).matches(REQUEST_ID_PATTERN)) {
+            context.setRequestId(request.getHeader(REQUEST_ID));
+        } else {
+            context.setRequestId(BAD_VALUE_TOKEN);
+            LOG.error("Error while validating Request Id with value {} as it did not meet validation criteria:{}",
+                request.getHeader(REQUEST_ID), REQUEST_ID_PATTERN);
+        }
         return context;
     }
+
 }

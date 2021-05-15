@@ -242,45 +242,8 @@
         "title_display": null
       },
       "channels": "[[ANYTHING_PRESENT]]",
-      "triggers": [
-        {
-          "id": "[[ANYTHING_PRESENT]]",
-          "name": "[[ANYTHING_PRESENT]]",
-          "description": null,
-          "order": "[[ANYTHING_PRESENT]]"
-        },
-        {
-          "id": "[[ANYTHING_PRESENT]]",
-          "name": "[[ANYTHING_PRESENT]]",
-          "description": null,
-          "order": "[[ANYTHING_PRESENT]]"
-        },
-        {
-          "id": "[[ANYTHING_PRESENT]]",
-          "name": "[[ANYTHING_PRESENT]]",
-          "description": null,
-          "order": "[[ANYTHING_PRESENT]]"
-        }
-      ],
-      "events": [
-        {
-          "id": "[[ANYTHING_PRESENT]]",
-          "timestamp": "[[ANYTHING_PRESENT]]",
-          "summary": "[[ANYTHING_PRESENT]]",
-          "comment": "[[ANYTHING_PRESENT]]",
-          "event_id": "[[ANYTHING_PRESENT]]",
-          "event_name": "[[ANYTHING_PRESENT]]",
-          "user_id": "[[ANYTHING_PRESENT]]",
-          "user_last_name": "[[ANYTHING_PRESENT]]",
-          "user_first_name": "[[ANYTHING_PRESENT]]",
-          "state_name": "[[ANYTHING_PRESENT]]",
-          "state_id": "[[ANYTHING_PRESENT]]",
-          "significant_item": null,
-          "proxied_by" : null,
-          "proxied_by_last_name" : null,
-          "proxied_by_first_name" : null
-        }
-      ],
+      "triggers": "[[ANYTHING_PRESENT]]",
+      "events": "[[ANYTHING_PRESENT]]",
       "case_id": "[[ANYTHING_PRESENT]]",
       "case_type": {
         "id": "[[ANYTHING_PRESENT]]",

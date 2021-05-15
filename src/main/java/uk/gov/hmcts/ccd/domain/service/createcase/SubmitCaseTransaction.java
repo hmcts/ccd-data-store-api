@@ -42,7 +42,7 @@ import java.time.ZoneOffset;
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 @Service
-class SubmitCaseTransaction {
+public class SubmitCaseTransaction {
 
     private final HttpServletRequest request;
     private final CaseDetailsRepository caseDetailsRepository;
