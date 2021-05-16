@@ -77,9 +77,7 @@ class DefaultSupplementaryDataUpdateOperationTest {
             request);
 
         assertAll(
-            () -> verify(supplementaryDataRepository, times(2)).incrementSupplementaryData(anyString(), anyString(),
-                any(Object.class)),
-            () -> verify(supplementaryDataRepository, times(2)).setSupplementaryData(anyString(), anyString(),
+            () -> verify(supplementaryDataRepository, times(1)).incrementSupplementaryData(anyString(), anyString(),
                 any(Object.class)),
             () -> verify(supplementaryDataRepository, times(1)).findSupplementaryData(anyString(), anySet()),
             () -> assertThat(response.getResponse(), is(resultMap))
@@ -89,8 +87,7 @@ class DefaultSupplementaryDataUpdateOperationTest {
     private Map<String, Map<String, Object>> createSupplementaryDataSetRequest() {
         String jsonRequest = "{\n"
             + "\t\"$set\": {\n"
-            + "\t\t\"orgs_assigned_users.organisationA\": 10,\n"
-            + "\t\t\"orgs_assigned_users.organisationC\": 20\n"
+            + "\t\t\"orgs_assigned_users.organisationA\": 10\n"
             + "\t}\n"
             + "}";
 
@@ -100,8 +97,7 @@ class DefaultSupplementaryDataUpdateOperationTest {
     private Map<String, Map<String, Object>> createSupplementaryDataIncrementRequest() {
         String jsonRequest = "{\n"
             + "\t\"$inc\": {\n"
-            + "\t\t\"orgs_assigned_users.organisationB\": 3,\n"
-            + "\t\t\"orgs_assigned_users.organisationD\": 1\n"
+            + "\t\t\"orgs_assigned_users.organisationB\": 3\n"
             + "\t}\n"
             + "}";
 

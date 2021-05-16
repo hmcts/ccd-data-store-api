@@ -4,6 +4,8 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+
+import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 
@@ -42,4 +44,53 @@ class SetSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
         assertNotNull(query);
         assertEquals(CASE_REFERENCE, query.getParameterValue("reference"));
     }
+
+    @Ignore
+    @Test
+    void shouldReturnValidRequestDataPassed() {
+        Thread t1 = new Thread(() -> {
+            String s = supplementaryDataQueryBuilder.requestedDataToJson("orgs_assigned_users.organisationA", 32);
+            assertEquals("{\n" +
+                "  \"orgs_assigned_users\": {\n" +
+                "    \"organisationA\": 32\n" +
+                "  }\n" +
+                "}", s);
+        });
+
+        Thread t2 = new Thread(() -> {
+            String s = supplementaryDataQueryBuilder.requestedDataToJson("orgs_assigned_users.organisationA", 32);
+            assertEquals("{\n" +
+                "  \"orgs_assigned_users\": {\n" +
+                "    \"organisationA\": 32\n" +
+                "  }\n" +
+                "}", s);
+        });
+
+        t1.start(); t2.start();
+    }
+
+    @Ignore
+    @Test
+    void shouldReturnValidRequestDataPassed1() {
+        Thread t1 = new Thread(() -> {
+            String s = supplementaryDataQueryBuilder.requestedDataToJson("orgs_assigned_users.organisationA", 32);
+            assertEquals("{\n" +
+                "  \"orgs_assigned_users\": {\n" +
+                "    \"organisationA\": 32\n" +
+                "  }\n" +
+                "}", s);
+        });
+
+        Thread t2 = new Thread(() -> {
+            String s = supplementaryDataQueryBuilder.requestedDataToJson("orgs_assigned_users.organisationA", 35);
+            assertEquals("{\n" +
+                "  \"orgs_assigned_users\": {\n" +
+                "    \"organisationA\": 35\n" +
+                "  }\n" +
+                "}", s);
+        });
+
+        t1.start(); t2.start();
+    }
+
 }
