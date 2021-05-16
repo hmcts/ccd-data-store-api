@@ -57,6 +57,7 @@ class ClassifiedGetEventsOperationTest {
         MockitoAnnotations.initMocks(this);
 
         caseDetails = new CaseDetails();
+        caseDetails.setReference(Long.valueOf(CASE_REFERENCE));
         caseDetails.setJurisdiction(JURISDICTION_ID);
         events = Arrays.asList(new AuditEvent(), new AuditEvent());
         event = new AuditEvent();
@@ -96,7 +97,7 @@ class ClassifiedGetEventsOperationTest {
         assertAll(
             () -> assertThat(outputs, is(notNullValue())),
             () -> assertThat(outputs, hasSize(0)),
-            () -> verify(classificationService, never()).applyClassification(caseDetails, null)
+            () -> verify(classificationService).applyClassification(caseDetails, null)
         );
     }
 

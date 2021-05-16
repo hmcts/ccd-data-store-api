@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessContr
 import static java.util.Comparator.comparingInt;
 
 @Service
+@Primary
 @ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "true")
 public class AttributeBasedSecurityClassificationService
     extends SecurityClassificationServiceImpl
@@ -28,11 +30,12 @@ public class AttributeBasedSecurityClassificationService
 
     @Autowired
     public AttributeBasedSecurityClassificationService(@Qualifier(CachedUserRepository.QUALIFIER)
-                                                           UserRepository userRepository,
+                                                               UserRepository userRepository,
                                                        CaseDataAccessControl caseDataAccessControl) {
         super(userRepository);
         this.caseDataAccessControl = caseDataAccessControl;
     }
+
 
     @Override
     public Optional<SecurityClassification> getUserClassification(CaseDetails caseDetails) {
