@@ -1,0 +1,27 @@
+{
+  "title": "must return appropriate negative response when request contains invalid caseType",
+  "_guid_": "S-054",
+  "_extends_": "F-029_Test_Data_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "provides an invalid case type id"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "ctid": "BAT-100-$er"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "body": {
+      "exception": "[[ANYTHING_PRESENT]]",
+      "message": "Case Type Id is not valid",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

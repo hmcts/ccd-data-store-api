@@ -98,13 +98,13 @@
           "_extends_": "104_Base_Case_Fields_expected",
           "fields" : {
 					"NumberField" : "3",
-					"[CASE_REFERENCE]" : "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data_Ordering3_3]}",
+					"[CASE_REFERENCE]" : "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering3_3]}",
 					"TextField" : "${[scenarioContext][customValues][UniqueString]}"
 				},
 				"case_id" : "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering3_3]}",
 				"fields_formatted" : {
 					"NumberField" : "3",
-					"[CASE_REFERENCE]" : "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data_Ordering3_3]}",
+					"[CASE_REFERENCE]" : "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering3_3]}",
 					"TextField" : "${[scenarioContext][customValues][UniqueString]}"
 				}
         },
@@ -112,13 +112,13 @@
           "_extends_": "104_Base_Case_Fields_expected",
           "fields" : {
 						"NumberField" : "1",
-						"[CASE_REFERENCE]" : "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data_Ordering3_1]}",
+						"[CASE_REFERENCE]" : "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering3_1]}",
 						"TextField" : "${[scenarioContext][customValues][UniqueString]}"
 					},
 					"case_id" : "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering3_1]}",
 					"fields_formatted" : {
 						"NumberField" : "1",
-						"[CASE_REFERENCE]" : "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data_Ordering3_1]}",
+						"[CASE_REFERENCE]" : "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering3_1]}",
 
 						"TextField" : "${[scenarioContext][customValues][UniqueString]}"
 					}
@@ -128,13 +128,13 @@
 
           "fields" : {
 						"NumberField" : "2",
-						"[CASE_REFERENCE]" : "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data_Ordering3_2]}",
+						"[CASE_REFERENCE]" : "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering3_2]}",
 						"TextField" : "${[scenarioContext][customValues][UniqueString]}"
 					},
 					"case_id" : "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering3_2]}",
 					"fields_formatted" : {
 						"NumberField" : "2",
-						"[CASE_REFERENCE]" : "${[scenarioContext][customValues][caseIdAsIntegerFrom_Private_Case_Creation_Autotest1_Data_Ordering3_2]}",
+						"[CASE_REFERENCE]" : "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data_Ordering3_2]}",
 						"TextField" : "${[scenarioContext][customValues][UniqueString]}"
 					}
 				}

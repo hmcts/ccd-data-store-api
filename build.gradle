@@ -9,9 +9,6 @@ buildscript {
         classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2'
     }
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.2'
-    }
-    dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
 }
@@ -25,11 +22,13 @@ plugins {
     id 'com.github.kt3k.coveralls' version '2.8.2'
     id 'se.patrikerdes.use-latest-versions' version '0.2.7'
     id 'net.ltgt.apt' version '0.21'
-    id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.22'
+    id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.23'
     id "org.jetbrains.gradle.plugin.idea-ext" version "0.7"
     id "info.solidsoft.pitest" version '1.4.0'
     id "io.freefair.lombok" version "5.3.0"
     id 'uk.gov.hmcts.java' version '0.12.0'
+    id 'au.com.dius.pact' version '4.1.0'
+
 }
 
 apply plugin: 'java'
@@ -43,10 +42,12 @@ apply plugin: 'org.sonarqube'
 apply plugin: 'jsonschema2pojo'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
-apply plugin: 'com.jfrog.bintray'
 apply plugin: 'se.patrikerdes.use-latest-versions'
 
-apply from: 'liquibase.gradle'
+def versions = [
+        pact_version: '4.1.7'
+]
+
 
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
@@ -73,15 +74,15 @@ repositories {
     mavenCentral()
     jcenter()
     maven {
-        url 'https://dl.bintray.com/hmcts/hmcts-maven'
+        url 'https://jitpack.io'
     }
     maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/' }
 }
 // end::repositories[]
 
 ext {
-    junitJupiterVersion = '5.5.2'
-    junitVintageVersion = '5.5.2'
+    junitJupiterVersion = '5.7.1'
+    junitVintageVersion = '5.7.1'
     powermockVersion = '2.0.7'
     reformLogging = '5.1.0'
     appInsightsVersion = '2.4.1'
@@ -122,6 +123,8 @@ configurations {
 
     aatCompile.extendsFrom(testCompile)
     aatRuntime.extendsFrom(testRuntime)
+    contractTestCompile.extendsFrom(testCompile)
+    contractTestRuntime.extendsFrom(testRuntime)
     cucumberRuntime.extendsFrom(functionalRuntime)
 }
 
@@ -160,7 +163,7 @@ dependencies {
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
 
-    compile group: 'org.liquibase', name: 'liquibase-core', version: '3.10.3'
+    compile "org.flywaydb:flyway-core:6.5.7"
     compile group: 'org.yaml', name: 'snakeyaml', version: '1.26'
     compile group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.1'
@@ -184,6 +187,9 @@ dependencies {
     compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
     compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
     compile group: 'org.awaitility', name: 'awaitility', version: '3.1.6'
+
+    // CVE-2021-29425
+    compile group: 'commons-io', name: 'commons-io', version: '2.8.0'
 
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.3'
     compile "com.fasterxml.jackson.core:jackson-databind:2.11.1"
@@ -215,6 +221,7 @@ dependencies {
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
     testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
+    testRuntime "org.junit.platform:junit-platform-commons:1.7.0"
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.24.0'
     testCompile group:'org.mockito', name: 'mockito-junit-jupiter', version:'2.24.0'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: powermockVersion
@@ -238,7 +245,17 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '7.0.0-RDM-10539-1'
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '7.0.0-RDM-10539.3'
+
+    contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
+    contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
+    contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
+    contractTestRuntime group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
+    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-client'
+    contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
+    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server'
+    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-core'
+    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
 }
 // end::dependencies[]
 
@@ -541,7 +558,7 @@ jsonSchema2Pojo {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "build/generated-sources/**/*.java,**/AuditRepository.java"
+        property "sonar.exclusions", "build/generated-sources/**/*.java,**/AuditRepository.java,**/CaseDetailsEndpoint.java,**/MidEventCallback.java,**/UIDefinitionRepository.java,**/CachedUIDefinitionGateway.java,**/CaseAccessEndpoint.java,**/UICaseSearchController.java,**/CaseSearchResultViewGenerator.java,**/CaseTypeService.java,**/DefaultCaseDefinitionRepository.java"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
@@ -692,6 +709,17 @@ sourceSets {
             srcDir('src/aat/resources')
         }
     }
+
+    contractTest {
+        java {
+            srcDir('src/contractTest/java')
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+        }
+        resources {
+            srcDir('src/contractTest/resources')
+        }
+    }
 }
 
 task smoke() {
@@ -769,16 +797,32 @@ task functional() {
     outputs.upToDateWhen { false }
 }
 
+project.ext {
+    pactVersion = getCheckedOutGitCommitHash()
+}
+
+def getCheckedOutGitCommitHash() {
+    'git rev-parse --verify --short HEAD'.execute().text.trim()
+}
+
+task runProviderPactVerification(type:Test) {
+    logger.lifecycle("Runs provider pact Tests")
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.contractTest.output.classesDirs
+    classpath = sourceSets.contractTest.runtimeClasspath
+    systemProperty 'pact.verifier.publishResults', System.getProperty('pact.verifier.publishResults')
+    systemProperty 'pact.provider.version', project.pactVersion
+    include "uk/gov/hmcts/ccd/v2/external/controller/**"
+}
+
+runProviderPactVerification.finalizedBy pactVerify
+
 def timestamp() {
     def date = new Date()
     return date.format('yyyy-MM-dd HH:mm:ss')
 }
 
 configurations { codacy }
-repositories {
-    maven { url "https://jitpack.io" }
-    maven { url "http://dl.bintray.com/typesafe/maven-releases" }
-}
 dependencies {
     codacy 'com.github.codacy:codacy-coverage-reporter:-SNAPSHOT'
 }
@@ -799,3 +843,4 @@ cucumberReports {
     reports = files("${projectDir}/target/cucumber.json")
     notFailingStatuses = ["skipped", "passed"]
 }
+

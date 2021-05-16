@@ -4,7 +4,9 @@ import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,25 +30,32 @@ public class SearchResultDefinition implements Serializable {
             .collect(Collectors.toList());
     }
 
-    public Map<String, String> getFieldsUserRoles() {
-        Map<String, String> fields = new HashMap<>();
-        for (SearchResultField srf : this.fields) {
-            fields.put(srf.getCaseFieldId(), srf.getRole());
+    public Map<String, List<String>> getFieldsUserRoles() {
+        Map<String, List<String>> fieldsUserRoles = new HashMap<>();
+        for (SearchResultField srf : fields) {
+            if (fieldsUserRoles.containsKey(srf.getCaseFieldId())) {
+                fieldsUserRoles.get(srf.getCaseFieldId()).add(srf.getRole());
+            } else {
+                fieldsUserRoles.put(srf.getCaseFieldId(), new ArrayList<>(Collections.singletonList(srf.getRole())));
+            }
         }
-        return fields;
+        return fieldsUserRoles;
     }
 
     public boolean fieldExists(String caseFieldId) {
-        Map<String, String> fields = getFieldsUserRoles();
+        Map<String, List<String>> fields = getFieldsUserRoles();
         return fields.containsKey(caseFieldId);
     }
 
     public boolean fieldHasRole(String caseFieldId, Set<String> roles) {
-        Map<String, String> fields = getFieldsUserRoles();
-        String role = fields.get(caseFieldId);
-        if (role != null && !roles.contains(role)) {
-            return false;
+        Map<String, List<String>> fields = getFieldsUserRoles();
+        List<String> userRoles = fields.get(caseFieldId);
+        if (userRoles != null) {
+            long count = userRoles.stream()
+                .filter(userRole -> userRole == null || roles.contains(userRole))
+                .count();
+            return count != 0;
         }
-        return true;
+        return false;
     }
 }

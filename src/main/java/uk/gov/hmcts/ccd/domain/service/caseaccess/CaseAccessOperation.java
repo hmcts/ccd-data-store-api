@@ -112,8 +112,7 @@ public class CaseAccessOperation {
 
         cauRolesByCaseId.forEach((caseId, requestedAssignments) ->
             requestedAssignments.forEach(requestedAssignment ->
-                caseUserRepository.grantAccess(caseId, requestedAssignment.getUserId(),
-                                               requestedAssignment.getCaseRole())
+                checkRoleAndPersist(caseId, requestedAssignment)
             )
         );
 
@@ -123,6 +122,16 @@ public class CaseAccessOperation {
                     ORGS_ASSIGNED_USERS_PATH + organisationId, newUserCount)
             )
         );
+    }
+
+    private void checkRoleAndPersist(Long caseId, CaseAssignedUserRoleWithOrganisation requestedAssignment) {
+        List<String> roles = caseUserRepository.findCaseRoles(caseId, requestedAssignment.getUserId());
+        boolean roleExists = roles.stream()
+            .anyMatch(dbRole -> dbRole.equalsIgnoreCase(requestedAssignment.getCaseRole()));
+        if (!roleExists) {
+            caseUserRepository.grantAccess(caseId, requestedAssignment.getUserId(),
+                requestedAssignment.getCaseRole());
+        }
     }
 
     @Transactional
@@ -235,7 +244,7 @@ public class CaseAccessOperation {
         Map<Long, List<CaseAssignedUserRoleWithOrganisation>> caseUserRolesWhichHaveAnOrgId =
             cauRolesByCaseId.entrySet().stream()
             .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
-                // filter out no organisation_id
+                // filter out no organisation_id and [CREATOR] case role
                 .filter(caseUserRole ->
                         StringUtils.isNoneBlank(caseUserRole.getOrganisationId())
                             && !caseUserRole.getCaseRole().equalsIgnoreCase(CREATOR.getRole()))
@@ -258,6 +267,9 @@ public class CaseAccessOperation {
         // find existing Case-User relationships for all the relevant cases + users found
         Map<Long, List<String>> existingCaseUserRelationships =
             caseUserRepository.findCaseUserRoles(caseIds, userIds).stream()
+                // filter out [CREATOR] case role
+                .filter(caseUserEntity ->
+                    !caseUserEntity.getCasePrimaryKey().getCaseRole().equalsIgnoreCase(CREATOR.getRole()))
                 .collect(Collectors.groupingBy(
                     caseUserEntity -> caseUserEntity.getCasePrimaryKey().getCaseDataId(),
                     Collectors.collectingAndThen(
