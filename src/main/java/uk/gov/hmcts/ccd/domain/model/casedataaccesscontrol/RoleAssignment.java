@@ -1,12 +1,15 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol;
 
-import java.time.Instant;
-import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.Instant;
+import java.util.List;
+
 @Builder
 @Data
+@AllArgsConstructor
 public class RoleAssignment {
     private String id;
     private String actorIdType; // currently IDAM
