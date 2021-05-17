@@ -16,12 +16,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.std.UserId;
 import uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation;
-import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 
 import java.util.List;
 
@@ -32,14 +30,9 @@ public class CaseAccessEndpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaseAccessEndpoint.class);
     private final CaseAccessOperation caseAccessOperation;
-    private final RoleAssignmentService roleAssignmentService;
-    private final ApplicationParams applicationParams;
 
-    public CaseAccessEndpoint(CaseAccessOperation caseAccessOperation, RoleAssignmentService roleAssignmentService,
-                              ApplicationParams applicationParams) {
+    public CaseAccessEndpoint(CaseAccessOperation caseAccessOperation) {
         this.caseAccessOperation = caseAccessOperation;
-        this.roleAssignmentService = roleAssignmentService;
-        this.applicationParams = applicationParams;
     }
 
     @RequestMapping(
@@ -63,9 +56,6 @@ public class CaseAccessEndpoint {
         @RequestParam(value = "userId") final String idSearchingFor
     ) {
         LOG.debug("Finding cases user: {} has access to", idSearchingFor);
-        if (applicationParams.getEnableAttributeBasedAccessControl()) {
-            return roleAssignmentService.getCaseIdsForAGivenUser(idSearchingFor);
-        }
         return caseAccessOperation.findCasesUserIdHasAccessTo(idSearchingFor);
     }
 

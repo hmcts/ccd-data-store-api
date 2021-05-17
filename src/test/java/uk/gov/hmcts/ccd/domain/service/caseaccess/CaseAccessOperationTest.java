@@ -2,13 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.caseaccess;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,6 +10,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
@@ -25,9 +19,17 @@ import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepo
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidCaseRoleException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -77,6 +79,11 @@ class CaseAccessOperationTest {
 
     @Mock
     private SupplementaryDataRepository supplementaryDataRepository;
+
+    @Mock
+    private RoleAssignmentService roleAssignmentService;
+    @Mock
+    private ApplicationParams applicationParams;
 
     @InjectMocks
     private uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation caseAccessOperation;
@@ -253,8 +260,43 @@ class CaseAccessOperationTest {
         }
 
         @Test
+        @DisplayName("RA set to true, should return cases that the user has access to")
+        void shouldReturnCasesUserHasAccessToForRA() {
+
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+            when(roleAssignmentService.getCaseIdsForAGivenUser(USER_ID))
+                .thenReturn(ids.stream().map(element -> String.valueOf(element)).collect(Collectors.toList()));
+
+            List<String> usersCases = caseAccessOperation.findCasesUserIdHasAccessTo(USER_ID);
+
+            assertAll(
+                () -> assertEquals(1, usersCases.size()),
+                () -> assertEquals(String.valueOf(1L), usersCases.get(0))
+            );
+        }
+
+        @Test
         @DisplayName("should return zero cases if the user has no access to any cases")
         void shouldReturnEmptyListIfUserHasAccessToNoCases() {
+
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+            when(caseUserRepository.findCasesUserIdHasAccessTo(USER_ID))
+                .thenReturn(new ArrayList<>());
+
+            List<String> usersCases = caseAccessOperation.findCasesUserIdHasAccessTo(USER_ID);
+
+            assertAll(
+                () -> assertEquals(0, usersCases.size()),
+                () -> verify(caseDetailsRepository, times(0)).findCaseReferencesByIds(ids)
+            );
+        }
+
+
+        @Test
+        @DisplayName("RA set to true, should return zero cases if the user has no access to any cases")
+        void shouldReturnEmptyListIfUserHasAccessToNoCasesForRA() {
+
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
             when(caseUserRepository.findCasesUserIdHasAccessTo(USER_ID))
                 .thenReturn(new ArrayList<>());
 
