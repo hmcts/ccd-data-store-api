@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
@@ -70,8 +71,13 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
             .map(accessProfileValue -> AccessProfile.builder()
                 .accessProfile(accessProfileValue)
                 .securityClassification(roleAssignment.getClassification())
-                .readOnly(roleToAccessProfileDefinition.getReadOnly()
-                    || roleAssignment.getReadOnly())
+                .readOnly(readOnly(roleAssignment, roleToAccessProfileDefinition))
                 .build()).collect(Collectors.toList());
+    }
+
+    private Boolean readOnly(RoleAssignment roleAssignment,
+                             RoleToAccessProfileDefinition roleToAccessProfileDefinition) {
+        return BooleanUtils.isTrue(roleAssignment.getReadOnly()) ||
+            BooleanUtils.isTrue(roleToAccessProfileDefinition.getReadOnly());
     }
 }
