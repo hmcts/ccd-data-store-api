@@ -5,12 +5,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -27,7 +27,6 @@ import java.util.Map;
 import static com.google.common.collect.Maps.newHashMap;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.HttpHeaders.ETAG;
-import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 
 @Repository
 @Qualifier(DefaultRoleAssignmentRepository.QUALIFIER)
@@ -35,12 +34,13 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
     private static final Logger LOG = LoggerFactory.getLogger(DefaultRoleAssignmentRepository.class);
 
     public static final String QUALIFIER = "default";
-    public static final String ROLE_ASSIGNMENTS_NOT_FOUND =
+    private static final String ROLE_ASSIGNMENTS_NOT_FOUND =
         "No Role Assignments found for userId=%s when getting from Role Assignment Service because of %s";
-    public static final String ROLE_ASSIGNMENTS_CLIENT_ERROR =
+    private static final String ROLE_ASSIGNMENTS_CLIENT_ERROR =
         "Client error when getting Role Assignments from Role Assignment Service because of %s";
-    public static final String ROLE_ASSIGNMENT_SERVICE_ERROR =
+    private static final String ROLE_ASSIGNMENT_SERVICE_ERROR =
         "Problem getting Role Assignments from Role Assignment Service because of %s";
+    private static final String GZIP_POSTFIX = "--gzip";
 
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
@@ -60,8 +60,10 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
     @Override
     public RoleAssignmentResponse getRoleAssignments(String userId) {
         try {
-            final HttpEntity<Object> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
-            addETagHeader(userId, requestEntity);
+            HttpHeaders headers = securityUtils.authorizationHeaders();
+            addETagHeader(userId, headers);
+
+            final HttpEntity<Object> requestEntity = new HttpEntity<>(headers);
 
             return getRoleAssignmentResponse(userId, requestEntity);
         } catch (Exception e) {
@@ -79,28 +81,36 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
         }
     }
 
-    private void addETagHeader(String userId, HttpEntity<Object> requestEntity) {
+    private void addETagHeader(String userId, HttpHeaders headers) {
         if (roleAssignments.containsKey(userId)) {
             Pair<String, RoleAssignmentResponse> stringRoleAssignmentResponsePair = roleAssignments.get(userId);
-            requestEntity.getHeaders().add(IF_NONE_MATCH, stringRoleAssignmentResponsePair.getKey());
+            headers.setIfNoneMatch(stringRoleAssignmentResponsePair.getKey());
         }
     }
 
     private RoleAssignmentResponse getRoleAssignmentResponse(String userId, HttpEntity<Object> requestEntity)
         throws URISyntaxException {
-        try {
-            ResponseEntity<RoleAssignmentResponse> exchange = exchangeGet(userId, requestEntity);
-            if (exchange.getHeaders().containsKey(ETAG) && isNotBlank(exchange.getHeaders().getFirst(ETAG))) {
-                roleAssignments.put(userId, Pair.of(exchange.getHeaders().getFirst(ETAG), exchange.getBody()));
-            }
 
-            return exchange.getBody();
-        } catch (HttpStatusCodeException e) {
-            if (e.getRawStatusCode() == HttpStatus.NOT_MODIFIED.value()) {
-                return roleAssignments.get(userId).getRight();
-            }
-            throw e;
+        ResponseEntity<RoleAssignmentResponse> exchange = exchangeGet(userId, requestEntity);
+        if (exchange.getStatusCode() == HttpStatus.NOT_MODIFIED && roleAssignments.containsKey(userId)) {
+            return roleAssignments.get(userId).getRight();
         }
+        if (exchange.getHeaders().containsKey(ETAG) && isNotBlank(exchange.getHeaders().getETag())) {
+            roleAssignments.put(userId, Pair.of(getETag(exchange.getHeaders().getETag()), exchange.getBody()));
+        }
+
+        return exchange.getBody();
+    }
+
+    /**
+     * 'Accept-Encoding: gzip' makes the response ETag header being suffixed with the '--gzip'.
+     * This method is to drop this suffix before using the ETag.
+     */
+    private String getETag(String eTag) {
+        if (eTag.endsWith(GZIP_POSTFIX + "\"")) {
+            return eTag.substring(0, eTag.length() - GZIP_POSTFIX.length() - 1) + "\"";
+        }
+        return eTag;
     }
 
     private ResponseEntity<RoleAssignmentResponse> exchangeGet(String userId, HttpEntity<Object> requestEntity)

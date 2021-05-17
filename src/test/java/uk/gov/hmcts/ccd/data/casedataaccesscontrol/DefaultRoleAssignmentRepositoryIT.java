@@ -11,13 +11,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import javax.inject.Inject;
 import java.time.Instant;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.badRequest;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.notFound;
-import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.serverError;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -85,14 +79,16 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
         stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).inScenario("ETag")
                     .whenScenarioStateIs(STARTED)
                     .willReturn(okJson(jsonBody(ID))
-                                    .withHeader(ETAG, "123456789")
+                                    .withHeader(ETAG, "\"W/123456789\"")
                     )
                     .willSetStateTo("Cache populated with RoleAssignments"));
 
         stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).inScenario("ETag")
                     .whenScenarioStateIs("Cache populated with RoleAssignments")
-                    .withHeader(IF_NONE_MATCH, equalTo("123456789"))
-                    .willReturn(aResponse().withStatus(304)));
+                    .withHeader(IF_NONE_MATCH, equalTo("\"W/123456789\""))
+                    .willReturn(aResponse()
+                        .withStatus(304)
+                        .withHeader(ETAG, "\"W/123456789\"")));
 
         validateRoleAssignments(ID);
         validateRoleAssignments(ID);
@@ -102,26 +98,25 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
     @Test
     public void shouldUpdateCacheWhenETagDiffersFromTheOneFromTheResponse() {
         // store the response and ETag in the cache
-        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).inScenario("ETag")
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).inScenario("ETag1")
                     .whenScenarioStateIs(STARTED)
                     .willReturn(okJson(jsonBody(ID))
-                                    .withHeader(ETAG, "553456789")
+                                    .withHeader(ETAG, "\"W/553456789\"")
                     )
                     .willSetStateTo("Cache populated with RoleAssignments"));
 
         // data has changed on the server and the response contains a new ETag and body
-        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).inScenario("ETag")
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).inScenario("ETag1")
                     .whenScenarioStateIs("Cache populated with RoleAssignments")
-                    .withHeader(IF_NONE_MATCH, equalTo("553456789"))
+                    .withHeader(IF_NONE_MATCH, equalTo("\"W/553456789\""))
                     .willReturn(okJson(jsonBody(ID1))
-                                    .withHeader(ETAG, "663456789")
+                                    .withHeader(ETAG, "\"W/663456789\"")
                     )
                     .willSetStateTo("Cache updated with RoleAssignments"));
 
-        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).inScenario("ETag")
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).inScenario("ETag1")
                     .whenScenarioStateIs("Cache updated with RoleAssignments")
-                    .whenScenarioStateIs(STARTED)
-                    .withHeader(IF_NONE_MATCH, equalTo("663456789"))
+                    .withHeader(IF_NONE_MATCH, equalTo("\"W/663456789\""))
                     .willReturn(aResponse().withStatus(304)));
 
         validateRoleAssignments(ID);
