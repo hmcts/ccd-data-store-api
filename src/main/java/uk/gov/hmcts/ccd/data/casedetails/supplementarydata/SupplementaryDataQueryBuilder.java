@@ -11,16 +11,10 @@ import java.util.regex.Pattern;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import org.hibernate.query.NativeQuery;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import pl.jalokim.propertiestojson.util.PropertiesToJsonConverter;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 public interface SupplementaryDataQueryBuilder {
-
-    Logger LOG = LoggerFactory.getLogger(SupplementaryDataQueryBuilder.class);
-
-    ObjectMapper objectMapper = new ObjectMapper();
 
     Query build(EntityManager entityManager,
                 String caseReference,
@@ -34,8 +28,6 @@ public interface SupplementaryDataQueryBuilder {
                                      String fieldPath,
                                      Object fieldValue) {
         String key = fieldPath.replaceAll(Pattern.quote("."), ",");
-        String str = String.format("Case reference => %s, key => %s", caseReference, key);
-        LOG.info(str);
         query.setParameter("leaf_node_key", "{" + key + "}");
         query.setParameter("value", fieldValue);
         query.setParameter("reference", caseReference);
@@ -56,8 +48,8 @@ public interface SupplementaryDataQueryBuilder {
 
         try {
             Object value = context.read("$." + pathToMatch, Object.class);
-
             try {
+                ObjectMapper objectMapper = new ObjectMapper();
                 return objectMapper.writeValueAsString(value);
             } catch (JsonProcessingException e) {
                 throw new ServiceException("Unable to map object to JSON string", e);
