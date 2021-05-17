@@ -26,7 +26,6 @@ import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
-import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.cauroles.CaseAssignedUserRolesOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -65,20 +64,17 @@ public class CaseAssignedUserRolesController {
     private final UIDService caseReferenceService;
     private final CaseAssignedUserRolesOperation caseAssignedUserRolesOperation;
     private final SecurityUtils securityUtils;
-    private final RoleAssignmentService roleAssignmentService;
 
     @Autowired
     public CaseAssignedUserRolesController(ApplicationParams applicationParams,
                                            UIDService caseReferenceService,
                                            @Qualifier("authorised") CaseAssignedUserRolesOperation
                                                caseAssignedUserRolesOperation,
-                                           SecurityUtils securityUtils,
-                                           RoleAssignmentService roleAssignmentService) {
+                                           SecurityUtils securityUtils) {
         this.applicationParams = applicationParams;
         this.caseReferenceService = caseReferenceService;
         this.caseAssignedUserRolesOperation = caseAssignedUserRolesOperation;
         this.securityUtils = securityUtils;
-        this.roleAssignmentService = roleAssignmentService;
     }
 
     @Transactional
@@ -141,57 +137,57 @@ public class CaseAssignedUserRolesController {
 
     @Transactional
     @DeleteMapping(
-            path = "/case-users"
+        path = "/case-users"
     )
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(
-            value = "Remove Case-Assigned Users and Roles"
+        value = "Remove Case-Assigned Users and Roles"
     )
     @ApiResponses({
-            @ApiResponse(
-                    code = 200,
-                    message = REMOVE_SUCCESS_MESSAGE,
-                    response = CaseAssignedUserRolesResponse.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "One or more of the following reasons:\n"
-                            + "1. " + V2.Error.EMPTY_CASE_USER_ROLE_LIST + ", \n"
-                            + "2. " + V2.Error.CASE_ID_INVALID + ": has to be a valid 16-digit Luhn number, \n"
-                            + "3. " + V2.Error.USER_ID_INVALID + ": has to be a string of length > 0, \n"
-                            + "4. " + V2.Error.CASE_ROLE_FORMAT_INVALID + ": has to be a none-empty string in square "
-                                + "brackets, \n"
-                            + "5. " + V2.Error.ORGANISATION_ID_INVALID + ": has to be a non-empty string, when present."
-            ),
-            @ApiResponse(
-                    code = 401,
-                    message = "Authentication failure due to invalid / expired tokens (IDAM / S2S)."
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "One of the following reasons:\n"
-                            + "1. Unauthorised S2S service \n"
-                            + "2. " + V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION + "."
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = V2.Error.CASE_NOT_FOUND
-            )
+        @ApiResponse(
+            code = 200,
+            message = REMOVE_SUCCESS_MESSAGE,
+            response = CaseAssignedUserRolesResponse.class
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "One or more of the following reasons:\n"
+                + "1. " + V2.Error.EMPTY_CASE_USER_ROLE_LIST + ", \n"
+                + "2. " + V2.Error.CASE_ID_INVALID + ": has to be a valid 16-digit Luhn number, \n"
+                + "3. " + V2.Error.USER_ID_INVALID + ": has to be a string of length > 0, \n"
+                + "4. " + V2.Error.CASE_ROLE_FORMAT_INVALID + ": has to be a none-empty string in square "
+                + "brackets, \n"
+                + "5. " + V2.Error.ORGANISATION_ID_INVALID + ": has to be a non-empty string, when present."
+        ),
+        @ApiResponse(
+            code = 401,
+            message = "Authentication failure due to invalid / expired tokens (IDAM / S2S)."
+        ),
+        @ApiResponse(
+            code = 403,
+            message = "One of the following reasons:\n"
+                + "1. Unauthorised S2S service \n"
+                + "2. " + V2.Error.CLIENT_SERVICE_NOT_AUTHORISED_FOR_OPERATION + "."
+        ),
+        @ApiResponse(
+            code = 404,
+            message = V2.Error.CASE_NOT_FOUND
+        )
     })
     @LogAudit(
-            operationType = REMOVE_CASE_ASSIGNED_USER_ROLES,
-            caseId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController)"
-                + ".buildCaseIds(#caseAssignedUserRolesRequest)",
-            targetIdamId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController)"
-                + ".buildUserIds(#caseAssignedUserRolesRequest)",
-            targetCaseRoles = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController)"
-                + ".buildCaseRoles(#caseAssignedUserRolesRequest)"
+        operationType = REMOVE_CASE_ASSIGNED_USER_ROLES,
+        caseId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController)"
+            + ".buildCaseIds(#caseAssignedUserRolesRequest)",
+        targetIdamId = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController)"
+            + ".buildUserIds(#caseAssignedUserRolesRequest)",
+        targetCaseRoles = "T(uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController)"
+            + ".buildCaseRoles(#caseAssignedUserRolesRequest)"
     )
     public ResponseEntity<CaseAssignedUserRolesResponse> removeCaseUserRoles(
-            @ApiParam(value = "Valid Service-to-Service JWT token for an approved micro-service", required = true)
-            @RequestHeader(SERVICE_AUTHORIZATION) String clientS2SToken,
-            @ApiParam(value = "List of Case-User-Role assignments to add", required = true)
-            @RequestBody CaseAssignedUserRolesRequest caseAssignedUserRolesRequest
+        @ApiParam(value = "Valid Service-to-Service JWT token for an approved micro-service", required = true)
+        @RequestHeader(SERVICE_AUTHORIZATION) String clientS2SToken,
+        @ApiParam(value = "List of Case-User-Role assignments to add", required = true)
+        @RequestBody CaseAssignedUserRolesRequest caseAssignedUserRolesRequest
     ) {
         validateRequest(clientS2SToken, caseAssignedUserRolesRequest);
         this.caseAssignedUserRolesOperation.removeCaseUserRoles(caseAssignedUserRolesRequest
@@ -243,16 +239,10 @@ public class CaseAssignedUserRolesController {
                                                                               Optional<List<String>> optionalUserIds) {
         List<String> userIds = optionalUserIds.orElseGet(Lists::newArrayList);
         validateRequestParams(caseIds, userIds);
-        final List<CaseAssignedUserRole> caseAssignedUserRoles;
-        if (applicationParams.getEnableAttributeBasedAccessControl()) {
-            caseAssignedUserRoles = roleAssignmentService.findRoleAssignmentsByCasesAndUsers(caseIds, userIds);
-        } else {
-            caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(caseIds
-                .stream()
-                .map(Long::valueOf)
-                .collect(Collectors.toCollection(ArrayList::new)), userIds);
-        }
-
+        List<CaseAssignedUserRole> caseAssignedUserRoles = this.caseAssignedUserRolesOperation.findCaseUserRoles(caseIds
+            .stream()
+            .map(Long::valueOf)
+            .collect(Collectors.toCollection(ArrayList::new)), userIds);
         return ResponseEntity.ok(new CaseAssignedUserRolesResource(caseAssignedUserRoles));
     }
 
@@ -353,8 +343,8 @@ public class CaseAssignedUserRolesController {
         CaseAssignedUserRolesRequest addCaseAssignedUserRolesRequest) {
         return addCaseAssignedUserRolesRequest != null
             ? Optional.ofNullable(addCaseAssignedUserRolesRequest.getCaseAssignedUserRoles())
-                .map(Collection::stream)
-                .orElseGet(Stream::empty)
+            .map(Collection::stream)
+            .orElseGet(Stream::empty)
             : Stream.empty();
     }
 

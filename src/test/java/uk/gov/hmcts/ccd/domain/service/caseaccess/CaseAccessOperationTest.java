@@ -265,7 +265,7 @@ class CaseAccessOperationTest {
 
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
             when(roleAssignmentService.getCaseIdsForAGivenUser(USER_ID))
-                .thenReturn(ids.stream().map(element -> String.valueOf(element)).collect(Collectors.toList()));
+                .thenReturn(ids.stream().map(String::valueOf).collect(Collectors.toList()));
 
             List<String> usersCases = caseAccessOperation.findCasesUserIdHasAccessTo(USER_ID);
 
@@ -723,6 +723,7 @@ class CaseAccessOperationTest {
         @Test
         @DisplayName("should find case assigned user roles")
         void shouldGetCaseAssignedUserRoles() {
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
             List<Long> caseReferences = Lists.newArrayList(CASE_REFERENCE);
             List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences,
                 Lists.newArrayList());
@@ -733,14 +734,50 @@ class CaseAccessOperationTest {
         }
 
         @Test
+        @DisplayName("RA set to true, should find case assigned user roles")
+        void shouldGetCaseAssignedUserRolesForRA() {
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+            final var caseReferences = Lists.newArrayList(CASE_REFERENCE);
+            final List<String> userIds = Lists.newArrayList();
+            when(roleAssignmentService.findRoleAssignmentsByCasesAndUsers(anyList(),anyList()))
+                .thenReturn(getCaseAssignedUserRoles());
+
+            List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences,
+                userIds);
+
+            assertNotNull(caseAssignedUserRoles);
+            assertEquals(1, caseAssignedUserRoles.size());
+            assertEquals(CASE_ROLE, caseAssignedUserRoles.get(0).getCaseRole());
+        }
+
+        @Test
         @DisplayName("should return empty result for non existing cases")
         void shouldReturnEmptyResultOnNonExistingCases() {
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
             List<Long> caseReferences = Lists.newArrayList(CASE_NOT_FOUND);
             List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences,
                 Lists.newArrayList());
 
             assertNotNull(caseAssignedUserRoles);
             assertEquals(0, caseAssignedUserRoles.size());
+        }
+
+        @Test
+        @DisplayName("RA set to true, should return empty result for non existing cases")
+        void shouldReturnEmptyResultOnNonExistingCasesForRA() {
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+            List<Long> caseReferences = Lists.newArrayList(CASE_NOT_FOUND);
+            List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences,
+                Lists.newArrayList());
+
+            assertNotNull(caseAssignedUserRoles);
+            assertEquals(0, caseAssignedUserRoles.size());
+        }
+
+        private List<CaseAssignedUserRole> getCaseAssignedUserRoles() {
+            return Arrays.asList(
+                new CaseAssignedUserRole[]{new CaseAssignedUserRole("caseDataId", "userId", CASE_ROLE)}
+                );
         }
     }
 

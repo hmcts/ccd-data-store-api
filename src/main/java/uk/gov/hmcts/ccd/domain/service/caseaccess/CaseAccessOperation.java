@@ -304,20 +304,26 @@ public class CaseAccessOperation {
     }
 
     public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseReferences, List<String> userIds) {
-        Map<String, Long> caseReferenceAndIds = getCaseDetailsList(caseReferences).stream()
-            .collect(Collectors.toMap(CaseDetails::getId, CaseDetails::getReference));
 
-        if (caseReferenceAndIds.isEmpty()) {
-            return Lists.newArrayList();
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            final var caseIds = caseReferences.stream().map(String::valueOf).collect(Collectors.toList());
+            return roleAssignmentService.findRoleAssignmentsByCasesAndUsers(caseIds, userIds);
+        } else {
+            Map<String, Long> caseReferenceAndIds = getCaseDetailsList(caseReferences).stream()
+                .collect(Collectors.toMap(CaseDetails::getId, CaseDetails::getReference));
+
+            if (caseReferenceAndIds.isEmpty()) {
+                return Lists.newArrayList();
+            }
+            List<Long> caseIds = caseReferenceAndIds.keySet().stream().map(Long::valueOf).collect(Collectors.toList());
+            List<CaseUserEntity> caseUserEntities = caseUserRepository.findCaseUserRoles(caseIds, userIds);
+            return caseUserEntities.stream()
+                .map(cue -> new CaseAssignedUserRole(
+                    String.valueOf(caseReferenceAndIds.get(String.valueOf(cue.getCasePrimaryKey().getCaseDataId()))),
+                    cue.getCasePrimaryKey().getUserId(),
+                    cue.getCasePrimaryKey().getCaseRole()))
+                .collect(Collectors.toCollection(ArrayList::new));
         }
-        List<Long> caseIds = caseReferenceAndIds.keySet().stream().map(Long::valueOf).collect(Collectors.toList());
-        List<CaseUserEntity> caseUserEntities = caseUserRepository.findCaseUserRoles(caseIds, userIds);
-        return caseUserEntities.stream()
-            .map(cue -> new CaseAssignedUserRole(
-                String.valueOf(caseReferenceAndIds.get(String.valueOf(cue.getCasePrimaryKey().getCaseDataId()))),
-                cue.getCasePrimaryKey().getUserId(),
-                cue.getCasePrimaryKey().getCaseRole()))
-            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     private List<CaseDetails> getCaseDetailsList(List<Long> caseReferences) {
