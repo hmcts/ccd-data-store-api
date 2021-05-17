@@ -50,7 +50,12 @@ import static org.mockito.Mockito.when;
     @VersionSelector(tag = "master")})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
     "server.port=8123", "spring.application.name=PACT_TEST",
-    "ccd.dm.domain=http://dm-store-aat.service.core-compute-aat.internal"
+    "ccd.document.url.pattern=${CCD_DOCUMENT_URL_PATTERN:https?://(((?:api-gateway.preprod.dm.reform.hmcts.net|"
+        + "(dm-store-aat.service.core-compute-aat|dm-store-(pr-[0-9]+|preview).service.core-compute-preview)."
+        + "internal(?::d+)?)/documents/[A-Za-z0-9-]+(?:/binary)?)|((em-hrs-api-aat.service.core-compute-aat|"
+        + "em-hrs-api-(pr-[0-9]+|preview).service.core-compute-preview).internal(?::d+)?/hearing-recordings/"
+        + "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/segments/[0-9]))}"
+
 })
 @ActiveProfiles("SECURITY_MOCK")
 @IgnoreNoPactsToVerify
@@ -132,8 +137,6 @@ public class CasesControllerProviderTest {
         if (context != null) {
             context.setTarget(new HttpTestTarget("localhost", 8123, "/"));
         }
-        // Uncomment the line below in order to pubish verification to pact broker
-        //System.getProperties().setProperty("pact.verifier.publishResults", "true");
         BaseType.setCaseDefinitionRepository(contractTestCaseDefinitionRepository);
         when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
         when(userAuthorisation.getUserId()).thenReturn("userId");
@@ -149,16 +152,13 @@ public class CasesControllerProviderTest {
 
     @State({"A Read for a Citizen is requested"})
     public void toReadForACitizen(Map<String, Object> dataMap) {
-        CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
-        getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
+        toGetACase(dataMap);
 
     }
 
     @State({"A Read for a Caseworker is requested"})
     public void toReadForCaseworker(Map<String, Object> dataMap) {
-        CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
-        getCaseOperation.setTestCaseReference(caseDetails.getReferenceAsString());
-
+        toGetACase(dataMap);
     }
 
     @State({"A Search for cases is requested"})
@@ -186,9 +186,7 @@ public class CasesControllerProviderTest {
 
     @State({"A Start Event for a Citizen is requested"})
     public void toStartEventForACitizen(Map<String, Object> dataMap) {
-        CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
-        startEventOperation.setCaseReferenceOverride((String) dataMap.get(EVENT_ID),
-            caseDetails.getReferenceAsString());
+        toStartEventForACaseworker(dataMap);
 
     }
 
@@ -212,8 +210,7 @@ public class CasesControllerProviderTest {
 
     @State({"A Submit Event for a Citizen is requested"})
     public void toSubmitEventForACitizen(Map<String, Object> dataMap) {
-        CaseDetails caseDetails = setUpCaseDetailsFromStateMapForEvent(dataMap);
-        createEventOperation.setTestCaseReference(caseDetails.getReferenceAsString());
+        toSubmitEventForACaseworker(dataMap);
     }
 
     @State({"A Submit for a Caseworker is requested"})
