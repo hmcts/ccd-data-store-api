@@ -31,6 +31,8 @@ class RoleAssignmentsMapperTest {
     private static final Instant END_TIME = Instant.parse("2215-11-04T14:43:22.456Z");
     private static final Instant CREATED = Instant.parse("2020-12-04T15:54:23.789Z");
 
+    private final RoleAssignmentsMapper instance = new RoleAssignmentsMapperImpl();
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -49,7 +51,7 @@ class RoleAssignmentsMapperTest {
                 roleAssignment1, roleAssignment2
             ));
 
-            RoleAssignments mapped = RoleAssignmentsMapper.INSTANCE.toRoleAssignments(response);
+            RoleAssignments mapped = instance.toRoleAssignments(response);
 
             List<RoleAssignment> roleAssignments = mapped.getRoleAssignments();
 
