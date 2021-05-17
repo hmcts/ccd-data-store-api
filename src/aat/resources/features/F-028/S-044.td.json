@@ -59,6 +59,9 @@
           "publish_as": null,
           "acls": [
             {
+              "__ordering__": "ordered"
+            },
+            {
               "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
@@ -104,6 +107,9 @@
           "publish": false,
           "publish_as": null,
           "acls": [
+            {
+              "__ordering__": "ordered"
+            },
             {
               "role": "[[ANYTHING_PRESENT]]",
               "create": true,
@@ -151,6 +157,9 @@
           "publish_as": null,
           "acls": [
             {
+              "__ordering__": "ordered"
+            },
+            {
               "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
@@ -196,6 +205,9 @@
           "publish": false,
           "publish_as": null,
           "acls": [
+            {
+              "__ordering__": "ordered"
+            },
             {
               "role": "[[ANYTHING_PRESENT]]",
               "create": true,
@@ -243,6 +255,9 @@
           "publish_as": null,
           "acls": [
             {
+              "__ordering__": "ordered"
+            },
+            {
               "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
@@ -288,6 +303,9 @@
           "publish": false,
           "publish_as": null,
           "acls": [
+            {
+              "__ordering__": "ordered"
+            },
             {
               "role": "[[ANYTHING_PRESENT]]",
               "create": true,
@@ -335,6 +353,9 @@
           "publish_as": null,
           "acls": [
             {
+              "__ordering__": "ordered"
+            },
+            {
               "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
@@ -381,6 +402,9 @@
           "publish_as": null,
           "acls": [
             {
+              "__ordering__": "ordered"
+            },
+            {
               "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
@@ -426,6 +450,9 @@
           "publish": false,
           "publish_as": null,
           "acls": [
+            {
+              "__ordering__": "ordered"
+            },
             {
               "role": "[[ANYTHING_PRESENT]]",
               "create": true,
@@ -488,6 +515,9 @@
           "publish": false,
           "publish_as": null,
           "acls": [
+            {
+              "__ordering__": "ordered"
+            },
             {
               "role": "[[ANYTHING_PRESENT]]",
               "create": true,
@@ -567,6 +597,9 @@
           "publish_as": null,
           "acls": [
             {
+              "__ordering__": "ordered"
+            },
+            {
               "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
@@ -640,6 +673,9 @@
           "publish_as": null,
           "acls": [
             {
+              "__ordering__": "ordered"
+            },
+            {
               "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
@@ -696,6 +732,9 @@
                 "live_until": null,
                 "show_condition": null,
                 "acls": [
+                  {
+                    "__ordering__": "ordered"
+                  },
                   {
                     "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
@@ -759,6 +798,9 @@
                 "show_condition": null,
                 "acls": [
                   {
+                    "__ordering__": "ordered"
+                  },
+                  {
                     "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
@@ -821,6 +863,9 @@
                       "show_condition": null,
                       "acls": [
                         {
+                          "__ordering__": "ordered"
+                        },
+                        {
                           "role": "[[ANYTHING_PRESENT]]",
                           "create": true,
                           "read": true,
@@ -874,6 +919,9 @@
                       "show_condition": null,
                       "acls": [
                         {
+                          "__ordering__": "ordered"
+                        },
+                        {
                           "role": "[[ANYTHING_PRESENT]]",
                           "create": true,
                           "read": true,
@@ -902,6 +950,9 @@
                 "live_until": null,
                 "show_condition": null,
                 "acls": [
+                  {
+                    "__ordering__": "ordered"
+                  },
                   {
                     "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
@@ -944,6 +995,9 @@
           "publish": false,
           "publish_as": null,
           "acls": [
+            {
+              "__ordering__": "ordered"
+            },
             {
               "role": "[[ANYTHING_PRESENT]]",
               "create": true,
@@ -1007,6 +1061,9 @@
                 "show_condition": null,
                 "acls": [
                   {
+                    "__ordering__": "ordered"
+                  },
+                  {
                     "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
@@ -1050,6 +1107,9 @@
                 "live_until": null,
                 "show_condition": null,
                 "acls": [
+                  {
+                    "__ordering__": "ordered"
+                  },
                   {
                     "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
@@ -1095,6 +1155,9 @@
                 "show_condition": null,
                 "acls": [
                   {
+                    "__ordering__": "ordered"
+                  },
+                  {
                     "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
@@ -1138,6 +1201,9 @@
                 "live_until": null,
                 "show_condition": null,
                 "acls": [
+                  {
+                    "__ordering__": "ordered"
+                  },
                   {
                     "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
@@ -1183,6 +1249,9 @@
                 "show_condition": null,
                 "acls": [
                   {
+                    "__ordering__": "ordered"
+                  },
+                  {
                     "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
@@ -1227,6 +1296,9 @@
                 "show_condition": null,
                 "acls": [
                   {
+                    "__ordering__": "ordered"
+                  },
+                  {
                     "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
                     "read": true,
@@ -1270,6 +1342,9 @@
                 "live_until": null,
                 "show_condition": null,
                 "acls": [
+                  {
+                    "__ordering__": "ordered"
+                  },
                   {
                     "role": "[[ANYTHING_PRESENT]]",
                     "create": true,
@@ -1316,6 +1391,9 @@
           "publish_as": null,
           "acls": [
             {
+              "__ordering__": "ordered"
+            },
+            {
               "role": "[[ANYTHING_PRESENT]]",
               "create": true,
               "read": true,
@@ -1361,6 +1439,9 @@
           "publish": false,
           "publish_as": null,
           "acls": [
+            {
+              "__ordering__": "ordered"
+            },
             {
               "role": "[[ANYTHING_PRESENT]]",
               "create": true,
