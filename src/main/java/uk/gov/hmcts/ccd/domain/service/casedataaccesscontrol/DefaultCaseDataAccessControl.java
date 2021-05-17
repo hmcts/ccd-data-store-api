@@ -64,8 +64,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         this.caseDetailsRepository = caseDetailsRepository;
     }
 
-    // Returns Optional<CaseDetails>. If this is not enough think of wrapping it in a AccessControlResponse
-    // that contains the additional information about the operation result
+    // Returns List<AccessProfile>. Returns list of access profiles for the user and filters access profiles based on the case type.
     @Override
     public List<AccessProfile> generateAccessProfilesByCaseTypeId(String caseTypeId) {
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
@@ -129,7 +128,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
             .map(roleAssignment -> Pair.of(roleAssignment, new RoleMatchingResult()))
             .collect(Collectors.toList());
 
-        augmented.addAll(filteringResults.getRoleMatchingResults());
+        augmented.addAll(filteringResults.getRoleAssignmentMatchingResults());
         return new RoleAssignmentFilteringResult(augmented);
     }
 

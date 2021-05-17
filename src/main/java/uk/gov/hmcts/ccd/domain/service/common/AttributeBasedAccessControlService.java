@@ -33,7 +33,6 @@ public class AttributeBasedAccessControlService extends AccessControlServiceImpl
 
     private DefaultCaseDataAccessControl defaultCaseDataAccessControl;
     private final CaseDefinitionRepository caseDefinitionRepository;
-    protected static final String IDAM_PREFIX = "idam:";
 
     @Autowired
     public AttributeBasedAccessControlService(final CompoundAccessControlService compoundAccessControlService,
