@@ -4,12 +4,17 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
 @Qualifier("increment")
 public class IncrementSupplementaryDataQueryBuilder implements SupplementaryDataQueryBuilder {
+    private static final Logger LOG = LoggerFactory.getLogger(IncrementSupplementaryDataQueryBuilder.class);
+
     @SuppressWarnings("checkstyle:LineLength") //don't want to break long SQL statement
     private static final String INC_UPDATE_QUERY = "UPDATE case_data SET "
             + "supplementary_data= (CASE"
@@ -33,6 +38,7 @@ public class IncrementSupplementaryDataQueryBuilder implements SupplementaryData
         String jsonValue = requestedDataToJson(fieldPath, fieldValue);
         query.setParameter("json_value", jsonValue);
         query.setParameter("node_path", Arrays.asList(fieldPath.split(Pattern.quote("."))));
+        LOG.error(String.format("Case reference => %s, Query => %s", caseReference, query.toString()));
         return query;
     }
 

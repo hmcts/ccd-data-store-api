@@ -32,7 +32,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 @Service
-class SubmitCaseTransaction implements AccessControl {
+public class SubmitCaseTransaction implements AccessControl {
 
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;

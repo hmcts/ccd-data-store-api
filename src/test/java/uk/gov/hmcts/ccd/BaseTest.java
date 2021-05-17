@@ -195,12 +195,12 @@ public abstract class BaseTest {
         return jdbcTemplate.queryForList("SELECT * FROM pg_catalog.pg_tables").stream()
             .filter(tableInfo -> tableInfo.get("schemaname").equals("public"))
             .map(tableInfo -> (String)tableInfo.get("tablename"))
-            .filter(BaseTest::notLiquibase)
+            .filter(BaseTest::notFlyaway)
             .collect(Collectors.toList());
     }
 
-    private static boolean notLiquibase(String tableName) {
-        return !tableName.equals("databasechangelog") && !tableName.equals("databasechangeloglock");
+    private static boolean notFlyaway(String tableName) {
+        return !tableName.equals("flyway_schema_history");
     }
 
     private List<String> determineSequences(JdbcTemplate jdbcTemplate) {
