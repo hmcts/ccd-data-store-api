@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.caseaccess;
 
 import com.google.common.collect.Lists;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import org.junit.Before;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.mockito.Mockito.verify;
 
@@ -29,9 +31,11 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
     private static final Long CASE_ID_3 = 3L;
     private static final String USER_ID = "89000";
     private static final String USER_ID_GRANTED = "89001";
+    private static final String USER_ID_CLAIMANT = "89002";
     private static final String CASE_ROLE = "[DEFENDANT]";
     private static final String CASE_ROLE_SOLICITOR = "[SOLICITOR]";
     private static final String CASE_ROLE_CREATOR = "[CREATOR]";
+    private static final String CASE_ROLE_CLAIMANT = "[CLAIMANT]";
 
     @PersistenceContext
     private EntityManager em;
@@ -136,6 +140,30 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
         caseUserEn = repository.findCaseUserRoles(Lists.newArrayList(CASE_ID_GRANTED), Lists.newArrayList());
 
         assertThat(caseUserEn.size(), equalTo(2));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
+        "classpath:sql/insert_cases.sql",
+        "classpath:sql/insert_case_users.sql",
+    })
+    public void shouldFindCaseUserRolesForAUserId() {
+        Set<String> caseUsers = repository.getCaseUserRolesByUserId(USER_ID);
+
+        assertThat(caseUsers.size(), equalTo(1));
+        assertThat(caseUsers.stream().findFirst().get(), equalTo(CASE_ROLE_CREATOR));
+
+        caseUsers = repository.getCaseUserRolesByUserId(USER_ID_GRANTED);
+
+        assertThat(caseUsers.size(), equalTo(3));
+        assertThat(caseUsers, hasItems(CASE_ROLE, CASE_ROLE_SOLICITOR, CASE_ROLE_CLAIMANT));
+
+        caseUsers = repository.getCaseUserRolesByUserId(USER_ID_CLAIMANT);
+        assertThat(caseUsers.size(), equalTo(1));
+        assertThat(caseUsers.stream().findFirst().get(), equalTo(CASE_ROLE_CLAIMANT));
+
+        caseUsers = repository.getCaseUserRolesByUserId("16");
+        assertThat(caseUsers.size(), equalTo(0));
     }
 
 }
