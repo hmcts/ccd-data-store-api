@@ -27,6 +27,10 @@ import static org.junit.Assert.assertTrue;
 class RoleAssignmentServiceTest {
 
     private static final String USER_ID = "user1";
+    private static final String CASE_ID = "111111";
+
+    private List<String> caseIds = Arrays.asList(new String[]{"111", "222"});
+    private List<String> userIds = Arrays.asList(new String[]{"111", "222"});
 
     @Mock
     private RoleAssignmentRepository roleAssignmentRepository;
@@ -44,7 +48,28 @@ class RoleAssignmentServiceTest {
         MockitoAnnotations.initMocks(this);
 
         roleAssignmentService = new RoleAssignmentService(roleAssignmentRepository,
-                                                          roleAssignmentsMapper);
+            roleAssignmentsMapper);
+    }
+
+    private RoleAssignments getRoleAssignments() {
+
+        final Instant currentTIme = Instant.now();
+        final long oneHour = 3600000;
+
+        final RoleAssignmentAttributes roleAssignmentAttributes =
+            RoleAssignmentAttributes.builder().caseId(Optional.of(CASE_ID)).build();
+
+        final List<RoleAssignment> roleAssignments = Arrays.asList(
+
+            RoleAssignment.builder().actorId("actorId").roleType(RoleType.CASE.name())
+                .attributes(roleAssignmentAttributes)
+                .beginTime(currentTIme.minusMillis(oneHour)).endTime(currentTIme.plusMillis(oneHour)).build(),
+
+            RoleAssignment.builder().actorId("actorId1").roleType(RoleType.CASE.name())
+                .attributes(roleAssignmentAttributes)
+                .beginTime(currentTIme.minusMillis(oneHour)).endTime(currentTIme.plusMillis(oneHour)).build()
+        );
+        return RoleAssignments.builder().roleAssignments(roleAssignments).build();
     }
 
     @Nested
@@ -69,14 +94,10 @@ class RoleAssignmentServiceTest {
     @DisplayName("findRoleAssignmentsByCasesAndUsers()")
     class GetRoleAssignmentsByCasesAndUsers {
 
-        private List<String> caseIds =  Arrays.asList(new String[] {"111","222"});
-        private List<String> userIds =  Arrays.asList(new String[] {"111","222"});
-        private static final String CASE_ID = "111111";
-
         @Test
         public void shouldGetRoleAssignments() {
 
-            BDDMockito.given(roleAssignmentRepository.findRoleAssignmentsByCasesAndUsers(caseIds,userIds))
+            BDDMockito.given(roleAssignmentRepository.findRoleAssignmentsByCasesAndUsers(caseIds, userIds))
                 .willReturn(mockedRoleAssignmentResponse);
 
             BDDMockito.given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))
@@ -89,25 +110,27 @@ class RoleAssignmentServiceTest {
             assertThat(caseAssignedUserRole.get(0).getCaseDataId(), is(CASE_ID));
         }
 
-        private RoleAssignments getRoleAssignments() {
 
-            final Instant currentTIme = Instant.now();
-            final long oneHour = 3600000;
+    }
 
-            final RoleAssignmentAttributes roleAssignmentAttributes =
-                RoleAssignmentAttributes.builder().caseId(Optional.of(CASE_ID)).build();
 
-            final List<RoleAssignment> roleAssignments = Arrays.asList(
+    @Nested
+    @DisplayName("getCaseIdsForAGivenUser()")
+    class GetCaseIdsForAGivenUser {
 
-                RoleAssignment.builder().actorId("actorId").roleType(RoleType.CASE.name())
-                    .attributes(roleAssignmentAttributes)
-                    .beginTime(currentTIme.minusMillis(oneHour)).endTime(currentTIme.plusMillis(oneHour)).build(),
+        @Test
+        public void shouldGetRoleAssignments() {
 
-                RoleAssignment.builder().actorId("actorId1").roleType(RoleType.CASE.name())
-                    .attributes(roleAssignmentAttributes)
-                    .beginTime(currentTIme.minusMillis(oneHour)).endTime(currentTIme.plusMillis(oneHour)).build()
-            );
-            return RoleAssignments.builder().roleAssignments(roleAssignments).build();
+            BDDMockito.given(roleAssignmentRepository.getRoleAssignments(USER_ID))
+                .willReturn(mockedRoleAssignmentResponse);
+
+            BDDMockito.given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))
+                .willReturn(getRoleAssignments());
+
+            List<String> resultCases =
+                roleAssignmentService.getCaseIdsForAGivenUser(USER_ID);
+
+            assertTrue(resultCases.size() == 2);
         }
     }
 }
