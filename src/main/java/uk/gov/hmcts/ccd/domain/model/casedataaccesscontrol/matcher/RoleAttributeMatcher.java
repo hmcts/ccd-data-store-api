@@ -10,6 +10,7 @@ public interface RoleAttributeMatcher {
 
     void matchAttribute(Pair<RoleAssignment, RoleMatchingResult> resultPair, CaseDetails caseDetails);
 
+    @SuppressWarnings("java:S2789")
     default boolean isValuesMatching(Optional<String> roleAssignmentValue,
                                      String caseDataValue) {
         if (roleAssignmentValue == null) {
