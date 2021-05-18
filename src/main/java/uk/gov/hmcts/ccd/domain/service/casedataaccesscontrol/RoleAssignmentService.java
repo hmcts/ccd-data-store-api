@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.CachedRoleAssignmentRepository;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
@@ -14,7 +16,8 @@ public class RoleAssignmentService implements AccessControl {
     private final RoleAssignmentsMapper roleAssignmentsMapper;
 
     @Autowired
-    public RoleAssignmentService(RoleAssignmentRepository roleAssignmentRepository,
+    public RoleAssignmentService(@Qualifier(CachedRoleAssignmentRepository.QUALIFIER)
+                                         RoleAssignmentRepository roleAssignmentRepository,
                                  RoleAssignmentsMapper roleAssignmentsMapper) {
         this.roleAssignmentRepository = roleAssignmentRepository;
         this.roleAssignmentsMapper = roleAssignmentsMapper;
