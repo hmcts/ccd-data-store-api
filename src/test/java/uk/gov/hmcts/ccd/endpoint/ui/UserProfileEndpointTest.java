@@ -55,10 +55,15 @@ public class UserProfileEndpointTest extends WireMockBaseTest {
         final JurisdictionDisplayProperties[] jurisdictions = userProfile.getJurisdictions();
         assertEquals(4, jurisdictions.length);
 
-        final JurisdictionDisplayProperties jurisdiction = jurisdictions[1];
-        assertEquals("PROBATE", jurisdiction.getId());
-        assertEquals("Test", jurisdiction.getName());
-        assertEquals("Test Jurisdiction", jurisdiction.getDescription());
+        final JurisdictionDisplayProperties jurisdiction0 = jurisdictions[0];
+        assertEquals("Test Case Role", jurisdiction0.getId());
+        assertEquals("Test Case Role", jurisdiction0.getName());
+        assertEquals("Test Jurisdiction", jurisdiction0.getDescription());
+
+        final JurisdictionDisplayProperties jurisdiction1 = jurisdictions[1];
+        assertEquals("PROBATE", jurisdiction1.getId());
+        assertEquals("Test", jurisdiction1.getName());
+        assertEquals("Test Jurisdiction", jurisdiction1.getDescription());
 
         final WorkbasketDefault workbasketDefault = userProfile.getDefaultSettings().getWorkbasketDefault();
         assertEquals("PROBATE", workbasketDefault.getJurisdictionId());
