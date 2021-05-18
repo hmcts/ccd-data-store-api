@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +27,8 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_GRANTED;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_GRANTED_LABEL;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_PROCESS;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_PROCESS_LABEL;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
@@ -67,14 +70,31 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
 
     private void updateWithAccessControlMetadata(CaseView caseView) {
         CaseAccessMetadata caseAccessMetadata = caseDataAccessControl.generateAccessMetadata(caseView.getCaseId());
+        CaseViewField caseViewFieldAccessGranted = new CaseViewField();
 
-        CaseViewField caseViewField = new CaseViewField();
-        caseViewField.setId(ACCESS_GRANTED);
-        caseViewField.setLabel(ACCESS_GRANTED_LABEL);
-        caseViewField.setSecurityLabel(SecurityClassification.PUBLIC.name());
-        caseViewField.setValue(caseAccessMetadata.getAccessGrantsString());
+        List<CaseViewField> metadataFieldsToAdd = new ArrayList<>();
 
-        caseView.addMetadataFields(List.of(caseViewField));
+        if (caseAccessMetadata.getAccessGrants() != null) {
+            caseViewFieldAccessGranted.setId(ACCESS_GRANTED);
+            caseViewFieldAccessGranted.setLabel(ACCESS_GRANTED_LABEL);
+            caseViewFieldAccessGranted.setSecurityLabel(SecurityClassification.PUBLIC.name());
+            caseViewFieldAccessGranted.setValue(caseAccessMetadata.getAccessGrantsString());
+            metadataFieldsToAdd.add(caseViewFieldAccessGranted);
+        }
+
+        CaseViewField caseViewFieldAccessProcess = new CaseViewField();
+
+        if (caseAccessMetadata.getAccessProcess() != null) {
+            caseViewFieldAccessProcess.setId(ACCESS_PROCESS);
+            caseViewFieldAccessProcess.setLabel(ACCESS_PROCESS_LABEL);
+            caseViewFieldAccessProcess.setSecurityLabel(SecurityClassification.PUBLIC.name());
+            caseViewFieldAccessProcess.setValue(caseAccessMetadata.getAccessProcessString());
+            metadataFieldsToAdd.add(caseViewFieldAccessProcess);
+        }
+
+        if (!metadataFieldsToAdd.isEmpty()) {
+            caseView.addMetadataFields(metadataFieldsToAdd);
+        }
     }
 
     private void filterCaseTabFieldsByReadAccess(CaseView caseView, Set<String> userRoles) {

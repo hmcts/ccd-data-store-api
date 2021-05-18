@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.model.aggregated;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @ToString
@@ -48,6 +49,9 @@ public abstract class AbstractCaseView {
     }
 
     public void addMetadataFields(List<CaseViewField> metadataFields) {
+        if (this.metadataFields == null) {
+            this.metadataFields = new ArrayList<>();
+        }
         this.metadataFields.addAll(metadataFields);
     }
 }

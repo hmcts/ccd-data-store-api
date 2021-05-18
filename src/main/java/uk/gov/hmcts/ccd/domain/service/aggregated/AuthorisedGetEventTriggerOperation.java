@@ -106,6 +106,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
         CaseUpdateViewEvent caseUpdateViewEvent = filterUpsertAccessForCase(caseTypeDefinition, userRoles,
             getEventTriggerOperation.executeForCase(caseReference, eventId, ignoreWarning));
+        updateWithAccessControlMetadata(caseUpdateViewEvent);
         return accessControlService.updateCollectionDisplayContextParameterByAccess(caseUpdateViewEvent, userRoles);
     }
 
@@ -123,7 +124,6 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
         CaseUpdateViewEvent caseUpdateViewEvent = filterCaseFieldsByCreateAccess(caseTypeDefinition,
             accessProfiles, getEventTriggerOperation.executeForDraft(draftReference, ignoreWarning));
-        updateWithAccessControlMetadata(caseUpdateViewEvent);
         return accessControlService.updateCollectionDisplayContextParameterByAccess(caseUpdateViewEvent,
             accessProfiles);
     }

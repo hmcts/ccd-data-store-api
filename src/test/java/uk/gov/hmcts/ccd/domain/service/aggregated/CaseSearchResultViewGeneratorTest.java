@@ -20,6 +20,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -305,6 +308,8 @@ class CaseSearchResultViewGeneratorTest {
         classUnderTest = new CaseSearchResultViewGenerator(userRepository,
             caseTypeService, searchResultDefinitionService, dateTimeSearchResultProcessor,
             caseSearchesViewAccessControl);
+
+        when(caseDataAccessControl.generateAccessMetadata(any())).thenReturn(new CaseAccessMetadata());
     }
 
     private void mockAccessProfiles() {
@@ -588,6 +593,26 @@ class CaseSearchResultViewGeneratorTest {
                 .get(FAMILY + SEPARATOR + FATHER_NAME)).asText(), is(FATHER_NAME_VALUE)),
             () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
                 .get(FAMILY + SEPARATOR + FAMILY_DETAILS_PATH_NESTED)).asText(), is(POSTCODE_VALUE))
+        );
+    }
+
+    @Test
+    void shouldBuildResultsWithCaseAccessMetadata() {
+        CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
+        caseAccessMetadata.setAccessGrants(List.of(GrantType.SPECIFIC, GrantType.BASIC));
+        caseAccessMetadata.setAccessProcess(AccessProcess.CHALLENGED);
+
+        when(caseDataAccessControl.generateAccessMetadata(any())).thenReturn(caseAccessMetadata);
+
+        CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET,
+            Collections.emptyList());
+
+        assertAll(
+            () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
+                .get(CaseAccessMetadata.ACCESS_PROCESS)).asText(), is(AccessProcess.CHALLENGED.name())),
+            () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
+                .get(CaseAccessMetadata.ACCESS_GRANTED)).asText(),
+                is(GrantType.BASIC.name() + "," + GrantType.SPECIFIC.name()))
         );
     }
 
