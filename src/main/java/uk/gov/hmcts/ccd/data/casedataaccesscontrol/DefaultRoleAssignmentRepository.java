@@ -95,7 +95,7 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
         if (exchange.getStatusCode() == HttpStatus.NOT_MODIFIED && roleAssignments.containsKey(userId)) {
             return roleAssignments.get(userId).getRight();
         }
-        if (exchange.getHeaders().containsKey(ETAG) && isNotBlank(exchange.getHeaders().getETag())) {
+        if (exchange.getHeaders().containsKey(ETAG) && exchange.getHeaders().getETag() != null) {
             roleAssignments.put(userId, Pair.of(getETag(exchange.getHeaders().getETag()), exchange.getBody()));
         }
 
