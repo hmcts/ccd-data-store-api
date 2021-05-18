@@ -53,9 +53,9 @@ public class UserProfileEndpointTest extends WireMockBaseTest {
         assertNull(userProfile.getChannels());
 
         final JurisdictionDisplayProperties[] jurisdictions = userProfile.getJurisdictions();
-        assertEquals(3, jurisdictions.length);
+        assertEquals(4, jurisdictions.length);
 
-        final JurisdictionDisplayProperties jurisdiction = jurisdictions[0];
+        final JurisdictionDisplayProperties jurisdiction = jurisdictions[1];
         assertEquals("PROBATE", jurisdiction.getId());
         assertEquals("Test", jurisdiction.getName());
         assertEquals("Test Jurisdiction", jurisdiction.getDescription());
@@ -65,12 +65,12 @@ public class UserProfileEndpointTest extends WireMockBaseTest {
         assertEquals("TestAddressBookCase", workbasketDefault.getCaseTypeId());
         assertEquals("CaseCreated", workbasketDefault.getStateId());
 
-        final JurisdictionDisplayProperties jurisdiction2 = jurisdictions[1];
+        final JurisdictionDisplayProperties jurisdiction2 = jurisdictions[2];
         assertEquals("DIVORCE", jurisdiction2.getId());
         assertEquals("Test 2", jurisdiction2.getName());
         assertEquals("Test Jurisdiction 2", jurisdiction2.getDescription());
 
-        final JurisdictionDisplayProperties jurisdiction3 = jurisdictions[2];
+        final JurisdictionDisplayProperties jurisdiction3 = jurisdictions[3];
         assertEquals("SSCS", jurisdiction3.getId());
         assertEquals("Test 3", jurisdiction3.getName());
         assertEquals("Test Jurisdiction 3", jurisdiction3.getDescription());
