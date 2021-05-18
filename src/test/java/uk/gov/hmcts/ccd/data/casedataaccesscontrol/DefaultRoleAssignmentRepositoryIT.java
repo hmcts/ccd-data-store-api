@@ -54,10 +54,6 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
     private static final String AUTHORISATIONS_AUTH_2 = "auth2";
     private static final String POST_CODE = "EC12 3LN";
 
-    @Inject
-    @Named(DefaultRoleAssignmentRepository.QUALIFIER)
-    private RoleAssignmentRepository roleAssignmentRepository;
-
     @DisplayName("should return roleAssignments")
     @Test
     public void shouldReturnRoleAssignments() {
