@@ -39,9 +39,9 @@ public class RegionMatcher implements RoleAttributeMatcher {
     }
 
     private Optional<String> getRegion(CaseDetails caseDetails) {
-        JsonNode caseManagementLocation = caseDetails.getData().get("caseManagementLocation");
+        JsonNode caseManagementLocation = caseDetails.getData().get(CASE_MANAGEMENT__LOCATION);
         if (caseManagementLocation != null) {
-            return Optional.ofNullable(caseManagementLocation.get("region").asText());
+            return Optional.ofNullable(caseManagementLocation.get(REGION).asText());
         }
         return Optional.empty();
     }

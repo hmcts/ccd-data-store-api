@@ -101,7 +101,7 @@ class AuthorisedGetEventsOperationTest {
         event.setCaseDataId(CASE_ID);
 
         doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
-        doReturn(CASE_USER_ROLES).when(caseAccessService).getAccessRoles(anyString());
+        doReturn(CASE_USER_ROLES).when(caseAccessService).getAccessProfilesByCaseReference(anyString());
         doReturn(classifiedEvents).when(getEventsOperation).getEvents(caseDetails);
         doReturn(classifiedEvents).when(getEventsOperation).getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
         doReturn(classifiedEvents).when(getEventsOperation).getEvents(CASE_REFERENCE);
@@ -153,7 +153,7 @@ class AuthorisedGetEventsOperationTest {
     @Test
     @DisplayName("should fail if no user roles and case roles found")
     void shouldReturnEmptyCaseIfNoUserRolesFound() {
-        doReturn(Sets.newHashSet()).when(caseAccessService).getAccessRoles(CASE_ID);
+        doReturn(Sets.newHashSet()).when(caseAccessService).getAccessProfilesByCaseReference(CASE_ID);
 
         assertThrows(ValidationException.class, () -> authorisedOperation.getEvents(caseDetails));
     }
@@ -161,7 +161,7 @@ class AuthorisedGetEventsOperationTest {
     @Test
     @DisplayName("should fail if no user roles found")
     void shouldReturnEmptyCaseIfEmptyUserRolesFound() {
-        doReturn(null).when(caseAccessService).getAccessRoles(CASE_ID);
+        doReturn(null).when(caseAccessService).getAccessProfilesByCaseReference(CASE_ID);
 
         assertThrows(ValidationException.class, () -> authorisedOperation.getEvents(caseDetails));
     }
@@ -177,7 +177,7 @@ class AuthorisedGetEventsOperationTest {
             inOrder(caseDefinitionRepository, getEventsOperation, accessControlService, caseAccessService);
         assertAll(() -> inOrder.verify(getEventsOperation).getEvents(caseDetails),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
-            () -> inOrder.verify(caseAccessService).getAccessRoles(CASE_ID),
+            () -> inOrder.verify(caseAccessService).getAccessProfilesByCaseReference(CASE_ID),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES,
                 CAN_READ),
             () -> inOrder.verify(accessControlService, never()).filterCaseAuditEventsByReadAccess(classifiedEvents,
@@ -196,7 +196,7 @@ class AuthorisedGetEventsOperationTest {
             inOrder(caseDefinitionRepository, getEventsOperation, accessControlService, caseAccessService);
         assertAll(() -> inOrder.verify(getEventsOperation).getEvents(caseDetails),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
-            () -> inOrder.verify(caseAccessService).getAccessRoles(CASE_ID),
+            () -> inOrder.verify(caseAccessService).getAccessProfilesByCaseReference(CASE_ID),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES,
                 CAN_READ),
             () -> inOrder.verify(accessControlService).filterCaseAuditEventsByReadAccess(classifiedEvents,
@@ -214,7 +214,7 @@ class AuthorisedGetEventsOperationTest {
             inOrder(caseDefinitionRepository, getEventsOperation, accessControlService, caseAccessService);
         assertAll(() -> inOrder.verify(getEventsOperation).getEvents(JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
-            () -> inOrder.verify(caseAccessService).getAccessRoles(CASE_ID),
+            () -> inOrder.verify(caseAccessService).getAccessProfilesByCaseReference(CASE_ID),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES,
                 CAN_READ),
             () -> inOrder.verify(accessControlService).filterCaseAuditEventsByReadAccess(classifiedEvents,
@@ -232,7 +232,7 @@ class AuthorisedGetEventsOperationTest {
             inOrder(caseDefinitionRepository, getEventsOperation, accessControlService, caseAccessService);
         assertAll(() -> inOrder.verify(getEventsOperation).getEvents(CASE_REFERENCE),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
-            () -> inOrder.verify(caseAccessService).getAccessRoles(CASE_ID),
+            () -> inOrder.verify(caseAccessService).getAccessProfilesByCaseReference(CASE_ID),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES,
                 CAN_READ),
             () -> inOrder.verify(accessControlService).filterCaseAuditEventsByReadAccess(classifiedEvents,
@@ -281,7 +281,7 @@ class AuthorisedGetEventsOperationTest {
         assertAll(
             () -> inOrder.verify(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
-            () -> inOrder.verify(caseAccessService).getAccessRoles(CASE_ID),
+            () -> inOrder.verify(caseAccessService).getAccessProfilesByCaseReference(CASE_ID),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES,
                 CAN_READ),
             () -> inOrder.verify(accessControlService)

@@ -137,7 +137,7 @@ class AuthorisedStartEventOperationTest {
         caseTypeDefinition.setId(CASE_TYPE_ID);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(caseAccessService.getAccessProfiles(anyString())).thenReturn(userRoles);
-        when(caseAccessService.getAccessRoles(anyString())).thenReturn(userRoles);
+        when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(userRoles);
         when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ))
             .thenReturn(true);
         when(accessControlService.filterCaseFieldsByAccess(eq(classifiedCaseDetailsNode),
@@ -330,7 +330,7 @@ class AuthorisedStartEventOperationTest {
                     EVENT_TRIGGER_ID,
                     IGNORE_WARNING),
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-                () -> inOrder.verify(caseAccessService).getAccessRoles(CASE_REFERENCE),
+                () -> inOrder.verify(caseAccessService).getAccessProfilesByCaseReference(CASE_REFERENCE),
                 () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
                     eq(userRoles),
                     eq(CAN_READ)),

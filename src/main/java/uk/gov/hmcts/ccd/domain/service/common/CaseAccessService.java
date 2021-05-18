@@ -81,7 +81,7 @@ public class CaseAccessService {
         return new HashSet<>(caseUserRepository.findCaseRoles(Long.valueOf(caseId), userRepository.getUserId()));
     }
 
-    public Set<String> getAccessRoles(String caseReference) {
+    public Set<String> getAccessProfilesByCaseReference(String caseReference) {
         List<AccessProfile> accessProfileList = caseDataAccessControl
             .generateAccessProfilesByCaseReference(caseReference);
         return caseDataAccessControl.extractAccessProfileNames(accessProfileList);

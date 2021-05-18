@@ -95,7 +95,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
         validateEventDefinition(() -> !eventTriggerService.isPreStateValid(
             caseDetails.getState(), caseEventDefinition));
 
-        Set<String> userRoles = caseAccessService.getAccessRoles(caseDetails.getReferenceAsString());
+        Set<String> userRoles = caseAccessService.getAccessProfilesByCaseReference(caseDetails.getReferenceAsString());
 
         verifyMandatoryAccessForCase(eventId, caseDetails, caseTypeDefinition, userRoles);
 
@@ -111,7 +111,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
         final CaseTypeDefinition caseTypeDefinition =
             caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
 
-        Set<String> accessProfiles = caseAccessService.getAccessRoles(caseDetails.getReferenceAsString());
+        Set<String> accessProfiles = caseAccessService.getAccessProfilesByCaseReference(caseDetails.getReferenceAsString());
 
         verifyRequiredAccessExistsForCaseType(draftResponse.getDocument().getEventId(),
             caseTypeDefinition, accessProfiles);

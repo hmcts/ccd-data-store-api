@@ -17,7 +17,7 @@ public class LocationMatcher implements RoleAttributeMatcher {
     @Override
     public void matchAttribute(Pair<RoleAssignment, RoleMatchingResult> resultPai, CaseDetails caseDetails) {
         RoleAssignment roleAssignment = resultPai.getLeft();
-        String caseLocation = getLocation(caseDetails).orElse("");
+        String caseLocation = getLocation(caseDetails).orElse(EMPTY_STR);
         log.debug("Match role assignment location {} with case details location {} for role assignment {}",
             roleAssignment.getAttributes().getLocation(),
             caseLocation,
@@ -39,9 +39,9 @@ public class LocationMatcher implements RoleAttributeMatcher {
     }
 
     private Optional<String> getLocation(CaseDetails caseDetails) {
-        JsonNode caseManagementLocation = caseDetails.getData().get("caseManagementLocation");
+        JsonNode caseManagementLocation = caseDetails.getData().get(CASE_MANAGEMENT__LOCATION);
         if (caseManagementLocation != null) {
-            return Optional.ofNullable(caseManagementLocation.get("baseLocation").asText());
+            return Optional.ofNullable(caseManagementLocation.get(BASE_LOCATION).asText());
         }
         return Optional.empty();
     }

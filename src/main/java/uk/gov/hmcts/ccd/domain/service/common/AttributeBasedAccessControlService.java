@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -13,15 +12,10 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.DefaultCaseDataAccessControl;
 
@@ -67,16 +61,6 @@ public class AttributeBasedAccessControlService extends AccessControlServiceImpl
             criteria);
     }
 
-    @Override
-    public boolean canAccessCaseEventWithCriteria(String eventId,
-                                                  List<CaseEventDefinition> caseEventDefinitions,
-                                                  Set<String> userRoles,
-                                                  Predicate<AccessControlList> criteria) {
-        return super.canAccessCaseEventWithCriteria(eventId,
-            caseEventDefinitions,
-            userRoles,
-            criteria);
-    }
 
     @Override
     public boolean canAccessCaseFieldsWithCriteria(JsonNode caseFields,
@@ -91,14 +75,6 @@ public class AttributeBasedAccessControlService extends AccessControlServiceImpl
             criteria);
     }
 
-    @Override
-    public boolean canAccessCaseViewFieldWithCriteria(CommonField caseViewField,
-                                                      Set<String> userRoles,
-                                                      Predicate<AccessControlList> criteria) {
-        return super.canAccessCaseViewFieldWithCriteria(caseViewField,
-            userRoles,
-            criteria);
-    }
 
     @Override
     public boolean canAccessCaseFieldsForUpsert(JsonNode newData,
@@ -125,12 +101,6 @@ public class AttributeBasedAccessControlService extends AccessControlServiceImpl
             access);
     }
 
-    @Override
-    public CaseUpdateViewEvent updateCollectionDisplayContextParameterByAccess(CaseUpdateViewEvent caseEventTrigger,
-                                                                               Set<String> userRoles) {
-        return super.updateCollectionDisplayContextParameterByAccess(caseEventTrigger,
-            userRoles);
-    }
 
     @Override
     public JsonNode filterCaseFieldsByAccess(JsonNode caseFields,
@@ -171,46 +141,9 @@ public class AttributeBasedAccessControlService extends AccessControlServiceImpl
             access);
     }
 
-    @Override
-    public List<AuditEvent> filterCaseAuditEventsByReadAccess(List<AuditEvent> auditEvents,
-                                                              List<CaseEventDefinition> caseEventDefinitions,
-                                                              Set<String> userRoles) {
-        return super.filterCaseAuditEventsByReadAccess(auditEvents,
-            caseEventDefinitions,
-            userRoles);
-    }
-
-    @Override
-    public List<CaseStateDefinition> filterCaseStatesByAccess(List<CaseStateDefinition> caseStateDefinitions,
-                                                              Set<String> userRoles,
-                                                              Predicate<AccessControlList> access) {
-        return super.filterCaseStatesByAccess(caseStateDefinitions,
-            userRoles,
-            access);
-    }
-
-    @Override
-    public List<CaseEventDefinition> filterCaseEventsByAccess(List<CaseEventDefinition> caseEventDefinitions,
-                                                              Set<String> userRoles,
-                                                              Predicate<AccessControlList> access) {
-        return super.filterCaseEventsByAccess(caseEventDefinitions,
-            userRoles,
-            access);
-    }
-
-    @Override
-    public CaseViewActionableEvent[] filterCaseViewTriggersByCreateAccess(
-        CaseViewActionableEvent[] caseViewTriggers,
-        List<CaseEventDefinition> caseEventDefinitions,
-        Set<String> userRoles) {
-        return super.filterCaseViewTriggersByCreateAccess(caseViewTriggers,
-            caseEventDefinitions,
-            userRoles);
-    }
-
     private void applyAccessProfileRules(List<CaseFieldDefinition> caseFieldDefinitions) {
         Optional<CaseTypeDefinition> caseTypeDefinition = getCaseTypeDefinition(caseFieldDefinitions);
-        if (!caseFieldDefinitions.isEmpty()) {
+        if (caseTypeDefinition.isPresent()) {
             applyAccessProfileRules(caseTypeDefinition.get());
         }
     }
@@ -245,10 +178,6 @@ public class AttributeBasedAccessControlService extends AccessControlServiceImpl
             });
     }
 
-    private Optional<CaseTypeDefinition> getCaseTypeDefinition(CaseFieldDefinition caseFieldDefinition) {
-        return getCaseTypeDefinition(Lists.newArrayList(caseFieldDefinition));
-    }
-
     private Optional<CaseTypeDefinition> getCaseTypeDefinition(List<CaseFieldDefinition> caseFieldDefinitions) {
         if (caseFieldDefinitions != null && caseFieldDefinitions.size() > 0) {
             return Optional.ofNullable(caseDefinitionRepository
@@ -257,11 +186,7 @@ public class AttributeBasedAccessControlService extends AccessControlServiceImpl
         return Optional.empty();
     }
 
-
-    private Optional<CaseTypeDefinition> getCaseEventCaseTypeDefinition(List<CaseEventDefinition> caseEventDefinition) {
-        return Optional.empty();
-    }
-
+    @Override
     public boolean hasAccessControlList(Set<String> userRoles,
                                         Predicate<AccessControlList> criteria,
                                         List<AccessControlList> accessControlLists) {
