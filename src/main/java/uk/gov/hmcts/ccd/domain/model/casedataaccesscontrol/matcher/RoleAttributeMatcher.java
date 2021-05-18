@@ -12,6 +12,7 @@ public interface RoleAttributeMatcher {
 
     default boolean isValuesMatching(Optional<String> roleAssignmentValue,
                                      String caseDataValue) {
+        //NOSONAR This comes from the Jackson deserializing Optional
         if (roleAssignmentValue == null) {
             return true;
         }
