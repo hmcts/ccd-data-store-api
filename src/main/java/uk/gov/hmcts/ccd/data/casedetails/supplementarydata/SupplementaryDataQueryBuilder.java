@@ -48,14 +48,18 @@ public interface SupplementaryDataQueryBuilder {
 
         try {
             Object value = context.read("$." + pathToMatch, Object.class);
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                return objectMapper.writeValueAsString(value);
-            } catch (JsonProcessingException e) {
-                throw new ServiceException("Unable to map object to JSON string", e);
-            }
+            return jsonNodeToString(value);
         } catch (PathNotFoundException e) {
             throw new ServiceException(String.format("Path %s is not found", pathToMatch));
+        }
+    }
+
+    default String jsonNodeToString(Object data) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(data);
+        } catch (JsonProcessingException e) {
+            throw new ServiceException("Unable to map object to JSON string", e);
         }
     }
 }
