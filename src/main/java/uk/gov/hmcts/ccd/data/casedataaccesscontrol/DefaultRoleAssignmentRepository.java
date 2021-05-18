@@ -106,7 +106,7 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
      * This method is to drop this suffix before using the ETag.
      */
     private String getETag(String etag) {
-        if (etag.endsWith(GZIP_POSTFIX + "\"")) {
+        if (etag != null && etag.endsWith(GZIP_POSTFIX + "\"")) {
             return etag.substring(0, etag.length() - GZIP_POSTFIX.length() - 1) + "\"";
         }
         return etag;
