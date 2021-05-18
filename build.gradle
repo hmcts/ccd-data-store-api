@@ -245,7 +245,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '7.0.0-RDM-10539.3'
+    testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '7.0.0-RDM-10539.4'
 
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
