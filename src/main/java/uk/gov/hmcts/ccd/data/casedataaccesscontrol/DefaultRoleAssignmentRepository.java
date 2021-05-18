@@ -106,11 +106,11 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
      * 'Accept-Encoding: gzip' makes the response ETag header being suffixed with the '--gzip'.
      * This method is to drop this suffix before using the ETag.
      */
-    private String getETag(String eTag) {
-        if (eTag.endsWith(GZIP_POSTFIX + "\"")) {
-            return eTag.substring(0, eTag.length() - GZIP_POSTFIX.length() - 1) + "\"";
+    private String getETag(String etag) {
+        if (etag.endsWith(GZIP_POSTFIX + "\"")) {
+            return etag.substring(0, etag.length() - GZIP_POSTFIX.length() - 1) + "\"";
         }
-        return eTag;
+        return etag;
     }
 
     private ResponseEntity<RoleAssignmentResponse> exchangeGet(String userId, HttpEntity<Object> requestEntity)
