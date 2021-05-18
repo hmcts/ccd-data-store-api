@@ -25,7 +25,6 @@ import static org.mockito.Mockito.anyListOf;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 class ClassifiedGetEventsOperationTest {
