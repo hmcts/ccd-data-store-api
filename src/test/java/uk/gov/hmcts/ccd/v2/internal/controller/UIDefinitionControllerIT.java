@@ -100,7 +100,7 @@ public class UIDefinitionControllerIT extends WireMockBaseTest {
         final MvcResult result =
             mockMvc.perform(get("/internal/jurisdictions")
                 .contentType(MediaType.APPLICATION_JSON)
-                .param("access", "create")
+                .param("access", "read")
                 .header(AUTHORIZATION, "Bearer user1")
                 .header(V2.EXPERIMENTAL_HEADER, "true"))
                 .andExpect(status().is(200))
