@@ -7,12 +7,15 @@ import javax.persistence.Query;
 
 import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
+import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SetSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
 
@@ -23,6 +26,9 @@ class SetSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
 
     @Inject
     private SetSupplementaryDataQueryBuilder supplementaryDataQueryBuilder;
+
+    @Mock
+    private Object mockObject;
 
     @Test
     void shouldReturnQueryListWhenRequestDataPassed() {
@@ -48,7 +54,7 @@ class SetSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturnValidValueForRequestedDataJsonForPath() {
+    void shouldReturnValidValueForRequestedDataJsonForPath() {
         String jsonString = supplementaryDataQueryBuilder.requestedDataJsonForPath(
             "orgs_assigned_users.organisationA", 35, "orgs_assigned_users.organisationA");
 
@@ -56,15 +62,29 @@ class SetSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldThrowServiceExceptionForUnknownPathForRequestedDataJsonForPath() {
-        ServiceException serviceException = assertThrows(ServiceException.class,
-            () -> supplementaryDataQueryBuilder.requestedDataJsonForPath(
-                "orgs_assigned_users.organisationA", 35, "orgs_assigned_users.test"));
-
-        assertEquals("Path orgs_assigned_users.test is not found", serviceException.getMessage());
+    void shouldThrowServiceExceptionForUnknownPathForRequestedDataJsonForPath() {
+        try {
+            supplementaryDataQueryBuilder.requestedDataJsonForPath(
+                "orgs_assigned_users.organisationA", 35, "orgs_assigned_users.test");
+            fail("Expected an ServiceException to be thrown");
+        } catch (ServiceException se) {
+            assertEquals("Path orgs_assigned_users.test is not found", se.getMessage());
+        }
     }
 
-    @Ignore // Can only be used for local testing on multithreading
+    @Test
+    void shouldThrowServiceExceptionForJsonNodeToString() {
+        when(mockObject.toString()).thenReturn(mockObject.getClass().getName());
+
+        try {
+            supplementaryDataQueryBuilder.jsonNodeToString(mockObject);
+            fail("Expected ServiceException");
+        } catch (ServiceException se) {
+            assertTrue(se.getMessage().startsWith("Unable to map object to JSON string"));
+        }
+    }
+
+    @Ignore("Can only be used for local testing on multithreading")
     @Test
     void shouldReturnValidRequestDataPassed() {
         Thread t1 = new Thread(() -> {
@@ -89,7 +109,7 @@ class SetSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
         t2.start();
     }
 
-    @Ignore // Can only be used for local testing on multithreading
+    @Ignore("Can only be used for local testing on multithreading")
     @Test
     void shouldReturnValidRequestDataPassed1() {
         Thread t1 = new Thread(() -> {
