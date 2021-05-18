@@ -7,7 +7,9 @@ import java.util.Collections;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -29,7 +31,7 @@ class SupplementaryDataTest {
 
         Map<String, JsonNode> value = JacksonUtils.convertValue(mapper.readTree(jsonRequest));
         SupplementaryData supplementaryData = new SupplementaryData(
-            "test", value.get("$set"), Collections.singleton(VALID_KEY));
+            value.get("$set"), Collections.singleton(VALID_KEY));
 
         assertNotNull(supplementaryData);
         assertNotNull(supplementaryData.getResponse());
@@ -49,12 +51,10 @@ class SupplementaryDataTest {
             + "}";
 
         Map<String, JsonNode> value = JacksonUtils.convertValue(mapper.readTree(jsonRequest));
-        SupplementaryData supplementaryData = new SupplementaryData(
-            "test", value.get("$inc"), Collections.singleton(INVALID_KEY));
+        ServiceException serviceException = assertThrows(ServiceException.class,
+            () -> new SupplementaryData(value.get("$inc"), Collections.singleton(INVALID_KEY)));
 
-        assertNotNull(supplementaryData);
-        assertNotNull(supplementaryData.getResponse());
-        assertEquals(0, supplementaryData.getResponse().size());
+        assertEquals("Path orgs_assigned_users.test is not found", serviceException.getMessage());
     }
 
 }

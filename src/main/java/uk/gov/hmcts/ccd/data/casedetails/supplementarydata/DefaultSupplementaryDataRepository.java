@@ -78,7 +78,7 @@ public class DefaultSupplementaryDataRepository implements SupplementaryDataRepo
         } catch (JsonProcessingException jpe) {
             LOG.error(jpe.getMessage());
         }
-        return new SupplementaryData(caseReference, responseNode, requestedProperties);
+        return new SupplementaryData(responseNode, requestedProperties);
     }
 
     private SupplementaryDataQueryBuilder queryBuilder(final SupplementaryDataOperation supplementaryDataOperation) {
