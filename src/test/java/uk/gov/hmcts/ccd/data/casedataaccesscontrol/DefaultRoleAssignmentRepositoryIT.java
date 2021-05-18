@@ -9,6 +9,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.time.Instant;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -54,6 +55,7 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
     private static final String POST_CODE = "EC12 3LN";
 
     @Inject
+    @Named(DefaultRoleAssignmentRepository.QUALIFIER)
     private RoleAssignmentRepository roleAssignmentRepository;
 
     @DisplayName("should return roleAssignments")
