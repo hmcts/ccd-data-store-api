@@ -388,19 +388,19 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals(savedCaseDetails.getDataClassification(), caseAuditEvent.getDataClassification());
         assertThat(caseAuditEvent.getSecurityClassification(), equalTo(PRIVATE));
 
-        assertThat(messageQueueList.get(0).getMessageInformation().findPath("case_id").toString(),
+        assertThat(messageQueueList.get(0).getMessageInformation().findPath("CaseId").toString(),
             containsString(savedCaseDetails.getId()));
-        assertThat(messageQueueList.get(0).getMessageInformation().findPath("user_id").toString(),
+        assertThat(messageQueueList.get(0).getMessageInformation().findPath("UserId").toString(),
             containsString(caseAuditEvent.getUserId()));
-        assertThat(messageQueueList.get(0).getMessageInformation().findPath("event_id").toString(),
+        assertThat(messageQueueList.get(0).getMessageInformation().findPath("EventId").toString(),
             containsString(caseAuditEvent.getEventId()));
-        assertThat(messageQueueList.get(0).getMessageInformation().findPath("case_type_id").toString(),
+        assertThat(messageQueueList.get(0).getMessageInformation().findPath("CaseTypeId").toString(),
             containsString(savedCaseDetails.getCaseTypeId()));
-        assertThat(messageQueueList.get(0).getMessageInformation().findPath("new_state_id").toString(),
+        assertThat(messageQueueList.get(0).getMessageInformation().findPath("NewStateId").toString(),
             containsString(savedCaseDetails.getState()));
-        assertThat(messageQueueList.get(0).getMessageInformation().findPath("event_instance_id").toString(),
+        assertThat(messageQueueList.get(0).getMessageInformation().findPath("EventInstanceId").toString(),
             containsString(caseAuditEvent.getId().toString()));
-        assertEquals("null", messageQueueList.get(0).getMessageInformation().findPath("previous_state_id").toString());
+        assertEquals("null", messageQueueList.get(0).getMessageInformation().findPath("PreviousStateId").toString());
         assertThat(messageQueueList.get(0).getId(), equalTo(1L));
         assertEquals("CASE_EVENT", messageQueueList.get(0).getMessageType());
     }
@@ -462,7 +462,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             template.query("SELECT * FROM message_queue_candidates", this::mapMessageCandidate);
         assertEquals("Incorrect number of rows in messageQueue", 1, messageQueueList.size());
 
-        assertEquals(messageQueueList.get(0).getMessageInformation().get("additional_data").get("Definition"),
+        assertEquals(messageQueueList.get(0).getMessageInformation().get("AdditionalData").get("Definition"),
             mapper.readTree("{\n"
                 + "    \"OtherAlias\": {\n"
                 + "        \"type\": \"SimpleNumber\",\n"
@@ -759,7 +759,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 + "  \"AliasForTextField\": \"text field\",\n"
                 + "  \"ComplexCollectionField\": null\n"
                 + "}"),
-            messageQueueList.get(0).getMessageInformation().get("additional_data").get("Data"));
+            messageQueueList.get(0).getMessageInformation().get("AdditionalData").get("Data"));
     }
 
     @Test

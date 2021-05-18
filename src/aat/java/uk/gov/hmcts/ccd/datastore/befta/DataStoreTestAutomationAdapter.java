@@ -19,6 +19,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.ccd.datastore.util.CaseIdHelper.hypheniseACaseId;
 
 public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
@@ -76,6 +77,16 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                 long longRef = (long) ReflectionUtils.deepGetFieldInObject(
                     scenarioContext,"childContexts." + childContext + ".testData.actualResponse.body.id");
                 return Long.toString(longRef);
+            } catch (Exception e) {
+                throw new FunctionalTestException("Problem getting case id as long", e);
+            }
+        } else if (key.toString().startsWith("HyphenisedCaseIdFromCaseCreation")) {
+            String childContext = key.toString().replace("HyphenisedCaseIdFromCaseCreation_","");
+            try {
+                long longRef = (long) ReflectionUtils.deepGetFieldInObject(
+                    scenarioContext,"childContexts." + childContext + ".testData.actualResponse.body.id");
+                String result = hypheniseACaseId(Long.toString(longRef));
+                return result;
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem getting case id as long", e);
             }
@@ -153,7 +164,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                 organisationIdentifierFieldPath).toString();
             String propertyName = "orgs_assigned_users." + organisationIdentifier;
 
-            int value = 0; // default
+            int value = incrementBy; // default
 
             // if path to previous value supplied : read it
             if (previousValueContextPath != null) {
@@ -163,9 +174,6 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                 Object previousValue = ReflectionUtils.deepGetFieldInObject(scenarioContext, previousValueFieldPath);
                 if (previousValue != null) {
                     value = Integer.parseInt(previousValue.toString())  + incrementBy; // and increment
-                }  else {
-                    throw new FunctionalTestException("Cannot find previous supplementary data property: '"
-                                                        + previousValueFieldPath + "'");
                 }
             }
             return Collections.singletonMap(propertyName, value);

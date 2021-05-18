@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 public class AccessProfileServiceImpl implements AccessProfileService, AccessControl {
 
     @Override
+    @SuppressWarnings("checkstyle:LineLength")
     public List<AccessProfile> generateAccessProfiles(RoleAssignmentFilteringResult filteringResults,
                                                       List<RoleToAccessProfileDefinition> roleToAccessProfilesMappings
     ) {
