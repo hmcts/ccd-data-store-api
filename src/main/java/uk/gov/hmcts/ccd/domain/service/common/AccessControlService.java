@@ -341,9 +341,7 @@ public class AccessControlService {
         if (hasAccessControlList(userRoles, CAN_DELETE, field.getAccessControlLists())) {
             collectionAccess.add(ALLOW_DELETE.getOption());
         }
-
-      return DisplayContextParameterUtil.updateCollectionDisplayContextParameter(field.getDisplayContextParameter(),
-                                                                                   collectionAccess);
+        return DisplayContextParameterUtil.updateCollectionDisplayContextParameter(field.getDisplayContextParameter(),
     }
 
     private void setChildrenAsReadOnlyIfNoAccess(final List<WizardPage> wizardPages,
