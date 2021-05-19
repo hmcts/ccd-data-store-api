@@ -35,7 +35,7 @@ public class ClassifiedGetEventsOperation implements GetEventsOperation {
     public List<AuditEvent> getEvents(CaseDetails caseDetails) {
         final List<AuditEvent> events = getEventsOperation.getEvents(caseDetails);
 
-        return secureEvents(events, caseDetails.getReferenceAsString());
+        return secureEvents(events, caseDetails);
     }
 
     @Override
@@ -51,15 +51,15 @@ public class ClassifiedGetEventsOperation implements GetEventsOperation {
     @Override
     public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String caseTypeId, Long eventId) {
         return getEventsOperation.getEvent(caseDetails, caseTypeId, eventId).flatMap(
-            event -> secureEvent(caseDetails.getReferenceAsString(), event));
-    }
-
-    private Optional<AuditEvent> secureEvent(String caseReference, AuditEvent event) {
-        return secureEvents(singletonList(event), caseReference).stream().findFirst();
+            event -> secureEvents(singletonList(event), caseDetails).stream().findFirst());
     }
 
     private List<AuditEvent> secureEvents(List<AuditEvent> events, String caseReference) {
         CaseDetails caseDetails = getCaseOperation.execute(caseReference).orElse(null);
+        return secureEvents(events, caseDetails);
+    }
+
+    private List<AuditEvent> secureEvents(List<AuditEvent> events, CaseDetails caseDetails) {
         if (null == caseDetails) {
             return Lists.newArrayList();
         }
