@@ -3,6 +3,9 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
@@ -15,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 @Service
 @Primary
@@ -30,9 +34,14 @@ public class ContractTestSubmitCaseTransaction extends SubmitCaseTransaction {
                                              SecurityClassificationService securityClassificationService,
                                              DefaultCaseUserRepository caseUserRepository,
                                              UserAuthorisation userAuthorisation,
-                                             MessageService messageService) {
+                                             MessageService messageService,
+                                             HttpServletRequest request,
+                                             RestTemplate restTemplate,
+                                             ApplicationParams applicationParams,
+                                             SecurityUtils securityUtils) {
         super(caseDetailsRepository, caseAuditEventRepository, caseTypeService,
             callbackInvoker, uidService, securityClassificationService,
-            caseUserRepository, userAuthorisation, messageService);
+            caseUserRepository, userAuthorisation, messageService,
+            request, restTemplate, applicationParams, securityUtils);
     }
 }
