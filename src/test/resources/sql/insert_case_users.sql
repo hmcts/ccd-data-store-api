@@ -20,3 +20,6 @@ values (4, 89002, '[CLAIMANT]');
 
 insert into case_users (case_data_id, user_id, case_role)
 values (5, 89002, '[CLAIMANT]');
+
+insert into case_users (case_data_id, user_id, case_role)
+values (4, 123, '[DEFENDANT]');
