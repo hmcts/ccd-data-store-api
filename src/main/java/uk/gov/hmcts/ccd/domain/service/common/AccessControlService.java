@@ -342,7 +342,7 @@ public class AccessControlService {
             collectionAccess.add(ALLOW_DELETE.getOption());
         }
 
-      return DisplayContextParameterUtil.updateCollectionDisplayContextParameter(field.getDisplayContextParameter(),
+        return DisplayContextParameterUtil.updateCollectionDisplayContextParameter(field.getDisplayContextParameter(),
                                                                                    collectionAccess);
     }
 
