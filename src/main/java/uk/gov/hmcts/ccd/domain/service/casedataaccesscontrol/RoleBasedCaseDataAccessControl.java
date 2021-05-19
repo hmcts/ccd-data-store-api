@@ -49,10 +49,8 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
     @Override
     public List<AccessProfile> generateAccessProfilesByCaseReference(String caseReference) {
         Set<String> roles = Sets.union(userRepository.getUserRoles(),
-            caseUserRepository
-                .findCaseRoles(Long.valueOf(caseReference), userRepository.getUserId())
-                .stream()
-                .collect(Collectors.toSet()));
+            Sets.newHashSet(caseUserRepository
+                .findCaseRoles(Long.valueOf(caseReference), userRepository.getUserId())));
         return userRoleToAccessProfiles(roles);
     }
 
@@ -66,7 +64,7 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
     private List<AccessProfile> userRoleToAccessProfiles(Set<String> roles) {
         return roles
             .stream()
-            .map(userRole -> new AccessProfile(userRole))
+            .map(AccessProfile::new)
             .collect(Collectors.toList());
     }
 }

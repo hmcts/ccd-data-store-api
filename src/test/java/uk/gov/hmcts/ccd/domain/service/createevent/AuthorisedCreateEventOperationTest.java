@@ -138,7 +138,7 @@ class AuthorisedCreateEventOperationTest {
         caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(caseAccessService.getAccessProfiles(anyString())).thenReturn(USER_ROLES);
-        when(caseAccessService.getAccessRoles(anyString())).thenReturn(USER_ROLES);
+        when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(USER_ROLES);
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(USER_ROLES),
             eq(CAN_UPDATE))).thenReturn(true);
         when(accessControlService.canAccessCaseStateWithCriteria(eq(STATE_ID), eq(caseTypeDefinition), eq(USER_ROLES),
@@ -206,7 +206,7 @@ class AuthorisedCreateEventOperationTest {
             () -> assertThat(output, sameInstance(classifiedCase)),
             () -> assertThat(output.getData(), is(equalTo(JacksonUtils.convertValue(authorisedCaseNode)))),
             () -> inOrder.verify(getCaseOperation).execute(CASE_REFERENCE),
-            () -> inOrder.verify(caseAccessService).getAccessRoles(CASE_REFERENCE),
+            () -> inOrder.verify(caseAccessService).getAccessProfilesByCaseReference(CASE_REFERENCE),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
                 eq(USER_ROLES),
@@ -260,7 +260,7 @@ class AuthorisedCreateEventOperationTest {
     @DisplayName("should fail if user roles not found")
     void shouldFailIfNoUserRolesFound() {
 
-        doReturn(Collections.EMPTY_SET).when(caseAccessService).getAccessRoles(anyString());
+        doReturn(Collections.EMPTY_SET).when(caseAccessService).getAccessProfilesByCaseReference(anyString());
 
         assertThrows(ValidationException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
             CASE_DATA_CONTENT));

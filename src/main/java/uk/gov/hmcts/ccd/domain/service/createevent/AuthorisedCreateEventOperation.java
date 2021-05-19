@@ -60,7 +60,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         CaseDetails existingCaseDetails = getCaseOperation.execute(caseReference)
             .orElseThrow(() -> new ResourceNotFoundException("Case not found"));
 
-        Set<String> accessProfiles = caseAccessService.getAccessRoles(caseReference);
+        Set<String> accessProfiles = caseAccessService.getAccessProfilesByCaseReference(caseReference);
         if (accessProfiles == null || accessProfiles.isEmpty()) {
             throw new ValidationException("Cannot find user roles for the user");
         }

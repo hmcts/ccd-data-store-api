@@ -11,11 +11,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
+import static uk.gov.hmcts.ccd.domain.service.AccessControl.IDAM_PREFIX;
 
 @Component
 public class PseudoRoleToAccessProfileGenerator {
 
-    protected static final String IDAM_PREFIX = "idam:";
     private static final String CASE_ROLE_ID_REGEX = "^(\\[[A-Za-z]+\\])$";
 
     public List<RoleToAccessProfileDefinition> generate(CaseTypeDefinition caseTypeDefinition) {

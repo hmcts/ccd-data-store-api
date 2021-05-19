@@ -513,6 +513,12 @@ public interface AccessControlService {
                                          List<AccessControlList> accessControlLists) {
         // scoop out access control roles based on user roles
         // intersect and make sure we have access for given criteria
+        return hasAccessControlList(userRoles, accessControlLists, criteria);
+    }
+
+    static boolean hasAccessControlList(Set<String> userRoles,
+                                        List<AccessControlList> accessControlLists,
+                                        Predicate<AccessControlList> criteria) {
         return accessControlLists != null && accessControlLists
             .stream()
             .filter(acls -> userRoles.contains(acls.getAccessProfile()))

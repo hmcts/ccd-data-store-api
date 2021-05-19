@@ -32,10 +32,11 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
                 roleToAccessProfileDefinitionMap.get(roleAssignment.getRoleName());
 
             if (roleToAccessProfileDefinition != null && !roleToAccessProfileDefinition.getDisabled()) {
-                List<String> authorisations = roleToAccessProfileDefinition.getAuthorisationList();
+                List<String> definitionAuthorisations = roleToAccessProfileDefinition.getAuthorisationList();
                 List<String> roleAssignmentAuthorisations = roleAssignment.getAuthorisations();
 
-                if (authorisationsAllowMappingToAccessProfiles(authorisations, roleAssignmentAuthorisations)) {
+                if (authorisationsAllowMappingToAccessProfiles(definitionAuthorisations,
+                    roleAssignmentAuthorisations)) {
                     accessProfiles.addAll(createAccessProfiles(roleAssignment, roleToAccessProfileDefinition));
                 }
             }
@@ -54,13 +55,13 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
     private boolean authorisationsAllowMappingToAccessProfiles(List<String> authorisations,
                                                                List<String> roleAssignmentAuthorisations) {
         if (roleAssignmentAuthorisations != null
-            && authorisations.size() > 0) {
+            && !authorisations.isEmpty()) {
             Collection<String> filterAuthorisations = CollectionUtils
                 .intersection(roleAssignmentAuthorisations, authorisations);
 
             return !filterAuthorisations.isEmpty();
         }
-        return authorisations.size() == 0;
+        return authorisations.isEmpty();
     }
 
     private List<AccessProfile> createAccessProfiles(RoleAssignment roleAssignment,

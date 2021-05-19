@@ -9,6 +9,12 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 public interface RoleAttributeMatcher {
 
+    String CASE_MANAGEMENT__LOCATION = "caseManagementLocation";
+    String BASE_LOCATION = "baseLocation";
+    String REGION = "region";
+    String EMPTY_STR = "";
+
+
     void matchAttribute(Pair<RoleAssignment, RoleMatchingResult> resultPair, CaseDetails caseDetails);
 
     void matchAttribute(Pair<RoleAssignment, RoleMatchingResult> resultPair, CaseTypeDefinition caseTypeDefinition);
@@ -18,7 +24,7 @@ public interface RoleAttributeMatcher {
         if (roleAssignmentValue == null) {
             return true;
         }
-        return !roleAssignmentValue.isPresent()
+        return roleAssignmentValue.isEmpty()
             || roleAssignmentValue.get().equals(caseDataValue);
     }
 }

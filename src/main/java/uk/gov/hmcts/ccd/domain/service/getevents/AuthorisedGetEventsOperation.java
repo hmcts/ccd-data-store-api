@@ -83,7 +83,7 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
 
-        Set<String> accessRoles = caseAccessService.getAccessRoles(caseId);
+        Set<String> accessRoles = caseAccessService.getAccessProfilesByCaseReference(caseId);
         if (accessRoles == null || accessRoles.isEmpty()) {
             throw new ValidationException("Cannot find user roles or case roles for the case ID " + caseId);
         }

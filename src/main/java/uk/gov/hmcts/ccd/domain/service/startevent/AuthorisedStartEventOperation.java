@@ -98,7 +98,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
             return Sets.union(caseAccessService.getAccessProfiles(caseTypeDefinition.getId()),
                 caseAccessService.getCaseCreationCaseRoles());
         } else {
-            return caseAccessService.getAccessRoles(caseDetails.getReferenceAsString());
+            return caseAccessService.getAccessProfilesByCaseReference(caseDetails.getReferenceAsString());
         }
     }
 
@@ -107,11 +107,11 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
 
         CaseDetails caseDetails = startEventResult.getCaseDetails();
-        Set<String> userRoles = getCaseRoles(caseDetails, caseTypeDefinition);
+        Set<String> caseRoles = getCaseRoles(caseDetails, caseTypeDefinition);
 
         if (!accessControlService.canAccessCaseTypeWithCriteria(
             caseTypeDefinition,
-            userRoles,
+            caseRoles,
             CAN_READ)) {
             caseDetails.setData(newHashMap());
             caseDetails.setDataClassification(newHashMap());
@@ -123,14 +123,14 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
                 accessControlService.filterCaseFieldsByAccess(
                     JacksonUtils.convertValueJsonNode(caseDetails.getData()),
                     caseTypeDefinition.getCaseFieldDefinitions(),
-                    userRoles,
+                    caseRoles,
                     CAN_READ,
                     false)));
             caseDetails.setDataClassification(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
                     caseTypeDefinition.getCaseFieldDefinitions(),
-                    userRoles,
+                    caseRoles,
                     CAN_READ,
                     true)));
         }

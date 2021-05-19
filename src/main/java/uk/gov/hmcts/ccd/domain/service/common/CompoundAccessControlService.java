@@ -1,26 +1,22 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.NullNode;
+import java.util.Optional;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.stream.StreamSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+
 import static java.util.Spliterators.spliteratorUnknownSize;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_DELETE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.VALUE;
-
-import java.util.List;
-import java.util.function.Predicate;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-
-import java.util.Optional;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.stream.StreamSupport;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.NullNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.hasAccessControlList;
 
 @Service
 public class CompoundAccessControlService {
@@ -52,7 +48,7 @@ public class CompoundAccessControlService {
             final JsonNode jsonNode = newData.get(caseFieldDefinition.getId());
             boolean containsNewItem = containsNewCollectionItem(jsonNode);
             return (!containsNewItem
-                || hasAccessControlList(userRoles, CAN_CREATE, caseFieldDefinition.getAccessControlLists()))
+                || hasAccessControlList(userRoles, caseFieldDefinition.getAccessControlLists(), CAN_CREATE))
                 && !isCreateDenied(jsonNode, caseFieldDefinition, userRoles);
         } else {
             return !isCreateDenied(newData.get(caseFieldDefinition.getId()), caseFieldDefinition, userRoles);
@@ -61,7 +57,7 @@ public class CompoundAccessControlService {
 
     private boolean isCreateDenied(JsonNode data, CaseFieldDefinition caseFieldDefinition, Set<String> userRoles) {
         if (caseFieldDefinition.isCollectionFieldType() && containsNewCollectionItem(data)
-            && !hasAccessControlList(userRoles, CAN_CREATE, caseFieldDefinition.getAccessControlLists())) {
+            && !hasAccessControlList(userRoles, caseFieldDefinition.getAccessControlLists(), CAN_CREATE)) {
             return true;
         }
         boolean createDenied = false;
@@ -112,7 +108,7 @@ public class CompoundAccessControlService {
             .anyMatch(oldItem -> itemMissing(oldItem, newData.get(caseFieldDefinition.getId())));
 
         return (!containsDeletedItem
-            || hasAccessControlList(userRoles, CAN_DELETE, caseFieldDefinition.getAccessControlLists()))
+            || hasAccessControlList(userRoles, caseFieldDefinition.getAccessControlLists(), CAN_DELETE))
             && !isDeleteDeniedForChildren(existingData.get(caseFieldDefinition.getId()),
             newData.get(caseFieldDefinition.getId()),
             caseFieldDefinition,
@@ -185,7 +181,7 @@ public class CompoundAccessControlService {
                 }
             }
         } else {
-            if (!hasAccessControlList(userRoles, CAN_DELETE, caseFieldDefinition.getAccessControlLists())) {
+            if (!hasAccessControlList(userRoles, caseFieldDefinition.getAccessControlLists(), CAN_DELETE)) {
                 LOG.info("A child {} item has been deleted but no Delete ACL", caseFieldDefinition.getId());
                 currentNodeOrAnyChildNodeDeletedWithoutAccess = true;
             }
@@ -269,7 +265,7 @@ public class CompoundAccessControlService {
             .getCollectionFieldTypeDefinition().getComplexFields()) {
             if (!field.isCompoundFieldType() && oldNode.get(VALUE).get(field.getId()) != null
                 && !oldNode.get(VALUE).get(field.getId()).equals(newNode.get(VALUE).get(field.getId()))
-                && !hasAccessControlList(userRoles, CAN_UPDATE, field.getAccessControlLists())) {
+                && !hasAccessControlList(userRoles, field.getAccessControlLists(), CAN_UPDATE)) {
                 udateDenied = true;
                 LOG.info(SIMPLE_CHILD_OF_HAS_DATA_UPDATE_BUT_NO_UPDATE_ACL, field.getId(), caseFieldDefinition.getId());
             } else if (field.isCompoundFieldType() && oldNode.get(VALUE).get(field.getId()) != null
@@ -294,7 +290,7 @@ public class CompoundAccessControlService {
         for (CaseFieldDefinition field : caseFieldDefinition.getFieldTypeDefinition().getComplexFields()) {
             if (!field.isCompoundFieldType()
                 && isSimpleFieldValueReallyUpdated(oldNode, newNode, field)
-                && !hasAccessControlList(userRoles, CAN_UPDATE, field.getAccessControlLists())) {
+                && !hasAccessControlList(userRoles, field.getAccessControlLists(), CAN_UPDATE)) {
                 updateDenied = true;
                 LOG.info(SIMPLE_CHILD_OF_HAS_DATA_UPDATE_BUT_NO_UPDATE_ACL, field.getId(), caseFieldDefinition.getId());
             } else if (field.isCompoundFieldType() && oldNode.get(field.getId()) != null
@@ -345,16 +341,5 @@ public class CompoundAccessControlService {
         return newItem.get("id") == null
             || newItem.get("id").equals(NullNode.getInstance())
             || newItem.get("id").asText().equalsIgnoreCase("null");
-    }
-
-    private boolean hasAccessControlList(Set<String> userRoles,
-                                         Predicate<AccessControlList> criteria,
-                                         List<AccessControlList> accessControlLists) {
-        // scoop out access control roles based on user roles
-        // intersect and make sure we have access for given criteria
-        return accessControlLists != null && accessControlLists
-            .stream()
-            .filter(acls -> userRoles.contains(acls.getAccessProfile()))
-            .anyMatch(criteria);
     }
 }

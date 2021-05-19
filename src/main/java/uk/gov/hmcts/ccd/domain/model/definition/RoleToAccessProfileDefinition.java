@@ -12,6 +12,8 @@ import lombok.Data;
 @Builder
 public class RoleToAccessProfileDefinition {
 
+    private static final String AUTHORISATION_SEPARATOR = ",";
+
     private String caseTypeId;
     private Boolean disabled;
     private Boolean readOnly;
@@ -23,8 +25,7 @@ public class RoleToAccessProfileDefinition {
 
     public List<String> getAuthorisationList() {
         if (getAuthorisations() != null) {
-            return Arrays.asList(getAuthorisations().split(","))
-                .stream()
+            return Arrays.stream(getAuthorisations().split(AUTHORISATION_SEPARATOR))
                 .filter(str -> str.length() > 0)
                 .collect(Collectors.toList());
         }
@@ -33,8 +34,7 @@ public class RoleToAccessProfileDefinition {
 
     public List<String> getAccessProfileList() {
         if (getAccessProfiles() != null) {
-            return Arrays.asList(getAccessProfiles().split(","))
-                .stream()
+            return Arrays.stream(getAccessProfiles().split(AUTHORISATION_SEPARATOR))
                 .filter(str -> str.length() > 0)
                 .collect(Collectors.toList());
         }
