@@ -201,7 +201,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a call [to verify Olawale's reception of the role CR-1 and CR-2 over the case C1] will get the expected response as in [S-105.13_Get_Case_Roles_for_Case_C1].
 
   # RDM-8842 AC-1
-  @S-105.14 @Ignore
+  @S-105.14
   Scenario: Must successfully increment Assigned User Count when assigning a user and case role for a specific case (by a user calling through/from an authorised application)
     Given an appropriate test context as detailed in the test data source,
     And a user [Richard - who can create a case],
@@ -223,7 +223,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
     And a call [to verify the count of users assigned to a case has increased by 1] will get the expected response as in [S-105.14_Verify_Counter_3].
 
    # RDM-8842 AC-2
-   @S-105.15 @Ignore
+   @S-105.15
    Scenario: Must not increment Assigned User Count when assigning a user and case role for a specific case if there was already a case user role assignment with the respective values in the request (by a user calling through/from an authorised application)
      Given an appropriate test context as detailed in the test data source,
      And a user [Richard - who can create a case],
@@ -241,7 +241,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
      And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
 
    # RDM-8842 AC-3
-   @S-105.16 @Ignore
+   @S-105.16
    Scenario: No organisation ID is provided by the user so Assigned User Count remains unchanged
      Given an appropriate test context as detailed in the test data source,
      And a user [Richard - who can create a case],
@@ -258,7 +258,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
      And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
 
    # RDM-8842 AC-4
-   @S-105.17 @Ignore
+   @S-105.17
    Scenario: Invalid Organisation ID provided
      Given an appropriate test context as detailed in the test data source,
      And a user [Richard - who can create a case],
@@ -277,7 +277,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
      And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
 
    # RDM-8842 AC-5
-   @S-105.18 @Ignore
+   @S-105.18
    Scenario: Must increment Assigned User Count when assigning a user and case role for a specific case if there was only [CREATOR] case user role assignment with the respective values in the request (by a user calling through/from an authorised application)
      Given an appropriate test context as detailed in the test data source,
      And a user [Richard - who can create a case],

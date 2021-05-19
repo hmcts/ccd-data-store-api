@@ -4,14 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.Option;
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import com.jayway.jsonpath.PathNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,15 +33,14 @@ public class SupplementaryData {
         if (requestKeys == null || requestKeys.isEmpty()) {
             this.response = JacksonUtils.convertJsonNode(data);
         } else {
-            ParseContext parseContext =
-                JsonPath.using(Configuration.defaultConfiguration().setOptions(Option.SUPPRESS_EXCEPTIONS));
-            DocumentContext context = parseContext.parse(jsonNodeToString(data));
-
+            DocumentContext context = JsonPath.parse(jsonNodeToString(data));
             this.response = new HashMap<>();
             requestKeys.forEach(key -> {
-                Object value = context.read("$." + key, Object.class);
-                if (value != null) {
+                try {
+                    Object value = context.read("$." + key, Object.class);
                     this.response.put(key, value);
+                } catch (PathNotFoundException e) {
+                    throw new ServiceException(String.format("Path %s is not found", key));
                 }
             });
         }
