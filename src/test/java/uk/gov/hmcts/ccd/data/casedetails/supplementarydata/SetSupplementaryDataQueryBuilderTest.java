@@ -3,6 +3,8 @@ package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
+import org.junit.Ignore;
 import javax.persistence.Query;
 
 import org.junit.Ignore;
@@ -124,9 +126,9 @@ class SetSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
         Thread t2 = new Thread(() -> {
             String s = supplementaryDataQueryBuilder.requestedDataToJson("orgs_assigned_users.organisationA", 35);
             assertEquals("{\n"
-                    + "  \"orgs_assigned_users\": {\n"
-                    + "    \"organisationA\": 35\n"
-                    + "  }\n"
+                + "  \"orgs_assigned_users\": {\n"
+                + "    \"organisationA\": 35\n"
+                + "  }\n"
                 + "}", s);
         });
 

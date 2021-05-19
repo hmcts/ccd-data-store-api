@@ -6,9 +6,12 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
@@ -24,14 +27,18 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
     private final UserRepository userRepository;
     private final AccessControlService accessControlService;
     private final GetUserProfileOperation getUserProfileOperation;
+    private final CaseUserRepository caseUserRepository;
 
     public AuthorisedGetUserProfileOperation(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                                              AccessControlService accessControlService,
                                              @Qualifier(DefaultGetUserProfileOperation.QUALIFIER)
-                                                 GetUserProfileOperation getUserProfileOperation) {
+                                                 GetUserProfileOperation getUserProfileOperation,
+                                             @Qualifier(CachedCaseUserRepository.QUALIFIER)
+                                                 CaseUserRepository caseUserRepository) {
         this.accessControlService = accessControlService;
         this.getUserProfileOperation = getUserProfileOperation;
         this.userRepository = userRepository;
+        this.caseUserRepository = caseUserRepository;
     }
 
     @Override
@@ -64,8 +71,11 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
             || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, access)) {
             return Optional.empty();
         }
+        Set<String> caseAndUserRoles = Sets.union(userRoles,
+            caseUserRepository.getCaseUserRolesByUserId(userRepository.getUserId()));
+
         caseTypeDefinition.setStates(accessControlService.filterCaseStatesByAccess(caseTypeDefinition.getStates(),
-            userRoles, access));
+            caseAndUserRoles, access));
         caseTypeDefinition.setEvents(accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
             userRoles, access));
 

@@ -35,7 +35,7 @@ public class JurisdictionViewResource extends RepresentationModel {
 
     @Data
     @NoArgsConstructor
-    public class JurisdictionView {
+    public static class JurisdictionView {
         private String id;
         private String name;
         private String description;
