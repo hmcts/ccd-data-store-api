@@ -54,8 +54,8 @@ public class SecurityClassificationMatcher implements RoleAttributeMatcher {
         Optional<SecurityClassification> securityClassification = getSecurityClassification(roleAssignment
             .getClassification());
         if (securityClassification.isPresent()) {
-            boolean value = caseTypeHasClassificationEqualOrLowerThan(securityClassification.get()).test(caseTypeDefinition
-            );
+            boolean value = caseTypeHasClassificationEqualOrLowerThan(securityClassification.get())
+                .test(caseTypeDefinition);
             resultPair.getRight().setClassificationMatched(value);
         }
 

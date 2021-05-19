@@ -111,7 +111,8 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
         final CaseTypeDefinition caseTypeDefinition =
             caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
 
-        Set<String> accessProfiles = caseAccessService.getAccessProfilesByCaseReference(caseDetails.getReferenceAsString());
+        Set<String> accessProfiles = caseAccessService
+            .getAccessProfilesByCaseReference(caseDetails.getReferenceAsString());
 
         verifyRequiredAccessExistsForCaseType(draftResponse.getDocument().getEventId(),
             caseTypeDefinition, accessProfiles);

@@ -24,6 +24,4 @@ public interface SecurityClassificationService {
 
     Optional<SecurityClassification>  getUserClassification(CaseDetails caseDetails);
 
-    Optional<SecurityClassification>  getUserClassification(CaseTypeDefinition caseTypeDefinition);
-
 }

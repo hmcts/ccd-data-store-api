@@ -46,5 +46,6 @@ public class JurisdictionMatcher implements RoleAttributeMatcher {
         log.debug("Role assignment jurisdiction {} and case type definition jurisdiction {} match {}",
             roleAssignment.getAttributes().getCaseId(),
             caseTypeDefinition.getJurisdictionId(),
-            matched);    }
+            matched);
+    }
 }

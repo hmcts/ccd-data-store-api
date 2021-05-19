@@ -64,7 +64,8 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         this.caseDetailsRepository = caseDetailsRepository;
     }
 
-    // Returns List<AccessProfile>. Returns list of access profiles for the user and filters access profiles based on the case type.
+    // Returns List<AccessProfile>. Returns list of access profiles
+    // for the user and filters access profiles based on the case type.
     @Override
     public List<AccessProfile> generateAccessProfilesByCaseTypeId(String caseTypeId) {
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);

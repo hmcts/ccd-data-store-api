@@ -12,7 +12,6 @@ import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 
@@ -41,13 +40,6 @@ public class AttributeBasedSecurityClassificationService
     public Optional<SecurityClassification> getUserClassification(CaseDetails caseDetails) {
         List<AccessProfile> accessProfiles = caseDataAccessControl
             .generateAccessProfilesByCaseReference(caseDetails.getReferenceAsString());
-        return getMaxSecurityClassification(accessProfiles);
-    }
-
-    @Override
-    public Optional<SecurityClassification> getUserClassification(CaseTypeDefinition caseTypeDefinition) {
-        List<AccessProfile> accessProfiles = caseDataAccessControl
-            .generateAccessProfilesByCaseTypeId(caseTypeDefinition.getId());
         return getMaxSecurityClassification(accessProfiles);
     }
 

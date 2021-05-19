@@ -117,11 +117,6 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
         return getUserClassification(caseDetails.getJurisdiction());
     }
 
-    @Override
-    public Optional<SecurityClassification> getUserClassification(CaseTypeDefinition caseTypeDefinition) {
-        return getUserClassification(caseTypeDefinition.getJurisdictionId());
-    }
-
     private JsonNode filterNestedObject(JsonNode data, JsonNode dataClassification,
                                         SecurityClassification userClassification) {
         if (isAnyNull(data, dataClassification)) {
