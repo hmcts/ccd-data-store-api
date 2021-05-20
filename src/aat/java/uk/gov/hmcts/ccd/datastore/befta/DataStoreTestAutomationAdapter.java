@@ -6,7 +6,7 @@ import org.junit.AssumptionViolatedException;
 import uk.gov.hmcts.befta.BeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultBeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
-import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
+import uk.gov.hmcts.befta.dse.ccd.DataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
@@ -23,7 +23,7 @@ import static uk.gov.hmcts.ccd.datastore.util.CaseIdHelper.hypheniseACaseId;
 
 public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
-    private TestDataLoaderToDefinitionStore loader = new TestDataLoaderToDefinitionStore(this);
+    private DataLoaderToDefinitionStore loader = new DataLoaderToDefinitionStore(this);
 
     private static Map<String, String> uniqueStringsPerTestData = new ConcurrentHashMap<>();
 
@@ -56,7 +56,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             @Override
             public void doLoadTestData() {
                 DataStoreTestAutomationAdapter.this.loader.addCcdRoles();
-                DataStoreTestAutomationAdapter.this.loader.importDefinitions();
+                DataStoreTestAutomationAdapter.this.loader.importCcdTestDefinitions();
             }
         };
     }
