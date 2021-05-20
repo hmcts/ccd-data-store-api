@@ -136,6 +136,10 @@ withPipeline(type, product, component) {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
     }
 
+    before('smoketest:preview') {
+        echo "data deployment stage - 1"
+    }
+
     after('smoketest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
     }
@@ -146,6 +150,10 @@ withPipeline(type, product, component) {
 
     after('functionalTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
+    }
+
+    after('functionalTest:preview') {
+        echo "data deployment stage - 2"
     }
 
     after('functionalTest:aat') {
