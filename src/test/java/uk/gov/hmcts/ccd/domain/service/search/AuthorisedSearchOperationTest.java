@@ -12,6 +12,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
@@ -66,6 +67,8 @@ class AuthorisedSearchOperationTest {
     private AccessControlService accessControlService;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private CaseUserRepository caseUserRepository;
 
     private AuthorisedSearchOperation authorisedSearchOperation;
 
@@ -172,7 +175,7 @@ class AuthorisedSearchOperationTest {
             anyBoolean());
 
         authorisedSearchOperation = new AuthorisedSearchOperation(nextOperationInChain,
-            caseDefinitionRepository, accessControlService, userRepository);
+            caseDefinitionRepository, accessControlService, userRepository,caseUserRepository);
     }
 
     private List<CaseFieldDefinition> getCaseFieldsWithIds(String... dataTestFields) {
