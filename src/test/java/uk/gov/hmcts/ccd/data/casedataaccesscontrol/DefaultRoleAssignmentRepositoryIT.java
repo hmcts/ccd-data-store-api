@@ -126,6 +126,30 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
         validateRoleAssignments(ID1);
     }
 
+    @DisplayName("should not populate cache when we receive empty roleAssignments")
+    @Test
+    public void shouldNotPopulateCacheWhenRoleAssignmentsArrayIsEmpty() {
+        // empty array of RoleAssignments should not be stored in the cache
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).inScenario("ETag")
+            .whenScenarioStateIs(STARTED)
+            .willReturn(okJson(jsonBodyWithNoRoleAssignments())
+                .withHeader(ETAG, "\"W/123456789\"")
+            )
+            .willSetStateTo("Cache not populated with RoleAssignments"));
+
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).inScenario("ETag")
+            .whenScenarioStateIs("Cache not populated with RoleAssignments")
+            .willReturn(okJson(jsonBodyWithNoRoleAssignments())
+                .withHeader(ETAG, "\"W/123456789\"")
+            ));
+
+        RoleAssignmentResponse roleAssignments = roleAssignmentRepository.getRoleAssignments(ACTOR_ID);
+        assertThat(roleAssignments.getRoleAssignments().size(), is(0));
+
+        RoleAssignmentResponse roleAssignments1 = roleAssignmentRepository.getRoleAssignments(ACTOR_ID);
+        assertThat(roleAssignments1.getRoleAssignments().size(), is(0));
+    }
+
     @DisplayName("should error on 400 when GET roleAssignments")
     @Test
     public void shouldErrorOn400WhenGetRoleAssignments() {
@@ -185,6 +209,12 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
             + "      \"authorisations\": [\"" + AUTHORISATIONS_AUTH_1 + "\", \"" + AUTHORISATIONS_AUTH_2 + "\"]\n"
             + "    }\n"
             + "  ]\n"
+            + "}";
+    }
+
+    private static String jsonBodyWithNoRoleAssignments() {
+        return "{\n"
+            + "  \"roleAssignmentResponse\": []\n"
             + "}";
     }
 

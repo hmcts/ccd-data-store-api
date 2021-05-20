@@ -95,10 +95,18 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
             return roleAssignments.get(userId).getRight();
         }
         if (exchange.getHeaders().containsKey(ETAG) && exchange.getHeaders().getETag() != null) {
-            roleAssignments.put(userId, Pair.of(getETag(exchange.getHeaders().getETag()), exchange.getBody()));
+            if (thereAreRoleAssignmentsInTheBody(exchange)) {
+                roleAssignments.put(userId, Pair.of(getETag(exchange.getHeaders().getETag()), exchange.getBody()));
+            }
         }
 
         return exchange.getBody();
+    }
+
+    private boolean thereAreRoleAssignmentsInTheBody(ResponseEntity<RoleAssignmentResponse> exchange) {
+        return exchange.getBody() != null
+            && exchange.getBody().getRoleAssignments() != null
+            && !exchange.getBody().getRoleAssignments().isEmpty();
     }
 
     /**
