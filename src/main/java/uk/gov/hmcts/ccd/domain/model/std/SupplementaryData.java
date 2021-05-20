@@ -4,9 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.Option;
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import java.util.HashMap;
@@ -36,10 +33,7 @@ public class SupplementaryData {
         if (requestKeys == null || requestKeys.isEmpty()) {
             this.response = JacksonUtils.convertJsonNode(data);
         } else {
-            ParseContext parseContext =
-                JsonPath.using(Configuration.defaultConfiguration().setOptions(Option.SUPPRESS_EXCEPTIONS));
-            DocumentContext context = parseContext.parse(jsonNodeToString(data));
-
+            DocumentContext context = JsonPath.parse(jsonNodeToString(data));
             this.response = new HashMap<>();
             requestKeys.forEach(key -> {
                 try {
