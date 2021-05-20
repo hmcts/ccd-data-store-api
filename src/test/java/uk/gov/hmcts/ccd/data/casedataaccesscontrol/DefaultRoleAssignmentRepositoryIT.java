@@ -130,14 +130,14 @@ public class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
     @Test
     public void shouldNotPopulateCacheWhenRoleAssignmentsArrayIsEmpty() {
         // empty array of RoleAssignments should not be stored in the cache
-        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).inScenario("ETag")
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).inScenario("ETag2")
             .whenScenarioStateIs(STARTED)
             .willReturn(okJson(jsonBodyWithNoRoleAssignments())
                 .withHeader(ETAG, "\"W/123456789\"")
             )
             .willSetStateTo("Cache not populated with RoleAssignments"));
 
-        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).inScenario("ETag")
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + ACTOR_ID)).inScenario("ETag2")
             .whenScenarioStateIs("Cache not populated with RoleAssignments")
             .willReturn(okJson(jsonBodyWithNoRoleAssignments())
                 .withHeader(ETAG, "\"W/123456789\"")
