@@ -131,27 +131,21 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     disableLegacyDeployment()
 
-    after('checkout') {
-        echo "data deployment stage - after checkout"
-    }
-
-    after('build') {
-        echo "data deployment stage - before smoke"
-        sh '''#!/bin/bash
-                 export BEFTA_S2S_CLIENT_SECRET=AAAAAAAAAAAAAAAC
-                 export CCD_IMPORT_AUTOTEST_EMAIL=auto.test.cnp@gmail.com
-                 export CCD_IMPORT_AUTOTEST_PASSWORD=Pa55word11
-                 export OAUTH2_CLIENT_SECRET=ccd_gateway_secret
-                 printenv
-                 ./gradlew deployData
-         '''
-        error('Aborting the build.')
-    }
-
     after('test') {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
     }
+
+
+    before('smoketest:preview') {
+        echo "data deployment stage - before smoketest:preview"
+
+        sh '''#!/bin/bash
+                 printenv
+                 ./gradlew deployData
+         '''
+    }
+
 
     after('smoketest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
