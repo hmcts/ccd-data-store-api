@@ -138,10 +138,9 @@ withPipeline(type, product, component) {
     after('build') {
         echo "data deployment stage - before smoke"
         sh '''#!/bin/bash
-                 pwd
-                 ls -lt
+                 java -version
+                 ./gradlew deployData
          '''
-        error('Aborting the build.')
     }
 
     after('test') {

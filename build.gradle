@@ -722,6 +722,13 @@ sourceSets {
     }
 }
 
+task deployData(type: JavaExec) {
+        main = "uk.gov.hmcts.ccd.datastore.befta.TestDataLoaderMain"
+        classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
+        args = ['AAT']
+        jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
+}
+
 task smoke() {
     description = 'Executes smoke tests against an the CCD Data Store API instance just deployed'
     dependsOn aatClasses
