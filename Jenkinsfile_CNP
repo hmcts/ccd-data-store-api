@@ -135,17 +135,18 @@ withPipeline(type, product, component) {
         echo "data deployment stage - after checkout"
     }
 
-    after('test') {
-        // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
-    }
-
-    before('smoketest:preview') {
+    after('build') {
         echo "data deployment stage - before smoke"
         sh '''#!/bin/bash
+                 pwd
                  ls -lt
          '''
         error('Aborting the build.')
+    }
+
+    after('test') {
+        // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
     }
 
     after('smoketest:preview') {
