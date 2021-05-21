@@ -3,6 +3,9 @@ package uk.gov.hmcts.ccd.data.caseaccess;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +29,7 @@ class CachedCaseUserRepositoryTest {
     private final String userId = "USERID1";
     private final List<String> caseUserRoles = Lists.newArrayList("[CREATOR]", "[LASOLICITOR]");
     private final List<Long> caseIds = Lists.newArrayList(12345L, 12346L);
+    private final Set<String> userRoles = Sets.newHashSet("[CREATOR]", "[CLAIMANT]");
 
     private CachedCaseUserRepository classUnderTest;
 
@@ -35,6 +39,7 @@ class CachedCaseUserRepositoryTest {
 
         doReturn(caseUserRoles).when(caseUserRepository).findCaseRoles(caseId, userId);
         doReturn(caseIds).when(caseUserRepository).findCasesUserIdHasAccessTo(userId);
+        doReturn(userRoles).when(caseUserRepository).getCaseUserRolesByUserId(userId);
         classUnderTest = new CachedCaseUserRepository(caseUserRepository);
     }
 
@@ -64,6 +69,23 @@ class CachedCaseUserRepositoryTest {
         assertAll(
             () -> assertThat(returned2, is(caseUserEntities)),
             () -> verify(caseUserRepository, times(2)).findCaseUserRoles(caseIds, userIds)
+        );
+    }
+
+    @Test
+    @DisplayName("should retrieve case user roles for a given user id")
+    void shouldGetCaseUserRoleForAUser() {
+        Set<String> returned = classUnderTest.getCaseUserRolesByUserId(userId);
+
+        assertAll(
+            () -> assertThat(returned, is(userRoles)),
+            () -> verify(caseUserRepository, times(1)).getCaseUserRolesByUserId(userId)
+        );
+        Set<String> returned2 = classUnderTest.getCaseUserRolesByUserId(userId);
+
+        assertAll(
+            () -> assertThat(returned2, is(userRoles)),
+            () -> verify(caseUserRepository, times(2)).getCaseUserRolesByUserId(userId)
         );
     }
 }
