@@ -2,10 +2,12 @@ package uk.gov.hmcts.ccd.v2.internal.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,6 +42,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static uk.gov.hmcts.ccd.domain.types.CollectionValidator.VALUE;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.ADDRESS_FIELD;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.AUTOTEST1_PUBLIC;
@@ -522,6 +525,27 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
         assertAll(
             () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
                 containsString("No mapping found for [invalid.keyword] in order to sort on"))
+        );
+    }
+
+    @Test
+    void shouldReturnErrorWhenInvalidJsonIsSent() throws Exception {
+        ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
+            .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
+            .build();
+
+        MockHttpServletRequestBuilder postRequest = post(POST_SEARCH_CASES)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(searchRequest.toString().replaceAll("s", "\":,}{}"))
+            .param("ctid", CASE_TYPE_A)
+            .param("use_case", "orgcases");
+
+        JsonNode exceptionNode = ElasticsearchTestHelper.executeRequest(postRequest, 400, mapper, mockMvc,
+            JsonNode.class);
+
+        assertAll(
+            () -> assertThat(exceptionNode.get(ERROR_MESSAGE).asText(),
+                containsString("Request requires correctly formatted JSON"))
         );
     }
 

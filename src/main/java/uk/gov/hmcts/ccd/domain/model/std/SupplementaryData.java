@@ -9,6 +9,8 @@ import com.jayway.jsonpath.JsonPath;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import com.jayway.jsonpath.PathNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,14 +30,18 @@ public class SupplementaryData {
     private Map<String, Object> response;
 
     public SupplementaryData(JsonNode data, Set<String> requestKeys) {
-        if (requestKeys == null || requestKeys.size() == 0) {
+        if (requestKeys == null || requestKeys.isEmpty()) {
             this.response = JacksonUtils.convertJsonNode(data);
         } else {
             DocumentContext context = JsonPath.parse(jsonNodeToString(data));
             this.response = new HashMap<>();
-            requestKeys.stream().forEach(key -> {
-                Object value = context.read("$." + key, Object.class);
-                this.response.put(key, value);
+            requestKeys.forEach(key -> {
+                try {
+                    Object value = context.read("$." + key, Object.class);
+                    this.response.put(key, value);
+                } catch (PathNotFoundException e) {
+                    throw new ServiceException(String.format("Path %s is not found", key));
+                }
             });
         }
     }

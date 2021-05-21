@@ -129,7 +129,6 @@ withPipeline(type, product, component) {
     enableAksStagingDeployment()
     disableLegacyDeploymentOnAAT()
     loadVaultSecrets(secrets)
-    enableDbMigration('ccd')
     disableLegacyDeployment()
 
     after('test') {

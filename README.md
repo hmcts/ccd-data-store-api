@@ -34,7 +34,7 @@ The following environment variables are required:
 | IDAM_S2S_URL | - | Base URL for IdAM's S2S API service (service-auth-provider). `http://localhost:4502` for the dockerised local instance or tunneled `dev` instance. |
 | USER_PROFILE_HOST | - | Base URL for the User Profile service. `http://localhost:4453` for the dockerised local instance. |
 | DEFINITION_STORE_HOST | - | Base URL for the Definition Store service. `http://localhost:4451` for the dockerised local instance. |
-| CCD_DM_DOMAIN | - | Base URL for the Document Management domain. |
+| CCD_DOCUMENT_URL_PATTERN | - |  URL Pattern for documents attachable to cases. |
 | AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY | - | For CNP environment this is provided by the terraform scripts. However any value would do for your local environment. |
 | DATA_STORE_DEFAULT_LOG_LEVEL | INFO | Default log level for classes under package uk.gov.hmcts.ccd |
 | HTTP_CLIENT_MAX_TOTAL | 100 | Used for Pooling connection manager; for further information, see https://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html |
