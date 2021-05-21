@@ -144,6 +144,8 @@ withPipeline(type, product, component) {
                  printenv
                  ./gradlew deployData
          '''
+
+        echo "data deployment stage end - before smoketest:preview"
     }
 
 
