@@ -722,11 +722,13 @@ sourceSets {
     }
 }
 
-task deployData(type: JavaExec) {
+task datadeploy(type: JavaExec) {
+    doLast {
         main = "uk.gov.hmcts.ccd.datastore.befta.TestDataLoaderMain"
         classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
         args = ['AAT']
         jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
+    }
 }
 
 task smoke() {
