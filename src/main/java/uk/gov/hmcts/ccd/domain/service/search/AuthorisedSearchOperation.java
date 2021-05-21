@@ -44,7 +44,7 @@ public class AuthorisedSearchOperation implements SearchOperation {
                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                      final CaseDefinitionRepository caseDefinitionRepository,
                                      final AccessControlService accessControlService,
-                                     @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                     @Qualifier(CachedUserRepository.QUALIFIER)
                                          final UserRepository userRepository,
                                      @Qualifier(CachedCaseUserRepository.QUALIFIER)
                                              CaseUserRepository caseUserRepository) {

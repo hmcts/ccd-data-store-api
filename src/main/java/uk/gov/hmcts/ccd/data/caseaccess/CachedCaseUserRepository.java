@@ -26,8 +26,8 @@ public class CachedCaseUserRepository implements CaseUserRepository {
 
     @Override
     @Caching(evict = {
-        @CacheEvict(value = "casesForUserCache", key = "#userId", allEntries = true),
-        @CacheEvict(value = "caseRolesForUserCache", key = "#userId.concat(#caseId)", allEntries = true)
+        @CacheEvict(value = "casesForUserCache", key = "#userId"),
+        @CacheEvict(value = "caseRolesForUserCache", key = "#userId.concat(#caseId)")
     })
     public void grantAccess(Long caseId, String userId, String caseRole) {
         caseUserRepository.grantAccess(caseId, userId, caseRole);
@@ -35,8 +35,8 @@ public class CachedCaseUserRepository implements CaseUserRepository {
 
     @Override
     @Caching(evict = {
-        @CacheEvict(value = "casesForUserCache", key = "#userId", allEntries = true),
-        @CacheEvict(value = "caseRolesForUserCache", key = "#userId.concat(#caseId)", allEntries = true)
+        @CacheEvict(value = "casesForUserCache", key = "#userId"),
+        @CacheEvict(value = "caseRolesForUserCache", key = "#userId.concat(#caseId)")
     })
     public void revokeAccess(Long caseId, String userId, String caseRole) {
         caseUserRepository.revokeAccess(caseId, userId, caseRole);

@@ -40,8 +40,8 @@ public class CachingConfiguration {
     }
 
     private void configCachesForCaseRoleRepository(Config config) {
-        config.addMapConfig(newMapConfigWithTtl(
-            "caseRolesForCaseTypeCache", applicationParams.getCaseDetailsCacheTTLSecs()));
+        config.addMapConfig(newMapConfigWithMaxIdle(
+            "caseRolesForCaseTypeCache", applicationParams.getDefinitionCacheMaxIdleSecs()));
     }
 
     private void configCachesForCaseUserRepository(Config config) {
@@ -52,13 +52,13 @@ public class CachingConfiguration {
     }
 
     private void configCachesForCaseDetailsRepository(Config config) {
-        final int caseDetailsCacheTTLSecs = applicationParams.getCaseDetailsCacheTTLSecs();
+        final int caseDetailsCacheTTLSecs = applicationParams.getDefinitionCacheMaxIdleSecs();
 
-        config.addMapConfig(newMapConfigWithTtl("caseDetailsByIDCache", caseDetailsCacheTTLSecs));
-        config.addMapConfig(newMapConfigWithTtl("caseDetailsByReferenceCache", caseDetailsCacheTTLSecs));
-        config.addMapConfig(newMapConfigWithTtl("uniqueCaseDetailsCache", caseDetailsCacheTTLSecs));
-        config.addMapConfig(newMapConfigWithTtl("paginatedSearchMetadataCache", caseDetailsCacheTTLSecs));
-        config.addMapConfig(newMapConfigWithTtl(
+        config.addMapConfig(newMapConfigWithMaxIdle("caseDetailsByIDCache", caseDetailsCacheTTLSecs));
+        config.addMapConfig(newMapConfigWithMaxIdle("caseDetailsByReferenceCache", caseDetailsCacheTTLSecs));
+        config.addMapConfig(newMapConfigWithMaxIdle("uniqueCaseDetailsCache", caseDetailsCacheTTLSecs));
+        config.addMapConfig(newMapConfigWithMaxIdle("paginatedSearchMetadataCache", caseDetailsCacheTTLSecs));
+        config.addMapConfig(newMapConfigWithMaxIdle(
                 "caseDetailsByMetaDataAndFieldDataCache", caseDetailsCacheTTLSecs));
     }
 
@@ -91,10 +91,10 @@ public class CachingConfiguration {
     }
 
     private void configCachesForDraftGateway(Config config) {
-        final int draftCacheTTLSecs = applicationParams.getDraftCacheTTLSecs();
+        final int draftCacheTTLSecs = applicationParams.getDefinitionCacheMaxIdleSecs();
 
-        config.addMapConfig(newMapConfigWithTtl("draftResponseCache", draftCacheTTLSecs));
-        config.addMapConfig(newMapConfigWithTtl("draftResponseCaseDetailsCache", draftCacheTTLSecs));
+        config.addMapConfig(newMapConfigWithMaxIdle("draftResponseCache", draftCacheTTLSecs));
+        config.addMapConfig(newMapConfigWithMaxIdle("draftResponseCaseDetailsCache", draftCacheTTLSecs));
     }
 
     private void configCachesForUserRepository(Config config) {

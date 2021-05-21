@@ -37,8 +37,8 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
 
     @Override
     @Caching(evict = {
-        @CacheEvict(value = "caseDetailsByReferenceCache", key = "#caseDetails.reference", allEntries = true),
-        @CacheEvict(value = "caseDetailsByIDCache", key = "#caseDetails.id", allEntries = true)
+        @CacheEvict(value = "caseDetailsByReferenceCache", key = "#caseDetails.reference"),
+        @CacheEvict(value = "caseDetailsByIDCache", key = "#caseDetails.id")
     })
     public CaseDetails set(final CaseDetails caseDetails) {
         return caseDetailsRepository.set(caseDetails);

@@ -171,7 +171,10 @@ public class CaseDataValidator {
 
     private boolean isBaseTypeValidator(FieldValidator validator, BaseType fieldType) {
         if (validator instanceof BaseTypeValidator) {
-            return ((BaseTypeValidator) validator).getType() == fieldType;
+            BaseType validatorType = ((BaseTypeValidator) validator).getType();
+            if (validatorType != null) {
+                return validatorType.getType().equals(fieldType.getType());
+            }
         }
         return false;
     }

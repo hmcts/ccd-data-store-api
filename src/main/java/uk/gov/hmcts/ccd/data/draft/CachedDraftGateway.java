@@ -58,13 +58,13 @@ public class CachedDraftGateway implements DraftGateway {
     }
 
     @Override
-    @CacheEvict(value = {"draftResponseCache", "draftResponseCaseDetailsCache"}, key = "#draftId", allEntries = true)
+    @CacheEvict(value = {"draftResponseCache", "draftResponseCaseDetailsCache"}, key = "#draftId")
     public DraftResponse update(UpdateCaseDraftRequest draft, String draftId) {
         return draftGateway.update(draft, draftId);
     }
 
     @Override
-    @CacheEvict(value = {"draftResponseCache", "draftResponseCaseDetailsCache"}, allEntries = true)
+    @CacheEvict(value = {"draftResponseCache", "draftResponseCaseDetailsCache"})
     public void delete(String draftId) {
         draftGateway.delete(draftId);
     }
