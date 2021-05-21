@@ -48,6 +48,7 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
         List<RoleToAccessProfileDefinition> roleToAccessProfiles) {
         return roleToAccessProfiles
             .stream()
+            .filter(e -> e.getRoleName() != null)
             .collect(Collectors.toMap(RoleToAccessProfileDefinition::getRoleName,
                                       Function.identity()));
     }
@@ -73,7 +74,7 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
                 AccessProfile accessProfile = new AccessProfile();
 
                 accessProfile.setReadOnly(roleToAccessProfileDefinition.isReadOnly()
-                    || roleAssignment.getReadOnly());
+                    || (roleAssignment.getReadOnly() != null && roleAssignment.getReadOnly()));
                 accessProfile.setClassification(roleAssignment.getClassification());
                 accessProfile.setAccessProfile(accessProfileValue);
                 return accessProfile;
