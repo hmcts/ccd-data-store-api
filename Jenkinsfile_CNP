@@ -131,10 +131,6 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     disableLegacyDeployment()
 
-    before('checkout') {
-        echo "data deployment stage - before checkout"
-    }
-
     after('checkout') {
         echo "data deployment stage - after checkout"
     }
@@ -145,7 +141,11 @@ withPipeline(type, product, component) {
     }
 
     before('smoketest:preview') {
-        echo "data deployment stage - 1"
+        echo "data deployment stage - before smoke"
+        sh '''#!/bin/bash
+                 ls -lt
+         '''
+        error('Aborting the build.')
     }
 
     after('smoketest:preview') {
