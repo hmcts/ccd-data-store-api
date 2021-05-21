@@ -131,6 +131,14 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     disableLegacyDeployment()
 
+    before('checkout') {
+        echo "data deployment stage - before checkout"
+    }
+
+    after('checkout') {
+        echo "data deployment stage - after checkout"
+    }
+
     after('test') {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
