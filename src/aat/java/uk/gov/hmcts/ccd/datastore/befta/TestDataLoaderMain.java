@@ -7,6 +7,7 @@ public class TestDataLoaderMain {
     }
 
     public static void main(String[] args) {
+        System.out.println("Received target deployment environment:"+args[0]);
         new DataStoreTestAutomationAdapter().getDataLoader().loadTestDataIfNecessary();
     }
 
