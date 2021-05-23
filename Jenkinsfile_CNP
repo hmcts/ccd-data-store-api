@@ -131,12 +131,6 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     disableLegacyDeployment()
 
-
-    after('checkout') {
-        echo "I am in checkout"
-        highLevelDataSetup(product: product, "aat")
-    }
-
     after('test') {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
@@ -145,13 +139,10 @@ withPipeline(type, product, component) {
     before('smoketest:preview') {
         echo "data deployment stage - before smoketest:preview"
 
-        sh '''#!/bin/bash
-              ./gradlew highLevelDataSetup --args=aat
-         '''
+        sh './gradlew highLevelDataSetup --args=aat'
 
         echo "data deployment stage end - before smoketest:preview"
     }
-
 
     after('smoketest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
@@ -168,9 +159,7 @@ withPipeline(type, product, component) {
     after('functionalTest:preview') {
         echo "data deployment stage - functionalTest:preview"
 
-        sh '''#!/bin/bash
-              ./gradlew highLevelDataSetup --args=prod
-         '''
+        sh './gradlew highLevelDataSetup --args=prod'
 
         echo "data deployment stage end - functionalTest:preview"
     }
