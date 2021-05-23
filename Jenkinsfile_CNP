@@ -134,11 +134,7 @@ withPipeline(type, product, component) {
 
     after('checkout') {
         echo "I am in checkout"
-
-        stageWithAgent('AfterCheckout', product) {
-            echo "I am a new stage"
-
-        }
+        highLevelDataSetup(product: product, "aat")
     }
 
     after('test') {
