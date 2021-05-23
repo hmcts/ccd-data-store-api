@@ -722,20 +722,10 @@ sourceSets {
     }
 }
 
-task datadeploy() {
-    doLast {
-        if (project.hasProperty("env") && ["aat", "prod"].contains(project.getProperty("env"))) {
-            javaexec {
-                main = "uk.gov.hmcts.ccd.datastore.befta.TestDataLoaderMain"
-                classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
-                args = [project.getProperty("env")]
-                jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
-            }
-        } else {
-            throw new GradleException('Required target environment argument \"env\" not passed properly: '+
-                    (project.hasProperty("env")?project.getProperty("env"):'<null>'))
-        }
-    }
+task highLevelDataSetup(type: JavaExec) {
+    main = "uk.gov.hmcts.ccd.datastore.befta.TestDataLoaderMain"
+    classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
+    jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
 task smoke() {
