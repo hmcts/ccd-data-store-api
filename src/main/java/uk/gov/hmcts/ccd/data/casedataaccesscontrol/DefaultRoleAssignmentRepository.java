@@ -1,8 +1,7 @@
 package uk.gov.hmcts.ccd.data.casedataaccesscontrol;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -27,10 +26,10 @@ import java.util.Map;
 import static com.google.common.collect.Maps.newHashMap;
 import static org.springframework.http.HttpHeaders.ETAG;
 
+@Slf4j
 @Repository
 @Qualifier(DefaultRoleAssignmentRepository.QUALIFIER)
 public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository {
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultRoleAssignmentRepository.class);
 
     public static final String QUALIFIER = "default";
     private static final String ROLE_ASSIGNMENTS_NOT_FOUND =
@@ -66,7 +65,7 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
 
             return getRoleAssignmentResponse(userId, requestEntity);
         } catch (Exception e) {
-            LOG.warn("Error while retrieving Role Assignments", e);
+            log.warn("Error while retrieving Role Assignments", e);
             if (e instanceof HttpClientErrorException
                 && ((HttpClientErrorException) e).getRawStatusCode() == HttpStatus.NOT_FOUND.value()) {
                 throw new ResourceNotFoundException(String.format(ROLE_ASSIGNMENTS_NOT_FOUND,
@@ -91,10 +90,13 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
         throws URISyntaxException {
 
         ResponseEntity<RoleAssignmentResponse> exchange = exchangeGet(userId, requestEntity);
+        log.debug("GET RoleAssignments for user={} returned response status={}", userId, exchange.getStatusCode());
+
         if (exchange.getStatusCode() == HttpStatus.NOT_MODIFIED && roleAssignments.containsKey(userId)) {
             return roleAssignments.get(userId).getRight();
         }
         if (exchange.getHeaders().containsKey(ETAG) && exchange.getHeaders().getETag() != null) {
+            log.debug("GET RoleAssignments response contains header ETag={}", exchange.getHeaders().getETag());
             if (thereAreRoleAssignmentsInTheBody(exchange)) {
                 roleAssignments.put(userId, Pair.of(getETag(exchange.getHeaders().getETag()), exchange.getBody()));
             }
