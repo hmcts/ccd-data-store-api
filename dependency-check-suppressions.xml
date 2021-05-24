@@ -35,4 +35,11 @@
 		<cve>CVE-2021-29425</cve>
 	</suppress>
 
+	<suppress>
+		<cve>CVE-2020-29242</cve>
+		<cve>CVE-2020-29243</cve>
+		<cve>CVE-2020-29244</cve>
+		<cve>CVE-2020-29245</cve>
+	</suppress>
+
 </suppressions>
