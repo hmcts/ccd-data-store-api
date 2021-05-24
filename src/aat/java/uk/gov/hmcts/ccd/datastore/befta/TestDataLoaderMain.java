@@ -9,4 +9,5 @@ public class TestDataLoaderMain {
     public static void main(String[] args) {
         new DataStoreTestAutomationAdapter().getDataLoader().loadTestDataIfNecessary();
     }
+
 }
