@@ -3,7 +3,7 @@ java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   environment:
-    DEFINITION_STORE_DB_NAME: ccd_definition_store
+    DATA_STORE_DB_NAME: ccd_data_store
     DATA_STORE_DB_HOST: ccd-data-store-api-postgres-db-v11-aat.postgres.database.azure.com
     keyVaults:
       ccd:
