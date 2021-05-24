@@ -136,6 +136,14 @@ withPipeline(type, product, component) {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
     }
 
+    before('smoketest:preview') {
+        echo "data deployment stage - before smoketest:preview"
+
+        sh './gradlew highLevelDataSetup --args=aat'
+
+        echo "data deployment stage end - before smoketest:preview"
+    }
+
     after('smoketest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
     }
@@ -146,6 +154,14 @@ withPipeline(type, product, component) {
 
     after('functionalTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
+    }
+
+    after('functionalTest:preview') {
+        echo "data deployment stage - functionalTest:preview"
+
+        sh './gradlew highLevelDataSetup --args=prod'
+
+        echo "data deployment stage end - functionalTest:preview"
     }
 
     after('functionalTest:aat') {
