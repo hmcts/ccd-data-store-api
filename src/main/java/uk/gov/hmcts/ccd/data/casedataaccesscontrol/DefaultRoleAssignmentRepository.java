@@ -21,6 +21,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.collect.Maps.newHashMap;
@@ -106,14 +107,17 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
     }
 
     private boolean thereAreRoleAssignmentsInTheBody(ResponseEntity<RoleAssignmentResponse> exchange) {
-        if (exchange.getBody() == null) {
-            return false;
-        }
-        if (exchange.getBody().getRoleAssignments() == null) {
+        RoleAssignmentResponse body = exchange.getBody();
+        if (body == null) {
             return false;
         }
 
-        return !exchange.getBody().getRoleAssignments().isEmpty();
+        List<RoleAssignmentResource> roleAssignments = body.getRoleAssignments();
+        if (roleAssignments == null) {
+            return false;
+        }
+
+        return !roleAssignments.isEmpty();
     }
 
     /**
