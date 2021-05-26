@@ -102,7 +102,7 @@ withPipeline(type, product, component) {
     }
     if (env.BRANCH_NAME.equalsIgnoreCase(dataStoreApiDevelopPr)) {
         enableSlackNotifications('#ccd-develop-builds')
-        env.ELASTIC_SEARCH_FTA_ENABLED = "true"
+        env.ELASTIC_SEARCH_FTA_ENABLED = "false"
     }
     onDemo {
         enableSlackNotifications('#ccd-demo-builds')
@@ -119,7 +119,7 @@ withPipeline(type, product, component) {
             environmentOfDependencies = "aat"
         }
         env.DEFINITION_STORE_HOST      = "http://ccd-definition-store-api-${environmentOfDependencies}.service.core-compute-${environmentOfDependencies}.internal"
-        env.ELASTIC_SEARCH_FTA_ENABLED = "true"
+        env.ELASTIC_SEARCH_FTA_ENABLED = "false"
     }
 
     echo "ES FTA Enabled = ${env.ELASTIC_SEARCH_FTA_ENABLED} on branch ${env.BRANCH_NAME}"
