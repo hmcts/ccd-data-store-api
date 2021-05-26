@@ -1,22 +1,26 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.google.common.collect.Sets;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
+import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
@@ -35,15 +39,22 @@ public class CaseAccessService {
 
     private final UserRepository userRepository;
     private final CaseUserRepository caseUserRepository;
+    private final RoleAssignmentService roleAssignmentService;
+    private final ApplicationParams applicationParams;
 
     private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN
         = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-."
         + "+-localAuthority$");
 
     public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
-                             @Qualifier(CachedCaseUserRepository.QUALIFIER)  CaseUserRepository caseUserRepository) {
+                             @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
+                             RoleAssignmentService roleAssignmentService,
+                             ApplicationParams applicationParams) {
+
         this.userRepository = userRepository;
         this.caseUserRepository = caseUserRepository;
+        this.roleAssignmentService = roleAssignmentService;
+        this.applicationParams = applicationParams;
     }
 
     public Boolean canUserAccess(CaseDetails caseDetails) {
@@ -65,9 +76,15 @@ public class CaseAccessService {
 
     public Optional<List<Long>> getGrantedCaseIdsForRestrictedRoles() {
         if (userCanOnlyAccessExplicitlyGrantedCases()) {
-            return Optional.of(caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId()));
+            final List<Long> caseIds;
+            if (applicationParams.getEnableAttributeBasedAccessControl()) {
+                caseIds = roleAssignmentService.getCaseIdsForAGivenUser(userRepository.getUserId())
+                    .stream().map(Long::parseLong).collect(Collectors.toList());
+            } else {
+                caseIds = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
+            }
+            return Optional.of(caseIds);
         }
-
         return Optional.empty();
     }
 
