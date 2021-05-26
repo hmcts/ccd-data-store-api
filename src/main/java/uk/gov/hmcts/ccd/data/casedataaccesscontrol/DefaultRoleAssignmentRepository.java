@@ -105,13 +105,15 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
         return exchange.getBody();
     }
 
-    public boolean thereAreRoleAssignmentsInTheBody(ResponseEntity<RoleAssignmentResponse> exchange) {
-        if (exchange.getBody() != null) {
-            if (exchange.getBody().getRoleAssignments() != null) {
-                return !exchange.getBody().getRoleAssignments().isEmpty();
-            }
+    private boolean thereAreRoleAssignmentsInTheBody(ResponseEntity<RoleAssignmentResponse> exchange) {
+        if (exchange.getBody() == null) {
+            return false;
         }
-        return false;
+        if (exchange.getBody().getRoleAssignments() == null) {
+            return false;
+        }
+
+        return !exchange.getBody().getRoleAssignments().isEmpty();
     }
 
     /**
