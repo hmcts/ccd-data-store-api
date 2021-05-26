@@ -6,9 +6,6 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
@@ -24,7 +21,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentAttacher;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
@@ -32,10 +29,8 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
-import uk.gov.hmcts.ccd.v3.V3;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
@@ -44,7 +39,6 @@ import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 @Service
 public class SubmitCaseTransaction {
 
-    private final HttpServletRequest request;
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
     private final CaseTypeService caseTypeService;
@@ -54,28 +48,21 @@ public class SubmitCaseTransaction {
     private final CaseUserRepository caseUserRepository;
     private final UserAuthorisation userAuthorisation;
     private final MessageService messageService;
-    private final RestTemplate restTemplate;
-    private final ApplicationParams applicationParams;
-    private final SecurityUtils securityUtils;
+    private final CaseDocumentService caseDocumentService;
 
     @Inject
-    public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
-                                     final CaseDetailsRepository caseDetailsRepository,
+    public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
                                  final CaseAuditEventRepository caseAuditEventRepository,
                                  final CaseTypeService caseTypeService,
                                  final CallbackInvoker callbackInvoker,
                                  final UIDService uidService,
                                  final SecurityClassificationService securityClassificationService,
                                  final @Qualifier(CachedCaseUserRepository.QUALIFIER)
-                                         CaseUserRepository caseUserRepository,
+                                     CaseUserRepository caseUserRepository,
                                  final UserAuthorisation userAuthorisation,
                                  final @Qualifier("caseEventMessageService") MessageService messageService,
-                                 final HttpServletRequest request,
-                                 final RestTemplate restTemplate,
-                                 final ApplicationParams applicationParams,
-                                 final SecurityUtils securityUtils
-                                 ) {
-        this.request = request;
+                                 final CaseDocumentService caseDocumentService
+    ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
         this.caseTypeService = caseTypeService;
@@ -85,9 +72,7 @@ public class SubmitCaseTransaction {
         this.caseUserRepository = caseUserRepository;
         this.userAuthorisation = userAuthorisation;
         this.messageService = messageService;
-        this.restTemplate = restTemplate;
-        this.applicationParams = applicationParams;
-        this.securityUtils = securityUtils;
+        this.caseDocumentService = caseDocumentService;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -108,14 +93,7 @@ public class SubmitCaseTransaction {
         newCaseDetails.setLastStateModifiedDate(now);
         newCaseDetails.setReference(Long.valueOf(uidService.generateUID()));
 
-        boolean isApiVersion3 = request.getContentType() != null
-            && request.getContentType().equals(V3.MediaType.CREATE_CASE);
-
-        CaseDocumentAttacher caseDocumentAttacher = null;
-        if (isApiVersion3) {
-            caseDocumentAttacher = new CaseDocumentAttacher(restTemplate, applicationParams, securityUtils);
-            caseDocumentAttacher.extractDocumentsWithHashTokenBeforeCallbackForCreateCase(newCaseDetails.getData());
-        }
+        final CaseDetails caseDetailsWithoutHashes = caseDocumentService.cloneCaseDetailsWithoutHashes(newCaseDetails);
 
         /*
             About to submit
@@ -124,25 +102,28 @@ public class SubmitCaseTransaction {
             been assigned and the UID generation has to be part of a retryable transaction in order to recover from
             collisions.
          */
-        AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse =
-            callbackInvoker.invokeAboutToSubmitCallback(caseEventDefinition, null, newCaseDetails,
-                caseTypeDefinition, ignoreWarning);
+        AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(
+            caseEventDefinition,
+            null,
+            caseDetailsWithoutHashes,
+            caseTypeDefinition,
+            ignoreWarning
+        );
 
-        final CaseDetails savedCaseDetails =
-            saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, event, caseTypeDefinition, idamUser,
-                caseEventDefinition, newCaseDetails);
+        final CaseDetails savedCaseDetails = saveAuditEventForCaseDetails(
+            aboutToSubmitCallbackResponse,
+            event,
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            caseDetailsWithoutHashes
+        );
 
         if (AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
-            caseUserRepository.grantAccess(Long.valueOf(savedCaseDetails.getId()),
-                                           idamUser.getId(),
-                                           CREATOR.getRole());
+            caseUserRepository.grantAccess(Long.valueOf(savedCaseDetails.getId()), idamUser.getId(), CREATOR.getRole());
         }
 
-        if (isApiVersion3) {
-            caseDocumentAttacher.caseDocumentAttachOperation(newCaseDetails,
-                aboutToSubmitCallbackResponse.getState().isPresent());
-            caseDocumentAttacher.restCallToAttachCaseDocuments();
-        }
+        caseDocumentService.attachCaseDocuments(newCaseDetails, savedCaseDetails);
 
         return savedCaseDetails;
     }
