@@ -87,8 +87,7 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
 
     private List<CaseStateDefinition> filterCaseStatesForUser(CaseTypeDefinition caseTypeDefinition,
                                                               Predicate<AccessControlList> access) {
-        List<CaseStateDefinition> caseStateDefinitions = caseTypeDefinition.getStates();
-        return accessControlService.filterCaseStatesByAccess(caseStateDefinitions,
+        return accessControlService.filterCaseStatesByAccess(caseTypeDefinition,
             getAccessProfiles(caseTypeDefinition.getId()),
             access);
     }

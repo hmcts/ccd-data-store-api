@@ -71,7 +71,7 @@ public class AccessControlServiceImpl implements AccessControlService {
         List<AccessControlList> stateACLs = caseType.getStates()
             .stream()
             .filter(cState -> cState.getId().equalsIgnoreCase(caseState))
-            .map(cState -> getAccessControlList(cState))
+            .map(cState -> getAccessControlList(caseType, cState))
             .flatMap(Collection::stream)
             .collect(toList());
 
@@ -275,22 +275,21 @@ public class AccessControlServiceImpl implements AccessControlService {
     }
 
     @Override
-    public List<CaseStateDefinition> filterCaseStatesByAccess(final List<CaseStateDefinition> caseStateDefinitions,
+    public List<CaseStateDefinition> filterCaseStatesByAccess(CaseTypeDefinition caseType,
                                                               final Set<String> userRoles,
                                                               final Predicate<AccessControlList> access) {
-        return caseStateDefinitions
+        return caseType.getStates()
             .stream()
             .filter(caseState -> hasAccessControlList(userRoles,
                 access,
-                getAccessControlList(caseState)))
+                getAccessControlList(caseType, caseState)))
             .collect(toList());
     }
 
     @Override
-    public List<CaseEventDefinition> filterCaseEventsByAccess(final List<CaseEventDefinition> caseEventDefinitions,
-                                                              final Set<String> userRoles,
+    public List<CaseEventDefinition> filterCaseEventsByAccess(CaseTypeDefinition caseTypeDefinition, final Set<String> userRoles,
                                                               final Predicate<AccessControlList> access) {
-        return caseEventDefinitions
+        return caseTypeDefinition.getEvents()
             .stream()
             .filter(caseEvent -> hasAccessControlList(userRoles,
                 access,

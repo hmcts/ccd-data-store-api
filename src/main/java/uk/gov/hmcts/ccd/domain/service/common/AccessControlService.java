@@ -107,12 +107,11 @@ public interface AccessControlService {
                                                        List<CaseEventDefinition> caseEventDefinitions,
                                                        Set<String> userRoles);
 
-    List<CaseStateDefinition> filterCaseStatesByAccess(List<CaseStateDefinition> caseStateDefinitions,
+    List<CaseStateDefinition> filterCaseStatesByAccess(CaseTypeDefinition caseType,
                                                        Set<String> userRoles,
                                                        Predicate<AccessControlList> access);
 
-    List<CaseEventDefinition> filterCaseEventsByAccess(List<CaseEventDefinition> caseEventDefinitions,
-                                                       Set<String> userRoles,
+    List<CaseEventDefinition> filterCaseEventsByAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles,
                                                        Predicate<AccessControlList> access);
 
     CaseViewActionableEvent[] filterCaseViewTriggersByCreateAccess(
@@ -529,7 +528,7 @@ public interface AccessControlService {
         return caseTypeDefinition != null ? caseTypeDefinition.getAccessControlLists() : newArrayList();
     }
 
-    default List<AccessControlList> getAccessControlList(CaseStateDefinition caseStateDefinition) {
+    default List<AccessControlList> getAccessControlList(CaseTypeDefinition caseTypeDefinition, CaseStateDefinition caseStateDefinition) {
         return caseStateDefinition != null ? caseStateDefinition.getAccessControlLists() : newArrayList();
     }
 

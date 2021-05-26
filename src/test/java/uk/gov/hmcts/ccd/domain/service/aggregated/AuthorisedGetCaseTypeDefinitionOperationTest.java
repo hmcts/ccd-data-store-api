@@ -328,7 +328,7 @@ class AuthorisedGetCaseTypeDefinitionOperationTest {
         void shouldReturnCorrectCaseStatesThatHaveAccessRights() {
             doReturn(Optional.of(testCaseTypeDefinition1)).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ);
             doReturn(newArrayList(CASE_STATE_1_1)).when(accessControlService)
-                .filterCaseStatesByAccess(testCaseTypeDefinition1.getStates(), USER_ROLES, CAN_READ);
+                .filterCaseStatesByAccess(null, USER_ROLES, CAN_READ);
 
             Optional<CaseTypeDefinition> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID, CAN_READ);
 
@@ -360,8 +360,7 @@ class AuthorisedGetCaseTypeDefinitionOperationTest {
             doReturn(Optional.of(testCaseTypeDefinition3)).when(getCaseTypeOperation).execute(CASE_TYPE_ID,
                 CAN_CREATE);
             doReturn(newArrayList(CASE_EVENT_3_1, CASE_EVENT_3_3)).when(accessControlService).filterCaseEventsByAccess(
-                testCaseTypeDefinition3.getEvents(),
-                USER_ROLES,
+                testCaseTypeDefinition3, USER_ROLES,
                 CAN_CREATE);
 
             Optional<CaseTypeDefinition> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID,

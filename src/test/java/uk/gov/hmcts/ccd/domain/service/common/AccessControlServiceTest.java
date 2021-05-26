@@ -1,22 +1,31 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
@@ -54,20 +63,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.ComplexACL
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageComplexFieldOverrideBuilder.newWizardPageComplexFieldOverride;
-
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-
-import java.util.HashMap;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 
 @SuppressWarnings("checkstyle:TypeName") // too many legacy TypeName occurrences on '@Nested' classes
 public class AccessControlServiceTest {
@@ -331,8 +326,11 @@ public class AccessControlServiceTest {
                     .withRole(ROLE_IN_USER_ROLES)
                     .build())
                 .build();
-            List<CaseStateDefinition> caseStates = new ArrayList<>(asList(caseState1, caseState2));
-            final List<CaseStateDefinition> states = accessControlService.filterCaseStatesByAccess(caseStates,
+            CaseTypeDefinition caseTypeDefinition = newCaseType()
+                .withState(caseState1)
+                .withState(caseState2)
+                .build();
+            final List<CaseStateDefinition> states = accessControlService.filterCaseStatesByAccess(caseTypeDefinition,
                 USER_ROLES, CAN_READ);
 
             assertAll(
@@ -363,9 +361,13 @@ public class AccessControlServiceTest {
                     .withRole(ROLE_IN_USER_ROLES)
                     .build())
                 .build();
-            List<CaseStateDefinition> caseStates = new ArrayList<>(asList(caseState1, caseState2, caseState3));
+            CaseTypeDefinition caseTypeDefinition = newCaseType()
+                .withState(caseState1)
+                .withState(caseState2)
+                .withState(caseState3)
+                .build();
             final List<CaseStateDefinition> states =
-                accessControlService.filterCaseStatesByAccess(caseStates, USER_ROLES, CAN_READ);
+                accessControlService.filterCaseStatesByAccess(caseTypeDefinition, USER_ROLES, CAN_READ);
 
             assertAll(
                 () -> assertThat(states.size(), is(0)),
@@ -3091,8 +3093,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            assertThat(accessControlService.filterCaseEventsByAccess(
+                caseType, USER_ROLES,
                 CAN_CREATE),
                 is(emptyCollectionOf(CaseEventDefinition.class)));
         }
@@ -3112,8 +3114,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            assertThat(accessControlService.filterCaseEventsByAccess(
+                caseType, USER_ROLES,
                 CAN_CREATE),
                 is(emptyCollectionOf(CaseEventDefinition.class)));
         }
@@ -3131,8 +3133,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(
+                caseType, USER_ROLES,
                 CAN_CREATE);
 
             assertAll(
@@ -3162,8 +3164,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(
+                caseType, USER_ROLES,
                 CAN_CREATE);
             assertAll(
                 () -> assertThat(result, hasSize(1)),
@@ -3206,8 +3208,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(
+                caseType, USER_ROLES,
                 CAN_CREATE);
             assertAll(
                 () -> assertThat(result, hasSize(2)),
@@ -3236,8 +3238,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            assertThat(accessControlService.filterCaseEventsByAccess(
+                caseType, USER_ROLES,
                 CAN_CREATE),
                 is(emptyCollectionOf(CaseEventDefinition.class)));
         }
@@ -3257,8 +3259,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            assertThat(accessControlService.filterCaseEventsByAccess(
+                caseType, USER_ROLES,
                 CAN_CREATE),
                 is(emptyCollectionOf(CaseEventDefinition.class)));
         }
@@ -3276,8 +3278,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(
+                caseType, USER_ROLES,
                 CAN_CREATE);
 
             assertAll(
@@ -3307,8 +3309,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(
+                caseType, USER_ROLES,
                 CAN_CREATE);
             assertAll(
                 () -> assertThat(result, hasSize(1)),
@@ -3351,8 +3353,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(
+                caseType, USER_ROLES,
                 CAN_CREATE);
             assertAll(
                 () -> assertThat(result, hasSize(2)),

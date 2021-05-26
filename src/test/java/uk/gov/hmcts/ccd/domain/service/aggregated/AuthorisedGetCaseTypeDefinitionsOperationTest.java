@@ -27,6 +27,7 @@ import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -339,9 +340,9 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
         void shouldReturnCorrectCaseStatesThatHaveReadAccess() {
             doReturn(testCaseTypes).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
             doReturn(newArrayList(CASE_STATE_1_1)).when(accessControlService)
-                .filterCaseStatesByAccess(testCaseType1.getStates(), USER_ROLES, CAN_READ);
+                .filterCaseStatesByAccess(null, USER_ROLES, CAN_READ);
             doReturn(newArrayList(CASE_STATE_3_1)).when(accessControlService)
-                .filterCaseStatesByAccess(testCaseType3.getStates(), USER_ROLES, CAN_READ);
+                .filterCaseStatesByAccess(null, USER_ROLES, CAN_READ);
 
             List<CaseTypeDefinition> caseTypes = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_READ);
 
@@ -365,11 +366,10 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
         void shouldReturnCaseTypesWithCreateAccessEventsForJurisdiction() {
             doReturn(testCaseTypes).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_CREATE);
             doReturn(newArrayList(CASE_EVENT_2_3)).when(accessControlService)
-                .filterCaseEventsByAccess(testCaseType2.getEvents(), USER_ROLES, CAN_CREATE);
+                .filterCaseEventsByAccess(any(), USER_ROLES, CAN_CREATE);
 
             doReturn(newArrayList(CASE_EVENT_3_1, CASE_EVENT_3_3)).when(accessControlService).filterCaseEventsByAccess(
-                testCaseType3.getEvents(),
-                USER_ROLES,
+                any(), USER_ROLES,
                 CAN_CREATE);
 
             List<CaseTypeDefinition> caseTypes = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_CREATE);
@@ -386,7 +386,7 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
         void shouldReturnCaseTypesWithUpdateAccessEventsForJurisdiction() {
             doReturn(testCaseTypes).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_UPDATE);
             doReturn(newArrayList(CASE_EVENT_3_2)).when(accessControlService)
-                .filterCaseEventsByAccess(testCaseType3.getEvents(), USER_ROLES, CAN_UPDATE);
+                .filterCaseEventsByAccess(any(), USER_ROLES, CAN_UPDATE);
 
             List<CaseTypeDefinition> caseTypes = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_UPDATE);
 
@@ -399,13 +399,12 @@ class AuthorisedGetCaseTypeDefinitionsOperationTest {
         void shouldReturnCaseTypesWithReadAccessEventsForJurisdiction() {
             doReturn(testCaseTypes).when(getCaseTypesOperation).execute(JURISDICTION_ID, CAN_READ);
             doReturn(newArrayList(CASE_EVENT_1_1, CASE_EVENT_1_2)).when(accessControlService).filterCaseEventsByAccess(
-                testCaseType1.getEvents(),
-                USER_ROLES,
+                any(), USER_ROLES,
                 CAN_READ);
             doReturn(newArrayList(CASE_EVENT_3_1,
                                   CASE_EVENT_3_2,
                                   CASE_EVENT_3_3)).when(accessControlService)
-                .filterCaseEventsByAccess(testCaseType3.getEvents(), USER_ROLES, CAN_READ);
+                .filterCaseEventsByAccess(any(), USER_ROLES, CAN_READ);
 
             List<CaseTypeDefinition> caseTypes = authorisedGetCaseTypesOperation.execute(JURISDICTION_ID, CAN_READ);
 

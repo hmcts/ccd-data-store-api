@@ -77,7 +77,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
                 .thenReturn(Lists.newArrayList());
             when(caseDataAccessControl.extractAccessProfileNames(anyList()))
                 .thenReturn(userRoles);
-            when(accessControlService.filterCaseStatesByAccess(caseTypeDefinition.getStates(), userRoles, CAN_READ))
+            when(accessControlService.filterCaseStatesByAccess(caseTypeDefinition, userRoles, CAN_READ))
                 .thenReturn(getCaseStates());
         }
 
@@ -122,7 +122,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
             assertAll(
                 () -> assertThat(result, containsInAnyOrder(STATE1, STATE2)),
                 () -> verify(caseDataAccessControl).generateAccessProfilesByCaseTypeId(anyString()),
-                () -> verify(accessControlService).filterCaseStatesByAccess(caseTypeDefinition.getStates(), userRoles,
+                () -> verify(accessControlService).filterCaseStatesByAccess(caseTypeDefinition, userRoles,
                     CAN_READ)
             );
         }
