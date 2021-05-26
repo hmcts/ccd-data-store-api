@@ -1,0 +1,146 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/data/jurisdictions?ids=test"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "id": "Test Case Role",
+        "name" : "Test Case Role",
+        "description" : "Test Jurisdiction",
+        "live_from": "2017-01-01",
+        "live_until": "2017-01-01",
+        "case_types": [
+          {
+            "id": "GrantOfRepresentation",
+            "description": "Probate - Grant of Representation",
+            "name": "Grant of Representation",
+            "states": [
+              {
+                "id": "SolAppCreated",
+                "name": "Application created",
+                "description": "Application created (Solicitor)",
+                "order": 1,
+                "title_display": null,
+                "acls": [
+                  {
+                    "role": "caseworker-probate-public",
+                    "create": true,
+                    "read": true,
+                    "update": true,
+                    "delete": true
+                  },
+                  {
+                    "role": "[DEFENDANT]",
+                    "create": true,
+                    "read": true,
+                    "update": true,
+                    "delete": false
+                  }
+                ]
+              },
+              {
+                "id": "SolAppUpdated",
+                "name": "Application updated",
+                "description": "Application updated (Solicitor)",
+                "order": 2,
+                "title_display": null,
+                "acls": [
+                  {
+                    "role": "caseworker-probate-public",
+                    "create": true,
+                    "read": true,
+                    "update": true,
+                    "delete": true
+                  },
+                  {
+                    "role": "[DEFENDANT]",
+                    "create": true,
+                    "read": true,
+                    "update": true,
+                    "delete": false
+                  }
+                ]
+              },
+              {
+                "id": "SolAppConfirmed",
+                "name": "Application confirmed",
+                "description": "Application confirmed (Solicitor)",
+                "order": 3,
+                "title_display": null,
+                "acls": [
+                  {
+                    "role": "caseworker-probate-solicitor",
+                    "create": true,
+                    "read": true,
+                    "update": true,
+                    "delete": true
+                  }
+                ]
+              },
+              {
+                "id": "PENDING",
+                "name": "Pending",
+                "description": null,
+                "order": 3,
+                "title_display": null,
+                "acls": [
+                  {
+                    "role": "[DEFENDANT]",
+                    "create": true,
+                    "read": true,
+                    "update": true,
+                    "delete": false
+                  }
+
+                ]
+              }
+            ],
+            "acls": [
+              {
+                "role": "caseworker-probate",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": true
+              },
+              {
+                "role": "caseworker-probate-issuer",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": true
+              },
+              {
+                "role": "caseworker-probate-solicitor",
+                "create": true,
+                "read": true,
+                "update": true,
+                "delete": true
+              },
+              {
+                "role": "caseworker-probate-public",
+                "create": true,
+                "read": true,
+                "update": false,
+                "delete": false
+              },
+              {
+              "role": "[DEFENDANT]",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
