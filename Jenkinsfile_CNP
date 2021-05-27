@@ -20,7 +20,7 @@ def component = "data-store-api"
 
 def definitionStoreDevelopPr = "PR-575" // This doesn't change frequently, but when it does, only change this value.
 def dataStoreApiDevelopPr    = "PR-1260" // This doesn't change frequently, but when it does, only change this value.
-def prsToUseAat             = "PR-1193,PR-1219,PR-1248,PR-1311,PR-1324,PR-921,PR-1404,PR-1419" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
+def prsToUseAat              = "PR-1193,PR-1219,PR-1248,PR-1311,PR-1324,PR-921,PR-1404,PR-1419" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
 
 def secrets = [
     'ccd-${env}': [
