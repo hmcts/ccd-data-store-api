@@ -200,7 +200,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                 organisationIdentifierFieldPath).toString();
             String propertyName = "orgs_assigned_users." + organisationIdentifier;
 
-            int value = 0; // default
+            int value = incrementBy; // default
 
             // if path to previous value supplied : read it
             if (previousValueContextPath != null) {
@@ -210,9 +210,6 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
                 Object previousValue = ReflectionUtils.deepGetFieldInObject(scenarioContext, previousValueFieldPath);
                 if (previousValue != null) {
                     value = Integer.parseInt(previousValue.toString())  + incrementBy; // and increment
-                }  else {
-                    throw new FunctionalTestException("Cannot find previous supplementary data property: '"
-                                                        + previousValueFieldPath + "'");
                 }
             }
             return Collections.singletonMap(propertyName, value);
