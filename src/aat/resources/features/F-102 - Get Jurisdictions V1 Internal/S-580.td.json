@@ -2,30 +2,34 @@
 	"_guid_": "S-580",
 	"_extends_": "F-102_Test_Data_Base",
 	"title": "Get jurisdictions available to the user",
+
 	"specs": [
 		"appropriate idam roles but no CCD user profile",
 		"has CREATE as case access parameter",
 		"contains HTTP 200 Ok status code",
 		"contains the list of jurisdictions a user has access to"
 	],
+
 	"user": {
 		"username": "befta.caseworker.1.noprofile@gmail.com",
 		"password": "[[$CCD_BEFTA_CASEWORKER_1_NO_PROFILE_PWD]]"
 	},
+
 	"request": {
 		"_extends_": "Common_Request",
 		"queryParams": {
 			"access": "create"
 		}
 	},
-	"expectedResponse": {
+
+  "expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"body": {
 			"arrayInMap": [
         {
           "__ordering__": "unordered"
         },
-				{
+			{
 					"id": "BEFTA_JURISDICTION_1",
 					"name": "BEFTA_JURISDICTION_1",
 					"description": "Content for the Test Jurisdiction.",
@@ -471,7 +475,7 @@
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-										}
+									}
 									]
 								},
 								{
@@ -527,7 +531,7 @@
 									"acls": [
 										{
                       "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
-										}
+									}
 									]
 								},
 								{
