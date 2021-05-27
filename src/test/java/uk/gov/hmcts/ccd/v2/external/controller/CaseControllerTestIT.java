@@ -38,6 +38,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
@@ -139,7 +140,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         assertThat(captor.getValue().getHttpStatus(), is(200));
         assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
         assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
-        assertThat(captor.getValue().getRequestId(), is(null));
+        assertNull(captor.getValue().getRequestId());
     }
 
     @Test
