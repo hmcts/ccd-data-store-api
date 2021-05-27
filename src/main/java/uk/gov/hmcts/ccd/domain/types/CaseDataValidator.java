@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.domain.types;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
@@ -24,6 +26,8 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPL
 public class CaseDataValidator {
     private static final String EMPTY_STRING = "";
     private static final String FIELD_SEPARATOR = ".";
+
+    private static final Logger LOG = LoggerFactory.getLogger(CaseDataValidator.class);
 
     private List<FieldValidator> validators;
 
@@ -171,7 +175,17 @@ public class CaseDataValidator {
 
     private boolean isBaseTypeValidator(FieldValidator validator, BaseType fieldType) {
         if (validator instanceof BaseTypeValidator) {
-            return ((BaseTypeValidator) validator).getType() == fieldType;
+            BaseType validatorType = ((BaseTypeValidator) validator).getType();
+            if (validatorType == fieldType) {
+                return true;
+            } else {
+                String msg = String.format("validatorType => %s, fieldType => %s", validatorType, fieldType);
+                if (validatorType != null) {
+                    msg += String.format(", validatorName => %s, fieldName => %s", validatorType.getType(),
+                        fieldType.getType());
+                }
+                LOG.error(msg);
+            }
         }
         return false;
     }
