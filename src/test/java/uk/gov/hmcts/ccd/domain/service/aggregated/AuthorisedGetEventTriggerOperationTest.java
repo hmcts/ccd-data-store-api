@@ -21,6 +21,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -79,6 +80,9 @@ class AuthorisedGetEventTriggerOperationTest {
     @Mock
     private EventTriggerService eventTriggerService;
 
+    @Mock
+    private CaseTypeService caseTypeService;
+
     private AuthorisedGetEventTriggerOperation authorisedGetEventTriggerOperation;
     private CaseUpdateViewEvent caseEventTrigger;
     private final CaseDetails caseDetails = new CaseDetails();
@@ -104,7 +108,8 @@ class AuthorisedGetEventTriggerOperationTest {
             caseAccessService,
             accessControlService,
             eventTriggerService,
-            draftGateway);
+            draftGateway,
+            caseTypeService);
         caseEventTrigger = new CaseUpdateViewEvent();
 
         caseType.setId(CASE_TYPE_ID);
