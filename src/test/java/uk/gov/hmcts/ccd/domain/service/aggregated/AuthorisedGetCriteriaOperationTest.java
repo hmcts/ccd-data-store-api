@@ -1,10 +1,30 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
+import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
@@ -15,27 +35,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.SearchInputBuilder.aSearchInput;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WorkbasketInputBuilder.aWorkbasketInput;
-
-import com.google.common.collect.Lists;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.search.SearchInput;
-import uk.gov.hmcts.ccd.domain.model.search.WorkbasketInput;
-import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import com.google.common.collect.Sets;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 class AuthorisedGetCriteriaOperationTest {
     private static final String CASE_TYPE_ONE = "CaseTypeOne";
@@ -127,9 +126,7 @@ class AuthorisedGetCriteriaOperationTest {
     void shouldReturnSearchInputWhenRoleExists() {
         doReturn(testSearchInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
         when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
-            .thenReturn(Lists.newArrayList());
-        when(caseDataAccessControl.extractAccessProfileNames(anyList()))
-            .thenReturn(Sets.newHashSet(ROLE1));
+            .thenReturn(createAccessProfiles(Sets.newHashSet(ROLE1)));
 
         final List<SearchInput> searchInputs =
             (List<SearchInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
@@ -143,14 +140,20 @@ class AuthorisedGetCriteriaOperationTest {
         );
     }
 
+    private Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+        return userRoles.stream()
+            .map(userRole -> AccessProfile.builder().readOnly(false)
+                .accessProfile(userRole)
+                .build())
+            .collect(Collectors.toSet());
+    }
+
     @Test
     @DisplayName("should not return duplicate search input when user has more than necessary role")
     void shouldReturnDistinctSearchInputWhenRoleExists() {
         doReturn(testSearchInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
         when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
-            .thenReturn(Lists.newArrayList());
-        when(caseDataAccessControl.extractAccessProfileNames(anyList()))
-            .thenReturn(Sets.newHashSet(ROLE1, ROLE2));
+            .thenReturn(createAccessProfiles(Sets.newHashSet(ROLE1, ROLE2)));
 
         final List<SearchInput> searchInputs =
             (List<SearchInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, SEARCH);
@@ -198,9 +201,7 @@ class AuthorisedGetCriteriaOperationTest {
     void shouldReturnWorkbasketInputWhenRoleExists() {
         doReturn(testWorkbasketInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
         when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
-            .thenReturn(Lists.newArrayList());
-        when(caseDataAccessControl.extractAccessProfileNames(anyList()))
-            .thenReturn(Sets.newHashSet(ROLE1));
+            .thenReturn(createAccessProfiles(Sets.newHashSet(ROLE1)));
 
         final List<WorkbasketInput> workbasketInputs =
             (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
@@ -219,9 +220,7 @@ class AuthorisedGetCriteriaOperationTest {
     void shouldReturnDistinctWorkbasketInputWhenRoleExists() {
         doReturn(testWorkbasketInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
         when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
-            .thenReturn(Lists.newArrayList());
-        when(caseDataAccessControl.extractAccessProfileNames(anyList()))
-            .thenReturn(Sets.newHashSet(ROLE1, ROLE2));
+            .thenReturn(createAccessProfiles(Sets.newHashSet(ROLE1, ROLE2)));
 
         final List<WorkbasketInput> workbasketInputs =
             (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
@@ -281,9 +280,7 @@ class AuthorisedGetCriteriaOperationTest {
 
         doReturn(testWorkbasketInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
         when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
-            .thenReturn(Lists.newArrayList());
-        when(caseDataAccessControl.extractAccessProfileNames(anyList()))
-            .thenReturn(Sets.newHashSet(ROLE1));
+            .thenReturn(createAccessProfiles(Sets.newHashSet(ROLE1)));
 
         final List<WorkbasketInput> workbasketInputs =
             (List<WorkbasketInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
@@ -328,9 +325,7 @@ class AuthorisedGetCriteriaOperationTest {
 
         doReturn(testSearchInputs).when(getCriteriaOperation).execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);
         when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
-            .thenReturn(Lists.newArrayList());
-        when(caseDataAccessControl.extractAccessProfileNames(anyList()))
-            .thenReturn(Sets.newHashSet(ROLE1));
+            .thenReturn(createAccessProfiles(Sets.newHashSet(ROLE1)));
 
         final List<SearchInput> searchInputs =
             (List<SearchInput>) classUnderTest.execute(CASE_TYPE_ONE, CAN_READ, WORKBASKET);

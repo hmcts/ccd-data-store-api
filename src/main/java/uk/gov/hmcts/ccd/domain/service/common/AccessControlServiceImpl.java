@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -47,16 +48,16 @@ public class AccessControlServiceImpl implements AccessControlService {
 
     @Override
     public boolean canAccessCaseTypeWithCriteria(final CaseTypeDefinition caseType,
-                                                 final Set<String> userRoles,
+                                                 final Set<AccessProfile> accessProfiles,
                                                  final Predicate<AccessControlList> criteria) {
         boolean hasAccess = caseType != null
-            && hasAccessControlList(userRoles, criteria, getAccessControlList(caseType));
+            && hasAccessControlList(accessProfiles, criteria, getAccessControlList(caseType));
 
         if (!hasAccess) {
             LOG.debug("No relevant case type access for caseType={}, caseTypeACLs={}, userRoles={}",
                      caseType != null ? caseType.getId() : "",
                      getAccessControlList(caseType),
-                     userRoles);
+                accessProfiles);
         }
 
         return hasAccess;
@@ -65,7 +66,7 @@ public class AccessControlServiceImpl implements AccessControlService {
     @Override
     public boolean canAccessCaseStateWithCriteria(final String caseState,
                                                   final CaseTypeDefinition caseType,
-                                                  final Set<String> userRoles,
+                                                  final Set<AccessProfile> accessProfiles,
                                                   final Predicate<AccessControlList> criteria) {
 
         List<AccessControlList> stateACLs = caseType.getStates()
@@ -75,13 +76,13 @@ public class AccessControlServiceImpl implements AccessControlService {
             .flatMap(Collection::stream)
             .collect(toList());
 
-        boolean hasAccess = hasAccessControlList(userRoles, criteria, stateACLs);
+        boolean hasAccess = hasAccessControlList(accessProfiles, criteria, stateACLs);
 
         if (!hasAccess) {
             LOG.debug("No relevant case state access for caseState={}, caseStateACL={}, userRoles={}",
                      caseState,
                      stateACLs,
-                     userRoles);
+                accessProfiles);
         }
         return hasAccess;
     }
@@ -89,14 +90,14 @@ public class AccessControlServiceImpl implements AccessControlService {
     @Override
     public boolean canAccessCaseEventWithCriteria(final String eventId,
                                                   final List<CaseEventDefinition> caseEventDefinitions,
-                                                  final Set<String> userRoles,
+                                                  final Set<AccessProfile> accessProfiles,
                                                   final Predicate<AccessControlList> criteria) {
-        boolean hasAccess = hasCaseEventAccess(eventId, caseEventDefinitions, userRoles, criteria);
+        boolean hasAccess = hasCaseEventAccess(eventId, caseEventDefinitions, accessProfiles, criteria);
         if (!hasAccess) {
             LOG.debug("No relevant event access for eventId={}, eventAcls={}, userRoles={}",
                 eventId,
                 getCaseEventAcls(caseEventDefinitions, eventId),
-                userRoles);
+                accessProfiles);
         }
         return hasAccess;
     }
@@ -104,12 +105,12 @@ public class AccessControlServiceImpl implements AccessControlService {
     @Override
     public boolean canAccessCaseFieldsWithCriteria(final JsonNode caseFields,
                                                    final List<CaseFieldDefinition> caseFieldDefinitions,
-                                                   final Set<String> userRoles,
+                                                   final Set<AccessProfile> accessProfiles,
                                                    final Predicate<AccessControlList> criteria) {
         if (caseFields != null) {
             final Iterator<String> fieldNames = caseFields.fieldNames();
             while (fieldNames.hasNext()) {
-                if (!hasCaseFieldAccess(caseFieldDefinitions, userRoles, criteria, fieldNames.next())) {
+                if (!hasCaseFieldAccess(caseFieldDefinitions, accessProfiles, criteria, fieldNames.next())) {
                     return false;
                 }
             }
@@ -119,24 +120,24 @@ public class AccessControlServiceImpl implements AccessControlService {
 
     @Override
     public boolean canAccessCaseViewFieldWithCriteria(final CommonField caseViewField,
-                                                      final Set<String> userRoles,
+                                                      final Set<AccessProfile> accessProfiles,
                                                       final Predicate<AccessControlList> criteria) {
-        return hasAccessControlList(userRoles, criteria, getAccessControlList(caseViewField));
+        return hasAccessControlList(accessProfiles, criteria, getAccessControlList(caseViewField));
     }
 
     @Override
     public boolean canAccessCaseFieldsForUpsert(final JsonNode newData,
                                                 final JsonNode existingData,
                                                 final List<CaseFieldDefinition> caseFieldDefinitions,
-                                                final Set<String> userRoles) {
+                                                final Set<AccessProfile> accessProfiles) {
         if (newData != null) {
             final boolean noAccessGranted = getStream(newData)
                 .anyMatch(newFieldName -> {
                     if (existingData.has(newFieldName)) {
                         return !valueDifferentAndHasUpdateAccess(newData, existingData, newFieldName,
-                            caseFieldDefinitions, userRoles);
+                            caseFieldDefinitions, accessProfiles);
                     } else {
-                        return !hasCaseFieldAccess(caseFieldDefinitions, userRoles, CAN_CREATE, newFieldName);
+                        return !hasCaseFieldAccess(caseFieldDefinitions, accessProfiles, CAN_CREATE, newFieldName);
                     }
                 });
             return !noAccessGranted;
@@ -147,19 +148,19 @@ public class AccessControlServiceImpl implements AccessControlService {
     @Override
     public JsonNode filterCaseFieldsByAccess(final JsonNode caseFields,
                                              final List<CaseFieldDefinition> caseFieldDefinitions,
-                                             final Set<String> userRoles,
+                                             final Set<AccessProfile> accessProfiles,
                                              final Predicate<AccessControlList> access,
                                              boolean isClassification) {
         ObjectNode filteredCaseFields = JSON_NODE_FACTORY.objectNode();
         getStream(caseFields).forEach(
-            fieldName -> findCaseFieldAndVerifyHasAccess(fieldName, caseFieldDefinitions, userRoles, access)
+            fieldName -> findCaseFieldAndVerifyHasAccess(fieldName, caseFieldDefinitions, accessProfiles, access)
                 .ifPresent(caseField -> {
                     if (isEmpty(getAccessControlList(caseField))) {
                         filteredCaseFields.set(fieldName, caseFields.get(fieldName));
                     } else if (!isClassification) {
                         filteredCaseFields.set(
                             fieldName,
-                            filterChildrenUsingJsonNode(caseField, caseFields.get(fieldName), userRoles,
+                            filterChildrenUsingJsonNode(caseField, caseFields.get(fieldName), accessProfiles,
                                 access, isClassification)
                         );
                     }
@@ -170,16 +171,16 @@ public class AccessControlServiceImpl implements AccessControlService {
 
     @Override
     public List<CaseFieldDefinition> filterCaseFieldsByAccess(final List<CaseFieldDefinition> caseFieldDefinitions,
-                                                              final Set<String> userRoles,
+                                                              final Set<AccessProfile> accessProfiles,
                                                               final Predicate<AccessControlList> access) {
         List<CaseFieldDefinition> filteredCaseFields = newArrayList();
         if (caseFieldDefinitions != null) {
             filteredCaseFields = caseFieldDefinitions
                 .stream()
-                .filter(caseField -> caseField.isMetadata() || hasAccessControlList(userRoles,
+                .filter(caseField -> caseField.isMetadata() || hasAccessControlList(accessProfiles,
                     access,
                     getAccessControlList(caseField)))
-                .map(caseField -> checkIfChildFilteringRequired(caseField, userRoles, access))
+                .map(caseField -> checkIfChildFilteringRequired(caseField, accessProfiles, access))
                 .collect(toList());
 
         }
@@ -190,7 +191,7 @@ public class AccessControlServiceImpl implements AccessControlService {
     public CaseUpdateViewEvent setReadOnlyOnCaseViewFieldsIfNoAccess(
         final CaseUpdateViewEvent caseEventTrigger,
         final List<CaseFieldDefinition> caseFieldDefinitions,
-        final Set<String> userRoles,
+        final Set<AccessProfile> accessProfiles,
         final Predicate<AccessControlList> access) {
         caseEventTrigger.getCaseFields().stream()
             .forEach(caseViewField -> {
@@ -198,12 +199,12 @@ public class AccessControlServiceImpl implements AccessControlService {
 
                 if (caseFieldOpt.isPresent()) {
                     CaseFieldDefinition field = caseFieldOpt.get();
-                    if (!hasAccessControlList(userRoles, access, getAccessControlList(field))) {
+                    if (!hasAccessControlList(accessProfiles, access, getAccessControlList(field))) {
                         caseViewField.setDisplayContext(READONLY);
                     }
                     if (field.isCompoundFieldType()) {
                         setChildrenAsReadOnlyIfNoAccess(caseEventTrigger.getWizardPages(), field.getId(), field,
-                            access, userRoles, caseViewField);
+                            access, accessProfiles, caseViewField);
                     }
                 } else {
                     caseViewField.setDisplayContext(READONLY);
@@ -213,16 +214,15 @@ public class AccessControlServiceImpl implements AccessControlService {
     }
 
     @Override
-    public CaseUpdateViewEvent updateCollectionDisplayContextParameterByAccess(final CaseUpdateViewEvent
-                                                                                   caseEventTrigger,
-                                                                               final Set<String> userRoles) {
+    public CaseUpdateViewEvent updateCollectionDisplayContextParameterByAccess(CaseUpdateViewEvent caseEventTrigger,
+                                                                               Set<AccessProfile> accessProfiles) {
         caseEventTrigger.getCaseFields().stream().filter(CommonField::isCollectionFieldType)
             .forEach(caseViewField ->
-                caseViewField.setDisplayContextParameter(generateDisplayContextParamer(userRoles, caseViewField)));
+                caseViewField.setDisplayContextParameter(generateDisplayContextParamer(accessProfiles, caseViewField)));
 
         caseEventTrigger.getCaseFields().forEach(caseViewField ->
             setChildrenCollectionDisplayContextParameter(caseViewField.getFieldTypeDefinition().getChildren(),
-                                                        userRoles));
+                accessProfiles));
 
         return caseEventTrigger;
     }
@@ -230,7 +230,7 @@ public class AccessControlServiceImpl implements AccessControlService {
     @Override
     public CaseUpdateViewEvent filterCaseViewFieldsByAccess(final CaseUpdateViewEvent caseEventTrigger,
                                                             final List<CaseFieldDefinition> caseFieldDefinitions,
-                                                            final Set<String> userRoles,
+                                                            final Set<AccessProfile> accessProfiles,
                                                             final Predicate<AccessControlList> access) {
         List<String> filteredCaseFieldIds = new ArrayList<>();
         caseEventTrigger.setCaseFields(caseEventTrigger.getCaseFields()
@@ -240,13 +240,13 @@ public class AccessControlServiceImpl implements AccessControlService {
 
                 if (caseFieldOpt.isPresent()) {
                     CaseFieldDefinition cf = caseFieldOpt.get();
-                    if (!hasAccessControlList(userRoles, access, getAccessControlList(cf))) {
+                    if (!hasAccessControlList(accessProfiles, access, getAccessControlList(cf))) {
                         filteredCaseFieldIds.add(caseViewField.getId());
                         return false;
                     }
                     if (!isEmpty(cf.getComplexACLs())) {
                         cf.getFieldTypeDefinition().getChildren().stream().forEach(caseField ->
-                            filterChildren(caseField, caseViewField, userRoles, access));
+                            filterChildren(caseField, caseViewField, accessProfiles, access));
                     }
                 } else {
                     return false;
@@ -262,12 +262,12 @@ public class AccessControlServiceImpl implements AccessControlService {
     @Override
     public List<AuditEvent> filterCaseAuditEventsByReadAccess(final List<AuditEvent> auditEvents,
                                                               final List<CaseEventDefinition> caseEventDefinitions,
-                                                              final Set<String> userRoles) {
+                                                              final Set<AccessProfile> accessProfiles) {
         List<AuditEvent> filteredAuditEvents = newArrayList();
         if (auditEvents != null) {
             filteredAuditEvents = auditEvents
                 .stream()
-                .filter(auditEvent -> hasCaseEventWithAccess(userRoles, auditEvent, caseEventDefinitions))
+                .filter(auditEvent -> hasCaseEventWithAccess(accessProfiles, auditEvent, caseEventDefinitions))
                 .collect(toList());
 
         }
@@ -276,22 +276,23 @@ public class AccessControlServiceImpl implements AccessControlService {
 
     @Override
     public List<CaseStateDefinition> filterCaseStatesByAccess(CaseTypeDefinition caseType,
-                                                              final Set<String> userRoles,
+                                                              final Set<AccessProfile> accessProfiles,
                                                               final Predicate<AccessControlList> access) {
         return caseType.getStates()
             .stream()
-            .filter(caseState -> hasAccessControlList(userRoles,
+            .filter(caseState -> hasAccessControlList(accessProfiles,
                 access,
                 getAccessControlList(caseType, caseState)))
             .collect(toList());
     }
 
     @Override
-    public List<CaseEventDefinition> filterCaseEventsByAccess(CaseTypeDefinition caseTypeDefinition, final Set<String> userRoles,
+    public List<CaseEventDefinition> filterCaseEventsByAccess(CaseTypeDefinition caseTypeDefinition,
+                                                              final Set<AccessProfile> accessProfiles,
                                                               final Predicate<AccessControlList> access) {
         return caseTypeDefinition.getEvents()
             .stream()
-            .filter(caseEvent -> hasAccessControlList(userRoles,
+            .filter(caseEvent -> hasAccessControlList(accessProfiles,
                 access,
                 getAccessControlList(caseEvent)))
             .collect(toList());
@@ -301,9 +302,9 @@ public class AccessControlServiceImpl implements AccessControlService {
     public CaseViewActionableEvent[] filterCaseViewTriggersByCreateAccess(
         final CaseViewActionableEvent[] caseViewTriggers,
         final List<CaseEventDefinition> caseEventDefinitions,
-        final Set<String> userRoles) {
+        final Set<AccessProfile> accessProfiles) {
         return stream(caseViewTriggers)
-            .filter(caseViewTrigger -> hasAccessControlList(userRoles,
+            .filter(caseViewTrigger -> hasAccessControlList(accessProfiles,
                 CAN_CREATE,
                 getCaseEventById(caseEventDefinitions, caseViewTrigger)
                     .map(eventDef -> getAccessControlList(eventDef))
@@ -313,7 +314,7 @@ public class AccessControlServiceImpl implements AccessControlService {
     }
 
     private boolean hasCaseFieldAccess(List<CaseFieldDefinition> caseFieldDefinitions,
-                                       Set<String> userRoles,
+                                       Set<AccessProfile> accessProfiles,
                                        Predicate<AccessControlList> criteria,
                                        String fieldName) {
         if (caseFieldDefinitions.isEmpty()) {
@@ -321,7 +322,7 @@ public class AccessControlServiceImpl implements AccessControlService {
         }
         for (CaseFieldDefinition caseField : caseFieldDefinitions) {
             if (caseField.getId().equals(fieldName)
-                && hasAccessControlList(userRoles, criteria, getAccessControlList(caseField))) {
+                && hasAccessControlList(accessProfiles, criteria, getAccessControlList(caseField))) {
                 return true;
             }
         }
@@ -330,7 +331,7 @@ public class AccessControlServiceImpl implements AccessControlService {
                 + "caseFieldDefinitions={}, userRoles={}",
             fieldName,
             getCaseFieldAcls(caseFieldDefinitions, fieldName),
-            userRoles);
+            accessProfiles);
         return false;
     }
 
@@ -338,7 +339,7 @@ public class AccessControlServiceImpl implements AccessControlService {
                                                      JsonNode existingData,
                                                      String newFieldName,
                                                      List<CaseFieldDefinition> caseFieldDefinitions,
-                                                     Set<String> userRoles) {
+                                                     Set<AccessProfile> accessProfiles) {
         if (existingData.get(newFieldName).equals(newData.get(newFieldName))) {
             return true;
         }
@@ -346,9 +347,12 @@ public class AccessControlServiceImpl implements AccessControlService {
         if (fieldOptional.isPresent()) {
             CaseFieldDefinition caseField = fieldOptional.get();
             if (!caseField.isCompoundFieldType()) {
-                return hasCaseFieldAccess(caseFieldDefinitions, userRoles, CAN_UPDATE, newFieldName);
+                return hasCaseFieldAccess(caseFieldDefinitions, accessProfiles, CAN_UPDATE, newFieldName);
             } else {
-                return compoundAccessControlService.hasAccessForAction(newData, existingData, caseField, userRoles);
+                return compoundAccessControlService.hasAccessForAction(newData,
+                    existingData,
+                    caseField,
+                    accessProfiles);
             }
         } else {
             AccessControlServiceImpl.LOG.error("Data submitted for unknown field '{}'", newFieldName);

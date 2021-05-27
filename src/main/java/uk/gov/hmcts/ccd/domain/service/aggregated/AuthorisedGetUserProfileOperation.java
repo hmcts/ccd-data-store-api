@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -53,21 +52,21 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
         return userProfile;
     }
 
-    private Set<String> getAccessProfiles(String caseTypeId) {
-        List<AccessProfile> accessProfiles = caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
-        return caseDataAccessControl.extractAccessProfileNames(accessProfiles);
+    private Set<AccessProfile> getAccessProfiles(String caseTypeId) {
+        return caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
     }
 
-    private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles,
+    private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition,
+                                                      Set<AccessProfile> accessProfiles,
                                                       Predicate<AccessControlList> access) {
-        if (caseTypeDefinition == null || CollectionUtils.isEmpty(userRoles)
-            || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, access)) {
+        if (caseTypeDefinition == null || CollectionUtils.isEmpty(accessProfiles)
+            || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, access)) {
             return Optional.empty();
         }
         caseTypeDefinition.setStates(accessControlService.filterCaseStatesByAccess(caseTypeDefinition,
-            userRoles, access));
+            accessProfiles, access));
         caseTypeDefinition.setEvents(accessControlService.filterCaseEventsByAccess(caseTypeDefinition,
-            userRoles, access));
+            accessProfiles, access));
 
         return Optional.of(caseTypeDefinition);
     }

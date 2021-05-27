@@ -57,9 +57,8 @@ public class AuthorisedGetCriteriaOperation implements GetCriteriaOperation {
             .collect(Collectors.toList());
     }
 
-    private Set<String> getAccessProfiles(String caseTypeId) {
-        List<AccessProfile> accessProfiles = caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
-        return caseDataAccessControl.extractAccessProfileNames(accessProfiles);
+    private Set<AccessProfile> getAccessProfiles(String caseTypeId) {
+        return caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
     }
 
     private boolean criteriaAllowedByCRUD(CaseTypeDefinition caseTypeDefinition, CriteriaInput criteriaInput) {
@@ -71,12 +70,12 @@ public class AuthorisedGetCriteriaOperation implements GetCriteriaOperation {
 
     private boolean filterDistinctFieldsByRole(final Set<String> addedFields,
                                                final CriteriaInput criteriaInput,
-                                               final Set<String> userRoles) {
+                                               final Set<AccessProfile> accessProfiles) {
         String id = criteriaInput.buildCaseFieldId();
         if (addedFields.contains(id)) {
             return false;
         } else {
-            if (StringUtils.isEmpty(criteriaInput.getRole()) || userRoles.contains(criteriaInput.getRole())) {
+            if (StringUtils.isEmpty(criteriaInput.getRole()) || accessProfiles.contains(criteriaInput.getRole())) {
                 addedFields.add(id);
                 return true;
             } else {

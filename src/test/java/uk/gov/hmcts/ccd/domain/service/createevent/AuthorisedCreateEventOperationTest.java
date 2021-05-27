@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import java.util.stream.Collectors;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -61,9 +63,9 @@ class AuthorisedCreateEventOperationTest {
     private static final String CASEWORKER_PROBATE_LOA1 = "caseworker-probate-loa1";
     private static final String CASEWORKER_PROBATE_LOA3 = "caseworker-probate-loa3";
     private static final String CASEWORKER_DIVORCE = "caseworker-divorce-loa3";
-    private static final Set<String> USER_ROLES = Sets.newHashSet(CASEWORKER_DIVORCE,
+    private static final Set<AccessProfile> USER_ROLES = createAccessProfiles(Sets.newHashSet(CASEWORKER_DIVORCE,
         CASEWORKER_PROBATE_LOA1,
-        CASEWORKER_PROBATE_LOA3);
+        CASEWORKER_PROBATE_LOA3));
 
     private static final String CASE_TYPE_ID = "Grant";
     private static final String CASE_ID = "26";
@@ -161,6 +163,14 @@ class AuthorisedCreateEventOperationTest {
             eq(USER_ROLES),
             eq(CAN_READ),
             anyBoolean())).thenReturn(authorisedCaseNode);
+    }
+
+    private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+        return userRoles.stream()
+            .map(userRole -> AccessProfile.builder().readOnly(false)
+                .accessProfile(userRole)
+                .build())
+            .collect(Collectors.toSet());
     }
 
     @Test

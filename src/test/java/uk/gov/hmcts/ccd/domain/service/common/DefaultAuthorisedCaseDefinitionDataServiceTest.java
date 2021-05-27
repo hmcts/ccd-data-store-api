@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.google.common.collect.Lists;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
@@ -25,7 +25,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -67,6 +66,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         private static final String STATE1 = "state1";
         private static final String STATE2 = "state2";
         private final Set<String> userRoles = new HashSet<>();
+        Set<AccessProfile> accessProfiles = createAccessProfiles(userRoles);
 
         @BeforeEach
         void setUp() {
@@ -74,10 +74,8 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
             when(caseTypeService.getCaseTypeForJurisdiction(CASE_TYPE, JURISDICTION)).thenReturn(caseTypeDefinition);
             when(caseTypeService.getCaseType(CASE_TYPE)).thenReturn(caseTypeDefinition);
             when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
-                .thenReturn(Lists.newArrayList());
-            when(caseDataAccessControl.extractAccessProfileNames(anyList()))
-                .thenReturn(userRoles);
-            when(accessControlService.filterCaseStatesByAccess(caseTypeDefinition, userRoles, CAN_READ))
+                .thenReturn(accessProfiles);
+            when(accessControlService.filterCaseStatesByAccess(caseTypeDefinition, accessProfiles, CAN_READ))
                 .thenReturn(getCaseStates());
         }
 
@@ -122,7 +120,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
             assertAll(
                 () -> assertThat(result, containsInAnyOrder(STATE1, STATE2)),
                 () -> verify(caseDataAccessControl).generateAccessProfilesByCaseTypeId(anyString()),
-                () -> verify(accessControlService).filterCaseStatesByAccess(caseTypeDefinition, userRoles,
+                () -> verify(accessControlService).filterCaseStatesByAccess(caseTypeDefinition, accessProfiles,
                     CAN_READ)
             );
         }
@@ -132,15 +130,14 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
     @DisplayName("Get user authorised case type")
     class GetUserAuthorisedCaseTypeDefinition {
         private final Set<String> userRoles = new HashSet<>();
+        Set<AccessProfile> accessProfiles = createAccessProfiles(userRoles);
 
         @BeforeEach
         void setUp() {
             when(caseTypeDefinition.getId()).thenReturn(CASE_TYPE);
             when(caseTypeService.getCaseType(CASE_TYPE)).thenReturn(caseTypeDefinition);
             when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
-                .thenReturn(Lists.newArrayList());
-            when(caseDataAccessControl.extractAccessProfileNames(anyList()))
-                .thenReturn(userRoles);
+                .thenReturn(accessProfiles);
             when(caseTypeDefinition.getSecurityClassification()).thenReturn(SecurityClassification.PRIVATE);
         }
 
@@ -148,7 +145,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         @DisplayName("should return case type when user has read access and user classification is higher or euqal to"
             + " case type classification")
         void shouldGetAuthorisedCaseType() {
-            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ))
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ))
                 .thenReturn(true);
             when(userRepository.getHighestUserClassification(anyString())).thenReturn(SecurityClassification.PRIVATE);
 
@@ -163,7 +160,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         @Test
         @DisplayName("should not return case type when user has no read access to the case type")
         void shouldNotReturnCaseTypeWhenNoAccess() {
-            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ))
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ))
                 .thenReturn(false);
             when(userRepository.getHighestUserClassification(anyString())).thenReturn(SecurityClassification.PRIVATE);
 
@@ -177,7 +174,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         @Test
         @DisplayName("should not return case type when user classification is lower than case type classification")
         void shouldNotReturnCaseTypeWhenClassificationNotMatched() {
-            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ))
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ))
                 .thenReturn(true);
             when(userRepository.getHighestUserClassification(anyString())).thenReturn(SecurityClassification.PUBLIC);
 
@@ -191,7 +188,16 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         void verifyCalls() {
             verify(caseTypeService).getCaseType(CASE_TYPE);
             verify(caseDataAccessControl).generateAccessProfilesByCaseTypeId(anyString());
-            verify(accessControlService).canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ);
+            verify(accessControlService).canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ);
         }
+    }
+
+
+    private Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+        return userRoles.stream()
+            .map(userRole -> AccessProfile.builder().readOnly(false)
+                .accessProfile(userRole)
+                .build())
+            .collect(Collectors.toSet());
     }
 }

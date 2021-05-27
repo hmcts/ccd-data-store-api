@@ -5,17 +5,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.checkerframework.checker.nullness.Opt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.DefaultCaseDataAccessControl;
@@ -56,7 +52,7 @@ public class AttributeBasedAccessControlService extends AccessControlServiceImpl
     }
 
     private List<AccessControlList> getAttributeBasedAccessControls(CaseTypeDefinition caseTypeDefinition) {
-        List<AccessProfile> accessProfiles = defaultCaseDataAccessControl
+        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
             .generateAccessProfilesByCaseTypeId(caseTypeDefinition.getId());
         List<AccessControlList> accessControlLists = caseTypeDefinition.getAccessControlLists();
         if (accessControlLists != null) {
@@ -87,15 +83,15 @@ public class AttributeBasedAccessControlService extends AccessControlServiceImpl
     }
 
     @Override
-    public boolean hasAccessControlList(Set<String> userRoles,
+    public boolean hasAccessControlList(Set<AccessProfile> accessProfiles,
                                         Predicate<AccessControlList> criteria,
                                         List<AccessControlList> accessControlLists) {
         return accessControlLists != null && accessControlLists
             .stream()
             .filter(acls -> {
                 String accessProfile = acls.getAccessProfile();
-                return userRoles.contains(accessProfile)
-                    || userRoles.contains(IDAM_PREFIX + accessProfile);
+                return accessProfiles.contains(accessProfile)
+                    || accessProfiles.contains(IDAM_PREFIX + accessProfile);
             })
             .anyMatch(criteria);
     }
