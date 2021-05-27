@@ -112,6 +112,38 @@ public class CaseControllerTestIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldLogAuditInfoForGetCaseByIdWithNullRequestId() throws Exception {
+        String caseId = "1504259907353529";
+        final String URL =  "/cases/" + caseId;
+
+        final MvcResult mvcResult = mockMvc.perform(get(URL)
+            .header(EXPERIMENTAL_HEADER, "experimental")
+            .contentType(JSON_CONTENT_TYPE)
+        ).andReturn();
+
+        assertEquals(mvcResult.getResponse().getContentAsString(), 200, mvcResult.getResponse().getStatus());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String content = mvcResult.getResponse().getContentAsString();
+        assertNotNull("Content Should not be null", content);
+        CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
+
+        assertThat(savedCaseResource.getReference(), is(caseId));
+
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CASE_ACCESSED.getLabel()));
+        assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
+        assertThat(captor.getValue().getIdamId(), is(UID));
+        assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
+        assertThat(captor.getValue().getHttpStatus(), is(200));
+        assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
+        assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
+        assertThat(captor.getValue().getRequestId(), is(null));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldLogAuditInfoForCreateEventByCaseId() throws Exception {
         String caseId = "1504259907353529";
         final String URL =  "/cases/" + caseId + "/events";
