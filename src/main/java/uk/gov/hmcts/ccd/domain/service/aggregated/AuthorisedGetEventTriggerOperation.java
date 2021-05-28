@@ -13,13 +13,11 @@ import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
-import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -47,7 +45,6 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     private final AccessControlService accessControlService;
     private final EventTriggerService eventTriggerService;
     private final DraftGateway draftGateway;
-    private final CaseTypeService caseTypeService;
 
     @Autowired
     public AuthorisedGetEventTriggerOperation(@Qualifier("default")
@@ -60,8 +57,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
                                               final AccessControlService accessControlService,
                                               final EventTriggerService eventTriggerService,
                                               @Qualifier(CachedDraftGateway.QUALIFIER)
-                                                  final DraftGateway draftGateway,
-                                              CaseTypeService caseTypeService) {
+                                                  final DraftGateway draftGateway) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAccessService = caseAccessService;
@@ -69,7 +65,6 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
         this.accessControlService = accessControlService;
         this.eventTriggerService = eventTriggerService;
         this.draftGateway = draftGateway;
-        this.caseTypeService = caseTypeService;
     }
 
     @Override
@@ -96,7 +91,6 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
         final CaseDetails caseDetails = getCaseDetails(caseReference);
         final CaseTypeDefinition caseTypeDefinition =
             caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
-        CaseStateDefinition caseStateDefinition = caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
         final CaseEventDefinition caseEventDefinition = getCaseEventDefinition(eventId, caseTypeDefinition);
 
         validateEventDefinition(() -> !eventTriggerService.isPreStateValid(
@@ -109,7 +103,6 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
         CaseUpdateViewEvent caseUpdateViewEvent = filterUpsertAccessForCase(caseTypeDefinition, userRoles,
             getEventTriggerOperation.executeForCase(caseReference, eventId, ignoreWarning));
-        caseUpdateViewEvent.setTitleDisplay(caseStateDefinition.getTitleDisplay());
         return accessControlService.updateCollectionDisplayContextParameterByAccess(caseUpdateViewEvent, userRoles);
     }
 

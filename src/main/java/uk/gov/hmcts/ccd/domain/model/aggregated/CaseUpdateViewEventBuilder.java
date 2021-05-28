@@ -12,8 +12,10 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -27,18 +29,21 @@ public class CaseUpdateViewEventBuilder {
     private final EventTriggerService eventTriggerService;
     private final CaseViewFieldBuilder caseViewFieldBuilder;
     private final FieldProcessorService fieldProcessorService;
+    private final CaseTypeService caseTypeService;
 
     public CaseUpdateViewEventBuilder(@Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                       final CaseDefinitionRepository caseDefinitionRepository,
                                       final UIDefinitionRepository uiDefinitionRepository,
                                       final EventTriggerService eventTriggerService,
                                       final CaseViewFieldBuilder caseViewFieldBuilder,
-                                      final FieldProcessorService fieldProcessorService) {
+                                      final FieldProcessorService fieldProcessorService,
+                                      CaseTypeService caseTypeService) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.uiDefinitionRepository = uiDefinitionRepository;
         this.eventTriggerService = eventTriggerService;
         this.caseViewFieldBuilder = caseViewFieldBuilder;
         this.fieldProcessorService = fieldProcessorService;
+        this.caseTypeService = caseTypeService;
     }
 
     public CaseUpdateViewEvent build(StartEventResult startEventResult,
@@ -52,6 +57,8 @@ public class CaseUpdateViewEventBuilder {
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
         final CaseEventDefinition caseEventDefinition = getCaseEventDefinition(eventId, caseTypeDefinition);
         final CaseUpdateViewEvent caseUpdateViewEvent = buildCaseUpdateEvent(caseEventDefinition);
+        final CaseStateDefinition caseStateDefinition = caseTypeService.findState(caseTypeDefinition,
+            startEventResult.getCaseDetails().getState());
         caseUpdateViewEvent.setCaseId(caseReference);
         caseUpdateViewEvent.setCaseFields(
             fieldProcessorService.processCaseViewFields(
@@ -62,6 +69,7 @@ public class CaseUpdateViewEventBuilder {
         final List<WizardPage> wizardPageCollection = uiDefinitionRepository.getWizardPageCollection(caseTypeId,
                                                                                                      eventId);
         caseUpdateViewEvent.setWizardPages(wizardPageCollection);
+        caseUpdateViewEvent.setTitleDisplay(caseStateDefinition.getTitleDisplay());
         return caseUpdateViewEvent;
     }
 

@@ -21,6 +21,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -85,6 +86,9 @@ class CaseUpdateViewEventBuilderTest {
     @Mock
     private FieldProcessorService fieldProcessorService;
 
+    @Mock
+    private CaseTypeService caseTypeService;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -99,7 +103,7 @@ class CaseUpdateViewEventBuilderTest {
         caseUpdateViewEventBuilder = new CaseUpdateViewEventBuilder(caseDefinitionRepository,
                                                               uiDefinitionRepository,
                                                               eventTriggerService,
-                                                              caseViewFieldBuilder, fieldProcessorService);
+                                                              caseViewFieldBuilder, fieldProcessorService,caseTypeService);
     }
 
     @Test
