@@ -35,6 +35,7 @@ public class BaseTypeTest {
     }
 
     @Test
+    @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     void initialiseBaseTypesWithMultiThreads() throws InterruptedException {
         FieldTypeDefinition documentFieldTypeDefinition = mock(FieldTypeDefinition.class);
         when(documentFieldTypeDefinition.getType()).thenReturn(TEXT_TYPE);
