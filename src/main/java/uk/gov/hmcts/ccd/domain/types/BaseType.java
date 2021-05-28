@@ -29,10 +29,12 @@ public class BaseType {
     /**
      * This needs to be lazily initialised as it would prevent startup of the application otherwise.
      */
-    public static void initialise() {
-        BaseType.caseDefinitionRepository.getBaseTypes()
-            .forEach(fieldType -> BaseType.register(new BaseType(fieldType)));
-        BaseType.initialised = Boolean.TRUE;
+    public static synchronized void initialise() {
+        if (!BaseType.initialised) {
+            BaseType.caseDefinitionRepository.getBaseTypes()
+                .forEach(fieldType -> BaseType.register(new BaseType(fieldType)));
+            BaseType.initialised = Boolean.TRUE;
+        }
     }
 
     public static void register(final BaseType baseType) {
@@ -40,19 +42,13 @@ public class BaseType {
     }
 
     public static BaseType get(final String type) {
-        if (!BaseType.initialised) {
-            BaseType.initialise();
-        }
-
+        BaseType.initialise();
         return BASE_TYPES.get(type.toUpperCase());
     }
 
     public static Boolean contains(final String type) {
-        if (!BaseType.initialised) {
-            BaseType.initialise();
-        }
-
-        return BASE_TYPES.keySet().contains(type.toUpperCase());
+        BaseType.initialise();
+        return BASE_TYPES.containsKey(type.toUpperCase());
     }
 
     public String getType() {
