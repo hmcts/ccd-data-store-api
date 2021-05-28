@@ -8,25 +8,29 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class CaseDocumentServiceTest extends TestFixtures {
-    private static final String JURISDICTION = "SSCS";
-    private static final String CASE_REFERENCE = "1234123412341236";
-    private static final Long REFERENCE = Long.valueOf(CASE_REFERENCE);
     private static final String STATE = "CreatedState";
 
     @Mock
@@ -46,16 +50,17 @@ class CaseDocumentServiceTest extends TestFixtures {
         // Given
         final Map<String, JsonNode> data = loadDataAsMap("new-document-with-hashtoken.json");
         final CaseDetails caseDetails = buildCaseDetails(data);
-
         final Map<String, JsonNode> dataWithoutHashes = loadDataAsMap("new-document-with-removed-hashtoken.json");
 
         doReturn(caseDetails).when(caseService).clone(caseDetails);
+        doCallRealMethod().when(documentUtils).findDocumentNodes(anyMap());
 
         // When
         final CaseDetails actualClonedCaseDetails = underTest.cloneCaseDetailsWithoutHashes(caseDetails);
 
         // Then
         verify(caseService).clone(caseDetails);
+        verify(documentUtils).findDocumentNodes(anyMap());
 
         assertThat(actualClonedCaseDetails)
             .isNotNull()
@@ -86,16 +91,33 @@ class CaseDocumentServiceTest extends TestFixtures {
         assertThat(thrown)
             .isInstanceOf(ServiceException.class)
             .hasMessageStartingWith("call back attempted to change the hashToken of the following documents:");
+
+        verify(documentUtils, never()).buildDocumentHashToken(anyMap(), anyMap());
     }
 
     @Test
-    void test() {
+    void testShouldApplyCaseDocumentPatch() {
+        // Given
+        final CaseDetails preCallbackCaseDetails = buildCaseDetails(emptyMap());
+        final CaseDetails postCallbackCaseDetails = buildCaseDetails(emptyMap());
+
+        doReturn(emptyMap(), emptyMap()).when(documentUtils).extractDocumentsHashes(anyMap());
+        doReturn(emptySet()).when(documentUtils).getTamperedHashes(anyMap(), anyMap());
+        doReturn(List.of(HASH_TOKEN_A, HASH_TOKEN_B)).when(documentUtils).buildDocumentHashToken(anyMap(), anyMap());
+        doNothing().when(caseDocumentAmApiClient).applyPatch(any(CaseDocumentsMetadata.class));
+
         // When
-        underTest.attachCaseDocuments(null, null);
+        underTest.attachCaseDocuments(preCallbackCaseDetails, postCallbackCaseDetails);
+
+        // Then
+        verify(documentUtils, times(2)).extractDocumentsHashes(anyMap());
+        verify(documentUtils).getTamperedHashes(anyMap(), anyMap());
+        verify(documentUtils).buildDocumentHashToken(anyMap(), anyMap());
+        verify(caseDocumentAmApiClient).applyPatch(any(CaseDocumentsMetadata.class));
     }
 
     private CaseDetails buildCaseDetails(final Map<String, JsonNode> data) {
-        final CaseDetails caseDetails = new CaseDetails();
+        CaseDetails caseDetails = new CaseDetails();
         caseDetails.setJurisdiction(JURISDICTION);
         caseDetails.setReference(REFERENCE);
         caseDetails.setState(STATE);
