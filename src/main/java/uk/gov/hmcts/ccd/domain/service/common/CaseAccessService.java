@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -41,6 +42,7 @@ public class CaseAccessService {
     private final CaseUserRepository caseUserRepository;
     private final RoleAssignmentService roleAssignmentService;
     private final ApplicationParams applicationParams;
+    private final CaseDetailsRepository caseDetailsRepository;
 
     private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN
         = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-."
@@ -49,12 +51,13 @@ public class CaseAccessService {
     public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                              @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
                              RoleAssignmentService roleAssignmentService,
-                             ApplicationParams applicationParams) {
+                             ApplicationParams applicationParams, CaseDetailsRepository caseDetailsRepository) {
 
         this.userRepository = userRepository;
         this.caseUserRepository = caseUserRepository;
         this.roleAssignmentService = roleAssignmentService;
         this.applicationParams = applicationParams;
+        this.caseDetailsRepository = caseDetailsRepository;
     }
 
     public Boolean canUserAccess(CaseDetails caseDetails) {
@@ -82,6 +85,7 @@ public class CaseAccessService {
                     .stream().map(Long::parseLong).collect(Collectors.toList());
             } else {
                 caseIds = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
+                caseDetailsRepository.findCaseReferencesByIds(caseIds);
             }
             return Optional.of(caseIds);
         }
