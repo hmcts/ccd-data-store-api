@@ -3,13 +3,18 @@ package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.ccd.TestFixtures;
+import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 
@@ -88,7 +93,7 @@ class CaseDocumentUtilsTest extends TestFixtures {
     }
 
     @ParameterizedTest
-    @MethodSource("provideMapsParameters")
+    @MethodSource("provideNullMapParameters")
     void testShouldRaiseExceptionWhenMapsAreNull(final Map<String, String> m1, final Map<String, String> m2) {
         // WHEN
         final Throwable thrown = catchThrowable(() -> underTest.getTamperedHashes(m1, m2));
@@ -148,4 +153,27 @@ class CaseDocumentUtilsTest extends TestFixtures {
             .isEmpty();
     }
 
+    @ParameterizedTest
+    @MethodSource("provideHashTokenParameters")
+    void testShouldBuildDocumentHashToken(final Map<String, String> m1,
+                                          final Map<String, String> m2,
+                                          final List<DocumentHashToken> expectedHashTokens) {
+        // When
+        final List<DocumentHashToken> actualHashTokens = underTest.buildDocumentHashToken(m1, m2);
+
+        // Then
+        assertThat(actualHashTokens)
+            .isNotNull()
+            .hasSameElementsAs(expectedHashTokens);
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideHashTokenParameters() {
+        return Stream.of(
+            Arguments.of(emptyMap(), emptyMap(), emptyList()),
+            Arguments.of(MAP_A, emptyMap(), List.of(HASH_TOKEN_A)),
+            Arguments.of(emptyMap(), MAP_B, List.of(HASH_TOKEN_B)),
+            Arguments.of(MAP_A, MAP_B, List.of(HASH_TOKEN_A, HASH_TOKEN_B))
+        );
+    }
 }

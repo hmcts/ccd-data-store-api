@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 
@@ -34,7 +36,19 @@ class CollectionUtilsTest extends TestFixtures {
     }
 
     @ParameterizedTest
-    @MethodSource("provideSetsParameters")
+    @MethodSource("provideEmptySetParameters")
+    void testShouldResultInEmptySet(final Set<String> set1, final Set<String> set2) {
+        // WHEN
+        final Set<String> intersection = CollectionUtils.setsIntersection(set1, set2);
+
+        // THEN
+        assertThat(intersection)
+            .isNotNull()
+            .isEmpty();
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideNullSetParameters")
     void testShouldRaiseExceptionWhenSetsAreNull(final Set<String> set1, final Set<String> set2) {
         // WHEN
         final Throwable thrown = catchThrowable(() -> CollectionUtils.setsIntersection(set1, set2));
@@ -45,7 +59,7 @@ class CollectionUtilsTest extends TestFixtures {
     }
 
     @ParameterizedTest
-    @MethodSource("provideMapsParameters")
+    @MethodSource("provideNullMapParameters")
     void testShouldRaiseExceptionWhenMapsAreNull(final Map<String, String> m1, final Map<String, String> m2) {
         // WHEN
         final Throwable thrown = catchThrowable(() -> CollectionUtils.mapsUnion(m1, m2));
@@ -55,8 +69,34 @@ class CollectionUtilsTest extends TestFixtures {
             .isInstanceOf(NullPointerException.class);
     }
 
+    @ParameterizedTest
+    @MethodSource("provideMapParameters")
+    void testShouldResultInMergedMap(final Map<String, String> m1,
+                                    final Map<String, String> m2,
+                                    final Map<String, String> expectedMap) {
+        // WHEN
+        final Map<String, String> union = CollectionUtils.mapsUnion(m1, m2);
+
+        // THEN
+        assertThat(union)
+            .isNotNull()
+            .containsExactlyInAnyOrderEntriesOf(expectedMap);
+    }
+
+    @Test
+    void testShouldRaiseExceptionWhenMapKeysCollide() {
+        final Map<String, String> m2 = Map.of("a", "B");
+
+        // WHEN
+        final Throwable thrown = catchThrowable(() -> CollectionUtils.mapsUnion(MAP_A, m2));
+
+        // THEN
+        assertThat(thrown)
+            .isInstanceOf(IllegalStateException.class);
+    }
+
     @SuppressWarnings("unused")
-    private static Stream<Arguments> provideSetsParameters() {
+    private static Stream<Arguments> provideNullSetParameters() {
         return Stream.of(
             Arguments.of(null, null),
             Arguments.of(SET_A, null),
@@ -64,4 +104,23 @@ class CollectionUtilsTest extends TestFixtures {
         );
     }
 
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideEmptySetParameters() {
+        return Stream.of(
+            Arguments.of(emptySet(), emptySet()),
+            Arguments.of(SET_A, emptySet()),
+            Arguments.of(emptySet(), SET_B),
+            Arguments.of(SET_A, Set.of("x", "y", "z"))
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideMapParameters() {
+        return Stream.of(
+            Arguments.of(emptyMap(), emptyMap(), emptyMap()),
+            Arguments.of(MAP_A, emptyMap(), MAP_A),
+            Arguments.of(emptyMap(), MAP_B, MAP_B),
+            Arguments.of(MAP_A, MAP_B, Map.of("a", "A", "b", "B"))
+        );
+    }
 }

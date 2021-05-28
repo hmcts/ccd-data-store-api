@@ -2,13 +2,11 @@ package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -18,16 +16,6 @@ import java.util.Set;
 
 @Named
 public class CaseDocumentService {
-    public static final String COMPLEX = "Complex";
-    public static final String COLLECTION = "Collection";
-    public static final String DOCUMENT = "Document";
-    public static final String DOCUMENT_URL = "document_url";
-    public static final String DOCUMENT_BINARY_URL = "document_binary_url";
-    public static final String HASH_TOKEN_STRING = "hashToken";
-    public static final String BINARY = "/binary";
-// ---------------------
-
-
     private static final String DOCUMENT_HASH = "hashToken";//"document_hash";
 
     private final CaseService caseService;
@@ -63,24 +51,19 @@ public class CaseDocumentService {
 
         ensureNoTemper(preCallbackHashes, postCallbackHashes);
 
-/*
-*
-        final List<DocumentHashToken> documentHashes = DocumentUtils.buildDocumentHashToken(preCallbackHashes, postCallbackHashes);
-
-*
-*
-        final CaseDocumentsMetadata documentMetadata = DocumentUtils.createDocumentMetadata(
-            afterCallbackCaseDetails.getReferenceAsString(),
-            afterCallbackCaseDetails.getCaseTypeId(),
-            afterCallbackCaseDetails.getJurisdiction(),
+        final List<DocumentHashToken> documentHashes = caseDocumentUtils.buildDocumentHashToken(
             preCallbackHashes,
             postCallbackHashes
         );
 
-        *
-        *
-        * */
+        final CaseDocumentsMetadata documentMetadata = CaseDocumentsMetadata.builder()
+            .caseId(afterCallbackCaseDetails.getReferenceAsString())
+            .caseTypeId(afterCallbackCaseDetails.getCaseTypeId())
+            .jurisdictionId(afterCallbackCaseDetails.getJurisdiction())
+            .documentHashToken(documentHashes)
+            .build();
 
+        caseDocumentAmApiClient.applyPatch(documentMetadata);
     }
 
     private void removeHashes(final Map<String, JsonNode> data) {
@@ -95,16 +78,6 @@ public class CaseDocumentService {
         if (!tamperedHashes.isEmpty()) {
             throw new ServiceException("call back attempted to change the hashToken of the following documents:"
                 + tamperedHashes);
-        }
-    }
-
-    private void exceptionScenarios(HttpClientErrorException restClientException) {
-        if (restClientException.getStatusCode() == HttpStatus.BAD_REQUEST) {
-            throw new BadSearchRequest(restClientException.getMessage());
-        } else if (restClientException.getStatusCode() == HttpStatus.NOT_FOUND) {
-            throw new ResourceNotFoundException(restClientException.getMessage());
-        } else {
-            throw new ServiceException("The downstream CCD AM application has failed");
         }
     }
 
