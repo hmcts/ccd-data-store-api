@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.data.caseaccess;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
@@ -48,5 +50,10 @@ public class CachedCaseUserRepository implements CaseUserRepository {
     @Override
     public List<CaseUserEntity> findCaseUserRoles(List<Long> caseIds, List<String> userIds) {
         return caseUserRepository.findCaseUserRoles(caseIds, userIds);
+    }
+
+    @Override
+    public Set<String> getCaseUserRolesByUserId(String userId) {
+        return caseUserRepository.getCaseUserRolesByUserId(userId);
     }
 }

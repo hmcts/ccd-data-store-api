@@ -103,7 +103,7 @@ public abstract class BaseTest {
     private CaseDefinitionRepository caseDefinitionRepository;
     @Inject
     @Qualifier(DefaultRoleAssignmentRepository.QUALIFIER)
-    private RoleAssignmentRepository roleAssignmentRepository;
+    protected RoleAssignmentRepository roleAssignmentRepository;
     @Inject
     @Qualifier(DefaultCaseRoleRepository.QUALIFIER)
     private CaseRoleRepository caseRoleRepository;

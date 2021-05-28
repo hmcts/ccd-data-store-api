@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.User;
@@ -58,6 +59,9 @@ class AuthorisedGetUserProfileOperationTest {
 
     private AuthorisedGetUserProfileOperation classUnderTest;
 
+    @Mock
+    private CaseUserRepository caseUserRepository;
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -77,7 +81,8 @@ class AuthorisedGetUserProfileOperationTest {
         doReturn(userProfile).when(getUserProfileOperation).execute(CAN_READ);
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(any(), any(), any());
         classUnderTest =
-            new AuthorisedGetUserProfileOperation(userRepository, accessControlService, getUserProfileOperation);
+            new AuthorisedGetUserProfileOperation(userRepository, accessControlService, getUserProfileOperation,
+                caseUserRepository);
     }
 
     @Test
