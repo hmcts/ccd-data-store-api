@@ -13,22 +13,22 @@ public class DefaultJurisdictionsResolver implements JurisdictionsResolver {
 
     private final ApplicationParams applicationParams;
     private final JurisdictionsResolver idamJurisdictionsResolver;
-    private final JurisdictionsResolver accessControlledJurisdictionsResolver;
+    private final JurisdictionsResolver attributeBasedJurisdictionsResolver;
 
     public DefaultJurisdictionsResolver(ApplicationParams applicationParams,
                                         @Qualifier(IdamJurisdictionsResolver.QUALIFIER)
                                             JurisdictionsResolver idamJurisdictionsResolver,
-                                        @Qualifier(AccessControlledJurisdictionsResolver.QUALIFIER)
-                                            JurisdictionsResolver accessControlledJurisdictionsResolver) {
+                                        @Qualifier(AttributeBasedJurisdictionsResolver.QUALIFIER)
+                                            JurisdictionsResolver attributeBasedJurisdictionsResolver) {
         this.idamJurisdictionsResolver = idamJurisdictionsResolver;
-        this.accessControlledJurisdictionsResolver = accessControlledJurisdictionsResolver;
+        this.attributeBasedJurisdictionsResolver = attributeBasedJurisdictionsResolver;
         this.applicationParams = applicationParams;
     }
 
     @Override
     public List<String> getJurisdictions() {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
-            return accessControlledJurisdictionsResolver.getJurisdictions();
+            return attributeBasedJurisdictionsResolver.getJurisdictions();
         } else {
             return idamJurisdictionsResolver.getJurisdictions();
         }

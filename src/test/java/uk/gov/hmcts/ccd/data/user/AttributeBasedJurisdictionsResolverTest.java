@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-class AccessControlledJurisdictionsResolverTest {
+class AttributeBasedJurisdictionsResolverTest {
 
     private static final String USER_ID = "12345";
     private static final String DIVORCE_SOLICITOR_ROLE = "caseworker-divorce-solicitor";
@@ -45,7 +45,7 @@ class AccessControlledJurisdictionsResolverTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        jurisdictionsResolver = new AccessControlledJurisdictionsResolver(userRepository, roleAssignmentService);
+        jurisdictionsResolver = new AttributeBasedJurisdictionsResolver(userRepository, roleAssignmentService);
     }
 
     @Test

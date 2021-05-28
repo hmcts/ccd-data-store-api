@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.data.user;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -22,7 +21,7 @@ class DefaultJurisdictionsResolverTest {
     @Mock
     private JurisdictionsResolver idamJurisdictionsResolver;
     @Mock
-    private JurisdictionsResolver accessControlledJurisdictionsResolver;
+    private JurisdictionsResolver attributeBasedJurisdictionsResolver;
 
     private JurisdictionsResolver jurisdictionsResolver;
 
@@ -30,7 +29,7 @@ class DefaultJurisdictionsResolverTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
         jurisdictionsResolver = new DefaultJurisdictionsResolver(applicationParams,
-            idamJurisdictionsResolver, accessControlledJurisdictionsResolver);
+            idamJurisdictionsResolver, attributeBasedJurisdictionsResolver);
     }
 
     @Test
@@ -42,18 +41,18 @@ class DefaultJurisdictionsResolverTest {
         assertEquals(jurisdictions, jurisdictionsResolver.getJurisdictions());
 
         verify(idamJurisdictionsResolver).getJurisdictions();
-        verifyZeroInteractions(accessControlledJurisdictionsResolver);
+        verifyZeroInteractions(attributeBasedJurisdictionsResolver);
     }
 
     @Test
-    public void shouldDelegateToAccessControlledJurisdictionsResolver() {
+    public void shouldDelegateToAttributeBasedJurisdictionsResolver() {
         List<String> jurisdictions = asList("divorce", "probate");
-        given(accessControlledJurisdictionsResolver.getJurisdictions()).willReturn(jurisdictions);
+        given(attributeBasedJurisdictionsResolver.getJurisdictions()).willReturn(jurisdictions);
         given(applicationParams.getEnableAttributeBasedAccessControl()).willReturn(true);
 
         assertEquals(jurisdictions, jurisdictionsResolver.getJurisdictions());
 
-        verify(accessControlledJurisdictionsResolver).getJurisdictions();
+        verify(attributeBasedJurisdictionsResolver).getJurisdictions();
         verifyZeroInteractions(idamJurisdictionsResolver);
     }
 }
