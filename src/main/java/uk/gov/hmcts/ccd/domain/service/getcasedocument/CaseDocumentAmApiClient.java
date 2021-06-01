@@ -15,11 +15,17 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.DocumentTokenException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+@Named
 public class CaseDocumentAmApiClient {
     private final RestTemplate restTemplate;
     private final SecurityUtils securityUtils;
     private final ApplicationParams applicationParams;
 
+
+    @Inject
     public CaseDocumentAmApiClient(final RestTemplate restTemplate,
                                    final SecurityUtils securityUtils,
                                    final ApplicationParams applicationParams) {

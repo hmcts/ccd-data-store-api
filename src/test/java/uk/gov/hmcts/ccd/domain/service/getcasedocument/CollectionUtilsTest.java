@@ -6,10 +6,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.ccd.TestFixtures;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,7 +38,7 @@ class CollectionUtilsTest extends TestFixtures {
     }
 
     @ParameterizedTest
-    @MethodSource("provideEmptySetParameters")
+    @MethodSource("provideSetParameters")
     void testShouldResultInEmptySet(final Set<String> set1, final Set<String> set2) {
         // WHEN
         final Set<String> intersection = CollectionUtils.setsIntersection(set1, set2);
@@ -72,8 +74,8 @@ class CollectionUtilsTest extends TestFixtures {
     @ParameterizedTest
     @MethodSource("provideMapParameters")
     void testShouldResultInMergedMap(final Map<String, String> m1,
-                                    final Map<String, String> m2,
-                                    final Map<String, String> expectedMap) {
+                                     final Map<String, String> m2,
+                                     final Map<String, String> expectedMap) {
         // WHEN
         final Map<String, String> union = CollectionUtils.mapsUnion(m1, m2);
 
@@ -95,6 +97,33 @@ class CollectionUtilsTest extends TestFixtures {
             .isInstanceOf(IllegalStateException.class);
     }
 
+    @ParameterizedTest
+    @MethodSource("provideNullListParameters")
+    void testShouldRaiseExceptionWhenListsAreNull(final List<String> l1, final List<String> l2) {
+        // WHEN
+        final Throwable thrown = catchThrowable(() -> CollectionUtils.listsUnion(l1, l2));
+
+        // THEN
+        assertThat(thrown)
+            .isInstanceOf(NullPointerException.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideListParameters")
+    void testShouldUnionLists(final List<String> l1,
+                              final List<String> l2,
+                              final List<String> expectedList,
+                              final int expectedSize) {
+        // WHEN
+        final List<String> union = CollectionUtils.listsUnion(l1, l2);
+
+        // THEN
+        assertThat(union)
+            .isNotNull()
+            .hasSize(expectedSize)
+            .hasSameElementsAs(expectedList);
+    }
+
     @SuppressWarnings("unused")
     private static Stream<Arguments> provideNullSetParameters() {
         return Stream.of(
@@ -105,7 +134,7 @@ class CollectionUtilsTest extends TestFixtures {
     }
 
     @SuppressWarnings("unused")
-    private static Stream<Arguments> provideEmptySetParameters() {
+    private static Stream<Arguments> provideSetParameters() {
         return Stream.of(
             Arguments.of(emptySet(), emptySet()),
             Arguments.of(SET_A, emptySet()),
@@ -123,4 +152,27 @@ class CollectionUtilsTest extends TestFixtures {
             Arguments.of(MAP_A, MAP_B, Map.of("a", "A", "b", "B"))
         );
     }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideNullListParameters() {
+        return Stream.of(
+            Arguments.of(null, null),
+            Arguments.of(emptyList(), null),
+            Arguments.of(null, emptyList())
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideListParameters() {
+        final List<String> listA = List.of("a", "b");
+        final List<String> listB = List.of("c", "d", "e");
+
+        return Stream.of(
+            Arguments.of(emptyList(), emptyList(), emptyList(), 0),
+            Arguments.of(listA, emptyList(), listA, 2),
+            Arguments.of(emptyList(), listA, listA, 2),
+            Arguments.of(listA, listB, List.of("a", "b", "c", "d", "e"), 5)
+        );
+    }
+
 }

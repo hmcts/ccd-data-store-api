@@ -1,0 +1,23 @@
+[
+  {
+    "document_url": "http://dm-store:8080/documents/0dfa903c-993d-4fa4-9bc4-b97d6352b862",
+    "document_filename": "Screenshot 2020-03-03 at 16.56.56.png",
+    "document_binary_url": "http://dm-store:8080/documents/0dfa903c-993d-4fa4-9bc4-b97d6352b862/binary"
+  },
+  {
+    "document_url": "http://dm-store:8080/documents/e16f2ae0-d6ce-4bd0-a652-47b3c4d86292",
+    "document_filename": "Screenshot 2020-02-19 at 17.17.42.png",
+    "document_binary_url": "http://dm-store:8080/documents/e16f2ae0-d6ce-4bd0-a652-47b3c4d86292/binary"
+  },
+  {
+    "document_url": "http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d",
+    "document_filename": "Screenshot 2020-03-24 at 08.38.47.png",
+    "document_binary_url": "http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d/binary"
+  },
+  {
+    "document_url": "http://dm-store:8080/documents/e08f1e2d-05a4-497a-b5b2-8fff07fb7a11",
+    "document_filename": "Screenshot 2020-03-03 at 16.56.56.png",
+    "document_binary_url": "http://dm-store:8080/documents/e08f1e2d-05a4-497a-b5b2-8fff07fb7a11/binary"
+  }
+]
+

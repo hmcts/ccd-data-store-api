@@ -155,6 +155,9 @@ public class ApplicationParams {
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
 
+    @Value("${document.hash.check.enabled}")
+    private boolean enableDocumentHashCheck;
+
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -420,5 +423,9 @@ public class ApplicationParams {
 
     public Integer getCasesIndexNameCaseTypeIdGroupPosition() {
         return casesIndexNameCaseTypeIdGroupPosition;
+    }
+
+    public boolean isDocumentHashCheckingEnabled() {
+        return enableDocumentHashCheck;
     }
 }

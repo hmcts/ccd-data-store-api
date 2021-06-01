@@ -85,15 +85,18 @@ public class SubmitCaseTransaction {
                                   CaseTypeDefinition caseTypeDefinition,
                                   IdamUser idamUser,
                                   CaseEventDefinition caseEventDefinition,
-                                  CaseDetails newCaseDetails, Boolean ignoreWarning) {
+                                  CaseDetails caseDetails,
+                                  Boolean ignoreWarning) {
 
         final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
 
-        newCaseDetails.setCreatedDate(now);
-        newCaseDetails.setLastStateModifiedDate(now);
-        newCaseDetails.setReference(Long.valueOf(uidService.generateUID()));
+        caseDetails.setCreatedDate(now);
+        caseDetails.setLastStateModifiedDate(now);
+        caseDetails.setReference(Long.valueOf(uidService.generateUID()));
 
-        final CaseDetails caseDetailsWithoutHashes = caseDocumentService.cloneCaseDetailsWithoutHashes(newCaseDetails);
+        final CaseDetails caseDetailsWithoutHashes = caseDocumentService.stripDocumentHashes(caseDetails);
+
+        // validate(object, empty())
 
         /*
             About to submit
@@ -110,20 +113,30 @@ public class SubmitCaseTransaction {
             ignoreWarning
         );
 
+        @SuppressWarnings("UnnecessaryLocalVariable")
+        final CaseDetails caseDetailsAfterCallback = caseDetailsWithoutHashes;
+
+        // validate(caseDetails, caseDetailsAfterCallback) // new documents only
+        caseDocumentService.validate(caseDetails.getData(), caseDetailsAfterCallback.getData());
+
+        final CaseDetails caseDetailsAfterCallbackWithoutHashes = caseDocumentService.stripDocumentHashes(
+            caseDetailsAfterCallback
+        );
+
         final CaseDetails savedCaseDetails = saveAuditEventForCaseDetails(
             aboutToSubmitCallbackResponse,
             event,
             caseTypeDefinition,
             idamUser,
             caseEventDefinition,
-            caseDetailsWithoutHashes
+            caseDetailsAfterCallbackWithoutHashes
         );
 
         if (AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             caseUserRepository.grantAccess(Long.valueOf(savedCaseDetails.getId()), idamUser.getId(), CREATOR.getRole());
         }
 
-        caseDocumentService.attachCaseDocuments(newCaseDetails, savedCaseDetails);
+        caseDocumentService.attachCaseDocuments(caseDetails, caseDetailsAfterCallback);
 
         return savedCaseDetails;
     }

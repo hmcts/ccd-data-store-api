@@ -27,21 +27,6 @@ public abstract class TestFixtures {
     protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
         .registerModule(new JavaTimeModule());
 
-    protected Map<String, JsonNode> loadDataAsMap(final String fileName) throws IOException {
-        final InputStream inputStream = getInputStream(fileName);
-        final TypeReference<Map<String, JsonNode>> typeReference = new TypeReference<>() {
-        };
-        return OBJECT_MAPPER.readValue(inputStream, typeReference);
-    }
-
-    @SuppressWarnings("SameParameterValue")
-    protected List<JsonNode> loadDataAsList(final String fileName) throws IOException {
-        final InputStream inputStream = getInputStream(fileName);
-        final TypeReference<List<JsonNode>> typeReference = new TypeReference<>() {
-        };
-        return OBJECT_MAPPER.readValue(inputStream, typeReference);
-    }
-
     @SuppressWarnings("unused")
     protected static Stream<Arguments> provideNullMapParameters() {
         return Stream.of(
@@ -51,9 +36,23 @@ public abstract class TestFixtures {
         );
     }
 
-    private InputStream getInputStream(final String fileName) {
+    protected static Map<String, JsonNode> fromFileAsMap(final String filename) throws IOException {
+        final InputStream inputStream = getInputStream(filename);
+        final TypeReference<Map<String, JsonNode>> typeReference = new TypeReference<>() {
+        };
+        return OBJECT_MAPPER.readValue(inputStream, typeReference);
+    }
+
+    protected static List<JsonNode> fromFileAsList(final String filename) throws IOException {
+        final InputStream inputStream = getInputStream(filename);
+        final TypeReference<List<JsonNode>> typeReference = new TypeReference<>() {
+        };
+        return OBJECT_MAPPER.readValue(inputStream, typeReference);
+    }
+
+    private static InputStream getInputStream(final String filename) {
         return TestFixtures.class.getClassLoader()
-            .getResourceAsStream("tests/".concat(fileName));
+            .getResourceAsStream("tests/".concat(filename));
     }
 
 }
