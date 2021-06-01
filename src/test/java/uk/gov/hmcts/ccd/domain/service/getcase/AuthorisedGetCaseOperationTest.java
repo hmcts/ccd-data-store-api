@@ -100,7 +100,7 @@ class AuthorisedGetCaseOperationTest {
             eq(caseType), eq(accessProfiles), eq(CAN_READ));
         doReturn(caseType).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
 
-        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+        when(caseDataAccessControl.generateAccessProfilesByCaseReference(anyString()))
             .thenReturn(accessProfiles);
 
         doReturn(USER_ID).when(userRepository).getUserId();
@@ -192,7 +192,7 @@ class AuthorisedGetCaseOperationTest {
         @Test
         @DisplayName("should return empty case if no user roles found")
         void shouldReturnEmptyCaseIfNoUserRolesFound() {
-            when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+            when(caseDataAccessControl.generateAccessProfilesByCaseReference(anyString()))
                 .thenReturn(Sets.newHashSet());
 
 
@@ -217,7 +217,7 @@ class AuthorisedGetCaseOperationTest {
         @Test
         @DisplayName("should return empty case if empty user roles")
         void shouldReturnEmptyCaseIfEmptyUserRolesFound() {
-            when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+            when(caseDataAccessControl.generateAccessProfilesByCaseReference(anyString()))
                 .thenReturn(Sets.newHashSet());
 
             final Optional<CaseDetails> result = authorisedGetCaseOperation.execute(JURISDICTION_ID,
@@ -339,7 +339,7 @@ class AuthorisedGetCaseOperationTest {
         @Test
         @DisplayName("should return empty case if no user roles found")
         void shouldReturnEmptyCaseIfNoUserRolesFound() {
-            when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+            when(caseDataAccessControl.generateAccessProfilesByCaseReference(anyString()))
                 .thenReturn(Sets.newHashSet());
 
             final Optional<CaseDetails> result = authorisedGetCaseOperation.execute(CASE_REFERENCE);
@@ -361,7 +361,7 @@ class AuthorisedGetCaseOperationTest {
         @Test
         @DisplayName("should return empty case if empty user roles")
         void shouldReturnEmptyCaseIfEmptyUserRolesFound() {
-            when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+            when(caseDataAccessControl.generateAccessProfilesByCaseReference(anyString()))
                 .thenReturn(Sets.newHashSet());
 
             final Optional<CaseDetails> result = authorisedGetCaseOperation.execute(CASE_REFERENCE);

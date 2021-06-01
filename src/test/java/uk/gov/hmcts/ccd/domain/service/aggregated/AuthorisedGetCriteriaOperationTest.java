@@ -12,7 +12,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -55,8 +54,7 @@ class AuthorisedGetCriteriaOperationTest {
     private GetCriteriaOperation getCriteriaOperation;
     @Mock
     private GetCaseTypeOperation getCaseTypeOperation;
-    @Mock
-    private UserRepository userRepository;
+
     private AuthorisedGetCriteriaOperation classUnderTest;
     @Mock
     private CaseDataAccessControl caseDataAccessControl;

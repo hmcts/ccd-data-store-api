@@ -346,7 +346,7 @@ class AuthorisedGetCaseTypeDefinitionOperationTest {
             Set<AccessProfile> accessProfiles = createAccessProfiles(USER_ROLES);
 
             doReturn(newArrayList(CASE_STATE_1_1)).when(accessControlService)
-                .filterCaseStatesByAccess(null, accessProfiles, CAN_READ);
+                .filterCaseStatesByAccess(testCaseTypeDefinition1, accessProfiles, CAN_READ);
 
             Optional<CaseTypeDefinition> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID, CAN_READ);
 

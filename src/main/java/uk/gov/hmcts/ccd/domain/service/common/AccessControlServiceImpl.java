@@ -155,7 +155,7 @@ public class AccessControlServiceImpl implements AccessControlService {
         getStream(caseFields).forEach(
             fieldName -> findCaseFieldAndVerifyHasAccess(fieldName, caseFieldDefinitions, accessProfiles, access)
                 .ifPresent(caseField -> {
-                    if (isEmpty(caseField.getAccessControlLists())) {
+                    if (isEmpty(caseField.getComplexACLs())) {
                         filteredCaseFields.set(fieldName, caseFields.get(fieldName));
                     } else if (!isClassification) {
                         filteredCaseFields.set(

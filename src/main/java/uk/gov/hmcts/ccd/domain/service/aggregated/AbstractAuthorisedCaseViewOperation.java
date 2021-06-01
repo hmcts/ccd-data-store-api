@@ -76,7 +76,7 @@ public abstract class AbstractAuthorisedCaseViewOperation {
     }
 
     private boolean tabAllowed(final CaseViewTab caseViewTab, final Set<AccessProfile> accessProfiles) {
-        Set<String> accessProfileNames = caseDataAccessControl.extractAccessProfileNames(accessProfiles);
+        Set<String> accessProfileNames = AccessControlService.extractAccessProfileNames(accessProfiles);
         return StringUtils.isEmpty(caseViewTab.getRole()) || accessProfileNames.contains(caseViewTab.getRole());
     }
 

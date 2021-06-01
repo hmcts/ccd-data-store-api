@@ -9,6 +9,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 
@@ -40,7 +41,7 @@ public class CaseSearchesViewAccessControl {
         if (useCase != null) {
             return searchResultDefinition.fieldExists(caseFieldId)
                 && searchResultDefinition.fieldHasRole(caseFieldId,
-                caseDataAccessControl.extractAccessProfileNames(accessProfiles));
+                AccessControlService.extractAccessProfileNames(accessProfiles));
         }
         return true;
     }

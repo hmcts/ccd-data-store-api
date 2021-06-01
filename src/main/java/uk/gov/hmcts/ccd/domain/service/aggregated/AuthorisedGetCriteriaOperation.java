@@ -15,6 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaInput;
 import uk.gov.hmcts.ccd.domain.model.search.CriteriaType;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.NO_CASE_TYPE_FOUND;
@@ -49,11 +50,12 @@ public class AuthorisedGetCriteriaOperation implements GetCriteriaOperation {
             throw resourceNotFoundException;
         }
         final HashSet<String> addedFields = new HashSet<>();
+        Set<String> accessProfileNames = AccessControlService.extractAccessProfileNames(getAccessProfiles(caseTypeId));
         return getCriteriaOperation.execute(caseTypeId, access, criteriaType).stream()
             .filter(crInput -> criteriaAllowedByCRUD(caseType.get(), crInput))
             .filter(input -> filterDistinctFieldsByRole(addedFields,
                 input,
-                getAccessProfiles(caseTypeId)))
+                accessProfileNames))
             .collect(Collectors.toList());
     }
 
@@ -70,7 +72,7 @@ public class AuthorisedGetCriteriaOperation implements GetCriteriaOperation {
 
     private boolean filterDistinctFieldsByRole(final Set<String> addedFields,
                                                final CriteriaInput criteriaInput,
-                                               final Set<AccessProfile> accessProfiles) {
+                                               final Set<String> accessProfiles) {
         String id = criteriaInput.buildCaseFieldId();
         if (addedFields.contains(id)) {
             return false;

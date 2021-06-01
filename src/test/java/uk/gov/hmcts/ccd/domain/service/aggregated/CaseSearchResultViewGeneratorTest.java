@@ -84,6 +84,8 @@ class CaseSearchResultViewGeneratorTest {
     private static final String ROLE_IN_USER_ROLE_1 = "Role 1";
     private static final String ROLE_IN_USER_ROLE_2 = "Role 2";
     private static final String ROLE_NOT_IN_USER_ROLE = "Role X";
+    private static final Set<AccessProfile> ACCESS_PROFILES = createAccessProfiles(Sets
+        .newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2));
 
     private static final String FAMILY_DETAILS = "FamilyDetails";
     private static final String FATHER_NAME_VALUE = "Simmon";
@@ -154,6 +156,9 @@ class CaseSearchResultViewGeneratorTest {
         ObjectNode familyDetails = (ObjectNode) new ObjectMapper().readTree(FAMILY_DETAILS_VALUE);
         dataMap.put(FAMILY_DETAILS, familyDetails);
 
+        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+            .thenReturn(ACCESS_PROFILES);
+
         CaseDetails caseDetails1 = caseDetails().withReference(999L)
             .withData(dataMap)
             .withCaseTypeId(CASE_TYPE_ID_1)
@@ -185,6 +190,7 @@ class CaseSearchResultViewGeneratorTest {
 
         final CaseFieldDefinition fatherName = newCaseField().withId(FATHER_NAME)
             .withFieldType(textFieldType())
+            .withCaseTypeId(CASE_TYPE_ID_1)
             .withSC(SECURITY_CLASSIFICATION.name())
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLE_1)
@@ -192,6 +198,7 @@ class CaseSearchResultViewGeneratorTest {
                 .build()).build();
         final CaseFieldDefinition motherName = newCaseField().withId(MOTHER_NAME)
             .withFieldType(textFieldType())
+            .withCaseTypeId(CASE_TYPE_ID_1)
             .withSC(SECURITY_CLASSIFICATION.name())
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLE_1)
@@ -200,6 +207,7 @@ class CaseSearchResultViewGeneratorTest {
 
         final CaseFieldDefinition addressLine1 = newCaseField().withId(ADDRESS_LINE_1)
             .withFieldType(textFieldType())
+            .withCaseTypeId(CASE_TYPE_ID_1)
             .withSC(SECURITY_CLASSIFICATION.name())
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLE_1)
@@ -207,6 +215,7 @@ class CaseSearchResultViewGeneratorTest {
                 .build()).build();
         final CaseFieldDefinition postCode = newCaseField().withId(POSTCODE)
             .withFieldType(textFieldType())
+            .withCaseTypeId(CASE_TYPE_ID_1)
             .withSC(SECURITY_CLASSIFICATION.name())
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLE_1)
@@ -215,7 +224,9 @@ class CaseSearchResultViewGeneratorTest {
         final FieldTypeDefinition addressFieldTypeDefinition = aFieldType().withId(FAMILY_ADDRESS).withType(COMPLEX)
             .withComplexField(addressLine1).withComplexField(postCode).build();
         final CaseFieldDefinition familyAddress =
-            newCaseField().withId(FAMILY_ADDRESS).withFieldType(addressFieldTypeDefinition).withAcl(anAcl()
+            newCaseField().withId(FAMILY_ADDRESS).withFieldType(addressFieldTypeDefinition)
+                .withCaseTypeId(CASE_TYPE_ID_1)
+                .withAcl(anAcl()
             .withRole(ROLE_IN_USER_ROLE_1)
             .withRead(true)
             .build()).build();
@@ -233,24 +244,28 @@ class CaseSearchResultViewGeneratorTest {
             .withCaseTypeId(CASE_TYPE_ID_1)
             .withJurisdiction(jurisdiction)
             .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
+                .withCaseTypeId(CASE_TYPE_ID_1)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLE_1)
                     .withRead(true)
                     .build()).build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
+                .withCaseTypeId(CASE_TYPE_ID_1)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLE_1)
                     .withRead(true)
                     .build()).build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
+                .withCaseTypeId(CASE_TYPE_ID_1)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLE_1)
                     .withRead(true)
                     .build()).build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .withField(newCaseField().withId(FAMILY_DETAILS).withFieldType(familyDetailsFieldTypeDefinition)
+                .withCaseTypeId(CASE_TYPE_ID_1)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLE_1)
                     .withRead(true)
@@ -269,12 +284,14 @@ class CaseSearchResultViewGeneratorTest {
             .withCaseTypeId(CASE_TYPE_ID_2)
             .withJurisdiction(jurisdiction)
             .withField(newCaseField().withId(CASE_FIELD_4).withFieldType(textFieldType())
+                .withCaseTypeId(CASE_TYPE_ID_2)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLE_1)
                     .withRead(true)
                     .build()).build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .withField(newCaseField().withId(CASE_FIELD_5).withFieldType(textFieldType())
+                .withCaseTypeId(CASE_TYPE_ID_2)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLE_1)
                     .withRead(true)
@@ -308,12 +325,7 @@ class CaseSearchResultViewGeneratorTest {
             caseSearchesViewAccessControl);
     }
 
-    private void mockAccessProfiles() {
-        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
-            .thenReturn(createAccessProfiles(Sets.newHashSet(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2)));
-    }
-
-    private Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+    private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
         return userRoles.stream()
             .map(userRole -> AccessProfile.builder().readOnly(false)
                 .accessProfile(userRole)
@@ -324,7 +336,6 @@ class CaseSearchResultViewGeneratorTest {
 
     @Test
     void shouldBuildCaseSearchResultHeaders() {
-        mockAccessProfiles();
 
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult,
             WORKBASKET, Collections.emptyList());
@@ -402,7 +413,6 @@ class CaseSearchResultViewGeneratorTest {
                     "", ""))
             .build();
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
-        mockAccessProfiles();
 
 
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult,
@@ -425,22 +435,30 @@ class CaseSearchResultViewGeneratorTest {
         CaseTypeDefinition caseTypeDefinition = newCaseType()
             .withCaseTypeId(CASE_TYPE_ID_1)
             .withJurisdiction(jurisdiction)
-            .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType()).withAcl(anAcl()
+            .withField(newCaseField().withId(CASE_FIELD_1)
+                .withCaseTypeId(CASE_TYPE_ID_1)
+                .withFieldType(textFieldType()).withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLE_1)
                 .withRead(true)
                 .build()).build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType()).withAcl(anAcl()
+            .withField(newCaseField().withId(CASE_FIELD_2)
+                .withCaseTypeId(CASE_TYPE_ID_1)
+                .withFieldType(textFieldType()).withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLE_1)
                 .withRead(true)
                 .build()).build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_4).withFieldType(textFieldType()).withAcl(anAcl()
+            .withField(newCaseField().withId(CASE_FIELD_4)
+                .withCaseTypeId(CASE_TYPE_ID_1)
+                .withFieldType(textFieldType()).withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLE_1)
                 .withRead(true)
                 .build()).build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_5).withFieldType(textFieldType()).withAcl(anAcl()
+            .withField(newCaseField().withId(CASE_FIELD_5)
+                .withCaseTypeId(CASE_TYPE_ID_1)
+                .withFieldType(textFieldType()).withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLE_1)
                 .withRead(true)
                 .build()).build())
@@ -464,7 +482,6 @@ class CaseSearchResultViewGeneratorTest {
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition);
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
-        mockAccessProfiles();
 
         when(userRepository.anyRoleMatches(any())).thenReturn(true);
         when(userRepository.anyRoleEqualsTo(any())).thenReturn(true);
@@ -516,22 +533,29 @@ class CaseSearchResultViewGeneratorTest {
             .withCaseTypeId(CASE_TYPE_ID_1)
             .withJurisdiction(jurisdiction)
             .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
+                .withCaseTypeId(CASE_TYPE_ID_1)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLE_1)
                     .withRead(true)
                     .build()).build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType()).withAcl(anAcl()
+            .withField(newCaseField().withId(CASE_FIELD_2)
+                .withCaseTypeId(CASE_TYPE_ID_1)
+                .withFieldType(textFieldType()).withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLE_1)
                 .withRead(true)
                 .build()).build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_4).withFieldType(textFieldType()).withAcl(anAcl()
+            .withField(newCaseField().withId(CASE_FIELD_4)
+                .withCaseTypeId(CASE_TYPE_ID_1)
+                .withFieldType(textFieldType()).withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLE_1)
                 .withRead(true)
                 .build()).build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_5).withFieldType(textFieldType()).withAcl(anAcl()
+            .withField(newCaseField().withId(CASE_FIELD_5)
+                .withCaseTypeId(CASE_TYPE_ID_1)
+                .withFieldType(textFieldType()).withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLE_1)
                 .withRead(true)
                 .build()).build())
@@ -540,7 +564,6 @@ class CaseSearchResultViewGeneratorTest {
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition);
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
-        mockAccessProfiles();
 
         when(userRepository.anyRoleMatches(any())).thenReturn(true);
         when(userRepository.anyRoleEqualsTo(any())).thenReturn(true);
@@ -579,7 +602,6 @@ class CaseSearchResultViewGeneratorTest {
             .build();
 
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
-        mockAccessProfiles();
 
         doReturn(true).when(userRepository).anyRoleEqualsTo(searchResultFieldWithValidRole.getRole());
 
@@ -607,7 +629,6 @@ class CaseSearchResultViewGeneratorTest {
                     "#DCP", ""))
             .build();
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
-        mockAccessProfiles();
 
         classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
@@ -636,7 +657,6 @@ class CaseSearchResultViewGeneratorTest {
                 FAMILY_DETAILS, "", ""))
             .build();
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
-        mockAccessProfiles();
 
         final BadRequestException exception = assertThrows(BadRequestException.class,
             () -> classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList()));

@@ -34,6 +34,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -53,6 +54,8 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     private static final String ROLE_IN_USER_ROLES = "caseworker-probate-loa1";
     private static final String ROLE_IN_USER_ROLES_2 = "caseworker-divorce-loa";
     private static final Set<String> USER_ROLES = newHashSet(ROLE_IN_USER_ROLES, ROLE_IN_USER_ROLES_2);
+
+    private static final Set<AccessProfile> ACCESS_PROFILES = createAccessProfiles(USER_ROLES);
     private static final String ROLE_NOT_IN_USER_ROLES = "caseworker-family-law";
     private static final String EVENT_ID_STRING = valueOf(EVENT_ID);
     private static final CaseEventDefinition CASE_EVENT = newCaseEvent().withId(EVENT_ID_STRING).build();
@@ -111,8 +114,10 @@ class AuthorisedGetCaseHistoryViewOperationTest {
         MockitoAnnotations.initMocks(this);
 
         doReturn(TEST_CASE_TYPE).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
-        doReturn(createAccessProfiles(USER_ROLES)).when(caseDataAccessControl)
+        doReturn(ACCESS_PROFILES).when(caseDataAccessControl)
             .generateAccessProfilesByCaseTypeId(CASE_TYPE_ID);
+        doReturn(ACCESS_PROFILES).when(caseDataAccessControl)
+            .generateAccessProfilesByCaseReference(anyString());
         doReturn(TEST_CASE_HISTORY_VIEW).when(getCaseHistoryViewOperation).execute(CASE_REFERENCE, EVENT_ID);
         doReturn(caseRoles).when(caseUserRepository).findCaseRoles(Long.valueOf(CASE_REFERENCE), USER_ID);
         doReturn(Optional.of(CASE_DETAILS)).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
@@ -123,7 +128,7 @@ class AuthorisedGetCaseHistoryViewOperationTest {
                     accessControlService, caseDetailsRepository, caseDataAccessControl);
     }
 
-    private Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+    private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
         return userRoles.stream()
             .map(userRole -> AccessProfile.builder().readOnly(false)
                 .accessProfile(userRole)
@@ -135,9 +140,8 @@ class AuthorisedGetCaseHistoryViewOperationTest {
     @Test
     @DisplayName("should return case history view")
     void shouldReturnCaseHistoryView() {
-        Set<AccessProfile> accessProfiles = createAccessProfiles(USER_ROLES);
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE,
-            accessProfiles, CAN_READ);
+            ACCESS_PROFILES, CAN_READ);
         doReturn(USER_ID).when(userRepository).getUserId();
 
         CaseHistoryView caseHistoryView = authorisedGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID);
@@ -147,15 +151,14 @@ class AuthorisedGetCaseHistoryViewOperationTest {
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         verify(caseDetailsRepository).findByReference(CASE_REFERENCE);
         verify(caseDataAccessControl).generateAccessProfilesByCaseReference(CASE_REFERENCE);
-        verify(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, accessProfiles, CAN_READ);
+        verify(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, ACCESS_PROFILES, CAN_READ);
     }
 
     @Test
     @DisplayName("should remove tabs based on Tab Role)")
     void shouldRemoveTabsNotAllowedForUser() {
-        Set<AccessProfile> accessProfiles = createAccessProfiles(USER_ROLES);
         doReturn(true).when(accessControlService)
-            .canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, accessProfiles, CAN_READ);
+            .canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, ACCESS_PROFILES, CAN_READ);
 
         final CaseHistoryView actualCaseView = authorisedGetCaseHistoryViewOperation.execute(CASE_REFERENCE, EVENT_ID);
 

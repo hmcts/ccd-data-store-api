@@ -11,11 +11,5 @@ public interface CaseDataAccessControl {
 
     Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference);
 
-    default Set<String> extractAccessProfileNames(Collection<AccessProfile> accessProfiles) {
-        return accessProfiles.stream()
-            .map(accessProfile -> accessProfile.getAccessProfile())
-            .collect(Collectors.toSet());
-    }
-
     void grantAccess(String caseId, String idamUserId);
 }
