@@ -1,0 +1,20 @@
+[
+  {
+    "document_url": "http://dm-store:8080/documents/5a16b8ed-c62f-41b3-b3c9-1df20b6a9979",
+    "document_filename": "E_1_AA_Claimant details.xlsx",
+    "document_binary_url": "http://dm-store:8080/documents/5a16b8ed-c62f-41b3-b3c9-1df20b6a9979/binary",
+    "hashToken": "36fc7aa586a54bffc2982ed490c4503f4aca875b7160c9d24b6690276886tytu"
+  },
+  {
+    "document_url": "http://dm-store:8080/documents/19de0db3-37c6-4191-a81d-c31a1379a9ca",
+    "document_filename": "E_1_BBClaimant details.xlsx",
+    "document_binary_url": "http://dm-store:8080/documents/19de0db3-37c6-4191-a81d-c31a1379a9ca/binary",
+    "hashToken": "0276886tytu36fc7aa586a54bffc2982ed490c4503f4aca875b7160c9d24b669"
+  },
+  {
+    "document_url": "http://dm-store:8080/documents/f6d623f2-db67-4a01-ae6e-3b6ee14a8b20",
+    "document_filename": "C_2_Collection of Documents.docx",
+    "document_binary_url": "http://dm-store:8080/documents/f6d623f2-db67-4a01-ae6e-3b6ee14a8b20/binary",
+    "hashToken": "7160c9d24b6690276886tytu36fc7aa586a54bffc2982ed490c4503f4aca875b"
+  }
+]
