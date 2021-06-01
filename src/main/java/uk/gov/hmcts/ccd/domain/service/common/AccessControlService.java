@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
@@ -126,7 +127,7 @@ public interface AccessControlService {
         Set<AccessProfile> accessProfiles, Predicate<AccessControlList> access) {
         return caseFieldDefinitions.stream().filter(caseField ->
             caseField.getId().equals(fieldName)
-                && hasAccessControlList(accessProfiles, access, getAccessControlList(caseField))).findFirst();
+                && hasAccessControlList(accessProfiles, access, caseField.getAccessControlLists())).findFirst();
     }
 
     default JsonNode filterChildrenUsingJsonNode(CaseFieldDefinition caseField,
@@ -136,7 +137,7 @@ public interface AccessControlService {
                                                  boolean isClassification) {
         if (caseField.isCompoundFieldType()) {
             caseField.getFieldTypeDefinition().getChildren().stream().forEach(childField -> {
-                if (!hasAccessControlList(accessProfiles, access, getAccessControlList(childField))) {
+                if (!hasAccessControlList(accessProfiles, access, childField.getAccessControlLists())) {
                     locateAndRemoveChildNode(caseField, jsonNode, childField);
                 } else {
                     if (childField.isCollectionFieldType()) {
@@ -215,13 +216,13 @@ public interface AccessControlService {
 
     default String generateDisplayContextParamer(Set<AccessProfile> accessProfiles, CommonField field) {
         List<String> collectionAccess = new ArrayList<>();
-        if (hasAccessControlList(accessProfiles, CAN_CREATE, getAccessControlList(field))) {
+        if (hasAccessControlList(accessProfiles, CAN_CREATE, field.getAccessControlLists())) {
             collectionAccess.add(ALLOW_INSERT.getOption());
         }
-        if (hasAccessControlList(accessProfiles, CAN_DELETE, getAccessControlList(field))) {
+        if (hasAccessControlList(accessProfiles, CAN_DELETE, field.getAccessControlLists())) {
             collectionAccess.add(ALLOW_DELETE.getOption());
         }
-        if (hasAccessControlList(accessProfiles, CAN_UPDATE, getAccessControlList(field))) {
+        if (hasAccessControlList(accessProfiles, CAN_UPDATE, field.getAccessControlLists())) {
             collectionAccess.add(ALLOW_INSERT.getOption());
             collectionAccess.add(ALLOW_DELETE.getOption());
         }
@@ -238,7 +239,7 @@ public interface AccessControlService {
                                                  CommonField caseViewField) {
         if (caseField.isCompoundFieldType()) {
             caseField.getFieldTypeDefinition().getChildren().stream().forEach(childField -> {
-                if (!hasAccessControlList(accessProfiles, access, getAccessControlList(childField))) {
+                if (!hasAccessControlList(accessProfiles, access, childField.getAccessControlLists())) {
                     findNestedField(caseViewField, childField.getId()).setDisplayContext(READONLY);
                     Optional<WizardPageField> optionalWizardPageField = getWizardPageField(wizardPages, rootFieldId);
                     if (optionalWizardPageField.isPresent()) {
@@ -310,11 +311,11 @@ public interface AccessControlService {
     default void filterChildren(CaseFieldDefinition caseField, CommonField caseViewField,
                                 Set<AccessProfile> accessProfiles,
                                 Predicate<AccessControlList> access) {
-        if (!hasAccessControlList(accessProfiles, access, getAccessControlList(caseField))) {
+        if (!hasAccessControlList(accessProfiles, access, caseField.getAccessControlLists())) {
             locateAndRemoveCaseField(caseField, caseViewField);
         } else if (caseField.isCompoundFieldType()) {
             caseField.getFieldTypeDefinition().getChildren().stream().forEach(childField -> {
-                if (!hasAccessControlList(accessProfiles, access, getAccessControlList(childField))) {
+                if (!hasAccessControlList(accessProfiles, access, childField.getAccessControlLists())) {
                     locateAndRemoveChildField(findNestedField(caseViewField, caseField.getId()), childField,
                         caseField.isCollectionFieldType());
                 } else if (childField.isCompoundFieldType()) {
@@ -442,7 +443,7 @@ public interface AccessControlService {
         return caseField.getFieldTypeDefinition()
             .getChildren()
             .stream()
-            .filter(childField -> hasAccessControlList(accessProfiles, access, getAccessControlList(childField)))
+            .filter(childField -> hasAccessControlList(accessProfiles, access, childField.getAccessControlLists()))
             .map(subField -> subField.isCompoundFieldType()
                 ? determineFieldTypeAndCheckChildAccess(subField, accessProfiles, access) : subField)
             .collect(toList());
@@ -464,8 +465,8 @@ public interface AccessControlService {
         return caseEventDefinitions
             .stream()
             .filter(caseEventDef ->
-                nonNull(getAccessControlList(caseEventDef)) && caseEventDef.getId().equals(eventId))
-            .map(caseEventDef -> getAccessControlList(caseEventDef))
+                nonNull(caseEventDef.getAccessControlLists()) && caseEventDef.getId().equals(eventId))
+            .map(caseEventDef -> caseEventDef.getAccessControlLists())
             .findAny().orElse(newArrayList());
     }
 
@@ -478,7 +479,7 @@ public interface AccessControlService {
                 auditEvent.getEventId().equals(caseEventDefinition.getId())
                     && hasAccessControlList(accessProfiles,
                     CAN_READ,
-                    getAccessControlList(caseEventDefinition)));
+                    caseEventDefinition.getAccessControlLists()));
     }
 
     default Stream<String> getStream(JsonNode newData) {
@@ -491,7 +492,7 @@ public interface AccessControlService {
                                        Predicate<AccessControlList> criteria) {
         for (CaseEventDefinition caseEvent : caseEventDefinitions) {
             if (caseEvent.getId().equals(eventId)
-                && hasAccessControlList(accessProfiles, criteria, getAccessControlList(caseEvent))) {
+                && hasAccessControlList(accessProfiles, criteria, caseEvent.getAccessControlLists())) {
                 return true;
             }
         }
@@ -502,15 +503,15 @@ public interface AccessControlService {
                                                            String fieldName) {
         return caseFieldDefinitions
             .stream()
-            .filter(caseField -> nonNull(getAccessControlList(caseField)) && caseField.getId().equals(fieldName))
+            .filter(caseField -> nonNull(caseField.getAccessControlLists()) && caseField.getId().equals(fieldName))
             .findAny();
     }
 
     default List<AccessControlList> getCaseFieldAcls(List<CaseFieldDefinition> caseFieldDefinitions, String fieldName) {
         return caseFieldDefinitions
             .stream()
-            .filter(caseField -> nonNull(getAccessControlList(caseField)) && caseField.getId().equals(fieldName))
-            .map(caseField -> getAccessControlList(caseField))
+            .filter(caseField -> nonNull(caseField.getAccessControlLists()) && caseField.getId().equals(fieldName))
+            .map(caseField -> caseField.getAccessControlLists())
             .findAny().orElse(newArrayList());
     }
 
@@ -525,30 +526,17 @@ public interface AccessControlService {
     static boolean hasAccessControlList(Set<AccessProfile> accessProfiles,
                                         List<AccessControlList> accessControlLists,
                                         Predicate<AccessControlList> criteria) {
+        Set<String> accessProfileNames = extractAccessProfileNames(accessProfiles);
         return accessControlLists != null && accessControlLists
             .stream()
-            .filter(acls -> accessProfiles.contains(acls.getAccessProfile()))
+            .filter(acls -> accessProfileNames.contains(acls.getAccessProfile()))
             .anyMatch(criteria);
     }
 
-    default List<AccessControlList> getAccessControlList(CaseTypeDefinition caseTypeDefinition) {
-        return caseTypeDefinition != null ? caseTypeDefinition.getAccessControlLists() : newArrayList();
+    static Set<String> extractAccessProfileNames(Set<AccessProfile> accessProfiles) {
+        return accessProfiles.stream()
+            .map(accessProfile -> accessProfile.getAccessProfile())
+            .collect(Collectors.toSet());
     }
 
-    default List<AccessControlList> getAccessControlList(CaseTypeDefinition caseTypeDefinition,
-                                                         CaseStateDefinition caseStateDefinition) {
-        return caseStateDefinition != null ? caseStateDefinition.getAccessControlLists() : newArrayList();
-    }
-
-    default List<AccessControlList> getAccessControlList(CaseEventDefinition caseEventDefinition) {
-        return caseEventDefinition != null ? caseEventDefinition.getAccessControlLists() : newArrayList();
-    }
-
-    default List<AccessControlList> getAccessControlList(CaseFieldDefinition caseFieldDefinition) {
-        return caseFieldDefinition != null ? caseFieldDefinition.getAccessControlLists() : newArrayList();
-    }
-
-    default List<AccessControlList> getAccessControlList(CommonField caseViewField) {
-        return caseViewField != null ? caseViewField.getAccessControlLists() : newArrayList();
-    }
 }

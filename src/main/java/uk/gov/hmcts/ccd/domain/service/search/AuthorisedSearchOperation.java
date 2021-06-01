@@ -68,21 +68,17 @@ public class AuthorisedSearchOperation implements SearchOperation {
         return results.stream()
             .filter(caseDetails -> accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(),
                 caseTypeDefinition,
-                getAccessProfilesByCaseReference(caseDetails.getReferenceAsString()),
+                getAccessProfiles(caseTypeDefinition),
                 CAN_READ))
 
             .collect(Collectors.toList())
             .stream()
             .map(caseDetails -> verifyFieldReadAccess(caseTypeDefinition,
-                getAccessProfilesByCaseReference(caseDetails.getReferenceAsString()),
+                getAccessProfiles(caseTypeDefinition),
                 caseDetails))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .collect(Collectors.toList());
-    }
-
-    private Set<AccessProfile> getAccessProfilesByCaseReference(String caseReference) {
-        return caseDataAccessControl.generateAccessProfilesByCaseReference(caseReference);
     }
 
     private CaseTypeDefinition getCaseType(String caseTypeId) {
