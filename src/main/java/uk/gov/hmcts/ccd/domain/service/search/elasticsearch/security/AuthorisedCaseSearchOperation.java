@@ -225,10 +225,8 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         return path == null ? "" : path.split(SEARCH_ALIAS_CASE_FIELD_PATH_SEPARATOR_REGEX)[0];
     }
 
-    private Set<String> getAccessProfiles(String caseReference) {
-        List<AccessProfile> accessProfileList = caseDataAccessControl
-            .generateAccessProfilesByCaseReference(caseReference);
-        return caseDataAccessControl.extractAccessProfileNames(accessProfileList);
+    private Set<AccessProfile> getAccessProfiles(String caseReference) {
+        return caseDataAccessControl.generateAccessProfilesByCaseReference(caseReference);
     }
 
     private JsonNode caseDataToJsonNode(CaseDetails caseDetails) {

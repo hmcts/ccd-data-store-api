@@ -15,6 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
@@ -49,19 +50,19 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
         CaseView caseView = getCaseViewOperation.execute(caseReference);
 
         CaseTypeDefinition caseTypeDefinition = getCaseType(caseView.getCaseType().getId());
-        Set<String> accessProfiles = getAccessProfiles(caseReference);
+        Set<AccessProfile> accessProfiles = getAccessProfiles(caseReference);
         verifyCaseTypeReadAccess(caseTypeDefinition, accessProfiles);
         filterCaseTabFieldsByReadAccess(caseView, accessProfiles);
         filterAllowedTabsWithFields(caseView, accessProfiles);
         return filterUpsertAccess(caseReference, caseTypeDefinition, accessProfiles, caseView);
     }
 
-    private void filterCaseTabFieldsByReadAccess(CaseView caseView, Set<String> userRoles) {
+    private void filterCaseTabFieldsByReadAccess(CaseView caseView, Set<AccessProfile> accessProfiles) {
         caseView.setTabs(Arrays.stream(caseView.getTabs()).map(
             caseViewTab -> {
                 caseViewTab.setFields(Arrays.stream(caseViewTab.getFields())
                     .filter(caseViewField -> getAccessControlService()
-                        .canAccessCaseViewFieldWithCriteria(caseViewField, userRoles, CAN_READ))
+                        .canAccessCaseViewFieldWithCriteria(caseViewField, accessProfiles, CAN_READ))
                     .toArray(CaseViewField[]::new));
                 return caseViewTab;
             }).toArray(CaseViewTab[]::new));
@@ -69,7 +70,7 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
 
     private CaseView filterUpsertAccess(String caseReference,
                                         CaseTypeDefinition caseTypeDefinition,
-                                        Set<String> userRoles,
+                                        Set<AccessProfile> userRoles,
                                         CaseView caseView) {
         CaseViewActionableEvent[] authorisedActionableEvents;
         if (!getAccessControlService().canAccessCaseTypeWithCriteria(caseTypeDefinition,

@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,27 +68,27 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     // Returns List<AccessProfile>. Returns list of access profiles
     // for the user and filters access profiles based on the case type.
     @Override
-    public List<AccessProfile> generateAccessProfilesByCaseTypeId(String caseTypeId) {
+    public Set<AccessProfile> generateAccessProfilesByCaseTypeId(String caseTypeId) {
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
         RoleAssignmentFilteringResult filteringResults = roleAssignmentsFilteringService
             .filter(roleAssignments, caseTypeDefinition);
 
-        return filteredAccessProfiles(filteringResults, caseTypeDefinition);
+        return Sets.newHashSet(filteredAccessProfiles(filteringResults, caseTypeDefinition));
     }
 
     @Override
-    public List<AccessProfile> generateAccessProfilesByCaseReference(String caseReference) {
+    public Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference) {
         Optional<CaseDetails> caseDetails =  caseDetailsRepository.findByReference(caseReference);
         if (caseDetails.isEmpty()) {
-            return Lists.newArrayList();
+            return Sets.newHashSet();
         }
         RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
         RoleAssignmentFilteringResult filteringResults = roleAssignmentsFilteringService
             .filter(roleAssignments, caseDetails.get());
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.get().getCaseTypeId());
 
-        return filteredAccessProfiles(filteringResults, caseTypeDefinition);
+        return Sets.newHashSet(filteredAccessProfiles(filteringResults, caseTypeDefinition));
     }
 
     private List<AccessProfile> filteredAccessProfiles(RoleAssignmentFilteringResult filteringResults,

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,7 +55,7 @@ class AttributeBasedSecurityClassificationServiceTest {
         when(accessProfile.getSecurityClassification()).thenReturn("PUBLIC");
 
         when(caseDataAccessControl.generateAccessProfilesByCaseReference(CASE_REFERENCE))
-            .thenReturn(Lists.newArrayList(accessProfile));
+            .thenReturn(Sets.newHashSet(accessProfile));
         Optional<SecurityClassification> classification =  classUnderTest.getUserClassification(caseDetails);
         assertEquals(classification.get(), SecurityClassification.PUBLIC);
     }
@@ -72,7 +72,7 @@ class AttributeBasedSecurityClassificationServiceTest {
         when(privateAccessProfile.getSecurityClassification()).thenReturn("PRIVATE");
 
         when(caseDataAccessControl.generateAccessProfilesByCaseReference(CASE_REFERENCE))
-            .thenReturn(Lists.newArrayList(accessProfile, privateAccessProfile));
+            .thenReturn(Sets.newHashSet(accessProfile, privateAccessProfile));
         Optional<SecurityClassification> classification =  classUnderTest.getUserClassification(caseDetails);
         assertEquals(classification.get(), SecurityClassification.PRIVATE);
     }

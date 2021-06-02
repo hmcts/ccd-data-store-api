@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.getcase;
 
-import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -58,21 +57,19 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
     }
 
 
-    private Set<String> getAccessProfiles(String caseReference) {
-        List<AccessProfile> accessProfileList = caseDataAccessControl
-            .generateAccessProfilesByCaseReference(caseReference);
-        return caseDataAccessControl.extractAccessProfileNames(accessProfileList);
+    private Set<AccessProfile> getAccessProfiles(String caseReference) {
+        return caseDataAccessControl.generateAccessProfilesByCaseReference(caseReference);
     }
 
-    private Optional<CaseDetails> verifyReadAccess(CaseTypeDefinition caseType, Set<String> userRoles,
+    private Optional<CaseDetails> verifyReadAccess(CaseTypeDefinition caseType, Set<AccessProfile> accessProfiles,
                                                    CaseDetails caseDetails) {
 
-        if (caseType == null || caseDetails == null || CollectionUtils.isEmpty(userRoles)) {
+        if (caseType == null || caseDetails == null || CollectionUtils.isEmpty(accessProfiles)) {
             return Optional.empty();
         }
 
-        if (!accessControlService.canAccessCaseTypeWithCriteria(caseType, userRoles, CAN_READ)
-            || !accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(), caseType, userRoles,
+        if (!accessControlService.canAccessCaseTypeWithCriteria(caseType, accessProfiles, CAN_READ)
+            || !accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(), caseType, accessProfiles,
             CAN_READ)) {
             return Optional.empty();
         }
@@ -81,14 +78,14 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
             accessControlService.filterCaseFieldsByAccess(
                 JacksonUtils.convertValueJsonNode(caseDetails.getData()),
                 caseType.getCaseFieldDefinitions(),
-                userRoles,
+                accessProfiles,
                 CAN_READ,
                 false)));
         caseDetails.setDataClassification(JacksonUtils.convertValue(
             accessControlService.filterCaseFieldsByAccess(
                 JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
                 caseType.getCaseFieldDefinitions(),
-                userRoles,
+                accessProfiles,
                 CAN_READ,
                 true)));
 

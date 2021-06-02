@@ -50,36 +50,34 @@ public class AuthorisedGetCaseTypesOperation implements GetCaseTypesOperation {
             .collect(Collectors.toList());
     }
 
-    private Set<String> getAccessProfiles(String caseTypeId) {
-        List<AccessProfile> accessProfiles = caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
+    private Set<AccessProfile> getAccessProfiles(String caseTypeId) {
+        Set<AccessProfile> accessProfiles = caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
         if (accessProfiles == null) {
             throw new ValidationException("Cannot find user roles for the user");
         }
-        return caseDataAccessControl.extractAccessProfileNames(accessProfiles);
+        return accessProfiles;
     }
 
     private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition,
-                                                      Set<String> userRoles,
+                                                      Set<AccessProfile> accessProfiles,
                                                       Predicate<AccessControlList> access) {
 
-        if (caseTypeDefinition == null || CollectionUtils.isEmpty(userRoles)) {
+        if (caseTypeDefinition == null || CollectionUtils.isEmpty(accessProfiles)) {
             return Optional.empty();
         }
 
-        if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, access)) {
+        if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, access)) {
             return Optional.empty();
         }
 
-        caseTypeDefinition.setStates(accessControlService.filterCaseStatesByAccess(caseTypeDefinition.getStates(),
-                                                                         userRoles,
-                                                                         access));
-        caseTypeDefinition.setEvents(accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
-                                                                         userRoles,
-                                                                         access));
+        caseTypeDefinition.setStates(accessControlService.filterCaseStatesByAccess(caseTypeDefinition,
+            accessProfiles, access));
+        caseTypeDefinition.setEvents(accessControlService.filterCaseEventsByAccess(caseTypeDefinition,
+            accessProfiles, access));
 
         caseTypeDefinition.setCaseFieldDefinitions(accessControlService.filterCaseFieldsByAccess(
                                                                         caseTypeDefinition.getCaseFieldDefinitions(),
-                                                                        userRoles,
+            accessProfiles,
                                                                         access));
 
 

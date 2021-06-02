@@ -1,22 +1,33 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
@@ -55,20 +66,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageBuilder.newWizardPage;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPageComplexFieldOverrideBuilder.newWizardPageComplexFieldOverride;
 
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-
-import java.util.HashMap;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-
 @SuppressWarnings("checkstyle:TypeName") // too many legacy TypeName occurrences on '@Nested' classes
 public class AccessControlServiceTest {
 
@@ -88,9 +85,9 @@ public class AccessControlServiceTest {
     static final String ROLE_NOT_IN_USER_ROLES_2 = "caseworker-divorce-loa5";
     private static final String FIRST_CHILD_ID = "46f98326-6c88-426d-82be-d362f0246b7a";
     private static final String SECOND_CHILD_ID = "7c7cfd2a-b5d7-420a-8420-3ac3019cfdc7";
-    static final Set<String> USER_ROLES = Sets.newHashSet(ROLE_IN_USER_ROLES,
+    static final Set<AccessProfile> ACCESS_PROFILES = createAccessProfiles(Sets.newHashSet(ROLE_IN_USER_ROLES,
         ROLE_IN_USER_ROLES_3,
-        ROLE_IN_USER_ROLES_2);
+        ROLE_IN_USER_ROLES_2));
 
     private AccessControlService accessControlService;
     private static final String EVENT_ID = "EVENT_ID";
@@ -255,9 +252,11 @@ public class AccessControlServiceTest {
                 .build();
 
             assertAll(
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES,
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType,
+                    ACCESS_PROFILES,
                     CAN_CREATE), is(false)),
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2, caseType, USER_ROLES,
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2, caseType,
+                    ACCESS_PROFILES,
                     CAN_CREATE), is(false))
             );
         }
@@ -277,9 +276,11 @@ public class AccessControlServiceTest {
                 .build();
 
             assertAll(
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES,
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1,
+                    caseType, ACCESS_PROFILES,
                     CAN_CREATE), is(false)),
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2, caseType, USER_ROLES,
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2,
+                    caseType, ACCESS_PROFILES,
                     CAN_CREATE), is(false))
             );
         }
@@ -299,9 +300,11 @@ public class AccessControlServiceTest {
                 .build();
 
             assertAll(
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES,
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1,
+                    caseType, ACCESS_PROFILES,
                     CAN_CREATE), is(true)),
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2, caseType, USER_ROLES,
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2,
+                    caseType, ACCESS_PROFILES,
                     CAN_CREATE), is(true))
             );
         }
@@ -311,7 +314,7 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToStateIfStateIsNotPresentInDefinition() throws IOException {
             CaseTypeDefinition caseType = newCaseType().build();
 
-            assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES,
+            assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, ACCESS_PROFILES,
                 CAN_CREATE), is(false));
         }
 
@@ -331,9 +334,12 @@ public class AccessControlServiceTest {
                     .withRole(ROLE_IN_USER_ROLES)
                     .build())
                 .build();
-            List<CaseStateDefinition> caseStates = new ArrayList<>(asList(caseState1, caseState2));
-            final List<CaseStateDefinition> states = accessControlService.filterCaseStatesByAccess(caseStates,
-                USER_ROLES, CAN_READ);
+            CaseTypeDefinition caseTypeDefinition = newCaseType()
+                .withState(caseState1)
+                .withState(caseState2)
+                .build();
+            final List<CaseStateDefinition> states = accessControlService.filterCaseStatesByAccess(caseTypeDefinition,
+                ACCESS_PROFILES, CAN_READ);
 
             assertAll(
                 () -> assertThat(states.size(), is(1)),
@@ -363,9 +369,13 @@ public class AccessControlServiceTest {
                     .withRole(ROLE_IN_USER_ROLES)
                     .build())
                 .build();
-            List<CaseStateDefinition> caseStates = new ArrayList<>(asList(caseState1, caseState2, caseState3));
+            CaseTypeDefinition caseTypeDefinition = newCaseType()
+                .withState(caseState1)
+                .withState(caseState2)
+                .withState(caseState3)
+                .build();
             final List<CaseStateDefinition> states =
-                accessControlService.filterCaseStatesByAccess(caseStates, USER_ROLES, CAN_READ);
+                accessControlService.filterCaseStatesByAccess(caseTypeDefinition, ACCESS_PROFILES, CAN_READ);
 
             assertAll(
                 () -> assertThat(states.size(), is(0)),
@@ -397,7 +407,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -424,7 +434,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -463,7 +473,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -491,7 +501,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -531,7 +541,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(true));
         }
@@ -550,7 +560,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(true));
         }
@@ -581,7 +591,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(true));
         }
@@ -606,7 +616,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -659,7 +669,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(true));
         }
@@ -684,7 +694,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -718,7 +728,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(true));
         }
@@ -743,7 +753,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -1138,7 +1148,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseEventWithCriteria(
                     EVENT_ID,
                     caseType.getEvents(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -1160,7 +1170,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseEventWithCriteria(
                     EVENT_ID,
                     caseType.getEvents(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -1181,7 +1191,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseEventWithCriteria(
                     EVENT_ID,
                     caseType.getEvents(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -1202,7 +1212,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseEventWithCriteria(
                     null,
                     caseType.getEvents(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     AccessControlList::isCreate),
                 is(false));
         }
@@ -1224,7 +1234,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseEventWithCriteria(
                     EVENT_ID_LOWER_CASE,
                     caseType.getEvents(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     AccessControlList::isCreate),
                 is(false));
         }
@@ -1250,7 +1260,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseEventWithCriteria(
                     EVENT_ID,
                     caseType.getEvents(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(true));
         }
@@ -1268,7 +1278,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseTypeWithCriteria(
                     caseType,
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -1289,7 +1299,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseTypeWithCriteria(
                     caseType,
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -1308,7 +1318,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseTypeWithCriteria(
                     caseType,
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -1329,7 +1339,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseTypeWithCriteria(
                     caseType,
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(true));
         }
@@ -1355,7 +1365,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1382,7 +1392,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1408,7 +1418,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1437,7 +1447,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1467,7 +1477,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1497,7 +1507,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1527,7 +1537,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1557,7 +1567,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1588,7 +1598,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1623,7 +1633,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1683,7 +1693,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1729,7 +1739,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1823,7 +1833,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1910,7 +1920,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1956,7 +1966,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1991,7 +2001,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -2029,7 +2039,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -2059,7 +2069,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -2083,7 +2093,7 @@ public class AccessControlServiceTest {
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
                 caseType.getEvents(),
-                USER_ROLES),
+                ACCESS_PROFILES),
                 is(emptyCollectionOf(AuditEvent.class)));
         }
     }
@@ -2104,7 +2114,7 @@ public class AccessControlServiceTest {
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
                 caseType.getEvents(),
-                USER_ROLES),
+                ACCESS_PROFILES),
                 is(emptyCollectionOf(AuditEvent.class)));
         }
 
@@ -2122,7 +2132,7 @@ public class AccessControlServiceTest {
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
                 caseType.getEvents(),
-                USER_ROLES),
+                ACCESS_PROFILES),
                 is(emptyCollectionOf(AuditEvent.class)));
         }
 
@@ -2144,7 +2154,7 @@ public class AccessControlServiceTest {
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
                 caseType.getEvents(),
-                USER_ROLES),
+                ACCESS_PROFILES),
                 is(emptyCollectionOf(AuditEvent.class)));
         }
 
@@ -2165,7 +2175,7 @@ public class AccessControlServiceTest {
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
                 caseType.getEvents(),
-                USER_ROLES),
+                ACCESS_PROFILES),
                 is(emptyCollectionOf(AuditEvent.class)));
         }
 
@@ -2187,7 +2197,7 @@ public class AccessControlServiceTest {
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
                 caseType.getEvents(),
-                USER_ROLES),
+                ACCESS_PROFILES),
                 is(emptyCollectionOf(AuditEvent.class)));
         }
 
@@ -2210,7 +2220,7 @@ public class AccessControlServiceTest {
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(
                 auditEvents,
                 caseType.getEvents(),
-                USER_ROLES),
+                ACCESS_PROFILES),
                 is(auditEvents));
         }
 
@@ -2240,7 +2250,7 @@ public class AccessControlServiceTest {
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
                 caseType.getEvents(),
-                USER_ROLES),
+                ACCESS_PROFILES),
                 is(auditEvents));
         }
 
@@ -2295,7 +2305,7 @@ public class AccessControlServiceTest {
             List<AuditEvent> actual = accessControlService.filterCaseAuditEventsByReadAccess(
                 auditEvents,
                 caseType.getEvents(),
-                USER_ROLES);
+                ACCESS_PROFILES);
             assertThat(actual, containsInAnyOrder(hasProperty("eventId", is("EVENT_ID_WITH_ACCESS")),
                 hasProperty("eventId", is("EVENT_ID_WITH_ACCESS_2"))));
         }
@@ -2333,7 +2343,7 @@ public class AccessControlServiceTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
@@ -2421,7 +2431,7 @@ public class AccessControlServiceTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertAll(
@@ -2514,7 +2524,7 @@ public class AccessControlServiceTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertAll(
@@ -2620,7 +2630,7 @@ public class AccessControlServiceTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertAll(
@@ -2736,7 +2746,7 @@ public class AccessControlServiceTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertAll(
@@ -2839,7 +2849,7 @@ public class AccessControlServiceTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertAll(
@@ -2883,7 +2893,7 @@ public class AccessControlServiceTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
@@ -2912,7 +2922,7 @@ public class AccessControlServiceTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
@@ -2943,7 +2953,7 @@ public class AccessControlServiceTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertThat(eventTrigger.getCaseFields(), everyItem(not(hasProperty("displayContext",
@@ -2982,7 +2992,7 @@ public class AccessControlServiceTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertThat(eventTrigger.getCaseFields(), everyItem(not(hasProperty("displayContext",
@@ -3054,7 +3064,7 @@ public class AccessControlServiceTest {
 
             CaseUpdateViewEvent actual = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
             assertAll(
                 () -> assertThat(actual.getCaseFields(), hasSize(4)),
@@ -3091,8 +3101,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            assertThat(accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE),
                 is(emptyCollectionOf(CaseEventDefinition.class)));
         }
@@ -3112,8 +3122,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            assertThat(accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE),
                 is(emptyCollectionOf(CaseEventDefinition.class)));
         }
@@ -3131,8 +3141,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE);
 
             assertAll(
@@ -3162,8 +3172,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE);
             assertAll(
                 () -> assertThat(result, hasSize(1)),
@@ -3206,8 +3216,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE);
             assertAll(
                 () -> assertThat(result, hasSize(2)),
@@ -3236,8 +3246,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            assertThat(accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE),
                 is(emptyCollectionOf(CaseEventDefinition.class)));
         }
@@ -3257,8 +3267,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            assertThat(accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE),
                 is(emptyCollectionOf(CaseEventDefinition.class)));
         }
@@ -3276,8 +3286,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE);
 
             assertAll(
@@ -3307,8 +3317,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE);
             assertAll(
                 () -> assertThat(result, hasSize(1)),
@@ -3351,8 +3361,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE);
             assertAll(
                 () -> assertThat(result, hasSize(2)),
@@ -3491,7 +3501,7 @@ public class AccessControlServiceTest {
                     getJsonNode(collStart + child1 + comma + child2 + comma + newChild + collEnd),
                     existingDataNode,
                     Collections.emptyList(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(false));
         }
 
@@ -3505,7 +3515,7 @@ public class AccessControlServiceTest {
                     getJsonNode(collStart + child1 + comma + child2 + comma + newChild + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(true));
         }
 
@@ -3519,7 +3529,7 @@ public class AccessControlServiceTest {
                     getJsonNode(collStart + child1 + comma + child2 + comma + newChildWithNoIdTag + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(true));
         }
 
@@ -3534,7 +3544,7 @@ public class AccessControlServiceTest {
                     getJsonNode(collStart + child1 + comma + child2 + comma + newChild + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(false));
         }
 
@@ -3550,7 +3560,7 @@ public class AccessControlServiceTest {
                     getJsonNode(collStart + child1Updated + comma + child2 + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(true));
         }
 
@@ -3567,7 +3577,7 @@ public class AccessControlServiceTest {
                         + comma + newChild + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(true));
         }
 
@@ -3582,7 +3592,7 @@ public class AccessControlServiceTest {
                     getJsonNode(collStart + child1Updated + comma + child2 + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(false));
         }
 
@@ -3597,7 +3607,7 @@ public class AccessControlServiceTest {
                     getJsonNode(collStart + child1 + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(true));
         }
 
@@ -3613,7 +3623,7 @@ public class AccessControlServiceTest {
                     getJsonNode(collStart + child1 + comma + newChildWithNoIdTag + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(true));
         }
 
@@ -3628,7 +3638,7 @@ public class AccessControlServiceTest {
                     getJsonNode(collStart + child1 + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(false));
         }
 
@@ -3646,7 +3656,7 @@ public class AccessControlServiceTest {
                         + newChildWithNoIdTag + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(true));
         }
     }
@@ -3663,7 +3673,7 @@ public class AccessControlServiceTest {
                 newDataNode,
                 existingDataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES),
+                ACCESS_PROFILES),
             is(hasFieldAccess));
     }
 
@@ -3864,5 +3874,13 @@ public class AccessControlServiceTest {
         ));
 
         return JacksonUtils.convertValueJsonNode(data);
+    }
+
+    private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+        return userRoles.stream()
+            .map(userRole -> AccessProfile.builder().readOnly(false)
+                .accessProfile(userRole)
+                .build())
+            .collect(Collectors.toSet());
     }
 }

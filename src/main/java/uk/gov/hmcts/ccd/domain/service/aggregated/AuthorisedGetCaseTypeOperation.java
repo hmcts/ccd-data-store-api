@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -35,42 +34,41 @@ public class AuthorisedGetCaseTypeOperation implements GetCaseTypeOperation {
 
     @Override
     public Optional<CaseTypeDefinition> execute(String caseTypeId, Predicate<AccessControlList> access) {
-        final Set<String> userRoles = getAccessProfiles(caseTypeId);
+        final Set<AccessProfile> userRoles = getAccessProfiles(caseTypeId);
         return getCaseTypeOperation.execute(caseTypeId, access)
             .flatMap(caseType -> verifyAccess(caseType, userRoles, access));
     }
 
-    private Set<String> getAccessProfiles(String caseTypeId) {
-        List<AccessProfile> accessProfileList = caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
-        if (accessProfileList == null) {
+    private Set<AccessProfile> getAccessProfiles(String caseTypeId) {
+        Set<AccessProfile> accessProfiles = caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
+        if (accessProfiles == null) {
             throw new ValidationException("Cannot find access profiles for the user");
         }
 
-        return caseDataAccessControl.extractAccessProfileNames(accessProfileList);
+        return accessProfiles;
     }
 
     private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition,
-                                                      Set<String> userRoles,
+                                                      Set<AccessProfile> accessProfiles,
                                                       Predicate<AccessControlList> access) {
 
-        if (CollectionUtils.isEmpty(userRoles)) {
+        if (CollectionUtils.isEmpty(accessProfiles)) {
             return Optional.empty();
         }
 
-        if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, access)) {
+        if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, access)) {
             return Optional.empty();
         }
 
-        caseTypeDefinition.setStates(accessControlService.filterCaseStatesByAccess(caseTypeDefinition.getStates(),
-                                                                         userRoles,
+        caseTypeDefinition.setStates(accessControlService.filterCaseStatesByAccess(caseTypeDefinition,
+                                                                         accessProfiles,
                                                                          access));
-        caseTypeDefinition.setEvents(accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
-                                                                         userRoles,
-                                                                         access));
+        caseTypeDefinition.setEvents(accessControlService.filterCaseEventsByAccess(caseTypeDefinition,
+            accessProfiles, access));
 
         caseTypeDefinition.setCaseFieldDefinitions(accessControlService.filterCaseFieldsByAccess(
                                                     caseTypeDefinition.getCaseFieldDefinitions(),
-                                                    userRoles,
+                                                    accessProfiles,
                                                     access));
 
 

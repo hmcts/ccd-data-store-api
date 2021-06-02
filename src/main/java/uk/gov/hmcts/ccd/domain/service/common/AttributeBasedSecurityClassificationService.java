@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -36,12 +36,12 @@ public class AttributeBasedSecurityClassificationService
 
     @Override
     public Optional<SecurityClassification> getUserClassification(CaseDetails caseDetails) {
-        List<AccessProfile> accessProfiles = caseDataAccessControl
+        Set<AccessProfile> accessProfiles = caseDataAccessControl
             .generateAccessProfilesByCaseReference(caseDetails.getReferenceAsString());
         return getMaxSecurityClassification(accessProfiles);
     }
 
-    private Optional<SecurityClassification> getMaxSecurityClassification(List<AccessProfile> accessProfiles) {
+    private Optional<SecurityClassification> getMaxSecurityClassification(Set<AccessProfile> accessProfiles) {
         if (accessProfiles != null) {
             return accessProfiles.stream()
                 .map(accessProfile -> SecurityClassification.valueOf(accessProfile.getSecurityClassification()))

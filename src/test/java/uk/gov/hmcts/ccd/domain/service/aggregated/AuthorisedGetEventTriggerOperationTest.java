@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Sets;
+import java.util.stream.Collectors;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -84,13 +86,13 @@ class AuthorisedGetEventTriggerOperationTest {
     private final CaseDetails caseDetails = new CaseDetails();
     private final CaseTypeDefinition caseType = new CaseTypeDefinition();
     private final List<CaseFieldDefinition> caseFields = Lists.newArrayList();
-    private final Set<String> userRoles = Sets.newHashSet(CASEWORKER_DIVORCE,
+    private final Set<AccessProfile> accessProfiles = createAccessProfiles(Sets.newHashSet(CASEWORKER_DIVORCE,
         CASEWORKER_PROBATE_LOA1,
-        CASEWORKER_PROBATE_LOA3);
-    private final Set<String> createCaseUserRoles = Sets.newHashSet(CASEWORKER_DIVORCE,
+        CASEWORKER_PROBATE_LOA3));
+    private final Set<AccessProfile> createCaseAccessProfiles = createAccessProfiles(Sets.newHashSet(CASEWORKER_DIVORCE,
         CASEWORKER_PROBATE_LOA1,
         CASEWORKER_PROBATE_LOA3,
-        GlobalCaseRole.CREATOR.getRole());
+        GlobalCaseRole.CREATOR.getRole()));
     private final List<CaseEventDefinition> events = Lists.newArrayList();
 
     @BeforeEach
@@ -115,26 +117,34 @@ class AuthorisedGetEventTriggerOperationTest {
         caseDetails.setCaseTypeId(CASE_TYPE_ID);
         caseDetails.setId(CASE_ID);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseType);
-        when(caseAccessService.getAccessProfiles(any())).thenReturn(userRoles);
-        when(caseAccessService.getAccessProfilesByCaseReference(any())).thenReturn(userRoles);
-        when(caseAccessService.getCaseCreationRoles(CASE_TYPE_ID)).thenReturn(createCaseUserRoles);
+        when(caseAccessService.getAccessProfiles(any())).thenReturn(accessProfiles);
+        when(caseAccessService.getAccessProfilesByCaseReference(any())).thenReturn(accessProfiles);
+        when(caseAccessService.getCaseCreationRoles(CASE_TYPE_ID)).thenReturn(createCaseAccessProfiles);
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType),
-                                                                eq(userRoles),
+                                                                eq(accessProfiles),
                                                                 eq(CAN_CREATE))).thenReturn(true);
-        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(userRoles), eq(CAN_READ)))
+        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseType), eq(accessProfiles), eq(CAN_READ)))
             .thenReturn(true);
         when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_TRIGGER_ID),
                                                                  eq(events),
-                                                                 eq(userRoles),
+                                                                 eq(accessProfiles),
                                                                  eq(CAN_CREATE))).thenReturn(true);
         when(accessControlService.canAccessCaseFieldsWithCriteria(any(JsonNode.class),
                                                                   eq(caseFields),
-                                                                  eq(userRoles),
+                                                                  eq(accessProfiles),
                                                                   eq(CAN_CREATE))).thenReturn(true);
 
         CaseEventDefinition caseEvent = new CaseEventDefinition();
         when(eventTriggerService.findCaseEvent(eq(caseType), eq(EVENT_TRIGGER_ID))).thenReturn(caseEvent);
         when(eventTriggerService.isPreStateValid(eq(STATE), eq(caseEvent))).thenReturn(true);
+    }
+
+    private Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+        return userRoles.stream()
+            .map(userRole -> AccessProfile.builder().readOnly(false)
+                .accessProfile(userRole)
+                .build())
+            .collect(Collectors.toSet());
     }
 
     @Nested
@@ -147,23 +157,29 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                          EVENT_TRIGGER_ID,
                                                                                          IGNORE);
             doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
-                                                                                    createCaseUserRoles,
-                                                                                    CAN_READ);
+                createCaseAccessProfiles,
+                CAN_READ);
             doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
-                                                                                    createCaseUserRoles,
-                                                                                    CAN_CREATE);
-            doReturn(true).when(accessControlService).canAccessCaseEventWithCriteria(EVENT_TRIGGER_ID,
-                                                                                     events,
-                                                                                     createCaseUserRoles,
-                                                                                     CAN_CREATE);
+                createCaseAccessProfiles,
+                CAN_CREATE);
+            doReturn(true).when(accessControlService)
+                .canAccessCaseEventWithCriteria(EVENT_TRIGGER_ID,
+                    events,
+                    createCaseAccessProfiles,
+                    CAN_CREATE);
             doReturn(caseEventTrigger).when(accessControlService)
-                .setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger, caseFields, createCaseUserRoles, CAN_CREATE);
-            doReturn(caseEventTrigger).when(accessControlService).filterCaseViewFieldsByAccess(caseEventTrigger,
-                                                                                               caseFields,
-                                                                                               createCaseUserRoles,
-                                                                                               CAN_CREATE);
+                .setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
+                    caseFields,
+                    createCaseAccessProfiles,
+                    CAN_CREATE);
             doReturn(caseEventTrigger).when(accessControlService)
-                .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, createCaseUserRoles);
+                .filterCaseViewFieldsByAccess(caseEventTrigger,
+                    caseFields,
+                    createCaseAccessProfiles,
+                    CAN_CREATE);
+
+            doReturn(caseEventTrigger).when(accessControlService)
+                .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, createCaseAccessProfiles);
         }
 
         @Test
@@ -199,21 +215,21 @@ class AuthorisedGetEventTriggerOperationTest {
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
                 () -> inOrder.verify(caseAccessService).getCaseCreationRoles(CASE_TYPE_ID),
                 () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseType),
-                                                                                         eq(createCaseUserRoles),
+                                                                                         eq(createCaseAccessProfiles),
                                                                                          eq(CAN_CREATE)),
                 () -> inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(eq(EVENT_TRIGGER_ID),
                                                                                           eq(caseType.getEvents()),
-                                                                                          eq(createCaseUserRoles),
+                                                                                          eq(createCaseAccessProfiles),
                                                                                           eq(CAN_CREATE)),
                 () -> inOrder.verify(getEventTriggerOperation).executeForCaseType(CASE_TYPE_ID,
                                                                                   EVENT_TRIGGER_ID,
                                                                                   IGNORE),
                 () -> inOrder.verify(accessControlService).filterCaseViewFieldsByAccess(eq(caseEventTrigger),
                                                                                         eq(caseFields),
-                                                                                        eq(createCaseUserRoles),
+                                                                                        eq(createCaseAccessProfiles),
                                                                                         eq(CAN_CREATE)),
                 () -> inOrder.verify(accessControlService)
-                    .updateCollectionDisplayContextParameterByAccess(eq(caseEventTrigger), eq(createCaseUserRoles))
+                    .updateCollectionDisplayContextParameterByAccess(eq(caseEventTrigger), eq(createCaseAccessProfiles))
             );
         }
 
@@ -221,7 +237,7 @@ class AuthorisedGetEventTriggerOperationTest {
         @DisplayName("should fail if no read access on case type")
         void shouldFailIfNoReadAccessOnCaseType() {
             doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
-                                                                                     createCaseUserRoles,
+                createCaseAccessProfiles,
                                                                                      CAN_READ);
 
             assertThrows(
@@ -234,7 +250,7 @@ class AuthorisedGetEventTriggerOperationTest {
         @DisplayName("should fail if no create access on case type")
         void shouldFailIfNoCreateAccessOnCaseType() {
             doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
-                                                                                     createCaseUserRoles,
+                createCaseAccessProfiles,
                                                                                      CAN_CREATE);
 
             assertThrows(
@@ -248,7 +264,7 @@ class AuthorisedGetEventTriggerOperationTest {
         void shouldFailIfNoCreateAccessOnCaseEvent() {
             doReturn(false).when(accessControlService).canAccessCaseEventWithCriteria(EVENT_TRIGGER_ID,
                                                                                       events,
-                                                                                      createCaseUserRoles,
+                createCaseAccessProfiles,
                                                                                       CAN_CREATE);
 
             assertThrows(
@@ -271,23 +287,23 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      IGNORE);
             doReturn(caseDetails).when(caseDetailsRepository).findByReference(CASE_REFERENCE_LONG);
             doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
-                                                                                    userRoles,
+                accessProfiles,
                                                                                     CAN_READ);
             doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
-                                                                                    userRoles,
+                accessProfiles,
                                                                                     CAN_UPDATE);
             doReturn(true).when(accessControlService).canAccessCaseEventWithCriteria(EVENT_TRIGGER_ID,
                                                                                      caseType.getEvents(),
-                                                                                     userRoles,
+                accessProfiles,
                                                                                      CAN_CREATE);
             doReturn(true).when(accessControlService).canAccessCaseStateWithCriteria(eq(caseDetails.getState()),
                                                                                      eq(caseType),
-                                                                                     eq(userRoles),
+                                                                                     eq(accessProfiles),
                                                                                      eq(CAN_UPDATE));
             doReturn(caseEventTrigger).when(accessControlService)
-                .setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger, caseFields, userRoles, CAN_UPDATE);
+                .setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger, caseFields, accessProfiles, CAN_UPDATE);
             doReturn(caseEventTrigger).when(accessControlService)
-                .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, userRoles);
+                .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, accessProfiles);
         }
 
         @Test
@@ -324,21 +340,21 @@ class AuthorisedGetEventTriggerOperationTest {
                 () -> inOrder.verify(caseAccessService).getAccessProfilesByCaseReference(CASE_REFERENCE),
                 () -> inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(eq(EVENT_TRIGGER_ID),
                                                                                           eq(caseType.getEvents()),
-                                                                                          eq(userRoles),
+                                                                                          eq(accessProfiles),
                                                                                           eq(CAN_CREATE)),
                 () -> inOrder.verify(accessControlService).canAccessCaseStateWithCriteria(eq(caseDetails.getState()),
                                                                                           eq(caseType),
-                                                                                          eq(userRoles),
+                                                                                          eq(accessProfiles),
                                                                                           eq(CAN_UPDATE)),
                 () -> inOrder.verify(getEventTriggerOperation).executeForCase(CASE_REFERENCE,
                                                                               EVENT_TRIGGER_ID,
                                                                               IGNORE),
                 () -> inOrder.verify(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(eq(caseEventTrigger),
                                                                                                  eq(caseFields),
-                                                                                                 eq(userRoles),
+                                                                                                 eq(accessProfiles),
                                                                                                  eq(CAN_UPDATE)),
                 () -> inOrder.verify(accessControlService)
-                    .updateCollectionDisplayContextParameterByAccess(eq(caseEventTrigger), eq(userRoles))
+                    .updateCollectionDisplayContextParameterByAccess(eq(caseEventTrigger), eq(accessProfiles))
             );
         }
 
@@ -346,7 +362,7 @@ class AuthorisedGetEventTriggerOperationTest {
         @DisplayName("should fail if no read access on case type")
         void shouldFailIfNoReadAccessOnCaseType() {
             doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
-                                                                                     userRoles,
+                accessProfiles,
                                                                                      CAN_READ);
 
             assertThrows(
@@ -359,7 +375,7 @@ class AuthorisedGetEventTriggerOperationTest {
         @DisplayName("should fail if no update access on case type")
         void shouldFailIfNoUpdateAccessOnCaseType() {
             doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(caseType,
-                                                                                     userRoles,
+                accessProfiles,
                                                                                      CAN_UPDATE);
 
             assertThrows(
@@ -373,7 +389,7 @@ class AuthorisedGetEventTriggerOperationTest {
         void shouldFailIfNoCreateAccessOnCaseEvent() {
             doReturn(false).when(accessControlService).canAccessCaseEventWithCriteria(EVENT_TRIGGER_ID,
                                                                                       caseType.getEvents(),
-                                                                                      userRoles,
+                accessProfiles,
                                                                                       CAN_CREATE);
 
             assertThrows(
@@ -387,7 +403,7 @@ class AuthorisedGetEventTriggerOperationTest {
         void shouldFailIfNoUpdateAccessOnCaseState() {
             doReturn(false).when(accessControlService).canAccessCaseStateWithCriteria(caseDetails.getState(),
                                                                                       caseType,
-                                                                                      userRoles,
+                accessProfiles,
                                                                                       CAN_UPDATE);
 
             assertThrows(
