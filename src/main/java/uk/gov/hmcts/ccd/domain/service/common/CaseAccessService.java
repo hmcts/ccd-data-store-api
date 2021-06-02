@@ -51,7 +51,8 @@ public class CaseAccessService {
     public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                              @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
                              RoleAssignmentService roleAssignmentService,
-                             ApplicationParams applicationParams, CaseDetailsRepository caseDetailsRepository) {
+                             ApplicationParams applicationParams,
+                             @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository) {
 
         this.userRepository = userRepository;
         this.caseUserRepository = caseUserRepository;
@@ -84,8 +85,8 @@ public class CaseAccessService {
                 caseIds = roleAssignmentService.getCaseIdsForAGivenUser(userRepository.getUserId())
                     .stream().map(Long::parseLong).collect(Collectors.toList());
             } else {
-                caseIds = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
-                caseDetailsRepository.findCaseReferencesByIds(caseIds);
+                final var ids = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
+                caseIds = caseDetailsRepository.findCaseReferencesByIds(ids);
             }
             return Optional.of(caseIds);
         }
