@@ -16,6 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 import java.util.List;
 import java.util.Map;
@@ -34,9 +35,9 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 @ExtendWith(MockitoExtension.class)
@@ -111,121 +112,141 @@ class CaseDocumentServiceTest extends TestFixtures {
     }
 
     @Test
-    void testShouldRaiseServiceException() {
-        // Given
-        final CaseDetails preCallbackCaseDetails = buildCaseDetails(emptyMap());
-        final CaseDetails postCallbackCaseDetails = buildCaseDetails(emptyMap());
+    void testShouldRaiseExceptionWhenHashTokensAreMissing() {
+        // GIVEN
+        doReturn(true).when(applicationParams).isDocumentHashCheckingEnabled();
+        doReturn(List.of(HASH_TOKEN_B2)).when(documentUtils).getViolatingDocuments(anyList());
 
-        doReturn(emptyMap(), emptyMap()).when(documentUtils).extractDocumentsHashes(anyMap());
-        doReturn(Set.of("tampered")).when(documentUtils).getTamperedHashes(anyMap(), anyMap());
+        // WHEN
+        final Throwable thrown = catchThrowable(() -> underTest.validate(List.of(HASH_TOKEN_B2)));
+
+        // THEN
+        verify(documentUtils).getViolatingDocuments(anyList());
+
+        assertThat(thrown)
+            .isInstanceOf(ValidationException.class)
+            .hasMessageStartingWith("Some message");
+    }
+
+    @Test
+    void testShouldBuildValidDocumentHashTokens() {
+        // Given
+        final Map<String, JsonNode> preCallbackCaseData = emptyMap();
+        final Map<String, JsonNode> postCallbackCaseData = emptyMap();
+
+        doReturn(emptyList(), emptyList()).when(documentUtils).findDocumentsHashes(anyMap());
+        doReturn(emptySet()).when(documentUtils).getTamperedHashes(anyList(), anyList());
+        doReturn(List.of(HASH_TOKEN_A1, HASH_TOKEN_A2))
+            .when(documentUtils).buildDocumentHashToken(anyList(), anyList());
+        doReturn(true).when(applicationParams).isDocumentHashCheckingEnabled();
+        doReturn(emptyList()).when(documentUtils).getViolatingDocuments(anyList());
 
         // When
-        final Throwable thrown = catchThrowable(() -> underTest.attachCaseDocuments(
-            preCallbackCaseDetails,
-            postCallbackCaseDetails)
+        final List<DocumentHashToken> result = underTest.extractDocumentHashToken(
+            preCallbackCaseData,
+            postCallbackCaseData
         );
+
+        // Then
+        assertThat(result)
+            .isNotNull()
+            .hasSameElementsAs(List.of(HASH_TOKEN_A1, HASH_TOKEN_A2));
+
+        verify(documentUtils, times(2)).findDocumentsHashes(anyMap());
+        verify(documentUtils).getTamperedHashes(anyList(), anyList());
+        verify(documentUtils).buildDocumentHashToken(anyList(), anyList());
+        verify(documentUtils).getViolatingDocuments(anyList());
+        verify(applicationParams).isDocumentHashCheckingEnabled();
+    }
+
+    @Test
+    void testShouldRaiseValidationException() {
+        // Given
+        final Map<String, JsonNode> preCallbackCaseData = emptyMap();
+        final Map<String, JsonNode> postCallbackCaseData = emptyMap();
+
+        doReturn(emptyList(), emptyList()).when(documentUtils).findDocumentsHashes(anyMap());
+        doReturn(emptySet()).when(documentUtils).getTamperedHashes(anyList(), anyList());
+        doReturn(List.of(HASH_TOKEN_B1, HASH_TOKEN_B2))
+            .when(documentUtils).buildDocumentHashToken(anyList(), anyList());
+        doReturn(true).when(applicationParams).isDocumentHashCheckingEnabled();
+        doReturn(List.of(HASH_TOKEN_B2)).when(documentUtils).getViolatingDocuments(anyList());
+
+        // When
+        final Throwable thrown = catchThrowable(() -> underTest.extractDocumentHashToken(
+            preCallbackCaseData,
+            postCallbackCaseData
+        ));
+
+        // Then
+        assertThat(thrown)
+            .isInstanceOf(ValidationException.class)
+            .hasMessageStartingWith("Some message");
+
+        verify(documentUtils, times(2)).findDocumentsHashes(anyMap());
+        verify(documentUtils).getTamperedHashes(anyList(), anyList());
+        verify(documentUtils).buildDocumentHashToken(anyList(), anyList());
+        verify(documentUtils).getViolatingDocuments(anyList());
+        verify(applicationParams).isDocumentHashCheckingEnabled();
+    }
+
+    @Test
+    void testShouldRaiseServiceException() {
+        // Given
+        final Map<String, JsonNode> preCallbackCaseData = emptyMap();
+        final Map<String, JsonNode> postCallbackCaseData = emptyMap();
+
+        doReturn(emptyList(), emptyList()).when(documentUtils).findDocumentsHashes(anyMap());
+        doReturn(Set.of("tampered")).when(documentUtils).getTamperedHashes(anyList(), anyList());
+
+        // When
+        final Throwable thrown = catchThrowable(() -> underTest.extractDocumentHashToken(
+            preCallbackCaseData,
+            postCallbackCaseData
+        ));
 
         // Then
         assertThat(thrown)
             .isInstanceOf(ServiceException.class)
             .hasMessageStartingWith("call back attempted to change the hashToken of the following documents:");
 
-        verify(documentUtils, never()).buildDocumentHashToken(anyMap(), anyMap());
+        verify(documentUtils, times(2)).findDocumentsHashes(anyMap());
+        verify(documentUtils).getTamperedHashes(anyList(), anyList());
+        verifyNoMoreInteractions(documentUtils);
     }
 
     @Test
     void testShouldApplyCaseDocumentPatch() {
         // Given
-        final CaseDetails preCallbackCaseDetails = buildCaseDetails(emptyMap());
-        final CaseDetails postCallbackCaseDetails = buildCaseDetails(emptyMap());
-
-        doReturn(emptyMap(), emptyMap()).when(documentUtils).extractDocumentsHashes(anyMap());
-        doReturn(emptySet()).when(documentUtils).getTamperedHashes(anyMap(), anyMap());
-        doReturn(List.of(HASH_TOKEN_A, HASH_TOKEN_B)).when(documentUtils).buildDocumentHashToken(anyMap(), anyMap());
+        final List<DocumentHashToken> documentHashTokens = List.of(HASH_TOKEN_A1, HASH_TOKEN_A2);
         doNothing().when(caseDocumentAmApiClient).applyPatch(any(CaseDocumentsMetadata.class));
 
         // When
-        underTest.attachCaseDocuments(preCallbackCaseDetails, postCallbackCaseDetails);
+        underTest.attachCaseDocuments(CASE_REFERENCE, CASE_TYPE_ID, JURISDICTION, documentHashTokens);
 
         // Then
-        verify(documentUtils, times(2)).extractDocumentsHashes(anyMap());
-        verify(documentUtils).getTamperedHashes(anyMap(), anyMap());
-        verify(documentUtils).buildDocumentHashToken(anyMap(), anyMap());
         verify(caseDocumentAmApiClient).applyPatch(any(CaseDocumentsMetadata.class));
     }
 
     @Test
     void testShouldNotApplyPatchWhenNoDocumentHashes() {
-        // Given
-        final CaseDetails preCallbackCaseDetails = buildCaseDetails(emptyMap());
-        final CaseDetails postCallbackCaseDetails = buildCaseDetails(emptyMap());
-
-        doReturn(emptyMap(), emptyMap()).when(documentUtils).extractDocumentsHashes(anyMap());
-        doReturn(emptySet()).when(documentUtils).getTamperedHashes(anyMap(), anyMap());
-        doReturn(emptyList()).when(documentUtils).buildDocumentHashToken(anyMap(), anyMap());
-
         // When
-        underTest.attachCaseDocuments(preCallbackCaseDetails, postCallbackCaseDetails);
+        underTest.attachCaseDocuments(CASE_REFERENCE, CASE_TYPE_ID, JURISDICTION, emptyList());
 
         // Then
         verifyZeroInteractions(caseDocumentAmApiClient);
     }
 
     @ParameterizedTest
-    @MethodSource("provideDocumentNodesParameters")
-    void testShouldFindNoViolations(final Map<String, JsonNode> originalCaseData,
-                                    final Map<String, JsonNode> caseDataAfterCallback,
-                                    final List<JsonNode> documentNodes) {
+    @MethodSource("provideValidHashTokenParameters")
+    void testShouldCheckForViolations(final List<DocumentHashToken> documentHashTokens) {
         // GIVEN
-        doReturn(documentNodes).when(documentUtils).findDocumentNodes(anyMap());
-        doReturn(emptyList()).when(documentUtils).getViolatingDocuments(anyList(), anyList());
         doReturn(true).when(applicationParams).isDocumentHashCheckingEnabled();
+        doReturn(emptyList()).when(documentUtils).getViolatingDocuments(anyList());
 
         // WHEN/THEN
-        assertThatCode(() -> underTest.validate(originalCaseData, caseDataAfterCallback))
+        assertThatCode(() -> underTest.validate(documentHashTokens))
             .doesNotThrowAnyException();
-    }
-
-    @Test
-    void testShouldRaiseExceptionWhenPreCallbackDocumentsHaveNoHashes() throws Exception {
-        // GIVEN
-        final Map<String, JsonNode> data = emptyMap();
-        final List<JsonNode> documentNodes = fromFileAsList("case-document-nodes-without-hashtoken.json");
-        doReturn(documentNodes, emptyList()).when(documentUtils).findDocumentNodes(anyMap());
-        doReturn(documentNodes).when(documentUtils).getViolatingDocuments(anyList(), anyList());
-        doReturn(true).when(applicationParams).isDocumentHashCheckingEnabled();
-
-        // WHEN
-        final Throwable thrown = catchThrowable(() -> underTest.validate(data, emptyMap()));
-
-        // THEN
-        verify(documentUtils, times(2)).findDocumentNodes(anyMap());
-        verify(documentUtils).getViolatingDocuments(anyList(), anyList());
-
-        assertThat(thrown)
-            .isInstanceOf(ValidationException.class)
-            .hasMessageStartingWith("Some message");
-    }
-
-    @Test
-    void testShouldRaiseExceptionWhenPostCallbackDocumentsHaveNoHashes() throws Exception {
-        // GIVEN
-        final Map<String, JsonNode> data = emptyMap();
-        final List<JsonNode> documentNodes = fromFileAsList("case-document-nodes-without-hashtoken.json");
-        doReturn(emptyList(), documentNodes).when(documentUtils).findDocumentNodes(anyMap());
-        doReturn(documentNodes).when(documentUtils).getViolatingDocuments(anyList(), anyList());
-        doReturn(true).when(applicationParams).isDocumentHashCheckingEnabled();
-
-        // WHEN
-        final Throwable thrown = catchThrowable(() -> underTest.validate(emptyMap(), data));
-
-        // THEN
-        verify(documentUtils, times(2)).findDocumentNodes(anyMap());
-        verify(documentUtils).getViolatingDocuments(anyList(), anyList());
-
-        assertThat(thrown)
-            .isInstanceOf(ValidationException.class)
-            .hasMessageStartingWith("Some message");
     }
 
     @Test
@@ -234,7 +255,7 @@ class CaseDocumentServiceTest extends TestFixtures {
         doReturn(false).when(applicationParams).isDocumentHashCheckingEnabled();
 
         // WHEN/THEN
-        assertThatCode(() -> underTest.validate(emptyMap(), emptyMap()))
+        assertThatCode(() -> underTest.validate(emptyList()))
             .doesNotThrowAnyException();
 
         verifyZeroInteractions(documentUtils);
@@ -252,18 +273,10 @@ class CaseDocumentServiceTest extends TestFixtures {
     }
 
     @SuppressWarnings("unused")
-    private static Stream<Arguments> provideDocumentNodesParameters() throws Exception {
-        final Map<String, JsonNode> preCallbackData = fromFileAsMap("A-case-data-with-hashtoken.json");
-        final List<JsonNode> preCallbackDocumentNodes = fromFileAsList("A-document-nodes.json");
-
-        final Map<String, JsonNode> postCallbackData = fromFileAsMap("SubmitTransactionDocumentUpload.json");
-        final List<JsonNode> documentNodes = fromFileAsList("case-document-nodes-with-hashtoken.json");
-
+    private static Stream<Arguments> provideValidHashTokenParameters() {
         return Stream.of(
-            Arguments.of(emptyMap(), emptyMap(), emptyList()),
-            Arguments.of(preCallbackData, emptyMap(), preCallbackDocumentNodes),
-            Arguments.of(emptyMap(), postCallbackData, documentNodes),
-            Arguments.of(preCallbackData, postCallbackData, documentNodes)
+            Arguments.of(emptyList()),
+            Arguments.of(List.of(HASH_TOKEN_A1, HASH_TOKEN_A2))
         );
     }
 }

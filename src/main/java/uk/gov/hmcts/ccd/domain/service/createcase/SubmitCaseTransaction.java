@@ -29,10 +29,12 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
+import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
@@ -51,7 +53,8 @@ public class SubmitCaseTransaction {
     private final CaseDocumentService caseDocumentService;
 
     @Inject
-    public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
+    public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                     final CaseDetailsRepository caseDetailsRepository,
                                  final CaseAuditEventRepository caseAuditEventRepository,
                                  final CaseTypeService caseTypeService,
                                  final CallbackInvoker callbackInvoker,
@@ -96,8 +99,6 @@ public class SubmitCaseTransaction {
 
         final CaseDetails caseDetailsWithoutHashes = caseDocumentService.stripDocumentHashes(caseDetails);
 
-        // validate(object, empty())
-
         /*
             About to submit
 
@@ -116,8 +117,10 @@ public class SubmitCaseTransaction {
         @SuppressWarnings("UnnecessaryLocalVariable")
         final CaseDetails caseDetailsAfterCallback = caseDetailsWithoutHashes;
 
-        // validate(caseDetails, caseDetailsAfterCallback) // new documents only
-        caseDocumentService.validate(caseDetails.getData(), caseDetailsAfterCallback.getData());
+        final List<DocumentHashToken> documentHashes = caseDocumentService.extractDocumentHashToken(
+            caseDetails.getData(),
+            caseDetailsAfterCallback.getData()
+        );
 
         final CaseDetails caseDetailsAfterCallbackWithoutHashes = caseDocumentService.stripDocumentHashes(
             caseDetailsAfterCallback
@@ -136,7 +139,12 @@ public class SubmitCaseTransaction {
             caseUserRepository.grantAccess(Long.valueOf(savedCaseDetails.getId()), idamUser.getId(), CREATOR.getRole());
         }
 
-        caseDocumentService.attachCaseDocuments(caseDetails, caseDetailsAfterCallback);
+        caseDocumentService.attachCaseDocuments(
+            caseDetails.getReferenceAsString(),
+            caseDetails.getCaseTypeId(),
+            caseDetails.getJurisdiction(),
+            documentHashes
+        );
 
         return savedCaseDetails;
     }
