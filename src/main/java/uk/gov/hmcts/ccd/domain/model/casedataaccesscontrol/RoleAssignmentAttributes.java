@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class RoleAssignmentAttributes {
     private Optional<String> jurisdiction;
     private Optional<String> caseId;
+    private Optional<String> caseTypeId;
     private Optional<String> region;
     private Optional<String> location;
     private Optional<String> contractType;

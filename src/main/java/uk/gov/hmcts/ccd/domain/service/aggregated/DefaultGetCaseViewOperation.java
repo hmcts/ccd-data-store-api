@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.google.common.collect.Lists;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -21,12 +22,10 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.getcase.AccessControlledGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
-
-import java.util.List;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_HISTORY_VIEWER;
 
@@ -42,8 +41,7 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
     private final CaseEventEnablingService caseEventEnablingService;
 
     @Autowired
-    public DefaultGetCaseViewOperation(@Qualifier(AccessControlledGetCaseOperation.QUALIFIER)
-                                               GetCaseOperation getCaseOperation,
+    public DefaultGetCaseViewOperation(@Qualifier(CreatorGetCaseOperation.QUALIFIER) GetCaseOperation getCaseOperation,
                                        @Qualifier("authorised") GetEventsOperation getEventsOperation,
                                        UIDefinitionRepository uiDefinitionRepository,
                                        CaseTypeService caseTypeService,

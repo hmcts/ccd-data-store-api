@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import static org.mockito.Mockito.verify;
@@ -24,6 +25,9 @@ class RoleBasedCaseDataAccessControlTest {
 
     @Mock
     private UserAuthorisation userAuthorisation;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private RoleBasedCaseDataAccessControl instance;

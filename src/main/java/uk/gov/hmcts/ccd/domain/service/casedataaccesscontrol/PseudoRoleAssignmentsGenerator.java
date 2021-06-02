@@ -20,53 +20,42 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.SPECIFIC;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.STANDARD;
+import static uk.gov.hmcts.ccd.domain.service.AccessControl.IDAM_PREFIX;
 
 @Component
-public class FakeRoleAssignmentsGenerator {
-
-    protected static final String IDAM_PREFIX = "idam:";
+public class PseudoRoleAssignmentsGenerator {
 
     private final UserRepository userRepository;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseAccessService caseAccessService;
 
     @Autowired
-    public FakeRoleAssignmentsGenerator(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
-                                        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+    public PseudoRoleAssignmentsGenerator(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
+                                          @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                             CaseDefinitionRepository caseDefinitionRepository,
-                                        CaseAccessService caseAccessService) {
+                                          CaseAccessService caseAccessService) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseAccessService = caseAccessService;
     }
 
-    public List<RoleAssignment> addFakeRoleAssignments(RoleAssignmentFilteringResult roleAssignmentsFilteringResult) {
+    public List<RoleAssignment> createPseudoRoleAssignments(RoleAssignmentFilteringResult filteringResult) {
+
         List<String> idamUserRoles = new ArrayList<>(userRepository.getUserRoles());
-        List<RoleAssignment> augmentedRoleAssignments = new ArrayList<>(
-            roleAssignmentsFilteringResult.getRoleAssignments());
+        List<RoleAssignment> pseudoRoleAssignments = new ArrayList<>();
 
         if (caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()) {
-            if (roleAssignmentsFilteringResult.atLeastOneCaseRoleExists()) {
-                augmentedRoleAssignments.addAll(createFakeRoleAssignmentsForGrantedOnlyAccess(idamUserRoles));
+            if (filteringResult.atLeastOneCaseRoleExists()) {
+                pseudoRoleAssignments.addAll(createPseudoRoleAssignmentsForGrantedOnlyAccess(idamUserRoles));
             }
         } else {
-            augmentedRoleAssignments.addAll(createFakeRoleAssignments(idamUserRoles));
+            pseudoRoleAssignments.addAll(createPseudoRoleAssignments(idamUserRoles));
         }
 
-        return augmentedRoleAssignments;
+        return pseudoRoleAssignments;
     }
 
-    private List<RoleAssignment> createFakeRoleAssignmentsForGrantedOnlyAccess(List<String> idamRoles) {
-        return idamRoles.stream()
-            .map(role -> RoleAssignment.builder()
-                .roleName(IDAM_PREFIX + role)
-                .grantType(SPECIFIC.name())
-                .classification(RESTRICTED.name())
-                .build())
-            .collect(Collectors.toList());
-    }
-
-    private List<RoleAssignment> createFakeRoleAssignments(List<String> idamRoles) {
+    private List<RoleAssignment> createPseudoRoleAssignments(List<String> idamRoles) {
         // TODO: potential performance issue here, to review
         List<UserRole> classifications = caseDefinitionRepository
             .getClassificationsForUserRoleList(idamRoles);
@@ -79,6 +68,16 @@ public class FakeRoleAssignmentsGenerator {
                 .roleName(IDAM_PREFIX + role)
                 .grantType(STANDARD.name())
                 .classification(roleToClassification.get(role))
+                .build())
+            .collect(Collectors.toList());
+    }
+
+    private List<RoleAssignment> createPseudoRoleAssignmentsForGrantedOnlyAccess(List<String> idamRoles) {
+        return idamRoles.stream()
+            .map(role -> RoleAssignment.builder()
+                .roleName(IDAM_PREFIX + role)
+                .grantType(SPECIFIC.name())
+                .classification(RESTRICTED.name())
                 .build())
             .collect(Collectors.toList());
     }

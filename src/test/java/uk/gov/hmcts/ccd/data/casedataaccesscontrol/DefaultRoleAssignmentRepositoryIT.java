@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.data.casedataaccesscontrol;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import java.time.Instant;
-import java.util.Optional;
 import javax.inject.Inject;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;

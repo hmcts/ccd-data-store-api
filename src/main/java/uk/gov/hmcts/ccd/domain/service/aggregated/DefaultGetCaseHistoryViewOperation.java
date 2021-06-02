@@ -14,7 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.DefaultObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.getcase.AccessControlledGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
@@ -32,7 +32,7 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
 
     @Autowired
     public DefaultGetCaseHistoryViewOperation(
-        @Qualifier(AccessControlledGetCaseOperation.QUALIFIER) GetCaseOperation getCaseOperation,
+        @Qualifier(CreatorGetCaseOperation.QUALIFIER) GetCaseOperation getCaseOperation,
         @Qualifier("authorised") GetEventsOperation getEventsOperation,
         UIDefinitionRepository uiDefinitionRepository, CaseTypeService caseTypeService,
         UIDService uidService,
@@ -60,7 +60,7 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
         String caseTypeId = caseDetails.getCaseTypeId();
         CaseTypeDefinition caseTypeDefinition = getCaseType(jurisdictionId, caseTypeId);
 
-        AuditEvent event = getEventsOperation.getEvent(jurisdictionId, caseTypeId, eventId).orElseThrow(
+        AuditEvent event = getEventsOperation.getEvent(caseDetails, caseTypeId, eventId).orElseThrow(
             () -> new ResourceNotFoundException(EVENT_NOT_FOUND));
 
         return merge(caseDetails, event, caseTypeDefinition);
