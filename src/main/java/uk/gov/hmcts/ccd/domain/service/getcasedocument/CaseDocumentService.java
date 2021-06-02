@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.jooq.lambda.tuple.Tuple2;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
@@ -42,53 +43,58 @@ public class CaseDocumentService {
         return documentNodes.isEmpty() ? caseDetails : removeHashes(caseDetails);
     }
 
-    public void attachCaseDocuments(final CaseDetails beforeCallbackCaseDetails,
-                                    final CaseDetails afterCallbackCaseDetails) {
+    public List<DocumentHashToken> extractDocumentHashToken(final Map<String, JsonNode> preCallbackCaseData,
+                                                            final Map<String, JsonNode> postCallbackCaseData) {
 
-        final Map<String, String> preCallbackHashes = caseDocumentUtils.extractDocumentsHashes(
-            beforeCallbackCaseDetails.getData()
+        final List<Tuple2<String, String>> preCallbackHashes = caseDocumentUtils.findDocumentsHashes(
+            preCallbackCaseData
         );
 
-        final Map<String, String> postCallbackHashes = caseDocumentUtils.extractDocumentsHashes(
-            afterCallbackCaseDetails.getData()
+        final List<Tuple2<String, String>> postCallbackHashes = caseDocumentUtils.findDocumentsHashes(
+            postCallbackCaseData
         );
 
         verifyNoTamper(preCallbackHashes, postCallbackHashes);
 
-        final List<DocumentHashToken> documentHashes = caseDocumentUtils.buildDocumentHashToken(
+        final List<DocumentHashToken> documentHashTokens = caseDocumentUtils.buildDocumentHashToken(
             preCallbackHashes,
             postCallbackHashes
         );
 
-        if (!documentHashes.isEmpty()) {
-            final CaseDocumentsMetadata documentMetadata = CaseDocumentsMetadata.builder()
-                .caseId(afterCallbackCaseDetails.getReferenceAsString())
-                .caseTypeId(afterCallbackCaseDetails.getCaseTypeId())
-                .jurisdictionId(afterCallbackCaseDetails.getJurisdiction())
-                .documentHashToken(documentHashes)
-                .build();
+        validate(documentHashTokens);
 
-            caseDocumentAmApiClient.applyPatch(documentMetadata);
-        }
+        return documentHashTokens;
     }
 
-    public void validate(final Map<String, JsonNode> originalCaseData,
-                         final Map<String, JsonNode> caseDataAfterCallback) {
+    public void attachCaseDocuments(final String caseId,
+                                    final String caseTypeId,
+                                    final String jurisdictionId,
+                                    final List<DocumentHashToken> documentHashes) {
+        if (documentHashes.isEmpty()) {
+            return;
+        }
+
+        final CaseDocumentsMetadata documentMetadata = CaseDocumentsMetadata.builder()
+            .caseId(caseId)
+            .caseTypeId(caseTypeId)
+            .jurisdictionId(jurisdictionId)
+            .documentHashToken(documentHashes)
+            .build();
+
+        caseDocumentAmApiClient.applyPatch(documentMetadata);
+    }
+
+    void validate(final List<DocumentHashToken> documentHashes) {
         if (!applicationParams.isDocumentHashCheckingEnabled()) {
             return;
         }
 
-        final List<JsonNode> preCallbackDocumentNodes = caseDocumentUtils.findDocumentNodes(originalCaseData);
-
-        final List<JsonNode> postCallbackDocumentNodes = caseDocumentUtils.findDocumentNodes(caseDataAfterCallback);
-
-        final List<JsonNode> violatingDocuments = caseDocumentUtils.getViolatingDocuments(
-            preCallbackDocumentNodes,
-            postCallbackDocumentNodes
+        final List<DocumentHashToken> violatingDocuments = caseDocumentUtils.getViolatingDocuments(
+            documentHashes
         );
 
         if (!violatingDocuments.isEmpty()) {
-            throw new ValidationException("Some message");
+            throw new ValidationException("Some message");  // TODO: suitable error message
         }
     }
 
@@ -101,8 +107,8 @@ public class CaseDocumentService {
         return clonedCaseDetails;
     }
 
-    private void verifyNoTamper(final Map<String, String> preCallbackHashes,
-                                final Map<String, String> postCallbackHashes) {
+    private void verifyNoTamper(final List<Tuple2<String, String>> preCallbackHashes,
+                                final List<Tuple2<String, String>> postCallbackHashes) {
         final Set<String> tamperedHashes = caseDocumentUtils.getTamperedHashes(preCallbackHashes, postCallbackHashes);
 
         if (!tamperedHashes.isEmpty()) {

@@ -47,11 +47,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyListOf;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -194,7 +198,7 @@ class SubmitCaseTransactionTest {
 
         assertAll(
             () -> assertThat(actualCaseDetails, sameInstance(savedCaseDetails)),
-            () -> verify(caseDocumentService).stripDocumentHashes(caseDetails),
+            () -> verify(caseDocumentService, times(2)).stripDocumentHashes(caseDetails),
             () -> order.verify(caseDetails).setCreatedDate(notNull(LocalDateTime.class)),
             () -> order.verify(caseDetails).setLastStateModifiedDate(notNull(LocalDateTime.class)),
             () -> order.verify(caseDetails).setReference(Long.valueOf(CASE_UID)),
@@ -226,6 +230,8 @@ class SubmitCaseTransactionTest {
     @DisplayName("should create a case")
     void shouldPersistCreateCaseEvent() throws IOException {
         CaseDetails inputCaseDetails = new CaseDetails();
+        inputCaseDetails.setCaseTypeId("SomeCaseType");
+        inputCaseDetails.setJurisdiction("SomeJurisdiction");
         inputCaseDetails.setState("SomeState");
         AboutToSubmitCallbackResponse response = buildResponse();
         doReturn(inputCaseDetails).when(caseDocumentService).stripDocumentHashes(inputCaseDetails);
@@ -239,7 +245,7 @@ class SubmitCaseTransactionTest {
         inputCaseDetails.setData(dataMap);
         doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
         doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
-        doNothing().when(caseDocumentService).attachCaseDocuments(any(CaseDetails.class), any(CaseDetails.class));
+        doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
 
         submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
@@ -249,7 +255,7 @@ class SubmitCaseTransactionTest {
             IGNORE_WARNING);
 
 
-        verify(caseDocumentService).attachCaseDocuments(any(CaseDetails.class), any(CaseDetails.class));
+        verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
     }
 
     @Test

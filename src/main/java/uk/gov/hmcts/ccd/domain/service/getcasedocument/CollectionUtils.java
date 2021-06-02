@@ -5,7 +5,6 @@ import lombok.NonNull;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,11 +23,5 @@ public final class CollectionUtils {
     public static <T> List<T> listsUnion(@NonNull final List<T> listA, @NonNull final List<T> listB) {
         return Stream.concat(listA.stream(), listB.stream())
             .collect(Collectors.toUnmodifiableList());
-    }
-
-    public static <T> Map<T, T> mapsUnion(@NonNull final Map<T, T> mapA, @NonNull final Map<T, T> mapB) {
-        return Stream.of(mapA, mapB)
-            .flatMap(x -> x.entrySet().stream())
-            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }
