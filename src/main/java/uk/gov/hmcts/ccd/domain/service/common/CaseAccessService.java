@@ -81,26 +81,26 @@ public class CaseAccessService {
         return new HashSet<>(caseUserRepository.findCaseRoles(Long.valueOf(caseId), userRepository.getUserId()));
     }
 
-    public Set<String> getAccessProfilesByCaseReference(String caseReference) {
-        List<AccessProfile> accessProfileList = caseDataAccessControl
-            .generateAccessProfilesByCaseReference(caseReference);
-        return caseDataAccessControl.extractAccessProfileNames(accessProfileList);
+    public Set<AccessProfile> getAccessProfilesByCaseReference(String caseReference) {
+        return caseDataAccessControl.generateAccessProfilesByCaseReference(caseReference);
     }
 
-    public Set<String> getCaseCreationCaseRoles() {
-        return Collections.singleton(CREATOR.getRole());
+    public Set<AccessProfile> getCaseCreationCaseRoles() {
+        return Collections.singleton(AccessProfile.builder()
+            .readOnly(false)
+            .accessProfile(CREATOR.getRole()).build());
     }
 
-    public Set<String> getCaseCreationRoles(String caseTypeId) {
+    public Set<AccessProfile> getCaseCreationRoles(String caseTypeId) {
         return Sets.union(getAccessProfiles(caseTypeId), getCaseCreationCaseRoles());
     }
 
-    public Set<String> getAccessProfiles(String caseTypeId) {
-        List<AccessProfile> accessProfiles = caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
+    public Set<AccessProfile> getAccessProfiles(String caseTypeId) {
+        Set<AccessProfile> accessProfiles = caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
         if (accessProfiles == null) {
             throw new ValidationException("Cannot find access profiles for the user");
         }
-        return caseDataAccessControl.extractAccessProfileNames(accessProfiles);
+        return accessProfiles;
     }
 
     public boolean isJurisdictionAccessAllowed(String jurisdiction) {

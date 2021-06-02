@@ -1,14 +1,15 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.google.common.collect.Lists;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -26,7 +27,6 @@ import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
@@ -262,32 +262,48 @@ class AuthorisedGetCaseTypeDefinitionOperationTest {
             .withField(CASE_FIELD_3_3)
             .build();
 
+        Set<AccessProfile> accessProfiles = createAccessProfiles(USER_ROLES);
         when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
-            .thenReturn(Lists.newArrayList());
-        when(caseDataAccessControl.extractAccessProfileNames(anyList()))
-            .thenReturn(USER_ROLES);
+            .thenReturn(accessProfiles);;
 
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition1, USER_ROLES,
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition1,
+            accessProfiles,
             CAN_CREATE);
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition1, USER_ROLES,
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition1,
+            accessProfiles,
             CAN_UPDATE);
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition1, USER_ROLES,
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition1,
+            accessProfiles,
             CAN_READ);
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition2, USER_ROLES,
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition2,
+            accessProfiles,
             CAN_CREATE);
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition2, USER_ROLES,
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition2,
+            accessProfiles,
             CAN_UPDATE);
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition2, USER_ROLES,
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition2,
+            accessProfiles,
             CAN_READ);
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition3, USER_ROLES,
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition3,
+            accessProfiles,
             CAN_CREATE);
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition3, USER_ROLES,
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition3,
+            accessProfiles,
             CAN_UPDATE);
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition3, USER_ROLES,
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(testCaseTypeDefinition3,
+            accessProfiles,
             CAN_READ);
         authorisedGetCaseTypeOperation = new AuthorisedGetCaseTypeOperation(accessControlService,
             getCaseTypeOperation,
             caseDataAccessControl);
+    }
+
+    private Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+        return userRoles.stream()
+            .map(userRole -> AccessProfile.builder().readOnly(false)
+                .accessProfile(userRole)
+                .build())
+            .collect(Collectors.toSet());
     }
 
     @Nested
@@ -327,8 +343,10 @@ class AuthorisedGetCaseTypeDefinitionOperationTest {
         @DisplayName("Should return case states that have matching access rights")
         void shouldReturnCorrectCaseStatesThatHaveAccessRights() {
             doReturn(Optional.of(testCaseTypeDefinition1)).when(getCaseTypeOperation).execute(CASE_TYPE_ID, CAN_READ);
+            Set<AccessProfile> accessProfiles = createAccessProfiles(USER_ROLES);
+
             doReturn(newArrayList(CASE_STATE_1_1)).when(accessControlService)
-                .filterCaseStatesByAccess(testCaseTypeDefinition1.getStates(), USER_ROLES, CAN_READ);
+                .filterCaseStatesByAccess(testCaseTypeDefinition1, accessProfiles, CAN_READ);
 
             Optional<CaseTypeDefinition> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID, CAN_READ);
 
@@ -359,9 +377,10 @@ class AuthorisedGetCaseTypeDefinitionOperationTest {
         void shouldReturnEventsWithMatchingAccessRights() {
             doReturn(Optional.of(testCaseTypeDefinition3)).when(getCaseTypeOperation).execute(CASE_TYPE_ID,
                 CAN_CREATE);
+            Set<AccessProfile> accessProfiles = createAccessProfiles(USER_ROLES);
+
             doReturn(newArrayList(CASE_EVENT_3_1, CASE_EVENT_3_3)).when(accessControlService).filterCaseEventsByAccess(
-                testCaseTypeDefinition3.getEvents(),
-                USER_ROLES,
+                testCaseTypeDefinition3, accessProfiles,
                 CAN_CREATE);
 
             Optional<CaseTypeDefinition> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID,
@@ -394,8 +413,11 @@ class AuthorisedGetCaseTypeDefinitionOperationTest {
         void shouldReturnCaseTypeWithMatchingAccessFields() {
             doReturn(Optional.of(testCaseTypeDefinition2)).when(getCaseTypeOperation).execute(CASE_TYPE_ID,
                 CAN_CREATE);
+            Set<AccessProfile> accessProfiles = createAccessProfiles(USER_ROLES);
+
             doReturn(newArrayList(CASE_FIELD_2_3)).when(accessControlService)
-                .filterCaseFieldsByAccess(testCaseTypeDefinition2.getCaseFieldDefinitions(), USER_ROLES, CAN_CREATE);
+                .filterCaseFieldsByAccess(testCaseTypeDefinition2.getCaseFieldDefinitions(),
+                    accessProfiles, CAN_CREATE);
 
             Optional<CaseTypeDefinition> caseTypeOpt = authorisedGetCaseTypeOperation.execute(CASE_TYPE_ID,
                 CAN_CREATE);

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -57,8 +58,8 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
     }
 
     @Override
-    public Optional<AuditEvent> getEvent(String jurisdiction, String caseTypeId, Long eventId) {
-        return getEventsOperation.getEvent(jurisdiction, caseTypeId, eventId).flatMap(
+    public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String caseTypeId, Long eventId) {
+        return getEventsOperation.getEvent(caseDetails, caseTypeId, eventId).flatMap(
             event -> secureEvent(caseTypeId, event));
     }
 
@@ -83,7 +84,7 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
 
-        Set<String> accessRoles = caseAccessService.getAccessProfilesByCaseReference(caseId);
+        Set<AccessProfile> accessRoles = caseAccessService.getAccessProfilesByCaseReference(caseId);
         if (accessRoles == null || accessRoles.isEmpty()) {
             throw new ValidationException("Cannot find user roles or case roles for the case ID " + caseId);
         }
@@ -91,18 +92,18 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
         return verifyReadAccess(events, accessRoles, caseTypeDefinition);
     }
 
-    private List<AuditEvent> verifyReadAccess(List<AuditEvent> events, Set<String> userRoles,
+    private List<AuditEvent> verifyReadAccess(List<AuditEvent> events, Set<AccessProfile> accessProfiles,
                                               CaseTypeDefinition caseTypeDefinition) {
 
         if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition,
-            userRoles,
+            accessProfiles,
             CAN_READ)) {
             return Lists.newArrayList();
         }
 
         return accessControlService.filterCaseAuditEventsByReadAccess(events,
             caseTypeDefinition.getEvents(),
-            userRoles);
+            accessProfiles);
     }
 
 }

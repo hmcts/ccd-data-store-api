@@ -87,8 +87,7 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
 
     private List<CaseStateDefinition> filterCaseStatesForUser(CaseTypeDefinition caseTypeDefinition,
                                                               Predicate<AccessControlList> access) {
-        List<CaseStateDefinition> caseStateDefinitions = caseTypeDefinition.getStates();
-        return accessControlService.filterCaseStatesByAccess(caseStateDefinitions,
+        return accessControlService.filterCaseStatesByAccess(caseTypeDefinition,
             getAccessProfiles(caseTypeDefinition.getId()),
             access);
     }
@@ -97,8 +96,7 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
         return caseStateDefinitions.stream().map(CaseStateDefinition::getId).collect(toList());
     }
 
-    private Set<String> getAccessProfiles(String caseTypeId) {
-        List<AccessProfile> accessProfileList = caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
-        return caseDataAccessControl.extractAccessProfileNames(accessProfileList);
+    private Set<AccessProfile> getAccessProfiles(String caseTypeId) {
+        return caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
     }
 }

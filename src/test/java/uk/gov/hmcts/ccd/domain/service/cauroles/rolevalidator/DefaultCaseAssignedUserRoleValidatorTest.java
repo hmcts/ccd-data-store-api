@@ -3,6 +3,8 @@ package uk.gov.hmcts.ccd.domain.service.cauroles.rolevalidator;
 import com.google.common.collect.Lists;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,12 +12,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -63,9 +65,15 @@ class DefaultCaseAssignedUserRoleValidatorTest {
 
     private void mockAccessProfiles() {
         when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
-            .thenReturn(Lists.newArrayList());
-        when(caseDataAccessControl.extractAccessProfileNames(anyList()))
-            .thenReturn(Collections.singleton(roleCaseworkerSolicitor));
+            .thenReturn(createAccessProfiles(Collections.singleton(roleCaseworkerSolicitor)));
+    }
+
+    private Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+        return userRoles.stream()
+            .map(userRole -> AccessProfile.builder().readOnly(false)
+                .accessProfile(userRole)
+                .build())
+            .collect(Collectors.toSet());
     }
 
     @Test

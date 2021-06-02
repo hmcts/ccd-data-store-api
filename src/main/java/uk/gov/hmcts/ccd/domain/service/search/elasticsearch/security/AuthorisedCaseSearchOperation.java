@@ -24,7 +24,7 @@ import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchCaseSearchOperation;
@@ -48,7 +48,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     private final CaseSearchOperation caseSearchOperation;
     private final AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
     private final AccessControlService accessControlService;
-    private final SecurityClassificationService classificationService;
+    private final SecurityClassificationServiceImpl classificationService;
     private final ObjectMapperService objectMapperService;
     private final CaseDataAccessControl caseDataAccessControl;
 
@@ -57,7 +57,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         @Qualifier(ElasticsearchCaseSearchOperation.QUALIFIER) CaseSearchOperation caseSearchOperation,
         AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService,
         AccessControlService accessControlService,
-        SecurityClassificationService classificationService,
+        SecurityClassificationServiceImpl classificationService,
         ObjectMapperService objectMapperService,
         CaseDataAccessControl caseDataAccessControl) {
 
@@ -225,10 +225,8 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         return path == null ? "" : path.split(SEARCH_ALIAS_CASE_FIELD_PATH_SEPARATOR_REGEX)[0];
     }
 
-    private Set<String> getAccessProfiles(String caseReference) {
-        List<AccessProfile> accessProfileList = caseDataAccessControl
-            .generateAccessProfilesByCaseReference(caseReference);
-        return caseDataAccessControl.extractAccessProfileNames(accessProfileList);
+    private Set<AccessProfile> getAccessProfiles(String caseReference) {
+        return caseDataAccessControl.generateAccessProfilesByCaseReference(caseReference);
     }
 
     private JsonNode caseDataToJsonNode(CaseDetails caseDetails) {

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import com.google.common.collect.Sets;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,12 +41,12 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
     }
 
     @Override
-    public List<AccessProfile> generateAccessProfilesByCaseTypeId(String caseTypeId) {
+    public Set<AccessProfile> generateAccessProfilesByCaseTypeId(String caseTypeId) {
         return userRoleToAccessProfiles(userRepository.getUserRoles());
     }
 
     @Override
-    public List<AccessProfile> generateAccessProfilesByCaseReference(String caseReference) {
+    public Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference) {
         Set<String> roles = Sets.union(userRepository.getUserRoles(),
             Sets.newHashSet(caseUserRepository
                 .findCaseRoles(Long.valueOf(caseReference), userRepository.getUserId())));
@@ -61,10 +60,10 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
         }
     }
 
-    private List<AccessProfile> userRoleToAccessProfiles(Set<String> roles) {
+    private Set<AccessProfile> userRoleToAccessProfiles(Set<String> roles) {
         return roles
             .stream()
             .map(AccessProfile::new)
-            .collect(Collectors.toList());
+            .collect(Collectors.toSet());
     }
 }

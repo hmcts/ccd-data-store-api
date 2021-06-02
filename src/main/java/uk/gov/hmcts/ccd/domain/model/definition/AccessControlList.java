@@ -77,6 +77,7 @@ public class AccessControlList implements Serializable {
     public String toString() {
         return "ACL{"
             + "accessProfile='" + accessProfile + '\''
+            + "role='" + role + '\''
             + ", crud=" + (isCreate() ? "C" : "") + (isRead() ? "R" : "")
             + (isUpdate() ? "U" : "") + (isDelete() ? "D" : "")
             + '}';

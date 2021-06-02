@@ -78,7 +78,7 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
 
     private Boolean readOnly(RoleAssignment roleAssignment,
                              RoleToAccessProfileDefinition roleToAccessProfileDefinition) {
-        return BooleanUtils.isTrue(roleAssignment.getReadOnly()) ||
-            BooleanUtils.isTrue(roleToAccessProfileDefinition.getReadOnly());
+        return BooleanUtils.isTrue(roleAssignment.getReadOnly())
+            || BooleanUtils.isTrue(roleToAccessProfileDefinition.getReadOnly());
     }
 }

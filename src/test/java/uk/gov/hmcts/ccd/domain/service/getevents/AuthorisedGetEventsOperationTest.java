@@ -14,6 +14,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -72,10 +73,11 @@ class AuthorisedGetEventsOperationTest {
     private static final String CASEWORKER_PROBATE_LOA1 = "caseworker-probate-loa1";
     private static final String CASEWORKER_PROBATE_LOA3 = "caseworker-probate-loa3";
     private static final String CASEWORKER_DIVORCE = "caseworker-divorce-loa3";
-    private static final Set<String> USER_ROLES = Sets.newHashSet(CASEWORKER_DIVORCE, CASEWORKER_PROBATE_LOA1,
-        CASEWORKER_PROBATE_LOA3);
-    private static final Set<String> CASE_ROLES = Sets.newHashSet("[LASOLICITOR]");
-    private static final Set<String> CASE_USER_ROLES =
+    private static final Set<AccessProfile> USER_ROLES = createAccessProfiles(
+        Sets.newHashSet(CASEWORKER_DIVORCE, CASEWORKER_PROBATE_LOA1,
+        CASEWORKER_PROBATE_LOA3));
+    private static final Set<AccessProfile> CASE_ROLES = createAccessProfiles(Sets.newHashSet("[LASOLICITOR]"));
+    private static final Set<AccessProfile> CASE_USER_ROLES =
         Sets.union(USER_ROLES, CASE_ROLES.stream().collect(Collectors.toSet()));
 
 
@@ -116,6 +118,14 @@ class AuthorisedGetEventsOperationTest {
 
         authorisedOperation = new AuthorisedGetEventsOperation(getEventsOperation, caseDefinitionRepository,
             accessControlService, caseAccessService);
+    }
+
+    private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+        return userRoles.stream()
+            .map(userRole -> AccessProfile.builder().readOnly(false)
+                .accessProfile(userRole)
+                .build())
+            .collect(Collectors.toSet());
     }
 
     @Test
@@ -266,20 +276,20 @@ class AuthorisedGetEventsOperationTest {
     @Test
     @DisplayName("should apply authorization when jurisdiction, case type id and event id is received")
     void shouldApplyAuthorisationForJurisdictionCaseTypeIdAndEvent() {
-        doReturn(Optional.of(event)).when(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        doReturn(Optional.of(event)).when(getEventsOperation).getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID);
         doReturn(singletonList(event)).when(accessControlService)
             .filterCaseAuditEventsByReadAccess(anyListOf(AuditEvent.class), anyListOf(CaseEventDefinition.class),
                 eq(CASE_USER_ROLES));
 
         Optional<AuditEvent> optionalAuditEvent =
-            authorisedOperation.getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+            authorisedOperation.getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID);
 
         assertThat(optionalAuditEvent.isPresent(), is(true));
         AuditEvent output = optionalAuditEvent.get();
         InOrder inOrder =
             inOrder(caseDefinitionRepository, getEventsOperation, accessControlService, caseAccessService);
         assertAll(
-            () -> inOrder.verify(getEventsOperation).getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID),
+            () -> inOrder.verify(getEventsOperation).getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(caseDetails.getCaseTypeId()),
             () -> inOrder.verify(caseAccessService).getAccessProfilesByCaseReference(CASE_ID),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(caseType, CASE_USER_ROLES,
