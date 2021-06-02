@@ -12,7 +12,7 @@ import java.util.List;
 @RequestScope
 public class IdamJurisdictionsResolver implements JurisdictionsResolver {
 
-    public static final String QUALIFIER = "default";
+    public static final String QUALIFIER = "idam";
 
     private final UserRepository userRepository;
 
