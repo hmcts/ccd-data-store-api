@@ -1,11 +1,14 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleMatchingResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 @Slf4j
 @Component
@@ -14,7 +17,7 @@ public class RegionMatcher implements RoleAttributeMatcher {
     @Override
     public void matchAttribute(Pair<RoleAssignment, RoleMatchingResult> resultPai, CaseDetails caseDetails) {
         RoleAssignment roleAssignment = resultPai.getLeft();
-        String caseRegion = ""; // Get region from case Details
+        String caseRegion = getRegion(caseDetails).orElse("");
         log.debug("Match role assignment region {} and case details region {} for role assignment {}",
             roleAssignment.getAttributes().getRegion(),
             caseRegion,
@@ -28,4 +31,19 @@ public class RegionMatcher implements RoleAttributeMatcher {
             caseRegion,
             matched);
     }
+
+    @Override
+    public void matchAttribute(Pair<RoleAssignment, RoleMatchingResult> resultPair,
+                               CaseTypeDefinition caseTypeDefinition) {
+        // TODO : need to implement this for search and create cases
+    }
+
+    private Optional<String> getRegion(CaseDetails caseDetails) {
+        JsonNode caseManagementLocation = caseDetails.getData().get(CASE_MANAGEMENT__LOCATION);
+        if (caseManagementLocation != null) {
+            return Optional.ofNullable(caseManagementLocation.get(REGION).asText());
+        }
+        return Optional.empty();
+    }
+
 }

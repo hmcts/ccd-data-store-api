@@ -4,6 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,15 +26,9 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -37,8 +37,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
@@ -96,6 +98,9 @@ class MergeDataToSearchResultOperationTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private CaseDataAccessControl caseDataAccessControl;
 
     @Mock
     private DateTimeSearchResultProcessor dateTimeSearchResultProcessor;
@@ -164,11 +169,17 @@ class MergeDataToSearchResultOperationTest {
             .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType()).build())
             .withField(labelField)
             .build();
-        doReturn(Collections.emptySet()).when(userRepository).getUserRoles();
+        mockAccessProfiles();
+
         doAnswer(i -> i.getArgument(1)).when(dateTimeSearchResultProcessor).execute(Mockito.any(),
             Mockito.any());
 
         classUnderTest = new MergeDataToSearchResultOperation(userRepository, dateTimeSearchResultProcessor);
+    }
+
+    private void mockAccessProfiles() {
+        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+            .thenReturn(Sets.newHashSet());
     }
 
     @Test

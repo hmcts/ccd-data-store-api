@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,9 +15,11 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.User;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 import static org.hamcrest.Matchers.everyItem;
@@ -28,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 class AuthorisedGetUserProfileOperationTest {
@@ -39,6 +43,8 @@ class AuthorisedGetUserProfileOperationTest {
         new JurisdictionDisplayProperties();
 
     private Set<String> userRoles = Sets.newHashSet("role1", "role2", "role3");
+    private Set<AccessProfile> accessProfiles = createAccessProfiles(userRoles);
+
     private List<CaseStateDefinition> caseStateDefinitions =
         Arrays.asList(new CaseStateDefinition(), new CaseStateDefinition(), new CaseStateDefinition());
     private List<CaseEventDefinition> caseEventDefinitions = Arrays.asList(new CaseEventDefinition(),
@@ -50,6 +56,9 @@ class AuthorisedGetUserProfileOperationTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private CaseDataAccessControl caseDataAccessControl;
 
     @Mock
     private AccessControlService accessControlService;
@@ -77,22 +86,31 @@ class AuthorisedGetUserProfileOperationTest {
         test1JurisdictionDisplayProperties.setCaseTypeDefinitions(caseTypes1Definition);
         test2JurisdictionDisplayProperties.setCaseTypeDefinitions(caseTypes2Definition);
 
-        doReturn(userRoles).when(userRepository).getUserRoles();
+        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(any()))
+            .thenReturn(accessProfiles);
         doReturn(userProfile).when(getUserProfileOperation).execute(CAN_READ);
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(any(), any(), any());
         classUnderTest =
-            new AuthorisedGetUserProfileOperation(userRepository, accessControlService, getUserProfileOperation,
-                caseUserRepository);
+            new AuthorisedGetUserProfileOperation(accessControlService, getUserProfileOperation, caseDataAccessControl);
     }
+
+    private Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+        return userRoles.stream()
+            .map(userRole -> AccessProfile.builder().readOnly(false)
+                .accessProfile(userRole)
+                .build())
+            .collect(Collectors.toSet());
+    }
+
 
     @Test
     @DisplayName("should return only caseTypes the user is allowed to access")
     public void execute() {
         doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(eq(notAllowedCaseTypeDefinition),
-            eq(userRoles), eq(CAN_READ));
-        doReturn(caseStateDefinitions).when(accessControlService).filterCaseStatesByAccess(any(), eq(userRoles),
+            eq(accessProfiles), eq(CAN_READ));
+        doReturn(caseStateDefinitions).when(accessControlService).filterCaseStatesByAccess(any(), eq(accessProfiles),
             eq(CAN_READ));
-        doReturn(caseEventDefinitions).when(accessControlService).filterCaseEventsByAccess(any(), eq(userRoles),
+        doReturn(caseEventDefinitions).when(accessControlService).filterCaseEventsByAccess(any(), eq(accessProfiles),
             eq(CAN_READ));
 
         UserProfile userProfile = classUnderTest.execute(CAN_READ);
@@ -114,7 +132,8 @@ class AuthorisedGetUserProfileOperationTest {
     @Test
     @DisplayName("should return empty caseType if the user is not allowed to access any case type")
     void shouldReturnEmptyCaseType() {
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(any(), eq(userRoles), eq(CAN_READ));
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(any(),
+            eq(accessProfiles), eq(CAN_READ));
 
         UserProfile userProfile = classUnderTest.execute(CAN_READ);
 
@@ -129,7 +148,8 @@ class AuthorisedGetUserProfileOperationTest {
     @DisplayName("should return empty jurisdictions if the user is not allowed to access any case type")
     void shouldReturnEmptyJurisdictions() {
         userProfile.setJurisdictions(new JurisdictionDisplayProperties[0]);
-        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(any(), eq(userRoles), eq(CAN_READ));
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(any(),
+            eq(accessProfiles), eq(CAN_READ));
 
         UserProfile userProfile = classUnderTest.execute(CAN_READ);
 

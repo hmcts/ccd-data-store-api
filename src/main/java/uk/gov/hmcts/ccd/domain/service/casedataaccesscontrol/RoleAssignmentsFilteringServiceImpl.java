@@ -53,9 +53,17 @@ public class RoleAssignmentsFilteringServiceImpl implements RoleAssignmentsFilte
         log.info("Filter role assignments for case event {}", caseDataContent.getEvent().getEventId());
 
         List<Pair<RoleAssignment, RoleMatchingResult>> roleAssignmentMatchPairs = roleAssignments
-            .getRoleAssignments().stream()
-            .map(roleAssignment -> Pair.of(roleAssignment, new RoleMatchingResult()))
+            .getRoleAssignments()
+            .stream()
+            .map(roleAssignment -> {
+                Pair<RoleAssignment, RoleMatchingResult> resultPair = Pair.of(roleAssignment, new RoleMatchingResult());
+
+                roleAttributeMatchers.forEach(matcher -> matcher.matchAttribute(resultPair, (CaseTypeDefinition) null));
+                return resultPair;
+            })
+            .filter(resultPair -> resultPair.getRight().matchedAllValues())
             .collect(Collectors.toList());
+
         return new RoleAssignmentFilteringResult(roleAssignmentMatchPairs);
     }
 
@@ -65,8 +73,15 @@ public class RoleAssignmentsFilteringServiceImpl implements RoleAssignmentsFilte
         log.info("Filter role assignments for case type {}", caseTypeDefinition.getName());
 
         List<Pair<RoleAssignment, RoleMatchingResult>> roleAssignmentMatchPairs = roleAssignments
-            .getRoleAssignments().stream()
-            .map(roleAssignment -> Pair.of(roleAssignment, new RoleMatchingResult()))
+            .getRoleAssignments()
+            .stream()
+            .map(roleAssignment -> {
+                Pair<RoleAssignment, RoleMatchingResult> resultPair = Pair.of(roleAssignment, new RoleMatchingResult());
+
+                roleAttributeMatchers.forEach(matcher -> matcher.matchAttribute(resultPair, caseTypeDefinition));
+                return resultPair;
+            })
+            .filter(resultPair -> resultPair.getRight().matchedAllValues())
             .collect(Collectors.toList());
         return new RoleAssignmentFilteringResult(roleAssignmentMatchPairs);
     }

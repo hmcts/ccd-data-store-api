@@ -58,7 +58,7 @@ public class SecurityClassificationServiceTest {
     private static final String JURISDICTION_ID = "PROBATE";
     private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
 
-    private SecurityClassificationService securityClassificationService;
+    private SecurityClassificationServiceImpl securityClassificationService;
 
     @Mock
     private Authentication authentication;
@@ -68,15 +68,18 @@ public class SecurityClassificationServiceTest {
 
     @Mock
     private UserRepository userRepository;
+    private CaseDetails caseDetails;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+        caseDetails = new CaseDetails();
+        caseDetails.setJurisdiction(JURISDICTION_ID);
 
         doReturn(authentication).when(securityContext).getAuthentication();
         SecurityContextHolder.setContext(securityContext);
 
-        securityClassificationService = spy(new SecurityClassificationService(userRepository));
+        securityClassificationService = spy(new SecurityClassificationServiceImpl(userRepository));
     }
 
     @Nested
@@ -230,7 +233,7 @@ public class SecurityClassificationServiceTest {
         @DisplayName("should return empty list when given null")
         void shouldReturnEmptyListInsteadOfNull() {
             final List<AuditEvent> classifiedEvents =
-                securityClassificationService.applyClassification(JURISDICTION_ID, null);
+                securityClassificationService.applyClassification(caseDetails, null);
 
             assertAll(
                 () -> assertThat(classifiedEvents, is(notNullValue())),
@@ -245,7 +248,7 @@ public class SecurityClassificationServiceTest {
                 JURISDICTION_ID);
 
             final List<AuditEvent> classifiedEvents =
-                securityClassificationService.applyClassification(JURISDICTION_ID,
+                securityClassificationService.applyClassification(caseDetails,
                                                                 Arrays.asList(publicEvent,
                                                                     privateEvent,
                                                                     restrictedEvent));
@@ -262,7 +265,7 @@ public class SecurityClassificationServiceTest {
             doReturn(Optional.of(PUBLIC)).when(securityClassificationService).getUserClassification(JURISDICTION_ID);
 
             final List<AuditEvent> classifiedEvents =
-                securityClassificationService.applyClassification(JURISDICTION_ID,
+                securityClassificationService.applyClassification(caseDetails,
                                                                     Arrays.asList(publicEvent,
                                                                         privateEvent,
                                                                         restrictedEvent));
@@ -278,7 +281,7 @@ public class SecurityClassificationServiceTest {
         void shouldReturnEmptyListWhenNoUserClassification() {
 
             final List<AuditEvent> classifiedEvents =
-                securityClassificationService.applyClassification(JURISDICTION_ID,
+                securityClassificationService.applyClassification(caseDetails,
                                                                     Arrays.asList(publicEvent,
                                                                         privateEvent,
                                                                         restrictedEvent));

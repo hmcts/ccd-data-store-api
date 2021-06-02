@@ -6,18 +6,18 @@ import org.apache.commons.lang3.tuple.Pair;
 
 public class RoleAssignmentFilteringResult {
 
-    private final List<Pair<RoleAssignment, RoleMatchingResult>> roleMatchingResults;
+    private final List<Pair<RoleAssignment, RoleMatchingResult>> roleAssignmentMatchingResults;
 
     public RoleAssignmentFilteringResult(List<Pair<RoleAssignment, RoleMatchingResult>> roleAssignmentMatchPairs) {
-        this.roleMatchingResults = roleAssignmentMatchPairs;
+        this.roleAssignmentMatchingResults = roleAssignmentMatchPairs;
     }
 
-    public List<Pair<RoleAssignment, RoleMatchingResult>> getRoleMatchingResults() {
-        return roleMatchingResults;
+    public List<Pair<RoleAssignment, RoleMatchingResult>> getRoleAssignmentMatchingResults() {
+        return roleAssignmentMatchingResults;
     }
 
     public List<RoleAssignment> getRoleAssignments() {
-        return roleMatchingResults.stream()
+        return roleAssignmentMatchingResults.stream()
             .map(Pair::getKey)
             .collect(Collectors.toList());
     }
@@ -35,7 +35,7 @@ public class RoleAssignmentFilteringResult {
     }
 
     public RoleAssignmentFilteringResult retainBasicAndSpecificGrantTypeRolesOnly() {
-        return new RoleAssignmentFilteringResult(roleMatchingResults
+        return new RoleAssignmentFilteringResult(roleAssignmentMatchingResults
             .stream()
             .filter(pair ->
                 pair.getKey().getGrantType().equals(GrantType.BASIC.name())

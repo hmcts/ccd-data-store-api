@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleMatchingResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 @Slf4j
 @Component
@@ -25,5 +26,11 @@ public class CaseIdMatcher implements RoleAttributeMatcher {
             roleAssignment.getAttributes().getCaseId(),
             caseDetails.getReferenceAsString(),
             matched);
+    }
+
+    @Override
+    public void matchAttribute(Pair<RoleAssignment, RoleMatchingResult> resultPair,
+                               CaseTypeDefinition caseTypeDefinition) {
+        // TODO : need to implement this for search and create cases
     }
 }

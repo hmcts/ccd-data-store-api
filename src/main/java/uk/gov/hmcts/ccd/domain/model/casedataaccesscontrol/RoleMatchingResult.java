@@ -6,6 +6,7 @@ import lombok.Data;
 public class RoleMatchingResult {
     boolean dateMatched;
     boolean caseIdMatched;
+    boolean caseTypeIdMatched;
     boolean jurisdictionMatched;
     boolean regionMatched;
     boolean locationMatched;
@@ -14,6 +15,7 @@ public class RoleMatchingResult {
     public boolean matchedAllValues() {
         return isDateMatched()
             && isCaseIdMatched()
+            && isCaseTypeIdMatched()
             && isJurisdictionMatched()
             && isClassificationMatched()
             && isRegionMatched()
