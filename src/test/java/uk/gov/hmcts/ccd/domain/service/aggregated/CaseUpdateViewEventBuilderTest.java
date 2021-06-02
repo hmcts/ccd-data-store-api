@@ -27,6 +27,7 @@ import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.core.StringStartsWith.startsWith;
@@ -72,7 +73,8 @@ class CaseUpdateViewEventBuilderTest {
     private final List<WizardPage> wizardPageCollection = Lists.newArrayList();
     private final List<CaseViewField> viewFields = Lists.newArrayList();
     private static final String STATE_ID = "STATE_ID";
-    private static final CaseStateDefinition CASE_STATE = newState().withId(STATE_ID).build();
+    private static final String TITLE_DISPLAY = "titleDisplay";
+    private final CaseStateDefinition caseStateDefinition = newState().withId(STATE_ID).build();
 
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
@@ -103,7 +105,8 @@ class CaseUpdateViewEventBuilderTest {
         when(caseViewFieldBuilder.build(caseFieldDefinitions, eventFields, caseDetails.getData()))
             .thenReturn(viewFields);
         caseDetails.setState(STATE_ID);
-        when(caseTypeService.findState(caseTypeDefinition, STATE_ID)).thenReturn(CASE_STATE);
+        caseStateDefinition.setTitleDisplay(TITLE_DISPLAY);
+        when(caseTypeService.findState(caseTypeDefinition, STATE_ID)).thenReturn(caseStateDefinition);
 
         caseUpdateViewEventBuilder = new CaseUpdateViewEventBuilder(caseDefinitionRepository,
                                                               uiDefinitionRepository,
@@ -135,6 +138,7 @@ class CaseUpdateViewEventBuilderTest {
             () -> assertThat(caseUpdateViewEvent, hasProperty("caseId", equalTo(CASE_REFERENCE))),
             () -> assertThat(caseUpdateViewEvent, hasProperty("caseFields", equalTo(viewFields))),
             () -> assertThat(caseUpdateViewEvent, hasProperty("wizardPages", equalTo(wizardPageCollection))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("titleDisplay", is(TITLE_DISPLAY))),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
             () -> inOrder.verify(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_TRIGGER_ID),
             () -> inOrder.verify(caseViewFieldBuilder).build(caseFieldDefinitions, eventFields,
