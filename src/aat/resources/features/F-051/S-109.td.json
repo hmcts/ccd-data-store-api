@@ -320,7 +320,7 @@
 											"__elementId__": "role"
 										},
 										{
-                      "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
+                     "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 										},
 										{
                       "_extends_": "CaseworkerCaaAccessControlList"
@@ -595,7 +595,7 @@
 									"order": 3,
 									"title_display": null,
 									"acls": [
-                    {
+                   {
                       "__ordering__": "unordered",
                       "__elementId__": "role"
                     },
