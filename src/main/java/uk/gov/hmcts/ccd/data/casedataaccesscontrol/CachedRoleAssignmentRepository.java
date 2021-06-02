@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.collect.Maps.newConcurrentMap;
@@ -27,5 +28,10 @@ public class CachedRoleAssignmentRepository implements RoleAssignmentRepository 
     @Override
     public RoleAssignmentResponse getRoleAssignments(String userId) {
         return roleAssignments.computeIfAbsent(userId, e -> roleAssignmentRepository.getRoleAssignments(userId));
+    }
+
+    @Override
+    public RoleAssignmentResponse findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds) {
+        return roleAssignmentRepository.findRoleAssignmentsByCasesAndUsers(caseIds,userIds);
     }
 }

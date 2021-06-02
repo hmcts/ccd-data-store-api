@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,7 +8,6 @@ import java.util.List;
 
 @Builder
 @Data
-@AllArgsConstructor
 public class RoleAssignment {
     private String id;
     private String actorIdType; // currently IDAM
@@ -30,5 +28,10 @@ public class RoleAssignment {
         return this.getAttributes() != null
             && this.getAttributes().getCaseId() != null
             && !this.getAttributes().getCaseId().isEmpty();
+    }
+
+    public boolean isAnExpiredRoleAssignment() {
+        final Instant machineTimestamp = Instant.now();
+        return machineTimestamp.isAfter(beginTime) && machineTimestamp.isBefore(endTime);
     }
 }

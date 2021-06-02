@@ -1,20 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.caseaccess;
 
 import com.google.common.collect.Lists;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.util.set.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseRoleRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
@@ -27,9 +19,19 @@ import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepo
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidCaseRoleException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
@@ -42,17 +44,24 @@ public class CaseAccessOperation {
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseRoleRepository caseRoleRepository;
     private final SupplementaryDataRepository supplementaryDataRepository;
+    private final RoleAssignmentService roleAssignmentService;
+    private final ApplicationParams applicationParams;
 
     public CaseAccessOperation(final @Qualifier(CachedCaseUserRepository.QUALIFIER)
                                    CaseUserRepository caseUserRepository,
                                @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
-                                   final CaseDetailsRepository caseDetailsRepository,
+                               final CaseDetailsRepository caseDetailsRepository,
                                @Qualifier(CachedCaseRoleRepository.QUALIFIER) CaseRoleRepository caseRoleRepository,
-                               @Qualifier("default") SupplementaryDataRepository supplementaryDataRepository) {
+                               @Qualifier("default") SupplementaryDataRepository supplementaryDataRepository,
+                               RoleAssignmentService roleAssignmentService,
+                               ApplicationParams applicationParams) {
+
         this.caseUserRepository = caseUserRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseRoleRepository = caseRoleRepository;
         this.supplementaryDataRepository = supplementaryDataRepository;
+        this.roleAssignmentService = roleAssignmentService;
+        this.applicationParams = applicationParams;
     }
 
     @Transactional
@@ -74,15 +83,20 @@ public class CaseAccessOperation {
 
     @Transactional
     public List<String> findCasesUserIdHasAccessTo(final String userId) {
-        List<Long> usersCases = caseUserRepository.findCasesUserIdHasAccessTo(userId);
-        if (usersCases.isEmpty()) {
-            return List.of();
+
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            return roleAssignmentService.getCaseIdsForAGivenUser(userId);
         } else {
-            return caseDetailsRepository
-                .findCaseReferencesByIds(usersCases)
-                .stream()
-                .map(String::valueOf)
-                .collect(Collectors.toList());
+            List<Long> usersCases = caseUserRepository.findCasesUserIdHasAccessTo(userId);
+            if (usersCases.isEmpty()) {
+                return List.of();
+            } else {
+                return caseDetailsRepository
+                    .findCaseReferencesByIds(usersCases)
+                    .stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.toList());
+            }
         }
     }
 
@@ -304,20 +318,26 @@ public class CaseAccessOperation {
     }
 
     public List<CaseAssignedUserRole> findCaseUserRoles(List<Long> caseReferences, List<String> userIds) {
-        Map<String, Long> caseReferenceAndIds = getCaseDetailsList(caseReferences).stream()
-            .collect(Collectors.toMap(CaseDetails::getId, CaseDetails::getReference));
 
-        if (caseReferenceAndIds.isEmpty()) {
-            return Lists.newArrayList();
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            final var caseIds = caseReferences.stream().map(String::valueOf).collect(Collectors.toList());
+            return roleAssignmentService.findRoleAssignmentsByCasesAndUsers(caseIds, userIds);
+        } else {
+            Map<String, Long> caseReferenceAndIds = getCaseDetailsList(caseReferences).stream()
+                .collect(Collectors.toMap(CaseDetails::getId, CaseDetails::getReference));
+
+            if (caseReferenceAndIds.isEmpty()) {
+                return Lists.newArrayList();
+            }
+            List<Long> caseIds = caseReferenceAndIds.keySet().stream().map(Long::valueOf).collect(Collectors.toList());
+            List<CaseUserEntity> caseUserEntities = caseUserRepository.findCaseUserRoles(caseIds, userIds);
+            return caseUserEntities.stream()
+                .map(cue -> new CaseAssignedUserRole(
+                    String.valueOf(caseReferenceAndIds.get(String.valueOf(cue.getCasePrimaryKey().getCaseDataId()))),
+                    cue.getCasePrimaryKey().getUserId(),
+                    cue.getCasePrimaryKey().getCaseRole()))
+                .collect(Collectors.toCollection(ArrayList::new));
         }
-        List<Long> caseIds = caseReferenceAndIds.keySet().stream().map(Long::valueOf).collect(Collectors.toList());
-        List<CaseUserEntity> caseUserEntities = caseUserRepository.findCaseUserRoles(caseIds, userIds);
-        return caseUserEntities.stream()
-            .map(cue -> new CaseAssignedUserRole(
-                String.valueOf(caseReferenceAndIds.get(String.valueOf(cue.getCasePrimaryKey().getCaseDataId()))),
-                cue.getCasePrimaryKey().getUserId(),
-                cue.getCasePrimaryKey().getCaseRole()))
-            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     private List<CaseDetails> getCaseDetailsList(List<Long> caseReferences) {
