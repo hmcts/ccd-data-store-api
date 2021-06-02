@@ -500,6 +500,7 @@ class MergeDataToSearchResultOperationTest {
         assertAll(
             () -> assertThat(searchResultView.getSearchResultViewItems().size(), is(2)),
             () -> assertThat(searchResultView.getSearchResultViewColumns().size(), is(1)),
+            () -> assertThat(searchResultView.getSearchResultViewItems().get(0).getCaseId(), is("999")),
             () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(0).getFields()
                 .get("FamilyDetails.FamilyAddress.PostCode")).asText(), is(POSTCODE_VALUE)),
             () -> assertThat(((TextNode)searchResultView.getSearchResultViewItems().get(1).getFields()

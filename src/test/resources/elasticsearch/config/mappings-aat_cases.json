@@ -440,13 +440,9 @@
         "type": "date"
       },
       "reference": {
-        "fields": {
-          "keyword": {
-            "ignore_above": 256,
-            "type": "keyword"
-          }
-        },
-        "type": "text"
+        "type": "text",
+        "analyzer": "standard",
+        "search_analyzer": "case_id_analyzer"
       },
       "security_classification": {
         "type": "keyword"

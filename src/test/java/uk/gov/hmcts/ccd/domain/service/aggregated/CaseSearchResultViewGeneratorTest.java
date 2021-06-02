@@ -373,7 +373,7 @@ class CaseSearchResultViewGeneratorTest {
                 is(LAST_STATE_MODIFIED_DATE)),
             () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[CREATED_DATE]"),
                 is(CREATED_DATE)),
-            () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[CASE_REFERENCE]"), is(999L)),
+            () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[CASE_REFERENCE]"), is("999")),
             () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[SECURITY_CLASSIFICATION]"),
                     is(SECURITY_CLASSIFICATION)),
             () -> assertThat(caseSearchResultView.getCases().get(0).getFields().get("[CASE_TYPE]"), is(CASE_TYPE_ID_1)),

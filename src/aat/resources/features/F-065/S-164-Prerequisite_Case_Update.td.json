@@ -160,6 +160,9 @@
           "classification": "PUBLIC",
           "value": [
             {
+              "__ordering__": "ordered"
+            },
+            {
               "id": "[[ANYTHING_PRESENT]]",
               "classification": "PUBLIC"
             },
@@ -203,6 +206,9 @@
         "CollectionField": {
           "classification": "PUBLIC",
           "value": [
+            {
+              "__ordering__": "ordered"
+            },
             {
               "id": "[[ANYTHING_PRESENT]]",
               "classification": "PUBLIC"

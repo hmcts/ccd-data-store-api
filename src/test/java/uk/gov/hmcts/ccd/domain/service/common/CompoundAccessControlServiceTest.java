@@ -16,7 +16,9 @@ import java.util.Map;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.DOCUMENT;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ROLE_IN_USER_ROLES;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ACCESS_PROFILES;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.addressesStart;
@@ -599,7 +601,8 @@ class CompoundAccessControlServiceTest {
 
             JsonNode dataNode = generatePeopleDataWithPerson(existingPersonStart + name + personEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(existingPersonStart
+            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(
+                existingPersonStart
                     + nameUpdated + personEnd),
                 dataNode, people, ACCESS_PROFILES), is(true));
         }
@@ -619,7 +622,8 @@ class CompoundAccessControlServiceTest {
 
             JsonNode dataNode = generatePeopleDataWithPerson(existingPersonStart + name + personEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(existingPersonStart
+            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(
+                existingPersonStart
                     + nameUpdated + personEnd),
                 dataNode, people, ACCESS_PROFILES), is(false));
         }
@@ -638,12 +642,15 @@ class CompoundAccessControlServiceTest {
             caseTypeDefinition.getCaseFieldDefinitions().stream().forEach(caseField ->
                 caseField.propagateACLsToNestedFields());
 
-            JsonNode dataNode = generatePeopleDataWithPerson(existingPersonStart + addressesStart + existingAddress1
+            JsonNode dataNode = generatePeopleDataWithPerson(existingPersonStart + addressesStart
+                + existingAddress1
                 + addressEnd + personEnd);
 
-            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(existingPersonStart
+            assertThat(compoundAccessControlService.hasAccessForAction(generatePeopleDataWithPerson(
+                existingPersonStart
                 + addressesStart
-                + existingAddress1Line1Updated + addressEnd + personEnd), dataNode, people, ACCESS_PROFILES), is(true));
+                + existingAddress1Line1Updated + addressEnd + personEnd), dataNode, people, ACCESS_PROFILES),
+                is(true));
         }
 
         @Test
@@ -740,7 +747,7 @@ class CompoundAccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should grand access when a child is updated and U exist - fine grained ACL")
+        @DisplayName("Should grant access when a child is updated and U exist - fine grained ACL")
         void shouldGrantAccessWhenChildUpdatedAndFineGrainedACLExists() throws IOException {
             final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(asList(anAcl()
@@ -786,7 +793,7 @@ class CompoundAccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should grand access when a child is updated and U exist, complex child has no initial value - "
+        @DisplayName("Should grant access when a child is updated and U exist, complex child has no initial value - "
             + "fine grained ACL")
         void shouldGrantAccessWhenChildUpdatedFromNullAndFineGrainedACLExists() throws IOException {
             final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
@@ -832,7 +839,7 @@ class CompoundAccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should grand access when a child is updated and U exist, complex child has null initial value - "
+        @DisplayName("Should grant access when a child is updated and U exist, complex child has null initial value - "
             + "fine grained ACL")
         void shouldGrantAccessWhenChildUpdatedFromNullNodeAndFineGrainedACLExists() throws IOException {
             final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
@@ -888,7 +895,7 @@ class CompoundAccessControlServiceTest {
         }
 
         @Test
-        @DisplayName("Should grand access when a child is updated and U exist, complex child has null final value - "
+        @DisplayName("Should grant access when a child is updated and U exist, complex child has null final value - "
             + "fine grained ACL")
         void shouldGrantAccessWhenChildUpdatedToNullAndFineGrainedACLExists() throws IOException {
             final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
@@ -1112,6 +1119,83 @@ class CompoundAccessControlServiceTest {
                 + existingAddress1LinesUpdated + addressEnd + "," + p2Notes + p2End;
             assertThat(compoundAccessControlService.hasAccessForAction(
                 generatePeopleDataWithPerson(p2Updated, p1Updated), dataNode, people, ACCESS_PROFILES), is(false));
+        }
+
+        @Test
+        @DisplayName("Should not grant access to case field if ACL false for collection of Document Type")
+        void shouldNotGrantAccessToFieldWithAclAccessNotGrantedForCollectionOfDocuments() throws IOException {
+            CaseTypeDefinition caseType = newCaseType()
+                .withField(newCaseField()
+                    .withId("Documents")
+                    .withFieldType(aFieldType()
+                        .withType(COLLECTION)
+                        .withCollectionFieldType(aFieldType()
+                            .withType(DOCUMENT)
+                            .withId(DOCUMENT)
+                            .build())
+                        .build())
+                    .withOrder(1)
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(false)
+                        .withUpdate(false)
+                        .withDelete(false)
+                        .withRead(true)
+                        .build())
+                    .build())
+                .build();
+            JsonNode newDataNode = getJsonNode("{\n"
+                + "  \"Documents\": [\n"
+                + "    {\n"
+                + "      \"id\": \"CollectionField1\",\n"
+                + "      \"value\": {\n"
+                + "        \"document_url\": \"{{DM_STORE_BASE_URL}}/documents/"
+                + "ae5c9e4b-1385-483e-b1b7-607e75dd3943\",\n"
+                + "        \"document_binary_url\": \"{{DM_STORE_BASE_URL}}/documents/"
+                + "ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary\",\n"
+                + "        \"document_filename\": \"Elastic Search test Case.png --> updated by Solicitor 1\"\n"
+                + "      }\n"
+                + "    },\n"
+                + "    {\n"
+                + "      \"id\": \"CollectionField2\",\n"
+                + "      \"value\": {\n"
+                + "        \"document_url\": \"{{DM_STORE_BASE_URL}}/documents/"
+                + "ae5c9e4b-1385-483e-b1b7-607e75dd3943\",\n"
+                + "        \"document_binary_url\": \"{{DM_STORE_BASE_URL}}/documents/"
+                + "ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary\",\n"
+                + "        \"document_filename\": \"Elastic Search test Case.png --> updated by Solicitor 1\"\n"
+                + "      }\n"
+                + "    }\n"
+                + "  ]\n"
+                + "}");
+            JsonNode existingDataNode = getJsonNode("{\n"
+                + "  \"Documents\": [\n"
+                + "    {\n"
+                + "      \"id\": \"CollectionField1\",\n"
+                + "      \"value\": {\n"
+                + "        \"document_url\": \"{{DM_STORE_BASE_URL}}/documents/"
+                + "ae5c9e4b-1385-483e-b1b7-607e75yfhgfhg\",\n"
+                + "        \"document_binary_url\": \"{{DM_STORE_BASE_URL}}/documents/"
+                + "ae5c9e4b-1385-483e-b1b7-607e75yfhgfhg/binary\",\n"
+                + "        \"document_filename\": \"Elastic Search test Case.png --> updated by Solicitor 1\"\n"
+                + "      }\n"
+                + "    },\n"
+                + "    {\n"
+                + "      \"id\": \"CollectionField2\",\n"
+                + "      \"value\": {\n"
+                + "        \"document_url\": \"{{DM_STORE_BASE_URL}}/documents/"
+                + "ae5c9e4b-1385-483e-b1b7-607e75dd3943\",\n"
+                + "        \"document_binary_url\": \"{{DM_STORE_BASE_URL}}/documents/"
+                + "ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary\",\n"
+                + "        \"document_filename\": \"Elastic Search test Case.png --> updated by Solicitor 1\"\n"
+                + "      }\n"
+                + "    }\n"
+                + "  ]\n"
+                + "}");
+
+            assertThat(compoundAccessControlService.hasAccessForAction(
+                newDataNode, existingDataNode, caseType.getCaseFieldDefinitions().get(0), ACCESS_PROFILES), is(false));
+
         }
     }
 
@@ -1349,7 +1433,7 @@ class CompoundAccessControlServiceTest {
             JsonNode newData = generatePeopleDataWithPerson(p2); // i.e. with deleted BirthInfo
 
             assertThat(compoundAccessControlService.hasAccessForAction(newData, existingData, people, ACCESS_PROFILES),
-                    is(true));
+                is(true));
         }
 
         @Test
@@ -1807,5 +1891,10 @@ class CompoundAccessControlServiceTest {
         final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(stringData));
 
         return JacksonUtils.convertValueJsonNode(data);
+    }
+
+    private JsonNode getJsonNode(String content) throws IOException {
+        final Map<String, JsonNode> newData = JacksonUtils.convertValue(MAPPER.readTree(content));
+        return JacksonUtils.convertValueJsonNode(newData);
     }
 }

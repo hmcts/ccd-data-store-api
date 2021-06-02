@@ -23,12 +23,14 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.hasAcc
 public class CompoundAccessControlService {
 
     private static final Logger LOG = LoggerFactory.getLogger(CompoundAccessControlService.class);
-    public static final String A_CHILD_OF_HAS_DATA_DETELE_WITHOUT_DELETE_ACL = "A child {} of {} has been deleted but"
+    public static final String A_CHILD_OF_HAS_DATA_DELETE_WITHOUT_DELETE_ACL = "A child {} of {} has been deleted but"
         + " no Delete ACL";
     public static final String A_CHILD_OF_HAS_DATA_UPDATE_WITHOUT_UPDATE_ACL = "A child {} of {} has data update "
         + "without Update ACL";
     public static final String SIMPLE_CHILD_OF_HAS_DATA_UPDATE_BUT_NO_UPDATE_ACL = "Simple child {} of {} has data "
         + "update but no Update ACL";
+    public static final String A_CHILD_HAS_DATA_UPDATE_WITHOUT_UPDATE_ACL = "A child of {} has data updated "
+        + "without Update ACL";
 
     public boolean hasAccessForAction(final JsonNode newData,
                                       final JsonNode existingData,
@@ -120,7 +122,7 @@ public class CompoundAccessControlService {
     private boolean itemMissing(JsonNode oldItem, JsonNode newValue) {
         boolean itemExists =
             StreamSupport.stream(spliteratorUnknownSize(newValue.elements(), Spliterator.ORDERED), false)
-            .anyMatch(newItem -> !isNullId(newItem) && newItem.get("id").equals(oldItem.get("id")));
+                .anyMatch(newItem -> !isNullId(newItem) && newItem.get("id").equals(oldItem.get("id")));
         return !itemExists;
     }
 
@@ -155,7 +157,7 @@ public class CompoundAccessControlService {
                     && isDeleteDeniedForChildren(existingData.get(field.getId()),
                     newData.get(field.getId()), field, accessProfiles)) {
                     deleteDeniedForAnyChildNode = true;
-                    LOG.info(A_CHILD_OF_HAS_DATA_DETELE_WITHOUT_DELETE_ACL, field.getId(), caseFieldDefinition.getId());
+                    LOG.info(A_CHILD_OF_HAS_DATA_DELETE_WITHOUT_DELETE_ACL, field.getId(), caseFieldDefinition.getId());
                     break;
                 }
             }
@@ -178,7 +180,7 @@ public class CompoundAccessControlService {
                     && isDeleteDeniedForChildren(existingNode.get(VALUE).get(field.getId()),
                     newNode.get(VALUE).get(field.getId()), field, accessProfiles)) {
                     currentNodeOrAnyChildNodeDeletedWithoutAccess = true;
-                    LOG.info(A_CHILD_OF_HAS_DATA_DETELE_WITHOUT_DELETE_ACL, field.getId(), caseFieldDefinition.getId());
+                    LOG.info(A_CHILD_OF_HAS_DATA_DELETE_WITHOUT_DELETE_ACL, field.getId(), caseFieldDefinition.getId());
                     break;
                 }
             }
@@ -263,26 +265,34 @@ public class CompoundAccessControlService {
                                                   final JsonNode oldNode,
                                                   final JsonNode newNode,
                                                   final Set<AccessProfile> accessProfiles) {
-        boolean udateDenied = false;
-        for (CaseFieldDefinition field : caseFieldDefinition.getFieldTypeDefinition()
-            .getCollectionFieldTypeDefinition().getComplexFields()) {
-            if (!field.isCompoundFieldType() && oldNode.get(VALUE).get(field.getId()) != null
-                && !oldNode.get(VALUE).get(field.getId()).equals(newNode.get(VALUE).get(field.getId()))
-                && !hasAccessControlList(accessProfiles, field.getAccessControlLists(), CAN_UPDATE)) {
-                udateDenied = true;
-                LOG.info(SIMPLE_CHILD_OF_HAS_DATA_UPDATE_BUT_NO_UPDATE_ACL, field.getId(), caseFieldDefinition.getId());
-            } else if (field.isCompoundFieldType() && oldNode.get(VALUE).get(field.getId()) != null
-                && newNode.get(VALUE).get(field.getId()) != null
-                && isUpdateDeniedForCaseField(oldNode.get(VALUE).get(field.getId()),
-                newNode.get(VALUE).get(field.getId()), field, accessProfiles)) {
-                udateDenied = true;
-                LOG.info(A_CHILD_OF_HAS_DATA_UPDATE_WITHOUT_UPDATE_ACL, field.getId(), caseFieldDefinition.getId());
-            }
-            if (udateDenied) {
-                break;
+        boolean updateDenied = false;
+        if (!caseFieldDefinition.getFieldTypeDefinition().getCollectionFieldTypeDefinition().isComplexFieldType()
+            && !oldNode.get(VALUE).equals(newNode.get(VALUE))
+            && !hasAccessControlList(accessProfiles, caseFieldDefinition.getAccessControlLists(), CAN_UPDATE)) {
+            updateDenied = true;
+            LOG.info(A_CHILD_HAS_DATA_UPDATE_WITHOUT_UPDATE_ACL, caseFieldDefinition.getId());
+        } else {
+            for (CaseFieldDefinition field : caseFieldDefinition.getFieldTypeDefinition()
+                .getCollectionFieldTypeDefinition().getComplexFields()) {
+                if (!field.isCompoundFieldType() && oldNode.get(VALUE).get(field.getId()) != null
+                    && !oldNode.get(VALUE).get(field.getId()).equals(newNode.get(VALUE).get(field.getId()))
+                    && !hasAccessControlList(accessProfiles, field.getAccessControlLists(), CAN_UPDATE)) {
+                    updateDenied = true;
+                    LOG.info(SIMPLE_CHILD_OF_HAS_DATA_UPDATE_BUT_NO_UPDATE_ACL, field.getId(),
+                        caseFieldDefinition.getId());
+                } else if (field.isCompoundFieldType() && oldNode.get(VALUE).get(field.getId()) != null
+                    && newNode.get(VALUE).get(field.getId()) != null
+                    && isUpdateDeniedForCaseField(oldNode.get(VALUE).get(field.getId()),
+                    newNode.get(VALUE).get(field.getId()), field, accessProfiles)) {
+                    updateDenied = true;
+                    LOG.info(A_CHILD_OF_HAS_DATA_UPDATE_WITHOUT_UPDATE_ACL, field.getId(), caseFieldDefinition.getId());
+                }
+                if (updateDenied) {
+                    break;
+                }
             }
         }
-        return udateDenied;
+        return updateDenied;
     }
 
     private boolean checkComplexNodesForUpdate(final CaseFieldDefinition caseFieldDefinition,

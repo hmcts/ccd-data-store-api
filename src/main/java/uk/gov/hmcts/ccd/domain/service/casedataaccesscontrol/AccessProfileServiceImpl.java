@@ -19,6 +19,7 @@ import uk.gov.hmcts.ccd.domain.service.AccessControl;
 public class AccessProfileServiceImpl implements AccessProfileService, AccessControl {
 
     @Override
+    @SuppressWarnings("checkstyle:LineLength")
     public List<AccessProfile> generateAccessProfiles(RoleAssignmentFilteringResult filteringResults,
                                                       List<RoleToAccessProfileDefinition> roleToAccessProfiles) {
 

@@ -14,7 +14,7 @@ Feature: F-107: Organisation Policies on Cases
       Then a positive response is received
       And the response has all other details as expected
 
-    @S-930
+    @S-930 @Ignore
     Scenario: must successfully update OrganisationPolicy fields on a case
       Given a user with [an active profile in CCD]
       And a case that has just been created as in [S-930_Create_Case_Data]
