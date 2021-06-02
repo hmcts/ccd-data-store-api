@@ -57,8 +57,11 @@ public class CaseUpdateViewEventBuilder {
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
         final CaseEventDefinition caseEventDefinition = getCaseEventDefinition(eventId, caseTypeDefinition);
         final CaseUpdateViewEvent caseUpdateViewEvent = buildCaseUpdateEvent(caseEventDefinition);
-        final CaseStateDefinition caseStateDefinition = caseTypeService.findState(caseTypeDefinition,
-            startEventResult.getCaseDetails().getState());
+        if (startEventResult.getCaseDetails().getState() != null) {
+            final CaseStateDefinition caseStateDefinition = caseTypeService.findState(caseTypeDefinition,
+                startEventResult.getCaseDetails().getState());
+            caseUpdateViewEvent.setTitleDisplay(caseStateDefinition.getTitleDisplay());
+        }
         caseUpdateViewEvent.setCaseId(caseReference);
         caseUpdateViewEvent.setCaseFields(
             fieldProcessorService.processCaseViewFields(
@@ -69,7 +72,7 @@ public class CaseUpdateViewEventBuilder {
         final List<WizardPage> wizardPageCollection = uiDefinitionRepository.getWizardPageCollection(caseTypeId,
                                                                                                      eventId);
         caseUpdateViewEvent.setWizardPages(wizardPageCollection);
-        caseUpdateViewEvent.setTitleDisplay(caseStateDefinition.getTitleDisplay());
+
         return caseUpdateViewEvent;
     }
 

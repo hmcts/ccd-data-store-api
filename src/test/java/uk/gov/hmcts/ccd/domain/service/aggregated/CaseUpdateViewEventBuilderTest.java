@@ -19,6 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -38,6 +39,7 @@ import static uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties.CASE_
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.StartEventResultBuilder.newStartEventTrigger;
 
@@ -69,6 +71,8 @@ class CaseUpdateViewEventBuilderTest {
         .withEventToken(TOKEN).build();
     private final List<WizardPage> wizardPageCollection = Lists.newArrayList();
     private final List<CaseViewField> viewFields = Lists.newArrayList();
+    private static final String STATE_ID = "STATE_ID";
+    private static final CaseStateDefinition CASE_STATE = newState().withId(STATE_ID).build();
 
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
@@ -85,7 +89,6 @@ class CaseUpdateViewEventBuilderTest {
     private CaseUpdateViewEventBuilder caseUpdateViewEventBuilder;
     @Mock
     private FieldProcessorService fieldProcessorService;
-
     @Mock
     private CaseTypeService caseTypeService;
 
@@ -99,11 +102,14 @@ class CaseUpdateViewEventBuilderTest {
             .thenReturn(wizardPageCollection);
         when(caseViewFieldBuilder.build(caseFieldDefinitions, eventFields, caseDetails.getData()))
             .thenReturn(viewFields);
+        caseDetails.setState(STATE_ID);
+        when(caseTypeService.findState(caseTypeDefinition, STATE_ID)).thenReturn(CASE_STATE);
 
         caseUpdateViewEventBuilder = new CaseUpdateViewEventBuilder(caseDefinitionRepository,
                                                               uiDefinitionRepository,
                                                               eventTriggerService,
-                                                              caseViewFieldBuilder, fieldProcessorService,caseTypeService);
+                                                              caseViewFieldBuilder, fieldProcessorService,
+                                                              caseTypeService);
     }
 
     @Test
