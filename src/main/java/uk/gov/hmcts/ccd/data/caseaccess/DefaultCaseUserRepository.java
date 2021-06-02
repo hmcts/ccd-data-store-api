@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -66,5 +68,12 @@ public class DefaultCaseUserRepository implements CaseUserRepository {
         }
         namedQuery.setParameter(CaseUserEntity.PARAM_CASE_DATA_IDS, caseIds);
         return namedQuery.getResultList();
+    }
+
+    public Set<String> getCaseUserRolesByUserId(String userId) {
+        TypedQuery<String> namedQuery = em.createNamedQuery(CaseUserEntity.GET_ALL_CASE_ROLES_BY_USER_ID, String.class);
+        namedQuery.setParameter("userId", userId);
+
+        return namedQuery.getResultList().stream().collect(Collectors.toSet());
     }
 }

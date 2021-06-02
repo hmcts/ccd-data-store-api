@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -10,7 +11,8 @@ import lombok.Data;
 
 @Data
 @Builder
-public class RoleToAccessProfileDefinition {
+public class RoleToAccessProfileDefinition implements Serializable {
+    private static final long serialVersionUID = 8882065812393433800L;
 
     private static final String AUTHORISATION_SEPARATOR = ",";
 

@@ -65,6 +65,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         private static final String JURISDICTION = "jurisdiction";
         private static final String STATE1 = "state1";
         private static final String STATE2 = "state2";
+        private static final String USERID = "userId";
         private final Set<String> userRoles = new HashSet<>();
         Set<AccessProfile> accessProfiles = createAccessProfiles(userRoles);
 

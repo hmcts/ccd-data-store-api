@@ -82,7 +82,7 @@ public class RoleAssignmentsMapperImpl implements RoleAssignmentsMapper {
             return null;
         }
 
-        List<RoleAssignment> list1 = new ArrayList<RoleAssignment>(list.size());
+        List<RoleAssignment> list1 = new ArrayList<>(list.size());
         for (RoleAssignmentResource roleAssignmentResource : list) {
             list1.add(roleAssignmentResourceToRoleAssignment(roleAssignmentResource));
         }

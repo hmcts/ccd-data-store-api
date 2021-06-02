@@ -18,6 +18,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
@@ -70,6 +71,8 @@ class AuthorisedSearchOperationTest {
 
     @Mock
     private CaseDataAccessControl caseDataAccessControl;
+    @Mock
+    private CaseUserRepository caseUserRepository;
 
     private AuthorisedSearchOperation authorisedSearchOperation;
 

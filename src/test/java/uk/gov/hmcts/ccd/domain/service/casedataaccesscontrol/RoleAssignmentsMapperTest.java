@@ -16,9 +16,11 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @DisplayName("RoleAssignmentMapperTest")
 class RoleAssignmentsMapperTest {
@@ -87,6 +89,53 @@ class RoleAssignmentsMapperTest {
                 () -> assertThat(roleAssignments.get(1).getId(), is(ASSIGNMENT_2)),
                 () -> assertThat(roleAssignments.get(1).getAttributes().getCaseId(),
                                  is(roleAssignment2.getAttributes().getCaseId()))
+            );
+        }
+
+        @Test
+        public void shouldMapNullRoleAssignmentResponse() {
+            assertNull(instance.toRoleAssignments(null));
+        }
+
+        @Test
+        public void shouldMapNullRoleAssignmentResourceList() {
+            RoleAssignmentResponse response = createRoleAssignmentResponse(null);
+
+            RoleAssignments mapped = instance.toRoleAssignments(response);
+
+            List<RoleAssignment> roleAssignments = mapped.getRoleAssignments();
+            assertNull(roleAssignments);
+        }
+
+        @Test
+        public void shouldMapNullRoleAssignmentResource() {
+            RoleAssignmentResource roleAssignment = null;
+            RoleAssignmentResponse response = createRoleAssignmentResponse(singletonList(roleAssignment));
+
+            RoleAssignments mapped = instance.toRoleAssignments(response);
+
+            List<RoleAssignment> roleAssignments = mapped.getRoleAssignments();
+            assertAll(
+                () -> assertThat(roleAssignments.size(), is(1)),
+                () -> assertNull(roleAssignments.get(0))
+            );
+        }
+
+        @Test
+        public void shouldMapNullRoleAssignmentAttributes() {
+            RoleAssignmentResource roleAssignment = RoleAssignmentResource.builder()
+                .id(ASSIGNMENT_1)
+                .attributes(null)
+                .build();
+            RoleAssignmentResponse response = createRoleAssignmentResponse(singletonList(roleAssignment));
+
+            RoleAssignments mapped = instance.toRoleAssignments(response);
+
+            List<RoleAssignment> roleAssignments = mapped.getRoleAssignments();
+            assertAll(
+                () -> assertThat(roleAssignments.size(), is(1)),
+                () -> assertThat(roleAssignments.get(0).getId(), is(ASSIGNMENT_1)),
+                () -> assertNull(roleAssignments.get(0).getAttributes())
             );
         }
     }

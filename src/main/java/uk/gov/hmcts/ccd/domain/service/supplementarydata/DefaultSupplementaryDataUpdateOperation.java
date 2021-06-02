@@ -4,9 +4,6 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -23,8 +20,6 @@ import static uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryD
 public class DefaultSupplementaryDataUpdateOperation implements SupplementaryDataUpdateOperation {
 
     private final SupplementaryDataRepository supplementaryDataRepository;
-
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultSupplementaryDataUpdateOperation.class);
 
     private EnumMap<SupplementaryDataOperation, BiConsumer<String, SupplementaryDataUpdateRequest>>
         supplementaryFunctions = new EnumMap<>(SupplementaryDataOperation.class);
@@ -52,16 +47,8 @@ public class DefaultSupplementaryDataUpdateOperation implements SupplementaryDat
     @Override
     public SupplementaryData updateSupplementaryData(String caseReference,
                                                      SupplementaryDataUpdateRequest supplementaryData) {
-        supplementaryData.getOperations().forEach(operationID -> {
-            LOG.error(String.format("Case reference: %s, Executing Operation ID: %s", caseReference, operationID));
-            executeOperation(operationID, caseReference, supplementaryData);
-        });
-
-        LOG.error(String.format("Case reference: %s, properties names below,", caseReference));
-        supplementaryData.getPropertiesNames().forEach(
-            data -> LOG.error(String.format("Case reference: %s, %s", caseReference, data))
-        );
-
+        supplementaryData.getOperations().forEach(operationID ->
+            executeOperation(operationID, caseReference, supplementaryData));
         return this.supplementaryDataRepository.findSupplementaryData(caseReference, supplementaryData
             .getPropertiesNames());
     }
@@ -69,9 +56,8 @@ public class DefaultSupplementaryDataUpdateOperation implements SupplementaryDat
     private void executeOperation(String operationID, String caseReference,
                                   SupplementaryDataUpdateRequest supplementaryData) {
         Optional<SupplementaryDataOperation> operation = SupplementaryDataOperation.getOperation(operationID);
-        operation.ifPresent(op -> {
-            LOG.error(String.format("Case reference: %s, operation name: %s", caseReference, op.getOperationName()));
-            supplementaryFunctions.get(operation.get()).accept(caseReference, supplementaryData);
-        });
+        operation.ifPresent(op ->
+            supplementaryFunctions.get(operation.get()).accept(caseReference, supplementaryData
+        ));
     }
 }

@@ -21,11 +21,11 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
     @Override
     @SuppressWarnings("checkstyle:LineLength")
     public List<AccessProfile> generateAccessProfiles(RoleAssignmentFilteringResult filteringResults,
-                                                      List<RoleToAccessProfileDefinition> roleToAccessProfiles) {
+                                                      List<RoleToAccessProfileDefinition> roleToAccessProfilesMappings) {
 
         List<AccessProfile> accessProfiles = new ArrayList<>();
         Map<String, RoleToAccessProfileDefinition> roleToAccessProfileDefinitionMap =
-            toRoleNameAsKeyMap(roleToAccessProfiles);
+            toRoleNameAsKeyMap(roleToAccessProfilesMappings);
 
         for (RoleAssignment roleAssignment : filteringResults.getRoleAssignments()) {
 
@@ -49,6 +49,7 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
         List<RoleToAccessProfileDefinition> roleToAccessProfiles) {
         return roleToAccessProfiles
             .stream()
+            .filter(e -> e.getRoleName() != null)
             .collect(Collectors.toMap(RoleToAccessProfileDefinition::getRoleName,
                                       Function.identity()));
     }
