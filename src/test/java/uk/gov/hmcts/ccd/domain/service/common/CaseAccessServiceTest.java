@@ -10,10 +10,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -23,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -49,8 +53,13 @@ class CaseAccessServiceTest {
     private static final String CASE_ROLE_CREATOR_ID = "[CREATOR]";
     private static final String CASE_REVOKED_ID = "789";
 
+    private static final long CASE_REFERENCE1 = 1614249749110028L;
+    private static final long CASE_REFERENCE2 = 1621941815540762L;
+
     private static final List<Long> CASES_GRANTED =
             asList(Long.valueOf(CASE_GRANTED_1_ID), Long.valueOf(CASE_GRANTED_2_ID));
+
+    private List<Long> caseReferences = Arrays.asList(new Long[]{CASE_REFERENCE1, CASE_REFERENCE2});
 
     @Mock
     private UserRepository userRepository;
@@ -58,8 +67,18 @@ class CaseAccessServiceTest {
     @Mock
     private CaseUserRepository caseUserRepository;
 
+    @Mock
+    private RoleAssignmentService roleAssignmentService;
+
+    @Mock
+    private CaseDetailsRepository caseDetailsRepository;
+
+    @Mock
+    private ApplicationParams applicationParams;
+
     @InjectMocks
     private CaseAccessService caseAccessService;
+
 
     @BeforeEach
     void setUp() {
@@ -382,11 +401,36 @@ class CaseAccessServiceTest {
             @Test
             @DisplayName("should return granted case ids for user with solicitor role")
             void shouldReturnCaseIds() {
+                when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+                when(caseDetailsRepository.findCaseReferencesByIds(CASES_GRANTED)).thenReturn(caseReferences);
                 doReturn(true).when(userRepository).anyRoleMatches(any());
                 Optional<List<Long>> result = caseAccessService.getGrantedCaseIdsForRestrictedRoles();
 
                 assertThat(result.isPresent(), is(true));
                 assertGrantedCaseIds(result.get());
+            }
+
+
+            @Test
+            @DisplayName("should return granted case ids for user with solicitor role for access control")
+            void shouldReturnCaseIdsForAccessControlTrue() {
+                when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+
+                when(caseDetailsRepository.findCaseReferencesByIds(CASES_GRANTED)).thenReturn(caseReferences);
+                doReturn(true).when(userRepository).anyRoleMatches(any());
+                when(roleAssignmentService.getCaseIdsForAGivenUser(USER_ID)).thenReturn(
+                    caseReferences.stream().map(element -> element.toString()).collect(Collectors.toList())
+                );
+                Optional<List<Long>> result = caseAccessService.getGrantedCaseIdsForRestrictedRoles();
+
+                assertThat(result.isPresent(), is(true));
+                assertAll(
+                    () -> assertThat(result.get(),
+                        hasItems(Long.valueOf(CASE_REFERENCE1), Long.valueOf(CASE_REFERENCE2))),
+                    () -> verify(userRepository).getUserId(),
+                    () -> verify(userRepository).anyRoleMatches(any()),
+                    () -> verify(roleAssignmentService).getCaseIdsForAGivenUser(USER_ID)
+                );
             }
         }
 
@@ -406,11 +450,14 @@ class CaseAccessServiceTest {
             @DisplayName("should return granted case ids for user with citizen role")
             void shouldReturnCaseIds() {
                 doReturn(true).when(userRepository).anyRoleMatches(any());
+                when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+                when(caseDetailsRepository.findCaseReferencesByIds(CASES_GRANTED)).thenReturn(caseReferences);
                 Optional<List<Long>> result = caseAccessService.getGrantedCaseIdsForRestrictedRoles();
 
                 assertThat(result.isPresent(), is(true));
                 assertGrantedCaseIds(result.get());
             }
+
         }
 
         @Nested
@@ -428,6 +475,8 @@ class CaseAccessServiceTest {
             @Test
             @DisplayName("should return granted case ids for user with letter-holder role")
             void shouldReturnCaseIds() {
+                when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+                when(caseDetailsRepository.findCaseReferencesByIds(CASES_GRANTED)).thenReturn(caseReferences);
                 doReturn(true).when(userRepository).anyRoleMatches(any());
                 Optional<List<Long>> result = caseAccessService.getGrantedCaseIdsForRestrictedRoles();
                 assertThat(result.isPresent(), is(true));
@@ -458,7 +507,7 @@ class CaseAccessServiceTest {
 
         private void assertGrantedCaseIds(List<Long> result) {
             assertAll(
-                () -> assertThat(result, hasItems(Long.valueOf(CASE_GRANTED_1_ID), Long.valueOf(CASE_GRANTED_2_ID))),
+                () -> assertThat(result, hasItems(Long.valueOf(CASE_REFERENCE1), Long.valueOf(CASE_REFERENCE2))),
                 () -> verify(userRepository).getUserId(),
                 () -> verify(userRepository).anyRoleMatches(any()),
                 () -> verify(caseUserRepository).findCasesUserIdHasAccessTo(USER_ID)

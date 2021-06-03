@@ -50,9 +50,9 @@ public class CaseAccessService {
 
     public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                              @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
-                             RoleAssignmentService roleAssignmentService,
-                             ApplicationParams applicationParams,
-                             @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository) {
+                             RoleAssignmentService roleAssignmentService, ApplicationParams applicationParams,
+                             @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository
+    ) {
 
         this.userRepository = userRepository;
         this.caseUserRepository = caseUserRepository;
