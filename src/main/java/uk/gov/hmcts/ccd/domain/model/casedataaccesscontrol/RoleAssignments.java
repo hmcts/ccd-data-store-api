@@ -27,6 +27,7 @@ public class RoleAssignments {
             .filter(Objects::nonNull)
             .filter(Optional::isPresent)
             .map(Optional::get)
+            .distinct()
             .collect(Collectors.toList());
     }
 
