@@ -69,7 +69,7 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 
         context.setRequestPath(request.getRequestURI());
 
-        if (request.getHeader(REQUEST_ID) != null && request.getHeader(REQUEST_ID).matches(REQUEST_ID_PATTERN)) {
+        if (request.getHeader(REQUEST_ID) == null || request.getHeader(REQUEST_ID).matches(REQUEST_ID_PATTERN)) {
             context.setRequestId(request.getHeader(REQUEST_ID));
         } else {
             context.setRequestId(BAD_VALUE_TOKEN);
