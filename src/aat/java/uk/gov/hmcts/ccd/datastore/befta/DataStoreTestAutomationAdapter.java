@@ -10,6 +10,7 @@ import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
+import uk.gov.hmcts.befta.BeftaMain;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,8 +24,9 @@ import static uk.gov.hmcts.ccd.datastore.util.CaseIdHelper.hypheniseACaseId;
 
 public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
-    private TestDataLoaderToDefinitionStore loader = new TestDataLoaderToDefinitionStore(this);
-
+    private TestDataLoaderToDefinitionStore loader = new TestDataLoaderToDefinitionStore(this,
+            "uk/gov/hmcts/ccd/test_definitions/valid", BeftaMain.getConfig().getDefinitionStoreUrl());
+     
     private static Map<String, String> uniqueStringsPerTestData = new ConcurrentHashMap<>();
 
     @Before("@elasticsearch")
