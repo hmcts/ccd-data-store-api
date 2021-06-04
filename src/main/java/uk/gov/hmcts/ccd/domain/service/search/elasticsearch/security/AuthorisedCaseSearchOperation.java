@@ -138,7 +138,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         JsonNode caseData = caseDataToJsonNode(caseDetails);
         JsonNode accessFilteredData =
             accessControlService.filterCaseFieldsByAccess(caseData, authorisedCaseType.getCaseFieldDefinitions(),
-                                                            getAccessProfiles(caseDetails.getReferenceAsString()),
+                                                            getAccessProfiles(authorisedCaseType.getId()),
                                                             CAN_READ, false);
         caseDetails.setData(jsonNodeToCaseData(accessFilteredData));
     }
@@ -225,8 +225,8 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         return path == null ? "" : path.split(SEARCH_ALIAS_CASE_FIELD_PATH_SEPARATOR_REGEX)[0];
     }
 
-    private Set<AccessProfile> getAccessProfiles(String caseReference) {
-        return caseDataAccessControl.generateAccessProfilesByCaseReference(caseReference);
+    private Set<AccessProfile> getAccessProfiles(String caseTypeId) {
+        return caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
     }
 
     private JsonNode caseDataToJsonNode(CaseDetails caseDetails) {
