@@ -217,14 +217,17 @@ public class DefaultDraftGateway implements DraftGateway {
         return draftResponse;
     }
 
-
     private Long getDraftId(HttpHeaders responseHeaders) {
         URI location = responseHeaders.getLocation();
-        String path = null;
+
         if (location != null) {
-            path = location.getPath();
+            String path = location.getPath();
+            if (path != null) {
+                return Long.valueOf(path.substring(path.lastIndexOf('/') + 1));
+            }
         }
-        return path == null ? null : Long.valueOf(path.substring(path.lastIndexOf('/') + 1));
+
+        return null;
     }
 
     private String validateDraftId(String did) {
