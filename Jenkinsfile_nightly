@@ -68,7 +68,8 @@ def vaultOverrides = [
 ]
 // vars needed for functional tests
 // Assume a feature build branched off 'develop', with dependencies develop-to-develop.
-//env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-${definitionStoreDevelopPr}.service.core-compute-preview.internal".toLowerCase()
+env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
+env.TEST_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
 
 // Other env variables needed for BEFTA.
 env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
@@ -93,13 +94,11 @@ withNightlyPipeline(type, product, component) {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
     }
+    
+    enableFullFunctionalTest(200)
 
-    after('functionalTest:preview') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/cucumber/**/*'
-    }
-
-    after('functionalTest:aat') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/cucumber/**/*'
+    after('fullFunctionalTest') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Functional Tests/**/*'
     }
     enableSlackNotifications('#ccd-nightly-builds')
 }

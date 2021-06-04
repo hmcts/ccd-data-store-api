@@ -46,6 +46,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.any;
@@ -190,6 +191,15 @@ class DefaultDraftGatewayTest {
         assertThat(actualException.getMessage(), is("The draft service is currently down, please refresh your browser"
             + " or try again later"));
         assertThat(actualException.getCause(), is(exception));
+    }
+
+    @Test
+    void shouldFailToGetResponseFromCreateDraft() {
+        ResponseEntity<HttpEntity> response = ResponseEntity.noContent().build();
+        doReturn(response).when(createDraftRestTemplate).exchange(anyString(), eq(HttpMethod.POST),
+            any(HttpEntity.class), eq(HttpEntity.class));
+
+        assertNull(draftGateway.create(createCaseDraftRequest));
     }
 
     @Test
