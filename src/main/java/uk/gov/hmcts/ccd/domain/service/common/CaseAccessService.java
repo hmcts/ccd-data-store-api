@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
@@ -9,7 +10,9 @@ import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
@@ -43,6 +46,7 @@ public class CaseAccessService {
     private final RoleAssignmentService roleAssignmentService;
     private final ApplicationParams applicationParams;
     private final CaseDetailsRepository caseDetailsRepository;
+    private final CaseDataAccessControl caseDataAccessControl;
 
     private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN
         = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-."
@@ -50,6 +54,7 @@ public class CaseAccessService {
 
     public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                              @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
+                             @Lazy CaseDataAccessControl caseDataAccessControl,
                              RoleAssignmentService roleAssignmentService, ApplicationParams applicationParams,
                              @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository
     ) {
@@ -59,6 +64,7 @@ public class CaseAccessService {
         this.roleAssignmentService = roleAssignmentService;
         this.applicationParams = applicationParams;
         this.caseDetailsRepository = caseDetailsRepository;
+        this.caseDataAccessControl = caseDataAccessControl;
     }
 
     public Boolean canUserAccess(CaseDetails caseDetails) {
@@ -97,24 +103,26 @@ public class CaseAccessService {
         return new HashSet<>(caseUserRepository.findCaseRoles(Long.valueOf(caseId), userRepository.getUserId()));
     }
 
-    public Set<String> getAccessRoles(String caseId) {
-        return Sets.union(userRepository.getUserRoles(), getCaseRoles(caseId));
+    public Set<AccessProfile> getAccessProfilesByCaseReference(String caseReference) {
+        return caseDataAccessControl.generateAccessProfilesByCaseReference(caseReference);
     }
 
-    public Set<String> getCaseCreationCaseRoles() {
-        return Collections.singleton(CREATOR.getRole());
+    public Set<AccessProfile> getCaseCreationCaseRoles() {
+        return Collections.singleton(AccessProfile.builder()
+            .readOnly(false)
+            .accessProfile(CREATOR.getRole()).build());
     }
 
-    public Set<String> getCaseCreationRoles() {
-        return Sets.union(getUserRoles(), getCaseCreationCaseRoles());
+    public Set<AccessProfile> getCaseCreationRoles(String caseTypeId) {
+        return Sets.union(getAccessProfiles(caseTypeId), getCaseCreationCaseRoles());
     }
 
-    public Set<String> getUserRoles() {
-        Set<String> userRoles = userRepository.getUserRoles();
-        if (userRoles == null) {
-            throw new ValidationException("Cannot find user roles for the user");
+    public Set<AccessProfile> getAccessProfiles(String caseTypeId) {
+        Set<AccessProfile> accessProfiles = caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
+        if (accessProfiles == null) {
+            throw new ValidationException("Cannot find access profiles for the user");
         }
-        return userRoles;
+        return accessProfiles;
     }
 
     public boolean isJurisdictionAccessAllowed(String jurisdiction) {

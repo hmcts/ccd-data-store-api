@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.getevents;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -7,14 +10,10 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
-import uk.gov.hmcts.ccd.domain.service.getcase.AccessControlledGetCaseOperation;
+import uk.gov.hmcts.ccd.domain.service.getcase.CreatorGetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
 
 @Service
 @Qualifier("default")
@@ -31,7 +30,7 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
 
     @Autowired
     public DefaultGetEventsOperation(CaseAuditEventRepository auditEventRepository, @Qualifier(
-        AccessControlledGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation, UIDService uidService) {
+        CreatorGetCaseOperation.QUALIFIER) final GetCaseOperation getCaseOperation, UIDService uidService) {
         this.auditEventRepository = auditEventRepository;
         this.getCaseOperation = getCaseOperation;
         this.uidService = uidService;
@@ -65,7 +64,7 @@ public class DefaultGetEventsOperation implements GetEventsOperation {
     }
 
     @Override
-    public Optional<AuditEvent> getEvent(String jurisdiction, String caseTypeId, Long eventId) {
+    public Optional<AuditEvent> getEvent(CaseDetails caseDetails, String caseTypeId, Long eventId) {
         return auditEventRepository.findByEventId(eventId).map(Optional::of)
             .orElseThrow(() -> new ResourceNotFoundException(CASE_EVENT_NOT_FOUND));
     }

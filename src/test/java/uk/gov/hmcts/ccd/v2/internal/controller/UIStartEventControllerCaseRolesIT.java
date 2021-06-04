@@ -81,13 +81,13 @@ public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
         final CaseViewField field1 = caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseFields().get(0);
         assertThat(field1.getId(), equalTo("PersonFirstName"));
 
-        assertThat(field1.getAccessControlLists().get(0).getRole(), equalTo("caseworker-probate-public"));
+        assertThat(field1.getAccessControlLists().get(0).getAccessProfile(), equalTo("caseworker-probate-public"));
         assertThat(field1.getAccessControlLists().get(0).isCreate(), is(false));
         assertThat(field1.getAccessControlLists().get(0).isRead(), is(false));
         assertThat(field1.getAccessControlLists().get(0).isUpdate(), is(false));
         assertThat(field1.getAccessControlLists().get(0).isDelete(), is(false));
 
-        assertThat(field1.getAccessControlLists().get(1).getRole(), equalTo("[CREATOR]"));
+        assertThat(field1.getAccessControlLists().get(1).getAccessProfile(), equalTo("[CREATOR]"));
         assertThat(field1.getAccessControlLists().get(1).isCreate(), is(true));
         assertThat(field1.getAccessControlLists().get(1).isRead(), is(true));
         assertThat(field1.getAccessControlLists().get(1).isUpdate(), is(true));
@@ -159,7 +159,7 @@ public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
         assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
 
         // hobbies ACLs are being overridden from the parent
-        assertThat(hobby.getAccessControlLists().get(0).getRole(), equalTo("[CAN_CREATE]"));
+        assertThat(hobby.getAccessControlLists().get(0).getAccessProfile(), equalTo("[CAN_CREATE]"));
         assertThat(hobby.getAccessControlLists().get(0).isCreate(), is(true));
         assertThat(hobby.getAccessControlLists().get(0).isRead(), is(false));
         assertThat(hobby.getAccessControlLists().get(0).isUpdate(), is(false));
@@ -191,12 +191,12 @@ public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
 
         final CaseViewField children = caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseFields().get(1);
         assertThat(children.getFieldTypeDefinition().getType(), equalTo("Collection"));
-        assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
+        assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowDelete,allowInsert)"));
 
         final CaseFieldDefinition hobby = children.getFieldTypeDefinition().getCollectionFieldTypeDefinition()
             .getChildren().get(1);
         assertThat(hobby.getId(), equalTo("hobbies"));
-        assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
+        assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowDelete,allowInsert)"));
     }
 
     @Test

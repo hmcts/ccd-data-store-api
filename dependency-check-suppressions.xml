@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions
-	xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+		xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
 
 	<suppress until="2021-06-25">
 		<notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security
@@ -26,9 +26,6 @@
 		</notes>
 		<cve>CVE-2007-1651</cve>
 		<cve>CVE-2007-1652</cve>
-	</suppress>
-	<suppress>
-		<cve>CVE-2021-29425</cve>
 	</suppress>
 
 	<suppress>

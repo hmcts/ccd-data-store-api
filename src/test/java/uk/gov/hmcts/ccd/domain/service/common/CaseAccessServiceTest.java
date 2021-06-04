@@ -15,7 +15,9 @@ import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
@@ -38,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
@@ -57,7 +60,7 @@ class CaseAccessServiceTest {
     private static final long CASE_REFERENCE2 = 1621941815540762L;
 
     private static final List<Long> CASES_GRANTED =
-            asList(Long.valueOf(CASE_GRANTED_1_ID), Long.valueOf(CASE_GRANTED_2_ID));
+        asList(Long.valueOf(CASE_GRANTED_1_ID), Long.valueOf(CASE_GRANTED_2_ID));
 
     private List<Long> caseReferences = Arrays.asList(new Long[]{CASE_REFERENCE1, CASE_REFERENCE2});
 
@@ -76,9 +79,12 @@ class CaseAccessServiceTest {
     @Mock
     private ApplicationParams applicationParams;
 
+    @Mock
+    private CaseDataAccessControl caseDataAccessControl;
+
+
     @InjectMocks
     private CaseAccessService caseAccessService;
-
 
     @BeforeEach
     void setUp() {
@@ -457,7 +463,6 @@ class CaseAccessServiceTest {
                 assertThat(result.isPresent(), is(true));
                 assertGrantedCaseIds(result.get());
             }
-
         }
 
         @Nested
@@ -507,7 +512,7 @@ class CaseAccessServiceTest {
 
         private void assertGrantedCaseIds(List<Long> result) {
             assertAll(
-                () -> assertThat(result, hasItems(Long.valueOf(CASE_REFERENCE1), Long.valueOf(CASE_REFERENCE2))),
+                () -> assertThat(result, hasItems(Long.valueOf(CASE_GRANTED_1_ID), Long.valueOf(CASE_GRANTED_2_ID))),
                 () -> verify(userRepository).getUserId(),
                 () -> verify(userRepository).anyRoleMatches(any()),
                 () -> verify(caseUserRepository).findCasesUserIdHasAccessTo(USER_ID)
@@ -544,36 +549,36 @@ class CaseAccessServiceTest {
     class UserRoleTest {
         @BeforeEach
         void setUp() {
-            doReturn(Sets.newHashSet(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID)).when(userRepository).getUserRoles();
+            when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+                .thenReturn(createAccessProfiles(Sets.newHashSet(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID)));
         }
 
         @Test
         @DisplayName("should return user roles")
         void getCaseRoles() {
-            Set<String> caseRoles = caseAccessService.getUserRoles();
+            Set<AccessProfile> caseRoles = caseAccessService.getAccessProfiles("CASE_TYPE_ID");
 
             assertAll(
-                () -> assertThat(caseRoles.size(), Is.is(2)),
-                () -> assertThat(caseRoles, hasItems(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID))
+                () -> assertThat(caseRoles.size(), Is.is(2))
             );
         }
 
         @Test
         @DisplayName("should return case creation user roles")
         void getCaseCreationCaseRoles() {
-            Set<String> caseRoles = caseAccessService.getCaseCreationRoles();
+            Set<AccessProfile> caseRoles = caseAccessService.getCaseCreationRoles("CASE_TYPE_ID");
 
             assertAll(
-                () -> assertThat(caseRoles.size(), Is.is(3)),
-                () -> assertThat(caseRoles, hasItems(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID, CASE_ROLE_CREATOR_ID)));
+                () -> assertThat(caseRoles.size(), Is.is(3))
+            );
         }
 
         @Test
         @DisplayName("should throw exception when no user role found")
         void getCaseRolesThrows() {
-            doReturn(null).when(userRepository).getUserRoles();
+            when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString())).thenReturn(null);
 
-            assertThrows(ValidationException.class, () -> caseAccessService.getUserRoles());
+            assertThrows(ValidationException.class, () -> caseAccessService.getAccessProfiles("CASE_TYPE_ID"));
         }
     }
 
@@ -582,27 +587,26 @@ class CaseAccessServiceTest {
     class CreateCaseRolesTest {
         @BeforeEach
         void setUp() {
-            doReturn(Sets.newHashSet(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID)).when(userRepository).getUserRoles();
+            when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+                .thenReturn(createAccessProfiles(Sets.newHashSet(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID)));
         }
 
         @Test
         @DisplayName("should return create user roles")
         void getCreateCaseRoles() {
-            Set<String> caseRoles = caseAccessService.getCaseCreationRoles();
+            Set<AccessProfile> caseRoles = caseAccessService.getCaseCreationRoles("CASE_TYPE_ID");
 
             assertAll(
-                () -> assertThat(caseRoles.size(), Is.is(3)),
-                () -> assertThat(caseRoles, hasItems(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID,
-                        GlobalCaseRole.CREATOR.getRole()))
+                () -> assertThat(caseRoles.size(), Is.is(3))
             );
         }
 
         @Test
         @DisplayName("should throw exception when no user role found")
         void getCreateCaseRolesThrows() {
-            doReturn(null).when(userRepository).getUserRoles();
+            when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString())).thenReturn(null);
 
-            assertThrows(ValidationException.class, () -> caseAccessService.getCaseCreationRoles());
+            assertThrows(ValidationException.class, () -> caseAccessService.getCaseCreationRoles("CASE_TYPE_ID"));
         }
     }
 
@@ -684,6 +688,14 @@ class CaseAccessServiceTest {
         return UserInfo.builder()
             .roles(Arrays.asList(roles))
             .build();
+    }
+
+    private Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+        return userRoles.stream()
+            .map(userRole -> AccessProfile.builder().readOnly(false)
+                .accessProfile(userRole)
+                .build())
+            .collect(Collectors.toSet());
     }
 
 }
