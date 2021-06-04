@@ -2,9 +2,7 @@ package uk.gov.hmcts.ccd.data.casedetails;
 
 import static java.util.Optional.ofNullable;
 
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -36,10 +34,6 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-    @Caching(evict = {
-        @CacheEvict(value = "caseDetailsByReferenceCache", key = "#caseDetails.reference"),
-        @CacheEvict(value = "caseDetailsByIDCache", key = "#caseDetails.id")
-    })
     public CaseDetails set(final CaseDetails caseDetails) {
         return caseDetailsRepository.set(caseDetails);
     }
