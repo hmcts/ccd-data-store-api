@@ -140,7 +140,7 @@ class AuthorisedCaseSearchOperationTest {
                 () -> assertThat(result.getTotal(), is(1L)),
                 () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ),
                 () -> verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class)),
-                () -> verify(caseDataAccessControl).generateAccessProfilesByCaseReference(CASE_REFERENCE_STR),
+                () -> verify(caseDataAccessControl).generateAccessProfilesByCaseTypeId(CASE_TYPE_ID_1),
                 () -> verify(objectMapperService).convertObjectToJsonNode(unFilteredData),
                 () -> verify(accessControlService).filterCaseFieldsByAccess(jsonNode,
                     caseTypeDefinition.getCaseFieldDefinitions(), accessProfiles, CAN_READ, false),
@@ -256,7 +256,7 @@ class AuthorisedCaseSearchOperationTest {
                 () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ),
                 () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_2, CAN_READ),
                 () -> verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class)),
-                () -> verify(caseDataAccessControl).generateAccessProfilesByCaseReference(CASE_REFERENCE_STR),
+                () -> verify(caseDataAccessControl).generateAccessProfilesByCaseTypeId(CASE_TYPE_ID_1),
                 () -> verify(classificationService).applyClassification(caseDetails)
             );
         }

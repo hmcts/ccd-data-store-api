@@ -9,8 +9,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
