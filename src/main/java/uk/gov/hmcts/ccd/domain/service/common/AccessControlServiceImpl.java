@@ -218,7 +218,8 @@ public class AccessControlServiceImpl implements AccessControlService {
                                                                                Set<AccessProfile> accessProfiles) {
         caseEventTrigger.getCaseFields().stream().filter(CommonField::isCollectionFieldType)
             .forEach(caseViewField ->
-                caseViewField.setDisplayContextParameter(generateDisplayContextParamer(accessProfiles, caseViewField)));
+                caseViewField.setDisplayContextParameter(generateDisplayContextParameter(accessProfiles,
+                    caseViewField)));
 
         caseEventTrigger.getCaseFields().forEach(caseViewField ->
             setChildrenCollectionDisplayContextParameter(caseViewField.getFieldTypeDefinition().getChildren(),
