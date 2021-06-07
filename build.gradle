@@ -278,7 +278,7 @@ dependencyManagement {
         dependencySet(group: 'commons-beanutils', version: '1.9.4') {
             entry 'commons-beanutils'
         }
-
+        dependency 'com.github.hmcts:befta-fw:extend-feature-flag-framework-SNAPSHOT'
         // Required for Embedded ES with Java 11
         dependency 'org.rauschig:jarchivelib:1.0.0'
 
@@ -292,6 +292,7 @@ dependencyManagement {
             entry 'groovy-xml'
             entry 'groovy-json'
         }
+
     }
 }
 
