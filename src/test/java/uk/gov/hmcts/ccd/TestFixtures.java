@@ -6,21 +6,33 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.jooq.lambda.tuple.Tuple2;
 import org.junit.jupiter.params.provider.Arguments;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.EventPostStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 
 public abstract class TestFixtures {
-    protected static final String JURISDICTION = "SSCS";
+    private static final Integer VERSION_NUMBER = 1;
+
+    protected static final String JURISDICTION_ID = "SSCS";
     protected static final String CASE_REFERENCE = "1234123412341236";
     protected static final Long REFERENCE = Long.valueOf(CASE_REFERENCE);
-    protected static final String CASE_TYPE_ID = "A7896";
+    protected static final String CASE_TYPE_ID = "Claim";
+    protected static final String STATE = "CreatedState";
+    protected static final String POST_STATE = "Updated";
 
     protected static final List<Tuple2<String, String>> DOCUMENT_HASH_PAIR_A = List.of(
         new Tuple2<>("http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976",
@@ -80,4 +92,49 @@ public abstract class TestFixtures {
             .getResourceAsStream("tests/".concat(filename));
     }
 
+    protected CaseDetails buildCaseDetails(final Map<String, JsonNode> data) {
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setJurisdiction(JURISDICTION_ID);
+        caseDetails.setReference(REFERENCE);
+        caseDetails.setState(STATE);
+        caseDetails.setDataClassification(emptyMap());
+
+        caseDetails.setData(data);
+
+        return caseDetails;
+    }
+
+    protected CaseEventDefinition buildCaseEventDefinition() {
+        CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setPostStates(getEventPostStates(POST_STATE));
+        caseEventDefinition.setPublish(Boolean.TRUE);
+
+        return caseEventDefinition;
+    }
+
+    protected CaseTypeDefinition buildCaseTypeDefinition() {
+        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setId(JURISDICTION_ID);
+        final Version version = new Version();
+        version.setNumber(VERSION_NUMBER);
+
+        CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setId(CASE_TYPE_ID);
+        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
+        caseTypeDefinition.setVersion(version);
+
+        return caseTypeDefinition;
+    }
+
+    private List<EventPostStateDefinition> getEventPostStates(String... postStateReferences) {
+        List<EventPostStateDefinition> postStates = new ArrayList<>();
+        int i = 0;
+        for (String reference : postStateReferences) {
+            EventPostStateDefinition definition = new EventPostStateDefinition();
+            definition.setPostStateReference(reference);
+            definition.setPriority(++i);
+            postStates.add(definition);
+        }
+        return postStates;
+    }
 }

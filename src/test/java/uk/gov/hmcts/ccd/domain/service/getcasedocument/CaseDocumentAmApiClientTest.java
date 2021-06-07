@@ -124,7 +124,7 @@ class CaseDocumentAmApiClientTest extends TestFixtures {
         return CaseDocumentsMetadata.builder()
             .caseId(CASE_REFERENCE)
             .caseTypeId("Some-Case-ID")
-            .jurisdictionId(JURISDICTION)
+            .jurisdictionId(JURISDICTION_ID)
             .documentHashToken(emptyList())
             .build();
     }
