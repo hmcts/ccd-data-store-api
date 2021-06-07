@@ -80,9 +80,12 @@ public class CreateCaseEventService {
     private final CaseDocumentService caseDocumentService;
 
     @Inject
-    public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                  @Qualifier(CachedCaseDetailsRepository.QUALIFIER) final CaseDetailsRepository caseDetailsRepository,
-                                  @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) final CaseDefinitionRepository caseDefinitionRepository,
+    public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER)
+                                      final UserRepository userRepository,
+                                  @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                      final CaseDetailsRepository caseDetailsRepository,
+                                  @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                      final CaseDefinitionRepository caseDefinitionRepository,
                                   final CaseAuditEventRepository caseAuditEventRepository,
                                   final EventTriggerService eventTriggerService,
                                   final EventTokenService eventTokenService,
@@ -98,9 +101,8 @@ public class CreateCaseEventService {
                                   final FieldProcessorService fieldProcessorService,
                                   final CasePostStateService casePostStateService,
                                   @Qualifier("utcClock") final Clock clock,
-                                  @Qualifier("caseEventMessageService"
-                                  ) final MessageService messageService,
-                                  CaseDocumentService caseDocumentService) {
+                                  @Qualifier("caseEventMessageService") final MessageService messageService,
+                                  final CaseDocumentService caseDocumentService) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -156,20 +158,21 @@ public class CreateCaseEventService {
         );
         final CaseDetails updatedCaseDetailsWithoutHashes = caseDocumentService.stripDocumentHashes(updatedCaseDetails);
 
-        AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(
+        final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(
             caseEventDefinition,
             caseDetailsInDatabase,
-            /*caseDetails*/ updatedCaseDetailsWithoutHashes,
+            updatedCaseDetailsWithoutHashes,
             caseTypeDefinition,
             content.getIgnoreWarning()
         );
 
         final Optional<String> newState = aboutToSubmitCallbackResponse.getState();
 
-        @SuppressWarnings("UnnecessaryLocalVariable") final CaseDetails caseDetailsAfterCallback = updatedCaseDetailsWithoutHashes;
+        @SuppressWarnings("UnnecessaryLocalVariable")
+        final CaseDetails caseDetailsAfterCallback = updatedCaseDetailsWithoutHashes;
 
         validateCaseFieldsOperation.validateData(caseDetailsAfterCallback.getData(), caseTypeDefinition, content);
-        LocalDateTime timeNow = now();
+        final LocalDateTime timeNow = now();
 
         final List<DocumentHashToken> documentHashes = caseDocumentService.extractDocumentHashToken(
             content.getData(),
@@ -180,7 +183,7 @@ public class CreateCaseEventService {
             caseDetailsAfterCallback
         );
 
-        String oldState = caseDetails.getState();
+        final String oldState = caseDetails.getState();
         final CaseDetails savedCaseDetails = saveCaseDetails(
             caseDetailsInDatabase,
             caseDetailsAfterCallbackWithoutHashes,
@@ -246,9 +249,11 @@ public class CreateCaseEventService {
                 new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
     }
 
-    private CaseDetails saveCaseDetails(CaseDetails caseDetailsBefore, final CaseDetails caseDetails,
+    private CaseDetails saveCaseDetails(final CaseDetails caseDetailsBefore,
+                                        final CaseDetails caseDetails,
                                         final CaseEventDefinition caseEventDefinition,
-                                        final Optional<String> state, LocalDateTime timeNow) {
+                                        final Optional<String> state,
+                                        final LocalDateTime timeNow) {
 
         if (!state.isPresent()) {
             updateCaseState(caseDetails, caseEventDefinition);

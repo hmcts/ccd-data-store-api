@@ -62,7 +62,7 @@ public class CaseDocumentService {
 
         final List<Tuple2<String, String>> preCallbackDocs = CollectionUtils.listsUnion(dbDocs, eventDocs);
 
-        // TODO: check with Sateesh if dbDocs also require checking
+        // TODO: check with Sateesh if this is correct
         verifyNoTamper(preCallbackDocs, postCallbackDocs);
 
         final List<DocumentHashToken> documentHashTokens = caseDocumentUtils.buildDocumentHashToken(

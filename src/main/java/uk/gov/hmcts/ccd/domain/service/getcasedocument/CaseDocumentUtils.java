@@ -20,11 +20,11 @@ import java.util.stream.Collectors;
 public class CaseDocumentUtils {
     private static final Function<List<Tuple2<String, String>>,
         Function<List<Tuple2<String, String>>, List<Tuple2<String, String>>>> FILTER = x -> y -> {
-        List<Tuple2<String, String>> a = new ArrayList<>(x);
-        List<Tuple2<String, String>> b = new ArrayList<>(y);
+            List<Tuple2<String, String>> a = new ArrayList<>(x);
+            List<Tuple2<String, String>> b = new ArrayList<>(y);
 
-        return a.removeAll(b) ? Collections.unmodifiableList(a) : x;
-    };
+            return a.removeAll(b) ? Collections.unmodifiableList(a) : x;
+        };
 
     public static final String DOCUMENT_URL = "document_url";
     public static final String DOCUMENT_HASH = "hashToken";// TODO: replace hashToken to "document_hash";
@@ -56,8 +56,10 @@ public class CaseDocumentUtils {
         return CollectionUtils.setsIntersection(h1, h2);
     }
 
-    public List<DocumentHashToken> buildDocumentHashToken(@NonNull final List<Tuple2<String, String>> preCallbackHashes,
-                                                          @NonNull final List<Tuple2<String, String>> postCallbackHashes) {
+    public List<DocumentHashToken> buildDocumentHashToken(
+        @NonNull final List<Tuple2<String, String>> preCallbackHashes,
+        @NonNull final List<Tuple2<String, String>> postCallbackHashes
+    ) {
 
         final List<Tuple2<String, String>> filtered = FILTER.apply(postCallbackHashes).apply(preCallbackHashes);
 
