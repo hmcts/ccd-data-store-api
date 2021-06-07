@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Collections.emptyMap;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.DOCUMENT_HASH;
 
 @Named
@@ -43,27 +44,41 @@ public class CaseDocumentService {
         return documentNodes.isEmpty() ? caseDetails : removeHashes(caseDetails);
     }
 
-    public List<DocumentHashToken> extractDocumentHashToken(final Map<String, JsonNode> preCallbackCaseData,
+    public List<DocumentHashToken> extractDocumentHashToken(final Map<String, JsonNode> databaseCaseData,
+                                                            final Map<String, JsonNode> preCallbackCaseData,
                                                             final Map<String, JsonNode> postCallbackCaseData) {
 
-        final List<Tuple2<String, String>> preCallbackHashes = caseDocumentUtils.findDocumentsHashes(
+        final List<Tuple2<String, String>> dbDocs = caseDocumentUtils.findDocumentsHashes(
+            databaseCaseData
+        );
+
+        final List<Tuple2<String, String>> eventDocs = caseDocumentUtils.findDocumentsHashes(
             preCallbackCaseData
         );
 
-        final List<Tuple2<String, String>> postCallbackHashes = caseDocumentUtils.findDocumentsHashes(
+        final List<Tuple2<String, String>> postCallbackDocs = caseDocumentUtils.findDocumentsHashes(
             postCallbackCaseData
         );
 
-        verifyNoTamper(preCallbackHashes, postCallbackHashes);
+        final List<Tuple2<String, String>> preCallbackDocs = CollectionUtils.listsUnion(dbDocs, eventDocs);
+
+        // TODO: check with Sateesh if dbDocs also require checking
+        verifyNoTamper(preCallbackDocs, postCallbackDocs);
 
         final List<DocumentHashToken> documentHashTokens = caseDocumentUtils.buildDocumentHashToken(
-            preCallbackHashes,
-            postCallbackHashes
+            preCallbackDocs,
+            postCallbackDocs
         );
 
         validate(documentHashTokens);
 
         return documentHashTokens;
+    }
+
+    public List<DocumentHashToken> extractDocumentHashToken(final Map<String, JsonNode> preCallbackCaseData,
+                                                            final Map<String, JsonNode> postCallbackCaseData) {
+
+        return extractDocumentHashToken(emptyMap(), preCallbackCaseData, postCallbackCaseData);
     }
 
     public void attachCaseDocuments(final String caseId,

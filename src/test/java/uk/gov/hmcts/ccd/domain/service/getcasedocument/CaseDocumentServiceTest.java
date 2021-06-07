@@ -42,8 +42,6 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class CaseDocumentServiceTest extends TestFixtures {
-    private static final String STATE = "CreatedState";
-
     @Mock
     private CaseService caseService;
 
@@ -79,7 +77,7 @@ class CaseDocumentServiceTest extends TestFixtures {
         assertThat(actualClonedCaseDetails)
             .isNotNull()
             .satisfies(x -> {
-                assertThat(x.getJurisdiction()).isEqualTo(JURISDICTION);
+                assertThat(x.getJurisdiction()).isEqualTo(JURISDICTION_ID);
                 assertThat(x.getReference()).isEqualTo(REFERENCE);
                 assertThat(x.getState()).isEqualTo(STATE);
                 assertThat(x.getData()).isEqualTo(dataWithoutHashes);
@@ -104,7 +102,7 @@ class CaseDocumentServiceTest extends TestFixtures {
         assertThat(actualClonedCaseDetails)
             .isNotNull()
             .satisfies(x -> {
-                assertThat(x.getJurisdiction()).isEqualTo(JURISDICTION);
+                assertThat(x.getJurisdiction()).isEqualTo(JURISDICTION_ID);
                 assertThat(x.getReference()).isEqualTo(REFERENCE);
                 assertThat(x.getState()).isEqualTo(STATE);
                 assertThat(x.getData()).isEqualTo(data);
@@ -152,7 +150,7 @@ class CaseDocumentServiceTest extends TestFixtures {
             .isNotNull()
             .hasSameElementsAs(List.of(HASH_TOKEN_A1, HASH_TOKEN_A2));
 
-        verify(documentUtils, times(2)).findDocumentsHashes(anyMap());
+        verify(documentUtils, times(3)).findDocumentsHashes(anyMap());
         verify(documentUtils).getTamperedHashes(anyList(), anyList());
         verify(documentUtils).buildDocumentHashToken(anyList(), anyList());
         verify(documentUtils).getViolatingDocuments(anyList());
@@ -183,7 +181,7 @@ class CaseDocumentServiceTest extends TestFixtures {
             .isInstanceOf(ValidationException.class)
             .hasMessageStartingWith("Some message");
 
-        verify(documentUtils, times(2)).findDocumentsHashes(anyMap());
+        verify(documentUtils, times(3)).findDocumentsHashes(anyMap());
         verify(documentUtils).getTamperedHashes(anyList(), anyList());
         verify(documentUtils).buildDocumentHashToken(anyList(), anyList());
         verify(documentUtils).getViolatingDocuments(anyList());
@@ -210,7 +208,7 @@ class CaseDocumentServiceTest extends TestFixtures {
             .isInstanceOf(ServiceException.class)
             .hasMessageStartingWith("call back attempted to change the hashToken of the following documents:");
 
-        verify(documentUtils, times(2)).findDocumentsHashes(anyMap());
+        verify(documentUtils, times(3)).findDocumentsHashes(anyMap());
         verify(documentUtils).getTamperedHashes(anyList(), anyList());
         verifyNoMoreInteractions(documentUtils);
     }
@@ -222,7 +220,7 @@ class CaseDocumentServiceTest extends TestFixtures {
         doNothing().when(caseDocumentAmApiClient).applyPatch(any(CaseDocumentsMetadata.class));
 
         // When
-        underTest.attachCaseDocuments(CASE_REFERENCE, CASE_TYPE_ID, JURISDICTION, documentHashTokens);
+        underTest.attachCaseDocuments(CASE_REFERENCE, CASE_TYPE_ID, JURISDICTION_ID, documentHashTokens);
 
         // Then
         verify(caseDocumentAmApiClient).applyPatch(any(CaseDocumentsMetadata.class));
@@ -231,7 +229,7 @@ class CaseDocumentServiceTest extends TestFixtures {
     @Test
     void testShouldNotApplyPatchWhenNoDocumentHashes() {
         // When
-        underTest.attachCaseDocuments(CASE_REFERENCE, CASE_TYPE_ID, JURISDICTION, emptyList());
+        underTest.attachCaseDocuments(CASE_REFERENCE, CASE_TYPE_ID, JURISDICTION_ID, emptyList());
 
         // Then
         verifyZeroInteractions(caseDocumentAmApiClient);
@@ -259,17 +257,6 @@ class CaseDocumentServiceTest extends TestFixtures {
             .doesNotThrowAnyException();
 
         verifyZeroInteractions(documentUtils);
-    }
-
-    private CaseDetails buildCaseDetails(final Map<String, JsonNode> data) {
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setJurisdiction(JURISDICTION);
-        caseDetails.setReference(REFERENCE);
-        caseDetails.setState(STATE);
-
-        caseDetails.setData(data);
-
-        return caseDetails;
     }
 
     @SuppressWarnings("unused")
