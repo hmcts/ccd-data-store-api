@@ -282,11 +282,6 @@ dependencyManagement {
         // Required for Embedded ES with Java 11
         dependency 'org.rauschig:jarchivelib:1.0.0'
 
-        // Remove once BEFTA rest-assured is updated
-        dependencySet(group: 'io.rest-assured', version: '4.3.0') {
-            entry 'json-path'
-            entry 'xml-path'
-        }
         dependencySet(group: 'org.codehaus.groovy', version: '3.0.2') {
             entry 'groovy'
             entry 'groovy-xml'
