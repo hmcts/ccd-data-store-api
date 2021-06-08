@@ -175,6 +175,7 @@ public class CreateCaseEventService {
         final LocalDateTime timeNow = now();
 
         final List<DocumentHashToken> documentHashes = caseDocumentService.extractDocumentHashToken(
+            caseDetailsInDatabase.getData(),
             content.getData(),
             caseDetailsAfterCallback.getData()
         );

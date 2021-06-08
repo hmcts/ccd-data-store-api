@@ -116,7 +116,7 @@ class CaseDocumentUtilsTest extends TestFixtures {
     @Test
     void testShouldDetectNoTempering() {
         // When
-        final Set<String> actualResult = underTest.getTamperedHashes(DOCUMENT_HASH_PAIR_A, DOCUMENT_HASH_PAIR_B);
+        final Set<String> actualResult = underTest.getTamperedHashes(DOCUMENT_HASH_PAIR_PRE, DOCUMENT_HASH_PAIR_POST);
 
         // Then
         assertThat(actualResult)
