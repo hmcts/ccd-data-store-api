@@ -29,7 +29,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
@@ -69,7 +69,7 @@ public class CreateCaseEventService {
     private final CaseSanitiser caseSanitiser;
     private final CallbackInvoker callbackInvoker;
     private final UIDService uidService;
-    private final SecurityClassificationService securityClassificationService;
+    private final SecurityClassificationServiceImpl securityClassificationService;
     private final ValidateCaseFieldsOperation validateCaseFieldsOperation;
     private final UserAuthorisation userAuthorisation;
     private final FieldProcessorService fieldProcessorService;
@@ -92,7 +92,7 @@ public class CreateCaseEventService {
                                   final CaseSanitiser caseSanitiser,
                                   final CallbackInvoker callbackInvoker,
                                   final UIDService uidService,
-                                  final SecurityClassificationService securityClassificationService,
+                                  final SecurityClassificationServiceImpl securityClassificationService,
                                   final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                   final UserAuthorisation userAuthorisation,
                                   final FieldProcessorService fieldProcessorService,

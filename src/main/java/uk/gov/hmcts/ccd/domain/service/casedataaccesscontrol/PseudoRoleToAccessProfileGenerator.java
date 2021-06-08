@@ -1,22 +1,21 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
-import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
+import static uk.gov.hmcts.ccd.domain.service.AccessControl.IDAM_PREFIX;
 
 @Component
 public class PseudoRoleToAccessProfileGenerator {
 
-    protected static final String IDAM_PREFIX = "idam:";
     private static final String CASE_ROLE_ID_REGEX = "^(\\[[A-Za-z]+\\])$";
 
     public List<RoleToAccessProfileDefinition> generate(CaseTypeDefinition caseTypeDefinition) {
@@ -58,15 +57,15 @@ public class PseudoRoleToAccessProfileGenerator {
 
     private List<String> getCaseRolesFromAcls(List<AccessControlList> accessControlLists) {
         return accessControlLists.stream()
-            .map(AccessControlList::getRole)
-            .filter(role -> role.matches(CASE_ROLE_ID_REGEX))
+            .map(AccessControlList::getAccessProfile)
+            .filter(accessProfile -> accessProfile.matches(CASE_ROLE_ID_REGEX))
             .collect(Collectors.toList());
     }
 
     private List<String> getIdamRolesFromAcls(List<AccessControlList> accessControlLists) {
         return accessControlLists.stream()
-            .map(AccessControlList::getRole)
-            .filter(role -> !role.matches(CASE_ROLE_ID_REGEX))
+            .map(AccessControlList::getAccessProfile)
+            .filter(accessProfile -> !accessProfile.matches(CASE_ROLE_ID_REGEX))
             .collect(Collectors.toList());
     }
 
@@ -103,14 +102,13 @@ public class PseudoRoleToAccessProfileGenerator {
     }
 
     private RoleToAccessProfileDefinition createRoleToAccessProfile(String ctId, String role, boolean addIdamPrefix) {
-        RoleToAccessProfileDefinition accessProfile = new RoleToAccessProfileDefinition();
-        accessProfile.setAccessProfiles(role);
-        accessProfile.setRoleName(addIdamPrefix ? IDAM_PREFIX + role : role);
-        accessProfile.setCaseTypeId(ctId);
-        accessProfile.setReadOnly(false);
-        accessProfile.setAuthorisations(null);
-        accessProfile.setReadOnly(false);
-        accessProfile.setDisabled(false);
-        return accessProfile;
+        return RoleToAccessProfileDefinition.builder()
+            .accessProfiles(role)
+            .roleName(addIdamPrefix ? IDAM_PREFIX + role : role)
+            .caseTypeId(ctId)
+            .readOnly(false)
+            .disabled(false)
+            .authorisations(null)
+            .build();
     }
 }

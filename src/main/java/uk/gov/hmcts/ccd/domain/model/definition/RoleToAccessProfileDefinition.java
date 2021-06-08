@@ -6,9 +6,15 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.Builder;
+import lombok.Data;
 
+@Data
+@Builder
 public class RoleToAccessProfileDefinition implements Serializable {
     private static final long serialVersionUID = 8882065812393433800L;
+
+    private static final String AUTHORISATION_SEPARATOR = ",";
 
     private String caseTypeId;
     private Boolean disabled;
@@ -19,87 +25,21 @@ public class RoleToAccessProfileDefinition implements Serializable {
     private Date liveTo;
     private String roleName;
 
-    public String getCaseTypeId() {
-        return caseTypeId;
-    }
-
-    public void setCaseTypeId(String caseTypeId) {
-        this.caseTypeId = caseTypeId;
-    }
-
-    public Boolean isDisabled() {
-        return disabled;
-    }
-
-    public void setDisabled(Boolean disabled) {
-        this.disabled = disabled;
-    }
-
-    public Boolean isReadOnly() {
-        return readOnly;
-    }
-
-    public void setReadOnly(Boolean readOnly) {
-        this.readOnly = readOnly;
-    }
-
-    public String getAuthorisations() {
-        return authorisations;
-    }
-
     public List<String> getAuthorisationList() {
         if (getAuthorisations() != null) {
-            return Arrays.asList(getAuthorisations().split(","))
-                .stream()
+            return Arrays.stream(getAuthorisations().split(AUTHORISATION_SEPARATOR))
                 .filter(str -> str.length() > 0)
                 .collect(Collectors.toList());
         }
         return new ArrayList<>();
-    }
-
-    public void setAuthorisations(String authorisations) {
-        this.authorisations = authorisations;
-    }
-
-    public String getAccessProfiles() {
-        return accessProfiles;
-    }
-
-    public void setAccessProfiles(String accessProfiles) {
-        this.accessProfiles = accessProfiles;
     }
 
     public List<String> getAccessProfileList() {
         if (getAccessProfiles() != null) {
-            return Arrays.asList(getAccessProfiles().split(","))
-                .stream()
+            return Arrays.stream(getAccessProfiles().split(AUTHORISATION_SEPARATOR))
                 .filter(str -> str.length() > 0)
                 .collect(Collectors.toList());
         }
         return new ArrayList<>();
-    }
-
-    public Date getLiveFrom() {
-        return liveFrom;
-    }
-
-    public void setLiveFrom(Date liveFrom) {
-        this.liveFrom = liveFrom;
-    }
-
-    public Date getLiveTo() {
-        return liveTo;
-    }
-
-    public void setLiveTo(Date liveTo) {
-        this.liveTo = liveTo;
-    }
-
-    public String getRoleName() {
-        return roleName;
-    }
-
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
     }
 }

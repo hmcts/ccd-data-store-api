@@ -10,6 +10,7 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.CaseTypeMatcher;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentsFilteringServiceImpl;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.RoleAttributeMatcher;
@@ -32,6 +33,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
     void setUp() {
         List<RoleAttributeMatcher> roleAttributeMatchers = Lists.newArrayList(new BeginDateEndDateMatcher(),
             new CaseIdMatcher(),
+            new CaseTypeMatcher(),
             new JurisdictionMatcher(),
             new LocationMatcher(),
             new RegionMatcher(),
@@ -45,7 +47,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
         CaseDetails caseDetails = mockCaseDetails();
         RoleAssignmentFilteringResult filteredRoleAssignments = classUnderTest
             .filter(roleAssignments, caseDetails);
-        assertEquals(1, filteredRoleAssignments.getRoleMatchingResults().size());
+        assertEquals(1, filteredRoleAssignments.getRoleAssignmentMatchingResults().size());
     }
 
 
@@ -55,7 +57,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
         CaseDetails caseDetails = mockCaseDetails();
         RoleAssignmentFilteringResult filteredRoleAssignments = classUnderTest
             .filter(roleAssignments, caseDetails);
-        assertEquals(2, filteredRoleAssignments.getRoleMatchingResults().size());
+        assertEquals(2, filteredRoleAssignments.getRoleAssignmentMatchingResults().size());
     }
 
     @Test
@@ -64,7 +66,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.PRIVATE);
         RoleAssignmentFilteringResult filteredRoleAssignments = classUnderTest
             .filter(roleAssignments, caseDetails);
-        assertEquals(2, filteredRoleAssignments.getRoleMatchingResults().size());
+        assertEquals(2, filteredRoleAssignments.getRoleAssignmentMatchingResults().size());
     }
 
     @Test
@@ -73,7 +75,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED);
         RoleAssignmentFilteringResult filteredRoleAssignments = classUnderTest
             .filter(roleAssignments, caseDetails);
-        assertEquals(1, filteredRoleAssignments.getRoleMatchingResults().size());
+        assertEquals(1, filteredRoleAssignments.getRoleAssignmentMatchingResults().size());
     }
 
     @Test
@@ -82,7 +84,7 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
         CaseDetails caseDetails = mockCaseDetails();
         RoleAssignmentFilteringResult filteredRoleAssignments = classUnderTest
             .filter(roleAssignments, caseDetails);
-        assertEquals(0, filteredRoleAssignments.getRoleMatchingResults().size());
+        assertEquals(0, filteredRoleAssignments.getRoleAssignmentMatchingResults().size());
     }
 
     private RoleAssignments mockRoleAssignments() {
