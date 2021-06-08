@@ -35,13 +35,13 @@ public class RegionMatcher implements RoleAttributeMatcher {
     @Override
     public void matchAttribute(Pair<RoleAssignment, RoleMatchingResult> resultPair,
                                CaseTypeDefinition caseTypeDefinition) {
-
+        // TODO : need to implement this for search and create cases
     }
 
     private Optional<String> getRegion(CaseDetails caseDetails) {
-        JsonNode caseManagementLocation = caseDetails.getData().get("caseManagementLocation");
+        JsonNode caseManagementLocation = caseDetails.getData().get(CASE_MANAGEMENT__LOCATION);
         if (caseManagementLocation != null) {
-            return Optional.ofNullable(caseManagementLocation.get("region").asText());
+            return Optional.ofNullable(caseManagementLocation.get(REGION).asText());
         }
         return Optional.empty();
     }

@@ -15,7 +15,7 @@
         }, {
           "case_id": "${}${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}",
           "user_id": "${[scenarioContext][parentContext][testData][users][userOlawale][id]}",
-          "case_role" : "[CREATOR]"
+          "case_role" : "[CR-1]"
         }, {
           "case_id": "${}${[scenarioContext][siblingContexts][F-105_Case_Data_Create_C1][testData][actualResponse][body][id]}",
           "user_id": "${[scenarioContext][parentContext][testData][users][userOlawale][id]}",

@@ -1,10 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
-import com.google.common.collect.Lists;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,7 +13,6 @@ import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
@@ -30,6 +25,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "true")
@@ -69,28 +69,28 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         this.caseDetailsRepository = caseDetailsRepository;
     }
 
-    // Returns Optional<CaseDetails>. If this is not enough think of wrapping it in a AccessControlResponse
-    // that contains the additional information about the operation result
+    // Returns List<AccessProfile>. Returns list of access profiles
+    // for the user and filters access profiles based on the case type.
     @Override
-    public List<AccessProfile> generateAccessProfilesByCaseTypeId(String caseTypeId) {
+    public Set<AccessProfile> generateAccessProfilesByCaseTypeId(String caseTypeId) {
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
         RoleAssignmentFilteringResult filteringResults = roleAssignmentsFilteringService
             .filter(roleAssignments, caseTypeDefinition);
 
-        return filteredAccessProfiles(filteringResults, caseTypeDefinition);
+        return Sets.newHashSet(filteredAccessProfiles(filteringResults, caseTypeDefinition));
     }
 
     @Override
-    public List<AccessProfile> generateAccessProfilesByCaseReference(String caseReference) {
+    public Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference) {
         Optional<CaseDetails> caseDetails =  caseDetailsRepository.findByReference(caseReference);
         if (caseDetails.isEmpty()) {
-            return Lists.newArrayList();
+            return Sets.newHashSet();
         }
         RoleAssignmentFilteringResult filteringResults = filterRoleAssignmentsWithCaseDetails(caseDetails.get());
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.get().getCaseTypeId());
 
-        return filteredAccessProfiles(filteringResults, caseTypeDefinition);
+        return Sets.newHashSet(filteredAccessProfiles(filteringResults, caseTypeDefinition));
     }
 
     private List<AccessProfile> filteredAccessProfiles(RoleAssignmentFilteringResult filteringResults,
@@ -132,7 +132,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
             .map(roleAssignment -> Pair.of(roleAssignment, new RoleMatchingResult()))
             .collect(Collectors.toList());
 
-        augmented.addAll(filteringResults.getRoleMatchingResults());
+        augmented.addAll(filteringResults.getRoleAssignmentMatchingResults());
         return new RoleAssignmentFilteringResult(augmented);
     }
 

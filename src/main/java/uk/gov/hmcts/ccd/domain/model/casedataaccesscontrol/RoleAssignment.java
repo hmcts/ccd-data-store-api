@@ -1,9 +1,10 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol;
 
-import java.time.Instant;
-import java.util.List;
 import lombok.Builder;
 import lombok.Data;
+
+import java.time.Instant;
+import java.util.List;
 
 @Builder
 @Data
@@ -27,5 +28,10 @@ public class RoleAssignment {
         return this.getAttributes() != null
             && this.getAttributes().getCaseId() != null
             && !this.getAttributes().getCaseId().isEmpty();
+    }
+
+    public boolean isAnExpiredRoleAssignment() {
+        final Instant machineTimestamp = Instant.now();
+        return machineTimestamp.isAfter(beginTime) && machineTimestamp.isBefore(endTime);
     }
 }

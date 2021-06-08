@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -60,7 +61,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         CaseDetails existingCaseDetails = getCaseOperation.execute(caseReference)
             .orElseThrow(() -> new ResourceNotFoundException("Case not found"));
 
-        Set<String> accessProfiles = caseAccessService.getAccessRoles(caseReference);
+        Set<AccessProfile> accessProfiles = caseAccessService.getAccessProfilesByCaseReference(caseReference);
         if (accessProfiles == null || accessProfiles.isEmpty()) {
             throw new ValidationException("Cannot find user roles for the user");
         }
@@ -79,13 +80,14 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         return verifyReadAccess(caseTypeDefinition, accessProfiles, caseDetails);
     }
 
-    private CaseDetails verifyReadAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles,
+    private CaseDetails verifyReadAccess(CaseTypeDefinition caseTypeDefinition,
+                                         Set<AccessProfile> accessProfiles,
                                          CaseDetails caseDetails) {
 
         if (caseDetails != null) {
             if (!accessControlService.canAccessCaseTypeWithCriteria(
                 caseTypeDefinition,
-                                userRoles,
+                accessProfiles,
                                 CAN_READ)) {
                 return null;
             }
@@ -94,7 +96,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                 accessControlService.filterCaseFieldsByAccess(
                     JacksonUtils.convertValueJsonNode(caseDetails.getData()),
                     caseTypeDefinition.getCaseFieldDefinitions(),
-                    userRoles,
+                    accessProfiles,
                     CAN_READ,
                     false)));
 
@@ -102,7 +104,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                 accessControlService.filterCaseFieldsByAccess(
                     JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
                     caseTypeDefinition.getCaseFieldDefinitions(),
-                    userRoles,
+                    accessProfiles,
                     CAN_READ,
                     true)));
         }
@@ -112,19 +114,19 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
     private void verifyUpsertAccess(Event event, Map<String, JsonNode> newData,
                                     CaseDetails existingCaseDetails,
                                     CaseTypeDefinition caseTypeDefinition,
-                                    Set<String> userRoles) {
-        if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition,userRoles,CAN_UPDATE)) {
+                                    Set<AccessProfile> accessProfiles) {
+        if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles,CAN_UPDATE)) {
             throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
         }
         if (!accessControlService.canAccessCaseStateWithCriteria(existingCaseDetails.getState(), caseTypeDefinition,
-            userRoles, CAN_UPDATE)) {
+            accessProfiles, CAN_UPDATE)) {
             throw new ResourceNotFoundException(NO_CASE_STATE_FOUND);
         }
 
         if (event == null || !accessControlService.canAccessCaseEventWithCriteria(
                             event.getEventId(),
                             caseTypeDefinition.getEvents(),
-                            userRoles,
+            accessProfiles,
                             CAN_CREATE)) {
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
         }
@@ -133,7 +135,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             MAPPER.convertValue(newData, JsonNode.class),
             MAPPER.convertValue(existingCaseDetails.getData(), JsonNode.class),
             caseTypeDefinition.getCaseFieldDefinitions(),
-            userRoles)) {
+            accessProfiles)) {
             throw new ResourceNotFoundException(NO_FIELD_FOUND);
         }
     }

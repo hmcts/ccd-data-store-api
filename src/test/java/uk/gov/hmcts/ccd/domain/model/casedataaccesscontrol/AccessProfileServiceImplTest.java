@@ -105,7 +105,7 @@ class AccessProfileServiceImplTest {
             Lists.newArrayList("auth2"),
             Lists.newArrayList("auth53"));
         List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions =
-            mockCaseTypeDefinitionWithRoleAssignments("RoleName", "RoleName1", "auth1,auth2", "auth3,auth4");
+            mockCaseTypeDefinitionWithRoleAssignments("RoleName", null, "auth1,auth2", "auth3,auth4");
         List<AccessProfile> mappedAccessProfiles = roleAssignmentMapper
             .generateAccessProfiles(filteringResult, roleToAccessProfileDefinitions);
 
@@ -219,7 +219,7 @@ class AccessProfileServiceImplTest {
         when(roleAssignment1.getGrantType()).thenReturn(GrantType.SPECIFIC.name());
         when(roleAssignment1.getRoleName()).thenReturn("RoleName1");
         when(roleAssignment1.getAuthorisations()).thenReturn(authorisations2);
-        when(roleAssignment1.getReadOnly()).thenReturn(false);
+        when(roleAssignment1.getReadOnly()).thenReturn(null);
 
         RoleAssignment roleAssignment2 = mock(RoleAssignment.class);
         when(roleAssignment2.getGrantType()).thenReturn(GrantType.EXCLUDED.name());

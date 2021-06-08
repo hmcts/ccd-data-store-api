@@ -20,11 +20,10 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.SPECIFIC;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.STANDARD;
+import static uk.gov.hmcts.ccd.domain.service.AccessControl.IDAM_PREFIX;
 
 @Component
 public class PseudoRoleAssignmentsGenerator {
-
-    protected static final String IDAM_PREFIX = "idam:";
 
     private final UserRepository userRepository;
     private final CaseDefinitionRepository caseDefinitionRepository;

@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ccd.data.casedataaccesscontrol;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -17,25 +19,40 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import static com.google.common.collect.Maps.newHashMap;
+import static org.springframework.http.HttpHeaders.ETAG;
+
+@Slf4j
 @Repository
 @Qualifier(DefaultRoleAssignmentRepository.QUALIFIER)
 public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository {
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultRoleAssignmentRepository.class);
+
 
     public static final String QUALIFIER = "default";
     public static final String ROLE_ASSIGNMENTS_NOT_FOUND =
         "No Role Assignments found for userId=%s when getting from Role Assignment Service because of %s";
+
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break error messages and add unwanted +
+    public static final String R_A_NOT_FOUND_FOR_CASE_AND_USER =
+        "No Role Assignments found for userIds=%s and casesIds=%s when getting from Role Assignment Service because of %s";
+
     public static final String ROLE_ASSIGNMENTS_CLIENT_ERROR =
         "Client error when getting Role Assignments from Role Assignment Service because of %s";
     public static final String ROLE_ASSIGNMENT_SERVICE_ERROR =
         "Problem getting Role Assignments from Role Assignment Service because of %s";
+    private static final String GZIP_POSTFIX = "--gzip";
 
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
+
+    // UserId as a key, Pair<ETag, RoleAssignmentResponse> as a value
+    private final Map<String, Pair<String, RoleAssignmentResponse>> roleAssignments = newHashMap();
 
     public DefaultRoleAssignmentRepository(final ApplicationParams applicationParams,
                                            final SecurityUtils securityUtils,
@@ -48,18 +65,14 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
     @Override
     public RoleAssignmentResponse getRoleAssignments(String userId) {
         try {
-            final HttpEntity<Object> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
-            final Map<String, String> queryParams = new HashMap<>();
-            queryParams.put("uid", ApplicationParams.encode(userId.toLowerCase()));
+            HttpHeaders headers = securityUtils.authorizationHeaders();
+            addETagHeader(userId, headers);
 
-            final String encodedUrl = UriComponentsBuilder.fromHttpUrl(applicationParams.amGetRoleAssignmentsURL())
-                .buildAndExpand(queryParams).toUriString();
-            return restTemplate.exchange(new URI(encodedUrl),
-                                         HttpMethod.GET, requestEntity,
-                                         RoleAssignmentResponse.class).getBody();
+            final HttpEntity<Object> requestEntity = new HttpEntity<>(headers);
 
+            return getRoleAssignmentResponse(userId, requestEntity);
         } catch (Exception e) {
-            LOG.warn("Error while retrieving Role Assignments", e);
+            log.warn("Error while retrieving Role Assignments", e);
             if (e instanceof HttpClientErrorException
                 && ((HttpClientErrorException) e).getRawStatusCode() == HttpStatus.NOT_FOUND.value()) {
                 throw new ResourceNotFoundException(String.format(ROLE_ASSIGNMENTS_NOT_FOUND,
@@ -72,4 +85,103 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
             }
         }
     }
+
+    private void addETagHeader(String userId, HttpHeaders headers) {
+        if (roleAssignments.containsKey(userId)) {
+            Pair<String, RoleAssignmentResponse> stringRoleAssignmentResponsePair = roleAssignments.get(userId);
+            headers.setIfNoneMatch(stringRoleAssignmentResponsePair.getKey());
+        }
+    }
+
+    private RoleAssignmentResponse getRoleAssignmentResponse(String userId, HttpEntity<Object> requestEntity)
+        throws URISyntaxException {
+
+        ResponseEntity<RoleAssignmentResponse> exchange = exchangeGet(userId, requestEntity);
+        log.debug("GET RoleAssignments for user={} returned response status={}", userId, exchange.getStatusCode());
+
+        if (exchange.getStatusCode() == HttpStatus.NOT_MODIFIED && roleAssignments.containsKey(userId)) {
+            return roleAssignments.get(userId).getRight();
+        }
+        if (exchange.getHeaders().containsKey(ETAG) && exchange.getHeaders().getETag() != null) {
+            log.debug("GET RoleAssignments response contains header ETag={}", exchange.getHeaders().getETag());
+            if (thereAreRoleAssignmentsInTheBody(exchange)) {
+                roleAssignments.put(userId, Pair.of(getETag(exchange.getHeaders().getETag()), exchange.getBody()));
+            }
+        }
+
+        return exchange.getBody();
+    }
+
+    private boolean thereAreRoleAssignmentsInTheBody(ResponseEntity<RoleAssignmentResponse> exchange) {
+        RoleAssignmentResponse body = exchange.getBody();
+        if (body == null) {
+            return false;
+        }
+
+        List<RoleAssignmentResource> roleAssignments = body.getRoleAssignments();
+        if (roleAssignments == null) {
+            return false;
+        }
+
+        return !roleAssignments.isEmpty();
+    }
+
+    /**
+     * 'Accept-Encoding: gzip' makes the response ETag header being suffixed with the '--gzip'.
+     * This method is to drop this suffix before using the ETag.
+     */
+    private String getETag(String etag) {
+        if (etag != null && etag.endsWith(GZIP_POSTFIX + "\"")) {
+            return etag.substring(0, etag.length() - GZIP_POSTFIX.length() - 1) + "\"";
+        }
+        return etag;
+    }
+
+    private ResponseEntity<RoleAssignmentResponse> exchangeGet(String userId, HttpEntity<Object> requestEntity)
+        throws URISyntaxException {
+        final Map<String, String> queryParams = new HashMap<>();
+        queryParams.put("uid", ApplicationParams.encode(userId.toLowerCase()));
+
+        final String encodedUrl = UriComponentsBuilder.fromHttpUrl(applicationParams.amGetRoleAssignmentsURL())
+            .buildAndExpand(queryParams).toUriString();
+
+        return restTemplate.exchange(new URI(encodedUrl),
+            HttpMethod.GET, requestEntity,
+            RoleAssignmentResponse.class);
+    }
+
+    @Override
+    public RoleAssignmentResponse findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds) {
+        try {
+            final var roleAssignmentQuery = new RoleAssignmentQuery(caseIds, userIds);
+            final var requestEntity = new HttpEntity(roleAssignmentQuery, securityUtils.authorizationHeaders());
+            return restTemplate.exchange(
+                applicationParams.amQueryRoleAssignmentsURL(),
+                HttpMethod.POST,
+                requestEntity,
+                RoleAssignmentResponse.class).getBody();
+
+        } catch (Exception exception) {
+            final ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(
+                String.format(R_A_NOT_FOUND_FOR_CASE_AND_USER, userIds, caseIds, exception.getMessage())
+            );
+            throw mapException(exception, resourceNotFoundException);
+        }
+    }
+
+    private RuntimeException mapException(Exception exception, ResourceNotFoundException resourceNotFoundException) {
+
+        if (exception instanceof HttpClientErrorException
+            && ((HttpClientErrorException) exception).getRawStatusCode() == HttpStatus.NOT_FOUND.value()) {
+            return resourceNotFoundException;
+        } else if (exception instanceof HttpClientErrorException
+            && HttpStatus.valueOf(((HttpClientErrorException) exception).getRawStatusCode()).is4xxClientError()) {
+            return new BadRequestException(String.format(ROLE_ASSIGNMENTS_CLIENT_ERROR, exception.getMessage()));
+        } else {
+            return new ServiceException(String.format(ROLE_ASSIGNMENT_SERVICE_ERROR, exception.getMessage()));
+        }
+    }
+
+
+
 }

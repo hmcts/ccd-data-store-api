@@ -22,7 +22,6 @@ import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeader
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
-
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
@@ -35,6 +34,7 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_GRANTED;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_PROCESS;
 import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedCaseFieldByPath;
@@ -232,7 +232,15 @@ public class CaseSearchResultViewGenerator {
         });
 
         newResults.putAll(caseData);
-        newResults.putAll(metadata);
+        newResults.putAll(convertReferenceToString(metadata));
         return newResults;
+    }
+
+    private Map<String, Object> convertReferenceToString(Map<String, Object> caseMetadata) {
+        Map<String, Object> caseMetaDataMap = new HashMap<>();
+        caseMetaDataMap.putAll(caseMetadata);
+        final String convertedCaseReference = String.valueOf(caseMetaDataMap.get(CASE_REFERENCE.getReference()));
+        caseMetaDataMap.put(CASE_REFERENCE.getReference(), convertedCaseReference);
+        return caseMetaDataMap;
     }
 }

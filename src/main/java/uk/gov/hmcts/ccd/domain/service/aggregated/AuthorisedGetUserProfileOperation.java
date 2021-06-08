@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import com.google.common.collect.Sets;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -53,21 +53,25 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
         return userProfile;
     }
 
-    private Set<String> getAccessProfiles(String caseTypeId) {
-        List<AccessProfile> accessProfiles = caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
-        return caseDataAccessControl.extractAccessProfileNames(accessProfiles);
+    private Set<AccessProfile> getAccessProfiles(String caseTypeId) {
+        return caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
     }
 
-    private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles,
+    private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition,
+                                                      Set<AccessProfile> accessProfiles,
                                                       Predicate<AccessControlList> access) {
-        if (caseTypeDefinition == null || CollectionUtils.isEmpty(userRoles)
-            || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, access)) {
+        if (caseTypeDefinition == null || CollectionUtils.isEmpty(accessProfiles)
+            || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, access)) {
             return Optional.empty();
         }
-        caseTypeDefinition.setStates(accessControlService.filterCaseStatesByAccess(caseTypeDefinition.getStates(),
-            userRoles, access));
-        caseTypeDefinition.setEvents(accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
-            userRoles, access));
+
+        Set<AccessProfile> caseAndUserRoles = Sets.union(accessProfiles,
+            caseDataAccessControl.getCaseUserAccessProfilesByUserId());
+
+        caseTypeDefinition.setStates(accessControlService.filterCaseStatesByAccess(caseTypeDefinition,
+            caseAndUserRoles, access));
+        caseTypeDefinition.setEvents(accessControlService.filterCaseEventsByAccess(caseTypeDefinition,
+            caseAndUserRoles, access));
 
         return Optional.of(caseTypeDefinition);
     }

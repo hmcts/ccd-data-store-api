@@ -5,17 +5,17 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 
 @Service
 @Qualifier("classified")
 public class ClassifiedCreateCaseOperation implements CreateCaseOperation {
     private final CreateCaseOperation createCaseOperation;
-    private final SecurityClassificationService classificationService;
+    private final SecurityClassificationServiceImpl classificationService;
 
     @Autowired
     public ClassifiedCreateCaseOperation(@Qualifier("default") CreateCaseOperation createCaseOperation,
-                                         SecurityClassificationService classificationService) {
+                                         SecurityClassificationServiceImpl classificationService) {
 
         this.createCaseOperation = createCaseOperation;
         this.classificationService = classificationService;

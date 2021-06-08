@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang.StringUtils;
@@ -38,8 +37,8 @@ public abstract class AbstractAuthorisedCaseViewOperation {
         this.caseDataAccessControl = caseDataAccessControl;
     }
 
-    void verifyCaseTypeReadAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles) {
-        if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ)) {
+    void verifyCaseTypeReadAccess(CaseTypeDefinition caseTypeDefinition, Set<AccessProfile> accessProfiles) {
+        if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ)) {
             ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(AccessControlService
                 .NO_CASE_TYPE_FOUND);
             resourceNotFoundException.withDetails(NO_CASE_TYPE_FOUND_DETAILS);
@@ -65,20 +64,20 @@ public abstract class AbstractAuthorisedCaseViewOperation {
             .orElseThrow(() -> new CaseNotFoundException(caseReference));
     }
 
-    protected Set<String> getAccessProfiles(String caseReference) {
-        List<AccessProfile> accessProfiles = caseDataAccessControl
+    protected Set<AccessProfile> getAccessProfiles(String caseReference) {
+        return caseDataAccessControl
             .generateAccessProfilesByCaseReference(caseReference);
-        return caseDataAccessControl.extractAccessProfileNames(accessProfiles);
     }
 
-    protected void filterAllowedTabsWithFields(AbstractCaseView abstractCaseView, Set<String> userRoles) {
+    protected void filterAllowedTabsWithFields(AbstractCaseView abstractCaseView, Set<AccessProfile> accessProfiles) {
         abstractCaseView.setTabs(Arrays.stream(abstractCaseView.getTabs())
-            .filter(caseViewTab -> caseViewTab.getFields().length > 0 && tabAllowed(caseViewTab, userRoles))
+            .filter(caseViewTab -> caseViewTab.getFields().length > 0 && tabAllowed(caseViewTab, accessProfiles))
             .toArray(CaseViewTab[]::new));
     }
 
-    private boolean tabAllowed(final CaseViewTab caseViewTab, final Set<String> userRoles) {
-        return StringUtils.isEmpty(caseViewTab.getRole()) || userRoles.contains(caseViewTab.getRole());
+    private boolean tabAllowed(final CaseViewTab caseViewTab, final Set<AccessProfile> accessProfiles) {
+        Set<String> accessProfileNames = AccessControlService.extractAccessProfileNames(accessProfiles);
+        return StringUtils.isEmpty(caseViewTab.getRole()) || accessProfileNames.contains(caseViewTab.getRole());
     }
 
     AccessControlService getAccessControlService() {

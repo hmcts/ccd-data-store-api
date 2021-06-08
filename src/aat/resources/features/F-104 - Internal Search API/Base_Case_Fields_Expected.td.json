@@ -1,0 +1,25 @@
+{
+  "_guid_" : "104_Base_Case_Fields_expected",
+  "fields": {
+    "[JURISDICTION]": "AUTOTEST1",
+    "[LAST_STATE_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
+    "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
+    "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data]}",
+    "[STATE]": "TODO",
+    "[SECURITY_CLASSIFICATION]": "PRIVATE",
+    "[CASE_TYPE]": "AAT_PRIVATE",
+    "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
+  },
+  "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data]}",
+  "fields_formatted": {
+    "[JURISDICTION]": "AUTOTEST1",
+    "[LAST_STATE_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
+    "[CREATED_DATE]": "[[ANYTHING_PRESENT]]",
+    "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data]}",
+    "[STATE]": "TODO",
+    "[SECURITY_CLASSIFICATION]": "PRIVATE",
+    "[CASE_TYPE]": "AAT_PRIVATE",
+    "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
+  },
+  "supplementary_data" : null
+}

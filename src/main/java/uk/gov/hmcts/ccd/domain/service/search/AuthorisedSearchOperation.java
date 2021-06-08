@@ -51,7 +51,7 @@ public class AuthorisedSearchOperation implements SearchOperation {
 
         final List<CaseDetails> results = searchOperation.execute(metaData, criteria);
         CaseTypeDefinition caseTypeDefinition = getCaseType(metaData.getCaseTypeId());
-        Set<String> accessProfiles = getAccessProfiles(caseTypeDefinition);
+        Set<AccessProfile> accessProfiles = getAccessProfiles(caseTypeDefinition);
 
         return (null == results || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition,
             accessProfiles,
@@ -59,10 +59,8 @@ public class AuthorisedSearchOperation implements SearchOperation {
             ? Lists.newArrayList() : filterByReadAccess(results, caseTypeDefinition);
     }
 
-    private Set<String> getAccessProfiles(CaseTypeDefinition caseTypeDefinition) {
-        List<AccessProfile> accessProfileList = caseDataAccessControl
-            .generateAccessProfilesByCaseTypeId(caseTypeDefinition.getId());
-        return caseDataAccessControl.extractAccessProfileNames(accessProfileList);
+    private Set<AccessProfile> getAccessProfiles(CaseTypeDefinition caseTypeDefinition) {
+        return caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeDefinition.getId());
     }
 
     private List<CaseDetails> filterByReadAccess(List<CaseDetails> results, CaseTypeDefinition caseTypeDefinition) {
@@ -70,22 +68,17 @@ public class AuthorisedSearchOperation implements SearchOperation {
         return results.stream()
             .filter(caseDetails -> accessControlService.canAccessCaseStateWithCriteria(caseDetails.getState(),
                 caseTypeDefinition,
-                getAccessProfilesByCaseReference(caseDetails.getReferenceAsString()),
+                getAccessProfiles(caseTypeDefinition),
                 CAN_READ))
 
             .collect(Collectors.toList())
             .stream()
             .map(caseDetails -> verifyFieldReadAccess(caseTypeDefinition,
-                getAccessProfilesByCaseReference(caseDetails.getReferenceAsString()),
+                getAccessProfiles(caseTypeDefinition),
                 caseDetails))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .collect(Collectors.toList());
-    }
-
-    private Set<String> getAccessProfilesByCaseReference(String caseReference) {
-        List<AccessProfile> accessProfiles = caseDataAccessControl.generateAccessProfilesByCaseReference(caseReference);
-        return caseDataAccessControl.extractAccessProfileNames(accessProfiles);
     }
 
     private CaseTypeDefinition getCaseType(String caseTypeId) {
@@ -98,7 +91,7 @@ public class AuthorisedSearchOperation implements SearchOperation {
     }
 
     private Optional<CaseDetails> verifyFieldReadAccess(CaseTypeDefinition caseTypeDefinition,
-                                                        Set<String> accessProfiles,
+                                                        Set<AccessProfile> accessProfiles,
                                                         CaseDetails caseDetails) {
 
         if (caseTypeDefinition == null || caseDetails == null || CollectionUtils.isEmpty(accessProfiles)) {

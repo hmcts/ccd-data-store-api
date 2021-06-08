@@ -117,6 +117,7 @@ public class BaseFilter {
         roleAssignmentAttributes.setContractType(Optional.of("SALARIED"));
         roleAssignmentAttributes.setLocation(location);
         roleAssignmentAttributes.setRegion(region);
+        roleAssignmentAttributes.setCaseTypeId(Optional.of("TEST_CASE_TYPE"));
         return roleAssignmentAttributes;
     }
 
@@ -133,6 +134,7 @@ public class BaseFilter {
         when(caseDetails.getSecurityClassification()).thenReturn(securityClassification);
         when(caseDetails.getReferenceAsString()).thenReturn(CASE_ID_1);
         when(caseDetails.getJurisdiction()).thenReturn(jurisdiction);
+        when(caseDetails.getCaseTypeId()).thenReturn("TEST_CASE_TYPE");
         return caseDetails;
     }
 }

@@ -35,7 +35,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.RO
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ROLE_IN_USER_ROLES_2;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ROLE_NOT_IN_USER_ROLES;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ROLE_NOT_IN_USER_ROLES_2;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.USER_ROLES;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.ACCESS_PROFILES;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.getAddressFieldType;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.getPeopleCollectionFieldDefinition;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlServiceTest.getPersonFieldType;
@@ -97,7 +97,7 @@ class AccessControlServiceFilterTest {
             final List<CaseEventDefinition> caseEventDefinitions = Arrays.asList(event1, event2, event3);
 
             final CaseViewActionableEvent[] filteredTriggers = accessControlService
-                .filterCaseViewTriggersByCreateAccess(caseViewTriggers, caseEventDefinitions, USER_ROLES);
+                .filterCaseViewTriggersByCreateAccess(caseViewTriggers, caseEventDefinitions, ACCESS_PROFILES);
             assertArrayEquals(caseViewTriggers, filteredTriggers);
         }
 
@@ -126,7 +126,7 @@ class AccessControlServiceFilterTest {
 
             final CaseViewActionableEvent[] filteredTriggers =
                 accessControlService.filterCaseViewTriggersByCreateAccess(caseViewTriggers, caseEventDefinitions,
-                    USER_ROLES);
+                        ACCESS_PROFILES);
             assertAll(
                 () -> assertThat(filteredTriggers.length, is(1)),
                 () -> assertThat(filteredTriggers[0], is(CASE_VIEW_TRIGGER_3))
@@ -179,7 +179,7 @@ class AccessControlServiceFilterTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                    ACCESS_PROFILES,
                 CAN_CREATE);
 
             assertAll(
@@ -231,7 +231,7 @@ class AccessControlServiceFilterTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                    ACCESS_PROFILES,
                 CAN_CREATE);
 
             assertThat(eventTrigger.getCaseFields(), hasSize(0));
@@ -271,7 +271,7 @@ class AccessControlServiceFilterTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                    ACCESS_PROFILES,
                 CAN_CREATE);
 
             assertAll(
@@ -368,7 +368,7 @@ class AccessControlServiceFilterTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                    ACCESS_PROFILES,
                 CAN_CREATE);
 
             assertAll(
@@ -502,7 +502,7 @@ class AccessControlServiceFilterTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                    ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertAll(
@@ -678,7 +678,7 @@ class AccessControlServiceFilterTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                    ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertAll(
@@ -871,7 +871,7 @@ class AccessControlServiceFilterTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                    ACCESS_PROFILES,
                 CAN_CREATE);
 
             assertAll(
@@ -1231,7 +1231,7 @@ class AccessControlServiceFilterTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                    ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertAll(
@@ -1313,7 +1313,7 @@ class AccessControlServiceFilterTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                    ACCESS_PROFILES,
                 CAN_CREATE);
 
             assertAll(
@@ -1395,7 +1395,7 @@ class AccessControlServiceFilterTest {
             CaseUpdateViewEvent eventTrigger = accessControlService.filterCaseViewFieldsByAccess(
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                    ACCESS_PROFILES,
                 CAN_CREATE);
 
             assertAll(
@@ -1449,7 +1449,7 @@ class AccessControlServiceFilterTest {
 
             CaseUpdateViewEvent eventTrigger = accessControlService.updateCollectionDisplayContextParameterByAccess(
                 caseEventTrigger,
-                USER_ROLES);
+                    ACCESS_PROFILES);
 
             assertThat("There should be only one caseField", eventTrigger.getCaseFields(), hasSize(1));
 
@@ -1475,7 +1475,7 @@ class AccessControlServiceFilterTest {
         }
 
         @Test
-        @DisplayName("Should set #COLLECTION(allowInsert,allowDelete) in DisplayContextParameter of a collection "
+        @DisplayName("Should set #COLLECTION() in DisplayContextParameter of a collection "
             + "caseField when an update ACL is set")
         void updateCollectionDisplayContextParameterWhenFieldHasUpdateRole() {
 
@@ -1505,16 +1505,14 @@ class AccessControlServiceFilterTest {
 
             CaseUpdateViewEvent eventTrigger = accessControlService.updateCollectionDisplayContextParameterByAccess(
                 caseEventTrigger,
-                USER_ROLES);
+                    ACCESS_PROFILES);
 
             CaseViewField people = eventTrigger.getCaseFields().stream()
                 .filter(e -> e.getId().equals("People")).findFirst().get();
 
             assertAll(
                 () -> assertNotNull(people),
-                () -> assertTrue(people.getDisplayContextParameter().contains("#COLLECTION(")),
-                () -> assertTrue(people.getDisplayContextParameter().contains("allowInsert")),
-                () -> assertTrue(people.getDisplayContextParameter().contains("allowDelete"))
+                () -> assertTrue(people.getDisplayContextParameter().contains("#COLLECTION()"))
             );
         }
 
@@ -1548,7 +1546,7 @@ class AccessControlServiceFilterTest {
 
             CaseUpdateViewEvent eventTrigger = accessControlService.updateCollectionDisplayContextParameterByAccess(
                 caseEventTrigger,
-                USER_ROLES);
+                    ACCESS_PROFILES);
 
             CaseViewField people = eventTrigger.getCaseFields().stream()
                 .filter(e -> e.getId().equals("People")).findFirst().get();
@@ -1604,7 +1602,7 @@ class AccessControlServiceFilterTest {
             List<CaseFieldDefinition> caseFieldDefinitions = Arrays.asList(caseField1, caseField2, caseField3);
 
             final List<CaseFieldDefinition> filteredCaseFields = accessControlService.filterCaseFieldsByAccess(
-                caseFieldDefinitions, USER_ROLES, CAN_READ);
+                caseFieldDefinitions, ACCESS_PROFILES, CAN_READ);
             assertAll(
                 () -> assertThat(filteredCaseFields, hasSize(3)),
                 () -> assertThat(filteredCaseFields, hasItem(caseField1)),
@@ -1652,7 +1650,7 @@ class AccessControlServiceFilterTest {
             List<CaseFieldDefinition> caseFieldDefinitions = Arrays.asList(caseField1, caseField2, caseField3);
 
             final List<CaseFieldDefinition> filteredCaseFields = accessControlService.filterCaseFieldsByAccess(
-                caseFieldDefinitions, USER_ROLES, CAN_READ);
+                caseFieldDefinitions, ACCESS_PROFILES, CAN_READ);
             assertAll(
                 () -> assertThat(filteredCaseFields, hasSize(2)),
                 () -> assertThat(filteredCaseFields, hasItem(caseField1)),
@@ -1708,7 +1706,7 @@ class AccessControlServiceFilterTest {
             people.propagateACLsToNestedFields();
 
             final List<CaseFieldDefinition> filteredCaseFields =
-                accessControlService.filterCaseFieldsByAccess(asList(people), USER_ROLES, CAN_READ);
+                accessControlService.filterCaseFieldsByAccess(asList(people), ACCESS_PROFILES, CAN_READ);
 
             assertAll(
                 () -> assertThat(filteredCaseFields, hasSize(1)),
@@ -1771,7 +1769,7 @@ class AccessControlServiceFilterTest {
             people.propagateACLsToNestedFields();
 
             final List<CaseFieldDefinition> filteredCaseFields = accessControlService.filterCaseFieldsByAccess(
-                asList(people), USER_ROLES, CAN_UPDATE);
+                asList(people), ACCESS_PROFILES, CAN_UPDATE);
 
             assertAll(
                 () -> assertThat(filteredCaseFields, hasSize(1)),

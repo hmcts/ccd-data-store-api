@@ -33,6 +33,19 @@ public class JurisdictionMatcher implements RoleAttributeMatcher {
     @Override
     public void matchAttribute(Pair<RoleAssignment, RoleMatchingResult> resultPair,
                                CaseTypeDefinition caseTypeDefinition) {
-
+        RoleAssignment roleAssignment = resultPair.getLeft();
+        log.debug("Matching role assignment jurisdiction {} with case type definition jurisdiction {}"
+                + " for role assignment {}",
+            roleAssignment.getAttributes().getCaseId(),
+            caseTypeDefinition.getJurisdictionId(),
+            roleAssignment.getId());
+        boolean matched = isValuesMatching(roleAssignment
+                .getAttributes().getJurisdiction(),
+            caseTypeDefinition.getJurisdictionId());
+        resultPair.getRight().setJurisdictionMatched(matched);
+        log.debug("Role assignment jurisdiction {} and case type definition jurisdiction {} match {}",
+            roleAssignment.getAttributes().getCaseId(),
+            caseTypeDefinition.getJurisdictionId(),
+            matched);
     }
 }

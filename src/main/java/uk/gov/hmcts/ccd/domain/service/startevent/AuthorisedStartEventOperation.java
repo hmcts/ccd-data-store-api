@@ -12,6 +12,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
@@ -93,12 +94,12 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
         return caseTypeDefinition;
     }
 
-    private Set<String> getCaseRoles(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition) {
+    private Set<AccessProfile> getCaseRoles(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition) {
         if (caseDetails == null || caseDetails.getId() == null || Draft.isDraft(caseDetails.getId())) {
             return Sets.union(caseAccessService.getAccessProfiles(caseTypeDefinition.getId()),
                 caseAccessService.getCaseCreationCaseRoles());
         } else {
-            return caseAccessService.getAccessRoles(caseDetails.getReferenceAsString());
+            return caseAccessService.getAccessProfilesByCaseReference(caseDetails.getReferenceAsString());
         }
     }
 
@@ -107,11 +108,11 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
 
         CaseDetails caseDetails = startEventResult.getCaseDetails();
-        Set<String> userRoles = getCaseRoles(caseDetails, caseTypeDefinition);
+        Set<AccessProfile> caseAccessProfiles = getCaseRoles(caseDetails, caseTypeDefinition);
 
         if (!accessControlService.canAccessCaseTypeWithCriteria(
             caseTypeDefinition,
-            userRoles,
+            caseAccessProfiles,
             CAN_READ)) {
             caseDetails.setData(newHashMap());
             caseDetails.setDataClassification(newHashMap());
@@ -123,14 +124,14 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
                 accessControlService.filterCaseFieldsByAccess(
                     JacksonUtils.convertValueJsonNode(caseDetails.getData()),
                     caseTypeDefinition.getCaseFieldDefinitions(),
-                    userRoles,
+                    caseAccessProfiles,
                     CAN_READ,
                     false)));
             caseDetails.setDataClassification(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
                     caseTypeDefinition.getCaseFieldDefinitions(),
-                    userRoles,
+                    caseAccessProfiles,
                     CAN_READ,
                     true)));
         }

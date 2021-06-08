@@ -7,9 +7,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 
 import java.util.Optional;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -32,7 +32,7 @@ class ClassifiedCreateCaseOperationTest {
     private CreateCaseOperation createCaseOperation;
 
     @Mock
-    private SecurityClassificationService classificationService;
+    private SecurityClassificationServiceImpl classificationService;
 
     private ClassifiedCreateCaseOperation classifiedCreateCaseOperation;
     private CaseDetails caseDetails;

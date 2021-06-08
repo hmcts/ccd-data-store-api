@@ -3,14 +3,21 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
@@ -18,20 +25,13 @@ import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.CaseSearchesViewAccessControl;
 import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
@@ -103,7 +103,7 @@ class CaseSearchesViewAccessControlTest {
     private SearchResultDefinitionService searchResultDefinitionService;
 
     @Mock
-    private SecurityClassificationService securityClassificationService;
+    private SecurityClassificationServiceImpl securityClassificationService;
 
     @Mock
     private DateTimeSearchResultProcessor dateTimeSearchResultProcessor;
@@ -172,18 +172,21 @@ class CaseSearchesViewAccessControlTest {
             .withCaseTypeId(CASE_TYPE_ID_1)
             .withJurisdiction(jurisdiction)
             .withField(newCaseField().withId(CASE_FIELD_1).withFieldType(textFieldType())
+                .withCaseTypeId(CASE_TYPE_ID_1)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLE_1)
                     .withRead(true)
                     .build()).build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
+                .withCaseTypeId(CASE_TYPE_ID_1)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLE_1)
                     .withRead(true)
                     .build()).build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
+                .withCaseTypeId(CASE_TYPE_ID_1)
                 .withAcl(anAcl()
                     .withRole(ROLE_IN_USER_ROLE_1)
                     .withRead(true)
@@ -267,6 +270,7 @@ class CaseSearchesViewAccessControlTest {
     void shouldReturnTrueForFilterFieldByAuthorisationAccessOnField() {
         final CaseFieldDefinition postCode = newCaseField().withId(POSTCODE)
             .withFieldType(textFieldType())
+            .withCaseTypeId(CASE_TYPE_ID_1)
             .withSC(SECURITY_CLASSIFICATION.name())
             .withAcl(anAcl()
                 .withRole(ROLE_IN_USER_ROLE_1)
@@ -376,9 +380,15 @@ class CaseSearchesViewAccessControlTest {
 
     private void mockAccessProfiles(String... roles) {
         when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
-            .thenReturn(Lists.newArrayList());
-        when(caseDataAccessControl.extractAccessProfileNames(anyList()))
-            .thenReturn(Sets.newHashSet(roles));
+            .thenReturn(createAccessProfiles(Sets.newHashSet(roles)));
+    }
+
+    private Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+        return userRoles.stream()
+            .map(userRole -> AccessProfile.builder().readOnly(false)
+                .accessProfile(userRole)
+                .build())
+            .collect(Collectors.toSet());
     }
 
 

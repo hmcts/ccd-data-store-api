@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,6 +16,8 @@ import uk.gov.hmcts.ccd.domain.model.common.HttpError;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -72,6 +75,18 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity
             .status(error.getStatus())
             .body(error);
+    }
+
+    @ExceptionHandler(SQLException.class)
+    @ResponseBody
+    public ResponseEntity<Map> handleSQLException(final SQLException exception) {
+        final String errorMsg = "SQL Exception thrown during API operation";
+        appInsights.trackException(exception);
+
+        LOG.error(errorMsg);
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(Collections.singletonMap("errorMessage", errorMsg));
     }
 
     @ExceptionHandler(Exception.class)

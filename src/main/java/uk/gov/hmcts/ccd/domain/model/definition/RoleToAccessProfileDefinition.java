@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.definition;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -10,7 +11,10 @@ import lombok.Data;
 
 @Data
 @Builder
-public class RoleToAccessProfileDefinition {
+public class RoleToAccessProfileDefinition implements Serializable {
+    private static final long serialVersionUID = 8882065812393433800L;
+
+    private static final String AUTHORISATION_SEPARATOR = ",";
 
     private String caseTypeId;
     private Boolean disabled;
@@ -23,8 +27,7 @@ public class RoleToAccessProfileDefinition {
 
     public List<String> getAuthorisationList() {
         if (getAuthorisations() != null) {
-            return Arrays.asList(getAuthorisations().split(","))
-                .stream()
+            return Arrays.stream(getAuthorisations().split(AUTHORISATION_SEPARATOR))
                 .filter(str -> str.length() > 0)
                 .collect(Collectors.toList());
         }
@@ -33,8 +36,7 @@ public class RoleToAccessProfileDefinition {
 
     public List<String> getAccessProfileList() {
         if (getAccessProfiles() != null) {
-            return Arrays.asList(getAccessProfiles().split(","))
-                .stream()
+            return Arrays.stream(getAccessProfiles().split(AUTHORISATION_SEPARATOR))
                 .filter(str -> str.length() > 0)
                 .collect(Collectors.toList());
         }
