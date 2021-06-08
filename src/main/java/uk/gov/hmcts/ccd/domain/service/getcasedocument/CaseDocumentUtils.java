@@ -50,10 +50,16 @@ public class CaseDocumentUtils {
 
     public Set<String> getTamperedHashes(@NonNull final List<Tuple2<String, String>> preCallbackHashes,
                                          @NonNull final List<Tuple2<String, String>> postCallbackHashes) {
-        final Set<String> h1 = preCallbackHashes.stream().map(x -> x.v1).collect(Collectors.toUnmodifiableSet());
-        final Set<String> h2 = postCallbackHashes.stream().map(x -> x.v1).collect(Collectors.toUnmodifiableSet());
+        final Set<String> preCallbackIds = preCallbackHashes.stream()
+            .map(x -> x.v1)
+            .collect(Collectors.toUnmodifiableSet());
 
-        return CollectionUtils.setsIntersection(h1, h2);
+        return postCallbackHashes.stream()
+            .distinct()
+            .filter(x -> preCallbackIds.contains(x.v1))
+            .filter(y -> Objects.nonNull(y.v2))
+            .map(z -> z.v1)
+            .collect(Collectors.toUnmodifiableSet());
     }
 
     public List<DocumentHashToken> buildDocumentHashToken(
