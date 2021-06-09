@@ -22,7 +22,7 @@ class AccessControlListTest {
         ObjectMapper objectMapper = new ObjectMapper();
         String value = objectMapper.writeValueAsString(accessControlList);
 
-        System.out.println(value);
+        assertEquals("{\"create\":true,\"read\":false,\"update\":false,\"delete\":false,\"role\":\"test\"}", value);
     }
 
     @Test
