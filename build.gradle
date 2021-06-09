@@ -157,6 +157,20 @@ dependencies {
     compile group: 'com.hazelcast', name: 'hazelcast', version: hazelcastVersion
     compile group: 'com.hazelcast', name: 'hazelcast-spring', version: hazelcastVersion
 
+    implementation group: 'org.springframework', name:'spring-aop', version: '5.3.7'
+    implementation group: 'org.springframework', name:'spring-aspects', version: '5.3.7'
+    implementation group: 'org.springframework', name:'spring-beans', version: '5.3.7'
+    implementation group: 'org.springframework', name:'spring-context', version: '5.3.7'
+    implementation group: 'org.springframework', name:'spring-core', version: '5.3.7'
+    implementation group: 'org.springframework', name:'spring-expression', version: '5.3.7'
+    implementation group: 'org.springframework', name:'spring-jcl', version: '5.3.7'
+    implementation group: 'org.springframework', name:'spring-jdbc', version: '5.3.7'
+    implementation group: 'org.springframework', name:'spring-orm', version: '5.3.7'
+    implementation group: 'org.springframework', name:'spring-tx', version: '5.3.7'
+    implementation group: 'org.springframework', name:'spring-web', version: '5.3.7'
+    implementation group: 'org.springframework', name:'spring-webmvc', version: '5.3.7'
+    implementation group: 'org.springframework', name:'spring-context-support', version: '5.3.7'
+
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.2'
@@ -240,7 +254,7 @@ dependencies {
     compile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
     }
-    compile(group: 'org.elasticsearch', name: 'elasticsearch', version: '6.8.14') {
+    compile(group: 'org.elasticsearch', name: 'elasticsearch', version: '6.8.15') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
