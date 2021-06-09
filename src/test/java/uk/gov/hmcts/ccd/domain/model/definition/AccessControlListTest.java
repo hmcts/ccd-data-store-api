@@ -24,6 +24,7 @@ class AccessControlListTest {
         System.out.println(value);
     }
 
+    @Test
     void shouldValidateAccessControlListSerializationWithRole() throws JsonProcessingException {
         String accessControlJson = "{\n"
             + "\t\"role\": \"caseworker-probate-public\",\n"
@@ -38,6 +39,7 @@ class AccessControlListTest {
         assertEquals(value.getAccessProfile(), "caseworker-probate-public");
     }
 
+    @Test
     void shouldValidateAccessControlListSerializationWithAccessProfile() throws JsonProcessingException {
         String accessControlJson = "{\n"
             + "\t\"accessProfile\": \"caseworker-probate-public\",\n"
