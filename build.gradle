@@ -46,10 +46,8 @@ apply plugin: 'se.patrikerdes.use-latest-versions'
 
 def versions = [
         pact_version: '4.1.7',
-        springFramework: '5.3.7'
 ]
-
-
+ext['spring-framework.version'] = '5.3.7'
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
@@ -157,20 +155,6 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-cache')
     compile group: 'com.hazelcast', name: 'hazelcast', version: hazelcastVersion
     compile group: 'com.hazelcast', name: 'hazelcast-spring', version: hazelcastVersion
-
-    implementation group: 'org.springframework', name:'spring-aop', version: versions.springFramework
-    implementation group: 'org.springframework', name:'spring-aspects', version: versions.springFramework
-    implementation group: 'org.springframework', name:'spring-beans', version: versions.springFramework
-    implementation group: 'org.springframework', name:'spring-context', version: versions.springFramework
-    implementation group: 'org.springframework', name:'spring-core', version: versions.springFramework
-    implementation group: 'org.springframework', name:'spring-expression', version: versions.springFramework
-    implementation group: 'org.springframework', name:'spring-jcl', version: versions.springFramework
-    implementation group: 'org.springframework', name:'spring-jdbc', version: versions.springFramework
-    implementation group: 'org.springframework', name:'spring-orm', version: versions.springFramework
-    implementation group: 'org.springframework', name:'spring-tx', version: versions.springFramework
-    implementation group: 'org.springframework', name:'spring-web', version: versions.springFramework
-    implementation group: 'org.springframework', name:'spring-webmvc', version: versions.springFramework
-    implementation group: 'org.springframework', name:'spring-context-support', version: versions.springFramework
 
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
