@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class AccessControlListTest {
 
@@ -52,5 +53,48 @@ class AccessControlListTest {
         ObjectMapper objectMapper = new ObjectMapper();
         AccessControlList value = objectMapper.readValue(accessControlJson, AccessControlList.class);
         assertEquals(value.getAccessProfile(), "caseworker-probate-public");
+    }
+
+    @Test
+    void shouldCreateDuplicate() {
+        AccessControlList accessControlList = new AccessControlList();
+
+        accessControlList.setUpdate(false);
+        accessControlList.setRead(false);
+        accessControlList.setDelete(false);
+        accessControlList.setCreate(true);
+        accessControlList.setAccessProfile("test");
+
+        AccessControlList duplicate  = accessControlList.duplicate();
+
+        assertNotNull(duplicate);
+        assertEquals(duplicate.getAccessProfile(), accessControlList.getAccessProfile());
+    }
+
+    @Test
+    void shouldValidateToString() {
+        AccessControlList accessControlList = new AccessControlList();
+
+        accessControlList.setUpdate(false);
+        accessControlList.setRead(false);
+        accessControlList.setDelete(false);
+        accessControlList.setCreate(true);
+        accessControlList.setAccessProfile("test");
+
+        assertNotNull(accessControlList.toString(), "ACL{accessProfile='test', crud=C}");
+    }
+
+
+    @Test
+    void shouldValidateToStringWithCRUD() {
+        AccessControlList accessControlList = new AccessControlList();
+
+        accessControlList.setUpdate(true);
+        accessControlList.setRead(true);
+        accessControlList.setDelete(true);
+        accessControlList.setCreate(true);
+        accessControlList.setAccessProfile("test");
+
+        assertNotNull(accessControlList.toString(), "ACL{accessProfile='test', crud=CRUD}");
     }
 }
