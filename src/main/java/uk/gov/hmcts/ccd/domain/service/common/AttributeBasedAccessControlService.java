@@ -26,7 +26,7 @@ public class AttributeBasedAccessControlService extends AccessControlServiceImpl
                                         Predicate<AccessControlList> criteria,
                                         List<AccessControlList> accessControlLists) {
         List<AccessControlList> newAccessControlList = applyReadOnly(accessProfiles, accessControlLists);
-        return hasAccessControlList(accessProfiles, criteria, newAccessControlList);
+        return super.hasAccessControlList(accessProfiles, criteria, newAccessControlList);
     }
 
     private List<AccessControlList> applyReadOnly(Set<AccessProfile> accessProfiles,
