@@ -37,7 +37,7 @@ class AccessControlListTest {
 
         ObjectMapper objectMapper = new ObjectMapper();
         AccessControlList value = objectMapper.readValue(accessControlJson, AccessControlList.class);
-        assertEquals(value.getAccessProfile(), "caseworker-probate-public");
+        assertEquals("caseworker-probate-public", value.getAccessProfile());
     }
 
     @Test
@@ -52,7 +52,7 @@ class AccessControlListTest {
 
         ObjectMapper objectMapper = new ObjectMapper();
         AccessControlList value = objectMapper.readValue(accessControlJson, AccessControlList.class);
-        assertEquals(value.getAccessProfile(), "caseworker-probate-public");
+        assertEquals("caseworker-probate-public", value.getAccessProfile());
     }
 
     @Test
@@ -81,7 +81,7 @@ class AccessControlListTest {
         accessControlList.setCreate(true);
         accessControlList.setAccessProfile("test");
 
-        assertNotNull(accessControlList.toString(), "ACL{accessProfile='test', crud=C}");
+        assertNotNull("ACL{accessProfile='test', crud=C}", accessControlList.toString());
     }
 
 
@@ -95,6 +95,6 @@ class AccessControlListTest {
         accessControlList.setCreate(true);
         accessControlList.setAccessProfile("test");
 
-        assertNotNull(accessControlList.toString(), "ACL{accessProfile='test', crud=CRUD}");
+        assertEquals("ACL{accessProfile='test', crud=CRUD}", accessControlList.toString());
     }
 }
