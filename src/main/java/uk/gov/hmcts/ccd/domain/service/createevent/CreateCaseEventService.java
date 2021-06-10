@@ -80,8 +80,7 @@ public class CreateCaseEventService {
     private final CaseDocumentService caseDocumentService;
 
     @Inject
-    public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER)
-                                      final UserRepository userRepository,
+    public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                   @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                       final CaseDetailsRepository caseDetailsRepository,
                                   @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
@@ -151,7 +150,7 @@ public class CreateCaseEventService {
         // Logic start from here to attach document with case ID
 
         final CaseDetails updatedCaseDetails = mergeUpdatedFieldsToCaseDetails(
-            Optional.ofNullable(content.getData()).orElse(emptyMap()),
+            content.getData(),
             caseDetails,
             caseEventDefinition,
             caseTypeDefinition
@@ -175,9 +174,9 @@ public class CreateCaseEventService {
         final LocalDateTime timeNow = now();
 
         final List<DocumentHashToken> documentHashes = caseDocumentService.extractDocumentHashToken(
-            caseDetailsInDatabase.getData(),
-            content.getData(),
-            caseDetailsAfterCallback.getData()
+            Optional.ofNullable(caseDetailsInDatabase.getData()).orElse(emptyMap()),
+            Optional.ofNullable(content.getData()).orElse(emptyMap()),
+            Optional.ofNullable(caseDetailsAfterCallback.getData()).orElse(emptyMap())
         );
 
         final CaseDetails caseDetailsAfterCallbackWithoutHashes = caseDocumentService.stripDocumentHashes(
@@ -266,7 +265,7 @@ public class CreateCaseEventService {
     }
 
     private void updateCaseState(CaseDetails caseDetails, CaseEventDefinition caseEventDefinition) {
-        String postState = casePostStateService.evaluateCaseState(caseEventDefinition, caseDetails);
+        final String postState = casePostStateService.evaluateCaseState(caseEventDefinition, caseDetails);
         if (shouldChangeState(postState)) {
             caseDetails.setState(postState);
         }
@@ -281,28 +280,35 @@ public class CreateCaseEventService {
                                                 final CaseEventDefinition caseEventDefinition,
                                                 final CaseTypeDefinition caseTypeDefinition) {
 
-        final Map<String, JsonNode> sanitisedData = caseSanitiser.sanitise(caseTypeDefinition, data);
-        final Map<String, JsonNode> caseData = new HashMap<>(Optional.ofNullable(caseDetails.getData())
-            .orElse(emptyMap()));
-        caseData.putAll(sanitisedData);
+        return Optional.ofNullable(data)
+            .map(x -> {
+                CaseDetails clonedCaseDetails = caseService.clone(caseDetails);
 
-        final Map<String, JsonNode> dataClassifications = caseDataService.getDefaultSecurityClassifications(
-            caseTypeDefinition,
-            caseDetails.getData(),
-            caseDetails.getDataClassification()
-        );
+                final Map<String, JsonNode> sanitisedData = caseSanitiser.sanitise(caseTypeDefinition, x);
+                final Map<String, JsonNode> caseData = new HashMap<>(Optional.ofNullable(caseDetails.getData())
+                    .orElse(emptyMap()));
+                caseData.putAll(sanitisedData);
+                clonedCaseDetails.setData(caseData);
 
-        final String postState = casePostStateService.evaluateCaseState(caseEventDefinition, caseDetails);
+                final Map<String, JsonNode> dataClassifications = caseDataService.getDefaultSecurityClassifications(
+                    caseTypeDefinition,
+                    clonedCaseDetails.getData(),
+                    clonedCaseDetails.getDataClassification()
+                );
 
-        CaseDetails clonedCaseDetails = caseService.clone(caseDetails);
-        clonedCaseDetails.setData(caseData);
-        clonedCaseDetails.setDataClassification(dataClassifications);
-        clonedCaseDetails.setLastModified(now());
-        if (shouldChangeState(postState)) {
-            clonedCaseDetails.setState(postState);
-        }
+                clonedCaseDetails.setDataClassification(dataClassifications);
+                clonedCaseDetails.setLastModified(now());
+                updateCaseState(clonedCaseDetails, caseEventDefinition);
 
-        return clonedCaseDetails;
+                return clonedCaseDetails;
+            })
+            .orElseGet(() -> {
+                CaseDetails clonedCaseDetails = caseService.clone(caseDetails);
+                clonedCaseDetails.setLastModified(now());
+                updateCaseState(clonedCaseDetails, caseEventDefinition);
+
+                return clonedCaseDetails;
+            });
     }
 
     private boolean shouldChangeState(final String postState) {
@@ -342,7 +348,8 @@ public class CreateCaseEventService {
             .caseDetails(caseDetails)
             .caseTypeDefinition(caseTypeDefinition)
             .caseEventDefinition(caseEventDefinition)
-            .oldState(oldState).build());
+            .oldState(oldState)
+            .build());
     }
 
     private void saveUserDetails(String onBehalfOfUserToken, AuditEvent auditEvent) {

@@ -52,7 +52,6 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
     private static final String CASE_TYPE_CREATOR_ROLE = "TestAddressBookCreatorCase";
     private CaseDataContent caseDetailsToUpdate;
 
-
     private static final int NUMBER_OF_CASES = 1;
 
     @Inject

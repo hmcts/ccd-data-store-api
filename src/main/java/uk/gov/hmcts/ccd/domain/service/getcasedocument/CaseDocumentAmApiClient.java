@@ -24,7 +24,6 @@ public class CaseDocumentAmApiClient {
     private final SecurityUtils securityUtils;
     private final ApplicationParams applicationParams;
 
-
     @Inject
     public CaseDocumentAmApiClient(final RestTemplate restTemplate,
                                    final SecurityUtils securityUtils,
