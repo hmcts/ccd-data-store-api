@@ -221,6 +221,19 @@ class DefaultCaseDataAccessControlTest {
         return roleToAccessProfileDefinitions;
     }
 
+    @Test
+    void testGetCaseUserAccessProfilesByUserId() {
+        Set<AccessProfile>  accessProfiles = defaultCaseDataAccessControl.getCaseUserAccessProfilesByUserId();
+
+        assertNotNull(accessProfiles);
+        assertEquals(0, accessProfiles.size());
+    }
+
+    @Test
+    void testGrantAccess() {
+        defaultCaseDataAccessControl.grantAccess(null, USER_ID);
+    }
+
     private List<AccessControlList> createAccessControlList() {
         AccessControlList accessControlList = new AccessControlList();
         accessControlList.setAccessProfile(ROLE_NAME_1);
