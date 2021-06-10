@@ -60,6 +60,11 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
         }
     }
 
+    @Override
+    public Set<AccessProfile> getCaseUserAccessProfilesByUserId() {
+        return userRoleToAccessProfiles(caseUserRepository.getCaseUserRolesByUserId(userRepository.getUserId()));
+    }
+
     private Set<AccessProfile> userRoleToAccessProfiles(Set<String> roles) {
         return roles
             .stream()

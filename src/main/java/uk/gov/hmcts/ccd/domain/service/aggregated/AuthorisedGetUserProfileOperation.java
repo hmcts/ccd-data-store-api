@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import com.google.common.collect.Sets;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
@@ -63,10 +64,14 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
             || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, access)) {
             return Optional.empty();
         }
+
+        Set<AccessProfile> caseAndUserRoles = Sets.union(accessProfiles,
+            caseDataAccessControl.getCaseUserAccessProfilesByUserId());
+
         caseTypeDefinition.setStates(accessControlService.filterCaseStatesByAccess(caseTypeDefinition,
-            accessProfiles, access));
+            caseAndUserRoles, access));
         caseTypeDefinition.setEvents(accessControlService.filterCaseEventsByAccess(caseTypeDefinition,
-            accessProfiles, access));
+            caseAndUserRoles, access));
 
         return Optional.of(caseTypeDefinition);
     }
