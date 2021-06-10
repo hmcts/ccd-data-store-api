@@ -207,15 +207,11 @@ class DefaultCaseDataAccessControlTest {
         List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions = Lists.newArrayList();
 
         Arrays.stream(roleNames).forEach(roleName -> {
-            roleToAccessProfileDefinitions.add(RoleToAccessProfileDefinition
-                .builder()
-                .roleName(roleName)
-                .accessProfiles(roleName)
-                .caseTypeId(CASE_TYPE_1)
-                .disabled(false)
-                .readOnly(false)
-                .authorisations(AUTHORISATION_1)
-                .build());
+            roleToAccessProfileDefinitions.add(
+                new RoleToAccessProfileDefinition(
+                    CASE_TYPE_1, false, false, AUTHORISATION_1,
+                    roleName, null, null, roleName
+                ));
         });
 
         return roleToAccessProfileDefinitions;

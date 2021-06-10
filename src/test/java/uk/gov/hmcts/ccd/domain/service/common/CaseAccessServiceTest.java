@@ -52,7 +52,6 @@ class CaseAccessServiceTest {
 
     private static final String CASE_GRANTED_1_ID = "123";
     private static final String CASE_GRANTED_2_ID = "456";
-    private static final String CASE_ROLE_CREATOR_ID = "[CREATOR]";
     private static final String CASE_REVOKED_ID = "789";
 
     private static final long CASE_REFERENCE1 = 1614249749110028L;
@@ -511,7 +510,7 @@ class CaseAccessServiceTest {
 
         private void assertGrantedCaseIds(List<Long> result) {
             assertAll(
-                () -> assertThat(result, hasItems(Long.valueOf(CASE_GRANTED_1_ID), Long.valueOf(CASE_GRANTED_2_ID))),
+                () -> assertThat(result, hasItems(Long.valueOf(CASE_REFERENCE1), Long.valueOf(CASE_REFERENCE2))),
                 () -> verify(userRepository).getUserId(),
                 () -> verify(userRepository).anyRoleMatches(any()),
                 () -> verify(caseUserRepository).findCasesUserIdHasAccessTo(USER_ID)
