@@ -109,7 +109,8 @@ class DefaultCaseDataAccessControlTest {
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
         doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
 
-        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl.generateAccessProfilesByCaseTypeId(CASE_TYPE_1);
+        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
+            .generateAccessProfilesByCaseTypeId(CASE_TYPE_1);
 
         assertNotNull(accessProfiles);
         assertEquals(1, accessProfiles.size());
@@ -239,15 +240,8 @@ class DefaultCaseDataAccessControlTest {
         return result;
     }
 
-    private Pair<RoleAssignment, RoleMatchingResult> createRoleAssignmentAndRoleMatchingResult(String roleName, String grantType) {
-        RoleAssignment roleAssignment = RoleAssignment.builder()
-            .roleName(roleName)
-            .actorId(ACTOR_ID_1)
-            .grantType(grantType)
-            .authorisations(Lists.newArrayList(AUTHORISATION_1, AUTHORISATION_2))
-            .readOnly(false)
-            .build();
-
+    private Pair<RoleAssignment, RoleMatchingResult> createRoleAssignmentAndRoleMatchingResult(String roleName,
+                                                                                               String grantType) {
         RoleMatchingResult matchingResult = new RoleMatchingResult();
         matchingResult.setCaseTypeIdMatched(true);
         matchingResult.setClassificationMatched(true);
@@ -256,6 +250,14 @@ class DefaultCaseDataAccessControlTest {
         matchingResult.setRegionMatched(true);
         matchingResult.setCaseTypeIdMatched(true);
         matchingResult.setJurisdictionMatched(true);
+
+        RoleAssignment roleAssignment = RoleAssignment.builder()
+            .roleName(roleName)
+            .actorId(ACTOR_ID_1)
+            .grantType(grantType)
+            .authorisations(Lists.newArrayList(AUTHORISATION_1, AUTHORISATION_2))
+            .readOnly(false)
+            .build();
         return Pair.of(roleAssignment, matchingResult);
     }
 }
