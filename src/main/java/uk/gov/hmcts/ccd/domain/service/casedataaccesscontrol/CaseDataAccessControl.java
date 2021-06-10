@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import java.util.HashSet;
 import java.util.Set;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 
@@ -9,5 +10,11 @@ public interface CaseDataAccessControl {
 
     Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference);
 
-    void grantAccess(String caseId, String idamUserId);
+    default Set<AccessProfile> getCaseUserAccessProfilesByUserId() {
+        return new HashSet<>();
+    }
+
+    default void grantAccess(String caseId, String idamUserId) {
+
+    }
 }

@@ -207,23 +207,19 @@ public interface AccessControlService {
                                                               Set<AccessProfile> accessProfiles) {
         caseFields.stream().filter(CommonField::isCollectionFieldType)
             .forEach(childField ->
-                childField.setDisplayContextParameter(generateDisplayContextParamer(accessProfiles, childField)));
+                childField.setDisplayContextParameter(generateDisplayContextParameter(accessProfiles, childField)));
 
         caseFields.forEach(childField ->
             setChildrenCollectionDisplayContextParameter(childField.getFieldTypeDefinition().getChildren(),
                 accessProfiles));
     }
 
-    default String generateDisplayContextParamer(Set<AccessProfile> accessProfiles, CommonField field) {
+    default String generateDisplayContextParameter(Set<AccessProfile> accessProfiles, CommonField field) {
         List<String> collectionAccess = new ArrayList<>();
         if (hasAccessControlList(accessProfiles, CAN_CREATE, field.getAccessControlLists())) {
             collectionAccess.add(ALLOW_INSERT.getOption());
         }
         if (hasAccessControlList(accessProfiles, CAN_DELETE, field.getAccessControlLists())) {
-            collectionAccess.add(ALLOW_DELETE.getOption());
-        }
-        if (hasAccessControlList(accessProfiles, CAN_UPDATE, field.getAccessControlLists())) {
-            collectionAccess.add(ALLOW_INSERT.getOption());
             collectionAccess.add(ALLOW_DELETE.getOption());
         }
 

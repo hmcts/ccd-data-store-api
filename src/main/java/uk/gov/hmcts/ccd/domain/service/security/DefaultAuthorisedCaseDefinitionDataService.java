@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.security;
 
+import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -76,7 +77,7 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
 
     private boolean verifyAclOnCaseType(CaseTypeDefinition caseTypeDefinition, Predicate<AccessControlList> access) {
         return accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition,
-            getAccessProfiles(caseTypeDefinition.getId()), access);
+            getUserAccessProfiles(caseTypeDefinition.getId()), access);
     }
 
     private boolean verifySecurityClassificationOnCaseType(CaseTypeDefinition caseTypeDefinition) {
@@ -88,7 +89,7 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     private List<CaseStateDefinition> filterCaseStatesForUser(CaseTypeDefinition caseTypeDefinition,
                                                               Predicate<AccessControlList> access) {
         return accessControlService.filterCaseStatesByAccess(caseTypeDefinition,
-            getAccessProfiles(caseTypeDefinition.getId()),
+            getCaseAndUserRoles(caseTypeDefinition.getId()),
             access);
     }
 
@@ -96,7 +97,12 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
         return caseStateDefinitions.stream().map(CaseStateDefinition::getId).collect(toList());
     }
 
-    private Set<AccessProfile> getAccessProfiles(String caseTypeId) {
+    private Set<AccessProfile> getUserAccessProfiles(String caseTypeId) {
         return caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
+    }
+
+    private Set<AccessProfile> getCaseAndUserRoles(String caseTypeId) {
+        return Sets.union(getUserAccessProfiles(caseTypeId),
+            caseDataAccessControl.getCaseUserAccessProfilesByUserId());
     }
 }

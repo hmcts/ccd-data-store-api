@@ -136,9 +136,4 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         augmented.addAll(filteringResults.getRoleAssignmentMatchingResults());
         return new RoleAssignmentFilteringResult(augmented);
     }
-
-    @Override
-    public void grantAccess(String caseId, String idamUserId) {
-
-    }
 }
