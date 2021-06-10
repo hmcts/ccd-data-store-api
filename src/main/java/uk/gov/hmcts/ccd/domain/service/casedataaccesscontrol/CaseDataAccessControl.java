@@ -14,5 +14,7 @@ public interface CaseDataAccessControl {
         return new HashSet<>();
     }
 
-    void grantAccess(String caseId, String idamUserId);
+    default void grantAccess(String caseId, String idamUserId) {
+
+    }
 }
