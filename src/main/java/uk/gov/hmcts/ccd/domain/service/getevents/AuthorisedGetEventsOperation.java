@@ -1,9 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.getevents;
 
 import com.google.common.collect.Lists;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -15,6 +12,10 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -49,7 +50,7 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
     @Override
     public List<AuditEvent> getEvents(String jurisdiction, String caseTypeId, String caseReference) {
         List<AuditEvent> auditEvents = getEventsOperation.getEvents(jurisdiction, caseTypeId, caseReference);
-        return secureEvents(caseTypeId, auditEvents.get(0).getCaseDataId(),  auditEvents);
+        return secureEvents(caseTypeId, auditEvents.get(0).getCaseDataId(), auditEvents);
     }
 
     @Override
@@ -71,7 +72,7 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
         if (events == null || events.size() == 0) {
             return Lists.newArrayList();
         }
-        return secureEvents(events.get(0).getCaseTypeId(), events.get(0).getCaseDataId(),  events);
+        return secureEvents(events.get(0).getCaseTypeId(), events.get(0).getCaseDataId(), events);
     }
 
     private List<AuditEvent> secureEvents(String caseTypeId, String caseId, List<AuditEvent> events) {
@@ -83,7 +84,6 @@ public class AuthorisedGetEventsOperation implements GetEventsOperation {
         if (caseTypeDefinition == null) {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
-
         Set<AccessProfile> accessRoles = caseAccessService.getAccessProfilesByCaseReference(caseId);
         if (accessRoles == null || accessRoles.isEmpty()) {
             throw new ValidationException("Cannot find user roles or case roles for the case ID " + caseId);

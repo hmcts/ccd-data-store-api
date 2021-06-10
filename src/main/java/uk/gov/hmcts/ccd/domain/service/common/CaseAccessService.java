@@ -49,8 +49,8 @@ public class CaseAccessService {
     private final CaseDataAccessControl caseDataAccessControl;
 
     private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN
-        = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-."
-        + "+-localAuthority$");
+            = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-."
+            + "+-localAuthority$");
 
     public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                              @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
@@ -86,15 +86,15 @@ public class CaseAccessService {
 
     public Optional<List<Long>> getGrantedCaseIdsForRestrictedRoles() {
         if (userCanOnlyAccessExplicitlyGrantedCases()) {
-            final List<Long> caseIds;
+            final List<Long> caseRefernces;
             if (applicationParams.getEnableAttributeBasedAccessControl()) {
-                caseIds = roleAssignmentService.getCaseIdsForAGivenUser(userRepository.getUserId())
+                caseRefernces = roleAssignmentService.getCaseIdsForAGivenUser(userRepository.getUserId())
                     .stream().map(Long::parseLong).collect(Collectors.toList());
             } else {
                 final var ids = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
-                caseIds = caseDetailsRepository.findCaseReferencesByIds(ids);
+                caseRefernces = caseDetailsRepository.findCaseReferencesByIds(ids);
             }
-            return Optional.of(caseIds);
+            return Optional.of(caseRefernces);
         }
         return Optional.empty();
     }

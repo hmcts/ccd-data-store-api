@@ -81,7 +81,10 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     public Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference) {
         Optional<CaseDetails> caseDetails =  caseDetailsRepository.findByReference(caseReference);
         if (caseDetails.isEmpty()) {
-            return Sets.newHashSet();
+            caseDetails = caseDetailsRepository.findById(null,Long.parseLong(caseReference));
+            if (caseDetails.isEmpty()) {
+                return Sets.newHashSet();
+            }
         }
         RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
         RoleAssignmentFilteringResult filteringResults = roleAssignmentsFilteringService
