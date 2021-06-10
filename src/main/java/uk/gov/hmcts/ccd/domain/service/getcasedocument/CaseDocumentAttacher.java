@@ -34,7 +34,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
-
+@Deprecated
 public class CaseDocumentAttacher {
 
     Map<String, String> documentsBeforeCallback = new HashMap<>();
