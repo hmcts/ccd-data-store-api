@@ -34,7 +34,7 @@ public class UserService {
                        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                            CaseDefinitionRepository caseDefinitionRepository,
                        JurisdictionMapper jurisdictionMapper,
-                       @Qualifier(IdamJurisdictionsResolver.QUALIFIER) JurisdictionsResolver jurisdictionsResolver) {
+                       @Qualifier(DefaultJurisdictionsResolver.QUALIFIER) JurisdictionsResolver jurisdictionsResolver) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.jurisdictionMapper = jurisdictionMapper;
