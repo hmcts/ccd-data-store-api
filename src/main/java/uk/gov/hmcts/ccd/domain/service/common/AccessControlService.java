@@ -223,9 +223,9 @@ public interface AccessControlService {
         if (hasAccessControlList(accessProfiles, CAN_DELETE, field.getAccessControlLists())) {
             collectionAccess.add(ALLOW_DELETE.getOption());
         }
-//        if (hasAccessControlList(accessProfiles, CAN_UPDATE, field.getAccessControlLists())) {
-//            collectionAccess.add(ALLOW_UPDATE.getOption());
-//        }
+    //        if (hasAccessControlList(accessProfiles, CAN_UPDATE, field.getAccessControlLists())) {
+    //            collectionAccess.add(ALLOW_UPDATE.getOption());
+    //        }
 
 
         return DisplayContextParameterUtil.updateCollectionDisplayContextParameter(field.getDisplayContextParameter(),
