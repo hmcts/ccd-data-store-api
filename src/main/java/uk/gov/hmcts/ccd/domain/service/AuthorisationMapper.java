@@ -7,13 +7,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.BooleanUtils;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 
-public interface AuthorisationMapper {
+@Component
+public class AuthorisationMapper {
 
-    default Map<String, RoleToAccessProfileDefinition> toRoleNameAsKeyMap(
+    public Map<String, RoleToAccessProfileDefinition> toRoleNameAsKeyMap(
         List<RoleToAccessProfileDefinition> roleToAccessProfiles) {
         return roleToAccessProfiles
             .stream()
@@ -22,7 +24,7 @@ public interface AuthorisationMapper {
                 Function.identity()));
     }
 
-    default boolean authorisationsAllowMappingToAccessProfiles(List<String> authorisations,
+    public boolean authorisationsAllowMappingToAccessProfiles(List<String> authorisations,
                                                                List<String> roleAssignmentAuthorisations) {
         if (roleAssignmentAuthorisations != null
             && !authorisations.isEmpty()) {
@@ -34,7 +36,7 @@ public interface AuthorisationMapper {
         return authorisations.isEmpty();
     }
 
-    default List<AccessProfile> createAccessProfiles(RoleAssignment roleAssignment,
+    public List<AccessProfile> createAccessProfiles(RoleAssignment roleAssignment,
                                                      RoleToAccessProfileDefinition roleToAccessProfileDefinition) {
         List<String> accessProfileList = roleToAccessProfileDefinition.getAccessProfileList();
         return accessProfileList

@@ -28,8 +28,8 @@ public class BeginDateEndDateMatcher implements RoleAttributeMatcher {
             roleAssignment.getId());
         if (roleAssignment.getBeginTime() != null && roleAssignment.getEndTime() != null) {
             Instant now = Instant.now();
-            return roleAssignment.getBeginTime().compareTo(now) < 0
-                && roleAssignment.getEndTime().compareTo(now) > 0;
+            return roleAssignment.getBeginTime().isBefore(now)
+                && roleAssignment.getEndTime().isAfter(now);
         }
         return false;
     }

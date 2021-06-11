@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
+import uk.gov.hmcts.ccd.domain.service.AuthorisationMapper;
 import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.BaseFilter;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
@@ -33,7 +34,7 @@ class AuthorisationsMatcherTest extends BaseFilter {
     @BeforeEach
     void setUp() {
         caseTypeService = mock(CaseTypeService.class);
-        classUnderTest = new AuthorisationsMatcher(caseTypeService);
+        classUnderTest = new AuthorisationsMatcher(caseTypeService, new AuthorisationMapper());
     }
 
     @Test

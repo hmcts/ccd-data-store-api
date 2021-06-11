@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import java.util.List;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,14 +29,8 @@ public class RoleAssignmentsFilteringServiceImpl implements RoleAssignmentsFilte
                                                 CaseDetails caseDetails) {
         log.info("Filter role assignments for case {}", caseDetails.getReference());
 
-        return roleAssignments
-            .getRoleAssignments()
-            .stream()
-            .filter(roleAssignment -> roleAttributeMatchers
-                .stream()
-                .map(matcher -> matcher.matchAttribute(roleAssignment, caseDetails))
-                .allMatch(matched -> matched == true))
-            .collect(Collectors.toList());
+        return filterMatchingRoleAssignments(roleAssignments,
+            (matcher, roleAssignment) -> matcher.matchAttribute(roleAssignment, caseDetails));
     }
 
     @Override
@@ -43,13 +38,21 @@ public class RoleAssignmentsFilteringServiceImpl implements RoleAssignmentsFilte
                                                       CaseTypeDefinition caseTypeDefinition) {
         log.info("Filter role assignments for case type {}", caseTypeDefinition.getName());
 
+        return filterMatchingRoleAssignments(roleAssignments,
+            (matcher, roleAssignment) -> matcher.matchAttribute(roleAssignment, caseTypeDefinition));
+
+    }
+
+
+    private List<RoleAssignment> filterMatchingRoleAssignments(
+        RoleAssignments roleAssignments,
+        BiPredicate<RoleAttributeMatcher, RoleAssignment> hasMatch) {
         return roleAssignments
             .getRoleAssignments()
             .stream()
             .filter(roleAssignment -> roleAttributeMatchers
                 .stream()
-                .map(matcher -> matcher.matchAttribute(roleAssignment, caseTypeDefinition))
-                .allMatch(matched -> matched == true))
+                .allMatch(matcher -> hasMatch.test(matcher, roleAssignment)))
             .collect(Collectors.toList());
     }
 

@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
@@ -11,7 +12,14 @@ import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.AuthorisationMapper;
 
 @Component
-public class AccessProfileServiceImpl implements AccessProfileService, AccessControl, AuthorisationMapper {
+public class AccessProfileServiceImpl implements AccessProfileService, AccessControl {
+
+    private AuthorisationMapper authorisationMapper;
+
+    @Autowired
+    public AccessProfileServiceImpl(AuthorisationMapper authorisationMapper) {
+        this.authorisationMapper = authorisationMapper;
+    }
 
     @Override
     @SuppressWarnings("checkstyle:LineLength")
@@ -21,7 +29,7 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
         // TODO: Think about improving this, as most of this logic is already done in AuthorisationsMatcher
         List<AccessProfile> accessProfiles = new ArrayList<>();
         Map<String, RoleToAccessProfileDefinition> roleToAccessProfileDefinitionMap =
-            toRoleNameAsKeyMap(roleToAccessProfilesMappings);
+            authorisationMapper.toRoleNameAsKeyMap(roleToAccessProfilesMappings);
 
         for (RoleAssignment roleAssignment : filteredRoleAssignments) {
 
@@ -32,9 +40,10 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
                 List<String> definitionAuthorisations = roleToAccessProfileDefinition.getAuthorisationList();
                 List<String> roleAssignmentAuthorisations = roleAssignment.getAuthorisations();
 
-                if (authorisationsAllowMappingToAccessProfiles(definitionAuthorisations,
+                if (authorisationMapper.authorisationsAllowMappingToAccessProfiles(definitionAuthorisations,
                     roleAssignmentAuthorisations)) {
-                    accessProfiles.addAll(createAccessProfiles(roleAssignment, roleToAccessProfileDefinition));
+                    accessProfiles.addAll(authorisationMapper
+                        .createAccessProfiles(roleAssignment, roleToAccessProfileDefinition));
                 }
             }
         }

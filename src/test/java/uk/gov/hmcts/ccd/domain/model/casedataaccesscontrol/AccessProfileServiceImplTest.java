@@ -6,6 +6,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
+import uk.gov.hmcts.ccd.domain.service.AuthorisationMapper;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.AccessProfileServiceImpl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,7 +20,8 @@ class AccessProfileServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        roleAssignmentMapper = new AccessProfileServiceImpl();
+        AuthorisationMapper authorisationMapper = new AuthorisationMapper();
+        roleAssignmentMapper = new AccessProfileServiceImpl(authorisationMapper);
     }
 
     @Test
