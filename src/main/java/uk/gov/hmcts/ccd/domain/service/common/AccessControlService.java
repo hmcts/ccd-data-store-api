@@ -38,7 +38,7 @@ import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
 import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollectionOptions.ALLOW_DELETE;
 import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollectionOptions.ALLOW_INSERT;
-import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollectionOptions.ALLOW_UPDATE;
+//import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollectionOptions.ALLOW_UPDATE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
 public interface AccessControlService {
@@ -223,9 +223,9 @@ public interface AccessControlService {
         if (hasAccessControlList(accessProfiles, CAN_DELETE, field.getAccessControlLists())) {
             collectionAccess.add(ALLOW_DELETE.getOption());
         }
-        if (hasAccessControlList(accessProfiles, CAN_UPDATE, field.getAccessControlLists())) {
-            collectionAccess.add(ALLOW_UPDATE.getOption());
-        }
+//        if (hasAccessControlList(accessProfiles, CAN_UPDATE, field.getAccessControlLists())) {
+//            collectionAccess.add(ALLOW_UPDATE.getOption());
+//        }
 
 
         return DisplayContextParameterUtil.updateCollectionDisplayContextParameter(field.getDisplayContextParameter(),
