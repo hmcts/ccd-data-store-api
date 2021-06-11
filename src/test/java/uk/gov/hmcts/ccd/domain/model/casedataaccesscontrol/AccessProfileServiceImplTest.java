@@ -1,14 +1,12 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.lang3.tuple.Pair;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.AccessProfileServiceImpl;
-
-import java.util.Collections;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -26,9 +24,9 @@ class AccessProfileServiceImplTest {
 
     @Test
     void shouldNotReturnAccessProfilesWhenGrantTypeExcluded() {
-        RoleAssignmentFilteringResult filteringResult = mockRoleAssignmentFilteringResultWithGrantTypeExcluded();
+        List<RoleAssignment> roleAssignments = mockRoleAssignmentFilteringResultWithGrantTypeExcluded();
         List<AccessProfile> mappedAccessProfiles = roleAssignmentMapper
-            .generateAccessProfiles(filteringResult, Collections.emptyList());
+            .generateAccessProfiles(roleAssignments, Collections.emptyList());
 
         assertNotNull(mappedAccessProfiles);
         assertEquals(0, mappedAccessProfiles.size());
@@ -36,11 +34,11 @@ class AccessProfileServiceImplTest {
 
     @Test
     void shouldNotReturnAccessProfilesWhenRoleNamesDidNotMatch() {
-        RoleAssignmentFilteringResult filteringResult = mockRoleAssignmentFilteringWithRoleNames();
+        List<RoleAssignment> roleAssignments = mockRoleAssignmentFilteringWithRoleNames();
         List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions =
             mockCaseTypeDefinitionWithRoleAssignments("TestName", "TestName1", "", "");
         List<AccessProfile> mappedAccessProfiles = roleAssignmentMapper
-            .generateAccessProfiles(filteringResult, roleToAccessProfileDefinitions);
+            .generateAccessProfiles(roleAssignments, roleToAccessProfileDefinitions);
 
         assertNotNull(mappedAccessProfiles);
         assertEquals(0, mappedAccessProfiles.size());
@@ -48,11 +46,11 @@ class AccessProfileServiceImplTest {
 
     @Test
     void shouldReturnAccessProfilesWhenAuthorisationsEmpty() {
-        RoleAssignmentFilteringResult filteringResult = mockRoleAssignmentFilteringWithRoleNames();
+        List<RoleAssignment> roleAssignments = mockRoleAssignmentFilteringWithRoleNames();
         List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions =
             mockCaseTypeDefinitionWithRoleAssignments("RoleName", "RoleName1", "", "");
         List<AccessProfile> mappedAccessProfiles = roleAssignmentMapper
-            .generateAccessProfiles(filteringResult, roleToAccessProfileDefinitions);
+            .generateAccessProfiles(roleAssignments, roleToAccessProfileDefinitions);
 
         assertNotNull(mappedAccessProfiles);
         assertEquals(4, mappedAccessProfiles.size());
@@ -60,12 +58,12 @@ class AccessProfileServiceImplTest {
 
     @Test
     void shouldNotReturnAccessProfilesWhenAuthorisationsEmptyOnRoleAssignment() {
-        RoleAssignmentFilteringResult filteringResult = mockRoleAssignmentFilteringWithAuthorisations(
+        List<RoleAssignment> roleAssignments = mockRoleAssignmentFilteringWithAuthorisations(
             null, Lists.newArrayList());
         List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions =
             mockCaseTypeDefinitionWithRoleAssignments("RoleName", "RoleName1", "auth1,auth2", "auth3,auth4");
         List<AccessProfile> mappedAccessProfiles = roleAssignmentMapper
-            .generateAccessProfiles(filteringResult, roleToAccessProfileDefinitions);
+            .generateAccessProfiles(roleAssignments, roleToAccessProfileDefinitions);
 
         assertNotNull(mappedAccessProfiles);
         assertEquals(0, mappedAccessProfiles.size());
@@ -73,13 +71,13 @@ class AccessProfileServiceImplTest {
 
     @Test
     void shouldReturnAccessProfilesWhenAuthorisationsMatch() {
-        RoleAssignmentFilteringResult filteringResult = mockRoleAssignmentFilteringWithAuthorisations(
+        List<RoleAssignment> roleAssignments = mockRoleAssignmentFilteringWithAuthorisations(
             Lists.newArrayList("auth2"),
             Lists.newArrayList("auth3"));
         List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions =
             mockCaseTypeDefinitionWithRoleAssignments("RoleName", "RoleName1", "auth1,auth2", "auth3,auth4");
         List<AccessProfile> mappedAccessProfiles = roleAssignmentMapper
-            .generateAccessProfiles(filteringResult, roleToAccessProfileDefinitions);
+            .generateAccessProfiles(roleAssignments, roleToAccessProfileDefinitions);
 
         assertNotNull(mappedAccessProfiles);
         assertEquals(4, mappedAccessProfiles.size());
@@ -87,13 +85,13 @@ class AccessProfileServiceImplTest {
 
     @Test
     void shouldReturnAccessProfilesWhenAuthorisationsMatchWhenGrantTypeExcludedInRoleAssignments() {
-        RoleAssignmentFilteringResult filteringResult = mockRoleAssignmentFilteringWithGrantTypeAndOtherGrantTypes(
+        List<RoleAssignment> roleAssignments = mockRoleAssignmentFilteringWithGrantTypeAndOtherGrantTypes(
             Lists.newArrayList("auth2"),
             Lists.newArrayList("auth3"));
         List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions =
             mockCaseTypeDefinitionWithRoleAssignments("RoleName", "RoleName1", "auth1,auth2", "auth3,auth4");
         List<AccessProfile> mappedAccessProfiles = roleAssignmentMapper
-            .generateAccessProfiles(filteringResult, roleToAccessProfileDefinitions);
+            .generateAccessProfiles(roleAssignments, roleToAccessProfileDefinitions);
 
         assertNotNull(mappedAccessProfiles);
         assertEquals(4, mappedAccessProfiles.size());
@@ -101,13 +99,13 @@ class AccessProfileServiceImplTest {
 
     @Test
     void shouldReturnAccessProfilesWhenReadOnlyAttributesSet() {
-        RoleAssignmentFilteringResult filteringResult = mockRoleAssignmentFilteringWithAuthorisations(
+        List<RoleAssignment> roleAssignments = mockRoleAssignmentFilteringWithAuthorisations(
             Lists.newArrayList("auth2"),
             Lists.newArrayList("auth53"));
         List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions =
             mockCaseTypeDefinitionWithRoleAssignments("RoleName", null, "auth1,auth2", "auth3,auth4");
         List<AccessProfile> mappedAccessProfiles = roleAssignmentMapper
-            .generateAccessProfiles(filteringResult, roleToAccessProfileDefinitions);
+            .generateAccessProfiles(roleAssignments, roleToAccessProfileDefinitions);
 
         assertNotNull(mappedAccessProfiles);
         assertEquals(2, mappedAccessProfiles.size());
@@ -116,33 +114,30 @@ class AccessProfileServiceImplTest {
 
     @Test
     void shouldReturnAccessProfilesWhenReadOnlyAttributesAreFalse() {
-        RoleAssignmentFilteringResult filteringResult = mockRoleAssignmentFilteringWithAuthorisations(
+        List<RoleAssignment> roleAssignments = mockRoleAssignmentFilteringWithAuthorisations(
             Lists.newArrayList("auth22"),
             Lists.newArrayList("auth3"));
         List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions =
             mockCaseTypeDefinitionWithRoleAssignments("RoleName", "RoleName1", "auth1,auth2", "auth3,auth4");
         List<AccessProfile> mappedAccessProfiles = roleAssignmentMapper
-            .generateAccessProfiles(filteringResult, roleToAccessProfileDefinitions);
+            .generateAccessProfiles(roleAssignments, roleToAccessProfileDefinitions);
 
         assertNotNull(mappedAccessProfiles);
         assertEquals(2, mappedAccessProfiles.size());
         assertEquals(false, mappedAccessProfiles.get(0).getReadOnly());
     }
 
-    private RoleAssignmentFilteringResult mockRoleAssignmentFilteringResultWithGrantTypeExcluded() {
-
+    private List<RoleAssignment> mockRoleAssignmentFilteringResultWithGrantTypeExcluded() {
         RoleAssignment roleAssignment = mock(RoleAssignment.class);
         when(roleAssignment.getGrantType()).thenReturn(GrantType.EXCLUDED.name());
 
         RoleAssignment roleAssignment1 = mock(RoleAssignment.class);
         when(roleAssignment1.getGrantType()).thenReturn(GrantType.EXCLUDED.name());
 
-        return new RoleAssignmentFilteringResult(Lists.newArrayList(
-            Pair.of(roleAssignment, mock(RoleMatchingResult.class)),
-            Pair.of(roleAssignment, mock(RoleMatchingResult.class))));
+        return Lists.newArrayList(roleAssignment, roleAssignment1);
     }
 
-    private RoleAssignmentFilteringResult mockRoleAssignmentFilteringWithRoleNames() {
+    private List<RoleAssignment> mockRoleAssignmentFilteringWithRoleNames() {
         RoleAssignment roleAssignment = mock(RoleAssignment.class);
         when(roleAssignment.getGrantType()).thenReturn(GrantType.BASIC.name());
         when(roleAssignment.getRoleName()).thenReturn("RoleName");
@@ -151,9 +146,7 @@ class AccessProfileServiceImplTest {
         when(roleAssignment1.getGrantType()).thenReturn(GrantType.SPECIFIC.name());
         when(roleAssignment1.getRoleName()).thenReturn("RoleName1");
 
-        return new RoleAssignmentFilteringResult(Lists.newArrayList(
-            Pair.of(roleAssignment, mock(RoleMatchingResult.class)),
-            Pair.of(roleAssignment, mock(RoleMatchingResult.class))));
+        return Lists.newArrayList(roleAssignment, roleAssignment1);
     }
 
     private List<RoleToAccessProfileDefinition> mockCaseTypeDefinitionWithRoleAssignments(String roleName1,
@@ -185,7 +178,7 @@ class AccessProfileServiceImplTest {
             roleToAccessProfileDefinition1);
     }
 
-    private RoleAssignmentFilteringResult mockRoleAssignmentFilteringWithAuthorisations(List<String> authorisations1,
+    private List<RoleAssignment> mockRoleAssignmentFilteringWithAuthorisations(List<String> authorisations1,
                                                                                         List<String> authorisations2) {
         RoleAssignment roleAssignment = mock(RoleAssignment.class);
         when(roleAssignment.getGrantType()).thenReturn(GrantType.BASIC.name());
@@ -199,13 +192,11 @@ class AccessProfileServiceImplTest {
         when(roleAssignment1.getAuthorisations()).thenReturn(authorisations2);
         when(roleAssignment1.getReadOnly()).thenReturn(false);
 
-        return new RoleAssignmentFilteringResult(Lists.newArrayList(
-            Pair.of(roleAssignment, mock(RoleMatchingResult.class)),
-            Pair.of(roleAssignment1, mock(RoleMatchingResult.class))));
+        return Lists.newArrayList(roleAssignment, roleAssignment1);
     }
 
 
-    private RoleAssignmentFilteringResult mockRoleAssignmentFilteringWithGrantTypeAndOtherGrantTypes(
+    private List<RoleAssignment> mockRoleAssignmentFilteringWithGrantTypeAndOtherGrantTypes(
         List<String> authorisations1,
         List<String> authorisations2) {
 
@@ -227,9 +218,8 @@ class AccessProfileServiceImplTest {
         when(roleAssignment2.getAuthorisations()).thenReturn(authorisations1);
         when(roleAssignment2.getReadOnly()).thenReturn(false);
 
-        return new RoleAssignmentFilteringResult(Lists.newArrayList(
-            Pair.of(roleAssignment, mock(RoleMatchingResult.class)),
-            Pair.of(roleAssignment1, mock(RoleMatchingResult.class)),
-            Pair.of(roleAssignment2, mock(RoleMatchingResult.class))));
+        return Lists.newArrayList(roleAssignment,
+            roleAssignment1,
+            roleAssignment2);
     }
 }

@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import com.google.common.collect.Sets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -18,10 +18,9 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleMatchingResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
@@ -71,10 +70,10 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     public Set<AccessProfile> generateAccessProfilesByCaseTypeId(String caseTypeId) {
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
-        RoleAssignmentFilteringResult filteringResults = roleAssignmentsFilteringService
+        List<RoleAssignment> filteredRoleAssignments = roleAssignmentsFilteringService
             .filter(roleAssignments, caseTypeDefinition);
 
-        return Sets.newHashSet(filteredAccessProfiles(filteringResults, caseTypeDefinition));
+        return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments, caseTypeDefinition));
     }
 
     @Override
@@ -84,53 +83,56 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
             return Sets.newHashSet();
         }
         RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
-        RoleAssignmentFilteringResult filteringResults = roleAssignmentsFilteringService
+        List<RoleAssignment> filteringResults = roleAssignmentsFilteringService
             .filter(roleAssignments, caseDetails.get());
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.get().getCaseTypeId());
 
         return Sets.newHashSet(filteredAccessProfiles(filteringResults, caseTypeDefinition));
     }
 
-    private List<AccessProfile> filteredAccessProfiles(RoleAssignmentFilteringResult filteringResults,
+    private List<AccessProfile> filteredAccessProfiles(List<RoleAssignment> filteredRoleAssignments,
                                                        CaseTypeDefinition caseTypeDefinition) {
         if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
             List<RoleAssignment> pseudoRoleAssignments = pseudoRoleAssignmentsGenerator
-                .createPseudoRoleAssignments(filteringResults);
-            filteringResults = augment(filteringResults, pseudoRoleAssignments);
+                .createPseudoRoleAssignments(filteredRoleAssignments);
+            filteredRoleAssignments = augment(filteredRoleAssignments, pseudoRoleAssignments);
         }
 
-        if (filteringResults.hasGrantTypeExcludedRole()) {
-            filteringResults = filteringResults.retainBasicAndSpecificGrantTypeRolesOnly();
+        if (hasGrantTypeExcludedRole(filteredRoleAssignments)) {
+            filteredRoleAssignments = retainBasicAndSpecificGrantTypeRolesOnly(filteredRoleAssignments);
         }
 
-        return generateAccessProfiles(filteringResults, caseTypeDefinition);
+        return generateAccessProfiles(filteredRoleAssignments, caseTypeDefinition);
     }
 
 
-    private List<AccessProfile> generateAccessProfiles(RoleAssignmentFilteringResult filteringResults,
+    private List<AccessProfile> generateAccessProfiles(List<RoleAssignment> filteredRoleAssignments,
                                                        CaseTypeDefinition caseTypeDefinition) {
+        List<RoleToAccessProfileDefinition> pseudoAccessProfilesMappings = new ArrayList<>();
+        pseudoAccessProfilesMappings.addAll(caseTypeDefinition.getRoleToAccessProfiles());
         if (applicationParams.getEnablePseudoAccessProfilesGeneration()) {
-            List<RoleToAccessProfileDefinition> pseudoAccessProfilesMappings =
-                pseudoRoleToAccessProfileGenerator.generate(caseTypeDefinition);
-
-            pseudoAccessProfilesMappings.addAll(caseTypeDefinition.getRoleToAccessProfiles());
-
-            return accessProfileService
-                .generateAccessProfiles(filteringResults, pseudoAccessProfilesMappings);
-        } else {
-            return accessProfileService
-                .generateAccessProfiles(filteringResults, caseTypeDefinition.getRoleToAccessProfiles());
+            pseudoAccessProfilesMappings.addAll(pseudoRoleToAccessProfileGenerator.generate(caseTypeDefinition));
         }
+        return accessProfileService.generateAccessProfiles(filteredRoleAssignments, pseudoAccessProfilesMappings);
     }
 
-    private RoleAssignmentFilteringResult augment(RoleAssignmentFilteringResult filteringResults,
+    private List<RoleAssignment> augment(List<RoleAssignment> filteredRoleAssignments,
                                                   List<RoleAssignment> pseudoRoleAssignments) {
-        List<Pair<RoleAssignment, RoleMatchingResult>> augmented = pseudoRoleAssignments
-            .stream()
-            .map(roleAssignment -> Pair.of(roleAssignment, new RoleMatchingResult()))
-            .collect(Collectors.toList());
-
-        augmented.addAll(filteringResults.getRoleAssignmentMatchingResults());
-        return new RoleAssignmentFilteringResult(augmented);
+        pseudoRoleAssignments.addAll(filteredRoleAssignments);
+        return pseudoRoleAssignments;
     }
+
+    public boolean hasGrantTypeExcludedRole(List<RoleAssignment> roleAssignments) {
+        return roleAssignments.stream()
+            .anyMatch(roleAssignment -> roleAssignment.getGrantType().equals(GrantType.EXCLUDED.name()));
+    }
+
+    public List<RoleAssignment> retainBasicAndSpecificGrantTypeRolesOnly(List<RoleAssignment> roleAssignments) {
+        return roleAssignments
+            .stream()
+            .filter(roleAssignment -> roleAssignment.getGrantType().equals(GrantType.BASIC.name())
+                || roleAssignment.getGrantType().equals(GrantType.SPECIFIC.name()))
+            .collect(Collectors.toList());
+    }
+
 }

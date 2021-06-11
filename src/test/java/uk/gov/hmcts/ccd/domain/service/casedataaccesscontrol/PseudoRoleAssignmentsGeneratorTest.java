@@ -3,8 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,8 +14,6 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleMatchingResult;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 
@@ -85,7 +81,7 @@ class PseudoRoleAssignmentsGeneratorTest {
             List<RoleAssignment> roleAssignments = singletonList(caseRoleAssignment());
 
             List<RoleAssignment> augmentedRoleAssignments = pseudoRoleAssignmentsGenerator
-                .createPseudoRoleAssignments(createRoleAssignmentFilteringResult(roleAssignments));
+                .createPseudoRoleAssignments(roleAssignments);
 
             Optional<RoleAssignment> caseworker1RoleAssignment = augmentedRoleAssignments
                 .stream().filter(ra -> EXPECTED_ROLE_CASEWORKER_1.equals(ra.getRoleName())).findFirst();
@@ -135,7 +131,7 @@ class PseudoRoleAssignmentsGeneratorTest {
             List<RoleAssignment> roleAssignments = singletonList(organisationRoleAssignment());
 
             List<RoleAssignment> augmentedRoleAssignments = pseudoRoleAssignmentsGenerator
-                .createPseudoRoleAssignments(createRoleAssignmentFilteringResult(roleAssignments));
+                .createPseudoRoleAssignments(roleAssignments);
 
             assertAll(
                 () -> assertThat(augmentedRoleAssignments.size(), is(0))
@@ -157,7 +153,7 @@ class PseudoRoleAssignmentsGeneratorTest {
             List<RoleAssignment> roleAssignments = singletonList(organisationRoleAssignment());
 
             List<RoleAssignment> augmentedRoleAssignments = pseudoRoleAssignmentsGenerator
-                .createPseudoRoleAssignments(createRoleAssignmentFilteringResult(roleAssignments));
+                .createPseudoRoleAssignments(roleAssignments);
 
             Optional<RoleAssignment> caseworker1RoleAssignment = augmentedRoleAssignments
                 .stream().filter(ra -> EXPECTED_ROLE_CASEWORKER_1.equals(ra.getRoleName())).findFirst();
@@ -180,14 +176,6 @@ class PseudoRoleAssignmentsGeneratorTest {
 
                 () -> verify(userRepository).getUserRoles()
             );
-        }
-
-        private RoleAssignmentFilteringResult createRoleAssignmentFilteringResult(
-            List<RoleAssignment> roleAssignments) {
-            return new RoleAssignmentFilteringResult(roleAssignments.stream()
-                                                         .map(roleAssignment ->
-                                                                  Pair.of(roleAssignment, new RoleMatchingResult()))
-                                                         .collect(Collectors.toList()));
         }
 
         private RoleAssignment caseRoleAssignment() {
