@@ -88,6 +88,14 @@ class AuditInterceptorTest {
         assertThat(AuditContextHolder.getAuditContext()).isNull();
 
         verify(auditService).audit(auditContext);
+
+        auditContext = new AuditContext();
+        request.removeHeader(AuditInterceptor.REQUEST_ID);
+        interceptor.afterCompletion(request, response, handler, null);
+        assertThat(auditContext.getRequestId()).isNull();
+
+        assertThat(AuditContextHolder.getAuditContext()).isNull();
+
     }
 
     @Test
