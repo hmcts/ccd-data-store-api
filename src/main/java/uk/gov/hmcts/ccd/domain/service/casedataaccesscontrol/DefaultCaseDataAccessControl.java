@@ -137,11 +137,6 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     }
 
     @Override
-    public void grantAccess(String caseId, String idamUserId) {
-
-    }
-
-    @Override
     public CaseAccessMetadata generateAccessMetadata(String caseReference) {
         Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(caseReference);
 

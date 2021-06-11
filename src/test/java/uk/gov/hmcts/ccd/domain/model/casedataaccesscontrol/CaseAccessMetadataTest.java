@@ -18,7 +18,8 @@ class CaseAccessMetadataTest {
     void testGetAccessGrantsString() {
         caseAccessMetadata.setAccessGrants(List.of(CHALLENGED, BASIC, STANDARD, EXCLUDED));
 
-        String expectedSortedValue = BASIC + "," + CHALLENGED + "," + EXCLUDED + "," + STANDARD;
+        String expectedSortedValue = String.join(",", BASIC.name(),
+            CHALLENGED.name(), EXCLUDED.name(), STANDARD.name());
         assertEquals(expectedSortedValue, caseAccessMetadata.getAccessGrantsString());
     }
 
