@@ -10,7 +10,6 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.RoleAttributeMatcher;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 
 @Slf4j
@@ -35,21 +34,6 @@ public class RoleAssignmentsFilteringServiceImpl implements RoleAssignmentsFilte
             .filter(roleAssignment -> roleAttributeMatchers
                 .stream()
                 .map(matcher -> matcher.matchAttribute(roleAssignment, caseDetails))
-                .allMatch(matched -> matched == true))
-            .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<RoleAssignment> filter(RoleAssignments roleAssignments,
-                                       CaseDataContent caseDataContent) {
-        log.info("Filter role assignments for case event {}", caseDataContent.getEvent().getEventId());
-
-        return roleAssignments
-            .getRoleAssignments()
-            .stream()
-            .filter(roleAssignment -> roleAttributeMatchers
-                .stream()
-                .map(matcher -> matcher.matchAttribute(roleAssignment, (CaseTypeDefinition) null))
                 .allMatch(matched -> matched == true))
             .collect(Collectors.toList());
     }
