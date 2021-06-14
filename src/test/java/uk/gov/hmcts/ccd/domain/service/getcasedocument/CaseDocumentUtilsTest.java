@@ -64,12 +64,12 @@ class CaseDocumentUtilsTest extends TestFixtures {
         final Map<String, JsonNode> data = fromFileAsMap("new-document-with-hashtoken.json");
 
         final List<Tuple2<String, String>> expectedHashesMap = List.of(
-            new Tuple2<>("http://dm-store:8080/documents/0dfa903c-993d-4fa4-9bc4-b97d6352b862", null),
-            new Tuple2<>("http://dm-store:8080/documents/e16f2ae0-d6ce-4bd0-a652-47b3c4d86292", null),
-            new Tuple2<>("http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d", null),
-            new Tuple2<>("http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976",
+            new Tuple2<>("0dfa903c-993d-4fa4-9bc4-b97d6352b862", null),
+            new Tuple2<>("e16f2ae0-d6ce-4bd0-a652-47b3c4d86292", null),
+            new Tuple2<>("b5eb1f0e-64cd-4ccb-996a-6915c28fa65d", null),
+            new Tuple2<>("8da17150-c001-47d7-bfeb-3dabed9e0976",
                 "36fc7aa586a54bffc2982ed490c4503f4aca875b7160c9d24b6690276886tytu"),
-            new Tuple2<>("http://dm-store:8080/documents/c1f160ca-cf52-4c0a-8376-3b51c340d00c",
+            new Tuple2<>("c1f160ca-cf52-4c0a-8376-3b51c340d00c",
                 "36fc7aa586a54bffc2982ed490c4503f4aca875b7160c9d24b6690276886617d")
         );
 
