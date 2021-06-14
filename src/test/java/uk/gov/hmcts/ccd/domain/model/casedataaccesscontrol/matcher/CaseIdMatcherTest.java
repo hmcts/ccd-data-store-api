@@ -1,17 +1,14 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
-import org.apache.commons.lang3.tuple.Pair;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleMatchingResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.BaseFilter;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,12 +29,8 @@ class CaseIdMatcherTest extends BaseFilter {
             Instant.now().plus(2, ChronoUnit.DAYS),
             "PRIVATE", null, null);
 
-        Pair<RoleAssignment, RoleMatchingResult> result = Pair.of(roleAssignment,
-            new RoleMatchingResult());
-
         CaseDetails caseDetails = mockCaseDetails();
-        classUnderTest.matchAttribute(result, caseDetails);
-        assertTrue(result.getRight().isCaseIdMatched());
+        assertTrue(classUnderTest.matchAttribute(roleAssignment, caseDetails));
     }
 
     @Test
@@ -47,12 +40,8 @@ class CaseIdMatcherTest extends BaseFilter {
             Instant.now().plus(2, ChronoUnit.DAYS),
             "PRIVATE", null, null);
 
-        Pair<RoleAssignment, RoleMatchingResult> result = Pair.of(roleAssignment,
-            new RoleMatchingResult());
-
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED, JURISDICTION_2);
-        classUnderTest.matchAttribute(result, caseDetails);
-        assertFalse(result.getRight().isCaseIdMatched());
+        assertFalse(classUnderTest.matchAttribute(roleAssignment, caseDetails));
     }
 
     @Test
@@ -63,12 +52,8 @@ class CaseIdMatcherTest extends BaseFilter {
             "PRIVATE", null,
             null, null, null);
 
-        Pair<RoleAssignment, RoleMatchingResult> result = Pair.of(roleAssignment,
-            new RoleMatchingResult());
-
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED, JURISDICTION_2);
-        classUnderTest.matchAttribute(result, caseDetails);
-        assertTrue(result.getRight().isCaseIdMatched());
+        assertTrue(classUnderTest.matchAttribute(roleAssignment, caseDetails));
     }
 
     @Test
@@ -79,11 +64,7 @@ class CaseIdMatcherTest extends BaseFilter {
             "PRIVATE", Optional.of(""),
             Optional.of(""), null, null);
 
-        Pair<RoleAssignment, RoleMatchingResult> result = Pair.of(roleAssignment,
-            new RoleMatchingResult());
-
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED, JURISDICTION_2);
-        classUnderTest.matchAttribute(result, caseDetails);
-        assertFalse(result.getRight().isCaseIdMatched());
+        assertFalse(classUnderTest.matchAttribute(roleAssignment, caseDetails));
     }
 }

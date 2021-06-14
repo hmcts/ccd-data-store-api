@@ -1,33 +1,37 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.BooleanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
+import uk.gov.hmcts.ccd.domain.service.AuthorisationMapper;
 
 @Component
 public class AccessProfileServiceImpl implements AccessProfileService, AccessControl {
 
+    private AuthorisationMapper authorisationMapper;
+
+    @Autowired
+    public AccessProfileServiceImpl(AuthorisationMapper authorisationMapper) {
+        this.authorisationMapper = authorisationMapper;
+    }
+
     @Override
     @SuppressWarnings("checkstyle:LineLength")
-    public List<AccessProfile> generateAccessProfiles(RoleAssignmentFilteringResult filteringResults,
+    public List<AccessProfile> generateAccessProfiles(List<RoleAssignment> filteredRoleAssignments,
                                                       List<RoleToAccessProfileDefinition> roleToAccessProfilesMappings) {
 
+        // TODO: Think about improving this, as most of this logic is already done in AuthorisationsMatcher
         List<AccessProfile> accessProfiles = new ArrayList<>();
         Map<String, RoleToAccessProfileDefinition> roleToAccessProfileDefinitionMap =
-            toRoleNameAsKeyMap(roleToAccessProfilesMappings);
+            authorisationMapper.toRoleNameAsKeyMap(roleToAccessProfilesMappings);
 
-        for (RoleAssignment roleAssignment : filteringResults.getRoleAssignments()) {
+        for (RoleAssignment roleAssignment : filteredRoleAssignments) {
 
             RoleToAccessProfileDefinition roleToAccessProfileDefinition =
                 roleToAccessProfileDefinitionMap.get(roleAssignment.getRoleName());
@@ -36,51 +40,13 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
                 List<String> definitionAuthorisations = roleToAccessProfileDefinition.getAuthorisationList();
                 List<String> roleAssignmentAuthorisations = roleAssignment.getAuthorisations();
 
-                if (authorisationsAllowMappingToAccessProfiles(definitionAuthorisations,
+                if (authorisationMapper.authorisationsAllowMappingToAccessProfiles(definitionAuthorisations,
                     roleAssignmentAuthorisations)) {
-                    accessProfiles.addAll(createAccessProfiles(roleAssignment, roleToAccessProfileDefinition));
+                    accessProfiles.addAll(authorisationMapper
+                        .createAccessProfiles(roleAssignment, roleToAccessProfileDefinition));
                 }
             }
         }
         return accessProfiles;
-    }
-
-    private Map<String, RoleToAccessProfileDefinition> toRoleNameAsKeyMap(
-        List<RoleToAccessProfileDefinition> roleToAccessProfiles) {
-        return roleToAccessProfiles
-            .stream()
-            .filter(e -> e.getRoleName() != null)
-            .collect(Collectors.toMap(RoleToAccessProfileDefinition::getRoleName,
-                                      Function.identity()));
-    }
-
-    private boolean authorisationsAllowMappingToAccessProfiles(List<String> authorisations,
-                                                               List<String> roleAssignmentAuthorisations) {
-        if (roleAssignmentAuthorisations != null
-            && !authorisations.isEmpty()) {
-            Collection<String> filterAuthorisations = CollectionUtils
-                .intersection(roleAssignmentAuthorisations, authorisations);
-
-            return !filterAuthorisations.isEmpty();
-        }
-        return authorisations.isEmpty();
-    }
-
-    private List<AccessProfile> createAccessProfiles(RoleAssignment roleAssignment,
-                                                     RoleToAccessProfileDefinition roleToAccessProfileDefinition) {
-        List<String> accessProfileList = roleToAccessProfileDefinition.getAccessProfileList();
-        return accessProfileList
-            .stream()
-            .map(accessProfileValue -> AccessProfile.builder()
-                .accessProfile(accessProfileValue)
-                .securityClassification(roleAssignment.getClassification())
-                .readOnly(readOnly(roleAssignment, roleToAccessProfileDefinition))
-                .build()).collect(Collectors.toList());
-    }
-
-    private Boolean readOnly(RoleAssignment roleAssignment,
-                             RoleToAccessProfileDefinition roleToAccessProfileDefinition) {
-        return BooleanUtils.isTrue(roleAssignment.getReadOnly())
-            || BooleanUtils.isTrue(roleToAccessProfileDefinition.getReadOnly());
     }
 }

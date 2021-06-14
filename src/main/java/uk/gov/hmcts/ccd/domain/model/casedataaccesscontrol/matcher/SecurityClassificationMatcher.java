@@ -2,11 +2,9 @@ package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleMatchingResult;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
@@ -19,8 +17,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils
 public class SecurityClassificationMatcher implements RoleAttributeMatcher {
 
     @Override
-    public void matchAttribute(Pair<RoleAssignment, RoleMatchingResult> resultPai, CaseDetails caseDetails) {
-        RoleAssignment roleAssignment = resultPai.getLeft();
+    public boolean matchAttribute(RoleAssignment roleAssignment, CaseDetails caseDetails) {
         SecurityClassification caseDetailsSecurityClassification = caseDetails.getSecurityClassification();
         log.debug("Match role assignment security classification {} with case details security classification "
                 + " {} for role assignment {}",
@@ -29,22 +26,22 @@ public class SecurityClassificationMatcher implements RoleAttributeMatcher {
             roleAssignment.getId());
         Optional<SecurityClassification> securityClassification = getSecurityClassification(roleAssignment
             .getClassification());
+        boolean matched = false;
         if (securityClassification.isPresent()) {
-            boolean value = caseHasClassificationEqualOrLowerThan(securityClassification.get()).test(caseDetails);
-            resultPai.getRight().setClassificationMatched(value);
+            matched = caseHasClassificationEqualOrLowerThan(securityClassification.get()).test(caseDetails);
         }
 
         log.debug("Role assignment security classification {} and case details security classification "
                 + " {} match {}",
             roleAssignment.getClassification(),
             caseDetailsSecurityClassification,
-            resultPai.getRight().isClassificationMatched());
+            matched);
+
+        return matched;
     }
 
     @Override
-    public void matchAttribute(Pair<RoleAssignment, RoleMatchingResult> resultPair,
-                               CaseTypeDefinition caseTypeDefinition) {
-        RoleAssignment roleAssignment = resultPair.getLeft();
+    public boolean matchAttribute(RoleAssignment roleAssignment, CaseTypeDefinition caseTypeDefinition) {
         SecurityClassification caseTypeSecurityClassification = caseTypeDefinition.getSecurityClassification();
         log.debug("Match role assignment security classification {} with case type security classification "
                 + " {} for role assignment {}",
@@ -53,17 +50,18 @@ public class SecurityClassificationMatcher implements RoleAttributeMatcher {
             roleAssignment.getId());
         Optional<SecurityClassification> securityClassification = getSecurityClassification(roleAssignment
             .getClassification());
+        boolean matched = false;
         if (securityClassification.isPresent()) {
-            boolean value = caseTypeHasClassificationEqualOrLowerThan(securityClassification.get())
+            matched = caseTypeHasClassificationEqualOrLowerThan(securityClassification.get())
                 .test(caseTypeDefinition);
-            resultPair.getRight().setClassificationMatched(value);
         }
 
         log.debug("Role assignment security classification {} and case type security classification "
                 + " {} match {}",
             roleAssignment.getClassification(),
             caseTypeSecurityClassification,
-            resultPair.getRight().isClassificationMatched());
+            matched);
+        return matched;
     }
 
 }
