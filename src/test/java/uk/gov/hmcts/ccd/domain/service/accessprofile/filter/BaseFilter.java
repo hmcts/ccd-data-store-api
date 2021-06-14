@@ -8,6 +8,7 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -18,6 +19,10 @@ public class BaseFilter {
     protected static final String JURISDICTION_2 = "JURISDICTION_2";
     protected static final String CASE_ID_1 = "CASE_ID_1";
     protected static final String CASE_ID_2 = "CASE_ID_2";
+    protected static final String CASE_TYPE_ID_1 = "CASE_TYPE_ID_1";
+    protected static final String CASE_TYPE_ID_2 = "CASE_TYPE_ID_2";
+    protected static final String ROLE_NAME_1 = "RoleName1";
+
 
     protected RoleAssignment createRoleAssignment(String caseId,
                                                   String jurisdiction) {
@@ -51,7 +56,7 @@ public class BaseFilter {
         RoleAssignment roleAssignment = RoleAssignment.builder().build();
 
         roleAssignment.setActorId("Actor1");
-        roleAssignment.setRoleName("RoleName1");
+        roleAssignment.setRoleName(ROLE_NAME_1);
         roleAssignment.setActorIdType("IDAM");
         roleAssignment.setRoleType("ORGANISATION");
         roleAssignment.setClassification(securityClassification);
@@ -83,7 +88,7 @@ public class BaseFilter {
         RoleAssignment roleAssignment = RoleAssignment.builder().build();
 
         roleAssignment.setActorId("Actor1");
-        roleAssignment.setRoleName("RoleName1");
+        roleAssignment.setRoleName(ROLE_NAME_1);
         roleAssignment.setActorIdType("IDAM");
         roleAssignment.setRoleType("ORGANISATION");
         roleAssignment.setClassification(securityClassification);
@@ -136,5 +141,22 @@ public class BaseFilter {
         when(caseDetails.getJurisdiction()).thenReturn(jurisdiction);
         when(caseDetails.getCaseTypeId()).thenReturn("TEST_CASE_TYPE");
         return caseDetails;
+    }
+
+    protected CaseTypeDefinition mockCaseTypeDefinition() {
+        return mockCaseTypeDefinition(SecurityClassification.PUBLIC);
+    }
+
+    protected CaseTypeDefinition mockCaseTypeDefinition(SecurityClassification securityClassification) {
+        return mockCaseTypeDefinition(securityClassification, JURISDICTION_1);
+    }
+
+    protected CaseTypeDefinition mockCaseTypeDefinition(SecurityClassification securityClassification,
+                                                 String jurisdiction) {
+        CaseTypeDefinition caseTypeDefinition = mock(CaseTypeDefinition.class);
+        when(caseTypeDefinition.getSecurityClassification()).thenReturn(securityClassification);
+        when(caseTypeDefinition.getId()).thenReturn(CASE_TYPE_ID_1);
+        when(caseTypeDefinition.getJurisdictionId()).thenReturn(jurisdiction);
+        return caseTypeDefinition;
     }
 }

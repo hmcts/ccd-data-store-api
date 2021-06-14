@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -8,14 +12,8 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.SPECIFIC;
@@ -39,23 +37,23 @@ public class PseudoRoleAssignmentsGenerator {
         this.caseAccessService = caseAccessService;
     }
 
-    public List<RoleAssignment> createPseudoRoleAssignments(RoleAssignmentFilteringResult filteringResult) {
+    public List<RoleAssignment> createPseudoRoleAssignments(List<RoleAssignment> filteredRoleAssignments) {
 
         List<String> idamUserRoles = new ArrayList<>(userRepository.getUserRoles());
         List<RoleAssignment> pseudoRoleAssignments = new ArrayList<>();
 
         if (caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()) {
-            if (filteringResult.atLeastOneCaseRoleExists()) {
+            if (atLeastOneCaseRoleExists(filteredRoleAssignments)) {
                 pseudoRoleAssignments.addAll(createPseudoRoleAssignmentsForGrantedOnlyAccess(idamUserRoles));
             }
         } else {
-            pseudoRoleAssignments.addAll(createPseudoRoleAssignments(idamUserRoles));
+            pseudoRoleAssignments.addAll(createPseudoRoleAssignmentsByIdamRoles(idamUserRoles));
         }
 
         return pseudoRoleAssignments;
     }
 
-    private List<RoleAssignment> createPseudoRoleAssignments(List<String> idamRoles) {
+    private List<RoleAssignment> createPseudoRoleAssignmentsByIdamRoles(List<String> idamRoles) {
         // TODO: potential performance issue here, to review
         List<UserRole> classifications = caseDefinitionRepository
             .getClassificationsForUserRoleList(idamRoles);
@@ -80,5 +78,11 @@ public class PseudoRoleAssignmentsGenerator {
                 .classification(RESTRICTED.name())
                 .build())
             .collect(Collectors.toList());
+    }
+
+    public boolean atLeastOneCaseRoleExists(List<RoleAssignment> roleAssignments) {
+        return roleAssignments
+            .stream()
+            .anyMatch(RoleAssignment::isCaseRoleAssignment);
     }
 }

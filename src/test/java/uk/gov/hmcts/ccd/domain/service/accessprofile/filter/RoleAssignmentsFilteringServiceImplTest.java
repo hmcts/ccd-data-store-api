@@ -8,18 +8,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.CaseTypeMatcher;
-import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentsFilteringServiceImpl;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.RoleAttributeMatcher;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.BeginDateEndDateMatcher;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.CaseIdMatcher;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.CaseTypeMatcher;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.JurisdictionMatcher;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.LocationMatcher;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.RegionMatcher;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.RoleAttributeMatcher;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.SecurityClassificationMatcher;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentsFilteringServiceImpl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -45,9 +44,9 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
     void shouldFilerBasedOnDateCaseIDJurisdiction() {
         RoleAssignments roleAssignments = mockRoleAssignments();
         CaseDetails caseDetails = mockCaseDetails();
-        RoleAssignmentFilteringResult filteredRoleAssignments = classUnderTest
+        List<RoleAssignment> filteredRoleAssignments = classUnderTest
             .filter(roleAssignments, caseDetails);
-        assertEquals(1, filteredRoleAssignments.getRoleAssignmentMatchingResults().size());
+        assertEquals(1, filteredRoleAssignments.size());
     }
 
 
@@ -55,36 +54,36 @@ class RoleAssignmentsFilteringServiceImplTest extends BaseFilter {
     void shouldFilerBasedOnSecurityClassificationWhenCaseClassificationIsLess() {
         RoleAssignments roleAssignments = mockRoleAssignmentsOnSecurityClassification();
         CaseDetails caseDetails = mockCaseDetails();
-        RoleAssignmentFilteringResult filteredRoleAssignments = classUnderTest
+        List<RoleAssignment> filteredRoleAssignments = classUnderTest
             .filter(roleAssignments, caseDetails);
-        assertEquals(2, filteredRoleAssignments.getRoleAssignmentMatchingResults().size());
+        assertEquals(2, filteredRoleAssignments.size());
     }
 
     @Test
     void shouldFilerBasedOnSecurityClassificationWhenCaseClassificationIsMore() {
         RoleAssignments roleAssignments = mockRoleAssignmentsOnSecurityClassification();
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.PRIVATE);
-        RoleAssignmentFilteringResult filteredRoleAssignments = classUnderTest
+        List<RoleAssignment> filteredRoleAssignments = classUnderTest
             .filter(roleAssignments, caseDetails);
-        assertEquals(2, filteredRoleAssignments.getRoleAssignmentMatchingResults().size());
+        assertEquals(2, filteredRoleAssignments.size());
     }
 
     @Test
     void shouldFilterBasedOnSecurityClassificationWhenCaseClassificationIsRestricted() {
         RoleAssignments roleAssignments = mockRoleAssignmentsOnSecurityClassification();
         CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED);
-        RoleAssignmentFilteringResult filteredRoleAssignments = classUnderTest
+        List<RoleAssignment> filteredRoleAssignments = classUnderTest
             .filter(roleAssignments, caseDetails);
-        assertEquals(1, filteredRoleAssignments.getRoleAssignmentMatchingResults().size());
+        assertEquals(1, filteredRoleAssignments.size());
     }
 
     @Test
     void shouldFilerBasedOnStartDateAndEndDate() {
         RoleAssignments roleAssignments = mockRoleAssignmentsDatesNotMatching();
         CaseDetails caseDetails = mockCaseDetails();
-        RoleAssignmentFilteringResult filteredRoleAssignments = classUnderTest
+        List<RoleAssignment> filteredRoleAssignments = classUnderTest
             .filter(roleAssignments, caseDetails);
-        assertEquals(0, filteredRoleAssignments.getRoleAssignmentMatchingResults().size());
+        assertEquals(0, filteredRoleAssignments.size());
     }
 
     private RoleAssignments mockRoleAssignments() {

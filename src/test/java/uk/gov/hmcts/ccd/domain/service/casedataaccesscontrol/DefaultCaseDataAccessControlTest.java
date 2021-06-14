@@ -6,26 +6,22 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleMatchingResult;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
+import uk.gov.hmcts.ccd.domain.service.AuthorisationMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -34,6 +30,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 class DefaultCaseDataAccessControlTest {
@@ -66,7 +63,6 @@ class DefaultCaseDataAccessControlTest {
     @Mock
     private RoleAssignmentsFilteringService roleAssignmentsFilteringService;
 
-    @Spy
     private AccessProfileServiceImpl accessProfileService;
 
     @Mock
@@ -84,12 +80,15 @@ class DefaultCaseDataAccessControlTest {
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
 
-    @InjectMocks
     private DefaultCaseDataAccessControl defaultCaseDataAccessControl;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
+        accessProfileService = spy(new AccessProfileServiceImpl(new AuthorisationMapper()));
+        defaultCaseDataAccessControl = new DefaultCaseDataAccessControl(roleAssignmentService, securityUtils,
+            roleAssignmentsFilteringService, pseudoRoleAssignmentsGenerator, applicationParams,
+            accessProfileService, pseudoRoleToAccessProfileGenerator, caseDefinitionRepository, caseDetailsRepository);
     }
 
     @Test
@@ -102,8 +101,8 @@ class DefaultCaseDataAccessControlTest {
         doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
         Map<String, String> roleAndGrantType = Maps.newHashMap();
         roleAndGrantType.put(ROLE_NAME_1, GRANT_TYPE_BASIC);
-        RoleAssignmentFilteringResult filteringResults = createFilteringResults(roleAndGrantType);
-        doReturn(filteringResults).when(roleAssignmentsFilteringService)
+        List<RoleAssignment> roleAssignments1 = createFilteringResults(roleAndGrantType);
+        doReturn(roleAssignments1).when(roleAssignmentsFilteringService)
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
 
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
@@ -120,8 +119,7 @@ class DefaultCaseDataAccessControlTest {
         verify(roleAssignmentsFilteringService).filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
         verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
         verify(applicationParams).getEnablePseudoAccessProfilesGeneration();
-        verify(accessProfileService).generateAccessProfiles(any(RoleAssignmentFilteringResult.class),
-            anyList());
+        verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
     }
 
     @Test
@@ -135,8 +133,8 @@ class DefaultCaseDataAccessControlTest {
 
         Map<String, String> roleAndGrantType = Maps.newHashMap();
         roleAndGrantType.put(ROLE_NAME_1, GRANT_TYPE_EXCLUDE);
-        RoleAssignmentFilteringResult filteringResults = createFilteringResults(roleAndGrantType);
-        doReturn(filteringResults).when(roleAssignmentsFilteringService)
+        List<RoleAssignment> roleAssignments1 = createFilteringResults(roleAndGrantType);
+        doReturn(roleAssignments1).when(roleAssignmentsFilteringService)
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
 
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
@@ -154,7 +152,7 @@ class DefaultCaseDataAccessControlTest {
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
         verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
         verify(applicationParams).getEnablePseudoAccessProfilesGeneration();
-        verify(accessProfileService).generateAccessProfiles(any(RoleAssignmentFilteringResult.class), anyList());
+        verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
     }
 
 
@@ -173,9 +171,9 @@ class DefaultCaseDataAccessControlTest {
         roleAndGrantType.put(ROLE_NAME_3, GRANT_TYPE_CHALLENGED);
         roleAndGrantType.put(ROLE_NAME_4, GRANT_TYPE_SPECIFIC);
         roleAndGrantType.put(ROLE_NAME_5, GRANT_TYPE_STANDARD);
-        RoleAssignmentFilteringResult filteringResults = createFilteringResults(roleAndGrantType);
+        List<RoleAssignment> roleAssignments1 = createFilteringResults(roleAndGrantType);
 
-        doReturn(filteringResults).when(roleAssignmentsFilteringService)
+        doReturn(roleAssignments1).when(roleAssignmentsFilteringService)
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
 
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
@@ -193,7 +191,7 @@ class DefaultCaseDataAccessControlTest {
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
         verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
         verify(applicationParams).getEnablePseudoAccessProfilesGeneration();
-        verify(accessProfileService).generateAccessProfiles(any(RoleAssignmentFilteringResult.class), anyList());
+        verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
     }
 
     private CaseTypeDefinition createCaseTypeDefinition(String... roleNames) {
@@ -237,28 +235,19 @@ class DefaultCaseDataAccessControlTest {
         return Lists.newArrayList(accessControlList);
     }
 
-    private RoleAssignmentFilteringResult createFilteringResults(Map<String, String> roleNameAndGrantType) {
-        List<Pair<RoleAssignment, RoleMatchingResult>> roleAssignmentMatchPairs = new ArrayList<>();
+    private List<RoleAssignment> createFilteringResults(Map<String, String> roleNameAndGrantType) {
+        List<RoleAssignment> roleAssignments = new ArrayList<>();
 
         roleNameAndGrantType.entrySet()
             .stream()
-            .forEach(entry -> roleAssignmentMatchPairs
+            .forEach(entry -> roleAssignments
                 .add(createRoleAssignmentAndRoleMatchingResult(entry.getKey(), entry.getValue())));
 
-        RoleAssignmentFilteringResult result = new RoleAssignmentFilteringResult(roleAssignmentMatchPairs);
-        return result;
+        return roleAssignments;
     }
 
-    private Pair<RoleAssignment, RoleMatchingResult> createRoleAssignmentAndRoleMatchingResult(String roleName,
-                                                                                               String grantType) {
-        RoleMatchingResult matchingResult = new RoleMatchingResult();
-        matchingResult.setCaseTypeIdMatched(true);
-        matchingResult.setClassificationMatched(true);
-        matchingResult.setDateMatched(true);
-        matchingResult.setLocationMatched(true);
-        matchingResult.setRegionMatched(true);
-        matchingResult.setCaseTypeIdMatched(true);
-        matchingResult.setJurisdictionMatched(true);
+    private RoleAssignment createRoleAssignmentAndRoleMatchingResult(String roleName,
+                                                                     String grantType) {
 
         RoleAssignment roleAssignment = RoleAssignment.builder()
             .roleName(roleName)
@@ -267,6 +256,6 @@ class DefaultCaseDataAccessControlTest {
             .authorisations(Lists.newArrayList(AUTHORISATION_1, AUTHORISATION_2))
             .readOnly(false)
             .build();
-        return Pair.of(roleAssignment, matchingResult);
+        return roleAssignment;
     }
 }
