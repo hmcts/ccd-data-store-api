@@ -20,6 +20,7 @@ import uk.gov.hmcts.ccd.ElasticsearchBaseTest;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.ccd.test.ElasticsearchTestHelper;
@@ -298,7 +299,7 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().get(0),
                 is(DEFAULT_CASE_REFERENCE)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(0)),
-            () -> assertThat(caseDetails.getFields().size(), is(8)),
+            () -> assertThat(caseDetails.getFields().size(), is(10)),
             () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
         );
     }
@@ -358,12 +359,12 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
                 is(nestedFieldId)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(2).getCaseFieldId(),
                 is(MetaData.CaseField.CASE_REFERENCE.getReference())),
-            () -> assertThat(caseDetails.getFields().size(), is(11)),
+            () -> assertThat(caseDetails.getFields().size(), is(13)),
             () -> assertExampleCaseMetadata(caseDetails.getFields(), false),
             () -> assertThat(caseDetails.getFields().get(TEXT_FIELD), is(TEXT_VALUE)),
             () -> assertThat(caseDetails.getFields().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
             () -> assertThat(caseDetails.getFields().containsKey(COMPLEX_FIELD), is(true)),
-            () -> assertThat(caseDetails.getFieldsFormatted().size(), is(11)),
+            () -> assertThat(caseDetails.getFieldsFormatted().size(), is(13)),
             () -> assertExampleCaseMetadata(caseDetails.getFieldsFormatted(), false),
             () -> assertThat(caseDetails.getFieldsFormatted().get(TEXT_FIELD), is(TEXT_VALUE)),
             () -> assertThat(caseDetails.getFieldsFormatted().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
@@ -395,12 +396,12 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
                 is(nestedFieldId)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(2).getCaseFieldId(),
                 is(MetaData.CaseField.CASE_REFERENCE.getReference())),
-            () -> assertThat(caseDetails.getFields().size(), is(11)),
+            () -> assertThat(caseDetails.getFields().size(), is(13)),
             () -> assertExampleCaseMetadata(caseDetails.getFields(), false),
             () -> assertThat(caseDetails.getFields().get(TEXT_FIELD), is(TEXT_VALUE)),
             () -> assertThat(caseDetails.getFields().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
             () -> assertThat(caseDetails.getFields().containsKey(COMPLEX_FIELD), is(true)),
-            () -> assertThat(caseDetails.getFieldsFormatted().size(), is(11)),
+            () -> assertThat(caseDetails.getFieldsFormatted().size(), is(13)),
             () -> assertExampleCaseMetadata(caseDetails.getFieldsFormatted(), false),
             () -> assertThat(caseDetails.getFieldsFormatted().get(TEXT_FIELD), is(TEXT_VALUE)),
             () -> assertThat(caseDetails.getFieldsFormatted().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
@@ -421,7 +422,7 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
         assertAll(
             () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
             () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(10)),
-            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getFields().size(), is(16)),
+            () -> assertThat(caseSearchResultViewResource.getCases().get(0).getFields().size(), is(18)),
             () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(), is(2)),
             () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2")
                     .asText(), is("SDField2Value")),
@@ -653,7 +654,9 @@ class UICaseSearchControllerIT extends ElasticsearchBaseTest {
                 is(DEFAULT_CASE_REFERENCE)),
             () -> assertThat(data.get(MetaData.CaseField.STATE.getReference()), is(STATE_VALUE)),
             () -> assertThat(data.get(MetaData.CaseField.SECURITY_CLASSIFICATION.getReference()),
-                is(SecurityClassification.PUBLIC.name()))
+                is(SecurityClassification.PUBLIC.name())),
+            () -> assertThat(data.get(CaseAccessMetadata.ACCESS_GRANTED), is(nullValue())),
+            () -> assertThat(data.get(CaseAccessMetadata.ACCESS_PROCESS), is(nullValue()))
         );
     }
 

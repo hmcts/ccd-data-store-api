@@ -1,18 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.search;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -29,9 +25,18 @@ import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProces
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_GRANTED;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_PROCESS;
 import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedCaseFieldByPath;
 
 @Service
@@ -201,8 +206,16 @@ public class CaseSearchResultViewGenerator {
             caseDetails.getMetadata()
         );
 
+        updateCaseFieldsWithAccessControlMetadata(caseFields, caseDetails.getReference().toString());
+
         return new SearchResultViewItem(caseDetails.getReferenceAsString(), caseFields, new HashMap<>(caseFields),
                 caseDetails.getSupplementaryData());
+    }
+
+    private void updateCaseFieldsWithAccessControlMetadata(Map<String, Object> caseFields, String caseReference) {
+        CaseAccessMetadata caseAccessMetadata = caseSearchesViewAccessControl.getCaseAccessMetaData(caseReference);
+        caseFields.put(ACCESS_GRANTED, new TextNode(caseAccessMetadata.getAccessGrantsString()));
+        caseFields.put(ACCESS_PROCESS, new TextNode(caseAccessMetadata.getAccessProcessString()));
     }
 
     private Map<String, Object> prepareData(SearchResultDefinition searchResult,

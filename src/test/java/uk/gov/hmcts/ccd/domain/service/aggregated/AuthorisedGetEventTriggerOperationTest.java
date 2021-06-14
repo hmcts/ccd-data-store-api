@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
-import java.util.stream.Collectors;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,11 +17,15 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
@@ -30,11 +35,16 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -81,6 +91,9 @@ class AuthorisedGetEventTriggerOperationTest {
     @Mock
     private EventTriggerService eventTriggerService;
 
+    @Mock
+    private CaseDataAccessControl caseDataAccessControl;
+
     private AuthorisedGetEventTriggerOperation authorisedGetEventTriggerOperation;
     private CaseUpdateViewEvent caseEventTrigger;
     private final CaseDetails caseDetails = new CaseDetails();
@@ -106,7 +119,8 @@ class AuthorisedGetEventTriggerOperationTest {
             caseAccessService,
             accessControlService,
             eventTriggerService,
-            draftGateway);
+            draftGateway,
+            caseDataAccessControl);
         caseEventTrigger = new CaseUpdateViewEvent();
 
         caseType.setId(CASE_TYPE_ID);
@@ -304,6 +318,8 @@ class AuthorisedGetEventTriggerOperationTest {
                 .setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger, caseFields, accessProfiles, CAN_UPDATE);
             doReturn(caseEventTrigger).when(accessControlService)
                 .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, accessProfiles);
+
+            doReturn(new CaseAccessMetadata()).when(caseDataAccessControl).generateAccessMetadata(any());
         }
 
         @Test
@@ -356,6 +372,44 @@ class AuthorisedGetEventTriggerOperationTest {
                 () -> inOrder.verify(accessControlService)
                     .updateCollectionDisplayContextParameterByAccess(eq(caseEventTrigger), eq(accessProfiles))
             );
+        }
+
+        @Test
+        @DisplayName("should return Case Access metadata")
+        void shouldReturnCaseAccessMetadata() throws JsonProcessingException {
+
+            CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
+            caseAccessMetadata.setAccessGrants(List.of(GrantType.STANDARD, GrantType.SPECIFIC, GrantType.CHALLENGED));
+            caseAccessMetadata.setAccessProcess(AccessProcess.NONE);
+            doReturn(caseAccessMetadata).when(caseDataAccessControl).generateAccessMetadata(any());
+
+            final CaseUpdateViewEvent output = authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
+                EVENT_TRIGGER_ID,
+                IGNORE);
+
+            assertTrue(isCaseAccessMetadataPresentInJson(output));
+            assertThat(output.getAccessGrants(),
+                is(GrantType.CHALLENGED.name() + "," + GrantType.SPECIFIC + "," + GrantType.STANDARD));
+            assertThat(output.getAccessProcess(), is(AccessProcess.NONE.name()));
+        }
+
+        @Test
+        @DisplayName("should not set CaseUpdateViewEvent json fields if there is no Case Access metadata")
+        void shouldNotSetCaseAccessMetadataJson() throws JsonProcessingException {
+            final CaseUpdateViewEvent output = authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
+                EVENT_TRIGGER_ID,
+                IGNORE);
+
+            assertFalse(isCaseAccessMetadataPresentInJson(output));
+            assertNull(output.getAccessGrants());
+            assertNull(output.getAccessProcess());
+        }
+
+        private boolean isCaseAccessMetadataPresentInJson(CaseUpdateViewEvent caseUpdateViewEvent)
+            throws JsonProcessingException {
+            ObjectMapper objMapper = new ObjectMapper();
+            String jsonString = objMapper.writeValueAsString(caseUpdateViewEvent);
+            return jsonString.contains("access_granted") || jsonString.contains("access_process");
         }
 
         @Test

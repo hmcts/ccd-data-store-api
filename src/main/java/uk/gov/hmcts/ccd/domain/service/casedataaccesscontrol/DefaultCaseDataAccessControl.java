@@ -1,10 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import com.google.common.collect.Sets;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,7 +13,10 @@ import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentFilteringResult;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
@@ -26,6 +25,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "true")
@@ -83,9 +87,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         if (caseDetails.isEmpty()) {
             return Sets.newHashSet();
         }
-        RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
-        RoleAssignmentFilteringResult filteringResults = roleAssignmentsFilteringService
-            .filter(roleAssignments, caseDetails.get());
+        RoleAssignmentFilteringResult filteringResults = filterRoleAssignmentsWithCaseDetails(caseDetails.get());
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.get().getCaseTypeId());
 
         return Sets.newHashSet(filteredAccessProfiles(filteringResults, caseTypeDefinition));
@@ -132,5 +134,56 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
 
         augmented.addAll(filteringResults.getRoleAssignmentMatchingResults());
         return new RoleAssignmentFilteringResult(augmented);
+    }
+
+    @Override
+    public CaseAccessMetadata generateAccessMetadata(String caseReference) {
+        Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(caseReference);
+
+        CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
+        if (caseDetails.isPresent()) {
+            RoleAssignmentFilteringResult filteringResults = filterRoleAssignmentsWithCaseDetails(caseDetails.get());
+            caseAccessMetadata.setAccessGrants(generatePostFilteringAccessGrants(filteringResults));
+            caseAccessMetadata.setAccessProcess(generatePostFilteringAccessProcess(filteringResults));
+        }
+        return caseAccessMetadata;
+    }
+
+    private RoleAssignmentFilteringResult filterRoleAssignmentsWithCaseDetails(CaseDetails caseDetails) {
+        RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
+        RoleAssignmentFilteringResult filteringResults = roleAssignmentsFilteringService
+            .filter(roleAssignments, caseDetails);
+
+        if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
+            List<RoleAssignment> pseudoRoleAssignments = pseudoRoleAssignmentsGenerator
+                .createPseudoRoleAssignments(filteringResults);
+            filteringResults = augment(filteringResults, pseudoRoleAssignments);
+        }
+
+        return filteringResults;
+    }
+
+    private AccessProcess generatePostFilteringAccessProcess(RoleAssignmentFilteringResult filteringResult) {
+        boolean userHasAccessToCase = filteringResult.getRoleAssignments().stream()
+            .map(roleAssignment -> GrantType.valueOf(roleAssignment.getGrantType()))
+            .anyMatch(DefaultCaseDataAccessControl::isUserAllowedAccessToCase);
+
+        if (userHasAccessToCase) {
+            return AccessProcess.NONE;
+        } else {
+            return AccessProcess.SPECIFIC;
+        }
+    }
+
+    private static boolean isUserAllowedAccessToCase(GrantType grantType) {
+        return grantType.equals(GrantType.STANDARD)
+            || grantType.equals(GrantType.SPECIFIC)
+            || grantType.equals(GrantType.CHALLENGED);
+    }
+
+    private List<GrantType> generatePostFilteringAccessGrants(RoleAssignmentFilteringResult filteringResult) {
+        return filteringResult.getRoleAssignments().stream()
+            .map(roleAssignment -> GrantType.valueOf(roleAssignment.getGrantType()))
+            .collect(Collectors.toList());
     }
 }

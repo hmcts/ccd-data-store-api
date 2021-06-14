@@ -6,22 +6,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -42,6 +36,16 @@ import uk.gov.hmcts.ccd.domain.service.search.CaseSearchesViewAccessControl;
 import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -323,6 +327,8 @@ class CaseSearchResultViewGeneratorTest {
         classUnderTest = new CaseSearchResultViewGenerator(userRepository,
             caseTypeService, searchResultDefinitionService, dateTimeSearchResultProcessor,
             caseSearchesViewAccessControl);
+
+        when(caseDataAccessControl.generateAccessMetadata(any())).thenReturn(new CaseAccessMetadata());
     }
 
     private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
@@ -618,6 +624,26 @@ class CaseSearchResultViewGeneratorTest {
                 .get(FAMILY + SEPARATOR + FATHER_NAME)).asText(), is(FATHER_NAME_VALUE)),
             () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
                 .get(FAMILY + SEPARATOR + FAMILY_DETAILS_PATH_NESTED)).asText(), is(POSTCODE_VALUE))
+        );
+    }
+
+    @Test
+    void shouldBuildResultsWithCaseAccessMetadata() {
+        CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
+        caseAccessMetadata.setAccessGrants(List.of(GrantType.SPECIFIC, GrantType.BASIC));
+        caseAccessMetadata.setAccessProcess(AccessProcess.CHALLENGED);
+
+        when(caseDataAccessControl.generateAccessMetadata(any())).thenReturn(caseAccessMetadata);
+
+        CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET,
+            Collections.emptyList());
+
+        assertAll(
+            () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
+                .get(CaseAccessMetadata.ACCESS_PROCESS)).asText(), is(AccessProcess.CHALLENGED.name())),
+            () -> assertThat(((TextNode) caseSearchResultView.getCases().get(0).getFields()
+                .get(CaseAccessMetadata.ACCESS_GRANTED)).asText(),
+                is(GrantType.BASIC.name() + "," + GrantType.SPECIFIC.name()))
         );
     }
 
