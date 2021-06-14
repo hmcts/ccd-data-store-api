@@ -9,10 +9,8 @@ import java.util.Set;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -23,6 +21,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
+import uk.gov.hmcts.ccd.domain.service.AuthorisationMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -31,6 +30,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 class DefaultCaseDataAccessControlTest {
@@ -63,7 +63,6 @@ class DefaultCaseDataAccessControlTest {
     @Mock
     private RoleAssignmentsFilteringService roleAssignmentsFilteringService;
 
-    @Spy
     private AccessProfileServiceImpl accessProfileService;
 
     @Mock
@@ -81,12 +80,15 @@ class DefaultCaseDataAccessControlTest {
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
 
-    @InjectMocks
     private DefaultCaseDataAccessControl defaultCaseDataAccessControl;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
+        accessProfileService = spy(new AccessProfileServiceImpl(new AuthorisationMapper()));
+        defaultCaseDataAccessControl = new DefaultCaseDataAccessControl(roleAssignmentService, securityUtils,
+            roleAssignmentsFilteringService, pseudoRoleAssignmentsGenerator, applicationParams,
+            accessProfileService, pseudoRoleToAccessProfileGenerator, caseDefinitionRepository, caseDetailsRepository);
     }
 
     @Test
