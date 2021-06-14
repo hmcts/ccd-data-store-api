@@ -84,17 +84,17 @@ public class CaseAccessService {
             .orElse(AccessLevel.ALL);
     }
 
-    public Optional<List<Long>> getGrantedCaseIdsForRestrictedRoles() {
+    public Optional<List<Long>> getGrantedCaseReferencesForRestrictedRoles() {
         if (userCanOnlyAccessExplicitlyGrantedCases()) {
-            final List<Long> caseRefernces;
+            List<Long> caseReferences;
             if (applicationParams.getEnableAttributeBasedAccessControl()) {
-                caseRefernces = roleAssignmentService.getCaseIdsForAGivenUser(userRepository.getUserId())
+                caseReferences = roleAssignmentService.getCaseReferencesForAGivenUser(userRepository.getUserId())
                     .stream().map(Long::parseLong).collect(Collectors.toList());
             } else {
                 final var ids = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
-                caseRefernces = caseDetailsRepository.findCaseReferencesByIds(ids);
+                caseReferences = caseDetailsRepository.findCaseReferencesByIds(ids);
             }
-            return Optional.of(caseRefernces);
+            return Optional.of(caseReferences);
         }
         return Optional.empty();
     }

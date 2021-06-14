@@ -32,7 +32,7 @@ public class UserAuthorisationSecurity implements CaseDetailsAuthorisationSecuri
         if (AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             if (applicationParams.getEnableAttributeBasedAccessControl()) {
                 final List<Long> caseReferences =
-                    roleAssignmentService.getCaseIdsForAGivenUser(userAuthorisation.getUserId())
+                    roleAssignmentService.getCaseReferencesForAGivenUser(userAuthorisation.getUserId())
                     .stream().map(Long::parseLong).collect(Collectors.toList());
                 builder.whereGrantedAccessOnlyForRA(caseReferences);
             } else {

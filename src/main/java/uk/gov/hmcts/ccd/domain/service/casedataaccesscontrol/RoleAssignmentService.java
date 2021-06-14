@@ -35,7 +35,7 @@ public class RoleAssignmentService implements AccessControl {
         return roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
     }
 
-    public List<String> getCaseIdsForAGivenUser(String userId) {
+    public List<String> getCaseReferencesForAGivenUser(String userId) {
         final RoleAssignments roleAssignments = this.getRoleAssignments(userId);
 
         return roleAssignments.getRoleAssignments().stream()

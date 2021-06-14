@@ -408,7 +408,7 @@ class CaseAccessServiceTest {
                 when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
                 when(caseDetailsRepository.findCaseReferencesByIds(CASES_GRANTED)).thenReturn(caseReferences);
                 doReturn(true).when(userRepository).anyRoleMatches(any());
-                Optional<List<Long>> result = caseAccessService.getGrantedCaseIdsForRestrictedRoles();
+                Optional<List<Long>> result = caseAccessService.getGrantedCaseReferencesForRestrictedRoles();
 
                 assertThat(result.isPresent(), is(true));
                 assertGrantedCaseIds(result.get());
@@ -422,10 +422,10 @@ class CaseAccessServiceTest {
 
                 when(caseDetailsRepository.findCaseReferencesByIds(CASES_GRANTED)).thenReturn(caseReferences);
                 doReturn(true).when(userRepository).anyRoleMatches(any());
-                when(roleAssignmentService.getCaseIdsForAGivenUser(USER_ID)).thenReturn(
+                when(roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID)).thenReturn(
                     caseReferences.stream().map(element -> element.toString()).collect(Collectors.toList())
                 );
-                Optional<List<Long>> result = caseAccessService.getGrantedCaseIdsForRestrictedRoles();
+                Optional<List<Long>> result = caseAccessService.getGrantedCaseReferencesForRestrictedRoles();
 
                 assertThat(result.isPresent(), is(true));
                 assertAll(
@@ -433,7 +433,7 @@ class CaseAccessServiceTest {
                         hasItems(Long.valueOf(CASE_REFERENCE1), Long.valueOf(CASE_REFERENCE2))),
                     () -> verify(userRepository).getUserId(),
                     () -> verify(userRepository).anyRoleMatches(any()),
-                    () -> verify(roleAssignmentService).getCaseIdsForAGivenUser(USER_ID)
+                    () -> verify(roleAssignmentService).getCaseReferencesForAGivenUser(USER_ID)
                 );
             }
         }
@@ -456,7 +456,7 @@ class CaseAccessServiceTest {
                 doReturn(true).when(userRepository).anyRoleMatches(any());
                 when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
                 when(caseDetailsRepository.findCaseReferencesByIds(CASES_GRANTED)).thenReturn(caseReferences);
-                Optional<List<Long>> result = caseAccessService.getGrantedCaseIdsForRestrictedRoles();
+                Optional<List<Long>> result = caseAccessService.getGrantedCaseReferencesForRestrictedRoles();
 
                 assertThat(result.isPresent(), is(true));
                 assertGrantedCaseIds(result.get());
@@ -481,7 +481,7 @@ class CaseAccessServiceTest {
                 when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
                 when(caseDetailsRepository.findCaseReferencesByIds(CASES_GRANTED)).thenReturn(caseReferences);
                 doReturn(true).when(userRepository).anyRoleMatches(any());
-                Optional<List<Long>> result = caseAccessService.getGrantedCaseIdsForRestrictedRoles();
+                Optional<List<Long>> result = caseAccessService.getGrantedCaseReferencesForRestrictedRoles();
                 assertThat(result.isPresent(), is(true));
                 assertGrantedCaseIds(result.get());
             }
@@ -502,7 +502,7 @@ class CaseAccessServiceTest {
             @Test
             @DisplayName("should return no case ids for user with case worker role")
             void shouldReturnCaseIds() {
-                Optional<List<Long>> result = caseAccessService.getGrantedCaseIdsForRestrictedRoles();
+                Optional<List<Long>> result = caseAccessService.getGrantedCaseReferencesForRestrictedRoles();
 
                 assertThat(result.isPresent(), is(false));
             }

@@ -128,7 +128,7 @@ class RoleAssignmentServiceTest {
                 .willReturn(getRoleAssignments());
 
             List<String> resultCases =
-                roleAssignmentService.getCaseIdsForAGivenUser(USER_ID);
+                roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID);
 
             assertTrue(resultCases.size() == 2);
         }

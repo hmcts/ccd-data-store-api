@@ -262,7 +262,7 @@ class CaseAccessOperationTest {
         void shouldReturnCasesUserHasAccessToForRA() {
 
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
-            when(roleAssignmentService.getCaseIdsForAGivenUser(USER_ID))
+            when(roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID))
                 .thenReturn(ids.stream().map(String::valueOf).collect(Collectors.toList()));
 
             List<String> usersCases = caseAccessOperation.findCasesUserIdHasAccessTo(USER_ID);

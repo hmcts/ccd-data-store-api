@@ -83,7 +83,7 @@ class UserAuthorisationSecurityTest {
         void accessLevelGrantedForRA() {
             doReturn(true).when(applicationParams).getEnableAttributeBasedAccessControl();
             when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
-            when(roleAssignmentService.getCaseIdsForAGivenUser(USER_ID)).thenReturn(caseReferences);
+            when(roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID)).thenReturn(caseReferences);
             security.secure(builder, null);
 
             assertAll(

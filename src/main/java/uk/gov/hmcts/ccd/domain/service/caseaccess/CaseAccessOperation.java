@@ -85,7 +85,7 @@ public class CaseAccessOperation {
     public List<String> findCasesUserIdHasAccessTo(final String userId) {
 
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
-            return roleAssignmentService.getCaseIdsForAGivenUser(userId);
+            return roleAssignmentService.getCaseReferencesForAGivenUser(userId);
         } else {
             List<Long> usersCases = caseUserRepository.findCasesUserIdHasAccessTo(userId);
             if (usersCases.isEmpty()) {

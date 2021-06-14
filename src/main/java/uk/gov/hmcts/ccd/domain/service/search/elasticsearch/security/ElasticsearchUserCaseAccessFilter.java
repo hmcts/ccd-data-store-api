@@ -28,14 +28,15 @@ public class ElasticsearchUserCaseAccessFilter implements CaseSearchFilter {
     @Override
     public Optional<QueryBuilder> getFilter(String caseTypeId) {
         Instant start = Instant.now();
-        return getGrantedCaseIdsForRestrictedRoles().map(caseReferences -> {
+        return getGrantedCaseReferencesForRestrictedRoles().map(caseReferences -> {
             Duration between = Duration.between(start, Instant.now());
-            log.info("retrieved {} granted case ids in {} millisecs...", caseReferences.size(), between.toMillis());
+            log.info("retrieved {} granted case references in {} millisecs...",
+                    caseReferences.size(), between.toMillis());
             return QueryBuilders.termsQuery(REFERENCE_FIELD_COL, caseReferences);
         });
     }
 
-    private Optional<List<Long>> getGrantedCaseIdsForRestrictedRoles() {
-        return caseAccessService.getGrantedCaseIdsForRestrictedRoles();
+    private Optional<List<Long>> getGrantedCaseReferencesForRestrictedRoles() {
+        return caseAccessService.getGrantedCaseReferencesForRestrictedRoles();
     }
 }
