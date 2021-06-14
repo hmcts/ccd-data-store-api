@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,10 +16,13 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AuthorisationMapper;
@@ -261,5 +265,71 @@ class DefaultCaseDataAccessControlTest {
             .readOnly(false)
             .build();
         return roleAssignment;
+    }
+
+    @Test
+    void testGenerateAccessMetadataReturnsAccessProcessValueOfNone() {
+        Map<String, String> roleAndGrantType = Maps.newHashMap();
+        roleAndGrantType.put(ROLE_NAME_1, GRANT_TYPE_STANDARD);
+        roleAndGrantType.put(ROLE_NAME_2, GRANT_TYPE_BASIC);
+
+        CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, false);
+
+        assertEquals(AccessProcess.NONE.name(), caseAccessMetadata.getAccessProcessString());
+        assertEquals(String.join(",", GRANT_TYPE_BASIC, GRANT_TYPE_STANDARD),
+            caseAccessMetadata.getAccessGrantsString());
+    }
+
+    @Test
+    void testGenerateAccessMetadataReturnsAccessProcessValueOfSpecific() {
+        Map<String, String> roleAndGrantType = Maps.newHashMap();
+        roleAndGrantType.put(ROLE_NAME_2, GRANT_TYPE_BASIC);
+
+        CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, false);
+
+        assertEquals(AccessProcess.SPECIFIC.name(), caseAccessMetadata.getAccessProcessString());
+        assertEquals(GRANT_TYPE_BASIC, caseAccessMetadata.getAccessGrantsString());
+    }
+
+    @Test
+    void testGenerateAccessMetadataWithPseudoRoleAssignmentsGeneration() {
+        Map<String, String> roleAndGrantType = Maps.newHashMap();
+        roleAndGrantType.put(ROLE_NAME_2, GRANT_TYPE_BASIC);
+
+        RoleAssignment roleAssignment1 = RoleAssignment.builder().grantType(GRANT_TYPE_CHALLENGED).build();
+        RoleAssignment roleAssignment2 = RoleAssignment.builder().grantType(GRANT_TYPE_STANDARD).build();
+
+        List<RoleAssignment> roleAssignments = new ArrayList<>();
+        roleAssignments.add(roleAssignment1);
+        roleAssignments.add(roleAssignment2);
+
+        doReturn(roleAssignments)
+            .when(pseudoRoleAssignmentsGenerator).createPseudoRoleAssignments(anyList());
+
+        CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, true);
+
+        assertEquals(AccessProcess.NONE.name(), caseAccessMetadata.getAccessProcessString());
+        assertEquals(String.join(",", GRANT_TYPE_BASIC, GRANT_TYPE_CHALLENGED, GRANT_TYPE_STANDARD),
+            caseAccessMetadata.getAccessGrantsString());
+    }
+
+    private CaseAccessMetadata getCaseAccessMetadata(Map<String, String> roleAndGrantType,
+                                                     boolean enablePseudoRolesAssignmentGeneration) {
+        doReturn(USER_ID).when(securityUtils).getUserId();
+        CaseDetails caseDetails = new CaseDetails();
+        Optional<CaseDetails> optionalCaseDetails = Optional.of(caseDetails);
+        doReturn(optionalCaseDetails).when(caseDetailsRepository).findByReference(anyString());
+
+        RoleAssignments roleAssignments = new RoleAssignments();
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
+
+        doReturn(enablePseudoRolesAssignmentGeneration)
+            .when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+
+        List<RoleAssignment> roleAssignmentsReturned = createFilteringResults(roleAndGrantType);
+        doReturn(roleAssignmentsReturned)
+            .when(roleAssignmentsFilteringService).filter(any(RoleAssignments.class), any(CaseDetails.class));
+
+        return defaultCaseDataAccessControl.generateAccessMetadata("CASE_ID");
     }
 }
