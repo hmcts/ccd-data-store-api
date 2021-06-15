@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 
 import java.util.Optional;
@@ -16,6 +18,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REFERENCE_FIELD_COL;
 
@@ -23,6 +26,12 @@ class ElasticsearchUserCaseAccessFilterTest {
 
     @Mock
     private CaseAccessService caseAccessService;
+
+    @Mock
+    private CaseDefinitionRepository caseDefinitionRepository;
+
+    @Mock
+    private CaseTypeDefinition caseTypeDefinition;
 
     @InjectMocks
     private ElasticsearchUserCaseAccessFilter filter;
@@ -36,8 +45,10 @@ class ElasticsearchUserCaseAccessFilterTest {
     void shouldCreateTermsQueryBuilder() {
         String caseTypeId = "caseType";
         Long caseId = 100L;
-        when(caseAccessService.getGrantedCaseReferencesForRestrictedRoles())
+        when(caseAccessService.getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition))
             .thenReturn(Optional.of(singletonList(caseId)));
+        when(caseDefinitionRepository.getCaseType(caseTypeId))
+            .thenReturn(caseTypeDefinition);
 
         Optional<QueryBuilder> optQueryBuilder = filter.getFilter(caseTypeId);
 
@@ -46,6 +57,8 @@ class ElasticsearchUserCaseAccessFilterTest {
         TermsQueryBuilder queryBuilder = (TermsQueryBuilder) optQueryBuilder.get();
         assertThat(queryBuilder.fieldName(), is(REFERENCE_FIELD_COL));
         assertThat(queryBuilder.values(), hasItem(caseId));
+
+        verify(caseAccessService).getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
     }
 
 }

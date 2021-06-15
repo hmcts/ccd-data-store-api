@@ -9,6 +9,7 @@ import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 
@@ -21,13 +22,16 @@ public class RoleAssignmentService implements AccessControl {
 
     private final RoleAssignmentRepository roleAssignmentRepository;
     private final RoleAssignmentsMapper roleAssignmentsMapper;
+    private final RoleAssignmentsFilteringService roleAssignmentsFilteringService;
 
     @Autowired
     public RoleAssignmentService(@Qualifier(CachedRoleAssignmentRepository.QUALIFIER)
                                          RoleAssignmentRepository roleAssignmentRepository,
-                                 RoleAssignmentsMapper roleAssignmentsMapper) {
+                                 RoleAssignmentsMapper roleAssignmentsMapper,
+                                 RoleAssignmentsFilteringService roleAssignmentsFilteringService) {
         this.roleAssignmentRepository = roleAssignmentRepository;
         this.roleAssignmentsMapper = roleAssignmentsMapper;
+        this.roleAssignmentsFilteringService = roleAssignmentsFilteringService;
     }
 
     public RoleAssignments getRoleAssignments(String userId) {
@@ -39,6 +43,19 @@ public class RoleAssignmentService implements AccessControl {
         final RoleAssignments roleAssignments = this.getRoleAssignments(userId);
 
         return roleAssignments.getRoleAssignments().stream()
+            .filter(roleAssignment -> isAValidRoleAssignments(roleAssignment))
+            .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
+            .flatMap(Optional::stream)
+            .collect(Collectors.toList());
+    }
+
+    public List<String> getCaseReferencesForAGivenUser(String userId, CaseTypeDefinition caseTypeDefinition) {
+
+        final RoleAssignments roleAssignments = this.getRoleAssignments(userId);
+        List<RoleAssignment> filteredRoleAssignments = roleAssignmentsFilteringService
+                .filter(roleAssignments, caseTypeDefinition);
+
+        return filteredRoleAssignments.stream()
             .filter(roleAssignment -> isAValidRoleAssignments(roleAssignment))
             .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
             .flatMap(Optional::stream)

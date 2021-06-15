@@ -12,6 +12,7 @@ import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
@@ -84,11 +85,12 @@ public class CaseAccessService {
             .orElse(AccessLevel.ALL);
     }
 
-    public Optional<List<Long>> getGrantedCaseReferencesForRestrictedRoles() {
+    public Optional<List<Long>> getGrantedCaseReferencesForRestrictedRoles(CaseTypeDefinition caseTypeDefinition) {
         if (userCanOnlyAccessExplicitlyGrantedCases()) {
             List<Long> caseReferences;
             if (applicationParams.getEnableAttributeBasedAccessControl()) {
-                caseReferences = roleAssignmentService.getCaseReferencesForAGivenUser(userRepository.getUserId())
+                caseReferences = roleAssignmentService
+                    .getCaseReferencesForAGivenUser(userRepository.getUserId(), caseTypeDefinition)
                     .stream().map(Long::parseLong).collect(Collectors.toList());
             } else {
                 final var ids = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());

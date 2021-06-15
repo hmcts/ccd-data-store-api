@@ -4,7 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 
 import java.time.Duration;
@@ -19,16 +23,22 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REFERENCE_FIEL
 public class ElasticsearchUserCaseAccessFilter implements CaseSearchFilter {
 
     private final CaseAccessService caseAccessService;
+    private final CaseDefinitionRepository caseDefinitionRepository;
 
     @Autowired
-    public ElasticsearchUserCaseAccessFilter(CaseAccessService caseAccessService) {
+    public ElasticsearchUserCaseAccessFilter(CaseAccessService caseAccessService,
+                                             @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                             final CaseDefinitionRepository caseDefinitionRepository) {
         this.caseAccessService = caseAccessService;
+        this.caseDefinitionRepository = caseDefinitionRepository;
     }
 
     @Override
     public Optional<QueryBuilder> getFilter(String caseTypeId) {
         Instant start = Instant.now();
-        return getGrantedCaseReferencesForRestrictedRoles().map(caseReferences -> {
+        CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
+
+        return getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition).map(caseReferences -> {
             Duration between = Duration.between(start, Instant.now());
             log.info("retrieved {} granted case references in {} millisecs...",
                     caseReferences.size(), between.toMillis());
@@ -36,7 +46,7 @@ public class ElasticsearchUserCaseAccessFilter implements CaseSearchFilter {
         });
     }
 
-    private Optional<List<Long>> getGrantedCaseReferencesForRestrictedRoles() {
-        return caseAccessService.getGrantedCaseReferencesForRestrictedRoles();
+    private Optional<List<Long>> getGrantedCaseReferencesForRestrictedRoles(CaseTypeDefinition caseTypeDefinition) {
+        return caseAccessService.getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
     }
 }

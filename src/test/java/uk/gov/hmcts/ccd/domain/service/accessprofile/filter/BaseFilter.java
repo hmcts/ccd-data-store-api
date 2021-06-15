@@ -23,6 +23,17 @@ public class BaseFilter {
     protected static final String CASE_TYPE_ID_2 = "CASE_TYPE_ID_2";
     protected static final String ROLE_NAME_1 = "RoleName1";
 
+    protected RoleAssignment createRoleAssignmentWithRoleName(String roleName) {
+        RoleAssignment ra = createRoleAssignment(CASE_ID_1, JURISDICTION_1);
+        ra.setRoleName(roleName);
+        return ra;
+    }
+
+    protected RoleAssignment createRoleAssignmentWithGrantType(String grantType) {
+        RoleAssignment ra = createRoleAssignment(CASE_ID_1, JURISDICTION_1);
+        ra.setGrantType(grantType);
+        return ra;
+    }
 
     protected RoleAssignment createRoleAssignment(String caseId,
                                                   String jurisdiction) {
