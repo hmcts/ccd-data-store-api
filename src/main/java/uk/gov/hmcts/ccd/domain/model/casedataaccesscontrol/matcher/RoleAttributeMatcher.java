@@ -21,10 +21,10 @@ public interface RoleAttributeMatcher {
 
     default boolean isValuesMatching(Optional<String> roleAssignmentValue,
                                      String caseDataValue) {
-        if (roleAssignmentValue == null) {
-            return true;
+        if (roleAssignmentValue != null) {
+            return roleAssignmentValue.isEmpty()
+                || roleAssignmentValue.get().equals(caseDataValue);
         }
-        return roleAssignmentValue.isEmpty()
-            || roleAssignmentValue.get().equals(caseDataValue);
+        return true;
     }
 }
