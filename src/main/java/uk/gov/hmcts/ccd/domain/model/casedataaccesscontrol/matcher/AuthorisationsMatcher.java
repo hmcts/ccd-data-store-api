@@ -53,6 +53,6 @@ public class AuthorisationsMatcher implements RoleAttributeMatcher {
             return authorisationMapper.authorisationsAllowMappingToAccessProfiles(definitionAuthorisations,
                 roleAssignmentAuthorisations);
         }
-        return false;
+        return CollectionUtils.isEmpty(roleAssignment.getAuthorisations());
     }
 }

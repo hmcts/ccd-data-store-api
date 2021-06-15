@@ -115,7 +115,7 @@ class AuthorisationsMatcherTest extends BaseFilter {
             false,
             Lists.newArrayList(AUTHORISATION_1));
         when(caseTypeDefinition.getRoleToAccessProfiles()).thenReturn(roleToAccessProfileDefinitions);
-        assertFalse(classUnderTest.matchAttribute(roleAssignment, caseTypeDefinition));
+        assertTrue(classUnderTest.matchAttribute(roleAssignment, caseTypeDefinition));
     }
 
     @Test
@@ -134,7 +134,7 @@ class AuthorisationsMatcherTest extends BaseFilter {
             false,
             Lists.newArrayList(AUTHORISATION_1));
         when(caseTypeDefinition.getRoleToAccessProfiles()).thenReturn(roleToAccessProfileDefinitions);
-        assertFalse(classUnderTest.matchAttribute(roleAssignment, caseTypeDefinition));
+        assertTrue(classUnderTest.matchAttribute(roleAssignment, caseTypeDefinition));
     }
 
     @Test
