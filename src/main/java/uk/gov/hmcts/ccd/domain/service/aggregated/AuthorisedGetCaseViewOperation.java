@@ -1,14 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
@@ -16,12 +14,23 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_GRANTED;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_GRANTED_LABEL;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_PROCESS;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_PROCESS_LABEL;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
@@ -33,7 +42,9 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
     private static final Logger LOG = LoggerFactory.getLogger(AuthorisedGetCaseViewOperation.class);
 
     public static final String QUALIFIER = "authorised";
+
     private final GetCaseViewOperation getCaseViewOperation;
+    private final CaseDataAccessControl caseDataAccessControl;
 
     public AuthorisedGetCaseViewOperation(
         final @Qualifier(DefaultGetCaseViewOperation.QUALIFIER) GetCaseViewOperation getCaseViewOperation,
@@ -43,6 +54,7 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
         CaseDataAccessControl caseDataAccessControl) {
         super(caseDefinitionRepository, accessControlService, caseDetailsRepository, caseDataAccessControl);
         this.getCaseViewOperation = getCaseViewOperation;
+        this.caseDataAccessControl = caseDataAccessControl;
     }
 
     @Override
@@ -54,7 +66,37 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
         verifyCaseTypeReadAccess(caseTypeDefinition, accessProfiles);
         filterCaseTabFieldsByReadAccess(caseView, accessProfiles);
         filterAllowedTabsWithFields(caseView, accessProfiles);
+        updateWithAccessControlMetadata(caseView);
         return filterUpsertAccess(caseReference, caseTypeDefinition, accessProfiles, caseView);
+    }
+
+    private void updateWithAccessControlMetadata(CaseView caseView) {
+        CaseAccessMetadata caseAccessMetadata = caseDataAccessControl.generateAccessMetadata(caseView.getCaseId());
+        CaseViewField caseViewFieldAccessGranted = new CaseViewField();
+
+        List<CaseViewField> metadataFieldsToAdd = new ArrayList<>();
+
+        if (caseAccessMetadata.getAccessGrants() != null) {
+            caseViewFieldAccessGranted.setId(ACCESS_GRANTED);
+            caseViewFieldAccessGranted.setLabel(ACCESS_GRANTED_LABEL);
+            caseViewFieldAccessGranted.setSecurityLabel(SecurityClassification.PUBLIC.name());
+            caseViewFieldAccessGranted.setValue(caseAccessMetadata.getAccessGrantsString());
+            metadataFieldsToAdd.add(caseViewFieldAccessGranted);
+        }
+
+        CaseViewField caseViewFieldAccessProcess = new CaseViewField();
+
+        if (caseAccessMetadata.getAccessProcess() != null) {
+            caseViewFieldAccessProcess.setId(ACCESS_PROCESS);
+            caseViewFieldAccessProcess.setLabel(ACCESS_PROCESS_LABEL);
+            caseViewFieldAccessProcess.setSecurityLabel(SecurityClassification.PUBLIC.name());
+            caseViewFieldAccessProcess.setValue(caseAccessMetadata.getAccessProcessString());
+            metadataFieldsToAdd.add(caseViewFieldAccessProcess);
+        }
+
+        if (!metadataFieldsToAdd.isEmpty()) {
+            caseView.addMetadataFields(metadataFieldsToAdd);
+        }
     }
 
     private void filterCaseTabFieldsByReadAccess(CaseView caseView, Set<AccessProfile> accessProfiles) {

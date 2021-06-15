@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -55,8 +56,8 @@ public class AccessControlServiceImpl implements AccessControlService {
 
         if (!hasAccess) {
             LOG.debug("No relevant case type access for caseType={}, caseTypeACLs={}, userRoles={}",
-                     caseType != null ? caseType.getId() : "",
-                     caseType.getAccessControlLists(),
+                caseType != null ? caseType.getId() : "",
+                caseType != null ? caseType.getAccessControlLists() : Lists.newArrayList(),
                 accessProfiles);
         }
 

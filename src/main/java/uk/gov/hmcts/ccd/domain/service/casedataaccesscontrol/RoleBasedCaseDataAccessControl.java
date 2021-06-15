@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import com.google.common.collect.Sets;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -13,8 +11,12 @@ import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
@@ -63,6 +65,11 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
     @Override
     public Set<AccessProfile> getCaseUserAccessProfilesByUserId() {
         return userRoleToAccessProfiles(caseUserRepository.getCaseUserRolesByUserId(userRepository.getUserId()));
+    }
+
+    @Override
+    public CaseAccessMetadata generateAccessMetadata(String reference) {
+        return new CaseAccessMetadata();
     }
 
     private Set<AccessProfile> userRoleToAccessProfiles(Set<String> roles) {

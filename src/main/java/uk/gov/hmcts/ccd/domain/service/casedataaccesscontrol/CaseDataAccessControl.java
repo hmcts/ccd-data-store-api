@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
+
 import java.util.HashSet;
 import java.util.Set;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 
 public interface CaseDataAccessControl {
 
@@ -17,4 +19,6 @@ public interface CaseDataAccessControl {
     default void grantAccess(String caseId, String idamUserId) {
 
     }
+
+    CaseAccessMetadata generateAccessMetadata(String caseId);
 }

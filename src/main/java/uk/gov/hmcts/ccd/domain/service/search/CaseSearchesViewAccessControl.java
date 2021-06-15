@@ -1,9 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.search;
 
-import java.util.List;
-import java.util.Set;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -12,6 +11,9 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessContr
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
+
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class CaseSearchesViewAccessControl {
@@ -67,5 +69,10 @@ public class CaseSearchesViewAccessControl {
 
     private Set<AccessProfile> getAccessProfiles(String caseTypeId) {
         return caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
+    }
+
+
+    public CaseAccessMetadata getCaseAccessMetaData(String caseReference) {
+        return caseDataAccessControl.generateAccessMetadata(caseReference);
     }
 }
