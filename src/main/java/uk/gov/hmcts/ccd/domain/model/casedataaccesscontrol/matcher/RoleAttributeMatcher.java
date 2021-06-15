@@ -19,12 +19,13 @@ public interface RoleAttributeMatcher {
         return true;
     }
 
+    @SuppressWarnings("java:S2789")
     default boolean isValuesMatching(Optional<String> roleAssignmentValue,
                                      String caseDataValue) {
-        if (roleAssignmentValue != null) {
-            return roleAssignmentValue.isEmpty()
-                || roleAssignmentValue.get().equals(caseDataValue);
+        if (roleAssignmentValue == null) {
+            return true;
         }
-        return true;
+        return roleAssignmentValue.isEmpty()
+            || roleAssignmentValue.get().equals(caseDataValue);
     }
 }
