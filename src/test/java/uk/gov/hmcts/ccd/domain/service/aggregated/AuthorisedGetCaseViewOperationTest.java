@@ -18,10 +18,8 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
@@ -33,7 +31,6 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -50,8 +47,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -279,7 +274,7 @@ class AuthorisedGetCaseViewOperationTest {
             .canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, ACCESS_PROFILES, CAN_READ);
         doReturn(false).when(accessControlService)
             .canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, ACCESS_PROFILES,
-            CAN_UPDATE);
+                CAN_UPDATE);
 
         CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
 
@@ -293,10 +288,10 @@ class AuthorisedGetCaseViewOperationTest {
             .canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, ACCESS_PROFILES, CAN_READ);
         doReturn(true).when(accessControlService)
             .canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, ACCESS_PROFILES,
-            CAN_UPDATE);
+                CAN_UPDATE);
         doReturn(false).when(accessControlService)
             .canAccessCaseStateWithCriteria(STATE, TEST_CASE_TYPE, ACCESS_PROFILES,
-            CAN_UPDATE);
+                CAN_UPDATE);
 
         CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
 
@@ -310,10 +305,10 @@ class AuthorisedGetCaseViewOperationTest {
             .canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, ACCESS_PROFILES, CAN_READ);
         doReturn(true).when(accessControlService)
             .canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, ACCESS_PROFILES,
-            CAN_UPDATE);
+                CAN_UPDATE);
         doReturn(true).when(accessControlService)
             .canAccessCaseStateWithCriteria(STATE, TEST_CASE_TYPE, ACCESS_PROFILES,
-            CAN_UPDATE);
+                CAN_UPDATE);
         doReturn(AUTH_CASE_VIEW_TRIGGERS)
             .when(accessControlService).filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getActionableEvents(),
             TEST_CASE_TYPE.getEvents(), ACCESS_PROFILES);
@@ -330,7 +325,7 @@ class AuthorisedGetCaseViewOperationTest {
             .canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, ACCESS_PROFILES, CAN_READ);
         doReturn(true).when(accessControlService)
             .canAccessCaseTypeWithCriteria(TEST_CASE_TYPE, ACCESS_PROFILES,
-            CAN_UPDATE);
+                CAN_UPDATE);
         doReturn(EMPTY_TRIGGERS)
             .when(accessControlService).filterCaseViewTriggersByCreateAccess(TEST_CASE_VIEW.getActionableEvents(),
             TEST_CASE_TYPE.getEvents(), ACCESS_PROFILES);
@@ -391,34 +386,6 @@ class AuthorisedGetCaseViewOperationTest {
         CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
 
         assertThat(caseView.getMetadataFields(), is(nullValue()));
-    }
-
-    @Test
-    @DisplayName("should return case containing case access metadata")
-    void shouldReturnCaseWithCaseAccessMetadata() {
-        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE,
-            ACCESS_PROFILES,
-            CAN_READ);
-
-        CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
-        caseAccessMetadata.setAccessProcess(AccessProcess.CHALLENGED);
-        caseAccessMetadata.setAccessGrants(List.of(GrantType.BASIC, GrantType.SPECIFIC, GrantType.CHALLENGED));
-
-        when(caseDataAccessControl.generateAccessMetadata(any()))
-            .thenReturn(caseAccessMetadata);
-
-        CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
-
-        assertTrue(caseView.getMetadataFields().stream()
-            .anyMatch(AuthorisedGetCaseViewOperationTest::caseViewFieldContainsCaseAccessMetadata));
-    }
-
-    private static boolean caseViewFieldContainsCaseAccessMetadata(CaseViewField caseViewField) {
-        final String accessGrantString = GrantType.BASIC.name() + "," + GrantType.CHALLENGED + "," + GrantType.SPECIFIC;
-        return (caseViewField.getId().equals(CaseAccessMetadata.ACCESS_PROCESS)
-            && caseViewField.getValue().equals(AccessProcess.CHALLENGED.name()))
-            || (caseViewField.getId().equals(CaseAccessMetadata.ACCESS_GRANTED)
-            && caseViewField.getValue().equals(accessGrantString));
     }
 
     @Test
