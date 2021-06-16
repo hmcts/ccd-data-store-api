@@ -22,11 +22,16 @@ public class RoleNameMatcher implements RoleAttributeMatcher {
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseTypeDefinition caseTypeDefinition) {
         String roleName = roleAssignment.getRoleName();
         List<RoleToAccessProfileDefinition> roleToAccessProfiles = caseTypeDefinition.getRoleToAccessProfiles();
-
-        return roleToAccessProfiles
+        boolean matchedRoleName = roleToAccessProfiles
             .stream()
             .filter(e -> e.getRoleName() != null)
             .map(RoleToAccessProfileDefinition::getRoleName)
             .anyMatch(e -> e.equals(roleName));
+        log.debug("Role Assignment id: {}, roleName: {} - Matching RoleName to {}",
+            roleAssignment.getId(),
+            roleAssignment.getRoleName(),
+            matchedRoleName);
+
+        return matchedRoleName;
     }
 }

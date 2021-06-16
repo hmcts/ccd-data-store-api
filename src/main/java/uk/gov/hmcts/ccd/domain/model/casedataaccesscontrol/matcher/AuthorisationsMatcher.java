@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
-import java.util.List;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +10,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AuthorisationMapper;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+
+import java.util.List;
+import java.util.Map;
+
+import static java.lang.String.join;
 
 @Slf4j
 @Component
@@ -46,13 +49,28 @@ public class AuthorisationsMatcher implements RoleAttributeMatcher {
             .get(roleAssignment.getRoleName());
         List<String> roleAssignmentAuthorisations = roleAssignment.getAuthorisations();
 
-        if (!CollectionUtils.isEmpty(roleAssignmentAuthorisations)
+        boolean emptyRoleAssignmentAuthorisations = CollectionUtils.isEmpty(roleAssignmentAuthorisations);
+        if (!emptyRoleAssignmentAuthorisations
             && roleToAccessProfileDefinition != null
             && !roleToAccessProfileDefinition.getDisabled()) {
             List<String> definitionAuthorisations = roleToAccessProfileDefinition.getAuthorisationList();
-            return authorisationMapper.authorisationsAllowMappingToAccessProfiles(definitionAuthorisations,
+            boolean match = authorisationMapper.authorisationsAllowMappingToAccessProfiles(definitionAuthorisations,
                 roleAssignmentAuthorisations);
+            log.debug("Role Assignment id: {}, roleName: {} - Matching Authorisations to {} from Access Profiles: {}" +
+                    " with role assignment Authorisations: {}",
+                roleAssignment.getId(),
+                roleAssignment.getRoleName(),
+                match,
+                join(",", definitionAuthorisations),
+                join(",", roleAssignmentAuthorisations));
+            return match;
         }
-        return CollectionUtils.isEmpty(roleAssignment.getAuthorisations());
+        log.debug("Role Assignment id: {}, roleName: {} - Matching Authorisations to {}" +
+                " with role assignment Authorisations: {}",
+            roleAssignment.getId(),
+            roleAssignment.getRoleName(),
+            emptyRoleAssignmentAuthorisations,
+            join(",", roleAssignmentAuthorisations));
+        return emptyRoleAssignmentAuthorisations;
     }
 }

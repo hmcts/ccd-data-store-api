@@ -12,6 +12,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentAttributesResource;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResource;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 
@@ -155,7 +156,7 @@ class RoleAssignmentsMapperTest {
             .roleType("CASE") // ORGANISATION, CASE
             .roleName("judiciary")
             .classification("PUBLIC")
-            .grantType("STANDARD") // BASIC, STANDARD, SPECIFIC, CHALLENGED, EXCLUDED
+            .grantType(GrantType.STANDARD.name()) // BASIC, STANDARD, SPECIFIC, CHALLENGED, EXCLUDED
             .roleCategory("JUDICIAL") // JUDICIAL, STAFF
             .readOnly(false)
             .beginTime(BEGIN_TIME)

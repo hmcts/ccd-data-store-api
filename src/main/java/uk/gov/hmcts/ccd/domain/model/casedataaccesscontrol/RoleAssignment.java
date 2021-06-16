@@ -30,7 +30,7 @@ public class RoleAssignment {
             && !this.getAttributes().getCaseId().isEmpty();
     }
 
-    public boolean isAnExpiredRoleAssignment() {
+    public boolean isNotExpiredRoleAssignment() {
         final Instant machineTimestamp = Instant.now();
         return machineTimestamp.isAfter(beginTime) && machineTimestamp.isBefore(endTime);
     }

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -10,8 +11,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 @Component
 public class GrantTypeMatcher implements RoleAttributeMatcher {
 
-    public static final String GRANT_TYPE_EXCLUDED = "EXCLUDED";
-
     @Override
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseDetails caseDetails) {
         return true;
@@ -19,6 +18,12 @@ public class GrantTypeMatcher implements RoleAttributeMatcher {
 
     @Override
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseTypeDefinition caseTypeDefinition) {
-        return !GRANT_TYPE_EXCLUDED.equals(roleAssignment.getGrantType());
+        boolean matchedGrantType = !GrantType.EXCLUDED.name().equals(roleAssignment.getGrantType());
+        log.debug("Role Assignment id: {}, roleName: {} - Matching GrantType to {}",
+            roleAssignment.getId(),
+            roleAssignment.getRoleName(),
+            matchedGrantType);
+
+        return matchedGrantType;
     }
 }

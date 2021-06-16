@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -21,7 +22,7 @@ class GrantTypeMatcherTest extends BaseFilter {
 
     @Test
     void shouldAlwaysMatchGrantTapeForMatchAttributeWithCaseDetails() {
-        RoleAssignment roleAssignment = createRoleAssignmentWithGrantType("EXCLUDED");
+        RoleAssignment roleAssignment = createRoleAssignmentWithGrantType(GrantType.EXCLUDED.name());
 
         CaseDetails caseDetails = mockCaseDetails();
         assertTrue(classUnderTest.matchAttribute(roleAssignment, caseDetails));
@@ -29,7 +30,7 @@ class GrantTypeMatcherTest extends BaseFilter {
 
     @Test
     void shouldMatchWhenGrantTapeNotExcluded() {
-        RoleAssignment roleAssignment = createRoleAssignmentWithGrantType("BASIC");
+        RoleAssignment roleAssignment = createRoleAssignmentWithGrantType(GrantType.BASIC.name());
 
         CaseTypeDefinition caseTypeDefinition = mockCaseTypeDefinition();
         assertTrue(classUnderTest.matchAttribute(roleAssignment, caseTypeDefinition));
@@ -37,7 +38,7 @@ class GrantTypeMatcherTest extends BaseFilter {
 
     @Test
     void shouldNotMatchWhenGrantTapeExcluded() {
-        RoleAssignment roleAssignment = createRoleAssignmentWithGrantType("EXCLUDED");
+        RoleAssignment roleAssignment = createRoleAssignmentWithGrantType(GrantType.EXCLUDED.name());
 
         CaseTypeDefinition caseTypeDefinition = mockCaseTypeDefinition();
         assertFalse(classUnderTest.matchAttribute(roleAssignment, caseTypeDefinition));

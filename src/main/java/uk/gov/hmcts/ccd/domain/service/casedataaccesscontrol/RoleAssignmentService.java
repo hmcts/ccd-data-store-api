@@ -41,12 +41,7 @@ public class RoleAssignmentService implements AccessControl {
 
     public List<String> getCaseReferencesForAGivenUser(String userId) {
         final RoleAssignments roleAssignments = this.getRoleAssignments(userId);
-
-        return roleAssignments.getRoleAssignments().stream()
-            .filter(roleAssignment -> isAValidRoleAssignments(roleAssignment))
-            .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
-            .flatMap(Optional::stream)
-            .collect(Collectors.toList());
+        return getValidCaseIds(roleAssignments.getRoleAssignments());
     }
 
     public List<String> getCaseReferencesForAGivenUser(String userId, CaseTypeDefinition caseTypeDefinition) {
@@ -55,8 +50,12 @@ public class RoleAssignmentService implements AccessControl {
         List<RoleAssignment> filteredRoleAssignments = roleAssignmentsFilteringService
                 .filter(roleAssignments, caseTypeDefinition);
 
-        return filteredRoleAssignments.stream()
-            .filter(roleAssignment -> isAValidRoleAssignments(roleAssignment))
+        return getValidCaseIds(filteredRoleAssignments);
+    }
+
+    private List<String> getValidCaseIds(List<RoleAssignment> roleAssignmentsList) {
+        return roleAssignmentsList.stream()
+            .filter(this::isAValidRoleAssignments)
             .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
             .flatMap(Optional::stream)
             .collect(Collectors.toList());
@@ -64,7 +63,7 @@ public class RoleAssignmentService implements AccessControl {
 
     private boolean isAValidRoleAssignments(RoleAssignment roleAssignment) {
         final boolean isCaseRoleType = roleAssignment.getRoleType().equals(RoleType.CASE.name());
-        return roleAssignment.isAnExpiredRoleAssignment() && isCaseRoleType;
+        return roleAssignment.isNotExpiredRoleAssignment() && isCaseRoleType;
     }
 
     public List<CaseAssignedUserRole> findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds) {
