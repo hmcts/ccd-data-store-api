@@ -28,9 +28,8 @@ class RoleNameMatcherTest extends BaseFilter {
 
     @Test
     void shouldAlwaysMatchRoleNameForMatchAttributeWithCaseDetails() {
-        RoleAssignment roleAssignment = createRoleAssignmentWithRoleName(ROLE_NAME1);
-
-        CaseDetails caseDetails = mockCaseDetails();
+        RoleAssignment roleAssignment = null;
+        CaseDetails caseDetails = null;
         assertTrue(classUnderTest.matchAttribute(roleAssignment, caseDetails));
     }
 

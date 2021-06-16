@@ -17,8 +17,10 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REFERENCE_FIELD_COL;
 
@@ -52,13 +54,27 @@ class ElasticsearchUserCaseAccessFilterTest {
 
         Optional<QueryBuilder> optQueryBuilder = filter.getFilter(caseTypeId);
 
-        assertThat(optQueryBuilder.isPresent(), is(true));
+        assertTrue(optQueryBuilder.isPresent());
         assertThat(optQueryBuilder.get(), instanceOf(TermsQueryBuilder.class));
         TermsQueryBuilder queryBuilder = (TermsQueryBuilder) optQueryBuilder.get();
         assertThat(queryBuilder.fieldName(), is(REFERENCE_FIELD_COL));
         assertThat(queryBuilder.values(), hasItem(caseId));
 
         verify(caseAccessService).getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
+    }
+
+    @Test
+    void shouldReturnOptionalEmptyWhenNoCaseTypeDefinitionFound() {
+        String caseTypeId = "caseType";
+
+        when(caseDefinitionRepository.getCaseType(caseTypeId))
+            .thenReturn(null);
+
+        Optional<QueryBuilder> optQueryBuilder = filter.getFilter(caseTypeId);
+
+        assertTrue(optQueryBuilder.isEmpty());
+
+        verifyZeroInteractions(caseAccessService);
     }
 
 }

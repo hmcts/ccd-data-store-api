@@ -22,9 +22,8 @@ class GrantTypeMatcherTest extends BaseFilter {
 
     @Test
     void shouldAlwaysMatchGrantTapeForMatchAttributeWithCaseDetails() {
-        RoleAssignment roleAssignment = createRoleAssignmentWithGrantType(GrantType.EXCLUDED.name());
-
-        CaseDetails caseDetails = mockCaseDetails();
+        RoleAssignment roleAssignment = null;
+        CaseDetails caseDetails = null;
         assertTrue(classUnderTest.matchAttribute(roleAssignment, caseDetails));
     }
 

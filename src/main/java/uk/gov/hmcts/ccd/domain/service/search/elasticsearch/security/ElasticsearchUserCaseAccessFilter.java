@@ -37,6 +37,9 @@ public class ElasticsearchUserCaseAccessFilter implements CaseSearchFilter {
     public Optional<QueryBuilder> getFilter(String caseTypeId) {
         Instant start = Instant.now();
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
+        if (caseTypeDefinition == null) {
+            return Optional.empty();
+        }
 
         return getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition).map(caseReferences -> {
             Duration between = Duration.between(start, Instant.now());
