@@ -81,8 +81,13 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     @Override
     public Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference) {
         Optional<CaseDetails> caseDetails =  caseDetailsRepository.findByReference(caseReference);
+        // R.A uses external micro-services which referer cases by caseReference
+        // Non R.A uses internal case id. Both cases should be contemplated in the code.
         if (caseDetails.isEmpty()) {
-            return Sets.newHashSet();
+            caseDetails = caseDetailsRepository.findById(null,Long.parseLong(caseReference));
+            if (caseDetails.isEmpty()) {
+                return Sets.newHashSet();
+            }
         }
         RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
         List<RoleAssignment> filteringResults = roleAssignmentsFilteringService

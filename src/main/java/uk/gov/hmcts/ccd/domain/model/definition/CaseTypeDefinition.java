@@ -38,6 +38,7 @@ public class CaseTypeDefinition implements Serializable {
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
     private final List<SearchAliasField> searchAliasFields = new ArrayList<>();
+    @JsonProperty("roleToAccessProfiles")
     private List<RoleToAccessProfileDefinition> roleToAccessProfiles = new ArrayList<>();
 
     public String getId() {

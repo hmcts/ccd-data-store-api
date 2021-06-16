@@ -1,25 +1,30 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.google.common.collect.Sets;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
+import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
@@ -38,17 +43,27 @@ public class CaseAccessService {
 
     private final UserRepository userRepository;
     private final CaseUserRepository caseUserRepository;
+    private final RoleAssignmentService roleAssignmentService;
+    private final ApplicationParams applicationParams;
+    private final CaseDetailsRepository caseDetailsRepository;
     private final CaseDataAccessControl caseDataAccessControl;
 
     private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN
-        = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-."
-        + "+-localAuthority$");
+            = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-."
+            + "+-localAuthority$");
 
     public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                              @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseUserRepository caseUserRepository,
-                             @Lazy CaseDataAccessControl caseDataAccessControl) {
+                             @Lazy CaseDataAccessControl caseDataAccessControl,
+                             RoleAssignmentService roleAssignmentService, ApplicationParams applicationParams,
+                             @Qualifier(CachedCaseUserRepository.QUALIFIER) CaseDetailsRepository caseDetailsRepository
+    ) {
+
         this.userRepository = userRepository;
         this.caseUserRepository = caseUserRepository;
+        this.roleAssignmentService = roleAssignmentService;
+        this.applicationParams = applicationParams;
+        this.caseDetailsRepository = caseDetailsRepository;
         this.caseDataAccessControl = caseDataAccessControl;
     }
 
@@ -69,11 +84,18 @@ public class CaseAccessService {
             .orElse(AccessLevel.ALL);
     }
 
-    public Optional<List<Long>> getGrantedCaseIdsForRestrictedRoles() {
+    public Optional<List<Long>> getGrantedCaseReferencesForRestrictedRoles() {
         if (userCanOnlyAccessExplicitlyGrantedCases()) {
-            return Optional.of(caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId()));
+            List<Long> caseReferences;
+            if (applicationParams.getEnableAttributeBasedAccessControl()) {
+                caseReferences = roleAssignmentService.getCaseReferencesForAGivenUser(userRepository.getUserId())
+                    .stream().map(Long::parseLong).collect(Collectors.toList());
+            } else {
+                final var ids = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
+                caseReferences = caseDetailsRepository.findCaseReferencesByIds(ids);
+            }
+            return Optional.of(caseReferences);
         }
-
         return Optional.empty();
     }
 
