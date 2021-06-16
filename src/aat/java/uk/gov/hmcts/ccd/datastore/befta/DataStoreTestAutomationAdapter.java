@@ -4,9 +4,8 @@ import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import org.junit.AssumptionViolatedException;
 import uk.gov.hmcts.befta.BeftaTestDataLoader;
-import uk.gov.hmcts.befta.DefaultBeftaTestDataLoader;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
-import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
+import uk.gov.hmcts.befta.dse.ccd.DataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.FunctionalTestException;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
@@ -22,8 +21,6 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.ccd.datastore.util.CaseIdHelper.hypheniseACaseId;
 
 public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter {
-
-    private TestDataLoaderToDefinitionStore loader = new TestDataLoaderToDefinitionStore(this);
 
     private static Map<String, String> uniqueStringsPerTestData = new ConcurrentHashMap<>();
 
@@ -52,13 +49,8 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     @Override
     protected BeftaTestDataLoader buildTestDataLoader() {
-        return new DefaultBeftaTestDataLoader() {
-            @Override
-            public void doLoadTestData() {
-                DataStoreTestAutomationAdapter.this.loader.addCcdRoles();
-                DataStoreTestAutomationAdapter.this.loader.importDefinitions();
-            }
-        };
+        return new DataLoaderToDefinitionStore(this,
+            DataLoaderToDefinitionStore.VALID_CCD_TEST_DEFINITIONS_PATH);
     }
 
     @Override
