@@ -56,8 +56,8 @@ public class AuthorisationsMatcher implements RoleAttributeMatcher {
             List<String> definitionAuthorisations = roleToAccessProfileDefinition.getAuthorisationList();
             boolean match = authorisationMapper.authorisationsAllowMappingToAccessProfiles(definitionAuthorisations,
                 roleAssignmentAuthorisations);
-            log.debug("Role Assignment id: {}, roleName: {} - Matching Authorisations to {} from Access Profiles: {}" +
-                    " with role assignment Authorisations: {}",
+            log.debug("Role Assignment id: {}, roleName: {} - Matching Authorisations to {} from Access Profiles: {}"
+                    + " with role assignment Authorisations: {}",
                 roleAssignment.getId(),
                 roleAssignment.getRoleName(),
                 match,
@@ -65,8 +65,8 @@ public class AuthorisationsMatcher implements RoleAttributeMatcher {
                 join(",", roleAssignmentAuthorisations));
             return match;
         }
-        log.debug("Role Assignment id: {}, roleName: {} - Matching Authorisations to {}" +
-                " with role assignment Authorisations: {}",
+        log.debug("Role Assignment id: {}, roleName: {} - Matching Authorisations to {}"
+                + " with role assignment Authorisations: {}",
             roleAssignment.getId(),
             roleAssignment.getRoleName(),
             emptyRoleAssignmentAuthorisations,
