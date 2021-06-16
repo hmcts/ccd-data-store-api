@@ -70,7 +70,7 @@ public class AuthorisationsMatcher implements RoleAttributeMatcher {
             roleAssignment.getId(),
             roleAssignment.getRoleName(),
             emptyRoleAssignmentAuthorisations,
-            join(",", roleAssignmentAuthorisations));
+            roleAssignmentAuthorisations != null ? join(",", roleAssignmentAuthorisations) : null);
         return emptyRoleAssignmentAuthorisations;
     }
 }

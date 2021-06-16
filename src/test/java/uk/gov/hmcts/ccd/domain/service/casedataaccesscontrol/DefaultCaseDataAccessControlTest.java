@@ -40,6 +40,7 @@ import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.BASIC;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.CHALLENGED;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.SPECIFIC;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.STANDARD;
 
 class DefaultCaseDataAccessControlTest {
 
@@ -303,7 +304,7 @@ class DefaultCaseDataAccessControlTest {
         CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, true);
 
         assertEquals(AccessProcess.NONE.name(), caseAccessMetadata.getAccessProcessString());
-        assertEquals(String.join(",", BASIC.name(), CHALLENGED.name(), SPECIFIC.name()),
+        assertEquals(String.join(",", BASIC.name(), CHALLENGED.name(), STANDARD.name()),
             caseAccessMetadata.getAccessGrantsString());
     }
 
