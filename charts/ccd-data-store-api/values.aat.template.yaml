@@ -3,17 +3,4 @@ java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   environment:
-    DATA_STORE_DB_NAME: ccd_data_store
     DATA_STORE_DB_HOST: ccd-data-store-api-postgres-db-v11-aat.postgres.database.azure.com
-  keyVaults:
-    ccd:
-      secrets:
-        - data-store-api-POSTGRES-USER-V11
-        - data-store-api-POSTGRES-PASS-V11
-        - data-store-api-draftStoreEncryptionSecret
-        - data-store-api-draft-key
-        - ccd-data-s2s-secret
-        - ccd-ELASTIC-SEARCH-URL
-        - ccd-ELASTIC-SEARCH-DATA-NODES-URL
-        - ccd-ELASTIC-SEARCH-PASSWORD
-        - AppInsightsInstrumentationKey
