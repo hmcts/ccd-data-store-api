@@ -31,7 +31,10 @@ public class RoleAssignment {
     }
 
     public boolean isNotExpiredRoleAssignment() {
-        final Instant machineTimestamp = Instant.now();
-        return machineTimestamp.isAfter(beginTime) && machineTimestamp.isBefore(endTime);
+        if (beginTime != null && endTime != null) {
+            final Instant machineTimestamp = Instant.now();
+            return machineTimestamp.isAfter(beginTime) && machineTimestamp.isBefore(endTime);
+        }
+        return false;
     }
 }

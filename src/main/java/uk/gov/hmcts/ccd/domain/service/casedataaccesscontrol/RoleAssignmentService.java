@@ -55,13 +55,13 @@ public class RoleAssignmentService implements AccessControl {
 
     private List<String> getValidCaseIds(List<RoleAssignment> roleAssignmentsList) {
         return roleAssignmentsList.stream()
-            .filter(this::isAValidRoleAssignments)
+            .filter(this::isValidRoleAssignment)
             .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
             .flatMap(Optional::stream)
             .collect(Collectors.toList());
     }
 
-    private boolean isAValidRoleAssignments(RoleAssignment roleAssignment) {
+    private boolean isValidRoleAssignment(RoleAssignment roleAssignment) {
         final boolean isCaseRoleType = roleAssignment.getRoleType().equals(RoleType.CASE.name());
         return roleAssignment.isNotExpiredRoleAssignment() && isCaseRoleType;
     }
@@ -73,7 +73,7 @@ public class RoleAssignmentService implements AccessControl {
         final RoleAssignments roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
         var caseIdError = new RuntimeException(RoleAssignmentAttributes.ATTRIBUTE_NOT_DEFINED);
         return roleAssignments.getRoleAssignments().stream()
-            .filter(roleAssignment -> isAValidRoleAssignments(roleAssignment))
+            .filter(roleAssignment -> isValidRoleAssignment(roleAssignment))
             .map(roleAssignment ->
                 new CaseAssignedUserRole(
                     roleAssignment.getAttributes().getCaseId().orElseThrow(() -> caseIdError),
