@@ -43,8 +43,8 @@ public class ElasticsearchUserCaseAccessFilter implements CaseSearchFilter {
 
         return getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition).map(caseReferences -> {
             Duration between = Duration.between(start, Instant.now());
-            log.info("retrieved {} granted case references in {} millisecs...",
-                    caseReferences.size(), between.toMillis());
+            log.info("retrieved {} granted case references {} in {} millisecs...",
+                    caseReferences.size(), String.join(",", caseReferences.toString()), between.toMillis());
             return QueryBuilders.termsQuery(REFERENCE_FIELD_COL, caseReferences);
         });
     }

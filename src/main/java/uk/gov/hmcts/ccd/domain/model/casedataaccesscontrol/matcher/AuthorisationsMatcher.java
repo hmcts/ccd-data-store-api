@@ -50,9 +50,7 @@ public class AuthorisationsMatcher implements RoleAttributeMatcher {
         List<String> roleAssignmentAuthorisations = roleAssignment.getAuthorisations();
 
         boolean emptyRoleAssignmentAuthorisations = CollectionUtils.isEmpty(roleAssignmentAuthorisations);
-        if (!emptyRoleAssignmentAuthorisations
-            && roleToAccessProfileDefinition != null
-            && !roleToAccessProfileDefinition.getDisabled()) {
+        if (!emptyRoleAssignmentAuthorisations && roleToAccessProfileDefinition != null) {
             List<String> definitionAuthorisations = roleToAccessProfileDefinition.getAuthorisationList();
             boolean match = authorisationMapper.authorisationsAllowMappingToAccessProfiles(definitionAuthorisations,
                 roleAssignmentAuthorisations);
