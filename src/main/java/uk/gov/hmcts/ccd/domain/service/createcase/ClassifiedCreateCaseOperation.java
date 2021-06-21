@@ -31,6 +31,6 @@ public class ClassifiedCreateCaseOperation implements CreateCaseOperation {
         if (null == caseDetails) {
             return null;
         }
-        return classificationService.applyClassification(caseDetails).orElse(null);
+        return classificationService.applyClassification(caseDetails, true).orElse(null);
     }
 }

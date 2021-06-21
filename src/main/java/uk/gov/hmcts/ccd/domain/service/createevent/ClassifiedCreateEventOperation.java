@@ -29,7 +29,7 @@ public class ClassifiedCreateEventOperation implements CreateEventOperation {
         final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseReference,
                                                                            content);
         return Optional.ofNullable(caseDetails)
-                       .flatMap(classificationService::applyClassification)
+                       .flatMap(details -> classificationService.applyClassification(details, true))
                        .orElse(null);
     }
 }

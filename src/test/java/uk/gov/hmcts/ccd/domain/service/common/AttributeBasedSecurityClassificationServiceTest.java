@@ -42,7 +42,7 @@ class AttributeBasedSecurityClassificationServiceTest {
         when(caseDetails.getReferenceAsString()).thenReturn(CASE_REFERENCE);
 
         when(caseDataAccessControl.generateAccessProfilesByCaseReference(CASE_REFERENCE)).thenReturn(null);
-        Optional<SecurityClassification> classification =  classUnderTest.getUserClassification(caseDetails);
+        Optional<SecurityClassification> classification =  classUnderTest.getUserClassification(caseDetails, false);
         assertTrue(classification.isEmpty());
     }
 
@@ -56,7 +56,7 @@ class AttributeBasedSecurityClassificationServiceTest {
 
         when(caseDataAccessControl.generateAccessProfilesByCaseReference(CASE_REFERENCE))
             .thenReturn(Sets.newHashSet(accessProfile));
-        Optional<SecurityClassification> classification =  classUnderTest.getUserClassification(caseDetails);
+        Optional<SecurityClassification> classification =  classUnderTest.getUserClassification(caseDetails, false);
         assertEquals(classification.get(), SecurityClassification.PUBLIC);
     }
 
@@ -73,7 +73,7 @@ class AttributeBasedSecurityClassificationServiceTest {
 
         when(caseDataAccessControl.generateAccessProfilesByCaseReference(CASE_REFERENCE))
             .thenReturn(Sets.newHashSet(accessProfile, privateAccessProfile));
-        Optional<SecurityClassification> classification =  classUnderTest.getUserClassification(caseDetails);
+        Optional<SecurityClassification> classification =  classUnderTest.getUserClassification(caseDetails, false);
         assertEquals(classification.get(), SecurityClassification.PRIVATE);
     }
 }
