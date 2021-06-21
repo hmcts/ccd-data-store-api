@@ -70,6 +70,35 @@ class AuditInterceptorTest {
     }
 
     @Test
+    void shouldPrepareAuditContextWithHttpSemanticsForInvalidValues() {
+        request = new MockHttpServletRequest("METHOD", REQUEST_URI);
+        request.addHeader(AuditInterceptor.REQUEST_ID, "invalid request id");
+        AuditContext auditContext = new AuditContext();
+
+        given(handler.hasMethodAnnotation(LogAudit.class)).willReturn(true);
+        AuditContextHolder.setAuditContext(auditContext);
+
+        interceptor.afterCompletion(request, response, handler, null);
+
+        assertThat(auditContext.getHttpMethod()).isEqualTo(interceptor.BAD_VALUE_TOKEN);
+        assertThat(auditContext.getRequestPath()).isEqualTo(REQUEST_URI);
+        assertThat(auditContext.getHttpStatus()).isEqualTo(STATUS);
+        assertThat(auditContext.getRequestId()).isEqualTo(interceptor.BAD_VALUE_TOKEN);
+
+        assertThat(AuditContextHolder.getAuditContext()).isNull();
+
+        verify(auditService).audit(auditContext);
+
+        auditContext = new AuditContext();
+        request.removeHeader(AuditInterceptor.REQUEST_ID);
+        interceptor.afterCompletion(request, response, handler, null);
+        assertThat(auditContext.getRequestId()).isNull();
+
+        assertThat(AuditContextHolder.getAuditContext()).isNull();
+
+    }
+
+    @Test
     void shouldNotAuditForWhenAnnotationIsNotPresent() {
 
         given(handler.hasMethodAnnotation(LogAudit.class)).willReturn(false);

@@ -275,7 +275,7 @@ Feature: F-105: Add Case-Assigned Users and Roles
      And the response has all the details as expected,
      And a call [to verify that Olawale hasn't received the role CR-1 over the case C1] will get the expected response as in [S-105.17_Verify_Case_Roles_for_Case_C1],
      And a call [to verify the count of users assigned to a case has NOT changed] will get the expected response as in [F-105_Verify_Counter_Unchanged].
-        
+
    # RDM-8842 AC-5
    @S-105.18
    Scenario: Must increment Assigned User Count when assigning a user and case role for a specific case if there was only [CREATOR] case user role assignment with the respective values in the request (by a user calling through/from an authorised application)

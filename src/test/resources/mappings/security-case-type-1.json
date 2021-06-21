@@ -837,6 +837,23 @@
               "delete": false
             }
           ]
+        },
+        {
+          "id": "PENDING",
+          "name": "Pending",
+          "description": null,
+          "order": 3,
+          "title_display": null,
+          "acls": [
+            {
+              "role": "[DEFENDANT]",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            }
+
+          ]
         }
       ],
       "acls": [

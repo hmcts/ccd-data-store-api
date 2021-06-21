@@ -7,9 +7,12 @@ import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
 
+import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
@@ -27,15 +30,19 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     private final CaseTypeService caseTypeService;
     private final AccessControlService accessControlService;
     private final UserRepository userRepository;
+    private final CaseUserRepository caseUserRepository;
 
     @Autowired
     public DefaultAuthorisedCaseDefinitionDataService(CaseTypeService caseTypeService,
                                                       AccessControlService accessControlService,
                                                       @Qualifier(CachedUserRepository.QUALIFIER)
-                                                              UserRepository userRepository) {
+                                                              UserRepository userRepository,
+                                                      @Qualifier(CachedCaseUserRepository.QUALIFIER)
+                                                      CaseUserRepository caseUserRepository) {
         this.caseTypeService = caseTypeService;
         this.accessControlService = accessControlService;
         this.userRepository = userRepository;
+        this.caseUserRepository = caseUserRepository;
     }
 
     @Override
@@ -82,7 +89,7 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
 
     private List<CaseStateDefinition> filterCaseStatesForUser(List<CaseStateDefinition> caseStateDefinitions,
                                                               Predicate<AccessControlList> access) {
-        return accessControlService.filterCaseStatesByAccess(caseStateDefinitions, getUserRoles(), access);
+        return accessControlService.filterCaseStatesByAccess(caseStateDefinitions, getCaseAndUserRoles(), access);
     }
 
     private List<String> collectCaseStateIds(List<CaseStateDefinition> caseStateDefinitions) {
@@ -91,5 +98,10 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
 
     private Set<String> getUserRoles() {
         return userRepository.getUserRoles();
+    }
+
+    private Set<String> getCaseAndUserRoles() {
+        return Sets.union(getUserRoles(),
+            caseUserRepository.getCaseUserRolesByUserId(userRepository.getUserId()));
     }
 }

@@ -53,24 +53,29 @@ public class UserProfileEndpointTest extends WireMockBaseTest {
         assertNull(userProfile.getChannels());
 
         final JurisdictionDisplayProperties[] jurisdictions = userProfile.getJurisdictions();
-        assertEquals(3, jurisdictions.length);
+        assertEquals(4, jurisdictions.length);
 
-        final JurisdictionDisplayProperties jurisdiction = jurisdictions[0];
-        assertEquals("PROBATE", jurisdiction.getId());
-        assertEquals("Test", jurisdiction.getName());
-        assertEquals("Test Jurisdiction", jurisdiction.getDescription());
+        final JurisdictionDisplayProperties jurisdiction0 = jurisdictions[0];
+        assertEquals("Test Case Role", jurisdiction0.getId());
+        assertEquals("Test Case Role", jurisdiction0.getName());
+        assertEquals("Test Jurisdiction", jurisdiction0.getDescription());
+
+        final JurisdictionDisplayProperties jurisdiction1 = jurisdictions[1];
+        assertEquals("PROBATE", jurisdiction1.getId());
+        assertEquals("Test", jurisdiction1.getName());
+        assertEquals("Test Jurisdiction", jurisdiction1.getDescription());
 
         final WorkbasketDefault workbasketDefault = userProfile.getDefaultSettings().getWorkbasketDefault();
         assertEquals("PROBATE", workbasketDefault.getJurisdictionId());
         assertEquals("TestAddressBookCase", workbasketDefault.getCaseTypeId());
         assertEquals("CaseCreated", workbasketDefault.getStateId());
 
-        final JurisdictionDisplayProperties jurisdiction2 = jurisdictions[1];
+        final JurisdictionDisplayProperties jurisdiction2 = jurisdictions[2];
         assertEquals("DIVORCE", jurisdiction2.getId());
         assertEquals("Test 2", jurisdiction2.getName());
         assertEquals("Test Jurisdiction 2", jurisdiction2.getDescription());
 
-        final JurisdictionDisplayProperties jurisdiction3 = jurisdictions[2];
+        final JurisdictionDisplayProperties jurisdiction3 = jurisdictions[3];
         assertEquals("SSCS", jurisdiction3.getId());
         assertEquals("Test 3", jurisdiction3.getName());
         assertEquals("Test Jurisdiction 3", jurisdiction3.getDescription());
