@@ -108,7 +108,7 @@ public class CaseDocumentService {
         );
 
         if (!violatingDocuments.isEmpty()) {
-            throw new ValidationException("Some message");  // TODO: suitable error message
+            throw new ValidationException("Document hashTokens are missing for the documents: " + violatingDocuments);
         }
     }
 

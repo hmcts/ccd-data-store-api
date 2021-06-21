@@ -174,7 +174,7 @@ public class CreateCaseEventService {
         final LocalDateTime timeNow = now();
 
         final List<DocumentHashToken> documentHashes = caseDocumentService.extractDocumentHashToken(
-            Optional.ofNullable(caseDetailsInDatabase.getData()).orElse(emptyMap()),
+            caseDetailsInDatabase.getData(),
             Optional.ofNullable(content.getData()).orElse(emptyMap()),
             Optional.ofNullable(caseDetailsAfterCallback.getData()).orElse(emptyMap())
         );
