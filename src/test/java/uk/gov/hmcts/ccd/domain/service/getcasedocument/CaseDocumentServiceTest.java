@@ -123,7 +123,7 @@ class CaseDocumentServiceTest extends TestFixtures {
 
         assertThat(thrown)
             .isInstanceOf(ValidationException.class)
-            .hasMessageStartingWith("Some message");
+            .hasMessageStartingWith("Document hashTokens are missing for the documents: ");
     }
 
     @Test
@@ -179,7 +179,7 @@ class CaseDocumentServiceTest extends TestFixtures {
         // Then
         assertThat(thrown)
             .isInstanceOf(ValidationException.class)
-            .hasMessageStartingWith("Some message");
+            .hasMessageStartingWith("Document hashTokens are missing for the documents: ");
 
         verify(documentUtils, times(3)).findDocumentsHashes(anyMap());
         verify(documentUtils).getTamperedHashes(anyList(), anyList());

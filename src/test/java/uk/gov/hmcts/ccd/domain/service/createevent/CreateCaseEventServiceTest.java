@@ -296,17 +296,19 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @Test
     @DisplayName("should update Last state modified")
     void shouldUpdateUserDetailsWhenOnBehalfOfUserTokenIsPassed() {
+        final String userToken = "Test_Token";
+
         caseDataContent = newCaseDataContent()
             .withEvent(event)
             .withData(data)
             .withToken(TOKEN)
             .withIgnoreWarning(IGNORE_WARNING)
-            .withOnBehalfOfUserToken("Test_Token")
+            .withOnBehalfOfUserToken(userToken)
             .build();
 
         final CreateCaseEventResult caseEventResult = underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
 
-        verify(userRepository).getUser("Test_Token");
+        verify(userRepository).getUser(userToken);
         verify(userRepository).getUser();
 
         assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
