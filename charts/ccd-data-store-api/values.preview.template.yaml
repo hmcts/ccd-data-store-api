@@ -6,8 +6,10 @@ java:
       resourceGroup: ccd-shared
       secrets:
         - data-store-api-draftStoreEncryptionSecret
-        - data-store-api-draft-key
-        - ccd-data-s2s-secret
+        - name: data-store-api-draft-key
+          alias: CCD_DRAFT_ENCRYPTION_KEY
+        - name: ccd-data-s2s-secret
+          alias: DATA_STORE_IDAM_KEY
   environment:
     AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY: "2dcb834e-768e-4429-9050-ab15af959995"
     DATA_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
