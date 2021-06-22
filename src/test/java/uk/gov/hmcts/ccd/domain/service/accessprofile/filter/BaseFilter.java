@@ -133,7 +133,7 @@ public class BaseFilter {
         roleAssignmentAttributes.setContractType(Optional.of("SALARIED"));
         roleAssignmentAttributes.setLocation(location);
         roleAssignmentAttributes.setRegion(region);
-        roleAssignmentAttributes.setCaseTypeId(Optional.of("TEST_CASE_TYPE"));
+        roleAssignmentAttributes.setCaseType(Optional.of("TEST_CASE_TYPE"));
         return roleAssignmentAttributes;
     }
 

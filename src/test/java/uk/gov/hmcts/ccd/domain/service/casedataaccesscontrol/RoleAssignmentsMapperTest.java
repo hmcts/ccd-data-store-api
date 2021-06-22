@@ -1,9 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
-import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,6 +11,11 @@ import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
+
+import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -89,7 +90,17 @@ class RoleAssignmentsMapperTest {
 
                 () -> assertThat(roleAssignments.get(1).getId(), is(ASSIGNMENT_2)),
                 () -> assertThat(roleAssignments.get(1).getAttributes().getCaseId(),
-                                 is(roleAssignment2.getAttributes().getCaseId()))
+                                 is(roleAssignment2.getAttributes().getCaseId())),
+                () -> assertThat(roleAssignments.get(1).getAttributes().getJurisdiction(),
+                    is(roleAssignment2.getAttributes().getJurisdiction())),
+                () -> assertThat(roleAssignments.get(1).getAttributes().getCaseType(),
+                    is(roleAssignment2.getAttributes().getCaseType())),
+                () -> assertThat(roleAssignments.get(1).getAttributes().getContractType(),
+                    is(roleAssignment2.getAttributes().getContractType())),
+                () -> assertThat(roleAssignments.get(1).getAttributes().getLocation(),
+                    is(roleAssignment2.getAttributes().getLocation())),
+                () -> assertThat(roleAssignments.get(1).getAttributes().getRegion(),
+                    is(roleAssignment2.getAttributes().getRegion()))
             );
         }
 
@@ -171,6 +182,7 @@ class RoleAssignmentsMapperTest {
         return RoleAssignmentAttributesResource.builder()
             .jurisdiction(Optional.of("DIVORCE"))
             .caseId(Optional.of(caseId))
+            .caseType(Optional.of("FT_Tabs"))
             .region(Optional.of("Hampshire"))
             .location(Optional.of("Southampton"))
             .contractType(Optional.of("SALARIED")) // SALARIED, FEEPAY
