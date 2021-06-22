@@ -9,6 +9,4 @@ spring:
         ccd-ELASTIC-SEARCH-URL: ELASTIC_SEARCH_HOSTS
         ccd-ELASTIC-SEARCH-DATA-NODES-URL: ELASTIC_SEARCH_DATA_NODES_HOSTS
         ccd-ELASTIC-SEARCH-PASSWORD: ELASTIC_SEARCH_PASSWORD
-        data-store-api-POSTGRES-USER: DATA_STORE_DB_USERNAME
-        data-store-api-POSTGRES-PASS: DATA_STORE_DB_PASSWORD
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
