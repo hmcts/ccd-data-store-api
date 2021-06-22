@@ -13,10 +13,8 @@ java:
   keyVaults:
     ccd:
       secrets:
-        - name: data-store-api-POSTGRES-USER
-          alias: DATA_STORE_DB_USERNAME
-        - name: data-store-api-POSTGRES-PASS
-          alias: DATA_STORE_DB_PASSWORD
+        - data-store-api-POSTGRES-USER
+        - data-store-api-POSTGRES-PASS
         - data-store-api-draftStoreEncryptionSecret
         - data-store-api-draft-key
         - ccd-data-s2s-secret
