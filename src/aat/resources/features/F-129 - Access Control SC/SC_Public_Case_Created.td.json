@@ -1,0 +1,62 @@
+{
+	"_guid_": "SC_Public_Case_Created",
+	"_extends_": "Case_Creation_Data_Base",
+
+	"users": {
+    "invokingUser": {
+      "_extends_" : "BeftaMasterPublicCaseworker"
+    }
+	},
+
+	"request": {
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "AUTOTEST1",
+			"ctid": "SC_Public"
+		},
+		"body": {
+      "data": {
+        "PublicTextField": "public text",
+        "PrivateTextField": "private text",
+        "RestrictedTextField": "restricted text"
+      },
+      "event": {
+        "id": "createCase"
+      },
+			"event_token": "${[scenarioContext][parentContext][childContexts][SC_Public_Case_Created_Token_Creation][testData][actualResponse][body][token]}"
+		}
+	},
+
+	"expectedResponse": {
+		"body": {
+			"id": "[[ANYTHING_PRESENT]]",
+			"jurisdiction": "AUTOTEST1",
+			"state": "CaseCreated",
+			"version": 0,
+			"case_type_id": "SC_Public",
+			"created_date": "[[ANYTHING_PRESENT]]",
+			"last_modified": "[[ANYTHING_PRESENT]]",
+			"last_state_modified_date": "[[ANYTHING_PRESENT]]",
+			"security_classification": "PUBLIC",
+			"case_data": {
+        "PublicTextField": "public text"
+      },
+			"data_classification": {
+        "PrivateTextField": "PRIVATE",
+        "PublicTextField": "PUBLIC",
+        "RestrictedTextField": "RESTRICTED"
+      },
+			"supplementary_data": null,
+			"after_submit_callback_response": null,
+			"callback_response_status_code": null,
+			"callback_response_status": null,
+			"delete_draft_response_status_code": null,
+			"delete_draft_response_status": null,
+			"security_classifications": {
+        "PublicTextField" : "PUBLIC",
+        "PrivateTextField" : "PRIVATE",
+        "RestrictedTextField" : "RESTRICTED"
+      }
+		}
+	}
+}

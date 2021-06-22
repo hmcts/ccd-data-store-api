@@ -1,0 +1,36 @@
+{
+  "_guid_": "F-129_Restricted_Case_Found",
+  "_extends_": "F-129_Test_Data_Base",
+
+  "specs": [
+    "to retrieve the Restricted SC case"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_" : "BeftaMasterRestrictedCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][SC_Restricted_Case_Created][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_" : "Common_200_Response",
+    "body": {
+      "case_type" : "SC_Restricted",
+      "security_classification" : "RESTRICTED",
+
+      "data": {
+        "RestrictedTextField" : "restricted text"
+      },
+      "data_classification" : {
+        "RestrictedTextField" : "RESTRICTED"
+      }
+    }
+  }
+}
+
