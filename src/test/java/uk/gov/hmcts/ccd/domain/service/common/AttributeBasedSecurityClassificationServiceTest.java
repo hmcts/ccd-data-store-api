@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 class AttributeBasedSecurityClassificationServiceTest {
 
     private static final String CASE_REFERENCE = "57869987767";
+    private static final String CASE_TYPE_ID = "FT_MASTER_CASE_TYP";
 
     private AttributeBasedSecurityClassificationService classUnderTest;
 
@@ -74,6 +75,51 @@ class AttributeBasedSecurityClassificationServiceTest {
         when(caseDataAccessControl.generateAccessProfilesByCaseReference(CASE_REFERENCE))
             .thenReturn(Sets.newHashSet(accessProfile, privateAccessProfile));
         Optional<SecurityClassification> classification =  classUnderTest.getUserClassification(caseDetails, false);
+        assertEquals(classification.get(), SecurityClassification.PRIVATE);
+    }
+
+    @Test
+    void shouldReturnEmptyClassificationWhenNoAccessProfilesExistsForUsersCaseTypeId() {
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        when(caseDetails.getReferenceAsString()).thenReturn(CASE_REFERENCE);
+        when(caseDetails.getCaseTypeId()).thenReturn(CASE_TYPE_ID);
+
+        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(CASE_REFERENCE)).thenReturn(null);
+        Optional<SecurityClassification> classification =  classUnderTest.getUserClassification(caseDetails, true);
+        assertTrue(classification.isEmpty());
+    }
+
+
+    @Test
+    void shouldReturnClassificationWhenAccessProfilesExistsForUsersCaseTypeId() {
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        when(caseDetails.getReferenceAsString()).thenReturn(CASE_REFERENCE);
+        when(caseDetails.getCaseTypeId()).thenReturn(CASE_TYPE_ID);
+
+        AccessProfile accessProfile = mock(AccessProfile.class);
+        when(accessProfile.getSecurityClassification()).thenReturn("PUBLIC");
+
+        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(CASE_TYPE_ID))
+            .thenReturn(Sets.newHashSet(accessProfile));
+        Optional<SecurityClassification> classification =  classUnderTest.getUserClassification(caseDetails, true);
+        assertEquals(classification.get(), SecurityClassification.PUBLIC);
+    }
+
+    @Test
+    void shouldReturnMaxClassificationWhenAccessProfilesExistsForUsersCaseTypeId() {
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        when(caseDetails.getReferenceAsString()).thenReturn(CASE_REFERENCE);
+        when(caseDetails.getCaseTypeId()).thenReturn(CASE_TYPE_ID);
+
+        AccessProfile accessProfile = mock(AccessProfile.class);
+        when(accessProfile.getSecurityClassification()).thenReturn("PUBLIC");
+
+        AccessProfile privateAccessProfile = mock(AccessProfile.class);
+        when(privateAccessProfile.getSecurityClassification()).thenReturn("PRIVATE");
+
+        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(CASE_TYPE_ID))
+            .thenReturn(Sets.newHashSet(accessProfile, privateAccessProfile));
+        Optional<SecurityClassification> classification =  classUnderTest.getUserClassification(caseDetails, true);
         assertEquals(classification.get(), SecurityClassification.PRIVATE);
     }
 }

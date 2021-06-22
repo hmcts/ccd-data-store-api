@@ -47,7 +47,7 @@ class ClassifiedCreateEventOperationTest {
                                                                          CASE_DATA_CONTENT);
 
         classifiedCase = new CaseDetails();
-        doReturn(Optional.of(classifiedCase)).when(classificationService).applyClassification(caseDetails, true);
+        doReturn(Optional.of(classifiedCase)).when(classificationService).applyClassification(caseDetails);
 
         classifiedCreateEventOperation =
                 new ClassifiedCreateEventOperation(createEventOperation, classificationService);
@@ -84,7 +84,7 @@ class ClassifiedCreateEventOperationTest {
 
         assertAll(
             () -> assertThat(output, sameInstance(classifiedCase)),
-            () -> verify(classificationService).applyClassification(caseDetails, true)
+            () -> verify(classificationService).applyClassification(caseDetails)
         );
     }
 
@@ -92,7 +92,7 @@ class ClassifiedCreateEventOperationTest {
     @DisplayName("should return null when case has higher classification")
     void shouldReturnNullCaseDetailsWhenHigherClassification() {
 
-        doReturn(Optional.empty()).when(classificationService).applyClassification(caseDetails, true);
+        doReturn(Optional.empty()).when(classificationService).applyClassification(caseDetails);
 
         final CaseDetails output = classifiedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
                                                                                   CASE_DATA_CONTENT);
