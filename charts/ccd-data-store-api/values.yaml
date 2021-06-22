@@ -17,8 +17,6 @@ java:
           alias: DATA_STORE_DB_USERNAME
         - name: data-store-api-POSTGRES-PASS
           alias: DATA_STORE_DB_PASSWORD
-        - name: data-store-api-draftStoreEncryptionSecret
-          alias: data-store-api-draftStoreEncryptionSecret
         - name: data-store-api-draft-key
           alias: CCD_DRAFT_ENCRYPTION_KEY
         - name: ccd-data-s2s-secret
@@ -31,6 +29,8 @@ java:
           alias: ELASTIC_SEARCH_PASSWORD
         - name: AppInsightsInstrumentationKey
           alias: azure.application-insights.instrumentation-key
+        - data-store-api-draftStoreEncryptionSecret
+
   environment:
     DATA_STORE_DB_PORT: 5432
     DATA_STORE_DB_NAME: ccd_data_store
