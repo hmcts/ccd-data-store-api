@@ -37,9 +37,9 @@ public class CaseDocumentUtils {
         final List<JsonNode> documentNodes = findDocumentNodes(data);
 
         return documentNodes.stream()
-            .map(x -> new Tuple2<>(
-                getDocumentId(x),
-                Optional.ofNullable(x.get(DOCUMENT_HASH)).map(JsonNode::textValue).orElse(null))
+            .map(node -> new Tuple2<>(
+                getDocumentId(node),
+                Optional.ofNullable(node.get(DOCUMENT_HASH)).map(JsonNode::textValue).orElse(null))
             )
             .collect(Collectors.toUnmodifiableList());
     }
@@ -69,7 +69,7 @@ public class CaseDocumentUtils {
 
     public List<JsonNode> findDocumentNodes(@NonNull final Map<String, JsonNode> data) {
         return data.values().stream()
-            .map(x -> x.findParents(DOCUMENT_URL))
+            .map(node -> node.findParents(DOCUMENT_URL))
             .flatMap(List::stream)
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
@@ -78,14 +78,14 @@ public class CaseDocumentUtils {
     public Set<String> getTamperedHashes(@NonNull final List<Tuple2<String, String>> preCallbackHashes,
                                          @NonNull final List<Tuple2<String, String>> postCallbackHashes) {
         final Set<String> preCallbackIds = preCallbackHashes.stream()
-            .map(x -> x.v1)
+            .map(pair -> pair.v1)
             .collect(Collectors.toUnmodifiableSet());
 
         return postCallbackHashes.stream()
             .distinct()
-            .filter(x -> preCallbackIds.contains(x.v1))
-            .filter(y -> Objects.nonNull(y.v2))
-            .map(z -> z.v1)
+            .filter(distinctPair -> preCallbackIds.contains(distinctPair.v1))
+            .filter(preCallbackPair -> Objects.nonNull(preCallbackPair.v2))
+            .map(tamperedPair -> tamperedPair.v1)
             .collect(Collectors.toUnmodifiableSet());
     }
 
@@ -99,16 +99,16 @@ public class CaseDocumentUtils {
         final List<Tuple2<String, String>> combinedHashes = CollectionUtils.listsUnion(preCallbackHashes, filtered);
 
         return combinedHashes.stream()
-            .map(x -> DocumentHashToken.builder()
-                .id(x.v1)
-                .hashToken(x.v2)
+            .map(pair -> DocumentHashToken.builder()
+                .id(pair.v1)
+                .hashToken(pair.v2)
                 .build())
             .collect(Collectors.toUnmodifiableList());
     }
 
     public List<DocumentHashToken> getViolatingDocuments(@NonNull final List<DocumentHashToken> documentHashes) {
         return documentHashes.stream()
-            .filter(x -> x.getHashToken() == null)
+            .filter(pair -> pair.getHashToken() == null)
             .collect(Collectors.toUnmodifiableList());
     }
 

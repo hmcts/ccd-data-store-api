@@ -281,10 +281,10 @@ public class CreateCaseEventService {
                                                 final CaseTypeDefinition caseTypeDefinition) {
 
         return Optional.ofNullable(data)
-            .map(x -> {
+            .map(nonNullData -> {
                 CaseDetails clonedCaseDetails = caseService.clone(caseDetails);
 
-                final Map<String, JsonNode> sanitisedData = caseSanitiser.sanitise(caseTypeDefinition, x);
+                final Map<String, JsonNode> sanitisedData = caseSanitiser.sanitise(caseTypeDefinition, nonNullData);
                 final Map<String, JsonNode> caseData = new HashMap<>(Optional.ofNullable(caseDetails.getData())
                     .orElse(emptyMap()));
                 caseData.putAll(sanitisedData);

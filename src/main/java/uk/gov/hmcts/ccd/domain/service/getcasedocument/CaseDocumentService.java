@@ -116,7 +116,7 @@ public class CaseDocumentService {
         final CaseDetails clonedCaseDetails = caseService.clone(caseDetails);
 
         final List<JsonNode> documentNodes = caseDocumentUtils.findDocumentNodes(clonedCaseDetails.getData());
-        documentNodes.forEach(x -> ((ObjectNode) x).remove(DOCUMENT_HASH));
+        documentNodes.forEach(node -> ((ObjectNode) node).remove(DOCUMENT_HASH));
 
         return clonedCaseDetails;
     }
@@ -126,7 +126,7 @@ public class CaseDocumentService {
         final Set<String> tamperedHashes = caseDocumentUtils.getTamperedHashes(preCallbackHashes, postCallbackHashes);
 
         if (!tamperedHashes.isEmpty()) {
-            throw new ServiceException("call back attempted to change the hashToken of the following documents:"
+            throw new ServiceException("Callback attempted to change the hashToken of the following documents:"
                 + tamperedHashes);
         }
     }

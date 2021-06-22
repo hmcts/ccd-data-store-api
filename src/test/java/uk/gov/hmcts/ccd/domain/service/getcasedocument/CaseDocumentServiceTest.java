@@ -206,7 +206,7 @@ class CaseDocumentServiceTest extends TestFixtures {
         // Then
         assertThat(thrown)
             .isInstanceOf(ServiceException.class)
-            .hasMessageStartingWith("call back attempted to change the hashToken of the following documents:");
+            .hasMessageStartingWith("Callback attempted to change the hashToken of the following documents:");
 
         verify(documentUtils, times(3)).findDocumentsHashes(anyMap());
         verify(documentUtils).getTamperedHashes(anyList(), anyList());
