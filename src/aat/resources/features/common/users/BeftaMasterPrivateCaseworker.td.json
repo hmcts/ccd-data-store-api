@@ -1,6 +1,6 @@
 {
   "_guid_": "BeftaMasterPrivateCaseworker",
 
-  "username": "auto.test.cnp+private@gmail.com",
-  "password": "Pa55word11"
+  "username": "[[$CCD_PRIVATE_CASEWORKER_EMAIL]]",
+  "password": "[[$CCD_PRIVATE_CASEWORKER_PASSWORD]]"
 }
