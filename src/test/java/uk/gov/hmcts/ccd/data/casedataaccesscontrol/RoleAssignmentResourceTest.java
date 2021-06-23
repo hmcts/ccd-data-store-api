@@ -26,9 +26,9 @@ class RoleAssignmentResourceTest {
 
         final long oneHour = 3600000;
         final RoleAssignments roleAssignments = getRoleAssignments(oneHour);
-        roleAssignments.getRoleAssignments().get(0).isAnExpiredRoleAssignment();
-        assertThat(roleAssignments.getRoleAssignments().get(0).isAnExpiredRoleAssignment(), is(true));
-        assertThat(roleAssignments.getRoleAssignments().get(1).isAnExpiredRoleAssignment(), is(true));
+        roleAssignments.getRoleAssignments().get(0).isNotExpiredRoleAssignment();
+        assertThat(roleAssignments.getRoleAssignments().get(0).isNotExpiredRoleAssignment(), is(true));
+        assertThat(roleAssignments.getRoleAssignments().get(1).isNotExpiredRoleAssignment(), is(true));
     }
 
     @Test
@@ -37,9 +37,9 @@ class RoleAssignmentResourceTest {
 
         final long oneHour = 0;
         final RoleAssignments roleAssignments = getRoleAssignments(oneHour);
-        roleAssignments.getRoleAssignments().get(0).isAnExpiredRoleAssignment();
-        assertThat(roleAssignments.getRoleAssignments().get(0).isAnExpiredRoleAssignment(), is(false));
-        assertThat(roleAssignments.getRoleAssignments().get(1).isAnExpiredRoleAssignment(), is(false));
+        roleAssignments.getRoleAssignments().get(0).isNotExpiredRoleAssignment();
+        assertThat(roleAssignments.getRoleAssignments().get(0).isNotExpiredRoleAssignment(), is(false));
+        assertThat(roleAssignments.getRoleAssignments().get(1).isNotExpiredRoleAssignment(), is(false));
     }
 
 
