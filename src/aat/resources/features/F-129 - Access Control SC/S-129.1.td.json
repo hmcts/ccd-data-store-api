@@ -9,7 +9,7 @@
 
   "users" : {
     "invokingUser": {
-      "_extends_" : "BeftaMasterPublicCaseworker"
+      "_extends_" : "CaseworkerAutotest"
     }
   },
 
