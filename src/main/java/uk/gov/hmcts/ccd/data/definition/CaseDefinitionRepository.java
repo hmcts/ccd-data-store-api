@@ -24,6 +24,8 @@ public interface CaseDefinitionRepository {
 
     JurisdictionDefinition getJurisdiction(String jurisdictionId);
 
+    List<JurisdictionDefinition> getJurisdictions(List<String> jurisdictionIds);
+
     List<String> getCaseTypesIDsByJurisdictions(List<String> jurisdictionIds);
 
     List<String> getAllCaseTypesIDs();

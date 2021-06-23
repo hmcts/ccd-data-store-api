@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -87,7 +86,6 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
-    @Cacheable("caseTypeDefinitionsCache")
     public CaseTypeDefinition getCaseType(int version, String caseTypeId) {
         return this.getCaseType(caseTypeId);
     }
@@ -140,7 +138,6 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
-    @Cacheable("userRolesCache")
     public UserRole getUserRoleClassifications(String userRole) {
         try {
             final HttpEntity requestEntity = new HttpEntity<CaseTypeDefinition>(securityUtils.authorizationHeaders());
@@ -180,7 +177,6 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
-    @Cacheable("caseTypeDefinitionLatestVersionCache")
     public CaseTypeDefinitionVersion getLatestVersion(String caseTypeId) {
         return getLatestVersionFromDefinitionStore(caseTypeId);
     }
@@ -207,10 +203,14 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         }
     }
 
-    @Cacheable(value = "jurisdictionCache")
     @Override
     public JurisdictionDefinition getJurisdiction(String jurisdictionId) {
         return getJurisdictionFromDefinitionStore(jurisdictionId);
+    }
+
+    @Override
+    public List<JurisdictionDefinition> getJurisdictions(List<String> jurisdictionIds) {
+        return getJurisdictionsFromDefinitionStore(Optional.ofNullable(jurisdictionIds));
     }
 
     public JurisdictionDefinition getJurisdictionFromDefinitionStore(String jurisdictionId) {
@@ -251,7 +251,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
         try {
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
-            if (jurisdictionIds.isPresent()) {
+            if (jurisdictionIds.isPresent() && !jurisdictionIds.get().isEmpty()) {
                 builder.queryParam("ids", String.join(",", jurisdictionIds.get()));
             }
             LOG.debug("Retrieving jurisdiction object(s) from definition store for Jurisdiction IDs: {}.",
