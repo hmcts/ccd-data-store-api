@@ -80,8 +80,9 @@ class CachedCaseRoleDefinitionRepositoryTest {
     @Test
     @DisplayName("should initially retrieve case roles from decorated repository with access control set to true.")
     void shouldGetCaseRolesFromCacheWithTrueAccessControl() {
-        Set<String> returned = classUnderTest.getRoles(caseType1);
         doReturn(caseRoles).when(caseRoleRepository).getRoles(caseType1);
+        Set<String> returned = classUnderTest.getRoles(caseType1);
+
 
         assertAll(
             () -> assertThat(returned, is(caseRoles)),
