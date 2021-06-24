@@ -29,8 +29,6 @@ java:
           alias: ELASTIC_SEARCH_PASSWORD
         - name: AppInsightsInstrumentationKey
           alias: azure.application-insights.instrumentation-key
-        - name: data-store-api-draftStoreEncryptionSecret
-          alias: data-store-api-draftStoreEncryptionSecret
 
   environment:
     DATA_STORE_DB_PORT: 5432

@@ -5,8 +5,6 @@ java:
     ccd:
       resourceGroup: ccd-shared
       secrets:
-        - name: data-store-api-draftStoreEncryptionSecret
-          alias: data-store-api-draftStoreEncryptionSecret
         - name: data-store-api-draft-key
           alias: CCD_DRAFT_ENCRYPTION_KEY
         - name: ccd-data-s2s-secret
