@@ -30,7 +30,7 @@ public class CaseDocumentUtils {
 
     public static final String DOCUMENT_URL = "document_url";
     public static final String DOCUMENT_BINARY_URL = "document_url";
-    public static final String DOCUMENT_HASH = "hashToken";// TODO: replace hashToken to "document_hash";
+    public static final String DOCUMENT_HASH = "document_hash";
     public static final String BINARY = "/binary";
 
     public List<Tuple2<String, String>> findDocumentsHashes(@NonNull final Map<String, JsonNode> data) {

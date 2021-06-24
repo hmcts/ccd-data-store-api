@@ -13,7 +13,7 @@
           "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][customValues][documentIdInTheResponse]}",
           "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][customValues][documentIdInTheResponse]}/binary",
           "document_filename": "${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][testData][actualResponse][body][documents][0][originalDocumentName]}",
-          "hashToken": "${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][testData][actualResponse][body][documents][0][hashToken]}"
+          "document_hash": "${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][testData][actualResponse][body][documents][0][hashToken]}"
         }
 			}
 		}
