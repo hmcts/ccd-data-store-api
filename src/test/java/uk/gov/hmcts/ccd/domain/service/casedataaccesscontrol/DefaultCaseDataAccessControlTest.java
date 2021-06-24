@@ -84,6 +84,9 @@ class DefaultCaseDataAccessControlTest {
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
 
+    @Mock
+    private FilteredRoleAssignments filteredRoleAssignments;
+
     private DefaultCaseDataAccessControl defaultCaseDataAccessControl;
 
     @BeforeEach
@@ -323,7 +326,8 @@ class DefaultCaseDataAccessControlTest {
             .when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
 
         List<RoleAssignment> roleAssignmentsReturned = createFilteringResults(roleAndGrantType);
-        doReturn(roleAssignmentsReturned)
+        doReturn(roleAssignmentsReturned).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+        doReturn(filteredRoleAssignments)
             .when(roleAssignmentsFilteringService).filter(any(RoleAssignments.class), any(CaseDetails.class));
 
         return defaultCaseDataAccessControl.generateAccessMetadata("CASE_ID");

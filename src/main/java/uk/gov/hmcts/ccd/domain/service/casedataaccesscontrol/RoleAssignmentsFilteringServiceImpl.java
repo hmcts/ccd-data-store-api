@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
-import java.util.List;
-import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,6 +9,11 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.RoleAttribute
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiPredicate;
 
 @Slf4j
 @Component
@@ -25,8 +27,8 @@ public class RoleAssignmentsFilteringServiceImpl implements RoleAssignmentsFilte
     }
 
     @Override
-    public List<RoleAssignment>  filter(RoleAssignments roleAssignments,
-                                                CaseDetails caseDetails) {
+    public FilteredRoleAssignments filter(RoleAssignments roleAssignments,
+                                          CaseDetails caseDetails) {
         log.info("Filter role assignments for case {}", caseDetails.getReference());
 
         return filterMatchingRoleAssignments(roleAssignments,
@@ -34,26 +36,34 @@ public class RoleAssignmentsFilteringServiceImpl implements RoleAssignmentsFilte
     }
 
     @Override
-    public List<RoleAssignment>  filter(RoleAssignments roleAssignments,
+    public List<RoleAssignment> filter(RoleAssignments roleAssignments,
                                                       CaseTypeDefinition caseTypeDefinition) {
         log.info("Filter role assignments for case type {}", caseTypeDefinition.getName());
 
         return filterMatchingRoleAssignments(roleAssignments,
-            (matcher, roleAssignment) -> matcher.matchAttribute(roleAssignment, caseTypeDefinition));
-
+            (matcher, roleAssignment) -> matcher.matchAttribute(roleAssignment, caseTypeDefinition))
+            .getFilteredMatchingRoleAssignments();
     }
 
-
-    private List<RoleAssignment> filterMatchingRoleAssignments(
+    private FilteredRoleAssignments filterMatchingRoleAssignments(
         RoleAssignments roleAssignments,
         BiPredicate<RoleAttributeMatcher, RoleAssignment> hasMatch) {
-        return roleAssignments
-            .getRoleAssignments()
-            .stream()
-            .filter(roleAssignment -> roleAttributeMatchers
-                .stream()
-                .allMatch(matcher -> hasMatch.test(matcher, roleAssignment)))
-            .collect(Collectors.toList());
+
+        FilteredRoleAssignments returnValue = new FilteredRoleAssignments();
+
+        for (RoleAssignment roleAssignment: roleAssignments.getRoleAssignments()) {
+
+            Map<String, Boolean> roleAttributeMatchersResults = new HashMap<>();
+            for (RoleAttributeMatcher roleAttributeMatcher : roleAttributeMatchers) {
+                boolean attributeMatched = hasMatch.test(roleAttributeMatcher, roleAssignment);
+                roleAttributeMatchersResults.put(roleAttributeMatcher.getClass().getName(), attributeMatched);
+            }
+
+            returnValue.addFilterMatchingResult(new RoleAssignmentFilteringResult(roleAssignment,
+                                                                                    roleAttributeMatchersResults));
+        }
+
+        return returnValue;
     }
 
 }
