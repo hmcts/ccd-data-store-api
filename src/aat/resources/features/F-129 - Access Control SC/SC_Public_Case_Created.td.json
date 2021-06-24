@@ -4,8 +4,7 @@
 
 	"users": {
     "invokingUser": {
-      "username": "auto.test.cnp@gmail.com",
-      "password": "Pa55word11"
+      "_extends_" : "CaseworkerAutotest"
     }
 	},
 
