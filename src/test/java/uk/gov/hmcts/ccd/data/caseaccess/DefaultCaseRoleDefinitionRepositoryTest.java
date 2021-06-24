@@ -1,5 +1,17 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseRoleDefinition;
+
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -12,19 +24,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpMethod.GET;
-
-import org.apache.poi.ss.formula.functions.Na;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseRoleDefinition;
 
 class DefaultCaseRoleDefinitionRepositoryTest {
     @Mock
@@ -47,20 +46,19 @@ class DefaultCaseRoleDefinitionRepositoryTest {
     private CaseRoleDefinition caseRoleDefinition1 = new CaseRoleDefinition();
     private CaseRoleDefinition caseRoleDefinition2 = new CaseRoleDefinition();
     private CaseRoleDefinition[] caseRoleDefinitions = {caseRoleDefinition1, caseRoleDefinition2};
-    private final String NAME_1="name1";
-    private final String NAME_2="name2";
-
-    private final String ROLE_1="role1";
-    private final String ROLE_2="role2";
+    private static final String NAME1 = "name1";
+    private static final String NAME2 = "name2";
+    private static final String ROLE1 = "role1";
+    private static final String ROLE2 = "role2";
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
         caseRoleRepository = new DefaultCaseRoleRepository(applicationParams, securityUtils, restTemplate);
-        caseRoleDefinition1.setId(ROLE_1);
-        caseRoleDefinition1.setName(NAME_1);
-        caseRoleDefinition2.setId(ROLE_2);
-        caseRoleDefinition2.setName(NAME_2);
+        caseRoleDefinition1.setId(ROLE1);
+        caseRoleDefinition1.setName(NAME1);
+        caseRoleDefinition2.setId(ROLE2);
+        caseRoleDefinition2.setName(NAME2);
     }
 
     @Test
@@ -98,14 +96,16 @@ class DefaultCaseRoleDefinitionRepositoryTest {
         when(securityUtils.authorizationHeaders()).thenReturn(httpHeaders);
         when(applicationParams.accessProfileRolesURL()).thenReturn("someURL");
         when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
-        doReturn(responseEntity).when(restTemplate).exchange(eq("someURL/caseTypeId/access/profile/roles"), eq(GET), any(),
-            eq(CaseRoleDefinition[].class));
+        doReturn(responseEntity).when(restTemplate).exchange(
+            eq("someURL/caseTypeId/access/profile/roles"), eq(GET), any(),
+            eq(CaseRoleDefinition[].class)
+        );
         when(responseEntity.getBody()).thenReturn(caseRoleDefinitions);
         Set<String> caseRoleSet = caseRoleRepository.getRoles("caseTypeId");
 
         assertThat(caseRoleSet.size(), is(2));
-        assertThat(caseRoleSet.toArray()[0], is(NAME_2));
-        assertThat(caseRoleSet.toArray()[1], is(NAME_1));
+        assertThat(caseRoleSet.toArray()[0], is(NAME2));
+        assertThat(caseRoleSet.toArray()[1], is(NAME1));
     }
 
     @Test
@@ -121,8 +121,8 @@ class DefaultCaseRoleDefinitionRepositoryTest {
         Set<String> caseRoleSet = caseRoleRepository.getRoles("caseTypeId");
 
         assertThat(caseRoleSet.size(), is(2));
-        assertThat(caseRoleSet.toArray()[0], is(ROLE_1));
-        assertThat(caseRoleSet.toArray()[1], is(ROLE_2));
+        assertThat(caseRoleSet.toArray()[0], is(ROLE1));
+        assertThat(caseRoleSet.toArray()[1], is(ROLE2));
     }
 
 
@@ -135,8 +135,12 @@ class DefaultCaseRoleDefinitionRepositoryTest {
         when(applicationParams.caseRolesURL()).thenReturn("someURL");
         when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
 
-        doReturn(responseEntity).when(restTemplate).exchange(eq("someURL/caseTypeId/access/profile/roles"), eq(GET), any(),
-            eq(CaseRoleDefinition[].class));
+        doReturn(responseEntity).when(restTemplate).exchange(
+            eq("someURL/caseTypeId/access/profile/roles"),
+            eq(GET),
+            any(),
+            eq(CaseRoleDefinition[].class)
+        );
 
         doReturn(responseEntity).when(restTemplate).exchange(eq("someURL/caseTypeId/roles"), eq(GET), any(),
             eq(CaseRoleDefinition[].class));
@@ -144,8 +148,9 @@ class DefaultCaseRoleDefinitionRepositoryTest {
         when(responseEntity.getBody()).thenReturn(new CaseRoleDefinition[]{});
         Set<String> caseRoleSet = caseRoleRepository.getRoles("caseTypeId");
 
-        verify(restTemplate, times(2)).exchange(anyString(), eq(GET), any(), eq(CaseRoleDefinition[].class));
+        verify(restTemplate, times(2)).exchange(
+            anyString(), eq(GET), any(), eq(CaseRoleDefinition[].class)
+        );
         verify(responseEntity, times(2)).getBody();
-
     }
 }
