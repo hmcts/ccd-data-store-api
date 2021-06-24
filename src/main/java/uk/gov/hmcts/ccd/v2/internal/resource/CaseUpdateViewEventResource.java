@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.v2.internal.resource;
 
-import static org.springframework.hateoas.server.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
