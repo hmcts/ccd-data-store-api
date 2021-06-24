@@ -1,11 +1,5 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static org.springframework.http.HttpMethod.GET;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
@@ -13,6 +7,12 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseRoleDefinition;
+
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.springframework.http.HttpMethod.GET;
 
 @Service
 @Qualifier(DefaultCaseRoleRepository.QUALIFIER)
@@ -40,5 +40,23 @@ public class DefaultCaseRoleRepository implements CaseRoleRepository {
             restTemplate.exchange(caseRolesUrl, GET, requestEntity, CaseRoleDefinition[].class).getBody();
 
         return Arrays.stream(caseRoleDefinitions).map(CaseRoleDefinition::getId).collect(Collectors.toSet());
+    }
+
+    private Set<String> getAccessProfilesRoles(String caseTypeId) {
+        final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
+        final var caseRolesUrl =
+            String.format("%s/%s/access/profile/roles", applicationParams.accessProfileRolesURL(), caseTypeId);
+        CaseRoleDefinition[] caseRoleDefinitions =
+            restTemplate.exchange(caseRolesUrl, GET, requestEntity, CaseRoleDefinition[].class).getBody();
+        return Arrays.stream(caseRoleDefinitions).map(CaseRoleDefinition::getName).collect(Collectors.toSet());
+    }
+
+    public Set<String> getRoles(String caseTypeId) {
+        if (!applicationParams.getEnableAttributeBasedAccessControl()) {
+            return this.getCaseRoles(caseTypeId);
+        } else {
+            final var accessProfilesRoles = this.getAccessProfilesRoles(caseTypeId);
+            return accessProfilesRoles.isEmpty() ? this.getCaseRoles(caseTypeId) : accessProfilesRoles;
+        }
     }
 }
