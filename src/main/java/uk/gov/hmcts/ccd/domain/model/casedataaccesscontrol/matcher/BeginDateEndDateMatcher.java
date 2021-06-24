@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
-import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
@@ -26,11 +25,6 @@ public class BeginDateEndDateMatcher implements RoleAttributeMatcher {
             roleAssignment.getBeginTime(),
             roleAssignment.getEndTime(),
             roleAssignment.getId());
-        if (roleAssignment.getBeginTime() != null && roleAssignment.getEndTime() != null) {
-            Instant now = Instant.now();
-            return roleAssignment.getBeginTime().isBefore(now)
-                && roleAssignment.getEndTime().isAfter(now);
-        }
-        return false;
+        return roleAssignment.isNotExpiredRoleAssignment();
     }
 }

@@ -1,10 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
 import com.google.common.collect.Lists;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
@@ -14,6 +10,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AuthorisationMapper;
 import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.BaseFilter;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -78,25 +79,6 @@ class AuthorisationsMatcherTest extends BaseFilter {
             Lists.newArrayList(AUTHORISATION_1));
         when(caseTypeDefinition.getRoleToAccessProfiles()).thenReturn(roleToAccessProfileDefinitions);
         assertTrue(classUnderTest.matchAttribute(roleAssignment, caseTypeDefinition));
-    }
-
-    @Test
-    void shouldMatchWhenRoleAssignmentHasDisabledDefinitionAuthorisations() {
-        RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
-            Instant.now().minus(1, ChronoUnit.DAYS),
-            Instant.now().plus(2, ChronoUnit.DAYS),
-            "PRIVATE", null, null);
-        roleAssignment.setAuthorisations(Lists.newArrayList(AUTHORISATION_1));
-
-        CaseTypeDefinition caseTypeDefinition = mockCaseTypeDefinition();
-        List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions = mockRoleToAccessProfileDefinitions(
-            ROLE_NAME_1,
-            CASE_TYPE_ID_1,
-            1,
-            true,
-            Lists.newArrayList(AUTHORISATION_1));
-        when(caseTypeDefinition.getRoleToAccessProfiles()).thenReturn(roleToAccessProfileDefinitions);
-        assertFalse(classUnderTest.matchAttribute(roleAssignment, caseTypeDefinition));
     }
 
     @Test

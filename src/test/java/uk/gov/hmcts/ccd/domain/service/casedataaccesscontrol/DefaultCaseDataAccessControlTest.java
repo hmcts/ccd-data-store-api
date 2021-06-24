@@ -19,6 +19,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
@@ -36,6 +37,10 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.BASIC;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.CHALLENGED;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.SPECIFIC;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.STANDARD;
 
 class DefaultCaseDataAccessControlTest {
 
@@ -49,12 +54,6 @@ class DefaultCaseDataAccessControlTest {
 
     private static final String AUTHORISATION_1 = "TEST_AUTH_1";
     private static final String AUTHORISATION_2 = "TEST_AUTH_2";
-
-    private static final String GRANT_TYPE_BASIC = "BASIC";
-    private static final String GRANT_TYPE_EXCLUDE = "EXCLUDED";
-    private static final String GRANT_TYPE_STANDARD = "STANDARD";
-    private static final String GRANT_TYPE_SPECIFIC = "SPECIFIC";
-    private static final String GRANT_TYPE_CHALLENGED = "CHALLENGED";
 
     private static final String CASE_TYPE_1 = "TEST_CASE_TYPE";
 
@@ -107,7 +106,7 @@ class DefaultCaseDataAccessControlTest {
         RoleAssignments roleAssignments = mock(RoleAssignments.class);
         doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
         Map<String, String> roleAndGrantType = Maps.newHashMap();
-        roleAndGrantType.put(ROLE_NAME_1, GRANT_TYPE_BASIC);
+        roleAndGrantType.put(ROLE_NAME_1, BASIC.name());
         List<RoleAssignment> roleAssignments1 = createFilteringResults(roleAndGrantType);
         doReturn(roleAssignments1).when(roleAssignmentsFilteringService)
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
@@ -139,7 +138,7 @@ class DefaultCaseDataAccessControlTest {
         doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
 
         Map<String, String> roleAndGrantType = Maps.newHashMap();
-        roleAndGrantType.put(ROLE_NAME_1, GRANT_TYPE_EXCLUDE);
+        roleAndGrantType.put(ROLE_NAME_1, GrantType.EXCLUDED.name());
         List<RoleAssignment> roleAssignments1 = createFilteringResults(roleAndGrantType);
         doReturn(roleAssignments1).when(roleAssignmentsFilteringService)
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
@@ -173,11 +172,11 @@ class DefaultCaseDataAccessControlTest {
         doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
 
         Map<String, String> roleAndGrantType = Maps.newHashMap();
-        roleAndGrantType.put(ROLE_NAME_1, GRANT_TYPE_BASIC);
-        roleAndGrantType.put(ROLE_NAME_2, GRANT_TYPE_EXCLUDE);
-        roleAndGrantType.put(ROLE_NAME_3, GRANT_TYPE_CHALLENGED);
-        roleAndGrantType.put(ROLE_NAME_4, GRANT_TYPE_SPECIFIC);
-        roleAndGrantType.put(ROLE_NAME_5, GRANT_TYPE_STANDARD);
+        roleAndGrantType.put(ROLE_NAME_1, BASIC.name());
+        roleAndGrantType.put(ROLE_NAME_2, GrantType.EXCLUDED.name());
+        roleAndGrantType.put(ROLE_NAME_3, CHALLENGED.name());
+        roleAndGrantType.put(ROLE_NAME_4, SPECIFIC.name());
+        roleAndGrantType.put(ROLE_NAME_5, GrantType.STANDARD.name());
         List<RoleAssignment> roleAssignments1 = createFilteringResults(roleAndGrantType);
 
         doReturn(roleAssignments1).when(roleAssignmentsFilteringService)
@@ -269,34 +268,34 @@ class DefaultCaseDataAccessControlTest {
     @Test
     void testGenerateAccessMetadataReturnsAccessProcessValueOfNone() {
         Map<String, String> roleAndGrantType = Maps.newHashMap();
-        roleAndGrantType.put(ROLE_NAME_1, GRANT_TYPE_STANDARD);
-        roleAndGrantType.put(ROLE_NAME_2, GRANT_TYPE_BASIC);
+        roleAndGrantType.put(ROLE_NAME_1, GrantType.STANDARD.name());
+        roleAndGrantType.put(ROLE_NAME_2, BASIC.name());
 
         CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, false);
 
         assertEquals(AccessProcess.NONE.name(), caseAccessMetadata.getAccessProcessString());
-        assertEquals(String.join(",", GRANT_TYPE_BASIC, GRANT_TYPE_STANDARD),
+        assertEquals(String.join(",", BASIC.name(), GrantType.STANDARD.name()),
             caseAccessMetadata.getAccessGrantsString());
     }
 
     @Test
     void testGenerateAccessMetadataReturnsAccessProcessValueOfSpecific() {
         Map<String, String> roleAndGrantType = Maps.newHashMap();
-        roleAndGrantType.put(ROLE_NAME_2, GRANT_TYPE_BASIC);
+        roleAndGrantType.put(ROLE_NAME_2, BASIC.name());
 
         CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, false);
 
         assertEquals(AccessProcess.SPECIFIC.name(), caseAccessMetadata.getAccessProcessString());
-        assertEquals(GRANT_TYPE_BASIC, caseAccessMetadata.getAccessGrantsString());
+        assertEquals(BASIC.name(), caseAccessMetadata.getAccessGrantsString());
     }
 
     @Test
     void testGenerateAccessMetadataWithPseudoRoleAssignmentsGeneration() {
         Map<String, String> roleAndGrantType = Maps.newHashMap();
-        roleAndGrantType.put(ROLE_NAME_2, GRANT_TYPE_BASIC);
+        roleAndGrantType.put(ROLE_NAME_2, BASIC.name());
 
-        RoleAssignment roleAssignment1 = RoleAssignment.builder().grantType(GRANT_TYPE_CHALLENGED).build();
-        RoleAssignment roleAssignment2 = RoleAssignment.builder().grantType(GRANT_TYPE_STANDARD).build();
+        RoleAssignment roleAssignment1 = RoleAssignment.builder().grantType(CHALLENGED.name()).build();
+        RoleAssignment roleAssignment2 = RoleAssignment.builder().grantType(GrantType.STANDARD.name()).build();
 
         List<RoleAssignment> roleAssignments = new ArrayList<>();
         roleAssignments.add(roleAssignment1);
@@ -308,7 +307,7 @@ class DefaultCaseDataAccessControlTest {
         CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, true);
 
         assertEquals(AccessProcess.NONE.name(), caseAccessMetadata.getAccessProcessString());
-        assertEquals(String.join(",", GRANT_TYPE_BASIC, GRANT_TYPE_CHALLENGED, GRANT_TYPE_STANDARD),
+        assertEquals(String.join(",", BASIC.name(), CHALLENGED.name(), STANDARD.name()),
             caseAccessMetadata.getAccessGrantsString());
     }
 
