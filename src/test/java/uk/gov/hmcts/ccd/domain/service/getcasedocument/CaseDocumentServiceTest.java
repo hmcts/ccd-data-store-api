@@ -135,7 +135,7 @@ class CaseDocumentServiceTest extends TestFixtures {
         doReturn(emptyList(), emptyList()).when(documentUtils).findDocumentsHashes(anyMap());
         doReturn(emptySet()).when(documentUtils).getTamperedHashes(anyList(), anyList());
         doReturn(List.of(HASH_TOKEN_A1, HASH_TOKEN_A2))
-            .when(documentUtils).buildDocumentHashToken(anyList(), anyList());
+            .when(documentUtils).buildDocumentHashToken(anyList(), anyList(), anyList());
         doReturn(true).when(applicationParams).isDocumentHashCheckingEnabled();
         doReturn(emptyList()).when(documentUtils).getViolatingDocuments(anyList());
 
@@ -152,7 +152,7 @@ class CaseDocumentServiceTest extends TestFixtures {
 
         verify(documentUtils, times(3)).findDocumentsHashes(anyMap());
         verify(documentUtils).getTamperedHashes(anyList(), anyList());
-        verify(documentUtils).buildDocumentHashToken(anyList(), anyList());
+        verify(documentUtils).buildDocumentHashToken(anyList(), anyList(), anyList());
         verify(documentUtils).getViolatingDocuments(anyList());
         verify(applicationParams).isDocumentHashCheckingEnabled();
     }
@@ -166,7 +166,7 @@ class CaseDocumentServiceTest extends TestFixtures {
         doReturn(emptyList(), emptyList()).when(documentUtils).findDocumentsHashes(anyMap());
         doReturn(emptySet()).when(documentUtils).getTamperedHashes(anyList(), anyList());
         doReturn(List.of(HASH_TOKEN_B1, HASH_TOKEN_B2))
-            .when(documentUtils).buildDocumentHashToken(anyList(), anyList());
+            .when(documentUtils).buildDocumentHashToken(anyList(), anyList(), anyList());
         doReturn(true).when(applicationParams).isDocumentHashCheckingEnabled();
         doReturn(List.of(HASH_TOKEN_B2)).when(documentUtils).getViolatingDocuments(anyList());
 
@@ -183,7 +183,7 @@ class CaseDocumentServiceTest extends TestFixtures {
 
         verify(documentUtils, times(3)).findDocumentsHashes(anyMap());
         verify(documentUtils).getTamperedHashes(anyList(), anyList());
-        verify(documentUtils).buildDocumentHashToken(anyList(), anyList());
+        verify(documentUtils).buildDocumentHashToken(anyList(), anyList(), anyList());
         verify(documentUtils).getViolatingDocuments(anyList());
         verify(applicationParams).isDocumentHashCheckingEnabled();
     }

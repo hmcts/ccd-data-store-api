@@ -65,7 +65,8 @@ public class CaseDocumentService {
         verifyNoTamper(preCallbackDocs, postCallbackDocs);
 
         final List<DocumentHashToken> documentHashTokens = caseDocumentUtils.buildDocumentHashToken(
-            preCallbackDocs,
+            dbDocs,
+            eventDocs,
             postCallbackDocs
         );
 

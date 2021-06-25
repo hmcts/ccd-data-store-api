@@ -128,9 +128,10 @@ class CaseDocumentUtilsTest extends TestFixtures {
     @MethodSource("provideHashTokenParameters")
     void testShouldBuildDocumentHashToken(final List<Tuple2<String, String>> p1,
                                           final List<Tuple2<String, String>> p2,
+                                          final List<Tuple2<String, String>> p3,
                                           final List<DocumentHashToken> expectedHashTokens) {
         // When
-        final List<DocumentHashToken> actualHashTokens = underTest.buildDocumentHashToken(p1, p2);
+        final List<DocumentHashToken> actualHashTokens = underTest.buildDocumentHashToken(p1, p2, p3);
 
         // Then
         assertThat(actualHashTokens)
@@ -141,7 +142,7 @@ class CaseDocumentUtilsTest extends TestFixtures {
     @ParameterizedTest
     @MethodSource("provideHashTokenValidationParameters")
     void testShouldValidateDocuments(final List<DocumentHashToken> documentHashTokens,
-                                                   final List<DocumentHashToken> expectedViolations) {
+                                     final List<DocumentHashToken> expectedViolations) {
         // WHEN
         final List<DocumentHashToken> actualViolations = underTest.getViolatingDocuments(documentHashTokens);
 
@@ -154,13 +155,45 @@ class CaseDocumentUtilsTest extends TestFixtures {
     @SuppressWarnings("unused")
     private static Stream<Arguments> provideHashTokenParameters() {
         return Stream.of(
-            Arguments.of(emptyList(), emptyList(), emptyList()),
-            Arguments.of(DOCUMENT_HASH_PAIR_A, emptyList(), List.of(HASH_TOKEN_A1, HASH_TOKEN_A2)),
-            Arguments.of(emptyList(), DOCUMENT_HASH_PAIR_B, List.of(HASH_TOKEN_B1, HASH_TOKEN_B2)),
+            Arguments.of(emptyList(), emptyList(), emptyList(), emptyList()),
+            Arguments.of(emptyList(), emptyList(), DOCUMENT_NO_HASH_PAIR_A, List.of(DOC_A1, DOC_A2)),
+            Arguments.of(emptyList(), emptyList(), DOCUMENT_HASH_PAIR_A, List.of(HASH_TOKEN_A1, HASH_TOKEN_A2)),
             Arguments.of(
+                emptyList(),
+                DOCUMENT_HASH_PAIR_A,
+                DOCUMENT_NO_HASH_PAIR_A,
+                List.of(HASH_TOKEN_A1, HASH_TOKEN_A2)
+            ),
+            Arguments.of(emptyList(), emptyList(), DOCUMENT_HASH_PAIR_B, List.of(HASH_TOKEN_B1, HASH_TOKEN_B2)),
+            Arguments.of(
+                List.of(new Tuple2<>("http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d", null)),
                 DOCUMENT_HASH_PAIR_A,
                 DOCUMENT_HASH_PAIR_B,
-                List.of(HASH_TOKEN_A1, HASH_TOKEN_A2, HASH_TOKEN_B1, HASH_TOKEN_B2)
+                List.of(HASH_TOKEN_A1, HASH_TOKEN_A2, HASH_TOKEN_B1)
+            ),
+            Arguments.of(
+                List.of(new Tuple2<>("http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d", null)),
+                DOCUMENT_HASH_PAIR_B,
+                DOCUMENT_HASH_PAIR_A,
+                List.of(HASH_TOKEN_A1, HASH_TOKEN_A2, HASH_TOKEN_B1)
+            ),
+            Arguments.of(
+                List.of(new Tuple2<>("http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d", null)),
+                List.of(new Tuple2<>("http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d", null)),
+                DOCUMENT_HASH_PAIR_A,
+                List.of(HASH_TOKEN_A1, HASH_TOKEN_A2)
+            ),
+            Arguments.of(
+                List.of(new Tuple2<>("http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d", null)),
+                DOCUMENT_HASH_PAIR_B,
+                List.of(new Tuple2<>("http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d", null)),
+                List.of(HASH_TOKEN_B1)
+            ),
+            Arguments.of(
+                List.of(new Tuple2<>("http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d", null)),
+                DOCUMENT_HASH_PAIR_B,
+                DOCUMENT_HASH_PAIR_C,
+                List.of(HASH_TOKEN_A1, HASH_TOKEN_A2, HASH_TOKEN_B1)
             )
         );
     }
