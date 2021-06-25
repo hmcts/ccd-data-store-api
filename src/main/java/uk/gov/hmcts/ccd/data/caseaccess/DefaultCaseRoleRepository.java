@@ -44,19 +44,18 @@ public class DefaultCaseRoleRepository implements CaseRoleRepository {
 
     private Set<String> getAccessProfilesRoles(String caseTypeId) {
         final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
-        final var caseRolesUrl =
-            String.format("%s/%s/access/profile/roles", applicationParams.accessProfileRolesURL(), caseTypeId);
+        final var caseRolesUrl = applicationParams.accessProfileRolesURL(caseTypeId);
         CaseRoleDefinition[] caseRoleDefinitions =
             restTemplate.exchange(caseRolesUrl, GET, requestEntity, CaseRoleDefinition[].class).getBody();
         return Arrays.stream(caseRoleDefinitions).map(CaseRoleDefinition::getName).collect(Collectors.toSet());
     }
 
     public Set<String> getRoles(String caseTypeId) {
-        if (!applicationParams.getEnableAttributeBasedAccessControl()) {
-            return this.getCaseRoles(caseTypeId);
-        } else {
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
             final var accessProfilesRoles = this.getAccessProfilesRoles(caseTypeId);
             return accessProfilesRoles.isEmpty() ? this.getCaseRoles(caseTypeId) : accessProfilesRoles;
+        } else {
+            return this.getCaseRoles(caseTypeId);
         }
     }
 }
