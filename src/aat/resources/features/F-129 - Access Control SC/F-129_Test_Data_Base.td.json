@@ -1,0 +1,52 @@
+{
+  "_guid_": "F-129_Test_Data_Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "retrieve a case by id",
+
+  "method": "GET",
+  "uri": "/cases/{cid}",
+
+  "users": {
+
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "experimental": true
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][SC_Public_Case_Created][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body" : {
+      "_links" : {
+        "self" : {
+          "href" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id" : "[[ANYTHING_PRESENT]]",
+      "jurisdiction" : "AUTOTEST1",
+      "case_type" : "SC_Public",
+      "created_on" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "last_modified_on" : "[[ANYTHING_PRESENT]]",
+      "state" : "CaseCreated",
+      "security_classification" : "PUBLIC",
+
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
+    }
+  }
+}
