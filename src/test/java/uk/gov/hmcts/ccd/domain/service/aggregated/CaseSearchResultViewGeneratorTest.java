@@ -318,8 +318,8 @@ class CaseSearchResultViewGeneratorTest {
         when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any()))
             .thenReturn(true);
 
-        classUnderTest = new CaseSearchResultViewGenerator(caseTypeService, searchResultDefinitionService, dateTimeSearchResultProcessor,
-            caseSearchesViewAccessControl, caseDataAccessControl);
+        classUnderTest = new CaseSearchResultViewGenerator(caseTypeService, searchResultDefinitionService,
+            dateTimeSearchResultProcessor, caseSearchesViewAccessControl, caseDataAccessControl);
 
         when(caseDataAccessControl.generateAccessMetadata(any())).thenReturn(new CaseAccessMetadata());
     }
