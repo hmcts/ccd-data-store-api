@@ -1,5 +1,5 @@
 {
-  "_guid_": "BeftaMasterRestrictedCaseworker",
+  "_guid_": "RestrictedCaseworker",
 
   "username": "[[$CCD_RESTRICTED_CASEWORKER_EMAIL]]",
   "password": "[[$CCD_RESTRICTED_CASEWORKER_PASSWORD]]"
