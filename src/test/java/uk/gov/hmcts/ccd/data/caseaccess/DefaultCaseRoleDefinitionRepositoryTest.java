@@ -97,7 +97,7 @@ class DefaultCaseRoleDefinitionRepositoryTest {
         when(applicationParams.accessProfileRolesURL("caseTypeId")).thenReturn("someURL");
         when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
         doReturn(responseEntity).when(restTemplate).exchange(
-            eq("someURL/caseTypeId/access/profile/roles"), eq(GET), any(),
+            eq("someURL"), eq(GET), any(),
             eq(CaseRoleDefinition[].class)
         );
         when(responseEntity.getBody()).thenReturn(caseRoleDefinitions);
@@ -136,7 +136,7 @@ class DefaultCaseRoleDefinitionRepositoryTest {
         when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
 
         doReturn(responseEntity).when(restTemplate).exchange(
-            eq("someURL/caseTypeId/access/profile/roles"),
+            eq("someURL"),
             eq(GET),
             any(),
             eq(CaseRoleDefinition[].class)
