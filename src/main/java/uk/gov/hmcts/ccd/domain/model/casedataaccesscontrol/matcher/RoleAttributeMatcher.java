@@ -12,8 +12,9 @@ public interface RoleAttributeMatcher {
     String REGION = "region";
     String EMPTY_STR = "";
 
-
-    boolean matchAttribute(RoleAssignment roleAssignment, CaseDetails caseDetails);
+    default boolean matchAttribute(RoleAssignment roleAssignment, CaseDetails caseDetails) {
+        return true;
+    }
 
     default boolean matchAttribute(RoleAssignment roleAssignment, CaseTypeDefinition caseTypeDefinition) {
         return true;

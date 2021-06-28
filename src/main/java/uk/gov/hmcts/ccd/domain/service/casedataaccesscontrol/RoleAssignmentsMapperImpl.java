@@ -40,6 +40,7 @@ public class RoleAssignmentsMapperImpl implements RoleAssignmentsMapper {
         RoleAssignmentAttributesBuilder roleAssignmentAttributes = RoleAssignmentAttributes.builder();
 
         roleAssignmentAttributes.jurisdiction(roleAssignmentAttributesResource.getJurisdiction());
+        roleAssignmentAttributes.caseType(roleAssignmentAttributesResource.getCaseType());
         roleAssignmentAttributes.caseId(roleAssignmentAttributesResource.getCaseId());
         roleAssignmentAttributes.region(roleAssignmentAttributesResource.getRegion());
         roleAssignmentAttributes.location(roleAssignmentAttributesResource.getLocation());
