@@ -246,7 +246,8 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '6.14.2'
+    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.0.0'
+    testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.0.12'
 
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
@@ -721,6 +722,14 @@ sourceSets {
             srcDir('src/contractTest/resources')
         }
     }
+}
+
+task highLevelDataSetup(type: JavaExec) {
+    dependsOn aatClasses
+
+    main = "uk.gov.hmcts.ccd.datastore.befta.HighLevelDataSetupApp"
+    classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
+    jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
 task smoke() {
