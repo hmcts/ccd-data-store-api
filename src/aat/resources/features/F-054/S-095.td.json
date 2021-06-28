@@ -10,9 +10,8 @@
 	],
 
 	"user": {
-		"username": "auto.test.cnp@gmail.com",
-		"password": "[[$CCD_IMPORT_AUTOTEST_PASSWORD]]"
-	},
+    "_extends_": "CaseworkerAutotest"
+  },
 
 	"expectedResponse": {
 		"_extends_": "Common_403_Response",
