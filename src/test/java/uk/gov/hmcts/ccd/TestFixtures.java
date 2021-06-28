@@ -40,11 +40,27 @@ public abstract class TestFixtures {
         new Tuple2<>("http://dm-store:8080/documents/c1f160ca-cf52-4c0a-8376-3b51c340d00c",
             "36fc7aa586a54bffc2982ed490c4503f4aca875b7160c9d24b6690276886617d")
     );
+
+    protected static final List<Tuple2<String, String>> DOCUMENT_NO_HASH_PAIR_A = List.of(
+        new Tuple2<>("http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976", null),
+        new Tuple2<>("http://dm-store:8080/documents/c1f160ca-cf52-4c0a-8376-3b51c340d00c", null)
+    );
+
     protected static final List<Tuple2<String, String>> DOCUMENT_HASH_PAIR_B = List.of(
         new Tuple2<>("http://dm-store:8080/documents/ed9e0976-c001-47d7-bfeb-3dab8da17150",
             "60c9d24b6690276886tytu36fc7aa586a54bffc2982ed490c4503f4aca875b71"),
         new Tuple2<>("http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d", null)
     );
+
+    protected static final List<Tuple2<String, String>> DOCUMENT_HASH_PAIR_C = List.of(
+        new Tuple2<>("http://dm-store:8080/documents/ed9e0976-c001-47d7-bfeb-3dab8da17150", null),
+        new Tuple2<>("http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d", null),
+        new Tuple2<>("http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976",
+            "36fc7aa586a54bffc2982ed490c4503f4aca875b7160c9d24b6690276886tytu"),
+        new Tuple2<>("http://dm-store:8080/documents/c1f160ca-cf52-4c0a-8376-3b51c340d00c",
+            "36fc7aa586a54bffc2982ed490c4503f4aca875b7160c9d24b6690276886617d")
+    );
+
     protected static final List<Tuple2<String, String>> DOCUMENT_HASH_PAIR_PRE = List.of(
         new Tuple2<>("http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976", null),
         new Tuple2<>("http://dm-store:8080/documents/c1f160ca-cf52-4c0a-8376-3b51c340d00c", null)
@@ -57,6 +73,12 @@ public abstract class TestFixtures {
         new Tuple2<>("http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d",
             "ed490c4503f4aca875b7160c9d24b6690276886tytu36fc7aa586a54bffc2982")
     );
+    protected static final DocumentHashToken DOC_A1 = DocumentHashToken.builder()
+        .id("http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976")
+        .build();
+    protected static final DocumentHashToken DOC_A2 = DocumentHashToken.builder()
+        .id("http://dm-store:8080/documents/c1f160ca-cf52-4c0a-8376-3b51c340d00c")
+        .build();
     protected static final DocumentHashToken HASH_TOKEN_A1 = DocumentHashToken.builder()
         .id("http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976")
         .hashToken("36fc7aa586a54bffc2982ed490c4503f4aca875b7160c9d24b6690276886tytu")
@@ -92,6 +114,7 @@ public abstract class TestFixtures {
         return OBJECT_MAPPER.readValue(inputStream, typeReference);
     }
 
+    @SuppressWarnings("SameParameterValue")
     protected static List<JsonNode> fromFileAsList(final String filename) throws IOException {
         final InputStream inputStream = getInputStream(filename);
         final TypeReference<List<JsonNode>> typeReference = new TypeReference<>() {

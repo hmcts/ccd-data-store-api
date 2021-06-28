@@ -7,8 +7,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 import javax.inject.Named;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -22,15 +20,17 @@ import java.util.stream.Collectors;
 public class CaseDocumentUtils {
     private static final Function<List<Tuple2<String, String>>,
         Function<List<Tuple2<String, String>>, List<Tuple2<String, String>>>> FILTER = x -> y -> {
-            List<Tuple2<String, String>> a = new ArrayList<>(x);
-            List<Tuple2<String, String>> b = new ArrayList<>(y);
+            List<String> a = x.stream().map(item -> item.v1).collect(Collectors.toList());
+            List<String> b = y.stream().map(item -> item.v1).collect(Collectors.toList());
 
-            return a.removeAll(b) ? Collections.unmodifiableList(a) : x;
+            return a.removeAll(b)
+                ? x.stream().filter(item -> a.contains(item.v1)).collect(Collectors.toUnmodifiableList())
+                : x;
         };
 
     public static final String DOCUMENT_URL = "document_url";
     public static final String DOCUMENT_BINARY_URL = "document_url";
-    public static final String DOCUMENT_HASH = "hashToken";// TODO: replace hashToken to "document_hash";
+    public static final String DOCUMENT_HASH = "document_hash";
     public static final String BINARY = "/binary";
 
     public List<Tuple2<String, String>> findDocumentsHashes(@NonNull final Map<String, JsonNode> data) {
@@ -90,15 +90,22 @@ public class CaseDocumentUtils {
     }
 
     public List<DocumentHashToken> buildDocumentHashToken(
-        @NonNull final List<Tuple2<String, String>> preCallbackHashes,
-        @NonNull final List<Tuple2<String, String>> postCallbackHashes
+        @NonNull final List<Tuple2<String, String>> databaseDocs,
+        @NonNull final List<Tuple2<String, String>> eventDocs,
+        @NonNull final List<Tuple2<String, String>> postCallbackDocs
     ) {
+        final List<Tuple2<String, String>> eventNewDocs = FILTER.apply(eventDocs).apply(databaseDocs);
 
-        final List<Tuple2<String, String>> filtered = FILTER.apply(postCallbackHashes).apply(preCallbackHashes);
+        final List<Tuple2<String, String>> preCallbackDocs = CollectionUtils.listsUnion(
+            databaseDocs,
+            eventNewDocs
+        );
 
-        final List<Tuple2<String, String>> combinedHashes = CollectionUtils.listsUnion(preCallbackHashes, filtered);
+        final List<Tuple2<String, String>> postCallbackNewDocs = FILTER.apply(postCallbackDocs).apply(preCallbackDocs);
 
-        return combinedHashes.stream()
+        final List<Tuple2<String, String>> combined = CollectionUtils.listsUnion(eventNewDocs, postCallbackNewDocs);
+
+        return combined.stream()
             .map(pair -> DocumentHashToken.builder()
                 .id(pair.v1)
                 .hashToken(pair.v2)

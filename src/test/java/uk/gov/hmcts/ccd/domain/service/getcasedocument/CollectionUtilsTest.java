@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
+import org.jooq.lambda.tuple.Tuple2;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -70,7 +71,7 @@ class CollectionUtilsTest extends TestFixtures {
     }
 
     @ParameterizedTest
-    @MethodSource("provideListParameters")
+    @MethodSource("provideTuple2SetParameters")
     void testShouldUnionLists(final List<String> l1,
                               final List<String> l2,
                               final List<String> expectedList,
@@ -89,6 +90,8 @@ class CollectionUtilsTest extends TestFixtures {
     private static Stream<Arguments> provideNullSetParameters() {
         return Stream.of(
             Arguments.of(null, null),
+            Arguments.of(emptySet(), null),
+            Arguments.of(null, emptySet()),
             Arguments.of(SET_A, null),
             Arguments.of(null, SET_B)
         );
@@ -105,15 +108,21 @@ class CollectionUtilsTest extends TestFixtures {
     }
 
     @SuppressWarnings("unused")
-    private static Stream<Arguments> provideListParameters() {
-        final List<String> listA = List.of("a", "b");
-        final List<String> listB = List.of("c", "d", "e");
+    private static Stream<Arguments> provideTuple2SetParameters() {
+        final List<Tuple2<String, String>> listA = List.of(new Tuple2<>("a", null), new Tuple2<>("b", null));
+        final List<Tuple2<String, String>> listB = List.of(new Tuple2<>("c", "v1"), new Tuple2<>("d", "v2"));
+        final List<Tuple2<String, String>> listC = List.of(
+            new Tuple2<>("a", null),
+            new Tuple2<>("b", null),
+            new Tuple2<>("c", "v1"),
+            new Tuple2<>("d", "v2")
+        );
 
         return Stream.of(
             Arguments.of(emptyList(), emptyList(), emptyList(), 0),
             Arguments.of(listA, emptyList(), listA, 2),
             Arguments.of(emptyList(), listA, listA, 2),
-            Arguments.of(listA, listB, List.of("a", "b", "c", "d", "e"), 5)
+            Arguments.of(listA, listB, listC, 4)
         );
     }
 

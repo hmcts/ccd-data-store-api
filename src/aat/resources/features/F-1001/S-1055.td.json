@@ -1,0 +1,34 @@
+{
+  "title": "must receive an error response for a malformed document ID",
+
+  "_guid_": "S-1055",
+  "_extends_": "F-1001_Test_Data_Base",
+
+  "specs": [
+    "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
+    "contains a malformed document ID"
+  ],
+
+  "productName": "CCD Data Store",
+  "operationName": "Get Document AM Data",
+  "method": "GET",
+  "uri": "/cases/{caseId}/documents/{documentId}",
+
+  "request": {
+    "pathVariables": {
+      "caseId": "1583927314536134",
+      "documentId": "8de9957b-d7a6-40a1-@£$&-6aac30d33644"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "message" : "DocumentId is not valid",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

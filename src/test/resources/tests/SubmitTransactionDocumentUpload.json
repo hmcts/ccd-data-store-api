@@ -12,7 +12,7 @@
     "DocumentField8": {
       "document_url": "http://dm-store:8080/documents/f0550adc-eaea-4232-b52f-1c4ac0534d60",
       "document_filename": "Test.png",
-      "hashToken": "UyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6Q"
+      "document_hash": "UyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6QUyWGSBgJexcS1i0fTp6Q"
     },
     "ComplexFixedListField": "VALUE2"
   },
@@ -25,19 +25,19 @@
       "document_url": "http://dm-store:8080/documents/7b8930ef-2bcd-44cd-8a78-1ae0b1f5a0ec",
       "document_filename": "Test.png",
       "document_binary_url": "http://dm-store:8080/documents/7b8930ef-2bcd-44cd-8a78-1ae0b1f5a0ec/binary",
-      "hashToken": "7b8930ef-2bcd-44cd-8a78-17b8930ef-27b8930ef-2bcd-44cd-8a78-1ae0b1f5a0ec"
+      "document_hash": "7b8930ef-2bcd-44cd-8a78-17b8930ef-27b8930ef-2bcd-44cd-8a78-1ae0b1f5a0ec"
     }
   },
   "DocumentField4": {
     "document_url": "http://dm-store:8080/documents/388a1ce0-f132-4680-90e9-5e782721cabb",
     "document_filename": "Screenshot 2020-03-17 at 1.24.43 pm.png",
     "document_binary_url": "http://dm-store:8080/documents/388a1ce0-f132-4680-90e9-5e782721cabb/binary",
-    "hashToken": "57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a"
+    "document_hash": "57e7fdf75e281aaa03a0f50f93e7b10bbebff162cf67a4531c4ec2509d615c0a"
   },
   "DocumentFieldWithoutBinaryUrl": {
     "document_url": "http://dm-store:8080/documents/5c4b5564-a29f-47d3-8c51-50e2d4629435",
     "document_filename": "File2.cr2",
-    "hashToken": "6a7e12164534a0c2252a94b308a2a185e46f89ab639c5342027b9cd393068bc"
+    "document_hash": "6a7e12164534a0c2252a94b308a2a185e46f89ab639c5342027b9cd393068bc"
   },
   "FixedListField": "VALUE2",
   "CollectionField": [
@@ -46,7 +46,7 @@
         "document_url": "http://dm-store:8080/documents/95f048e7-9574-4a3d-9189-986015276fd7",
         "document_filename": "DocumentField1InsideCollectionArray.png",
         "document_binary_url": "http://dm-store:8080/documents/95f048e7-9574-4a3d-9189-986015276fd7/binary",
-        "hashToken": "adfadfafgsdgsadgwrgsrg"
+        "document_hash": "adfadfafgsdgsadgwrgsrg"
       }
     },
     {
@@ -54,7 +54,7 @@
         "document_url": "http://dm-store:8080/documents/3ca8b55e-76fe-4723-bb60-4e14e950bb0c",
         "document_filename": "DocumentField2InsideCollectionArray.jpeg",
         "document_binary_url": "http://dm-store:8080/documents/3ca8b55e-76fe-4723-bb60-4e14e950bb0c/binary",
-        "hashToken": "sdg455sfgsfgfsgfsgsgsdgsdgsdgdsgs"
+        "document_hash": "sdg455sfgsfgfsgfsgsgsdgsdgsdgdsgs"
       }
     }
   ]
