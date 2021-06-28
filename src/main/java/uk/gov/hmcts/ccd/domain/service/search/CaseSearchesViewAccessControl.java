@@ -72,7 +72,8 @@ public class CaseSearchesViewAccessControl {
     }
 
 
-    public CaseAccessMetadata getCaseAccessMetaData(String caseReference) {
-        return caseDataAccessControl.generateAccessMetadata(caseReference);
+    public CaseAccessMetadata getCaseAccessMetaData(String caseReference,
+                                                    boolean isCheckingRegionLocationFilteringChecks) {
+        return caseDataAccessControl.generateAccessMetadata(caseReference, isCheckingRegionLocationFilteringChecks);
     }
 }

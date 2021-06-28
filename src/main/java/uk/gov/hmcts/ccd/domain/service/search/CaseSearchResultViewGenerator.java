@@ -38,6 +38,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_R
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_GRANTED;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_PROCESS;
 import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedCaseFieldByPath;
+import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl.CHECK_REGION_LOCATION_FALSE;
 
 @Service
 public class CaseSearchResultViewGenerator {
@@ -213,7 +214,8 @@ public class CaseSearchResultViewGenerator {
     }
 
     private void updateCaseFieldsWithAccessControlMetadata(Map<String, Object> caseFields, String caseReference) {
-        CaseAccessMetadata caseAccessMetadata = caseSearchesViewAccessControl.getCaseAccessMetaData(caseReference);
+        CaseAccessMetadata caseAccessMetadata = caseSearchesViewAccessControl.getCaseAccessMetaData(caseReference,
+            CHECK_REGION_LOCATION_FALSE);
         caseFields.put(ACCESS_GRANTED, new TextNode(caseAccessMetadata.getAccessGrantsString()));
         caseFields.put(ACCESS_PROCESS, new TextNode(caseAccessMetadata.getAccessProcessString()));
     }

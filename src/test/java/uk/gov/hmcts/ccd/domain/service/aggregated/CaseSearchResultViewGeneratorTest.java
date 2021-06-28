@@ -53,6 +53,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
@@ -328,7 +329,8 @@ class CaseSearchResultViewGeneratorTest {
             caseTypeService, searchResultDefinitionService, dateTimeSearchResultProcessor,
             caseSearchesViewAccessControl);
 
-        when(caseDataAccessControl.generateAccessMetadata(any())).thenReturn(new CaseAccessMetadata());
+        when(caseDataAccessControl.generateAccessMetadata(anyString(), anyBoolean()))
+            .thenReturn(new CaseAccessMetadata());
     }
 
     private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
@@ -633,7 +635,8 @@ class CaseSearchResultViewGeneratorTest {
         caseAccessMetadata.setAccessGrants(List.of(GrantType.SPECIFIC, GrantType.BASIC));
         caseAccessMetadata.setAccessProcess(AccessProcess.CHALLENGED);
 
-        when(caseDataAccessControl.generateAccessMetadata(any())).thenReturn(caseAccessMetadata);
+        when(caseDataAccessControl.generateAccessMetadata(anyString(), anyBoolean()))
+            .thenReturn(caseAccessMetadata);
 
         CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET,
             Collections.emptyList());

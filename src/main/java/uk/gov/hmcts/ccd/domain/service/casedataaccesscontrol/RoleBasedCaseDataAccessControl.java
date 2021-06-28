@@ -68,7 +68,8 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
     }
 
     @Override
-    public CaseAccessMetadata generateAccessMetadata(String reference) {
+    public CaseAccessMetadata generateAccessMetadata(String reference,
+                                                     boolean isCheckingRegionLocationFilteringChecks) {
         return new CaseAccessMetadata();
     }
 

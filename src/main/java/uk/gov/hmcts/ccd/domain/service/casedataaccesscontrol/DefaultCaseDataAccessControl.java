@@ -148,39 +148,52 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     }
 
     @Override
-    public CaseAccessMetadata generateAccessMetadata(String caseReference) {
+    public CaseAccessMetadata generateAccessMetadata(String caseReference,
+                                                     boolean isCheckingRegionLocationFilteringChecks) {
         Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(caseReference);
 
         CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
         if (caseDetails.isPresent()) {
-            List<RoleAssignment> roleAssignments = filterRoleAssignmentsWithCaseDetails(caseDetails.get());
-            caseAccessMetadata.setAccessGrants(generatePostFilteringAccessGrants(roleAssignments));
-            caseAccessMetadata.setAccessProcess(generatePostFilteringAccessProcess(roleAssignments));
+            FilteredRoleAssignments filteredRoleAssignments = filterRoleAssignmentsWithCaseDetails(caseDetails.get());
+
+            List<RoleAssignment> pseudoRoleAssignments
+                = appendGeneratedPseudoRoleAssignments(filteredRoleAssignments.getFilteredMatchingRoleAssignments());
+
+            caseAccessMetadata.setAccessGrants(generatePostFilteringAccessGrants(pseudoRoleAssignments));
+            caseAccessMetadata.setAccessProcess(generatePostFilteringAccessProcess(
+                filteredRoleAssignments,
+                pseudoRoleAssignments,
+                isCheckingRegionLocationFilteringChecks));
         }
         return caseAccessMetadata;
     }
 
-    private List<RoleAssignment> filterRoleAssignmentsWithCaseDetails(CaseDetails caseDetails) {
+    private FilteredRoleAssignments filterRoleAssignmentsWithCaseDetails(CaseDetails caseDetails) {
         RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
-        List<RoleAssignment>  filteringResults = roleAssignmentsFilteringService
-            .filter(roleAssignments, caseDetails).getFilteredMatchingRoleAssignments();
+        return roleAssignmentsFilteringService.filter(roleAssignments, caseDetails);
+    }
 
+    private List<RoleAssignment> appendGeneratedPseudoRoleAssignments(List<RoleAssignment> filteringResults) {
         if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
             List<RoleAssignment> pseudoRoleAssignments = pseudoRoleAssignmentsGenerator
                 .createPseudoRoleAssignments(filteringResults);
             filteringResults = augment(filteringResults, pseudoRoleAssignments);
         }
-
         return filteringResults;
     }
 
-    private AccessProcess generatePostFilteringAccessProcess(List<RoleAssignment> roleAssignments) {
-        boolean userHasAccessToCase = roleAssignments.stream()
+    private AccessProcess generatePostFilteringAccessProcess(FilteredRoleAssignments filteredRoleAssignments,
+                                                             List<RoleAssignment> pseudoGeneratedRoleAssignments,
+                                                             boolean isCheckingRegionLocationFilteringChecks) {
+        boolean userHasAccessToCase = pseudoGeneratedRoleAssignments.stream()
             .map(roleAssignment -> GrantType.valueOf(roleAssignment.getGrantType()))
             .anyMatch(DefaultCaseDataAccessControl::isUserAllowedAccessToCase);
 
         if (userHasAccessToCase) {
             return AccessProcess.NONE;
+        } else if (isCheckingRegionLocationFilteringChecks
+            && !filteredRoleAssignments.getFilteredRoleAssignmentsFailedOnRegionOrBaseLocationMatcher().isEmpty()) {
+            return AccessProcess.CHALLENGED;
         } else {
             return AccessProcess.SPECIFIC;
         }

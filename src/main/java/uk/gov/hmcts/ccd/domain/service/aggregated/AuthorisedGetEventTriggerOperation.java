@@ -28,6 +28,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl.CHECK_REGION_LOCATION_FALSE;
+import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl.CHECK_REGION_LOCATION_TRUE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
@@ -85,7 +87,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
             getEventTriggerOperation.executeForCaseType(caseTypeId,
                 eventId,
                 ignoreWarning));
-
+        updateWithAccessControlMetadata(caseUpdateViewEvent, CHECK_REGION_LOCATION_TRUE);
         return accessControlService
             .updateCollectionDisplayContextParameterByAccess(caseUpdateViewEvent, accessProfiles);
     }
@@ -109,7 +111,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
         CaseUpdateViewEvent caseUpdateViewEvent = filterUpsertAccessForCase(caseTypeDefinition, accessProfiles,
             getEventTriggerOperation.executeForCase(caseReference, eventId, ignoreWarning));
-        updateWithAccessControlMetadata(caseUpdateViewEvent);
+        updateWithAccessControlMetadata(caseUpdateViewEvent, CHECK_REGION_LOCATION_FALSE);
         return accessControlService
             .updateCollectionDisplayContextParameterByAccess(caseUpdateViewEvent, accessProfiles);
     }
@@ -133,9 +135,11 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
             accessProfiles);
     }
 
-    private void updateWithAccessControlMetadata(CaseUpdateViewEvent caseUpdateViewEvent) {
+    private void updateWithAccessControlMetadata(CaseUpdateViewEvent caseUpdateViewEvent,
+                                                 boolean isCheckingRegionLocationFilteringChecks) {
         CaseAccessMetadata caseAccessMetadata
-            = caseDataAccessControl.generateAccessMetadata(caseUpdateViewEvent.getCaseId());
+            = caseDataAccessControl.generateAccessMetadata(caseUpdateViewEvent.getCaseId(),
+                isCheckingRegionLocationFilteringChecks);
         caseUpdateViewEvent.setAccessGrants(caseAccessMetadata.getAccessGrantsString());
         caseUpdateViewEvent.setAccessProcess(caseAccessMetadata.getAccessProcessString());
     }

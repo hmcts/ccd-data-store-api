@@ -47,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -166,7 +167,7 @@ class AuthorisedGetCaseViewOperationTest {
 
         when(caseDataAccessControl.generateAccessProfilesByCaseReference(anyString()))
             .thenReturn(ACCESS_PROFILES);
-        when(caseDataAccessControl.generateAccessMetadata(anyString()))
+        when(caseDataAccessControl.generateAccessMetadata(anyString(), anyBoolean()))
             .thenReturn(new CaseAccessMetadata());
         doReturn(USER_ID).when(userRepository).getUserId();
         doReturn(true).when(accessControlService)
