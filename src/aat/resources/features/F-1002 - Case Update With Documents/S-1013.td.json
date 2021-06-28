@@ -18,19 +18,19 @@
           "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_1][customValues][documentIdInTheResponse]}",
           "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_1][testData][actualResponse][body][documents][0][originalDocumentName]}",
           "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_1][customValues][documentIdInTheResponse]}/binary",
-          "hashToken": "${[scenarioContext][childContexts][Default_Document_Upload_1][testData][actualResponse][body][documents][0][hashToken]}"
+          "document_hash": "${[scenarioContext][childContexts][Default_Document_Upload_1][testData][actualResponse][body][documents][0][hashToken]}"
         },
         "DocumentField2": {
           "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_2][customValues][documentIdInTheResponse]}",
           "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_2][testData][actualResponse][body][documents][0][originalDocumentName]}",
           "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_2][customValues][documentIdInTheResponse]}/binary",
-          "hashToken": "${[scenarioContext][childContexts][Default_Document_Upload_2][testData][actualResponse][body][documents][0][hashToken]}"
+          "document_hash": "${[scenarioContext][childContexts][Default_Document_Upload_2][testData][actualResponse][body][documents][0][hashToken]}"
         },
         "DocumentField3": {
           "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_3][customValues][documentIdInTheResponse]}",
           "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_3][testData][actualResponse][body][documents][0][originalDocumentName]}",
           "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_3][customValues][documentIdInTheResponse]}/binary",
-          "hashToken": "${[scenarioContext][childContexts][Default_Document_Upload_3][testData][actualResponse][body][documents][0][hashToken]}"
+          "document_hash": "${[scenarioContext][childContexts][Default_Document_Upload_3][testData][actualResponse][body][documents][0][hashToken]}"
         }
       },
       "data_classification": {

@@ -18,7 +18,7 @@
           "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
           "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
           "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary",
-          "hashToken": "00000adba426c8f8b00000eb69eb9c000f501eb67c4c52c7fc37c1a000000000"
+          "document_hash": "00000adba426c8f8b00000eb69eb9c000f501eb67c4c52c7fc37c1a000000000"
         }
       },
       "data_classification": {
