@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +13,15 @@ import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
 import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import uk.gov.hmcts.ccd.domain.model.definition.SortOrder;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.getdraft.DefaultGetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchInputProcessor;
@@ -47,8 +51,8 @@ public class SearchQueryOperation {
     private final SearchOperation searchOperation;
     private final GetDraftsOperation getDraftsOperation;
     private final SearchResultDefinitionService searchResultDefinitionService;
-    private final UserRepository userRepository;
     private final DateTimeSearchInputProcessor dateTimeSearchInputProcessor;
+    private final CaseDataAccessControl caseDataAccessControl;
 
     @Autowired
     public SearchQueryOperation(@Qualifier(AuthorisedSearchOperation.QUALIFIER) final SearchOperation searchOperation,
@@ -57,15 +61,15 @@ public class SearchQueryOperation {
                                     final GetCaseTypeOperation getCaseTypeOperation,
                                 @Qualifier(DefaultGetDraftsOperation.QUALIFIER) GetDraftsOperation getDraftsOperation,
                                 SearchResultDefinitionService searchResultDefinitionService,
-                                @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                                final DateTimeSearchInputProcessor dateTimeSearchInputProcessor) {
+                                final DateTimeSearchInputProcessor dateTimeSearchInputProcessor,
+                                final CaseDataAccessControl caseDataAccessControl) {
         this.searchOperation = searchOperation;
         this.mergeDataToSearchResultOperation = mergeDataToSearchResultOperation;
         this.getCaseTypeOperation = getCaseTypeOperation;
         this.getDraftsOperation = getDraftsOperation;
         this.searchResultDefinitionService = searchResultDefinitionService;
-        this.userRepository = userRepository;
         this.dateTimeSearchInputProcessor = dateTimeSearchInputProcessor;
+        this.caseDataAccessControl = caseDataAccessControl;
     }
 
     public SearchResultView execute(final String view,
@@ -127,7 +131,16 @@ public class SearchQueryOperation {
     }
 
     private boolean filterByRole(SearchResultField resultField) {
-        return StringUtils.isEmpty(resultField.getRole()) || userRepository.anyRoleEqualsTo(resultField.getRole());
+        Set<AccessProfile> accessProfiles =  caseDataAccessControl
+            .generateAccessProfilesByCaseTypeId(resultField.getCaseTypeId());
+        Set<String> accessProfileNames = AccessControlService.extractAccessProfileNames(accessProfiles);
+
+        return StringUtils.isEmpty(resultField.getRole())
+            || anyRoleEqualsTo(accessProfileNames, resultField.getRole());
+    }
+
+    private boolean anyRoleEqualsTo(Set<String> accessProfiles, String accessProfile) {
+        return accessProfiles.contains(accessProfile);
     }
 
     private SortOrderField toSortOrderField(SearchResultField searchResultField) {

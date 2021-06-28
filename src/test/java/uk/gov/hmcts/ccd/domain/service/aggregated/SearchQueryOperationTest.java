@@ -19,6 +19,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway.DRAFT_STORE_DOWN_ERR_MESSAGE;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.NO_ERROR;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.SEARCH;
@@ -31,6 +32,10 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventB
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 
+import com.google.common.collect.Sets;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -50,12 +55,14 @@ import java.util.Optional;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import uk.gov.hmcts.ccd.domain.model.definition.SortOrder;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.getdraft.GetDraftsOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchInputProcessor;
 import uk.gov.hmcts.ccd.domain.service.search.SearchOperation;
@@ -94,7 +101,7 @@ public class SearchQueryOperationTest {
     private GetDraftsOperation getDraftsOperation;
 
     @Mock
-    private UserRepository userRepository;
+    private CaseDataAccessControl caseDataAccessControl;
 
     @Mock
     private DateTimeSearchInputProcessor dateTimeSearchInputProcessor;
@@ -129,8 +136,8 @@ public class SearchQueryOperationTest {
         searchQueryOperation = new SearchQueryOperation(searchOperation,
             mergeDataToSearchResultOperation,
             getCaseTypeOperation,
-            getDraftsOperation, searchResultDefinitionService, userRepository,
-            dateTimeSearchInputProcessor);
+            getDraftsOperation, searchResultDefinitionService,
+            dateTimeSearchInputProcessor, caseDataAccessControl);
         SearchResultDefinition searchResult = searchResult()
             .withSearchResultFields(buildSearchResultField(CASE_TYPE_ID, CASE_FIELD_2, "", CASE_FIELD_2, "", ""))
             .build();
@@ -339,7 +346,7 @@ public class SearchQueryOperationTest {
 
         doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET),
             any());
-        doReturn(true).when(userRepository).anyRoleEqualsTo(sortField2.getRole());
+        mockAccessProfiles(USER_ROLE_2);
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
@@ -374,4 +381,18 @@ public class SearchQueryOperationTest {
             hasProperty("caseTypeId", is(CASE_TYPE_ID))));
     }
 
+    private void mockAccessProfiles(String... accessProfileNames) {
+        Set<AccessProfile> accessProfiles = Sets.newHashSet();
+        if (accessProfileNames != null) {
+            accessProfiles = Arrays.stream(accessProfileNames)
+                .map(profileName -> {
+                    AccessProfile accessProfile = new AccessProfile();
+                    accessProfile.setAccessProfile(profileName);
+                    accessProfile.setReadOnly(false);
+                    accessProfile.setSecurityClassification("PUBLIC");
+                    return accessProfile;
+                }).collect(Collectors.toSet());
+        }
+        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString())).thenReturn(accessProfiles);
+    }
 }
