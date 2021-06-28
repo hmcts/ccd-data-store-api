@@ -11,9 +11,9 @@ public enum OAuth2 {
     private final String redirectUri;
 
     OAuth2() {
-        clientId = Env.require("OAUTH2_CLIENT_ID");
-        clientSecret = Env.require("OAUTH2_CLIENT_SECRET");
-        redirectUri = Env.require("OAUTH2_REDIRECT_URI");
+        clientId = Env.require("CCD_API_GATEWAY_OAUTH2_CLIENT_ID");
+        clientSecret = Env.require("CCD_API_GATEWAY_OAUTH2_CLIENT_SECRET");
+        redirectUri = Env.require("CCD_API_GATEWAY_OAUTH2_REDIRECT_URL");
     }
 
     public String getClientId() {
