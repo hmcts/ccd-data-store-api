@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -39,7 +41,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
@@ -95,9 +96,6 @@ class MergeDataToSearchResultOperationTest {
     private static final String FAMILY_ADDRESS = "FamilyAddress";
     private static final String ADDRESS_LINE_1 = "AddressLine1";
     private static final String POSTCODE = "PostCode";
-
-    @Mock
-    private UserRepository userRepository;
 
     @Mock
     private CaseDataAccessControl caseDataAccessControl;
@@ -174,12 +172,7 @@ class MergeDataToSearchResultOperationTest {
         doAnswer(i -> i.getArgument(1)).when(dateTimeSearchResultProcessor).execute(Mockito.any(),
             Mockito.any());
 
-        classUnderTest = new MergeDataToSearchResultOperation(userRepository, dateTimeSearchResultProcessor);
-    }
-
-    private void mockAccessProfiles() {
-        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
-            .thenReturn(Sets.newHashSet());
+        classUnderTest = new MergeDataToSearchResultOperation(dateTimeSearchResultProcessor, caseDataAccessControl);
     }
 
     @Test
@@ -259,7 +252,7 @@ class MergeDataToSearchResultOperationTest {
                 searchResultFieldWithInvalidRole)
             .build();
 
-        doReturn(true).when(userRepository).anyRoleEqualsTo(searchResultFieldWithValidRole.getRole());
+        mockAccessProfiles(ROLE_IN_USER_ROLE_1);
 
         final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult,
             caseDetailsList, NO_ERROR);
@@ -306,8 +299,7 @@ class MergeDataToSearchResultOperationTest {
                 searchResultFieldWithInvalidRole)
             .build();
 
-        doReturn(true).when(userRepository).anyRoleEqualsTo(searchResultFieldWithValidRole.getRole());
-        doReturn(true).when(userRepository).anyRoleEqualsTo(searchResultFieldWithValidRole2.getRole());
+        mockAccessProfiles(ROLE_IN_USER_ROLE_1, ROLE_IN_USER_ROLE_2);
 
         final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult,
             caseDetailsList, NO_ERROR);
@@ -350,7 +342,7 @@ class MergeDataToSearchResultOperationTest {
                 searchResultFieldWithValidRole)
             .build();
 
-        doReturn(true).when(userRepository).anyRoleEqualsTo(searchResultFieldWithValidRole.getRole());
+        mockAccessProfiles(ROLE_IN_USER_ROLE_2);
 
 
         final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult,
@@ -367,6 +359,21 @@ class MergeDataToSearchResultOperationTest {
             () -> assertThat(searchResultView.getSearchResultViewColumns().get(2).getCaseFieldId(), is(CASE_FIELD_4)),
             () -> assertThat(searchResultView.getResultError(), is(NO_ERROR))
         );
+    }
+
+    private void mockAccessProfiles(String... accessProfileNames) {
+        Set<AccessProfile> accessProfiles = Sets.newHashSet();
+        if (accessProfileNames != null) {
+            accessProfiles = Arrays.stream(accessProfileNames)
+                .map(profileName -> {
+                    AccessProfile accessProfile = new AccessProfile();
+                    accessProfile.setAccessProfile(profileName);
+                    accessProfile.setReadOnly(false);
+                    accessProfile.setSecurityClassification("PUBLIC");
+                    return accessProfile;
+                }).collect(Collectors.toSet());
+        }
+        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString())).thenReturn(accessProfiles);
     }
 
     @Test

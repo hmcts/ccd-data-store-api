@@ -2,11 +2,18 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -15,17 +22,10 @@ import uk.gov.hmcts.ccd.domain.model.definition.SearchResultField;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.CASE_REFERENCE;
@@ -35,14 +35,13 @@ import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedC
 @Singleton
 public class MergeDataToSearchResultOperation {
 
-    private final UserRepository userRepository;
     private final DateTimeSearchResultProcessor dateTimeSearchResultProcessor;
+    private CaseDataAccessControl caseDataAccessControl;
 
-    public MergeDataToSearchResultOperation(@Qualifier(CachedUserRepository.QUALIFIER)
-                                            final UserRepository userRepository,
-                                            final DateTimeSearchResultProcessor dateTimeSearchResultProcessor) {
-        this.userRepository = userRepository;
+    public MergeDataToSearchResultOperation(final DateTimeSearchResultProcessor dateTimeSearchResultProcessor,
+                                            CaseDataAccessControl caseDataAccessControl) {
         this.dateTimeSearchResultProcessor = dateTimeSearchResultProcessor;
+        this.caseDataAccessControl = caseDataAccessControl;
     }
 
     public SearchResultView execute(final CaseTypeDefinition caseTypeDefinition,
@@ -93,13 +92,22 @@ public class MergeDataToSearchResultOperation {
         if (addedFields.contains(id)) {
             return false;
         } else {
-            if (StringUtils.isEmpty(resultField.getRole()) || userRepository.anyRoleEqualsTo(resultField.getRole())) {
+            Set<AccessProfile> accessProfiles =  caseDataAccessControl
+                .generateAccessProfilesByCaseTypeId(resultField.getCaseTypeId());
+            Set<String> accessProfileNames = AccessControlService.extractAccessProfileNames(accessProfiles);
+
+            if (StringUtils.isEmpty(resultField.getRole())
+                || anyRoleEqualsTo(accessProfileNames, resultField.getRole())) {
                 addedFields.add(id);
                 return true;
             } else {
                 return false;
             }
         }
+    }
+
+    private boolean anyRoleEqualsTo(Set<String> accessProfiles, String accessProfile) {
+        return accessProfiles.contains(accessProfile);
     }
 
 
