@@ -1475,7 +1475,7 @@ class AccessControlServiceFilterTest {
         }
 
         @Test
-        @DisplayName("Should set #COLLECTION() in DisplayContextParameter of a collection "
+        @DisplayName("Should set #COLLECTION(allowUpdate) in DisplayContextParameter of a collection "
             + "caseField when an update ACL is set")
         void updateCollectionDisplayContextParameterWhenFieldHasUpdateRole() {
 
@@ -1512,7 +1512,7 @@ class AccessControlServiceFilterTest {
 
             assertAll(
                 () -> assertNotNull(people),
-                () -> assertTrue(people.getDisplayContextParameter().contains("#COLLECTION()"))
+                () -> assertTrue(people.getDisplayContextParameter().contains("#COLLECTION(allowUpdate)"))
             );
         }
 
