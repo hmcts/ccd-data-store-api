@@ -45,7 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -152,8 +151,7 @@ class AuthorisedGetEventTriggerOperationTest {
         CaseEventDefinition caseEvent = new CaseEventDefinition();
         when(eventTriggerService.findCaseEvent(eq(caseType), eq(EVENT_TRIGGER_ID))).thenReturn(caseEvent);
         when(eventTriggerService.isPreStateValid(eq(STATE), eq(caseEvent))).thenReturn(true);
-        doReturn(new CaseAccessMetadata()).when(caseDataAccessControl).generateAccessMetadata(any(),
-            anyBoolean());
+        doReturn(new CaseAccessMetadata()).when(caseDataAccessControl).generateAccessMetadata(any());
     }
 
     private Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
@@ -197,6 +195,8 @@ class AuthorisedGetEventTriggerOperationTest {
 
             doReturn(caseEventTrigger).when(accessControlService)
                 .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, createCaseAccessProfiles);
+            doReturn(new CaseAccessMetadata())
+                .when(caseDataAccessControl).generateAccessMetadataForCreateEndpoint(any());
         }
 
         @Test
@@ -297,8 +297,7 @@ class AuthorisedGetEventTriggerOperationTest {
             CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
             caseAccessMetadata.setAccessGrants(List.of(GrantType.STANDARD, GrantType.SPECIFIC, GrantType.CHALLENGED));
             caseAccessMetadata.setAccessProcess(AccessProcess.NONE);
-            doReturn(caseAccessMetadata).when(caseDataAccessControl).generateAccessMetadata(any(),
-                anyBoolean());
+            doReturn(caseAccessMetadata).when(caseDataAccessControl).generateAccessMetadataForCreateEndpoint(any());
 
             final CaseUpdateViewEvent output = authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
                 EVENT_TRIGGER_ID,
@@ -421,8 +420,7 @@ class AuthorisedGetEventTriggerOperationTest {
             CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
             caseAccessMetadata.setAccessGrants(List.of(GrantType.STANDARD, GrantType.SPECIFIC, GrantType.CHALLENGED));
             caseAccessMetadata.setAccessProcess(AccessProcess.NONE);
-            doReturn(caseAccessMetadata).when(caseDataAccessControl).generateAccessMetadata(any(),
-                anyBoolean());
+            doReturn(caseAccessMetadata).when(caseDataAccessControl).generateAccessMetadata(any());
 
             final CaseUpdateViewEvent output = authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
                 EVENT_TRIGGER_ID,

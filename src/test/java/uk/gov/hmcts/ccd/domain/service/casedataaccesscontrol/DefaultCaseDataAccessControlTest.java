@@ -1,13 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import com.google.common.collect.Maps;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +22,14 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AuthorisationMapper;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,8 +44,8 @@ import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.CHAL
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.SPECIFIC;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.STANDARD;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment.builder;
-import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl.CHECK_REGION_LOCATION_FALSE;
-import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl.CHECK_REGION_LOCATION_TRUE;
+import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.DefaultCaseDataAccessControl.CHECK_REGION_LOCATION_FALSE;
+import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.DefaultCaseDataAccessControl.CHECK_REGION_LOCATION_TRUE;
 
 class DefaultCaseDataAccessControlTest {
 
@@ -375,6 +376,10 @@ class DefaultCaseDataAccessControlTest {
         doReturn(filteredRoleAssignments)
             .when(roleAssignmentsFilteringService).filter(any(RoleAssignments.class), any(CaseDetails.class));
 
-        return defaultCaseDataAccessControl.generateAccessMetadata("CASE_ID", isCheckingRegionLocationFilteringChecks);
+        if (isCheckingRegionLocationFilteringChecks) {
+            return defaultCaseDataAccessControl.generateAccessMetadataForCreateEndpoint("CASE_ID");
+        } else {
+            return defaultCaseDataAccessControl.generateAccessMetadata("CASE_ID");
+        }
     }
 }

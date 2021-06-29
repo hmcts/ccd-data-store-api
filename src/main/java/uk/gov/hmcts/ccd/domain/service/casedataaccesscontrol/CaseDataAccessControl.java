@@ -7,10 +7,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public interface CaseDataAccessControl {
-    boolean CHECK_REGION_LOCATION_TRUE = true;
-
-    boolean CHECK_REGION_LOCATION_FALSE = false;
-
     Set<AccessProfile> generateAccessProfilesByCaseTypeId(String caseTypeId);
 
     Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference);
@@ -23,5 +19,7 @@ public interface CaseDataAccessControl {
 
     }
 
-    CaseAccessMetadata generateAccessMetadata(String caseId, boolean isCheckingRegionLocationFilteringChecks);
+    CaseAccessMetadata generateAccessMetadata(String caseId);
+
+    CaseAccessMetadata generateAccessMetadataForCreateEndpoint(String caseId);
 }

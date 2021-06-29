@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
@@ -47,7 +46,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -148,8 +146,6 @@ class AuthorisedGetCaseViewOperationTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private CaseUserRepository caseUserRepository;
-    @Mock
     private CaseDetailsRepository caseDetailsRepository;
 
     @Mock
@@ -167,7 +163,7 @@ class AuthorisedGetCaseViewOperationTest {
 
         when(caseDataAccessControl.generateAccessProfilesByCaseReference(anyString()))
             .thenReturn(ACCESS_PROFILES);
-        when(caseDataAccessControl.generateAccessMetadata(anyString(), anyBoolean()))
+        when(caseDataAccessControl.generateAccessMetadata(anyString()))
             .thenReturn(new CaseAccessMetadata());
         doReturn(USER_ID).when(userRepository).getUserId();
         doReturn(true).when(accessControlService)
@@ -362,7 +358,7 @@ class AuthorisedGetCaseViewOperationTest {
     }
 
     @Test
-    @DisplayName("shoudl throw excetpion when case Type is invalid")
+    @DisplayName("should throw exception when case Type is invalid")
     void shouldThrowExceptionforInvalidCaseType() {
         doReturn(null).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
 

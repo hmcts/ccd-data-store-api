@@ -34,6 +34,8 @@ import java.util.stream.Collectors;
 @Lazy
 public class DefaultCaseDataAccessControl implements CaseDataAccessControl, AccessControl {
 
+    public static final boolean CHECK_REGION_LOCATION_TRUE = true;
+    public static final boolean CHECK_REGION_LOCATION_FALSE = false;
     private final RoleAssignmentService roleAssignmentService;
     private final SecurityUtils securityUtils;
     private final RoleAssignmentsFilteringService roleAssignmentsFilteringService;
@@ -148,9 +150,18 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     }
 
     @Override
-    public CaseAccessMetadata generateAccessMetadata(String caseReference,
-                                                     boolean isCheckingRegionLocationFilteringChecks) {
-        Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(caseReference);
+    public CaseAccessMetadata generateAccessMetadata(String caseId) {
+        return createCaseAccessMetaData(caseId, CHECK_REGION_LOCATION_FALSE);
+    }
+
+    @Override
+    public CaseAccessMetadata generateAccessMetadataForCreateEndpoint(String caseId) {
+        return createCaseAccessMetaData(caseId, CHECK_REGION_LOCATION_TRUE);
+    }
+
+    private CaseAccessMetadata createCaseAccessMetaData(String caseId,
+                                                        boolean isCheckingRegionLocationFilteringChecks) {
+        Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(caseId);
 
         CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
         if (caseDetails.isPresent()) {

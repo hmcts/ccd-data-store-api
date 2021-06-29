@@ -28,8 +28,8 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl.CHECK_REGION_LOCATION_FALSE;
-import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl.CHECK_REGION_LOCATION_TRUE;
+import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.DefaultCaseDataAccessControl.CHECK_REGION_LOCATION_FALSE;
+import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.DefaultCaseDataAccessControl.CHECK_REGION_LOCATION_TRUE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
@@ -137,9 +137,16 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
     private void updateWithAccessControlMetadata(CaseUpdateViewEvent caseUpdateViewEvent,
                                                  boolean isCheckingRegionLocationFilteringChecks) {
-        CaseAccessMetadata caseAccessMetadata
-            = caseDataAccessControl.generateAccessMetadata(caseUpdateViewEvent.getCaseId(),
-                isCheckingRegionLocationFilteringChecks);
+        CaseAccessMetadata caseAccessMetadata;
+
+        if (isCheckingRegionLocationFilteringChecks) {
+            caseAccessMetadata =
+                caseDataAccessControl.generateAccessMetadataForCreateEndpoint(caseUpdateViewEvent.getCaseId());
+        } else {
+            caseAccessMetadata =
+                caseDataAccessControl.generateAccessMetadata(caseUpdateViewEvent.getCaseId());
+        }
+
         caseUpdateViewEvent.setAccessGrants(caseAccessMetadata.getAccessGrantsString());
         caseUpdateViewEvent.setAccessProcess(caseAccessMetadata.getAccessProcessString());
     }
