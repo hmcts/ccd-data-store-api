@@ -22,6 +22,6 @@ public interface SecurityClassificationService {
 
     Optional<SecurityClassification> getUserClassification(String jurisdictionId);
 
-    Optional<SecurityClassification>  getUserClassification(CaseDetails caseDetails);
+    Optional<SecurityClassification>  getUserClassification(CaseDetails caseDetails, boolean create);
 
 }

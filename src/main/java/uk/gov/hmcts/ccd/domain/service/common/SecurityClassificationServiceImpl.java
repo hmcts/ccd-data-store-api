@@ -50,7 +50,11 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     }
 
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails) {
-        Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails);
+        return applyClassification(caseDetails, false);
+    }
+
+    public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create) {
+        Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, create);
         Optional<CaseDetails> result = Optional.of(caseDetails);
 
         return userClassificationOpt
@@ -72,7 +76,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     }
 
     public List<AuditEvent> applyClassification(CaseDetails caseDetails, List<AuditEvent> events) {
-        final Optional<SecurityClassification> userClassification = getUserClassification(caseDetails);
+        final Optional<SecurityClassification> userClassification = getUserClassification(caseDetails, false);
 
         if (null == events || !userClassification.isPresent()) {
             return newArrayList();
@@ -115,7 +119,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     }
 
     @Override
-    public Optional<SecurityClassification> getUserClassification(CaseDetails caseDetails) {
+    public Optional<SecurityClassification> getUserClassification(CaseDetails caseDetails, boolean create) {
         return getUserClassification(caseDetails.getJurisdiction());
     }
 
