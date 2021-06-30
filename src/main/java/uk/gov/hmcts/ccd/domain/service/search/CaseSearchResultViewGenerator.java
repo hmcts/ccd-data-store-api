@@ -8,11 +8,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -26,7 +24,6 @@ import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeader
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
-import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -176,22 +173,14 @@ public class CaseSearchResultViewGenerator {
         if (addedFields.contains(id)) {
             return false;
         } else {
-            Set<AccessProfile> accessProfiles =  caseDataAccessControl
-                .generateAccessProfilesByCaseTypeId(resultField.getCaseTypeId());
-            Set<String> accessProfileNames = AccessControlService.extractAccessProfileNames(accessProfiles);
-
             if (StringUtils.isEmpty(resultField.getRole())
-                || anyRoleEqualsTo(accessProfileNames, resultField.getRole())) {
+                || caseDataAccessControl.anyRoleEqualsTo(resultField.getCaseTypeId(), resultField.getRole())) {
                 addedFields.add(id);
                 return true;
             } else {
                 return false;
             }
         }
-    }
-
-    private boolean anyRoleEqualsTo(Set<String> accessProfiles, String accessProfile) {
-        return accessProfiles.contains(accessProfile);
     }
 
     private CommonField commonField(SearchResultField searchResultField, CaseFieldDefinition caseFieldDefinition) {

@@ -21,4 +21,6 @@ public interface CaseDataAccessControl {
     }
 
     CaseAccessMetadata generateAccessMetadata(String caseId);
+
+    boolean anyRoleEqualsTo(String caseTypeId, String accessProfile);
 }

@@ -7,13 +7,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -23,7 +21,6 @@ import uk.gov.hmcts.ccd.domain.model.search.SearchResultView;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewColumn;
 import uk.gov.hmcts.ccd.domain.model.search.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
-import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
@@ -92,12 +89,9 @@ public class MergeDataToSearchResultOperation {
         if (addedFields.contains(id)) {
             return false;
         } else {
-            Set<AccessProfile> accessProfiles =  caseDataAccessControl
-                .generateAccessProfilesByCaseTypeId(resultField.getCaseTypeId());
-            Set<String> accessProfileNames = AccessControlService.extractAccessProfileNames(accessProfiles);
 
             if (StringUtils.isEmpty(resultField.getRole())
-                || anyRoleEqualsTo(accessProfileNames, resultField.getRole())) {
+                || caseDataAccessControl.anyRoleEqualsTo(resultField.getCaseTypeId(), resultField.getRole())) {
                 addedFields.add(id);
                 return true;
             } else {
@@ -105,12 +99,6 @@ public class MergeDataToSearchResultOperation {
             }
         }
     }
-
-    private boolean anyRoleEqualsTo(Set<String> accessProfiles, String accessProfile) {
-        return accessProfiles.contains(accessProfile);
-    }
-
-
 
     private CommonField commonField(SearchResultField searchResultField, CaseFieldDefinition caseFieldDefinition) {
         return caseFieldDefinition.getComplexFieldNestedField(searchResultField.getCaseFieldPath())

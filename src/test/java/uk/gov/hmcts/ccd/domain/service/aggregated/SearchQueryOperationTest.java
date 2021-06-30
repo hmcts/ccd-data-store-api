@@ -1,13 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +15,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.draft.DraftAccessException;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -51,7 +46,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway.DRAFT_STORE_DOWN_ERR_MESSAGE;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.NO_ERROR;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.SEARCH;
@@ -342,7 +336,7 @@ public class SearchQueryOperationTest {
 
         doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET),
             any());
-        mockAccessProfiles(USER_ROLE_2);
+        doReturn(true).when(caseDataAccessControl).anyRoleEqualsTo(CASE_TYPE_ID, sortField2.getRole());
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 
@@ -377,18 +371,4 @@ public class SearchQueryOperationTest {
             hasProperty("caseTypeId", is(CASE_TYPE_ID))));
     }
 
-    private void mockAccessProfiles(String... accessProfileNames) {
-        Set<AccessProfile> accessProfiles = Sets.newHashSet();
-        if (accessProfileNames != null) {
-            accessProfiles = Arrays.stream(accessProfileNames)
-                .map(profileName -> {
-                    AccessProfile accessProfile = new AccessProfile();
-                    accessProfile.setAccessProfile(profileName);
-                    accessProfile.setReadOnly(false);
-                    accessProfile.setSecurityClassification("PUBLIC");
-                    return accessProfile;
-                }).collect(Collectors.toSet());
-        }
-        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString())).thenReturn(accessProfiles);
-    }
 }

@@ -54,6 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -481,8 +482,14 @@ class CaseSearchResultViewGeneratorTest {
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition);
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
+
+        when(caseDataAccessControl.anyRoleEqualsTo(anyString(), anyString())).thenReturn(true);
+        when(caseDataAccessControl.anyRoleEqualsTo(CASE_TYPE_ID_1, searchResultFieldWithInvalidRole.getRole()))
+            .thenReturn(false);
+
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult,
             WORKBASKET, Collections.emptyList());
+        when(caseDataAccessControl.anyRoleEqualsTo(anyString(), anyString())).thenReturn(true);
 
         assertAll(
             () -> assertThat(caseSearchResultView.getHeaders().get(0).getFields().size(), is(3)),
@@ -557,6 +564,11 @@ class CaseSearchResultViewGeneratorTest {
         when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition);
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
+
+        when(caseDataAccessControl.anyRoleEqualsTo(anyString(), anyString())).thenReturn(true);
+        when(caseDataAccessControl.anyRoleEqualsTo(CASE_TYPE_ID_1,
+            searchResultFieldWithInvalidRole.getRole())).thenReturn(false);
+
         final CaseSearchResultView caseSearchResultView =
             classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
 
@@ -589,6 +601,10 @@ class CaseSearchResultViewGeneratorTest {
             .build();
 
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
+
+        doReturn(true).when(caseDataAccessControl)
+            .anyRoleEqualsTo(CASE_TYPE_ID_1, searchResultFieldWithValidRole.getRole());
+
 
         CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET,
             Collections.emptyList());
