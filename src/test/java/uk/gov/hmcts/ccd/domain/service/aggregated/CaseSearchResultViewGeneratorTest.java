@@ -483,13 +483,13 @@ class CaseSearchResultViewGeneratorTest {
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
 
-        when(caseDataAccessControl.anyRoleEqualsTo(anyString(), anyString())).thenReturn(true);
-        when(caseDataAccessControl.anyRoleEqualsTo(CASE_TYPE_ID_1, searchResultFieldWithInvalidRole.getRole()))
-            .thenReturn(false);
+        when(caseDataAccessControl.anyAccessProfileEqualsTo(anyString(), anyString())).thenReturn(true);
+        when(caseDataAccessControl.anyAccessProfileEqualsTo(CASE_TYPE_ID_1,
+            searchResultFieldWithInvalidRole.getRole())).thenReturn(false);
 
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult,
             WORKBASKET, Collections.emptyList());
-        when(caseDataAccessControl.anyRoleEqualsTo(anyString(), anyString())).thenReturn(true);
+        when(caseDataAccessControl.anyAccessProfileEqualsTo(anyString(), anyString())).thenReturn(true);
 
         assertAll(
             () -> assertThat(caseSearchResultView.getHeaders().get(0).getFields().size(), is(3)),
@@ -565,8 +565,8 @@ class CaseSearchResultViewGeneratorTest {
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
 
-        when(caseDataAccessControl.anyRoleEqualsTo(anyString(), anyString())).thenReturn(true);
-        when(caseDataAccessControl.anyRoleEqualsTo(CASE_TYPE_ID_1,
+        when(caseDataAccessControl.anyAccessProfileEqualsTo(anyString(), anyString())).thenReturn(true);
+        when(caseDataAccessControl.anyAccessProfileEqualsTo(CASE_TYPE_ID_1,
             searchResultFieldWithInvalidRole.getRole())).thenReturn(false);
 
         final CaseSearchResultView caseSearchResultView =
@@ -603,7 +603,7 @@ class CaseSearchResultViewGeneratorTest {
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
         doReturn(true).when(caseDataAccessControl)
-            .anyRoleEqualsTo(CASE_TYPE_ID_1, searchResultFieldWithValidRole.getRole());
+            .anyAccessProfileEqualsTo(CASE_TYPE_ID_1, searchResultFieldWithValidRole.getRole());
 
 
         CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET,

@@ -157,7 +157,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     }
 
     @Override
-    public boolean anyRoleEqualsTo(String caseTypeId, String accessProfile) {
+    public boolean anyAccessProfileEqualsTo(String caseTypeId, String accessProfile) {
         Set<AccessProfile> accessProfiles =  generateAccessProfilesByCaseTypeId(caseTypeId);
         Set<String> accessProfileNames = AccessControlService.extractAccessProfileNames(accessProfiles);
         if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {

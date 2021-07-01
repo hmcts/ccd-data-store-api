@@ -247,7 +247,7 @@ class MergeDataToSearchResultOperationTest {
             .build();
 
         doReturn(true).when(caseDataAccessControl)
-            .anyRoleEqualsTo(CASE_TYPE_ID, searchResultFieldWithValidRole.getRole());
+            .anyAccessProfileEqualsTo(CASE_TYPE_ID, searchResultFieldWithValidRole.getRole());
 
         final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult,
             caseDetailsList, NO_ERROR);
@@ -295,9 +295,9 @@ class MergeDataToSearchResultOperationTest {
             .build();
 
         doReturn(true).when(caseDataAccessControl)
-            .anyRoleEqualsTo(CASE_TYPE_ID, searchResultFieldWithValidRole.getRole());
+            .anyAccessProfileEqualsTo(CASE_TYPE_ID, searchResultFieldWithValidRole.getRole());
         doReturn(true).when(caseDataAccessControl)
-            .anyRoleEqualsTo(CASE_TYPE_ID, searchResultFieldWithValidRole2.getRole());
+            .anyAccessProfileEqualsTo(CASE_TYPE_ID, searchResultFieldWithValidRole2.getRole());
 
         final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult,
             caseDetailsList, NO_ERROR);
@@ -341,7 +341,7 @@ class MergeDataToSearchResultOperationTest {
             .build();
 
         doReturn(true).when(caseDataAccessControl)
-            .anyRoleEqualsTo(CASE_TYPE_ID, searchResultFieldWithValidRole.getRole());
+            .anyAccessProfileEqualsTo(CASE_TYPE_ID, searchResultFieldWithValidRole.getRole());
 
 
         final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult,

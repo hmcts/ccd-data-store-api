@@ -126,7 +126,7 @@ public class SearchQueryOperation {
 
     private boolean filterByRole(SearchResultField resultField) {
         return StringUtils.isEmpty(resultField.getRole())
-            || caseDataAccessControl.anyRoleEqualsTo(resultField.getCaseTypeId(), resultField.getRole());
+            || caseDataAccessControl.anyAccessProfileEqualsTo(resultField.getCaseTypeId(), resultField.getRole());
     }
 
     private SortOrderField toSortOrderField(SearchResultField searchResultField) {

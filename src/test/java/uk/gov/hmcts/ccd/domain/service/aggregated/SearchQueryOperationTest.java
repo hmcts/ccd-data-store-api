@@ -336,7 +336,7 @@ public class SearchQueryOperationTest {
 
         doReturn(searchResult).when(searchResultDefinitionService).getSearchResultDefinition(any(), eq(WORKBASKET),
             any());
-        doReturn(true).when(caseDataAccessControl).anyRoleEqualsTo(CASE_TYPE_ID, sortField2.getRole());
+        doReturn(true).when(caseDataAccessControl).anyAccessProfileEqualsTo(CASE_TYPE_ID, sortField2.getRole());
 
         searchQueryOperation.execute(WORKBASKET, metadata, criteria);
 

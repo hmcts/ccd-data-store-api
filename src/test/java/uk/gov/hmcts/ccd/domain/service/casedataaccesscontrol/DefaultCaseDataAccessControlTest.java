@@ -326,7 +326,7 @@ class DefaultCaseDataAccessControlTest {
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
         doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
 
-        boolean anyRoleEquals = defaultCaseDataAccessControl.anyRoleEqualsTo(CASE_TYPE_1, "test");
+        boolean anyRoleEquals = defaultCaseDataAccessControl.anyAccessProfileEqualsTo(CASE_TYPE_1, "test");
         assertEquals(false, anyRoleEquals);
     }
 
@@ -347,7 +347,7 @@ class DefaultCaseDataAccessControlTest {
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
         doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
 
-        boolean anyRoleEquals = defaultCaseDataAccessControl.anyRoleEqualsTo(CASE_TYPE_1, ROLE_NAME_1);
+        boolean anyRoleEquals = defaultCaseDataAccessControl.anyAccessProfileEqualsTo(CASE_TYPE_1, ROLE_NAME_1);
         assertEquals(true, anyRoleEquals);
     }
 
@@ -381,10 +381,10 @@ class DefaultCaseDataAccessControlTest {
         doReturn(pseudoRoleAssignments)
             .when(pseudoRoleAssignmentsGenerator).createPseudoRoleAssignments(anyList());
 
-        boolean anyRoleEquals = defaultCaseDataAccessControl.anyRoleEqualsTo(CASE_TYPE_1, ROLE_NAME_1);
+        boolean anyRoleEquals = defaultCaseDataAccessControl.anyAccessProfileEqualsTo(CASE_TYPE_1, ROLE_NAME_1);
         assertEquals(true, anyRoleEquals);
 
-        anyRoleEquals = defaultCaseDataAccessControl.anyRoleEqualsTo(CASE_TYPE_1,
+        anyRoleEquals = defaultCaseDataAccessControl.anyAccessProfileEqualsTo(CASE_TYPE_1,
             AccessControl.IDAM_PREFIX + ROLE_NAME_2);
         assertEquals(true, anyRoleEquals);
     }

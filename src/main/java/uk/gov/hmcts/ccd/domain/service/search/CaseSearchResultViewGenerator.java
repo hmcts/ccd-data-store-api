@@ -174,7 +174,8 @@ public class CaseSearchResultViewGenerator {
             return false;
         } else {
             if (StringUtils.isEmpty(resultField.getRole())
-                || caseDataAccessControl.anyRoleEqualsTo(resultField.getCaseTypeId(), resultField.getRole())) {
+                || caseDataAccessControl.anyAccessProfileEqualsTo(resultField.getCaseTypeId(),
+                resultField.getRole())) {
                 addedFields.add(id);
                 return true;
             } else {

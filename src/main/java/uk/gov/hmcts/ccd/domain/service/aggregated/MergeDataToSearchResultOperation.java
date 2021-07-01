@@ -66,7 +66,7 @@ public class MergeDataToSearchResultOperation {
         return Arrays.stream(searchResult.getFields())
             .flatMap(searchResultField -> caseTypeDefinition.getCaseFieldDefinitions().stream()
                     .filter(caseField -> caseField.getId().equals(searchResultField.getCaseFieldId()))
-                    .filter(caseField -> filterDistinctFieldsByRole(addedFields, searchResultField))
+                    .filter(caseField -> filterDistinctFieldsByAccessProfile(addedFields, searchResultField))
                     .map(caseField -> createSearchResultViewColumn(searchResultField, caseField))
                     )
             .collect(Collectors.toList());
@@ -84,14 +84,16 @@ public class MergeDataToSearchResultOperation {
             displayContextParameter(searchResultField, commonField));
     }
 
-    private boolean filterDistinctFieldsByRole(final HashSet<String> addedFields, final SearchResultField resultField) {
+    private boolean filterDistinctFieldsByAccessProfile(final HashSet<String> addedFields,
+                                                        final SearchResultField resultField) {
         String id = resultField.buildCaseFieldId();
         if (addedFields.contains(id)) {
             return false;
         } else {
 
             if (StringUtils.isEmpty(resultField.getRole())
-                || caseDataAccessControl.anyRoleEqualsTo(resultField.getCaseTypeId(), resultField.getRole())) {
+                || caseDataAccessControl.anyAccessProfileEqualsTo(resultField.getCaseTypeId(),
+                resultField.getRole())) {
                 addedFields.add(id);
                 return true;
             } else {
