@@ -45,6 +45,8 @@ class RoleAssignmentServiceTest {
     private RoleAssignmentsFilteringService roleAssignmentFilteringService;
     @Mock
     private CaseTypeDefinition caseTypeDefinition;
+    @Mock
+    private RoleAssignmentCategoryService roleAssignmentCategoryService;
 
     private RoleAssignmentService roleAssignmentService;
 
@@ -53,7 +55,7 @@ class RoleAssignmentServiceTest {
         MockitoAnnotations.initMocks(this);
 
         roleAssignmentService = new RoleAssignmentService(roleAssignmentRepository,
-            roleAssignmentsMapper, roleAssignmentFilteringService);
+            roleAssignmentsMapper, roleAssignmentFilteringService, roleAssignmentCategoryService);
     }
 
     private RoleAssignments getRoleAssignments() {

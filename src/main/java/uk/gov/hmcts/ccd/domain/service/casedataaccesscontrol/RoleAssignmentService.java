@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -17,24 +18,32 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class RoleAssignmentService implements AccessControl {
 
     private final RoleAssignmentRepository roleAssignmentRepository;
     private final RoleAssignmentsMapper roleAssignmentsMapper;
     private final RoleAssignmentsFilteringService roleAssignmentsFilteringService;
+    private final RoleAssignmentCategoryService roleAssignmentCategoryService;
 
     @Autowired
     public RoleAssignmentService(@Qualifier(CachedRoleAssignmentRepository.QUALIFIER)
                                          RoleAssignmentRepository roleAssignmentRepository,
                                  RoleAssignmentsMapper roleAssignmentsMapper,
-                                 RoleAssignmentsFilteringService roleAssignmentsFilteringService) {
+                                 RoleAssignmentsFilteringService roleAssignmentsFilteringService,
+                                 RoleAssignmentCategoryService roleAssignmentCategoryService) {
         this.roleAssignmentRepository = roleAssignmentRepository;
         this.roleAssignmentsMapper = roleAssignmentsMapper;
         this.roleAssignmentsFilteringService = roleAssignmentsFilteringService;
+        this.roleAssignmentCategoryService = roleAssignmentCategoryService;
     }
 
     public RoleAssignments getRoleAssignments(String userId) {
+        // TODO: RDM-10924 - move roleCategory from here to the POST roleAssignments operation once it is implemented
+        String roleCategory = roleAssignmentCategoryService.getRoleCategory(userId);
+        log.info("user: {} has roleCategory: {}", userId, roleCategory);
+
         RoleAssignmentResponse roleAssignmentResponse = roleAssignmentRepository.getRoleAssignments(userId);
         return roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
     }
