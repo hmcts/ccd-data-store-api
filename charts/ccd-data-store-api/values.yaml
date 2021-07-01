@@ -13,15 +13,23 @@ java:
   keyVaults:
     ccd:
       secrets:
-        - data-store-api-POSTGRES-USER
-        - data-store-api-POSTGRES-PASS
-        - data-store-api-draftStoreEncryptionSecret
-        - data-store-api-draft-key
-        - ccd-data-s2s-secret
-        - ccd-ELASTIC-SEARCH-URL
-        - ccd-ELASTIC-SEARCH-DATA-NODES-URL
-        - ccd-ELASTIC-SEARCH-PASSWORD
-        - AppInsightsInstrumentationKey
+        - name: data-store-api-POSTGRES-USER
+          alias: DATA_STORE_DB_USERNAME
+        - name: data-store-api-POSTGRES-PASS
+          alias: DATA_STORE_DB_PASSWORD
+        - name: data-store-api-draft-key
+          alias: CCD_DRAFT_ENCRYPTION_KEY
+        - name: ccd-data-s2s-secret
+          alias: DATA_STORE_IDAM_KEY
+        - name: ccd-ELASTIC-SEARCH-URL
+          alias: ELASTIC_SEARCH_HOSTS
+        - name: ccd-ELASTIC-SEARCH-DATA-NODES-URL
+          alias: ELASTIC_SEARCH_DATA_NODES_HOSTS
+        - name: ccd-ELASTIC-SEARCH-PASSWORD
+          alias: ELASTIC_SEARCH_PASSWORD
+        - name: AppInsightsInstrumentationKey
+          alias: azure.application-insights.instrumentation-key
+
   environment:
     DATA_STORE_DB_PORT: 5432
     DATA_STORE_DB_NAME: ccd_data_store
@@ -41,9 +49,6 @@ java:
     DEFINITION_CACHE_JURISDICTION_TTL_SEC: 120
 
     ELASTIC_SEARCH_ENABLED: true
-    ELASTIC_SEARCH_HOSTS: ''
-    ELASTIC_SEARCH_DATA_NODES_HOSTS: ''
-    ELASTIC_SEARCH_PASSWORD: ''
     ELASTIC_SEARCH_BLACKLIST: query_string
     ELASTIC_SEARCH_CASE_INDEX_NAME_FORMAT: '%s_cases'
     ELASTIC_SEARCH_CASE_INDEX_TYPE: _doc
