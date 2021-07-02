@@ -17,6 +17,9 @@ java:
         - data-store-api-POSTGRES-PASS
         - data-store-api-draftStoreEncryptionSecret
         - data-store-api-draft-key
+        - idam-data-store-client-secret
+        - idam-data-store-system-user-username
+        - idam-data-store-system-user-password
         - ccd-data-s2s-secret
         - ccd-ELASTIC-SEARCH-URL
         - ccd-ELASTIC-SEARCH-DATA-NODES-URL

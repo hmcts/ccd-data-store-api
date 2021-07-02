@@ -38,7 +38,7 @@ public class IdamRepository {
     public List<String> getUserRoles(String userId) {
         String dataStoreSystemUserToken = getDataStoreSystemUserAccessToken();
         List<String> roles = getUserByUserId(userId, dataStoreSystemUserToken).getRoles();
-        log.info("System user queried user info from IDAM API. User Id={}. Roles={}.", userId, roles);
+        log.debug("System user queried user info from IDAM API. User Id={}. Roles={}.", userId, roles);
         return roles;
     }
 

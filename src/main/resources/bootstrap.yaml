@@ -12,3 +12,6 @@ spring:
         data-store-api-POSTGRES-USER: DATA_STORE_DB_USERNAME
         data-store-api-POSTGRES-PASS: DATA_STORE_DB_PASSWORD
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
+        idam-data-store-client-secret: IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET
+        idam-data-store-system-user-username: IDAM_DATA_STORE_SYSTEM_USER_USERNAME
+        idam-data-store-system-user-password: IDAM_DATA_STORE_SYSTEM_USER_PASSWORD

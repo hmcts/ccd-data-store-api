@@ -1,15 +1,16 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory;
 import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository.ROLE_CATEGORY_CITIZEN;
-import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository.ROLE_CATEGORY_JUDICIAL;
-import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository.ROLE_CATEGORY_PROFESSIONAL;
-import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository.ROLE_CATEGORY_STAFF;
+import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.ROLE_CATEGORY_CITIZEN;
+import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.ROLE_CATEGORY_JUDICIAL;
+import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.ROLE_CATEGORY_PROFESSIONAL;
+import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.ROLE_CATEGORY_STAFF;
 
 @Service
 public class RoleAssignmentCategoryService {
@@ -27,7 +28,7 @@ public class RoleAssignmentCategoryService {
         this.idamRepository = idamRepository;
     }
 
-    public String getRoleCategory(String userId) {
+    public RoleCategory getRoleCategory(String userId) {
         List<String> idamUserRoles = idamRepository.getUserRoles(userId);
         if (hasProfessionalRole(idamUserRoles)) {
             return ROLE_CATEGORY_PROFESSIONAL;

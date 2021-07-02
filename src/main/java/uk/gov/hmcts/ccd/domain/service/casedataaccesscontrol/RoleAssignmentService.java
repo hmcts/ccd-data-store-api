@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.CachedRoleAssignmentRepository;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
@@ -41,8 +42,8 @@ public class RoleAssignmentService implements AccessControl {
 
     public RoleAssignments getRoleAssignments(String userId) {
         // TODO: RDM-10924 - move roleCategory from here to the POST roleAssignments operation once it is implemented
-        String roleCategory = roleAssignmentCategoryService.getRoleCategory(userId);
-        log.info("user: {} has roleCategory: {}", userId, roleCategory);
+        RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(userId);
+        log.debug("user: {} has roleCategory: {}", userId, roleCategory.getName());
 
         RoleAssignmentResponse roleAssignmentResponse = roleAssignmentRepository.getRoleAssignments(userId);
         return roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
