@@ -45,7 +45,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -487,6 +486,13 @@ class CaseAccessOperationTest {
             configureCaseRepository(null);
         }
 
+        private void mockExistingCaseUserRoles(List<CaseUserEntity> existingCaseUserRoles) {
+            when(caseUserRepository.findCaseUserRoles(
+                argThat(arg -> arg.contains(CASE_ID) || arg.contains(CASE_ID_OTHER)),
+                argThat(arg -> arg.contains(USER_ID)))
+            ).thenReturn(existingCaseUserRoles);
+        }
+
         @Test
         @DisplayName("should add single case user role")
         void shouldAddSingleCaseUserRole() {
@@ -494,6 +500,8 @@ class CaseAccessOperationTest {
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE)
             );
+            // behave as no existing case roles
+            mockExistingCaseUserRoles(new ArrayList<>());
 
             // ACT
             caseAccessOperation.addCaseUserRoles(caseUserRoles);
@@ -510,7 +518,10 @@ class CaseAccessOperationTest {
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, role)
             );
-            given(caseUserRepository.findCaseRoles(CASE_ID, USER_ID)).willReturn(List.of("[defendant]"));
+            // register existing case role
+            mockExistingCaseUserRoles(List.of(
+                createCaseUserEntity(CASE_ID, "[defendant]", USER_ID))
+            );
 
             // ACT
             caseAccessOperation.addCaseUserRoles(caseUserRoles);
@@ -528,6 +539,8 @@ class CaseAccessOperationTest {
             caseDetailsOther.setReference(CASE_REFERENCE_OTHER);
             doReturn(Optional.of(caseDetailsOther)).when(caseDetailsRepository).findByReference(null,
                 CASE_REFERENCE_OTHER);
+            // behave as no existing case roles
+            mockExistingCaseUserRoles(new ArrayList<>());
 
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE),
@@ -551,6 +564,8 @@ class CaseAccessOperationTest {
                 // NB: repeat case reference
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_OTHER)
             );
+            // behave as no existing case roles
+            mockExistingCaseUserRoles(new ArrayList<>());
 
             // ACT
             caseAccessOperation.addCaseUserRoles(caseUserRoles);
@@ -582,11 +597,8 @@ class CaseAccessOperationTest {
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
             );
-            // behave as a new relationship
-            when(caseUserRepository.findCaseUserRoles(
-                argThat(arg -> arg.contains(CASE_ID)),
-                argThat(arg -> arg.contains(USER_ID))
-            )).thenReturn(new ArrayList<>());
+            // behave as no existing case roles
+            mockExistingCaseUserRoles(new ArrayList<>());
 
             // ACT
             caseAccessOperation.addCaseUserRoles(caseUserRoles);
@@ -603,13 +615,10 @@ class CaseAccessOperationTest {
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(
                     CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR, ORGANISATION
-                ));
-
-            // behave as a new relationship
-            when(caseUserRepository.findCaseUserRoles(
-                argThat(arg -> arg.contains(CASE_ID)),
-                argThat(arg -> arg.contains(USER_ID))
-            )).thenReturn(new ArrayList<>());
+                )
+            );
+            // behave as no existing case roles
+            mockExistingCaseUserRoles(new ArrayList<>());
 
             // ACT
             caseAccessOperation.addCaseUserRoles(caseUserRoles);
@@ -625,11 +634,8 @@ class CaseAccessOperationTest {
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
             );
-            // behave as a new relationship
-            when(caseUserRepository.findCaseUserRoles(
-                argThat(arg -> arg.contains(CASE_ID)),
-                argThat(arg -> arg.contains(USER_ID))
-            )).thenReturn(Collections.singletonList(
+            // register existing case role
+            mockExistingCaseUserRoles(List.of(
                 createCaseUserEntity(CASE_ID, CASE_ROLE, USER_ID)
             ));
 
@@ -649,11 +655,8 @@ class CaseAccessOperationTest {
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_OTHER,
                     ORGANISATION)
             );
-            // behave as a new relationship
-            when(caseUserRepository.findCaseUserRoles(
-                argThat(arg -> arg.contains(CASE_ID)),
-                argThat(arg -> arg.contains(USER_ID))
-            )).thenReturn(new ArrayList<>());
+            // behave as no existing case roles
+            mockExistingCaseUserRoles(new ArrayList<>());
 
             // ACT
             caseAccessOperation.addCaseUserRoles(caseUserRoles);
@@ -672,11 +675,8 @@ class CaseAccessOperationTest {
                 new CaseAssignedUserRoleWithOrganisation(
                     CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR, ORGANISATION)
             );
-            // behave as a new relationship
-            when(caseUserRepository.findCaseUserRoles(
-                argThat(arg -> arg.contains(CASE_ID)),
-                argThat(arg -> arg.contains(USER_ID))
-            )).thenReturn(new ArrayList<>());
+            // behave as no existing case roles
+            mockExistingCaseUserRoles(new ArrayList<>());
 
             // ACT
             caseAccessOperation.addCaseUserRoles(caseUserRoles);
@@ -693,12 +693,8 @@ class CaseAccessOperationTest {
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
             );
-
-            // for an existing [CREATOR] relation
-            when(caseUserRepository.findCaseUserRoles(
-                argThat(arg -> arg.contains(CASE_ID)),
-                argThat(arg -> arg.contains(USER_ID))
-            )).thenReturn(Collections.singletonList(
+            // register existing [CREATOR] case role
+            mockExistingCaseUserRoles(List.of(
                 createCaseUserEntity(CASE_ID, CASE_ROLE_CREATOR, USER_ID)
             ));
 
@@ -718,12 +714,8 @@ class CaseAccessOperationTest {
                 new CaseAssignedUserRoleWithOrganisation(
                     CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR, ORGANISATION)
             );
-
-            // for an existing relationship
-            when(caseUserRepository.findCaseUserRoles(
-                argThat(arg -> arg.contains(CASE_ID)),
-                argThat(arg -> arg.contains(USER_ID))
-            )).thenReturn(Collections.singletonList(
+            // register existing case role
+            mockExistingCaseUserRoles(List.of(
                 createCaseUserEntity(CASE_ID, CASE_ROLE, USER_ID)
             ));
 
