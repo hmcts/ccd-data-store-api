@@ -11,6 +11,7 @@ Background:
 Scenario: must return 201 if the grant is successful for a user to a valid case ID
 
     Given a user with [an active profile in CCD],
+      And a user [testUser - with an active profile in CCD],
       And a case that has just been created as in [Standard_Full_Case_Creation_Data],
 
      When a request is prepared with appropriate values,
@@ -26,6 +27,7 @@ Scenario: must return 201 if the grant is successful for a user to a valid case 
 Scenario: must return 404 when case id is structurally valid but not exist in CCD
 
     Given a user with [an active profile in CCD],
+      And a user [testUser - with an active profile in CCD],
 
      When a request is prepared with appropriate values,
       And the request [contains in input parameters a structurally valid but non-existing case-reference],
@@ -40,6 +42,7 @@ Scenario: must return 404 when case id is structurally valid but not exist in CC
 Scenario: must return negative response when request does not provide valid authentication credentials
 
     Given a user with [an active profile in CCD],
+      And a user [testUser - with an active profile in CCD],
 
      When a request is prepared with appropriate values,
       And the request [does not provide valid authentication credentials],
@@ -54,6 +57,7 @@ Scenario: must return negative response when request does not provide valid auth
 Scenario: must return negative response when request does not provide an authorized access
 
     Given a user with [an active profile in CCD],
+      And a user [testUser - with an active profile in CCD],
 
      When a request is prepared with appropriate values,
       And the request [does not provide authorised access to the operation],
@@ -68,6 +72,7 @@ Scenario: must return negative response when request does not provide an authori
 Scenario: must return negative response when request body doesn't provide a mandatory field
 
     Given a user with [an active profile in CCD],
+      And a user [testUser - with an active profile in CCD],
 
      When a request is prepared with appropriate values,
       And the request [does not provide a mandatory field for the operation],
@@ -82,6 +87,7 @@ Scenario: must return negative response when request body doesn't provide a mand
 Scenario: must return negative response when case id contains some non-numeric characters
 
     Given a user with [an active profile in CCD],
+      And a user [testUser - with an active profile in CCD],
 
      When a request is prepared with appropriate values,
       And the request [does not provide the numeric case id for the operation],

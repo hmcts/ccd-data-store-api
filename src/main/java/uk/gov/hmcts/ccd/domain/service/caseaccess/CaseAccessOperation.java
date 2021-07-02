@@ -69,15 +69,20 @@ public class CaseAccessOperation {
         final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(jurisdictionId,
             Long.valueOf(caseReference));
 
-        final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
-        caseUserRepository.grantAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
+        final var caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
+
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            roleAssignmentService.createCaseRoleAssignments(caseDetails, userId, Set.of(CREATOR.getRole()), true);
+        } else {
+            caseUserRepository.grantAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
+        }
     }
 
     @Transactional
     public void revokeAccess(final String jurisdictionId, final String caseReference, final String userId) {
         final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(jurisdictionId,
             Long.valueOf(caseReference));
-        final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
+        final var caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
         caseUserRepository.revokeAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
     }
 
@@ -108,12 +113,18 @@ public class CaseAccessOperation {
 
         validateCaseRoles(Sets.union(globalCaseRoles, validCaseRoles), targetCaseRoles);
 
-        final Long caseId = Long.valueOf(caseDetails.getId());
         final String userId = caseUser.getUserId();
-        final List<String> currentCaseRoles = caseUserRepository.findCaseRoles(caseId, userId);
 
-        grantAddedCaseRoles(userId, caseId, currentCaseRoles, targetCaseRoles);
-        revokeRemovedCaseRoles(userId, caseId, currentCaseRoles, targetCaseRoles);
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            // NB: `replaceExisting = true` uses RAS which does not need us to revokeRemoved or ignoreGranted.
+            roleAssignmentService.createCaseRoleAssignments(caseDetails, userId, targetCaseRoles, true);
+        } else {
+            final var caseId = Long.valueOf(caseDetails.getId());
+            final List<String> currentCaseRoles = caseUserRepository.findCaseRoles(caseId, userId);
+
+            grantAddedCaseRoles(userId, caseId, currentCaseRoles, targetCaseRoles);
+            revokeRemovedCaseRoles(userId, caseId, currentCaseRoles, targetCaseRoles);
+        }
     }
 
     @Transactional

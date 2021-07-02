@@ -7,6 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -29,11 +31,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -84,12 +88,12 @@ class CaseAccessOperationTest {
 
     @Mock
     private RoleAssignmentService roleAssignmentService;
+
     @Mock
     private ApplicationParams applicationParams;
 
     @InjectMocks
     private uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation caseAccessOperation;
-
 
     @BeforeEach
     void setUp() {
@@ -104,36 +108,97 @@ class CaseAccessOperationTest {
     @DisplayName("grantAccess()")
     class GrantAccess {
 
+        @Captor
+        ArgumentCaptor<CaseDetails> caseDetailsCaptor;
+
+        @Captor
+        ArgumentCaptor<Set<String>> rolesCaptor;
+
+        @BeforeEach
+        void setUp() {
+            MockitoAnnotations.initMocks(this);
+        }
+
         @Test
         @DisplayName("should grant access to user")
         void shouldGrantAccess() {
+
+            // GIVEN
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
+            // WHEN
             caseAccessOperation.grantAccess(JURISDICTION, CASE_REFERENCE.toString(), USER_ID);
 
+            // THEN
             assertAll(
                 () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_REFERENCE),
-                () -> verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CREATOR.getRole())
+                () -> verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CREATOR.getRole()),
+                () -> verifyZeroInteractions(roleAssignmentService)
+            );
+        }
+
+        @Test
+        @DisplayName("RA set to true, should grant access to user")
+        void shouldGrantAccessForRA() {
+
+            // GIVEN
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+
+            // WHEN
+            caseAccessOperation.grantAccess(JURISDICTION, CASE_REFERENCE.toString(), USER_ID);
+
+            // THEN
+            assertAll(
+                () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_REFERENCE),
+                () -> {
+                    verify(roleAssignmentService).createCaseRoleAssignments(
+                        caseDetailsCaptor.capture(),
+                        eq(USER_ID),
+                        rolesCaptor.capture(),
+                        eq(true)
+                    );
+
+                    CaseDetails caseDetails = caseDetailsCaptor.getValue();
+                    assertAll(
+                        () -> assertEquals(CASE_ID.toString(), caseDetails.getId()),
+                        () -> assertEquals(CASE_REFERENCE, caseDetails.getReference())
+                    );
+
+                    Set<String> roles = rolesCaptor.getValue();
+                    assertAll(
+                        () -> assertEquals(1, roles.size()),
+                        () -> assertTrue(roles.contains(CREATOR.getRole()))
+                    );
+                },
+                () -> verifyZeroInteractions(caseUserRepository)
             );
         }
 
         @Test
         @DisplayName("should throw not found exception when reference not found")
         void shouldThrowNotFound() {
+            String caseNotFound = CASE_NOT_FOUND.toString();
+
             assertAll(
                 () -> assertThrows(CaseNotFoundException.class,
-                    () -> caseAccessOperation.grantAccess(JURISDICTION, CASE_NOT_FOUND.toString(), USER_ID)),
+                    () -> caseAccessOperation.grantAccess(JURISDICTION, caseNotFound, USER_ID)),
                 () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_NOT_FOUND),
-                () -> verify(caseUserRepository, never()).grantAccess(CASE_ID, USER_ID, CREATOR.getRole())
+                () -> verifyZeroInteractions(caseUserRepository),
+                () -> verifyZeroInteractions(roleAssignmentService)
             );
         }
 
         @Test
         @DisplayName("should throw not found exception when reference in different jurisdiction")
         void shouldHandleWrongJurisdiction() {
+            String caseReference = CASE_REFERENCE.toString();
+
             assertAll(
                 () -> assertThrows(CaseNotFoundException.class,
-                    () -> caseAccessOperation.grantAccess(WRONG_JURISDICTION, CASE_REFERENCE.toString(), USER_ID)),
+                    () -> caseAccessOperation.grantAccess(WRONG_JURISDICTION, caseReference, USER_ID)),
                 () -> verify(caseDetailsRepository).findByReference(WRONG_JURISDICTION, CASE_REFERENCE),
-                () -> verify(caseUserRepository, never()).grantAccess(CASE_ID, USER_ID, CREATOR.getRole())
+                () -> verifyZeroInteractions(caseUserRepository),
+                () -> verifyZeroInteractions(roleAssignmentService)
             );
         }
     }
@@ -141,10 +206,16 @@ class CaseAccessOperationTest {
     @Nested()
     @DisplayName("updateUserAccess(reference, caseUser)")
     class GrantAccessCaseUser {
+
         private CaseDetails caseDetails;
+
+        @Captor
+        ArgumentCaptor<Set<String>> rolesCaptor;
 
         @BeforeEach
         void setUp() {
+            MockitoAnnotations.initMocks(this);
+
             caseDetails = new CaseDetails();
             caseDetails.setId(CASE_ID.toString());
             caseDetails.setCaseTypeId(CASE_TYPE_ID);
@@ -157,41 +228,136 @@ class CaseAccessOperationTest {
                                                                                            caseUser(NOT_CASE_ROLE));
             assertThrows(InvalidCaseRoleException.class, execAccessUpdate);
             verifyZeroInteractions(caseUserRepository);
+            verifyZeroInteractions(roleAssignmentService);
         }
 
         @Test
         @DisplayName("should grant access when added case role valid")
         void shouldGrantAccessForCaseRole() {
+
+            // GIVEN
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
+            // WHEN
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE));
 
+            // THEN
             verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
+        }
+
+        @Test
+        @DisplayName("RA set to true, should grant access when added case role valid")
+        void shouldGrantAccessForCaseRoleForRA() {
+
+            // GIVEN
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+
+            // WHEN
+            caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE));
+
+            // THEN
+            verify(roleAssignmentService).createCaseRoleAssignments(
+                eq(caseDetails),
+                eq(USER_ID),
+                rolesCaptor.capture(),
+                eq(true)
+            );
+
+            // :: verify roles submitted
+            Set<String> roles = rolesCaptor.getValue();
+            assertAll(
+                () -> assertEquals(1, roles.size()),
+                () -> assertTrue(roles.contains(CASE_ROLE))
+            );
+
+            // :: verify legacy service not called
+            verifyZeroInteractions(caseUserRepository);
         }
 
         @Test
         @DisplayName("should grant access when added case roles contains global [CREATOR]")
         void shouldGrantAccessForCaseRoleCreator() {
+
+            // GIVEN
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
+            // WHEN
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE, CREATOR.getRole()));
 
+            // THEN
             assertAll(
                 () -> verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE),
-                () -> verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CREATOR.getRole())
+                () -> verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CREATOR.getRole()),
+                () -> verifyZeroInteractions(roleAssignmentService)
             );
+        }
+
+        @Test
+        @DisplayName("RA set to true, should grant access when added case roles contains global [CREATOR]")
+        void shouldGrantAccessForCaseRoleCreatorForRA() {
+
+            // GIVEN
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+
+            // WHEN
+            caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE, CREATOR.getRole()));
+
+            // THEN
+            verify(roleAssignmentService).createCaseRoleAssignments(
+                eq(caseDetails),
+                eq(USER_ID),
+                rolesCaptor.capture(),
+                eq(true)
+            );
+
+            // :: verify roles submitted
+            Set<String> roles = rolesCaptor.getValue();
+            assertAll(
+                () -> assertEquals(2, roles.size()),
+                () -> assertTrue(roles.contains(CASE_ROLE)),
+                () -> assertTrue(roles.contains(CREATOR.getRole()))
+            );
+
+            // :: verify legacy service not called
+            verifyZeroInteractions(caseUserRepository);
         }
 
         @Test
         @DisplayName("should revoke access for removed case roles")
         void shouldRevokeRemovedCaseRoles() {
+            // NB: test not valid for 'Attribute Based Access Control' as :
+            //     RAS submission with `replaceExisting = true` does not require us to revokeRemoved.
+
+            // GIVEN
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
+            // WHEN
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE));
 
-            verify(caseUserRepository).revokeAccess(CASE_ID, USER_ID, CASE_ROLE_GRANTED);
+            // THEN
+            assertAll(
+                () -> verify(caseUserRepository).revokeAccess(CASE_ID, USER_ID, CASE_ROLE_GRANTED),
+                () -> verifyZeroInteractions(roleAssignmentService)
+            );
         }
 
         @Test
         @DisplayName("should ignore case roles already granted")
         void shouldIgnoreGrantedCaseRoles() {
+            // NB: test not valid for 'Attribute Based Access Control' as :
+            //     RAS submission with `replaceExisting = true` does not require us to ignoreGranted.
+
+            // GIVEN
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
+            // WHEN
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE_GRANTED));
 
-            verify(caseUserRepository, never()).grantAccess(CASE_ID, USER_ID, CASE_ROLE_GRANTED);
+            // THEN
+            assertAll(
+                () -> verify(caseUserRepository, never()).grantAccess(CASE_ID, USER_ID, CASE_ROLE_GRANTED),
+                () -> verifyZeroInteractions(roleAssignmentService)
+            );
         }
     }
 
@@ -213,9 +379,11 @@ class CaseAccessOperationTest {
         @Test
         @DisplayName("should throw not found exception when reference not found")
         void shouldThrowNotFound() {
+            String caseNotFound = CASE_NOT_FOUND.toString();
+
             assertAll(
                 () -> assertThrows(CaseNotFoundException.class,
-                    () -> caseAccessOperation.revokeAccess(JURISDICTION, CASE_NOT_FOUND.toString(), USER_ID)),
+                    () -> caseAccessOperation.revokeAccess(JURISDICTION, caseNotFound, USER_ID)),
                 () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_NOT_FOUND),
                 () -> verify(caseUserRepository, never()).revokeAccess(CASE_ID, USER_ID, CREATOR.getRole())
             );
@@ -224,9 +392,11 @@ class CaseAccessOperationTest {
         @Test
         @DisplayName("should throw not found exception when reference in different jurisdiction")
         void shouldHandleWrongJurisdiction() {
+            String caseReference = CASE_REFERENCE.toString();
+
             assertAll(
                 () -> assertThrows(CaseNotFoundException.class,
-                    () -> caseAccessOperation.revokeAccess(WRONG_JURISDICTION, CASE_REFERENCE.toString(), USER_ID)),
+                    () -> caseAccessOperation.revokeAccess(WRONG_JURISDICTION, caseReference, USER_ID)),
                 () -> verify(caseDetailsRepository).findByReference(WRONG_JURISDICTION, CASE_REFERENCE),
                 () -> verify(caseUserRepository, never()).revokeAccess(CASE_ID, USER_ID, CREATOR.getRole())
             );
