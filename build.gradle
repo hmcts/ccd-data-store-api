@@ -218,6 +218,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.19.0'
     testCompile ('com.opentable.components:otj-pg-embedded:0.12.0')
     testCompile ('com.github.tomakehurst:wiremock-jre8:2.25.1')
     testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE')

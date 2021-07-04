@@ -1,0 +1,39 @@
+{
+
+  "DocumentField5" : {
+    "document_url" : "http://dm-store:8080/documents/0dfa903c-993d-4fa4-9bc4-b97d6352b862",
+    "document_filename" : "Screenshot 2020-03-03 at 16.56.56.png",
+    "document_binary_url" : "http://dm-store:8080/documents/0dfa903c-993d-4fa4-9bc4-b97d6352b862/binary"
+  },
+  "DocumentField2" : {
+    "document_url" : "http://dm-store:8080/documents/e16f2ae0-d6ce-4bd0-a652-47b3c4d86292",
+    "document_filename" : "Screenshot 2020-02-19 at 17.17.42.png",
+    "document_binary_url" : "http://dm-store:8080/documents/e16f2ae0-d6ce-4bd0-a652-47b3c4d86292/binary"
+  },
+  "DocumentField1" : {
+    "document_url" : "http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d",
+    "document_filename" : "Screenshot 2020-03-24 at 08.38.47.png",
+    "document_binary_url" : "http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d/binary"
+  },
+
+  "DocumentField7" : {
+    "document_url": "http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976",
+    "document_filename": "Screenshot 2020-02-24 at 13.32.03.Jpeg",
+    "document_binary_url": "http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976/binary"
+  },
+  "timeline": [
+    {
+      "id": "ca7fdb34-bf2f-4d59-a807-d005b6a462d5",
+      "value": {
+        "type": {
+          "document_url": "http://dm-store:8080/documents/c1f160ca-cf52-4c0a-8376-3b51c340d00c",
+          "document_filename": "AM-592 Attach case with V3 version.png",
+          "document_binary_url": "http://dm-store:8080/documents/c1f160ca-cf52-4c0a-8376-3b51c340d00c/binary"
+        },
+        "description": null
+      }
+    }
+  ]
+
+}
+

@@ -1,0 +1,36 @@
+{
+  "_guid_": "S-1012",
+  "_extends_": "F-1002-Test_Base_Request_Body",
+  "title": "must successfully update case data content without any document field",
+
+  "specs": [
+    "contains a Case Id created above",
+    "is to update the case created above, with some updates in only non document fields"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1002-Case_Creation_Data][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "MoneyGBPField" : "10121012",
+        "EmailField" : "S1012NonDocumentFieldsUpdate@gmail.com",
+        "TextField" : "NonDocumentFieldsUpdate"
+      },
+      "event_token": "${[scenarioContext][childContexts][S-1012-Update_Event_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "F-1002-Test_Base_Response_Body",
+
+    "body": {
+      "data": {
+        "MoneyGBPField" : "10121012",
+        "EmailField" : "S1012NonDocumentFieldsUpdate@gmail.com",
+        "TextField" : "NonDocumentFieldsUpdate"
+      }
+    }
+  }
+}

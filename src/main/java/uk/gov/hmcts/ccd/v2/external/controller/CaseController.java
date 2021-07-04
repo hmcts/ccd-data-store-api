@@ -41,7 +41,6 @@ import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
-import uk.gov.hmcts.ccd.v3.V3;
 
 import static org.springframework.http.ResponseEntity.status;
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CASE_ACCESSED;
@@ -238,88 +237,6 @@ public class CaseController {
     @PostMapping(
         path = "/case-types/{caseTypeId}/cases",
         headers = {
-            V3.EXPERIMENTAL_HEADER
-        },
-        produces = {
-            V3.MediaType.CREATE_CASE
-        },
-        consumes = {
-            V3.MediaType.CREATE_CASE
-        }
-    )
-    @ApiOperation(
-        value = "Submit case creation V3",
-        notes = V3.EXPERIMENTAL_WARNING
-    )
-    @ApiResponses({
-
-        @ApiResponse(
-            code = 201,
-            message = "Created",
-            response = CaseResource.class
-        ),
-        @ApiResponse(
-            code = 400,
-            message = V3.Error.MISSING_EVENT_TOKEN
-        ),
-        @ApiResponse(
-            code = 403,
-            message = V3.Error.GRANT_FORBIDDEN
-        ),
-        @ApiResponse(
-            code = 404,
-            message = V3.Error.EVENT_TRIGGER_NOT_FOUND
-        ),
-        @ApiResponse(
-            code = 404,
-            message = V3.Error.NO_MATCHING_EVENT_TRIGGER
-        ),
-        @ApiResponse(
-            code = 409,
-            message = V3.Error.CASE_ALTERED
-        ),
-        @ApiResponse(
-            code = 422,
-            message = V3.Error.CASE_DATA_NOT_FOUND
-        ),
-        @ApiResponse(
-            code = 422,
-            message = V3.Error.CASE_TYPE_NOT_FOUND
-        ),
-        @ApiResponse(
-            code = 422,
-            message = V3.Error.USER_ROLE_NOT_FOUND
-        ),
-        @ApiResponse(
-            code = 422,
-            message = V3.Error.EVENT_TRIGGER_NOT_SPECIFIED
-        ),
-        @ApiResponse(
-            code = 422,
-            message = V3.Error.EVENT_TRIGGER_NOT_KNOWN_FOR_CASE_TYPE
-        ),
-        @ApiResponse(
-            code = 422,
-            message = V3.Error.EVENT_TRIGGER_HAS_PRE_STATE
-        ),
-        @ApiResponse(
-            code = 422,
-            message = V3.Error.CASE_FIELD_INVALID
-        )
-
-    })
-    public ResponseEntity<CaseResource> createCaseV3(@PathVariable("caseTypeId") String caseTypeId,
-                                                     @RequestBody final CaseDataContent content,
-                                                     @RequestParam(value = "ignore-warning", required = false)
-                                                         final Boolean ignoreWarning) {
-        return getCaseResourceResponseEntity(caseTypeId, content, ignoreWarning);
-    }
-
-    @Transactional
-    @ResponseStatus(code = HttpStatus.CREATED)
-    @PostMapping(
-        path = "/case-types/{caseTypeId}/cases",
-        headers = {
             V2.EXPERIMENTAL_HEADER
         },
         produces = {
@@ -504,80 +421,6 @@ public class CaseController {
         SupplementaryData supplementaryDataUpdated = supplementaryDataUpdateOperation.updateSupplementaryData(caseId,
             supplementaryDataUpdateRequest);
         return status(HttpStatus.OK).body(new SupplementaryDataResource(supplementaryDataUpdated));
-    }
-
-    @Transactional
-    @ResponseStatus(code = HttpStatus.CREATED)
-    @PostMapping(
-        path = "/cases/{caseId}/events",
-        headers = {
-            V3.EXPERIMENTAL_HEADER
-        },
-        produces = {
-            V3.MediaType.CREATE_EVENT
-        },
-        consumes  = {
-            V3.MediaType.CREATE_EVENT
-        }
-    )
-    @ApiOperation(
-        value = "Submit event creation V3",
-        notes = V3.EXPERIMENTAL_WARNING
-    )
-    @ApiResponses({
-        @ApiResponse(
-            code = 201,
-            message = "Created",
-            response = CaseResource.class
-        ),
-        @ApiResponse(
-            code = 400,
-            message = V3.Error.CASE_ID_INVALID
-        ),
-        @ApiResponse(
-            code = 403,
-            message = V3.Error.GRANT_FORBIDDEN
-        ),
-        @ApiResponse(
-            code = 404,
-            message = V3.Error.EVENT_TRIGGER_NOT_FOUND
-        ),
-        @ApiResponse(
-            code = 409,
-            message = V3.Error.CASE_ALTERED
-        ),
-        @ApiResponse(
-            code = 422,
-            message = V3.Error.CASE_DATA_NOT_FOUND
-        ),
-        @ApiResponse(
-            code = 422,
-            message = V3.Error.CASE_TYPE_NOT_FOUND
-        ),
-        @ApiResponse(
-            code = 422,
-            message = V3.Error.USER_ROLE_NOT_FOUND
-        ),
-        @ApiResponse(
-            code = 422,
-            message = V3.Error.EVENT_TRIGGER_NOT_SPECIFIED
-        ),
-        @ApiResponse(
-            code = 422,
-            message = V3.Error.EVENT_TRIGGER_NOT_KNOWN_FOR_CASE_TYPE
-        ),
-        @ApiResponse(
-            code = 422,
-            message = V3.Error.EVENT_TRIGGER_HAS_PRE_STATE
-        ),
-        @ApiResponse(
-            code = 422,
-            message = V3.Error.CASE_FIELD_INVALID
-        )
-    })
-    public ResponseEntity<CaseResource> createEventV3(@PathVariable("caseId") String caseId,
-                                                    @RequestBody final CaseDataContent content) {
-        return createCaseEvent(caseId, content);
     }
 
     private ResponseEntity<CaseResource> createCaseEvent(@PathVariable("caseId") String caseId,
