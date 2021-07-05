@@ -57,7 +57,7 @@ class RoleAssignmentServiceTest {
         MockitoAnnotations.initMocks(this);
 
         BDDMockito.given(roleAssignmentCategoryService.getRoleCategory(USER_ID))
-            .willReturn(RoleCategory.ROLE_CATEGORY_PROFESSIONAL);
+            .willReturn(RoleCategory.PROFESSIONAL);
 
         roleAssignmentService = new RoleAssignmentService(roleAssignmentRepository,
             roleAssignmentsMapper, roleAssignmentFilteringService, roleAssignmentCategoryService);

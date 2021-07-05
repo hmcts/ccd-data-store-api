@@ -7,10 +7,10 @@ import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.ROLE_CATEGORY_CITIZEN;
-import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.ROLE_CATEGORY_JUDICIAL;
-import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.ROLE_CATEGORY_PROFESSIONAL;
-import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.ROLE_CATEGORY_STAFF;
+import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.CITIZEN;
+import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.JUDICIAL;
+import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.PROFESSIONAL;
+import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.STAFF;
 
 @Service
 public class RoleAssignmentCategoryService {
@@ -31,13 +31,13 @@ public class RoleAssignmentCategoryService {
     public RoleCategory getRoleCategory(String userId) {
         List<String> idamUserRoles = idamRepository.getUserRoles(userId);
         if (hasProfessionalRole(idamUserRoles)) {
-            return ROLE_CATEGORY_PROFESSIONAL;
+            return PROFESSIONAL;
         } else if (hasCitizenRole(idamUserRoles)) {
-            return ROLE_CATEGORY_CITIZEN;
+            return CITIZEN;
         } else if (hasJudicialRole(idamUserRoles)) {
-            return ROLE_CATEGORY_JUDICIAL;
+            return JUDICIAL;
         } else {
-            return ROLE_CATEGORY_STAFF;
+            return STAFF;
         }
     }
 

@@ -16,6 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -43,7 +44,7 @@ public class RoleAssignmentService implements AccessControl {
     public RoleAssignments getRoleAssignments(String userId) {
         // TODO: RDM-10924 - move roleCategory from here to the POST roleAssignments operation once it is implemented
         RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(userId);
-        log.debug("user: {} has roleCategory: {}", userId, roleCategory.getName());
+        log.debug("user: {} has roleCategory: {}", userId, roleCategory);
 
         RoleAssignmentResponse roleAssignmentResponse = roleAssignmentRepository.getRoleAssignments(userId);
         return roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
@@ -67,6 +68,7 @@ public class RoleAssignmentService implements AccessControl {
         return roleAssignmentsList.stream()
             .filter(this::isValidRoleAssignment)
             .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
+            .filter(Objects::nonNull)
             .flatMap(Optional::stream)
             .collect(Collectors.toList());
     }
