@@ -191,12 +191,12 @@ public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
 
         final CaseViewField children = caseUpdateViewEventResource.getCaseUpdateViewEvent().getCaseFields().get(1);
         assertThat(children.getFieldTypeDefinition().getType(), equalTo("Collection"));
-        assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
+        assertThat(children.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert,allowUpdate)"));
 
         final CaseFieldDefinition hobby = children.getFieldTypeDefinition().getCollectionFieldTypeDefinition()
             .getChildren().get(1);
         assertThat(hobby.getId(), equalTo("hobbies"));
-        assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
+        assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert,allowUpdate)"));
     }
 
     @Test

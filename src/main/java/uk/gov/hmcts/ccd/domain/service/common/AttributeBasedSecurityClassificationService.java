@@ -35,9 +35,14 @@ public class AttributeBasedSecurityClassificationService
 
 
     @Override
-    public Optional<SecurityClassification> getUserClassification(CaseDetails caseDetails) {
-        Set<AccessProfile> accessProfiles = caseDataAccessControl
-            .generateAccessProfilesByCaseReference(caseDetails.getReferenceAsString());
+    public Optional<SecurityClassification> getUserClassification(CaseDetails caseDetails, boolean create) {
+        Set<AccessProfile> accessProfiles;
+        if (create) {
+            accessProfiles = caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseDetails.getCaseTypeId());
+        } else {
+            accessProfiles = caseDataAccessControl
+                .generateAccessProfilesByCaseReference(caseDetails.getReferenceAsString());
+        }
         return getMaxSecurityClassification(accessProfiles);
     }
 
