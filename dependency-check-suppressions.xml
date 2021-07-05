@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions
-		xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+	xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
 
-	<suppress until="2021-06-25">
+	<suppress until="2021-07-25">
 		<notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security
 			(any version), see https://pivotal.io/security/cve-2018-1258
 			False positive confirmed.
@@ -10,7 +10,7 @@
 		<cve>CVE-2018-1258</cve>
 	</suppress>
 
-	<suppress until="2021-06-25">
+	<suppress until="2021-07-25">
 		<notes>These CVE's are coming from Dhowden tag library and it impacts only MP3/MP4/OGG/FLAC metadata parsing
 			library. Also it is declared as false positive in https://github.com/jeremylong/DependencyCheck/issues/3043
 		</notes>
@@ -20,28 +20,15 @@
 		<cve>CVE-2020-29245</cve>
 	</suppress>
 
-	<suppress until="2021-06-25">
+	<suppress until="2021-07-25">
 		<notes>Declared as False Positive on com.nimbusds:oauth2-oidc-sdk #2866
 			https://github.com/jeremylong/DependencyCheck/issues/2866
 		</notes>
 		<cve>CVE-2007-1651</cve>
 		<cve>CVE-2007-1652</cve>
 	</suppress>
-
 	<suppress>
 		<cve>CVE-2021-29425</cve>
-		<cve>CVE-2020-29243</cve>
-		<cve>CVE-2020-29242</cve>
-		<cve>CVE-2020-29245</cve>
-		<cve>CVE-2020-29244</cve>
-
-		<cve>CVE-2007-1652</cve>
-		<cve>CVE-2018-1258</cve>
-		<cve>CVE-2007-1651</cve>
-		<cve>CVE-2021-22112</cve>
-		<cve>CVE-2021-22135</cve>
-		<cve>CVE-2021-22137</cve>
-		<cve>CVE-2021-22118</cve>
 	</suppress>
 
 </suppressions>

@@ -36,9 +36,6 @@ class DefaultCaseRoleDefinitionRepositoryTest {
     private SecurityUtils securityUtils;
 
     @Mock
-    private HttpHeaders httpHeaders;
-
-    @Mock
     private ResponseEntity<CaseRoleDefinition[]> responseEntity;
 
     private DefaultCaseRoleRepository caseRoleRepository;
@@ -65,7 +62,7 @@ class DefaultCaseRoleDefinitionRepositoryTest {
     @DisplayName("return case roles when case type has case roles")
     void returnCaseRolesForCaseType() {
 
-        when(securityUtils.authorizationHeaders()).thenReturn(httpHeaders);
+        when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
         when(applicationParams.caseRolesURL()).thenReturn("someURL");
         doReturn(responseEntity).when(restTemplate).exchange(eq("someURL/caseTypeId/roles"), eq(GET), any(),
             eq(CaseRoleDefinition[].class));
@@ -79,7 +76,7 @@ class DefaultCaseRoleDefinitionRepositoryTest {
     @DisplayName("return NO case roles when case type has NO case roles")
     void returnNoCaseRolesWhenCaseTypeDoesntHaveAny() {
 
-        when(securityUtils.userAuthorizationHeaders()).thenReturn(httpHeaders);
+        when(securityUtils.userAuthorizationHeaders()).thenReturn(new HttpHeaders());
         when(applicationParams.caseRolesURL()).thenReturn("someURL");
         doReturn(responseEntity).when(restTemplate).exchange(eq("someURL/caseTypeId/roles"), eq(GET), any(),
             eq(CaseRoleDefinition[].class));
