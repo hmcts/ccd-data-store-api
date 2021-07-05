@@ -54,6 +54,12 @@
         "type": "MultiSelectList"
       },
       {
+        "type": "DynamicMultiSelectList"
+      },
+      {
+        "type": "DynamicRadioList"
+      },
+      {
         "type": "Document"
       }
     ]
