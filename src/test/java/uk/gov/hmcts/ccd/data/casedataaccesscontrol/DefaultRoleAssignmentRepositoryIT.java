@@ -8,7 +8,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.ActorIdType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleType;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
@@ -44,13 +48,13 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
 
     private static final String ID = "4d96923f-891a-4cb1-863e-9bec44d1689d";
     private static final String ID1 = "4d96923f-891a-4cb1-863e-9bec44d1612d";
-    private static final String ACTOR_ID_TYPE = "IDAM";
+    private static final String ACTOR_ID_TYPE = ActorIdType.IDAM.name();
     private static final String ACTOR_ID = "567567";
-    private static final String ROLE_TYPE = "ORGANISATION";
+    private static final String ROLE_TYPE = RoleType.ORGANISATION.name();
     private static final String ROLE_NAME = "judge";
-    private static final String CLASSIFICATION = "PUBLIC";
-    private static final String GRANT_TYPE = "STANDARD";
-    private static final String ROLE_CATEGORY = "JUDICIAL";
+    private static final String CLASSIFICATION = Classification.PUBLIC.name();
+    private static final String GRANT_TYPE = GrantType.STANDARD.name();
+    private static final String ROLE_CATEGORY = RoleCategory.JUDICIAL.name();
     private static final Boolean READ_ONLY = Boolean.FALSE;
     private static final String BEGIN_TIME = "2021-01-01T00:00:00.000Z";
     private static final String END_TIME = "2223-01-01T00:00:00.000Z";
@@ -175,20 +179,20 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
 
             RoleRequestResource roleRequest = RoleRequestResource.builder()
                 .assignerId(ACTOR_ID)
-                .process("CCD")
+                .process(RoleAssignmentRepository.DEFAULT_PROCESS)
                 .reference(ATTRIBUTES_CASE_ID + "-" + ACTOR_ID)
                 .replaceExisting(false)
                 .build();
 
             List<RoleAssignmentResource> requestedRoles = roles.stream()
                 .map(roleName -> RoleAssignmentResource.builder()
-                    .actorIdType(RoleAssignmentRepository.ACTOR_ID_TYPE_IDAM)
+                    .actorIdType(ActorIdType.IDAM.name())
                     .actorId(ACTOR_ID)
-                    .roleType(RoleAssignmentRepository.ROLE_TYPE_CASE)
+                    .roleType(RoleType.CASE.name())
                     .roleName(roleName)
-                    .classification((RoleAssignmentRepository.CLASSIFICATION_RESTRICTED))
+                    .classification(Classification.RESTRICTED.name())
                     .grantType(GrantType.SPECIFIC.name())
-                    .roleCategory(RoleAssignmentRepository.ROLE_CATEGORY_PROFESSIONAL)
+                    .roleCategory(RoleCategory.PROFESSIONAL.name())
                     .readOnly(false)
                     .beginTime(Instant.now())
                     .attributes(RoleAssignmentAttributesResource.builder()

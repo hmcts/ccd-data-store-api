@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.data.casedataaccesscontrol;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
-import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleType;
 
 import java.util.ArrayList;
 import java.util.List;

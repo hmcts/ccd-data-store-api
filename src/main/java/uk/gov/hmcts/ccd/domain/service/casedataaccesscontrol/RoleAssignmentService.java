@@ -10,10 +10,14 @@ import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRequestResource
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResource;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleRequestResource;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.ActorIdType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
@@ -49,20 +53,20 @@ public class RoleAssignmentService implements AccessControl {
 
         RoleRequestResource roleRequest = RoleRequestResource.builder()
             .assignerId(userId)
-            .process("CCD")
+            .process(RoleAssignmentRepository.DEFAULT_PROCESS)
             .reference(createRoleRequestReference(caseDetails, userId))
             .replaceExisting(replaceExisting)
             .build();
 
         List<RoleAssignmentResource> requestedRoles = roles.stream()
             .map(roleName -> RoleAssignmentResource.builder()
-                .actorIdType(RoleAssignmentRepository.ACTOR_ID_TYPE_IDAM)
+                .actorIdType(ActorIdType.IDAM.name())
                 .actorId(userId)
-                .roleType(RoleAssignmentRepository.ROLE_TYPE_CASE)
+                .roleType(RoleType.CASE.name())
                 .roleName(roleName)
-                .classification((RoleAssignmentRepository.CLASSIFICATION_RESTRICTED))
+                .classification(Classification.RESTRICTED.name())
                 .grantType(GrantType.SPECIFIC.name())
-                .roleCategory(RoleAssignmentRepository.ROLE_CATEGORY_PROFESSIONAL)
+                .roleCategory(RoleCategory.PROFESSIONAL.name())
                 .readOnly(false)
                 .beginTime(Instant.now())
                 .attributes(RoleAssignmentAttributesResource.builder()

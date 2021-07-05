@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
-import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleType;
 
 import java.time.Instant;
 import java.util.Arrays;

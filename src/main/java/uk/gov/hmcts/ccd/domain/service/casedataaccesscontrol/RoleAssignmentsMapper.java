@@ -37,7 +37,4 @@ public interface RoleAssignmentsMapper {
 
     List<RoleAssignment> map(List<RoleAssignmentResource> roleAssignmentResources);
 
-    @Mapping(source = "attributes.caseType", target = "attributes.caseTypeId")
-    RoleAssignment map(RoleAssignmentResource roleAssignmentResource);
-
 }

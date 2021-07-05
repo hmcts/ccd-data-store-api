@@ -15,10 +15,14 @@ import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRequestResponse
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResource;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleRequestResource;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.ActorIdType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
@@ -48,8 +52,8 @@ class RoleAssignmentServiceTest {
     private static final String USER_ID = "user1";
     private static final String CASE_ID = "111111";
 
-    private List<String> caseIds = Arrays.asList("111", "222");
-    private List<String> userIds = Arrays.asList("111", "222");
+    private final List<String> caseIds = Arrays.asList("111", "222");
+    private final List<String> userIds = Arrays.asList("111", "222");
 
     @Mock
     private RoleAssignmentRepository roleAssignmentRepository;
@@ -151,7 +155,7 @@ class RoleAssignmentServiceTest {
             assertNotNull(actualRoleRequest);
             assertAll(
                 () -> assertEquals(USER_ID, actualRoleRequest.getAssignerId()),
-                () -> assertEquals("CCD", actualRoleRequest.getProcess()),
+                () -> assertEquals(RoleAssignmentRepository.DEFAULT_PROCESS, actualRoleRequest.getProcess()),
                 () -> assertEquals(expectedCaseDetails.getReference() + "-" + USER_ID,
                         actualRoleRequest.getReference()),
                 () -> assertEquals(expectedReplaceExisting, actualRoleRequest.isReplaceExisting())
@@ -183,13 +187,11 @@ class RoleAssignmentServiceTest {
                 () -> assertEquals(expectedRoleName, actualRoleAssignment.getRoleName()),
 
                 // defaults
-                () -> assertEquals(RoleAssignmentRepository.ACTOR_ID_TYPE_IDAM, actualRoleAssignment.getActorIdType()),
-                () -> assertEquals(RoleAssignmentRepository.ROLE_TYPE_CASE, actualRoleAssignment.getRoleType()),
-                () -> assertEquals(RoleAssignmentRepository.CLASSIFICATION_RESTRICTED,
-                                   actualRoleAssignment.getClassification()),
+                () -> assertEquals(ActorIdType.IDAM.name(), actualRoleAssignment.getActorIdType()),
+                () -> assertEquals(RoleType.CASE.name(), actualRoleAssignment.getRoleType()),
+                () -> assertEquals(Classification.RESTRICTED.name(), actualRoleAssignment.getClassification()),
                 () -> assertEquals(GrantType.SPECIFIC.name(), actualRoleAssignment.getGrantType()),
-                () -> assertEquals(RoleAssignmentRepository.ROLE_CATEGORY_PROFESSIONAL,
-                                   actualRoleAssignment.getRoleCategory()),
+                () -> assertEquals(RoleCategory.PROFESSIONAL.name(), actualRoleAssignment.getRoleCategory()),
                 () -> assertFalse(actualRoleAssignment.getReadOnly()),
                 () -> assertNotNull(actualRoleAssignment.getBeginTime()),
 
@@ -245,7 +247,7 @@ class RoleAssignmentServiceTest {
     class GetRoleAssignments {
 
         @Test
-        public void shouldGetRoleAssignments() {
+        void shouldGetRoleAssignments() {
             given(roleAssignmentRepository.getRoleAssignments(USER_ID))
                 .willReturn(mockedRoleAssignmentResponse);
             given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))
@@ -305,7 +307,7 @@ class RoleAssignmentServiceTest {
     class GetCaseIdsForAGivenUserAndCaseTypeDefinition {
 
         @Test
-        public void shouldGetRoleAssignments() {
+        void shouldGetRoleAssignments() {
 
             given(roleAssignmentRepository.getRoleAssignments(USER_ID))
                 .willReturn(mockedRoleAssignmentResponse);
@@ -319,7 +321,7 @@ class RoleAssignmentServiceTest {
             List<String> resultCases =
                 roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID, caseTypeDefinition);
 
-            assertTrue(resultCases.size() == 2);
+            assertEquals(2, resultCases.size());
             roleAssignmentFilteringService.filter(roleAssignments, caseTypeDefinition);
         }
     }
