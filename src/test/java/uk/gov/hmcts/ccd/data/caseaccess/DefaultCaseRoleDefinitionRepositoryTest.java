@@ -40,9 +40,9 @@ class DefaultCaseRoleDefinitionRepositoryTest {
 
     private DefaultCaseRoleRepository caseRoleRepository;
 
-    private CaseRoleDefinition caseRoleDefinition1 = new CaseRoleDefinition();
-    private CaseRoleDefinition caseRoleDefinition2 = new CaseRoleDefinition();
-    private CaseRoleDefinition[] caseRoleDefinitions = {caseRoleDefinition1, caseRoleDefinition2};
+    private final CaseRoleDefinition caseRoleDefinition1 = new CaseRoleDefinition();
+    private final CaseRoleDefinition caseRoleDefinition2 = new CaseRoleDefinition();
+    private final CaseRoleDefinition[] caseRoleDefinitions = {caseRoleDefinition1, caseRoleDefinition2};
     private static final String NAME1 = "name1";
     private static final String NAME2 = "name2";
     private static final String ROLE1 = "role1";
@@ -90,7 +90,7 @@ class DefaultCaseRoleDefinitionRepositoryTest {
     @DisplayName("return case roles when case type has case roles and role assignment is true")
     void returnCaseRolesForCaseTypeAndRoleAssignment() {
 
-        when(securityUtils.authorizationHeaders()).thenReturn(httpHeaders);
+        when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
         when(applicationParams.accessProfileRolesURL("caseTypeId")).thenReturn("someURL");
         when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
         doReturn(responseEntity).when(restTemplate).exchange(
@@ -109,7 +109,7 @@ class DefaultCaseRoleDefinitionRepositoryTest {
     @DisplayName("return case roles when case type has case roles and role assignment is false")
     void returnCaseRolesForCaseTypeAndRoleAssignmentIsFalse() {
 
-        when(securityUtils.authorizationHeaders()).thenReturn(httpHeaders);
+        when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
         when(applicationParams.caseRolesURL()).thenReturn("someURL");
         when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
         doReturn(responseEntity).when(restTemplate).exchange(eq("someURL/caseTypeId/roles"), eq(GET), any(),
@@ -127,7 +127,7 @@ class DefaultCaseRoleDefinitionRepositoryTest {
     @DisplayName("return case roles when case type has case roles and role assignment is true")
     void returnCaseRolesForCaseTypeAndRoleAssignmentIsTrueAndThereAreNotRoles() {
 
-        when(securityUtils.authorizationHeaders()).thenReturn(httpHeaders);
+        when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
         when(applicationParams.accessProfileRolesURL("caseTypeId")).thenReturn("someURL");
         when(applicationParams.caseRolesURL()).thenReturn("someURL");
         when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
