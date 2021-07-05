@@ -30,12 +30,12 @@ public class CaseTypeMatcher implements RoleAttributeMatcher {
     private boolean matchCaseType(RoleAssignment roleAssignment,
                                String logMessage, String caseTypeId, String logMatchedMessage) {
         log.debug(logMessage,
-            roleAssignment.getAttributes().getCaseTypeId(),
+            roleAssignment.getAttributes().getCaseType(),
             caseTypeId,
             roleAssignment.getId());
-        boolean matched = isValuesMatching(roleAssignment.getAttributes().getCaseTypeId(), caseTypeId);
+        boolean matched = isValuesMatching(roleAssignment.getAttributes().getCaseType(), caseTypeId);
         log.debug(logMatchedMessage,
-            roleAssignment.getAttributes().getCaseTypeId(),
+            roleAssignment.getAttributes().getCaseType(),
             caseTypeId,
             matched);
         return matched;

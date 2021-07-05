@@ -271,6 +271,13 @@ public class ApplicationParams {
         return caseDefinitionHost + "/api/data/caseworkers/uid/jurisdictions/jid/case-types";
     }
 
+    public String accessProfileRolesURL(String caseTypeId) {
+        return String.format(
+            "%s/api/data/caseworkers/uid/jurisdictions/jid/case-types/%s/access/profile/roles", caseDefinitionHost,
+            encode(caseTypeId)
+        );
+    }
+
     public String roleAssignmentBaseURL() {
         return roleAssignmentServiceHost + "/am/role-assignments";
     }

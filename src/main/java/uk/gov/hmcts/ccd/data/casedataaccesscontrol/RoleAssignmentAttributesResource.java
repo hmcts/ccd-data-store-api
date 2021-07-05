@@ -34,8 +34,8 @@ public class RoleAssignmentAttributesResource implements Serializable {
     private static final long serialVersionUID = -7106266789404292869L;
 
     Optional<String> jurisdiction;
-    Optional<String> caseId;
     Optional<String> caseType;
+    Optional<String> caseId;
     Optional<String> region;
     Optional<String> location;
     Optional<String> contractType;

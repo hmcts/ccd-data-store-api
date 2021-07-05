@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRequestResource
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRequestResponse;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResource;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
@@ -134,8 +135,45 @@ class RoleAssignmentsMapperTest {
             assertAll(
                 () -> assertThat(roleAssignments.size(), is(2)),
 
-                () -> assertThat(roleAssignments.get(0), matchesRoleAssignmentResource(roleAssignment1)),
-                () -> assertThat(roleAssignments.get(1), matchesRoleAssignmentResource(roleAssignment2))
+                () -> assertThat(roleAssignments.get(0).getId(), is(ASSIGNMENT_1)),
+                () -> assertThat(roleAssignments.get(0).getActorIdType(), is(roleAssignment1.getActorIdType())),
+                () -> assertThat(roleAssignments.get(0).getActorId(), is(roleAssignment1.getActorId())),
+                () -> assertThat(roleAssignments.get(0).getRoleType(), is(roleAssignment1.getRoleType())),
+                () -> assertThat(roleAssignments.get(0).getRoleName(), is(roleAssignment1.getRoleName())),
+                () -> assertThat(roleAssignments.get(0).getClassification(),
+                                 is(roleAssignment1.getClassification())),
+                () -> assertThat(roleAssignments.get(0).getGrantType(), is(roleAssignment1.getGrantType())),
+                () -> assertThat(roleAssignments.get(0).getRoleCategory(), is(roleAssignment1.getRoleCategory())),
+                () -> assertThat(roleAssignments.get(0).getReadOnly(), is(roleAssignment1.getReadOnly())),
+                () -> assertThat(roleAssignments.get(0).getBeginTime(), is(roleAssignment1.getBeginTime())),
+                () -> assertThat(roleAssignments.get(0).getEndTime(), is(roleAssignment1.getEndTime())),
+                () -> assertThat(roleAssignments.get(0).getCreated(), is(roleAssignment1.getCreated())),
+                () -> assertThat(roleAssignments.get(0).getAuthorisations().size(), is(0)),
+
+                () -> assertThat(roleAssignments.get(0).getAttributes().getJurisdiction(),
+                                 is(roleAssignment1.getAttributes().getJurisdiction())),
+                () -> assertThat(roleAssignments.get(0).getAttributes().getCaseId(),
+                                 is(roleAssignment1.getAttributes().getCaseId())),
+                () -> assertThat(roleAssignments.get(0).getAttributes().getRegion(),
+                                 is(roleAssignment1.getAttributes().getRegion())),
+                () -> assertThat(roleAssignments.get(0).getAttributes().getLocation(),
+                                 is(roleAssignment1.getAttributes().getLocation())),
+                () -> assertThat(roleAssignments.get(0).getAttributes().getContractType(),
+                                 is(roleAssignment1.getAttributes().getContractType())),
+
+                () -> assertThat(roleAssignments.get(1).getId(), is(ASSIGNMENT_2)),
+                () -> assertThat(roleAssignments.get(1).getAttributes().getCaseId(),
+                                 is(roleAssignment2.getAttributes().getCaseId())),
+                () -> assertThat(roleAssignments.get(1).getAttributes().getJurisdiction(),
+                    is(roleAssignment2.getAttributes().getJurisdiction())),
+                () -> assertThat(roleAssignments.get(1).getAttributes().getCaseType(),
+                    is(roleAssignment2.getAttributes().getCaseType())),
+                () -> assertThat(roleAssignments.get(1).getAttributes().getContractType(),
+                    is(roleAssignment2.getAttributes().getContractType())),
+                () -> assertThat(roleAssignments.get(1).getAttributes().getLocation(),
+                    is(roleAssignment2.getAttributes().getLocation())),
+                () -> assertThat(roleAssignments.get(1).getAttributes().getRegion(),
+                    is(roleAssignment2.getAttributes().getRegion()))
             );
         }
 
@@ -251,7 +289,7 @@ class RoleAssignmentsMapperTest {
             .roleType("CASE") // ORGANISATION, CASE
             .roleName("judiciary")
             .classification("PUBLIC")
-            .grantType("STANDARD") // BASIC, STANDARD, SPECIFIC, CHALLENGED, EXCLUDED
+            .grantType(GrantType.STANDARD.name()) // BASIC, STANDARD, SPECIFIC, CHALLENGED, EXCLUDED
             .roleCategory("JUDICIAL") // JUDICIAL, STAFF
             .readOnly(false)
             .beginTime(BEGIN_TIME)
@@ -266,6 +304,7 @@ class RoleAssignmentsMapperTest {
         return RoleAssignmentAttributesResource.builder()
             .jurisdiction(Optional.of("DIVORCE"))
             .caseId(Optional.of(caseId))
+            .caseType(Optional.of("FT_Tabs"))
             .region(Optional.of("Hampshire"))
             .location(Optional.of("Southampton"))
             .contractType(Optional.of("SALARIED")) // SALARIED, FEEPAY
