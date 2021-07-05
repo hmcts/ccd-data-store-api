@@ -140,7 +140,7 @@ public class CaseAccessOperation {
             = getNewUserCountByCaseAndOrganisation(cauRolesByCaseDetails, existingCaseUserRoles);
 
         cauRolesByCaseDetails.forEach((caseDetails, requestedAssignments) -> {
-            Map<String, List<String>> caseRolesByUserIdAndCase = requestedAssignments.stream()
+            Map<String, Set<String>> caseRolesByUserIdAndCase = requestedAssignments.stream()
                 // filter out existing case user roles
                 .filter(caseUserRole ->
                         existingCaseUserRoles.stream()
@@ -154,13 +154,21 @@ public class CaseAccessOperation {
                         Collectors.toList(),
                         caseUserRole -> caseUserRole.stream()
                             .map(CaseAssignedUserRole::getCaseRole)
-                            .distinct().collect(Collectors.toList())
+                            .collect(Collectors.toSet())
                     )));
 
-                Long caseId = Long.parseLong(caseDetails.getId());
-                caseRolesByUserIdAndCase.forEach((userId, caseRoles) ->
-                    caseRoles.forEach(caseRole ->
-                        caseUserRepository.grantAccess(caseId, userId, caseRole)));
+                if (applicationParams.getEnableAttributeBasedAccessControl()) {
+                    caseRolesByUserIdAndCase.forEach((userId, caseRoles) ->
+                        // NB: `replaceExisting = false` uses RAS which needs us to filter out existing case user roles
+                        //      to prevent duplicates being generated.  see filter above.
+                        roleAssignmentService.createCaseRoleAssignments(caseDetails, userId, caseRoles, false)
+                    );
+                } else {
+                    Long caseId = Long.parseLong(caseDetails.getId());
+                    caseRolesByUserIdAndCase.forEach((userId, caseRoles) ->
+                        caseRoles.forEach(caseRole ->
+                            caseUserRepository.grantAccess(caseId, userId, caseRole)));
+                }
             }
         );
 
@@ -391,9 +399,15 @@ public class CaseAccessOperation {
         List<CaseDetails> caseDetailsList = new ArrayList<>(cauRolesByCaseDetails.keySet());
         List<String> userIds = getUserIdsFromMap(cauRolesByCaseDetails);
 
-        List<Long> caseIds = getCaseIdsFromCaseDetailsList(caseDetailsList);
-        List<CaseUserEntity> caseUserEntities = caseUserRepository.findCaseUserRoles(caseIds, userIds);
-        return getCaseAssignedUserRolesFrom(caseUserEntities, caseDetailsList);
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            final var caseIds = caseDetailsList.stream()
+                .map(CaseDetails::getReferenceAsString).collect(Collectors.toList());
+            return roleAssignmentService.findRoleAssignmentsByCasesAndUsers(caseIds, userIds);
+        } else {
+            List<Long> caseIds = getCaseIdsFromCaseDetailsList(caseDetailsList);
+            List<CaseUserEntity> caseUserEntities = caseUserRepository.findCaseUserRoles(caseIds, userIds);
+            return getCaseAssignedUserRolesFrom(caseUserEntities, caseDetailsList);
+        }
     }
 
     private List<CaseAssignedUserRole> getCaseAssignedUserRolesFrom(List<CaseUserEntity> caseUserEntities,

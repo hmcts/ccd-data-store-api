@@ -29,7 +29,9 @@ import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -102,6 +104,7 @@ class CaseAccessOperationTest {
         configureCaseRoleRepository();
         configureCaseUserRepository();
     }
+
 
     @Nested
     @DisplayName("grantAccess()")
@@ -201,6 +204,7 @@ class CaseAccessOperationTest {
             );
         }
     }
+
 
     @Nested()
     @DisplayName("updateUserAccess(reference, caseUser)")
@@ -360,6 +364,7 @@ class CaseAccessOperationTest {
         }
     }
 
+
     @Nested
     @DisplayName("revokeAccess()")
     class RevokeAccess {
@@ -401,6 +406,7 @@ class CaseAccessOperationTest {
             );
         }
     }
+
 
     @Nested
     @DisplayName("findCasesUserIdHasAccessTo(userId)")
@@ -477,26 +483,47 @@ class CaseAccessOperationTest {
 
     }
 
+
     @Nested()
     @DisplayName("addCaseUserRoles(caseUserRoles)")
     class AddCaseAssignUserRoles {
 
+        @Captor
+        ArgumentCaptor<CaseDetails> caseDetailsCaptor;
+
+        @Captor
+        ArgumentCaptor<Set<String>> rolesCaptor;
+
         @BeforeEach
         void setUp() {
+            MockitoAnnotations.initMocks(this);
+
             configureCaseRepository(null);
         }
 
-        private void mockExistingCaseUserRoles(List<CaseUserEntity> existingCaseUserRoles) {
-            when(caseUserRepository.findCaseUserRoles(
-                argThat(arg -> arg.contains(CASE_ID) || arg.contains(CASE_ID_OTHER)),
-                argThat(arg -> arg.contains(USER_ID)))
-            ).thenReturn(existingCaseUserRoles);
+        @Test
+        @DisplayName("should throw not found exception when case not found")
+        void shouldThrowNotFound() {
+
+            // ARRANGE
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_NOT_FOUND.toString(), USER_ID, CASE_ROLE)
+            );
+
+            // ACT / ASSERT
+            assertThrows(CaseNotFoundException.class, () -> caseAccessOperation.addCaseUserRoles(caseUserRoles));
+
+            verifyZeroInteractions(caseUserRepository);
+            verifyZeroInteractions(roleAssignmentService);
         }
 
         @Test
         @DisplayName("should add single case user role")
         void shouldAddSingleCaseUserRole() {
+
             // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE)
             );
@@ -508,12 +535,56 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(caseUserRepository, times(1)).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
+
+            verifyZeroInteractions(roleAssignmentService);
+        }
+
+        @Test
+        @DisplayName("RA set to true, should add single case user role")
+        void shouldAddSingleCaseUserRoleForRA() {
+
+            // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE)
+            );
+            // behave as no existing case roles
+            mockExistingCaseUserRolesForRA(new ArrayList<>());
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(roleAssignmentService).createCaseRoleAssignments(
+                caseDetailsCaptor.capture(),
+                eq(USER_ID),
+                rolesCaptor.capture(),
+                eq(false)
+            );
+
+            CaseDetails caseDetails = caseDetailsCaptor.getValue();
+            assertAll(
+                () -> assertEquals(CASE_ID.toString(), caseDetails.getId()),
+                () -> assertEquals(CASE_REFERENCE, caseDetails.getReference())
+            );
+
+            Set<String> roles = rolesCaptor.getValue();
+            assertAll(
+                () -> assertEquals(1, roles.size()),
+                () -> assertTrue(roles.contains(CASE_ROLE))
+            );
+
+            verifyZeroInteractions(caseUserRepository);
         }
 
         @Test
         @DisplayName("should not add case user role when same role with different case exists")
         void shouldNotAddCaseUserRoleWhenRoleIsCaseInsensitive() {
+
             // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
             String role = "[DEFENDANT]";
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, role)
@@ -528,12 +599,42 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(caseUserRepository, never()).grantAccess(CASE_ID, USER_ID, role);
+
+            verifyZeroInteractions(roleAssignmentService);
+        }
+
+        @Test
+        @DisplayName("RA set to true, should not add case user role when same role with different case exists")
+        void shouldNotAddCaseUserRoleWhenRoleIsCaseInsensitiveForRA() {
+
+            // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
+            String role = "[DEFENDANT]";
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, role)
+            );
+            // register existing case role
+            mockExistingCaseUserRolesForRA(List.of(
+                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, "[defendant]")
+            ));
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(caseUserRepository, never()).grantAccess(CASE_ID, USER_ID, role);
+
+            verifyZeroInteractions(roleAssignmentService);
         }
 
         @Test
         @DisplayName("should add multiple case user roles")
         void shouldAddMultipleCaseUserRoles() {
+
             // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
             final CaseDetails caseDetailsOther = new CaseDetails();
             caseDetailsOther.setId(String.valueOf(CASE_ID_OTHER));
             caseDetailsOther.setReference(CASE_REFERENCE_OTHER);
@@ -553,12 +654,90 @@ class CaseAccessOperationTest {
             // ASSERT
             verify(caseUserRepository, times(1)).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
             verify(caseUserRepository, times(1)).grantAccess(CASE_ID_OTHER, USER_ID, CASE_ROLE);
+
+            verifyZeroInteractions(roleAssignmentService);
+        }
+
+        @Test
+        @DisplayName("RA set to true, should add multiple case user roles")
+        void shouldAddMultipleCaseUserRolesForRA() {
+
+            // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+
+            final CaseDetails caseDetailsOther = new CaseDetails();
+            caseDetailsOther.setId(String.valueOf(CASE_ID_OTHER));
+            caseDetailsOther.setReference(CASE_REFERENCE_OTHER);
+            doReturn(Optional.of(caseDetailsOther)).when(caseDetailsRepository).findByReference(null,
+                CASE_REFERENCE_OTHER);
+            // behave as no existing case roles
+            mockExistingCaseUserRolesForRA(new ArrayList<>());
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE)
+            );
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(roleAssignmentService, times(2)).createCaseRoleAssignments(
+                caseDetailsCaptor.capture(),
+                eq(USER_ID),
+                rolesCaptor.capture(),
+                eq(false)
+            );
+
+            // :: create map of captor value indexes
+            List<CaseDetails> caseDetailsList = caseDetailsCaptor.getAllValues();
+            List<Set<String>> rolesList = rolesCaptor.getAllValues();
+            assertAll(
+                () -> assertEquals(2, caseDetailsList.size()),
+                () -> assertEquals(2, rolesList.size())
+            );
+            Map<Long, Integer> captorValueMap = new HashMap<>();
+            captorValueMap.put(caseDetailsList.get(0).getReference(), 0);
+            captorValueMap.put(caseDetailsList.get(1).getReference(), 1);
+
+            // :: load captor details for CASE_REFERENCE
+            Integer index1 = captorValueMap.get(CASE_REFERENCE);
+            CaseDetails caseDetails1 = caseDetailsList.get(index1);
+            Set<String> roles1 = rolesList.get(index1);
+
+            assertAll(
+                () -> assertEquals(CASE_ID.toString(), caseDetails1.getId()),
+                () -> assertEquals(CASE_REFERENCE, caseDetails1.getReference())
+            );
+            assertAll(
+                () -> assertEquals(1, roles1.size()),
+                () -> assertTrue(roles1.contains(CASE_ROLE))
+            );
+
+            // :: load captor details for CASE_REFERENCE_OTHER
+            Integer index2 = captorValueMap.get(CASE_REFERENCE_OTHER);
+            CaseDetails caseDetails2 = caseDetailsList.get(index2);
+            Set<String> roles2 = rolesList.get(index2);
+
+            assertAll(
+                () -> assertEquals(CASE_ID_OTHER.toString(), caseDetails2.getId()),
+                () -> assertEquals(CASE_REFERENCE_OTHER, caseDetails2.getReference())
+            );
+            assertAll(
+                () -> assertEquals(1, roles2.size()),
+                () -> assertTrue(roles2.contains(CASE_ROLE))
+            );
+
+            verifyZeroInteractions(caseUserRepository);
         }
 
         @Test
         @DisplayName("should add multiple case user roles but lookup case details once per case")
         void shouldAddMultipleCaseUserRolesButLoadCaseDetailsOncePerCase() {
+
             // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE),
                 // NB: repeat case reference
@@ -576,24 +755,62 @@ class CaseAccessOperationTest {
             // standard grant access check for all case user roles
             verify(caseUserRepository, times(1)).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
             verify(caseUserRepository, times(1)).grantAccess(CASE_ID, USER_ID, CASE_ROLE_OTHER);
+
+            verifyZeroInteractions(roleAssignmentService);
         }
 
         @Test
-        @DisplayName("should throw not found exception when case not found")
-        void shouldThrowNotFound() {
+        @DisplayName("RA set to true, should add multiple case user roles but lookup case details once per case")
+        void shouldAddMultipleCaseUserRolesButLoadCaseDetailsOncePerCaseForRA() {
+
             // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
-                new CaseAssignedUserRoleWithOrganisation(CASE_NOT_FOUND.toString(), USER_ID, CASE_ROLE)
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE),
+                // NB: repeat case reference
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_OTHER)
+            );
+            // behave as no existing case roles
+            mockExistingCaseUserRoles(new ArrayList<>());
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            // NB: only one lookup per case reference
+            verify(caseDetailsRepository, times(1)).findByReference(null, CASE_REFERENCE);
+            // single submission of all roles for case
+            verify(roleAssignmentService).createCaseRoleAssignments(
+                caseDetailsCaptor.capture(),
+                eq(USER_ID),
+                rolesCaptor.capture(),
+                eq(false)
             );
 
-            // ACT / ASSERT
-            assertThrows(CaseNotFoundException.class, () -> caseAccessOperation.addCaseUserRoles(caseUserRoles));
+            CaseDetails caseDetails = caseDetailsCaptor.getValue();
+            assertAll(
+                () -> assertEquals(CASE_ID.toString(), caseDetails.getId()),
+                () -> assertEquals(CASE_REFERENCE, caseDetails.getReference())
+            );
+
+            Set<String> roles = rolesCaptor.getValue();
+            assertAll(
+                () -> assertEquals(2, roles.size()),
+                () -> assertTrue(roles.contains(CASE_ROLE)),
+                () -> assertTrue(roles.contains(CASE_ROLE_OTHER))
+            );
+
+            verifyZeroInteractions(caseUserRepository);
         }
 
         @Test
         @DisplayName("should increment organisation user count for single new case-user relationship")
         void shouldIncrementOrganisationUserCountForSingleNewRelationship() {
+
             // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
             );
@@ -606,12 +823,40 @@ class CaseAccessOperationTest {
             // ASSERT
             verify(supplementaryDataRepository, times(1))
                 .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), 1L);
+
+            verifyZeroInteractions(roleAssignmentService);
+        }
+
+        @Test
+        @DisplayName("RA set to true, should increment organisation user count for single new case-user relationship")
+        void shouldIncrementOrganisationUserCountForSingleNewRelationshipForRA() {
+
+            // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
+            );
+            // behave as no existing case roles
+            mockExistingCaseUserRolesForRA(new ArrayList<>());
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(supplementaryDataRepository, times(1))
+                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), 1L);
+
+            verifyZeroInteractions(caseUserRepository);
         }
 
         @Test
         @DisplayName("should not increment organisation user count for single new case-user with [CREATOR] role")
         void shouldNotIncrementOrganisationUserCountForSingleNewRelationshipWithCreatorRole() {
+
             // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(
                     CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR, ORGANISATION
@@ -625,12 +870,43 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(supplementaryDataRepository, never()).incrementSupplementaryData(anyString(), anyString(), any());
+
+            verifyZeroInteractions(roleAssignmentService);
+        }
+
+        @Test
+        @DisplayName(
+            "RA set to true, should not increment organisation user count for single new case-user with [CREATOR] role"
+        )
+        void shouldNotIncrementOrganisationUserCountForSingleNewRelationshipWithCreatorRoleForRA() {
+
+            // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(
+                    CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR, ORGANISATION
+                )
+            );
+            // behave as no existing case roles
+            mockExistingCaseUserRolesForRA(new ArrayList<>());
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(supplementaryDataRepository, never()).incrementSupplementaryData(anyString(), anyString(), any());
+
+            verifyZeroInteractions(caseUserRepository);
         }
 
         @Test
         @DisplayName("should not increment organisation user count for existing case-user relationship")
         void shouldNotIncrementOrganisationUserCountForExistingRelationship() {
+
             // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
             );
@@ -644,12 +920,41 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(supplementaryDataRepository, never()).incrementSupplementaryData(anyString(), anyString(), any());
+
+            verifyZeroInteractions(roleAssignmentService);
+        }
+
+        @Test
+        @DisplayName("RA set to true, should not increment organisation user count for existing case-user relationship")
+        void shouldNotIncrementOrganisationUserCountForExistingRelationshipForRA() {
+
+            // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
+            );
+            // register existing case role
+            mockExistingCaseUserRolesForRA(List.of(
+                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE)
+            ));
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(supplementaryDataRepository, never()).incrementSupplementaryData(anyString(), anyString(), any());
+
+            verifyZeroInteractions(caseUserRepository);
         }
 
         @Test
         @DisplayName("should increment organisation user count only once for repeat new case-user relationship")
         void shouldIncrementOrganisationUserCountOnlyOnceForRepeatNewRelationship() {
+
             // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION),
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_OTHER,
@@ -664,12 +969,44 @@ class CaseAccessOperationTest {
             // ASSERT
             verify(supplementaryDataRepository, times(1))
                 .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), 1L);
+
+            verifyZeroInteractions(roleAssignmentService);
+        }
+
+        @Test
+        @DisplayName(
+            "RA set to true, should increment organisation user count only once for repeat new case-user relationship"
+        )
+        void shouldIncrementOrganisationUserCountOnlyOnceForRepeatNewRelationshipForRA() {
+
+            // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_OTHER,
+                    ORGANISATION)
+            );
+            // behave as no existing case roles
+            mockExistingCaseUserRolesForRA(new ArrayList<>());
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(supplementaryDataRepository, times(1))
+                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), 1L);
+
+            verifyZeroInteractions(caseUserRepository);
         }
 
         @Test
         @DisplayName("should increment organisation user count for new case-user relationship without [CREATOR] role")
         void shouldIncrementOrganisationUserCountForNewRelationshipsThatDoNotContainCreatorRole() {
+
             // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION),
                 new CaseAssignedUserRoleWithOrganisation(
@@ -684,12 +1021,45 @@ class CaseAccessOperationTest {
             // ASSERT
             verify(supplementaryDataRepository, times(1))
                 .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION),1L);
+
+            verifyZeroInteractions(roleAssignmentService);
+        }
+
+        @Test
+        @DisplayName(
+            "RA set to true, should increment organisation user count for new case-user relationship without "
+                + "[CREATOR] role"
+        )
+        void shouldIncrementOrganisationUserCountForNewRelationshipsThatDoNotContainCreatorRoleForRA() {
+
+            // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION),
+                new CaseAssignedUserRoleWithOrganisation(
+                    CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR, ORGANISATION)
+            );
+            // behave as no existing case roles
+            mockExistingCaseUserRolesForRA(new ArrayList<>());
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(supplementaryDataRepository, times(1))
+                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION),1L);
+
+            verifyZeroInteractions(caseUserRepository);
         }
 
         @Test
         @DisplayName("should increment organisation user count for new case-user relationship with existing [CREATOR]")
         void shouldIncrementOrganisationUserCountForNewRelationshipsWithExistingCreatorRole() {
+
             // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
             );
@@ -704,12 +1074,45 @@ class CaseAccessOperationTest {
             // ASSERT
             verify(supplementaryDataRepository, times(1))
                 .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION),1L);
+
+            verifyZeroInteractions(roleAssignmentService);
+        }
+
+        @Test
+        @DisplayName(
+            "RA set to true, should increment organisation user count for new case-user relationship with"
+                + " existing [CREATOR]"
+        )
+        void shouldIncrementOrganisationUserCountForNewRelationshipsWithExistingCreatorRoleForRA() {
+
+            // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
+            );
+            // register existing [CREATOR] case role
+            mockExistingCaseUserRolesForRA(List.of(
+                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR)
+            ));
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(supplementaryDataRepository, times(1))
+                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION),1L);
+
+            verifyZeroInteractions(caseUserRepository);
         }
 
         @Test
         @DisplayName("should not increment organisation user count for new [CREATOR] with existing relationship")
         void shouldNotIncrementOrganisationUserCountForNewCreatorRoleWithExistingRelationships() {
+
             // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 new CaseAssignedUserRoleWithOrganisation(
                     CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR, ORGANISATION)
@@ -724,12 +1127,44 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(supplementaryDataRepository, never()).incrementSupplementaryData(anyString(), anyString(), any());
+
+            verifyZeroInteractions(roleAssignmentService);
+        }
+
+        @Test
+        @DisplayName(
+            "RA set to true, should not increment organisation user count for new [CREATOR] with existing relationship"
+        )
+        void shouldNotIncrementOrganisationUserCountForNewCreatorRoleWithExistingRelationshipsForRA() {
+
+            // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(
+                    CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR, ORGANISATION)
+            );
+            // register existing case role
+            mockExistingCaseUserRolesForRA(List.of(
+                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE)
+            ));
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(supplementaryDataRepository, never()).incrementSupplementaryData(anyString(), anyString(), any());
+
+            verifyZeroInteractions(caseUserRepository);
         }
 
         @Test
         @DisplayName("should increment organisation user count for multiple new case-user relationship")
         void shouldIncrementOrganisationUserCountForMultipleNewRelationships() {
+
             // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
                 // CASE_REFERENCE/CASE_ID
                 // (2 orgs with 2 users with 2 roles >> 2 org counts incremented by 2)
@@ -759,8 +1194,9 @@ class CaseAccessOperationTest {
             when(caseUserRepository.findCaseUserRoles(
                 argThat(arg -> arg.contains(CASE_ID) && arg.contains(CASE_ID_OTHER)),
                 argThat(arg -> arg.contains(USER_ID) && arg.contains(USER_ID_OTHER))
-            )).thenReturn(Collections.singletonList(createCaseUserEntity(CASE_ID_OTHER, CASE_ROLE_OTHER,
-                USER_ID_OTHER)));
+            )).thenReturn(Collections.singletonList(
+                createCaseUserEntity(CASE_ID_OTHER, CASE_ROLE_OTHER, USER_ID_OTHER)
+            ));
 
             // ACT
             caseAccessOperation.addCaseUserRoles(caseUserRoles);
@@ -783,8 +1219,93 @@ class CaseAccessOperationTest {
                     eq(getOrgUserCountSupDataKey(ORGANISATION_OTHER)),
                     anyLong()
                 );
+
+            verifyZeroInteractions(roleAssignmentService);
         }
+
+        @Test
+        @DisplayName("RA set to true, should increment organisation user count for multiple new case-user relationship")
+        void shouldIncrementOrganisationUserCountForMultipleNewRelationshipsForRA() {
+
+            // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                // CASE_REFERENCE/CASE_ID
+                // (2 orgs with 2 users with 2 roles >> 2 org counts incremented by 2)
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID_OTHER, CASE_ROLE,
+                    ORGANISATION),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_OTHER,
+                    ORGANISATION_OTHER),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID_OTHER, CASE_ROLE_OTHER,
+                    ORGANISATION_OTHER),
+
+                // CASE_REFERENCE_OTHER/CASE_ID_OTHER
+                // (2 orgs with 1 user each with multiple roles >> 2 org counts incremented by 1)
+                // (however 2nd org count will not be required as existing relationship added below **)
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE,
+                    ORGANISATION),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE_OTHER,
+                    ORGANISATION),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID_OTHER, CASE_ROLE,
+                    ORGANISATION_OTHER),
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID_OTHER,
+                    CASE_ROLE_OTHER, ORGANISATION_OTHER)
+
+            );
+            // ** CASE_REFERENCE_OTHER + USER_ID_OTHER as exiting relationship
+            // (i.e. to check adjusting count still works in multiple)
+            when(roleAssignmentService.findRoleAssignmentsByCasesAndUsers(
+                argThat(arg -> arg.contains(CASE_REFERENCE.toString())
+                            && arg.contains(CASE_REFERENCE_OTHER.toString())),
+                argThat(arg -> arg.contains(USER_ID) && arg.contains(USER_ID_OTHER))
+            )).thenReturn(Collections.singletonList(
+                new CaseAssignedUserRole(CASE_REFERENCE_OTHER.toString(), USER_ID_OTHER, CASE_ROLE_OTHER)
+            ));
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            // verify CASE_REFERENCE/CASE_ID
+            verify(supplementaryDataRepository, times(1))
+                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), 2L);
+            verify(supplementaryDataRepository, times(1))
+                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION_OTHER),
+                    2L);
+
+            // verify CASE_REFERENCE_OTHER/CASE_ID_OTHER (NB: only 1 user per org: 2nd org has no new relationships)
+            verify(supplementaryDataRepository, times(1))
+                .incrementSupplementaryData(CASE_REFERENCE_OTHER.toString(), getOrgUserCountSupDataKey(ORGANISATION),
+                    1L);
+            verify(supplementaryDataRepository, never()) // NB: never called as exiting relationship ignored
+                .incrementSupplementaryData(
+                    eq(CASE_REFERENCE_OTHER.toString()),
+                    eq(getOrgUserCountSupDataKey(ORGANISATION_OTHER)),
+                    anyLong()
+                );
+
+            verifyZeroInteractions(caseUserRepository);
+        }
+
+        private void mockExistingCaseUserRoles(List<CaseUserEntity> existingCaseUserRoles) {
+            when(caseUserRepository.findCaseUserRoles(
+                argThat(arg -> arg.contains(CASE_ID) || arg.contains(CASE_ID_OTHER)),
+                argThat(arg -> arg.contains(USER_ID)))
+            ).thenReturn(existingCaseUserRoles);
+        }
+
+        private void mockExistingCaseUserRolesForRA(List<CaseAssignedUserRole> existingCaseUserRoles) {
+            when(roleAssignmentService.findRoleAssignmentsByCasesAndUsers(
+                argThat(arg -> arg.contains(CASE_REFERENCE.toString())
+                            || arg.contains(CASE_REFERENCE_OTHER.toString())),
+                argThat(arg -> arg.contains(USER_ID)))
+            ).thenReturn(existingCaseUserRoles);
+        }
+
     }
+
 
     @Nested()
     @DisplayName("removeCaseUserRoles(caseUserRoles)")
@@ -1119,6 +1640,7 @@ class CaseAccessOperationTest {
         }
     }
 
+
     @Nested()
     @DisplayName("findCaseUserRoles(caseReferences, userIds)")
     class GetCaseAssignUserRoles {
@@ -1184,11 +1706,12 @@ class CaseAccessOperationTest {
         }
 
         private List<CaseAssignedUserRole> getCaseAssignedUserRoles() {
-            return Arrays.asList(
-                new CaseAssignedUserRole[]{new CaseAssignedUserRole("caseDataId", "userId", CASE_ROLE)}
-                );
+            return Collections.singletonList(
+                new CaseAssignedUserRole("caseDataId", "userId", CASE_ROLE)
+            );
         }
     }
+
 
     private void configureCaseRepository(String jurisdiction) {
         final CaseDetails caseDetails = new CaseDetails();
