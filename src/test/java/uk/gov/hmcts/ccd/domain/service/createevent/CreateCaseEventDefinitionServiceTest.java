@@ -35,6 +35,7 @@ import uk.gov.hmcts.ccd.domain.service.message.CaseEventMessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -60,7 +61,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataCo
 
 class CreateCaseEventDefinitionServiceTest {
 
-    private static final String USER_ID = "123";
     private static final String JURISDICTION_ID = "SSCS";
     private static final String CASE_TYPE_ID = "Claim";
     private static final String CASE_REFERENCE = "1234123412341236";
@@ -110,8 +110,10 @@ class CreateCaseEventDefinitionServiceTest {
     private CasePostStateService casePostStateService;
     @Mock
     private CaseEventMessageService caseEventMessageService;
+    @Mock
+    private CaseDataIssueLogger caseDataIssueLogger;
 
-    private Clock fixedClock = Clock.fixed(Instant.parse("2018-08-19T16:02:42.00Z"), ZoneOffset.UTC);
+    private final Clock fixedClock = Clock.fixed(Instant.parse("2018-08-19T16:02:42.00Z"), ZoneOffset.UTC);
 
     @InjectMocks
     private CreateCaseEventService createEventService;
