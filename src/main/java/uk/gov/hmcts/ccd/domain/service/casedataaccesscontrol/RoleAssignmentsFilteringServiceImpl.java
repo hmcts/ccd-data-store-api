@@ -36,13 +36,12 @@ public class RoleAssignmentsFilteringServiceImpl implements RoleAssignmentsFilte
     }
 
     @Override
-    public List<RoleAssignment> filter(RoleAssignments roleAssignments,
+    public FilteredRoleAssignments filter(RoleAssignments roleAssignments,
                                                       CaseTypeDefinition caseTypeDefinition) {
         log.info("Filter role assignments for case type {}", caseTypeDefinition.getName());
 
         return filterMatchingRoleAssignments(roleAssignments,
-            (matcher, roleAssignment) -> matcher.matchAttribute(roleAssignment, caseTypeDefinition))
-            .getFilteredMatchingRoleAssignments();
+            (matcher, roleAssignment) -> matcher.matchAttribute(roleAssignment, caseTypeDefinition));
     }
 
     private FilteredRoleAssignments filterMatchingRoleAssignments(

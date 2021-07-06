@@ -27,6 +27,10 @@ public class RoleAssignmentFilteringResult {
     }
 
     public boolean hasFailedFilteringOnRegionAndBaseLocation() {
+        if (filterResults.values().isEmpty()) {
+            return false;
+        }
+
         return filterResults.entrySet().stream()
             .filter(entrySet -> entrySet.getValue().equals(Boolean.FALSE))
             .allMatch(RoleAssignmentFilteringResult::isRegionOrLocationFilteringResult);

@@ -12,6 +12,7 @@ import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
@@ -73,7 +74,7 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
     }
 
     @Override
-    public CaseAccessMetadata generateAccessMetadataForCreateEndpoint(String caseId) {
+    public CaseAccessMetadata generateAccessMetadata(CaseTypeDefinition caseTypeDefinition) {
         return new CaseAccessMetadata();
     }
 

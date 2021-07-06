@@ -48,7 +48,7 @@ public class RoleAssignmentService implements AccessControl {
 
         final RoleAssignments roleAssignments = this.getRoleAssignments(userId);
         List<RoleAssignment> filteredRoleAssignments = roleAssignmentsFilteringService
-                .filter(roleAssignments, caseTypeDefinition);
+                .filter(roleAssignments, caseTypeDefinition).getFilteredMatchingRoleAssignments();
 
         return getValidCaseIds(filteredRoleAssignments);
     }

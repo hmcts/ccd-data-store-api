@@ -119,4 +119,13 @@ class RoleAssignmentFilteringResultTest {
         assertFalse(roleAssignmentFilteringResult.hasFailedFilteringOnRegionAndBaseLocation());
     }
 
+    @Test
+    void hasFailedFilteringBasedOnRegionAndLocationReturnsFalseWhenNoFilteringResults() {
+        Map<String, Boolean> filteringResults = new HashMap<>();
+
+        RoleAssignmentFilteringResult roleAssignmentFilteringResult =
+            new RoleAssignmentFilteringResult(roleAssignment, filteringResults);
+
+        assertFalse(roleAssignmentFilteringResult.hasFailedFilteringOnRegionAndBaseLocation());
+    }
 }

@@ -113,7 +113,8 @@ class DefaultCaseDataAccessControlTest {
         Map<String, String> roleAndGrantType = Maps.newHashMap();
         roleAndGrantType.put(ROLE_NAME_1, BASIC.name());
         List<RoleAssignment> roleAssignments1 = createFilteringResults(roleAndGrantType);
-        doReturn(roleAssignments1).when(roleAssignmentsFilteringService)
+        doReturn(roleAssignments1).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
 
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
@@ -145,7 +146,9 @@ class DefaultCaseDataAccessControlTest {
         Map<String, String> roleAndGrantType = Maps.newHashMap();
         roleAndGrantType.put(ROLE_NAME_1, GrantType.EXCLUDED.name());
         List<RoleAssignment> roleAssignments1 = createFilteringResults(roleAndGrantType);
-        doReturn(roleAssignments1).when(roleAssignmentsFilteringService)
+
+        doReturn(roleAssignments1).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
 
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
@@ -184,7 +187,9 @@ class DefaultCaseDataAccessControlTest {
         roleAndGrantType.put(ROLE_NAME_5, GrantType.STANDARD.name());
         List<RoleAssignment> roleAssignments1 = createFilteringResults(roleAndGrantType);
 
-        doReturn(roleAssignments1).when(roleAssignmentsFilteringService)
+
+        doReturn(roleAssignments1).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
 
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
@@ -373,12 +378,16 @@ class DefaultCaseDataAccessControlTest {
 
         List<RoleAssignment> roleAssignmentsReturned = createFilteringResults(roleAndGrantType);
         doReturn(roleAssignmentsReturned).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
-        doReturn(filteredRoleAssignments)
-            .when(roleAssignmentsFilteringService).filter(any(RoleAssignments.class), any(CaseDetails.class));
+
 
         if (isCheckingRegionLocationFilteringChecks) {
-            return defaultCaseDataAccessControl.generateAccessMetadataForCreateEndpoint("CASE_ID");
+            doReturn(filteredRoleAssignments)
+                .when(roleAssignmentsFilteringService).filter(
+                    any(RoleAssignments.class), any(CaseTypeDefinition.class));
+            return defaultCaseDataAccessControl.generateAccessMetadata(new CaseTypeDefinition());
         } else {
+            doReturn(filteredRoleAssignments)
+                .when(roleAssignmentsFilteringService).filter(any(RoleAssignments.class), any(CaseDetails.class));
             return defaultCaseDataAccessControl.generateAccessMetadata("CASE_ID");
         }
     }

@@ -45,6 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -122,6 +123,7 @@ class AuthorisedGetEventTriggerOperationTest {
             draftGateway,
             caseDataAccessControl);
         caseEventTrigger = new CaseUpdateViewEvent();
+        caseEventTrigger.setCaseId(CASE_ID);
 
         caseType.setId(CASE_TYPE_ID);
         caseType.setEvents(events);
@@ -151,7 +153,8 @@ class AuthorisedGetEventTriggerOperationTest {
         CaseEventDefinition caseEvent = new CaseEventDefinition();
         when(eventTriggerService.findCaseEvent(eq(caseType), eq(EVENT_TRIGGER_ID))).thenReturn(caseEvent);
         when(eventTriggerService.isPreStateValid(eq(STATE), eq(caseEvent))).thenReturn(true);
-        doReturn(new CaseAccessMetadata()).when(caseDataAccessControl).generateAccessMetadata(any());
+        doReturn(new CaseAccessMetadata())
+            .when(caseDataAccessControl).generateAccessMetadata(any(CaseTypeDefinition.class));
     }
 
     private Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
@@ -196,7 +199,7 @@ class AuthorisedGetEventTriggerOperationTest {
             doReturn(caseEventTrigger).when(accessControlService)
                 .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, createCaseAccessProfiles);
             doReturn(new CaseAccessMetadata())
-                .when(caseDataAccessControl).generateAccessMetadataForCreateEndpoint(any());
+                .when(caseDataAccessControl).generateAccessMetadata(any(CaseTypeDefinition.class));
         }
 
         @Test
@@ -297,7 +300,8 @@ class AuthorisedGetEventTriggerOperationTest {
             CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
             caseAccessMetadata.setAccessGrants(List.of(GrantType.STANDARD, GrantType.SPECIFIC, GrantType.CHALLENGED));
             caseAccessMetadata.setAccessProcess(AccessProcess.NONE);
-            doReturn(caseAccessMetadata).when(caseDataAccessControl).generateAccessMetadataForCreateEndpoint(any());
+            doReturn(caseAccessMetadata).when(caseDataAccessControl)
+                .generateAccessMetadata(any(CaseTypeDefinition.class));
 
             final CaseUpdateViewEvent output = authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
                 EVENT_TRIGGER_ID,
@@ -359,12 +363,12 @@ class AuthorisedGetEventTriggerOperationTest {
                 .setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger, caseFields, accessProfiles, CAN_UPDATE);
             doReturn(caseEventTrigger).when(accessControlService)
                 .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, accessProfiles);
+            doReturn(new CaseAccessMetadata()).when(caseDataAccessControl).generateAccessMetadata(anyString());
         }
 
         @Test
         @DisplayName("should call decorated get event trigger operation as is")
         void shouldCallDecoratedGetEventTriggerOperation() {
-
             final CaseUpdateViewEvent output = authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
                                                                                               EVENT_TRIGGER_ID,
                                                                                               IGNORE);
@@ -416,11 +420,10 @@ class AuthorisedGetEventTriggerOperationTest {
         @Test
         @DisplayName("should return Case Access metadata")
         void shouldReturnCaseAccessMetadata() throws JsonProcessingException {
-
             CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
             caseAccessMetadata.setAccessGrants(List.of(GrantType.STANDARD, GrantType.SPECIFIC, GrantType.CHALLENGED));
             caseAccessMetadata.setAccessProcess(AccessProcess.NONE);
-            doReturn(caseAccessMetadata).when(caseDataAccessControl).generateAccessMetadata(any());
+            doReturn(caseAccessMetadata).when(caseDataAccessControl).generateAccessMetadata(anyString());
 
             final CaseUpdateViewEvent output = authorisedGetEventTriggerOperation.executeForCase(CASE_REFERENCE,
                 EVENT_TRIGGER_ID,

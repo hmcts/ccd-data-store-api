@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -21,5 +22,5 @@ public interface CaseDataAccessControl {
 
     CaseAccessMetadata generateAccessMetadata(String caseId);
 
-    CaseAccessMetadata generateAccessMetadataForCreateEndpoint(String caseId);
+    CaseAccessMetadata generateAccessMetadata(CaseTypeDefinition caseTypeDefinition);
 }
