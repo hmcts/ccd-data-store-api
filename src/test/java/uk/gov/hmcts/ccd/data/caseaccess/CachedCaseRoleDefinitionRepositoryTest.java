@@ -63,4 +63,37 @@ class CachedCaseRoleDefinitionRepositoryTest {
             () -> verifyNoMoreInteractions(caseRoleRepository)
         );
     }
+
+
+    @Test
+    @DisplayName("should initially retrieve case roles from decorated repository with access control set to true.")
+    void shoudlGetCaseRolesFromDefaultRepositoryWithTrueAccessControl() {
+        doReturn(caseRoles).when(caseRoleRepository).getRoles(caseType1);
+        Set<String> returned = classUnderTest.getRoles(caseType1);
+
+        assertAll(
+            () -> assertThat(returned, is(caseRoles)),
+            () -> verify(caseRoleRepository, times(1)).getRoles(caseType1)
+        );
+    }
+
+    @Test
+    @DisplayName("should initially retrieve case roles from decorated repository with access control set to true.")
+    void shouldGetCaseRolesFromCacheWithTrueAccessControl() {
+        doReturn(caseRoles).when(caseRoleRepository).getRoles(caseType1);
+        Set<String> returned = classUnderTest.getRoles(caseType1);
+
+
+        assertAll(
+            () -> assertThat(returned, is(caseRoles)),
+            () -> verify(caseRoleRepository, times(1)).getRoles(caseType1)
+        );
+        Set<String> returned2 = classUnderTest.getRoles(caseType1);
+
+        assertAll(
+            () -> assertThat(returned2, is(caseRoles)),
+            () -> verifyNoMoreInteractions(caseRoleRepository)
+        );
+    }
+
 }

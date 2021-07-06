@@ -621,7 +621,7 @@
               } ],
               "complexACLs" : [ ],
               "display_context" : null,
-              "display_context_parameter" : "#COLLECTION(allowDelete,allowInsert)",
+              "display_context_parameter" : "#COLLECTION(allowDelete,allowInsert,allowUpdate)",
               "retain_hidden_value" : true,
               "formatted_value" : null
             }, {
