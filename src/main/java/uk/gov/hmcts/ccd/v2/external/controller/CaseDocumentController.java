@@ -28,16 +28,12 @@ public class CaseDocumentController {
 
     @GetMapping(
         path = "/{caseId}/documents/{documentId}",
-        headers = {
-            V2.EXPERIMENTAL_HEADER
-        },
         produces = {
             V2.MediaType.CASE_DOCUMENT
         }
     )
     @ApiOperation(
-        value = "Retrieve a case document metadata by case and document Id",
-        notes = V2.EXPERIMENTAL_WARNING
+        value = "Retrieve a case document metadata by case and document Id"
     )
     @ApiResponses({
         @ApiResponse(
