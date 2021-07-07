@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
+import uk.gov.hmcts.ccd.data.caseaccess.RoleCategory;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
@@ -30,6 +31,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -579,6 +581,58 @@ class CaseAccessServiceTest {
         void shouldReturnFalseWhenUserHasAccess() {
             boolean canAccess = caseAccessService.isJurisdictionAccessAllowed("autotest1");
             assertFalse(canAccess);
+        }
+    }
+
+    @Nested
+    @DisplayName("role category")
+    class RetrieveRoleCategory {
+        @BeforeEach
+        void setUp() {
+            doReturn(Sets.newHashSet(CASE_GRANTED_1_ID, CASE_GRANTED_2_ID)).when(userRepository).getUserRoles();
+        }
+
+        @Test
+        @DisplayName("should role category of professional")
+        void getRoleCategoryProfessional() {
+            Set<String> roles = new HashSet<>();
+            roles.add("caseworker-solicitor");
+            doReturn(roles).when(userRepository).getUserRoles();
+            RoleCategory roleCategory = caseAccessService.getRoleCategory();
+
+            assertEquals(roleCategory, RoleCategory.PROFESSIONAL);
+        }
+
+        @Test
+        @DisplayName("should role category of judicial")
+        void getRoleCategoryJudicial() {
+            Set<String> roles = new HashSet<>();
+            roles.add("caseworker-panelmember");
+            doReturn(roles).when(userRepository).getUserRoles();
+            RoleCategory roleCategory = caseAccessService.getRoleCategory();
+
+            assertEquals(roleCategory, RoleCategory.JUDICIAL);
+        }
+
+        @Test
+        @DisplayName("should role category of citizen")
+        void getRoleCategoryCitizen() {
+            Set<String> roles = new HashSet<>();
+            roles.add("citizen");
+            doReturn(roles).when(userRepository).getUserRoles();
+            RoleCategory roleCategory = caseAccessService.getRoleCategory();
+
+            assertEquals(roleCategory, RoleCategory.CITIZEN);
+        }
+
+        @Test
+        @DisplayName("should throw exception when no user role found")
+        void getUserRolesThrows() {
+            Set<String> roles = new HashSet<>();
+            roles.add("anyRole");
+            doReturn(roles).when(userRepository).getUserRoles();
+
+            assertThrows(ValidationException.class, () -> caseAccessService.getRoleCategory());
         }
     }
 

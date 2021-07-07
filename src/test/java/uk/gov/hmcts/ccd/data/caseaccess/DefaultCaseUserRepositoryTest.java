@@ -1,10 +1,6 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
 import com.google.common.collect.Lists;
-import java.util.List;
-import java.util.Set;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +9,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -56,7 +57,7 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldGrantAccessAsCustomCaseRole() {
-        repository.grantAccess(CASE_ID, USER_ID, CASE_ROLE);
+        repository.grantAccess(CASE_ID, USER_ID, CASE_ROLE, RoleCategory.CITIZEN);
 
         assertThat(countAccesses(CASE_ID, USER_ID, CASE_ROLE), equalTo(1));
         verify(auditRepository).auditGrant(CASE_ID, USER_ID, CASE_ROLE);

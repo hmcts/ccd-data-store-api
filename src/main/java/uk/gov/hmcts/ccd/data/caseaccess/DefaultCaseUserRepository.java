@@ -1,14 +1,15 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Repository;
+
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Repository;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Repository
 @Qualifier(DefaultCaseUserRepository.QUALIFIER)
@@ -26,8 +27,8 @@ public class DefaultCaseUserRepository implements CaseUserRepository {
         this.auditRepo = caseUserAuditRepository;
     }
 
-    public void grantAccess(Long caseId, String userId, String caseRole) {
-        em.merge(new CaseUserEntity(caseId, userId, caseRole));
+    public void grantAccess(Long caseId, String userId, String caseRole, RoleCategory roleCategory) {
+        em.merge(new CaseUserEntity(caseId, userId, caseRole, roleCategory.toString()));
         auditRepo.auditGrant(caseId, userId, caseRole);
     }
 

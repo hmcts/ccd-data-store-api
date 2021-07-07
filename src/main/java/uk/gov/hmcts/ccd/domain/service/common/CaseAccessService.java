@@ -1,22 +1,24 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.google.common.collect.Sets;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.RoleCategory;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
@@ -39,6 +41,13 @@ public class CaseAccessService {
     private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN
         = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-."
         + "+-localAuthority$");
+    private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN_PROFESSIONAL
+        = Pattern.compile(".+-solicitor$|^caseworker-.+-localAuthority$");
+    private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN_CITIZEN
+        = Pattern.compile("^citizen(-.*)?$|^letter-holder$");
+    private static final Pattern RESTRICT_GRANTED_ROLES_PATTERN_JUDICIAL
+        = Pattern.compile(".+-panelmember");
+
 
     public CaseAccessService(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
                              @Qualifier(CachedCaseUserRepository.QUALIFIER)  CaseUserRepository caseUserRepository) {
@@ -61,6 +70,12 @@ public class CaseAccessService {
             .findFirst()
             .map(role -> AccessLevel.GRANTED)
             .orElse(AccessLevel.ALL);
+    }
+
+    private Boolean getAccessLevel(Pattern pattern) {
+        return userRepository.getUserRoles()
+            .stream()
+            .anyMatch(role -> pattern.matcher(role).matches());
     }
 
     public Optional<List<Long>> getGrantedCaseIdsForRestrictedRoles() {
@@ -116,5 +131,18 @@ public class CaseAccessService {
     public Boolean canOnlyViewExplicitlyGrantedCases() {
         return userRepository.anyRoleMatches(RESTRICT_GRANTED_ROLES_PATTERN);
     }
+
+    public RoleCategory getRoleCategory() {
+        if (getAccessLevel(RESTRICT_GRANTED_ROLES_PATTERN_CITIZEN)) {
+            return RoleCategory.CITIZEN;
+        } else if (getAccessLevel(RESTRICT_GRANTED_ROLES_PATTERN_PROFESSIONAL)) {
+            return RoleCategory.PROFESSIONAL;
+        } else if (getAccessLevel(RESTRICT_GRANTED_ROLES_PATTERN_JUDICIAL)) {
+            return RoleCategory.JUDICIAL;
+        } else {
+            throw new ValidationException("Cannot find matching user roles for the user");
+        }
+    }
+
 
 }

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface CaseUserRepository {
-    void grantAccess(Long caseId, String userId, String caseRole);
+    void grantAccess(Long caseId, String userId, String caseRole, RoleCategory roleCategory);
 
     void revokeAccess(Long caseId, String userId, String caseRole);
 
