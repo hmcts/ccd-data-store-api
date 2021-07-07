@@ -82,8 +82,10 @@ public class SearchQueryFactoryOperation {
     private String addUserCaseAccessClause(Map<String, Object> params) {
         if (applicationParam.getEnableAttributeBasedAccessControl()) {
             List<String> caseIds = roleAssignmentService.getCaseReferencesForAGivenUser(userAuthorisation.getUserId());
-            params.put("case_ids", caseIds);
-            return " AND reference IN (:case_ids)";
+            if (caseIds != null && caseIds.size() > 0) {
+                params.put("case_ids", caseIds);
+                return " AND reference IN (:case_ids)";
+            }
         } else if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             params.put("user_id", userAuthorisation.getUserId());
             return " AND id IN (SELECT cu.case_data_id FROM case_users AS cu WHERE user_id = :user_id)";
