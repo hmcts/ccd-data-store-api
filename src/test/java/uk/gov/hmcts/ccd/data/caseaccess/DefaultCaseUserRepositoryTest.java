@@ -9,6 +9,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -19,6 +21,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 @Transactional
@@ -46,6 +49,12 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
     @MockBean
     private CaseUserAuditRepository auditRepository;
 
+    @MockBean
+    private CachedUserRepository cachedUserRepository;
+
+    @MockBean
+    CaseAccessService caseAccessService;
+
     @Autowired
     private DefaultCaseUserRepository repository;
 
@@ -57,7 +66,8 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldGrantAccessAsCustomCaseRole() {
-        repository.grantAccess(CASE_ID, USER_ID, CASE_ROLE, RoleCategory.CITIZEN);
+        doReturn(RoleCategory.CITIZEN).when(caseAccessService).getRoleCategory();
+        repository.grantAccess(CASE_ID, USER_ID, CASE_ROLE);
 
         assertThat(countAccesses(CASE_ID, USER_ID, CASE_ROLE), equalTo(1));
         verify(auditRepository).auditGrant(CASE_ID, USER_ID, CASE_ROLE);

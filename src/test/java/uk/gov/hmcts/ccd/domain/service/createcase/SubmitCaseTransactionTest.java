@@ -234,7 +234,7 @@ class SubmitCaseTransactionTest {
             IGNORE_WARNING);
 
         verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID),
-            IDAM_ID, CREATOR.getRole(), RoleCategory.JUDICIAL);
+            IDAM_ID, CREATOR.getRole());
     }
 
     @Test

@@ -112,8 +112,7 @@ class CaseAccessOperationTest {
                 () -> verify(caseUserRepository).grantAccess(
                     CASE_ID,
                     USER_ID,
-                    CREATOR.getRole(),
-                    RoleCategory.PROFESSIONAL)
+                    CREATOR.getRole())
             );
         }
 
@@ -127,8 +126,7 @@ class CaseAccessOperationTest {
                 () -> verify(caseUserRepository, never()).grantAccess(
                     CASE_ID,
                     USER_ID,
-                    CREATOR.getRole(),
-                    RoleCategory.PROFESSIONAL)
+                    CREATOR.getRole())
             );
         }
 
@@ -142,8 +140,7 @@ class CaseAccessOperationTest {
                 () -> verify(caseUserRepository, never()).grantAccess(
                     CASE_ID,
                     USER_ID,
-                    CREATOR.getRole(),
-                    RoleCategory.PROFESSIONAL)
+                    CREATOR.getRole())
             );
         }
     }
@@ -174,7 +171,7 @@ class CaseAccessOperationTest {
         void shouldGrantAccessForCaseRole() {
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE));
 
-            verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE,  RoleCategory.PROFESSIONAL);
+            verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
         }
 
         @Test
@@ -183,12 +180,11 @@ class CaseAccessOperationTest {
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE, CREATOR.getRole()));
 
             assertAll(
-                () -> verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE,  RoleCategory.PROFESSIONAL),
+                () -> verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE),
                 () -> verify(caseUserRepository).grantAccess(
                     CASE_ID,
                     USER_ID,
-                    CREATOR.getRole(),
-                    RoleCategory.PROFESSIONAL)
+                    CREATOR.getRole())
             );
         }
 
@@ -208,8 +204,7 @@ class CaseAccessOperationTest {
             verify(caseUserRepository, never()).grantAccess(
                 CASE_ID,
                 USER_ID,
-                CASE_ROLE_GRANTED,
-                RoleCategory.PROFESSIONAL);
+                CASE_ROLE_GRANTED);
         }
     }
 
@@ -315,8 +310,7 @@ class CaseAccessOperationTest {
             verify(caseUserRepository, times(1)).grantAccess(
                 CASE_ID,
                 USER_ID,
-                CASE_ROLE,
-                RoleCategory.PROFESSIONAL);
+                CASE_ROLE);
         }
 
         @Test
@@ -333,7 +327,7 @@ class CaseAccessOperationTest {
             caseAccessOperation.addCaseUserRoles(caseUserRoles);
 
             // ASSERT
-            verify(caseUserRepository, never()).grantAccess(CASE_ID, USER_ID, role,  RoleCategory.PROFESSIONAL);
+            verify(caseUserRepository, never()).grantAccess(CASE_ID, USER_ID, role);
         }
 
         @Test
@@ -358,13 +352,11 @@ class CaseAccessOperationTest {
             verify(caseUserRepository, times(1)).grantAccess(
                 CASE_ID,
                 USER_ID,
-                CASE_ROLE,
-                RoleCategory.PROFESSIONAL);
+                CASE_ROLE);
             verify(caseUserRepository, times(1)).grantAccess(
                 CASE_ID_OTHER,
                 USER_ID,
-                CASE_ROLE,
-                RoleCategory.PROFESSIONAL);
+                CASE_ROLE);
         }
 
         @Test
@@ -385,9 +377,9 @@ class CaseAccessOperationTest {
             verify(caseDetailsRepository, times(1)).findByReference(null, CASE_REFERENCE);
             // standard grant access check for all case user roles
             verify(caseUserRepository, times(1)).grantAccess(
-                CASE_ID, USER_ID, CASE_ROLE,  RoleCategory.PROFESSIONAL);
+                CASE_ID, USER_ID, CASE_ROLE);
             verify(caseUserRepository, times(1)).grantAccess(
-                CASE_ID, USER_ID, CASE_ROLE_OTHER,  RoleCategory.PROFESSIONAL);
+                CASE_ID, USER_ID, CASE_ROLE_OTHER);
         }
 
         @Test

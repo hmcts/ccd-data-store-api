@@ -65,8 +65,7 @@ public class CaseAccessOperation {
             Long.valueOf(caseReference));
 
         final CaseDetails caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
-        caseUserRepository.grantAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole(),
-            caseAccessService.getRoleCategory());
+        caseUserRepository.grantAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
     }
 
     @Transactional
@@ -135,7 +134,7 @@ public class CaseAccessOperation {
             .anyMatch(dbRole -> dbRole.equalsIgnoreCase(requestedAssignment.getCaseRole()));
         if (!roleExists) {
             caseUserRepository.grantAccess(caseId, requestedAssignment.getUserId(),
-                requestedAssignment.getCaseRole(), caseAccessService.getRoleCategory());
+                requestedAssignment.getCaseRole());
         }
     }
 
@@ -351,8 +350,7 @@ public class CaseAccessOperation {
             .filter(targetRole -> !currentCaseRoles.contains(targetRole))
             .forEach(targetRole -> caseUserRepository.grantAccess(caseId,
                 userId,
-                targetRole,
-                caseAccessService.getRoleCategory()));
+                targetRole));
     }
 
     private void revokeRemovedCaseRoles(String userId,

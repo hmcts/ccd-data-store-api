@@ -28,8 +28,8 @@ public class CachedCaseUserRepository implements CaseUserRepository {
     }
 
     @Override
-    public void grantAccess(Long caseId, String userId, String caseRole, RoleCategory roleCategory) {
-        caseUserRepository.grantAccess(caseId, userId, caseRole, roleCategory);
+    public void grantAccess(Long caseId, String userId, String caseRole) {
+        caseUserRepository.grantAccess(caseId, userId, caseRole);
     }
 
     @Override

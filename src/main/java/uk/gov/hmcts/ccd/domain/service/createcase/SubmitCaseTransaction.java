@@ -111,7 +111,7 @@ public class SubmitCaseTransaction {
         if (AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             caseUserRepository.grantAccess(Long.valueOf(savedCaseDetails.getId()),
                                            idamUser.getId(),
-                                           CREATOR.getRole(), caseAccessService.getRoleCategory());
+                                           CREATOR.getRole());
         }
 
         return savedCaseDetails;

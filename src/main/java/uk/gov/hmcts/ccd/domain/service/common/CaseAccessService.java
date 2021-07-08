@@ -73,7 +73,7 @@ public class CaseAccessService {
     }
 
     private Boolean getAccessLevel(Pattern pattern) {
-        return userRepository.getUserRoles()
+        return getUserRoles()
             .stream()
             .anyMatch(role -> pattern.matcher(role).matches());
     }

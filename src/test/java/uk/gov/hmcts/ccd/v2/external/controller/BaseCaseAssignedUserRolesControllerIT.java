@@ -9,6 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -28,8 +29,10 @@ import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.RoleCategory;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -96,6 +99,9 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     @Mock
     protected Authentication authentication;
 
+    @MockBean
+    protected CaseAccessService caseAccessService;
+
     @Mock
     protected SecurityContext securityContext;
 
@@ -146,6 +152,8 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             + "        }";
         stubFor(WireMock.get(urlMatching("/o/userinfo"))
             .willReturn(okJson(userJson).withStatus(200)));
+
+        doReturn(RoleCategory.PROFESSIONAL).when(caseAccessService).getRoleCategory();
     }
 
     protected HttpHeaders createHttpHeaders() {
