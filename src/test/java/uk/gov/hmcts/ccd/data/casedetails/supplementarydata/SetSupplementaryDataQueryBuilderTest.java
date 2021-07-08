@@ -6,6 +6,8 @@ import javax.persistence.PersistenceContext;
 
 import org.junit.Ignore;
 import javax.persistence.Query;
+
+import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
