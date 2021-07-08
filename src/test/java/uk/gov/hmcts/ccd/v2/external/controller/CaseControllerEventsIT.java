@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
@@ -16,14 +14,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.service.getcasedocument.GetCaseDocumentsOperationTest;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 
 import javax.inject.Inject;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
@@ -124,11 +118,5 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
     private void assertCaseDataResultSetSize() {
         final int count = template.queryForObject("SELECT count(1) as n FROM case_data", Integer.class);
         assertEquals("Incorrect case data size", NUMBER_OF_CASES, count);
-    }
-
-    static HashMap<String, JsonNode> buildCaseDetailData(String fileName) throws IOException {
-        InputStream inputStream =
-            GetCaseDocumentsOperationTest.class.getClassLoader().getResourceAsStream("tests/".concat(fileName));
-        return mapper.readValue(inputStream, new TypeReference<>() {});
     }
 }
