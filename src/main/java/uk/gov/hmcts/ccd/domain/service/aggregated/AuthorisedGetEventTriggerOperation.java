@@ -10,8 +10,10 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -85,7 +87,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
             getEventTriggerOperation.executeForCaseType(caseTypeId,
                 eventId,
                 ignoreWarning));
-        updateWithAccessControlMetadata(caseUpdateViewEvent, caseTypeDefinition);
+        updateWithAccessControlMetadataForCreate(caseUpdateViewEvent);
         return accessControlService
             .updateCollectionDisplayContextParameterByAccess(caseUpdateViewEvent, accessProfiles);
     }
@@ -133,13 +135,9 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
             accessProfiles);
     }
 
-    private void updateWithAccessControlMetadata(CaseUpdateViewEvent caseUpdateViewEvent,
-                                                 CaseTypeDefinition caseTypeDefinition) {
-        CaseAccessMetadata caseAccessMetadata =
-            caseDataAccessControl.generateAccessMetadata(caseTypeDefinition);
-
-        caseUpdateViewEvent.setAccessGrants(caseAccessMetadata.getAccessGrantsString());
-        caseUpdateViewEvent.setAccessProcess(caseAccessMetadata.getAccessProcessString());
+    private void updateWithAccessControlMetadataForCreate(CaseUpdateViewEvent caseUpdateViewEvent) {
+        caseUpdateViewEvent.setAccessGrants(GrantType.STANDARD.name());
+        caseUpdateViewEvent.setAccessProcess(AccessProcess.NONE.name());
     }
 
     private void updateWithAccessControlMetadata(CaseUpdateViewEvent caseUpdateViewEvent) {

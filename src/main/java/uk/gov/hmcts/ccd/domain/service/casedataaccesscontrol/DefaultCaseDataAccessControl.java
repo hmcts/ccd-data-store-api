@@ -34,8 +34,6 @@ import java.util.stream.Collectors;
 @Lazy
 public class DefaultCaseDataAccessControl implements CaseDataAccessControl, AccessControl {
 
-    public static final boolean CHECK_REGION_LOCATION_TRUE = true;
-    public static final boolean CHECK_REGION_LOCATION_FALSE = false;
     private final RoleAssignmentService roleAssignmentService;
     private final SecurityUtils securityUtils;
     private final RoleAssignmentsFilteringService roleAssignmentsFilteringService;
@@ -154,11 +152,6 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         return createCaseAccessMetaDataByCaseId(caseId);
     }
 
-    @Override
-    public CaseAccessMetadata generateAccessMetadata(CaseTypeDefinition caseTypeDefinition) {
-        return createCaseAccessMetaDataByCaseTypeDefinition(caseTypeDefinition);
-    }
-
     private CaseAccessMetadata createCaseAccessMetaDataByCaseId(String caseId) {
         Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(caseId);
         CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
@@ -168,34 +161,20 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
                     roleAssignmentService.getRoleAssignments(securityUtils.getUserId()),
                     caseDetails.get());
 
-            populateCaseAccessMetadata(caseAccessMetadata, filteredRoleAssignments, CHECK_REGION_LOCATION_FALSE);
+            populateCaseAccessMetadata(caseAccessMetadata, filteredRoleAssignments);
         }
         return caseAccessMetadata;
     }
 
-    private CaseAccessMetadata createCaseAccessMetaDataByCaseTypeDefinition(CaseTypeDefinition caseTypeDefinition) {
-        CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
-
-        FilteredRoleAssignments filteredRoleAssignments =
-                roleAssignmentsFilteringService.filter(
-                    roleAssignmentService.getRoleAssignments(securityUtils.getUserId()),
-                    caseTypeDefinition);
-
-        populateCaseAccessMetadata(caseAccessMetadata, filteredRoleAssignments, CHECK_REGION_LOCATION_TRUE);
-        return caseAccessMetadata;
-    }
-
     private void populateCaseAccessMetadata(CaseAccessMetadata caseAccessMetadata,
-                                            FilteredRoleAssignments filteredRoleAssignments,
-                                            boolean isCheckingRegionLocationFilteringChecks) {
+                                            FilteredRoleAssignments filteredRoleAssignments) {
         List<RoleAssignment> pseudoRoleAssignments
             = appendGeneratedPseudoRoleAssignments(filteredRoleAssignments.getFilteredMatchingRoleAssignments());
 
         caseAccessMetadata.setAccessGrants(generatePostFilteringAccessGrants(pseudoRoleAssignments));
         caseAccessMetadata.setAccessProcess(generatePostFilteringAccessProcess(
             filteredRoleAssignments,
-            pseudoRoleAssignments,
-            isCheckingRegionLocationFilteringChecks));
+            pseudoRoleAssignments));
     }
 
     private List<RoleAssignment> appendGeneratedPseudoRoleAssignments(List<RoleAssignment> filteringResults) {
@@ -208,16 +187,14 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     }
 
     private AccessProcess generatePostFilteringAccessProcess(FilteredRoleAssignments filteredRoleAssignments,
-                                                             List<RoleAssignment> pseudoGeneratedRoleAssignments,
-                                                             boolean isCheckingRegionLocationFilteringChecks) {
+                                                             List<RoleAssignment> pseudoGeneratedRoleAssignments) {
         boolean userHasAccessToCase = pseudoGeneratedRoleAssignments.stream()
             .map(roleAssignment -> GrantType.valueOf(roleAssignment.getGrantType()))
             .anyMatch(DefaultCaseDataAccessControl::isUserAllowedAccessToCase);
 
         if (userHasAccessToCase) {
             return AccessProcess.NONE;
-        } else if (isCheckingRegionLocationFilteringChecks
-            && !filteredRoleAssignments.getFilteredRoleAssignmentsFailedOnRegionOrBaseLocationMatcher().isEmpty()) {
+        } else if (!filteredRoleAssignments.getFilteredRoleAssignmentsFailedOnRegionOrBaseLocationMatcher().isEmpty()) {
             return AccessProcess.CHALLENGED;
         } else {
             return AccessProcess.SPECIFIC;

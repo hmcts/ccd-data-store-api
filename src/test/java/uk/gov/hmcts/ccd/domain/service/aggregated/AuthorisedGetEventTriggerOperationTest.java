@@ -153,8 +153,6 @@ class AuthorisedGetEventTriggerOperationTest {
         CaseEventDefinition caseEvent = new CaseEventDefinition();
         when(eventTriggerService.findCaseEvent(eq(caseType), eq(EVENT_TRIGGER_ID))).thenReturn(caseEvent);
         when(eventTriggerService.isPreStateValid(eq(STATE), eq(caseEvent))).thenReturn(true);
-        doReturn(new CaseAccessMetadata())
-            .when(caseDataAccessControl).generateAccessMetadata(any(CaseTypeDefinition.class));
     }
 
     private Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
@@ -198,8 +196,6 @@ class AuthorisedGetEventTriggerOperationTest {
 
             doReturn(caseEventTrigger).when(accessControlService)
                 .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, createCaseAccessProfiles);
-            doReturn(new CaseAccessMetadata())
-                .when(caseDataAccessControl).generateAccessMetadata(any(CaseTypeDefinition.class));
         }
 
         @Test
@@ -296,33 +292,13 @@ class AuthorisedGetEventTriggerOperationTest {
         @Test
         @DisplayName("should return Case Access metadata")
         void shouldReturnCaseAccessMetadata() throws JsonProcessingException {
-
-            CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
-            caseAccessMetadata.setAccessGrants(List.of(GrantType.STANDARD, GrantType.SPECIFIC, GrantType.CHALLENGED));
-            caseAccessMetadata.setAccessProcess(AccessProcess.NONE);
-            doReturn(caseAccessMetadata).when(caseDataAccessControl)
-                .generateAccessMetadata(any(CaseTypeDefinition.class));
-
             final CaseUpdateViewEvent output = authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
                 EVENT_TRIGGER_ID,
                 IGNORE);
 
             assertTrue(isCaseAccessMetadataPresentInJson(output));
-            assertThat(output.getAccessGrants(),
-                is(GrantType.CHALLENGED.name() + "," + GrantType.SPECIFIC + "," + GrantType.STANDARD));
+            assertThat(output.getAccessGrants(), is(GrantType.STANDARD.name()));
             assertThat(output.getAccessProcess(), is(AccessProcess.NONE.name()));
-        }
-
-        @Test
-        @DisplayName("should not set CaseUpdateViewEvent json fields if there is no Case Access metadata")
-        void shouldNotSetCaseAccessMetadataJson() throws JsonProcessingException {
-            final CaseUpdateViewEvent output = authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
-                EVENT_TRIGGER_ID,
-                IGNORE);
-
-            assertFalse(isCaseAccessMetadataPresentInJson(output));
-            assertNull(output.getAccessGrants());
-            assertNull(output.getAccessProcess());
         }
 
         private boolean isCaseAccessMetadataPresentInJson(CaseUpdateViewEvent caseUpdateViewEvent)

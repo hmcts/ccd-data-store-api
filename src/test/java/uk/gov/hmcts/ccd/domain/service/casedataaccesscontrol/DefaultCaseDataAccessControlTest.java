@@ -44,8 +44,6 @@ import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.CHAL
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.SPECIFIC;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.STANDARD;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment.builder;
-import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.DefaultCaseDataAccessControl.CHECK_REGION_LOCATION_FALSE;
-import static uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.DefaultCaseDataAccessControl.CHECK_REGION_LOCATION_TRUE;
 
 class DefaultCaseDataAccessControlTest {
 
@@ -281,9 +279,7 @@ class DefaultCaseDataAccessControlTest {
         roleAndGrantType.put(ROLE_NAME_1, GrantType.STANDARD.name());
         roleAndGrantType.put(ROLE_NAME_2, BASIC.name());
 
-        CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType,
-            false,
-            CHECK_REGION_LOCATION_FALSE);
+        CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, false);
 
         assertEquals(AccessProcess.NONE.name(), caseAccessMetadata.getAccessProcessString());
         assertEquals(String.join(",", BASIC.name(), GrantType.STANDARD.name()),
@@ -295,9 +291,7 @@ class DefaultCaseDataAccessControlTest {
         Map<String, String> roleAndGrantType = Maps.newHashMap();
         roleAndGrantType.put(ROLE_NAME_2, BASIC.name());
 
-        CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType,
-            false,
-            CHECK_REGION_LOCATION_FALSE);
+        CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, false);
 
         assertEquals(AccessProcess.SPECIFIC.name(), caseAccessMetadata.getAccessProcessString());
         assertEquals(BASIC.name(), caseAccessMetadata.getAccessGrantsString());
@@ -318,9 +312,7 @@ class DefaultCaseDataAccessControlTest {
         doReturn(roleAssignments)
             .when(pseudoRoleAssignmentsGenerator).createPseudoRoleAssignments(anyList());
 
-        CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType,
-            true,
-            CHECK_REGION_LOCATION_FALSE);
+        CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, true);
 
         assertEquals(AccessProcess.NONE.name(), caseAccessMetadata.getAccessProcessString());
         assertEquals(String.join(",", BASIC.name(), CHALLENGED.name(), STANDARD.name()),
@@ -337,9 +329,7 @@ class DefaultCaseDataAccessControlTest {
             .when(filteredRoleAssignments)
             .getFilteredRoleAssignmentsFailedOnRegionOrBaseLocationMatcher();
 
-        CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType,
-            false,
-            CHECK_REGION_LOCATION_TRUE);
+        CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, false);
 
         assertEquals(AccessProcess.CHALLENGED.name(), caseAccessMetadata.getAccessProcessString());
         assertEquals(BASIC.name(), caseAccessMetadata.getAccessGrantsString());
@@ -354,17 +344,14 @@ class DefaultCaseDataAccessControlTest {
             .when(filteredRoleAssignments)
             .getFilteredRoleAssignmentsFailedOnRegionOrBaseLocationMatcher();
 
-        CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType,
-            false,
-            CHECK_REGION_LOCATION_TRUE);
+        CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, false);
 
         assertEquals(AccessProcess.NONE.name(), caseAccessMetadata.getAccessProcessString());
         assertEquals(STANDARD.name(), caseAccessMetadata.getAccessGrantsString());
     }
 
     private CaseAccessMetadata getCaseAccessMetadata(Map<String, String> roleAndGrantType,
-                                                     boolean enablePseudoRolesAssignmentGeneration,
-                                                     boolean isCheckingRegionLocationFilteringChecks) {
+                                                     boolean enablePseudoRolesAssignmentGeneration) {
         doReturn(USER_ID).when(securityUtils).getUserId();
         CaseDetails caseDetails = new CaseDetails();
         Optional<CaseDetails> optionalCaseDetails = Optional.of(caseDetails);
@@ -380,15 +367,9 @@ class DefaultCaseDataAccessControlTest {
         doReturn(roleAssignmentsReturned).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
 
 
-        if (isCheckingRegionLocationFilteringChecks) {
-            doReturn(filteredRoleAssignments)
+        doReturn(filteredRoleAssignments)
                 .when(roleAssignmentsFilteringService).filter(
-                    any(RoleAssignments.class), any(CaseTypeDefinition.class));
-            return defaultCaseDataAccessControl.generateAccessMetadata(new CaseTypeDefinition());
-        } else {
-            doReturn(filteredRoleAssignments)
-                .when(roleAssignmentsFilteringService).filter(any(RoleAssignments.class), any(CaseDetails.class));
-            return defaultCaseDataAccessControl.generateAccessMetadata("CASE_ID");
-        }
+                    any(RoleAssignments.class), any(CaseDetails.class));
+        return defaultCaseDataAccessControl.generateAccessMetadata("CASE_ID");
     }
 }
