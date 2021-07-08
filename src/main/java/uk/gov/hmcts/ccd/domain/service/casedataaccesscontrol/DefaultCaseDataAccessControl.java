@@ -152,6 +152,15 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         return createCaseAccessMetaDataByCaseId(caseId);
     }
 
+    @Override
+    public CaseAccessMetadata generateAccessMetadataWithNoCaseId() {
+        CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
+        caseAccessMetadata.setAccessGrants(List.of(GrantType.STANDARD));
+        caseAccessMetadata.setAccessProcess(AccessProcess.NONE);
+
+        return caseAccessMetadata;
+    }
+
     private CaseAccessMetadata createCaseAccessMetaDataByCaseId(String caseId) {
         Optional<CaseDetails> caseDetails = caseDetailsRepository.findByReference(caseId);
         CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();

@@ -19,5 +19,7 @@ public interface CaseDataAccessControl {
 
     }
 
+    CaseAccessMetadata generateAccessMetadataWithNoCaseId();
+
     CaseAccessMetadata generateAccessMetadata(String caseId);
 }

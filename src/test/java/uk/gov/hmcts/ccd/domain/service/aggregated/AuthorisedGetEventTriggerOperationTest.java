@@ -196,6 +196,9 @@ class AuthorisedGetEventTriggerOperationTest {
 
             doReturn(caseEventTrigger).when(accessControlService)
                 .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, createCaseAccessProfiles);
+
+            doReturn(new CaseAccessMetadata())
+                .when(caseDataAccessControl).generateAccessMetadataWithNoCaseId();
         }
 
         @Test
@@ -292,6 +295,13 @@ class AuthorisedGetEventTriggerOperationTest {
         @Test
         @DisplayName("should return Case Access metadata")
         void shouldReturnCaseAccessMetadata() throws JsonProcessingException {
+            CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
+            caseAccessMetadata.setAccessProcess(AccessProcess.NONE);
+            caseAccessMetadata.setAccessGrants(List.of(GrantType.STANDARD));
+
+            doReturn(caseAccessMetadata)
+                .when(caseDataAccessControl).generateAccessMetadataWithNoCaseId();
+
             final CaseUpdateViewEvent output = authorisedGetEventTriggerOperation.executeForCaseType(CASE_TYPE_ID,
                 EVENT_TRIGGER_ID,
                 IGNORE);

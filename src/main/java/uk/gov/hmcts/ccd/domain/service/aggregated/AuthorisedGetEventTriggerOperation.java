@@ -10,10 +10,8 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -136,8 +134,10 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     }
 
     private void updateWithAccessControlMetadataForCreate(CaseUpdateViewEvent caseUpdateViewEvent) {
-        caseUpdateViewEvent.setAccessGrants(GrantType.STANDARD.name());
-        caseUpdateViewEvent.setAccessProcess(AccessProcess.NONE.name());
+        CaseAccessMetadata caseAccessMetadata = caseDataAccessControl.generateAccessMetadataWithNoCaseId();
+
+        caseUpdateViewEvent.setAccessGrants(caseAccessMetadata.getAccessGrantsString());
+        caseUpdateViewEvent.setAccessProcess(caseAccessMetadata.getAccessProcessString());
     }
 
     private void updateWithAccessControlMetadata(CaseUpdateViewEvent caseUpdateViewEvent) {
