@@ -56,8 +56,7 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
                 Map<String, Object> data = retrieveContextData(caseEventData, expressionScript.getVariables());
                 if (data.isEmpty()) {
                     return true;
-                }
-                else {
+                } else {
                     return (Boolean) expressionScript.execute(new MapContext(data));
                 }
             }
