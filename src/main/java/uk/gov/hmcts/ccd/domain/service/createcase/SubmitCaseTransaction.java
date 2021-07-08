@@ -18,7 +18,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -48,7 +47,6 @@ public class SubmitCaseTransaction {
     private final CaseUserRepository caseUserRepository;
     private final UserAuthorisation userAuthorisation;
     private final MessageService messageService;
-    private final CaseAccessService caseAccessService;
 
     @Inject
     public SubmitCaseTransaction(@Qualifier(CachedCaseDetailsRepository.QUALIFIER)
@@ -61,8 +59,7 @@ public class SubmitCaseTransaction {
                                  final @Qualifier(CachedCaseUserRepository.QUALIFIER)
                                          CaseUserRepository caseUserRepository,
                                  final UserAuthorisation userAuthorisation,
-                                 final @Qualifier("caseEventMessageService") MessageService messageService,
-                                 final CaseAccessService caseAccessService
+                                 final @Qualifier("caseEventMessageService") MessageService messageService
                                  ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
@@ -73,7 +70,6 @@ public class SubmitCaseTransaction {
         this.caseUserRepository = caseUserRepository;
         this.userAuthorisation = userAuthorisation;
         this.messageService = messageService;
-        this.caseAccessService = caseAccessService;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

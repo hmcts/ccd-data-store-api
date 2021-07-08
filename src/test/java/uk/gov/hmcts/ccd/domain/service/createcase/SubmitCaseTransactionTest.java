@@ -9,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
-import uk.gov.hmcts.ccd.data.caseaccess.RoleCategory;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
@@ -22,7 +21,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -98,9 +96,6 @@ class SubmitCaseTransactionTest {
     @Mock
     private MessageService messageService;
 
-    @Mock
-    private CaseAccessService caseAccessService;
-
     @InjectMocks
     private SubmitCaseTransaction submitCaseTransaction;
     private Event event;
@@ -120,7 +115,7 @@ class SubmitCaseTransactionTest {
             uidService,
             securityClassificationService,
             caseUserRepository,
-            userAuthorisation, messageService, caseAccessService);
+            userAuthorisation, messageService);
 
         event = buildEvent();
         caseTypeDefinition = buildCaseType();
@@ -225,7 +220,6 @@ class SubmitCaseTransactionTest {
     @DisplayName("when creator has access level GRANTED, then it should grant access to creator")
     void shouldGrantAccessToAccessLevelGrantedCreator() {
         when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
-        doReturn(RoleCategory.JUDICIAL).when(caseAccessService).getRoleCategory();
         submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
             idamUser,

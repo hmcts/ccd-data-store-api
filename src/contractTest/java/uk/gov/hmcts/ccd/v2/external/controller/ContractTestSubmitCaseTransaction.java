@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -31,9 +30,9 @@ public class ContractTestSubmitCaseTransaction extends SubmitCaseTransaction {
                                              SecurityClassificationService securityClassificationService,
                                              DefaultCaseUserRepository caseUserRepository,
                                              UserAuthorisation userAuthorisation,
-                                             MessageService messageService, CaseAccessService caseAccessService) {
+                                             MessageService messageService) {
         super(caseDetailsRepository, caseAuditEventRepository, caseTypeService,
             callbackInvoker, uidService, securityClassificationService,
-            caseUserRepository, userAuthorisation, messageService, caseAccessService);
+            caseUserRepository, userAuthorisation, messageService);
     }
 }
