@@ -49,7 +49,7 @@ class RoleAssignmentServiceTest {
     private CaseTypeDefinition caseTypeDefinition;
     @Mock
     private FilteredRoleAssignments filteredRoleAssignments;
-
+    @Mock
     private RoleAssignmentCategoryService roleAssignmentCategoryService;
 
     private RoleAssignmentService roleAssignmentService;
