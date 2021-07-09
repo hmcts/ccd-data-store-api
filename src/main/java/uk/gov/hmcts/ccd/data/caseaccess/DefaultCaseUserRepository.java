@@ -37,7 +37,7 @@ public class DefaultCaseUserRepository implements CaseUserRepository {
     }
 
     public void revokeAccess(Long caseId, String userId, String caseRole) {
-        CaseUserEntity primaryKey = new CaseUserEntity(caseId, userId, caseRole);
+        CaseUserEntity primaryKey = new CaseUserEntity(caseId, userId, caseRole, null);
         CaseUserEntity caseUser = em.find(CaseUserEntity.class, primaryKey.getCasePrimaryKey());
 
         if (caseUser != null) {

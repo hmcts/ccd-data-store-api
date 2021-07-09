@@ -42,8 +42,6 @@ public class CaseUserEntity implements Serializable {
         private String userId;
         @Column(name = "case_role")
         private String caseRole;
-        @Column(name = "role_category")
-        private String roleCategory;
 
         public Long getCaseDataId() {
             return caseDataId;
@@ -69,24 +67,21 @@ public class CaseUserEntity implements Serializable {
             this.caseRole = caseRole;
         }
 
-        public String getRoleCategory() {
-            return roleCategory;
-        }
-
-        public void setRoleCategory(String roleCategory) {
-            this.roleCategory = roleCategory;
-        }
     }
 
     @EmbeddedId
     private CasePrimaryKey casePrimaryKey;
+
+    @Column(name = "role_category")
+    private String roleCategory;
+
 
     public CaseUserEntity() {
         // needed for hibernate
     }
 
     CaseUserEntity(Long caseDataId, String userId) {
-        this(caseDataId, userId, GlobalCaseRole.CREATOR.getRole());
+        this(caseDataId, userId, GlobalCaseRole.CREATOR.getRole(), null);
     }
 
     CaseUserEntity(Long caseDataId, String userId, String caseRole, String roleCategory) {
@@ -94,18 +89,9 @@ public class CaseUserEntity implements Serializable {
         casePrimaryKey.caseDataId = caseDataId;
         casePrimaryKey.userId = userId;
         casePrimaryKey.caseRole = caseRole;
-        casePrimaryKey.roleCategory = roleCategory;
 
         this.casePrimaryKey = casePrimaryKey;
-    }
-
-    CaseUserEntity(Long caseDataId, String userId, String caseRole) {
-        CasePrimaryKey casePrimaryKey = new CasePrimaryKey();
-        casePrimaryKey.caseDataId = caseDataId;
-        casePrimaryKey.userId = userId;
-        casePrimaryKey.caseRole = caseRole;
-
-        this.casePrimaryKey = casePrimaryKey;
+        this.roleCategory = roleCategory;
     }
 
     public CasePrimaryKey getCasePrimaryKey() {
@@ -114,6 +100,14 @@ public class CaseUserEntity implements Serializable {
 
     public void setCasePrimaryKey(CasePrimaryKey casePrimaryKey) {
         this.casePrimaryKey = casePrimaryKey;
+    }
+
+    public String getRoleCategory() {
+        return roleCategory;
+    }
+
+    public void setRoleCategory(String roleCategory) {
+        this.roleCategory = roleCategory;
     }
 
 }
