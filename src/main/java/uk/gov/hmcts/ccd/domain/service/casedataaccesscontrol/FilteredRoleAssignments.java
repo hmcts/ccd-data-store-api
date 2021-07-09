@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
-import lombok.Data;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 
@@ -8,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Data
 public class FilteredRoleAssignments {
     List<RoleAssignmentFilteringResult> roleAssignmentFilteringResults = new ArrayList<>();
 
