@@ -5,6 +5,7 @@ import com.microsoft.applicationinsights.core.dependencies.google.common.collect
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
@@ -16,6 +17,8 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.RoleCategory;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
 
 import javax.inject.Inject;
@@ -23,6 +26,7 @@ import javax.inject.Inject;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
@@ -36,10 +40,14 @@ public class CaseUserControllerIT extends WireMockBaseTest {
     @SpyBean
     private AuditRepository auditRepository;
 
+    @MockBean
+    private CaseAccessService caseAccessService;
+
     @Before
     public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, "caseworker-probate");
+        doReturn(RoleCategory.PROFESSIONAL).when(caseAccessService).getRoleCategory();
     }
 
     @Test

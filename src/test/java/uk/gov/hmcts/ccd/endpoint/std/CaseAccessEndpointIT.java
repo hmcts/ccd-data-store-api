@@ -5,6 +5,7 @@ import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
@@ -17,7 +18,9 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.RoleCategory;
 import uk.gov.hmcts.ccd.domain.model.std.UserId;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -25,6 +28,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -44,12 +48,15 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
     private MockMvc mockMvc;
     @SpyBean
     private AuditRepository auditRepository;
+    @MockBean
+    private CaseAccessService caseAccessService;
 
     @Before
     public void setUp() throws IOException {
         super.initMock();
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, "caseworker-probate");
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        doReturn(RoleCategory.PROFESSIONAL).when(caseAccessService).getRoleCategory();
     }
 
     @Test
