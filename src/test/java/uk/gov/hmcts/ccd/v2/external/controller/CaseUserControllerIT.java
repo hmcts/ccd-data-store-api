@@ -17,8 +17,8 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
-import uk.gov.hmcts.ccd.data.caseaccess.RoleCategory;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentCategoryService;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
 
 import javax.inject.Inject;
@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -41,13 +42,13 @@ public class CaseUserControllerIT extends WireMockBaseTest {
     private AuditRepository auditRepository;
 
     @MockBean
-    private CaseAccessService caseAccessService;
+    private RoleAssignmentCategoryService roleAssignmentCategoryService;
 
     @Before
     public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, "caseworker-probate");
-        doReturn(RoleCategory.PROFESSIONAL).when(caseAccessService).getRoleCategory();
+        doReturn(RoleCategory.PROFESSIONAL).when(roleAssignmentCategoryService).getRoleCategory(any());
     }
 
     @Test

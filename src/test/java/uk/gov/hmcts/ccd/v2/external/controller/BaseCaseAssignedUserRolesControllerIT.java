@@ -29,10 +29,10 @@ import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseUserRepository;
-import uk.gov.hmcts.ccd.data.caseaccess.RoleCategory;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentCategoryService;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -45,6 +45,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -100,7 +101,7 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     protected Authentication authentication;
 
     @MockBean
-    protected CaseAccessService caseAccessService;
+    protected RoleAssignmentCategoryService roleAssignmentCategoryService;
 
     @Mock
     protected SecurityContext securityContext;
@@ -153,7 +154,7 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         stubFor(WireMock.get(urlMatching("/o/userinfo"))
             .willReturn(okJson(userJson).withStatus(200)));
 
-        doReturn(RoleCategory.PROFESSIONAL).when(caseAccessService).getRoleCategory();
+        doReturn(RoleCategory.PROFESSIONAL).when(roleAssignmentCategoryService).getRoleCategory(any());
     }
 
     protected HttpHeaders createHttpHeaders() {

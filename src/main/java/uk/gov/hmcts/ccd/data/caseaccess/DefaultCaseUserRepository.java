@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.data.caseaccess;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentCategoryService;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class DefaultCaseUserRepository implements CaseUserRepository {
 
     private final CaseUserAuditRepository auditRepo;
-    private final CaseAccessService caseAccessService;
+    private final RoleAssignmentCategoryService roleAssignmentCategoryService;
 
     public static final String QUALIFIER = "default";
 
@@ -26,13 +26,14 @@ public class DefaultCaseUserRepository implements CaseUserRepository {
 
     @Inject
     public DefaultCaseUserRepository(CaseUserAuditRepository caseUserAuditRepository,
-                                     CaseAccessService caseAccessService) {
+                                     RoleAssignmentCategoryService roleAssignmentCategoryService) {
         this.auditRepo = caseUserAuditRepository;
-        this.caseAccessService = caseAccessService;
+        this.roleAssignmentCategoryService = roleAssignmentCategoryService;
     }
 
     public void grantAccess(Long caseId, String userId, String caseRole) {
-        em.merge(new CaseUserEntity(caseId, userId, caseRole, caseAccessService.getRoleCategory().toString()));
+        em.merge(new CaseUserEntity(caseId, userId, caseRole,
+            roleAssignmentCategoryService.getRoleCategory(userId).name()));
         auditRepo.auditGrant(caseId, userId, caseRole);
     }
 

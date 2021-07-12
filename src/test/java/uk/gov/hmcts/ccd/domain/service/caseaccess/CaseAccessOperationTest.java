@@ -13,13 +13,13 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
-import uk.gov.hmcts.ccd.data.caseaccess.RoleCategory;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentCategoryService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidCaseRoleException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
@@ -82,7 +82,7 @@ class CaseAccessOperationTest {
     private SupplementaryDataRepository supplementaryDataRepository;
 
     @Mock
-    private CaseAccessService caseAccessService;
+    private RoleAssignmentCategoryService roleAssignmentCategoryService;
 
     @InjectMocks
     private uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation caseAccessOperation;
@@ -1010,7 +1010,7 @@ class CaseAccessOperationTest {
     }
 
     private void configureCaseAccessService() {
-        doReturn(RoleCategory.PROFESSIONAL).when(caseAccessService).getRoleCategory();
+        doReturn(RoleCategory.PROFESSIONAL).when(roleAssignmentCategoryService).getRoleCategory(any());
     }
 
     private void configureCaseRoleRepository() {
