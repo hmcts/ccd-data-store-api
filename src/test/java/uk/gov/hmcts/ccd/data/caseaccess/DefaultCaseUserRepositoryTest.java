@@ -9,7 +9,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 
 import javax.persistence.EntityManager;
@@ -48,9 +47,6 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
 
     @MockBean
     private CaseUserAuditRepository auditRepository;
-
-    @MockBean
-    private CachedUserRepository cachedUserRepository;
 
     @MockBean
     CaseAccessService caseAccessService;

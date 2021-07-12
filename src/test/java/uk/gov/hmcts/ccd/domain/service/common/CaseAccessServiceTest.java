@@ -600,7 +600,7 @@ class CaseAccessServiceTest {
             doReturn(roles).when(userRepository).getUserRoles();
             RoleCategory roleCategory = caseAccessService.getRoleCategory();
 
-            assertEquals(roleCategory, RoleCategory.PROFESSIONAL);
+            assertEquals(RoleCategory.PROFESSIONAL, roleCategory);
         }
 
 
@@ -612,7 +612,7 @@ class CaseAccessServiceTest {
             doReturn(roles).when(userRepository).getUserRoles();
             RoleCategory roleCategory = caseAccessService.getRoleCategory();
 
-            assertEquals(roleCategory, RoleCategory.STAFF);
+            assertEquals(RoleCategory.STAFF, roleCategory);
         }
 
 
@@ -624,7 +624,7 @@ class CaseAccessServiceTest {
             doReturn(roles).when(userRepository).getUserRoles();
             RoleCategory roleCategory = caseAccessService.getRoleCategory();
 
-            assertEquals(roleCategory, RoleCategory.JUDICIAL);
+            assertEquals(RoleCategory.JUDICIAL, roleCategory);
         }
 
         @Test
@@ -635,7 +635,7 @@ class CaseAccessServiceTest {
             doReturn(roles).when(userRepository).getUserRoles();
             RoleCategory roleCategory = caseAccessService.getRoleCategory();
 
-            assertEquals(roleCategory, RoleCategory.CITIZEN);
+            assertEquals(RoleCategory.CITIZEN, roleCategory);
         }
     }
 

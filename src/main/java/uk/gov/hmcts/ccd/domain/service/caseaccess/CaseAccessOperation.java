@@ -18,7 +18,6 @@ import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepo
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidCaseRoleException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
@@ -43,20 +42,17 @@ public class CaseAccessOperation {
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseRoleRepository caseRoleRepository;
     private final SupplementaryDataRepository supplementaryDataRepository;
-    private final CaseAccessService caseAccessService;
 
     public CaseAccessOperation(final @Qualifier(CachedCaseUserRepository.QUALIFIER)
                                    CaseUserRepository caseUserRepository,
                                @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                final CaseDetailsRepository caseDetailsRepository,
                                @Qualifier(CachedCaseRoleRepository.QUALIFIER) CaseRoleRepository caseRoleRepository,
-                               @Qualifier("default") SupplementaryDataRepository supplementaryDataRepository,
-                               final CaseAccessService caseAccessService) {
+                               @Qualifier("default") SupplementaryDataRepository supplementaryDataRepository) {
         this.caseUserRepository = caseUserRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseRoleRepository = caseRoleRepository;
         this.supplementaryDataRepository = supplementaryDataRepository;
-        this.caseAccessService = caseAccessService;
     }
 
     @Transactional
