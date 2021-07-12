@@ -1,0 +1,16 @@
+{
+  "_guid_": "F-129_Get_Case_Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "retrieve a case by id",
+
+  "method": "GET",
+  "uri": "/cases/{cid}",
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "experimental": true
+    }
+  }
+}
