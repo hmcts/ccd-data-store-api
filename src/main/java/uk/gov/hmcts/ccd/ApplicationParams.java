@@ -158,6 +158,9 @@ public class ApplicationParams {
     @Value("${document.hash.check.enabled}")
     private boolean enableDocumentHashCheck;
 
+    @Value("${ccd.case-document-am-api.attachDocumentEnabled:true}")
+    private boolean attachDocumentEnabled;
+
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -427,5 +430,9 @@ public class ApplicationParams {
 
     public boolean isDocumentHashCheckingEnabled() {
         return enableDocumentHashCheck;
+    }
+
+    public boolean isAttachDocumentEnabled() {
+        return attachDocumentEnabled;
     }
 }
