@@ -6,5 +6,6 @@ package uk.gov.hmcts.ccd.data.caseaccess;
 public enum RoleCategory {
     PROFESSIONAL,
     CITIZEN,
-    JUDICIAL;
+    JUDICIAL,
+    STAFF;
 }

@@ -603,6 +603,19 @@ class CaseAccessServiceTest {
             assertEquals(roleCategory, RoleCategory.PROFESSIONAL);
         }
 
+
+        @Test
+        @DisplayName("should role category of staff")
+        void getRoleCategoryStaff() {
+            Set<String> roles = new HashSet<>();
+            roles.add("random-role");
+            doReturn(roles).when(userRepository).getUserRoles();
+            RoleCategory roleCategory = caseAccessService.getRoleCategory();
+
+            assertEquals(roleCategory, RoleCategory.STAFF);
+        }
+
+
         @Test
         @DisplayName("should role category of judicial")
         void getRoleCategoryJudicial() {
@@ -623,16 +636,6 @@ class CaseAccessServiceTest {
             RoleCategory roleCategory = caseAccessService.getRoleCategory();
 
             assertEquals(roleCategory, RoleCategory.CITIZEN);
-        }
-
-        @Test
-        @DisplayName("should throw exception when no user role found")
-        void getUserRolesThrows() {
-            Set<String> roles = new HashSet<>();
-            roles.add("anyRole");
-            doReturn(roles).when(userRepository).getUserRoles();
-
-            assertThrows(ValidationException.class, () -> caseAccessService.getRoleCategory());
         }
     }
 

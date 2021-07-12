@@ -140,7 +140,7 @@ public class CaseAccessService {
         } else if (getAccessLevel(RESTRICT_GRANTED_ROLES_PATTERN_JUDICIAL)) {
             return RoleCategory.JUDICIAL;
         } else {
-            throw new ValidationException("Cannot find matching user roles for the user");
+            return RoleCategory.STAFF;
         }
     }
 
