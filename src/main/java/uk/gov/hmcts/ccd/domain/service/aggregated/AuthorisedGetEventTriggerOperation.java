@@ -85,7 +85,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
             getEventTriggerOperation.executeForCaseType(caseTypeId,
                 eventId,
                 ignoreWarning));
-
+        updateWithAccessControlMetadataForCreate(caseUpdateViewEvent);
         return accessControlService
             .updateCollectionDisplayContextParameterByAccess(caseUpdateViewEvent, accessProfiles);
     }
@@ -133,9 +133,17 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
             accessProfiles);
     }
 
+    private void updateWithAccessControlMetadataForCreate(CaseUpdateViewEvent caseUpdateViewEvent) {
+        CaseAccessMetadata caseAccessMetadata = caseDataAccessControl.generateAccessMetadataWithNoCaseId();
+
+        caseUpdateViewEvent.setAccessGrants(caseAccessMetadata.getAccessGrantsString());
+        caseUpdateViewEvent.setAccessProcess(caseAccessMetadata.getAccessProcessString());
+    }
+
     private void updateWithAccessControlMetadata(CaseUpdateViewEvent caseUpdateViewEvent) {
-        CaseAccessMetadata caseAccessMetadata
-            = caseDataAccessControl.generateAccessMetadata(caseUpdateViewEvent.getCaseId());
+        CaseAccessMetadata caseAccessMetadata =
+                caseDataAccessControl.generateAccessMetadata(caseUpdateViewEvent.getCaseId());
+
         caseUpdateViewEvent.setAccessGrants(caseAccessMetadata.getAccessGrantsString());
         caseUpdateViewEvent.setAccessProcess(caseAccessMetadata.getAccessProcessString());
     }

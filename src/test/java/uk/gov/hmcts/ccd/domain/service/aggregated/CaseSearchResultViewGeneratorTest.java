@@ -328,7 +328,8 @@ class CaseSearchResultViewGeneratorTest {
             caseTypeService, searchResultDefinitionService, dateTimeSearchResultProcessor,
             caseSearchesViewAccessControl);
 
-        when(caseDataAccessControl.generateAccessMetadata(any())).thenReturn(new CaseAccessMetadata());
+        when(caseDataAccessControl.generateAccessMetadata(anyString()))
+            .thenReturn(new CaseAccessMetadata());
     }
 
     private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
@@ -633,7 +634,8 @@ class CaseSearchResultViewGeneratorTest {
         caseAccessMetadata.setAccessGrants(List.of(GrantType.SPECIFIC, GrantType.BASIC));
         caseAccessMetadata.setAccessProcess(AccessProcess.CHALLENGED);
 
-        when(caseDataAccessControl.generateAccessMetadata(any())).thenReturn(caseAccessMetadata);
+        when(caseDataAccessControl.generateAccessMetadata(anyString()))
+            .thenReturn(caseAccessMetadata);
 
         CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET,
             Collections.emptyList());
