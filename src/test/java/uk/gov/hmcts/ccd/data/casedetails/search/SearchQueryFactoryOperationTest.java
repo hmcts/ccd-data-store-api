@@ -88,13 +88,12 @@ class SearchQueryFactoryOperationTest {
 
     @Test
     void shouldCallRoleAssignmentServiceWhenRAEnabled() {
-        MetaData metadata = new MetaData(META_DATA_0_VALUE, META_DATA_1_VALUE);
         when(applicationParam.getEnableAttributeBasedAccessControl()).thenReturn(true);
         when(userAuthorisation.getUserId()).thenReturn("Test User");
 
         TypedQuery query = mock(TypedQuery.class);
         when(entityManager.createNativeQuery(anyString(), any(Class.class))).thenReturn(query);
-
+        MetaData metadata = new MetaData(META_DATA_0_VALUE, META_DATA_1_VALUE);
         classUnderTest.build(metadata, Maps.newHashMap(), false);
 
         verify(sortOrderQueryBuilder).buildSortOrderClause(metadata);
@@ -105,13 +104,12 @@ class SearchQueryFactoryOperationTest {
 
     @Test
     void shouldNotCallRoleAssignmentServiceWhenRANotEnabled() {
-        MetaData metadata = new MetaData(META_DATA_0_VALUE, META_DATA_1_VALUE);
         when(applicationParam.getEnableAttributeBasedAccessControl()).thenReturn(false);
         when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.GRANTED);
 
         TypedQuery query = mock(TypedQuery.class);
         when(entityManager.createNativeQuery(anyString(), any(Class.class))).thenReturn(query);
-
+        MetaData metadata = new MetaData(META_DATA_0_VALUE, META_DATA_1_VALUE);
         classUnderTest.build(metadata, Maps.newHashMap(), false);
 
         verify(sortOrderQueryBuilder).buildSortOrderClause(metadata);
