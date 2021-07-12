@@ -145,6 +145,7 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
 
         assertThat(caseUserEn.size(), equalTo(1));
         assertThat(caseUserEn.get(0).getCasePrimaryKey().getCaseRole(), equalTo(CASE_ROLE_CREATOR));
+        assertThat(caseUserEn.get(0).getRoleCategory(), equalTo(RoleCategory.CITIZEN.name()));
 
         caseUserEn = repository.findCaseUserRoles(Lists.newArrayList(CASE_ID_GRANTED), Lists.newArrayList());
 
