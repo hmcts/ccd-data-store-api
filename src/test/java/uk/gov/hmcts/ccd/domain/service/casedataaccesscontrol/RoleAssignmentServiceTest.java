@@ -48,6 +48,8 @@ class RoleAssignmentServiceTest {
     @Mock
     private CaseTypeDefinition caseTypeDefinition;
     @Mock
+    private FilteredRoleAssignments filteredRoleAssignments;
+    @Mock
     private RoleAssignmentCategoryService roleAssignmentCategoryService;
 
     private RoleAssignmentService roleAssignmentService;
@@ -158,8 +160,11 @@ class RoleAssignmentServiceTest {
             RoleAssignments roleAssignments = getRoleAssignments();
             given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))
                 .willReturn(roleAssignments);
-            given(roleAssignmentFilteringService.filter(roleAssignments, caseTypeDefinition))
+
+            given(filteredRoleAssignments.getFilteredMatchingRoleAssignments())
                 .willReturn(roleAssignments.getRoleAssignments());
+            given(roleAssignmentFilteringService.filter(roleAssignments, caseTypeDefinition))
+                .willReturn(filteredRoleAssignments);
 
             List<String> resultCases =
                 roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID, caseTypeDefinition);

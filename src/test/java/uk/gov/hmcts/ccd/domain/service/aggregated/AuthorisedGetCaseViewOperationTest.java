@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
@@ -152,8 +151,6 @@ class AuthorisedGetCaseViewOperationTest {
     private AccessControlService accessControlService;
     @Mock
     private UserRepository userRepository;
-    @Mock
-    private CaseUserRepository caseUserRepository;
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
 
@@ -367,7 +364,7 @@ class AuthorisedGetCaseViewOperationTest {
     }
 
     @Test
-    @DisplayName("shoudl throw excetpion when case Type is invalid")
+    @DisplayName("should throw exception when case Type is invalid")
     void shouldThrowExceptionforInvalidCaseType() {
         doReturn(null).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
 
