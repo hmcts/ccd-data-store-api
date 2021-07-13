@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
@@ -18,8 +17,10 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
 import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
@@ -31,6 +32,8 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -47,6 +50,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -146,8 +151,6 @@ class AuthorisedGetCaseViewOperationTest {
     private AccessControlService accessControlService;
     @Mock
     private UserRepository userRepository;
-    @Mock
-    private CaseUserRepository caseUserRepository;
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
 
@@ -361,7 +364,7 @@ class AuthorisedGetCaseViewOperationTest {
     }
 
     @Test
-    @DisplayName("shoudl throw excetpion when case Type is invalid")
+    @DisplayName("should throw exception when case Type is invalid")
     void shouldThrowExceptionforInvalidCaseType() {
         doReturn(null).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
 
@@ -402,5 +405,49 @@ class AuthorisedGetCaseViewOperationTest {
         doReturn(Optional.empty()).when(caseDetailsRepository).findByReference(CASE_REFERENCE);
 
         assertThrows(CaseNotFoundException.class, () -> authorisedGetCaseViewOperation.getCaseId(CASE_REFERENCE));
+    }
+
+    @Test
+    @DisplayName("should return case containing case access metadata")
+    void shouldReturnCaseWithCaseAccessMetadata() {
+        CaseView accessMetaDataCaseView = aCaseView()
+            .withCaseId(CASE_REFERENCE)
+            .withState(caseState)
+            .withCaseViewType(TEST_CASE_VIEW_TYPE)
+            .build();
+        accessMetaDataCaseView.addMetadataFields(populateMetadataFields());
+        doReturn(accessMetaDataCaseView).when(getCaseViewOperation).execute(CASE_REFERENCE);
+        doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(TEST_CASE_TYPE,
+            ACCESS_PROFILES,
+            CAN_READ);
+
+        CaseAccessMetadata caseAccessMetadata = new CaseAccessMetadata();
+        caseAccessMetadata.setAccessProcess(AccessProcess.CHALLENGED);
+        caseAccessMetadata.setAccessGrants(List.of(GrantType.BASIC, GrantType.SPECIFIC, GrantType.CHALLENGED));
+
+        when(caseDataAccessControl.generateAccessMetadata(any()))
+            .thenReturn(caseAccessMetadata);
+
+        CaseView caseView = authorisedGetCaseViewOperation.execute(CASE_REFERENCE);
+
+        assertEquals(5, (long) caseView.getMetadataFields().size());
+        assertTrue(caseView.getMetadataFields().stream()
+            .anyMatch(AuthorisedGetCaseViewOperationTest::caseViewFieldContainsCaseAccessMetadata));
+    }
+
+    private List<CaseViewField> populateMetadataFields() {
+        List<CaseViewField> caseViewFields = new ArrayList<>();
+        caseViewFields.add(FIELD_1);
+        caseViewFields.add(FIELD_2);
+        caseViewFields.add(FIELD_3);
+        return caseViewFields;
+    }
+
+    private static boolean caseViewFieldContainsCaseAccessMetadata(CaseViewField caseViewField) {
+        final String accessGrantString = GrantType.BASIC.name() + "," + GrantType.CHALLENGED + "," + GrantType.SPECIFIC;
+        return (caseViewField.getId().equals(CaseAccessMetadata.ACCESS_PROCESS)
+            && caseViewField.getValue().equals(AccessProcess.CHALLENGED.name()))
+            || (caseViewField.getId().equals(CaseAccessMetadata.ACCESS_GRANTED)
+            && caseViewField.getValue().equals(accessGrantString));
     }
 }

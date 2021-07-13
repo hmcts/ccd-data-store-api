@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public interface CaseDataAccessControl {
-
     Set<AccessProfile> generateAccessProfilesByCaseTypeId(String caseTypeId);
 
     Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference);
@@ -20,5 +19,9 @@ public interface CaseDataAccessControl {
 
     }
 
+    CaseAccessMetadata generateAccessMetadataWithNoCaseId();
+
     CaseAccessMetadata generateAccessMetadata(String caseId);
+
+    boolean anyAccessProfileEqualsTo(String caseTypeId, String accessProfile);
 }
