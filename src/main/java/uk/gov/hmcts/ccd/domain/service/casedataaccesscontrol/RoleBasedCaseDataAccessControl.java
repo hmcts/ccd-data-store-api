@@ -73,6 +73,11 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
     }
 
     @Override
+    public boolean anyAccessProfileEqualsTo(String caseTypeId, String userRole) {
+        return userRepository.anyRoleEqualsTo(userRole);
+    }
+
+    @Override
     public CaseAccessMetadata generateAccessMetadataWithNoCaseId() {
         return new CaseAccessMetadata();
     }

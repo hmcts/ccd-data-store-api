@@ -22,6 +22,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -173,6 +174,17 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
             populateCaseAccessMetadata(caseAccessMetadata, filteredRoleAssignments);
         }
         return caseAccessMetadata;
+    }
+
+    @Override
+    public boolean anyAccessProfileEqualsTo(String caseTypeId, String accessProfile) {
+        Set<AccessProfile> accessProfiles =  generateAccessProfilesByCaseTypeId(caseTypeId);
+        Set<String> accessProfileNames = AccessControlService.extractAccessProfileNames(accessProfiles);
+        if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
+            return accessProfileNames.contains(accessProfile)
+                || accessProfileNames.contains(IDAM_PREFIX + accessProfile);
+        }
+        return accessProfileNames.contains(accessProfile);
     }
 
     private void populateCaseAccessMetadata(CaseAccessMetadata caseAccessMetadata,

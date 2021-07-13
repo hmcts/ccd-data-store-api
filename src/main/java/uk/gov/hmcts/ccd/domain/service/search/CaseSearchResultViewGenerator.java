@@ -2,11 +2,14 @@ package uk.gov.hmcts.ccd.domain.service.search;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -20,17 +23,11 @@ import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.HeaderGroupMetadata;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeader;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.processor.date.DateTimeSearchResultProcessor;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
@@ -42,22 +39,22 @@ import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedC
 @Service
 public class CaseSearchResultViewGenerator {
 
-    private final UserRepository userRepository;
     private final CaseTypeService caseTypeService;
     private final SearchResultDefinitionService searchResultDefinitionService;
     private final DateTimeSearchResultProcessor dateTimeSearchResultProcessor;
     private final CaseSearchesViewAccessControl caseSearchesViewAccessControl;
+    private final CaseDataAccessControl caseDataAccessControl;
 
-    public CaseSearchResultViewGenerator(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
-                                         CaseTypeService caseTypeService,
+    public CaseSearchResultViewGenerator(CaseTypeService caseTypeService,
                                          SearchResultDefinitionService searchResultDefinitionService,
                                          DateTimeSearchResultProcessor dateTimeSearchResultProcessor,
-                                         CaseSearchesViewAccessControl caseSearchesViewAccessControl) {
-        this.userRepository = userRepository;
+                                         CaseSearchesViewAccessControl caseSearchesViewAccessControl,
+                                         CaseDataAccessControl caseDataAccessControl) {
         this.caseTypeService = caseTypeService;
         this.searchResultDefinitionService = searchResultDefinitionService;
         this.dateTimeSearchResultProcessor = dateTimeSearchResultProcessor;
         this.caseSearchesViewAccessControl = caseSearchesViewAccessControl;
+        this.caseDataAccessControl = caseDataAccessControl;
     }
 
     public CaseSearchResultView execute(String caseTypeId,
@@ -176,7 +173,9 @@ public class CaseSearchResultViewGenerator {
         if (addedFields.contains(id)) {
             return false;
         } else {
-            if (StringUtils.isEmpty(resultField.getRole()) || userRepository.anyRoleEqualsTo(resultField.getRole())) {
+            if (StringUtils.isEmpty(resultField.getRole())
+                || caseDataAccessControl.anyAccessProfileEqualsTo(resultField.getCaseTypeId(),
+                resultField.getRole())) {
                 addedFields.add(id);
                 return true;
             } else {

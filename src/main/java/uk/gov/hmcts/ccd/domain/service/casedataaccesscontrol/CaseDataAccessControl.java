@@ -22,4 +22,6 @@ public interface CaseDataAccessControl {
     CaseAccessMetadata generateAccessMetadataWithNoCaseId();
 
     CaseAccessMetadata generateAccessMetadata(String caseId);
+
+    boolean anyAccessProfileEqualsTo(String caseTypeId, String accessProfile);
 }
