@@ -45,7 +45,11 @@ def secrets = [
         secret('ccd-befta-caseworker-caa-pwd', 'CCD_BEFTA_CASEWORKER_CAA_PWD'),
         secret('ccd-befta-master-caseworker-pwd', 'CCD_BEFTA_MASTER_CASEWORKER_PWD'),
         secret('ccd-befta-master-solicitor1-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_1_PWD'),
-        secret('ccd-befta-master-solicitor2-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_2_PWD')
+        secret('ccd-befta-master-solicitor2-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_2_PWD'),
+
+        secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_OAUTH2_CLIENT_SECRET'),
+        secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
+        secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD')
     ],
     's2s-${env}': [
         secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
@@ -68,15 +72,10 @@ def vaultOverrides = [
 ]
 // vars needed for functional tests
 // Assume a feature build branched off 'develop', with dependencies develop-to-develop.
-env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
 env.TEST_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
 
 // Other env variables needed for BEFTA.
-env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
-env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
-env.OAUTH2_CLIENT_ID = "ccd_gateway"
-env.OAUTH2_REDIRECT_URI = "https://www-ccd.aat.platform.hmcts.net/oauth2redirect"
 env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
 env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN" // Temporary workaround for platform changes: turn BEFTA header checks to warning mode
@@ -89,12 +88,13 @@ withNightlyPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     enableDbMigration('ccd')
     disableLegacyDeployment()
+    enableHighLevelDataSetup()
 
     after('test') {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
     }
-    
+
     enableFullFunctionalTest(200)
 
     after('fullFunctionalTest') {
