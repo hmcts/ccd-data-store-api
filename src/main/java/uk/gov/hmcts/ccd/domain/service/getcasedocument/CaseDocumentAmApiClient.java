@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import java.util.List;
+
 import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
 
 @Named
@@ -37,8 +39,12 @@ public class CaseDocumentAmApiClient {
         uk.gov.hmcts.reform.ccd.document.am.model.CaseDocumentsMetadata mappedCaseDocumentsMetadata =
             caseDocumentMetadataMapper.convertToAmClientCaseDocumentsMetadata(caseDocumentsMetadata);
 
-        String authorization = headers.get(HttpHeaders.AUTHORIZATION).get(0);
-        String serviceAuthorization = headers.get(SERVICE_AUTHORIZATION).get(0);
+        List<String> authHeaders = headers.get(HttpHeaders.AUTHORIZATION);
+        String authorization = authHeaders == null ? null : authHeaders.get(0);
+
+        List<String> serviceAuthHeaders = headers.get(SERVICE_AUTHORIZATION);
+        String serviceAuthorization = serviceAuthHeaders == null ? null : serviceAuthHeaders.get(0);
+
         try {
             caseDocumentClientApi.patchDocument(authorization, serviceAuthorization, mappedCaseDocumentsMetadata);
         } catch (FeignException feignException) {
