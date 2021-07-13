@@ -250,6 +250,7 @@ dependencies {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
+    compile 'uk.gov.hmcts.reform:ccd-case-document-am-client:1.0.0'
 
     testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.0.0'
     testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.2.0'

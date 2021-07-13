@@ -1,21 +1,18 @@
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
+import feign.FeignException;
+import feign.FeignException.FeignClientException;
+import feign.Request;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.TestFixtures;
@@ -25,7 +22,11 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DocumentTokenException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
+import uk.gov.hmcts.reform.ccd.document.am.model.PatchDocumentMetaDataResponse;
 
+import java.nio.charset.Charset;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
@@ -48,6 +49,12 @@ class CaseDocumentAmApiClientTest extends TestFixtures {
     @Mock
     private ApplicationParams applicationParams;
 
+    @Mock
+    private CaseDocumentMetadataMapper caseDocumentMetadataMapper;
+
+    @Mock
+    private CaseDocumentClientApi caseDocumentClientApi;
+
     @InjectMocks
     private CaseDocumentAmApiClient underTest;
 
@@ -55,50 +62,43 @@ class CaseDocumentAmApiClientTest extends TestFixtures {
 
     @BeforeEach
     void prepare() {
-        doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
-        doReturn("http://localhost:4455").when(applicationParams).getCaseDocumentAmApiHost();
-        doReturn("/cases/documents/attachToCase").when(applicationParams).getAttachDocumentPath();
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(HttpHeaders.AUTHORIZATION, "authString");
+        httpHeaders.add(SecurityUtils.SERVICE_AUTHORIZATION, "serviceAuthString");
+        doReturn(httpHeaders).when(securityUtils).authorizationHeaders();
     }
 
     @Test
     void testShouldReturnSuccess() {
         // GIVEN
-        final ResponseEntity<String> responseEntity = new ResponseEntity<>("Success", HttpStatus.OK);
-        doReturn(responseEntity).when(restTemplate).exchange(
-            anyString(),
-            any(HttpMethod.class),
-            ArgumentMatchers.<HttpEntity<CaseDocumentsMetadata>>any(),
-            ArgumentMatchers.<Class<String>>any()
-        );
+        doReturn(uk.gov.hmcts.reform.ccd.document.am.model.CaseDocumentsMetadata.builder().build())
+            .when(caseDocumentMetadataMapper).convertToAmClientCaseDocumentsMetadata(any(CaseDocumentsMetadata.class));
+
+        PatchDocumentMetaDataResponse patchDocumentMetaDataResponse = new PatchDocumentMetaDataResponse("Success");
+        doReturn(patchDocumentMetaDataResponse).when(caseDocumentClientApi).patchDocument(anyString(), anyString(),
+            any(uk.gov.hmcts.reform.ccd.document.am.model.CaseDocumentsMetadata.class));
 
         // WHEN
         underTest.applyPatch(documentMetadata);
 
         // THEN
         verify(securityUtils).authorizationHeaders();
-        verify(applicationParams).getCaseDocumentAmApiHost();
-        verify(applicationParams).getAttachDocumentPath();
-        verify(restTemplate).exchange(
+        verify(caseDocumentClientApi).patchDocument(
             anyString(),
-            any(HttpMethod.class),
-            ArgumentMatchers.<HttpEntity<CaseDocumentsMetadata>>any(),
-            ArgumentMatchers.<Class<String>>any()
+            anyString(),
+            any(uk.gov.hmcts.reform.ccd.document.am.model.CaseDocumentsMetadata.class)
         );
     }
 
     @ParameterizedTest
     @MethodSource("provideErrorScenarioParameters")
-    void testShouldRaiseException(final HttpStatus status, final String errorMessage, final Class<?> type) {
+    void testShouldRaiseException(final FeignException feignException, final String errorMessage, final Class<?> type) {
         // GIVEN
-        final HttpClientErrorException httpClientErrorException = new HttpClientErrorException(
-            status,
-            errorMessage
-        );
-        doThrow(httpClientErrorException).when(restTemplate).exchange(
+        doReturn(uk.gov.hmcts.reform.ccd.document.am.model.CaseDocumentsMetadata.builder().build())
+            .when(caseDocumentMetadataMapper).convertToAmClientCaseDocumentsMetadata(any(CaseDocumentsMetadata.class));
+        doThrow(feignException).when(caseDocumentClientApi).patchDocument(anyString(),
             anyString(),
-            any(HttpMethod.class),
-            ArgumentMatchers.<HttpEntity<CaseDocumentsMetadata>>any(),
-            ArgumentMatchers.<Class<String>>any()
+            any(uk.gov.hmcts.reform.ccd.document.am.model.CaseDocumentsMetadata.class)
         );
 
         // WHEN
@@ -110,14 +110,8 @@ class CaseDocumentAmApiClientTest extends TestFixtures {
             .hasMessageContaining(errorMessage);
 
         verify(securityUtils).authorizationHeaders();
-        verify(applicationParams).getCaseDocumentAmApiHost();
-        verify(applicationParams).getAttachDocumentPath();
-        verify(restTemplate).exchange(
-            anyString(),
-            any(HttpMethod.class),
-            ArgumentMatchers.<HttpEntity<CaseDocumentsMetadata>>any(),
-            ArgumentMatchers.<Class<String>>any()
-        );
+        verify(caseDocumentClientApi).patchDocument(anyString(),anyString(),
+            any(uk.gov.hmcts.reform.ccd.document.am.model.CaseDocumentsMetadata.class));
     }
 
     private CaseDocumentsMetadata buildCaseDocumentsMetadata() {
@@ -135,11 +129,25 @@ class CaseDocumentAmApiClientTest extends TestFixtures {
         final String notFoundMessage = "The resource X was not found";
         final String serviceErrorMessage = "The downstream CCD AM application has failed";
         final String forbiddenMessage = "The user has provided an invalid hashToken for document";
+
+        Request request = Request.create(Request.HttpMethod.GET, "someUrl", Map.of(),
+            null, Charset.defaultCharset(),
+            null
+        );
+
         return Stream.of(
-            Arguments.of(HttpStatus.BAD_REQUEST, badRequestMessage, BadSearchRequest.class),
-            Arguments.of(HttpStatus.NOT_FOUND, notFoundMessage, ResourceNotFoundException.class),
-            Arguments.of(HttpStatus.INTERNAL_SERVER_ERROR, serviceErrorMessage, ServiceException.class),
-            Arguments.of(HttpStatus.FORBIDDEN, forbiddenMessage, DocumentTokenException.class)
+            Arguments.of(new FeignClientException.BadRequest(badRequestMessage, request, null),
+                badRequestMessage,
+                BadSearchRequest.class),
+            Arguments.of(new FeignClientException.NotFound(notFoundMessage, request, null),
+                notFoundMessage,
+                ResourceNotFoundException.class),
+            Arguments.of(new FeignClientException.InternalServerError(serviceErrorMessage, request, null),
+                serviceErrorMessage,
+                ServiceException.class),
+            Arguments.of(new FeignClientException.Forbidden(forbiddenMessage, request, null),
+                forbiddenMessage,
+                DocumentTokenException.class)
         );
     }
 }
