@@ -40,6 +40,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.BASIC;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.CHALLENGED;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.SPECIFIC;
@@ -331,8 +332,9 @@ class DefaultCaseDataAccessControlTest {
         Map<String, String> roleAndGrantType = Maps.newHashMap();
         roleAndGrantType.put(ROLE_NAME_1, BASIC.name());
         List<RoleAssignment> roleAssignments1 = createFilteringResults(roleAndGrantType);
-        doReturn(roleAssignments1).when(roleAssignmentsFilteringService)
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
+        when(filteredRoleAssignments.getFilteredMatchingRoleAssignments()).thenReturn(roleAssignments1);
 
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
         doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
@@ -352,8 +354,9 @@ class DefaultCaseDataAccessControlTest {
         Map<String, String> roleAndGrantType = Maps.newHashMap();
         roleAndGrantType.put(ROLE_NAME_1, BASIC.name());
         List<RoleAssignment> roleAssignments1 = createFilteringResults(roleAndGrantType);
-        doReturn(roleAssignments1).when(roleAssignmentsFilteringService)
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
+        when(filteredRoleAssignments.getFilteredMatchingRoleAssignments()).thenReturn(roleAssignments1);
 
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
         doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
@@ -376,8 +379,9 @@ class DefaultCaseDataAccessControlTest {
         roleAndGrantType.put(ROLE_NAME_1, BASIC.name());
         roleAndGrantType.put(ROLE_NAME_2, BASIC.name());
         List<RoleAssignment> roleAssignments1 = createFilteringResults(roleAndGrantType);
-        doReturn(roleAssignments1).when(roleAssignmentsFilteringService)
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
+        when(filteredRoleAssignments.getFilteredMatchingRoleAssignments()).thenReturn(roleAssignments1);
 
         doReturn(true).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
 
