@@ -430,6 +430,7 @@ class DefaultCaseDataAccessControlTest {
         assertEquals(AccessProcess.NONE.name(), caseAccessMetadata.getAccessProcessString());
         assertEquals(STANDARD.name(), caseAccessMetadata.getAccessGrantsString());
     }
+
     private CaseAccessMetadata getCaseAccessMetadata(Map<String, String> roleAndGrantType,
                                                      boolean enablePseudoRolesAssignmentGeneration) {
         doReturn(USER_ID).when(securityUtils).getUserId();
