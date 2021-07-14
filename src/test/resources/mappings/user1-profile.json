@@ -1,28 +1,37 @@
 {
   "request": {
     "method": "GET",
-    "url": "/user-profile/users?uid=cloud.strife%40test.com"
+    "url": "/user-profile/users"
   },
   "response": {
     "status": 200,
     "headers": {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "email-ids-users-to-find": "cloud.strife@test.com"
     },
     "jsonBody": {
-      "id" : "cloud.strife@test.com",
-      "jurisdictions" : [ {
-        "id" : "PROBATE",
-        "name" : "name test"
-      }, {
-        "id" : "DIVORCE",
-        "name" : "name test2"
-      }, {
-        "id" : "SSCS",
-        "name" : "name test3"
-      } ],
-      "work_basket_default_jurisdiction" : "PROBATE",
-      "work_basket_default_case_type" : "TestAddressBookCase",
-      "work_basket_default_state" : "CaseCreated"
+      "user_profiles": [
+        {
+          "id": "cloud.strife@test.com",
+          "jurisdictions": [
+            {
+              "id": "PROBATE",
+              "name": "name test"
+            },
+            {
+              "id": "DIVORCE",
+              "name": "name test2"
+            },
+            {
+              "id": "SSCS",
+              "name": "name test3"
+            }
+          ],
+          "work_basket_default_jurisdiction": "PROBATE",
+          "work_basket_default_case_type": "TestAddressBookCase",
+          "work_basket_default_state": "CaseCreated"
+        }
+      ]
     }
   }
 }
