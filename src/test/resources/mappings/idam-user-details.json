@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/v1/users/123"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": "123",
+      "email": "Cloud.Strife@test.com",
+      "forename": "Cloud",
+      "surname": "Strife",
+      "roles": [ "caseworker", "caseworker-test", "caseworker-PROBATE-public", "caseworker-PROBATE", "caseworker-DIVORCE", "caseworker-SSCS" ]
+    }
+  }
+}

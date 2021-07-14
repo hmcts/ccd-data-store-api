@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
@@ -102,6 +105,9 @@ import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.createPostRequest;
 
 class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
 
+    private static final String GET_ROLE_ASSIGNMENTS =
+        "/am/role-assignments/actors/123";
+
     private static final String POST_SEARCH_CASES = "/searchCases";
 
     @Inject
@@ -124,6 +130,19 @@ class CaseSearchEndpointESIT extends ElasticsearchBaseTest {
         MockUtils.setSecurityAuthorities(authentication, AUTOTEST1_PUBLIC, AUTOTEST2_PUBLIC);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+
+        mockEmptyRoleAssignments();
+    }
+
+    private void mockEmptyRoleAssignments() {
+        stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS))
+            .willReturn(okJson(jsonBodyWithNoRoleAssignments())));
+    }
+
+    private static String jsonBodyWithNoRoleAssignments() {
+        return "{\n"
+            + "  \"roleAssignmentResponse\": []\n"
+            + "}";
     }
 
     @Nested
