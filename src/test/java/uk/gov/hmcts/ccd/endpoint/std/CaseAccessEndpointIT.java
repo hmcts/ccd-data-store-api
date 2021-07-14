@@ -1,11 +1,12 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.google.common.collect.Lists;
 import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
@@ -18,18 +19,17 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
-import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory;
 import uk.gov.hmcts.ccd.domain.model.std.UserId;
-import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentCategoryService;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -49,15 +49,22 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
     private MockMvc mockMvc;
     @SpyBean
     private AuditRepository auditRepository;
-    @MockBean
-    private RoleAssignmentCategoryService roleAssignmentCategoryService;
 
     @Before
     public void setUp() throws IOException {
         super.initMock();
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, "caseworker-probate");
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-        doReturn(RoleCategory.PROFESSIONAL).when(roleAssignmentCategoryService).getRoleCategory(any());
+
+        String uidNoEventAccess = "1234";
+        UserInfo userInfo = UserInfo.builder()
+            .uid(uidNoEventAccess)
+            .roles(Lists.newArrayList(MockUtils.ROLE_CASEWORKER_PUBLIC))
+            .build();
+        stubFor(WireMock.post(urlMatching("/o/token"))
+            .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
+        stubFor(WireMock.get(urlMatching("/api/v1/users/.*"))
+            .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
     }
 
     @Test

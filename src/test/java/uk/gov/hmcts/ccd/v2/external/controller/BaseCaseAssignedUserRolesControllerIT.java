@@ -9,7 +9,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -29,10 +28,10 @@ import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseUserRepository;
-import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentCategoryService;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -45,7 +44,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -100,7 +98,7 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     @Mock
     protected Authentication authentication;
 
-    @MockBean
+    @Inject
     protected RoleAssignmentCategoryService roleAssignmentCategoryService;
 
     @Mock
@@ -154,7 +152,16 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         stubFor(WireMock.get(urlMatching("/o/userinfo"))
             .willReturn(okJson(userJson).withStatus(200)));
 
-        doReturn(RoleCategory.PROFESSIONAL).when(roleAssignmentCategoryService).getRoleCategory(any());
+
+        String uidNoEventAccess = "1234";
+        UserInfo userInfo = UserInfo.builder()
+            .uid(uidNoEventAccess)
+            .roles(Lists.newArrayList(MockUtils.ROLE_CASEWORKER_PUBLIC))
+            .build();
+        stubFor(WireMock.post(urlMatching("/o/token"))
+            .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
+        stubFor(WireMock.get(urlMatching("/api/v1/users/.*"))
+            .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
     }
 
     protected HttpHeaders createHttpHeaders() {
