@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
@@ -13,16 +14,24 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_GRANTED;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_GRANTED_LABEL;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_PROCESS;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata.ACCESS_PROCESS_LABEL;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
@@ -34,6 +43,7 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
     private static final Logger LOG = LoggerFactory.getLogger(AuthorisedGetCaseViewOperation.class);
 
     public static final String QUALIFIER = "authorised";
+    public static final String TEXT = "Text";
 
     private final GetCaseViewOperation getCaseViewOperation;
     private final CaseDataAccessControl caseDataAccessControl;
@@ -58,7 +68,48 @@ public class AuthorisedGetCaseViewOperation extends AbstractAuthorisedCaseViewOp
         verifyCaseTypeReadAccess(caseTypeDefinition, accessProfiles);
         filterCaseTabFieldsByReadAccess(caseView, accessProfiles);
         filterAllowedTabsWithFields(caseView, accessProfiles);
+        updateWithAccessControlMetadata(caseView);
         return filterUpsertAccess(caseReference, caseTypeDefinition, accessProfiles, caseView);
+    }
+
+    private void updateWithAccessControlMetadata(CaseView caseView) {
+        CaseAccessMetadata caseAccessMetadata = caseDataAccessControl.generateAccessMetadata(caseView.getCaseId());
+
+        List<CaseViewField> metadataFieldsToAdd = new ArrayList<>();
+
+        if (caseAccessMetadata.getAccessGrants() != null) {
+            metadataFieldsToAdd.add(createCaseViewField(ACCESS_GRANTED,
+                ACCESS_GRANTED_LABEL,
+                caseAccessMetadata.getAccessGrantsString()));
+        }
+
+        if (caseAccessMetadata.getAccessProcess() != null) {
+            metadataFieldsToAdd.add(createCaseViewField(ACCESS_PROCESS,
+                ACCESS_PROCESS_LABEL,
+                caseAccessMetadata.getAccessProcessString()));
+        }
+
+        if (!metadataFieldsToAdd.isEmpty()) {
+            caseView.addMetadataFields(metadataFieldsToAdd);
+        }
+    }
+
+    private CaseViewField createCaseViewField(
+                                     String accessGranted,
+                                     String accessGrantedLabel,
+                                     String caseViewFieldValue) {
+        var fieldTypeDefinition = new FieldTypeDefinition();
+        fieldTypeDefinition.setId(TEXT);
+        fieldTypeDefinition.setType(TEXT);
+
+        CaseViewField caseViewField = new CaseViewField();
+        caseViewField.setId(accessGranted);
+        caseViewField.setLabel(accessGrantedLabel);
+        caseViewField.setSecurityLabel(SecurityClassification.PUBLIC.name());
+        caseViewField.setValue(caseViewFieldValue);
+        caseViewField.setFieldTypeDefinition(fieldTypeDefinition);
+        caseViewField.setMetadata(true);
+        return caseViewField;
     }
 
     private void filterCaseTabFieldsByReadAccess(CaseView caseView, Set<AccessProfile> accessProfiles) {

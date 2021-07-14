@@ -16,6 +16,11 @@ import static java.util.stream.Collectors.toList;
 @Named
 @Singleton
 public class ApplicationParams {
+    @Value("${idam.data-store.system-user.username}")
+    private String dataStoreSystemUserId;
+
+    @Value("${idam.data-store.system-user.password}")
+    private String dataStoreSystemUserPassword;
 
     @Value("#{'${ccd.s2s-authorised.services.case_user_roles}'.split(',')}")
     private List<String> authorisedServicesForCaseUserRoles;
@@ -160,6 +165,22 @@ public class ApplicationParams {
 
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
+
+    public String getDataStoreSystemUserId() {
+        return dataStoreSystemUserId;
+    }
+
+    public void setDataStoreSystemUserId(String dateStoreSystemUserId) {
+        this.dataStoreSystemUserId = dateStoreSystemUserId;
+    }
+
+    public String getDataStoreSystemUserPassword() {
+        return dataStoreSystemUserPassword;
+    }
+
+    public void setDataStoreSystemUserPassword(String dataStoreSystemUserPassword) {
+        this.dataStoreSystemUserPassword = dataStoreSystemUserPassword;
+    }
 
     public static String encode(final String stringToEncode) {
         try {

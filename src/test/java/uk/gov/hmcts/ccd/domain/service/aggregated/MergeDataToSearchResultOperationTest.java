@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -37,10 +35,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
@@ -95,9 +91,6 @@ class MergeDataToSearchResultOperationTest {
     private static final String FAMILY_ADDRESS = "FamilyAddress";
     private static final String ADDRESS_LINE_1 = "AddressLine1";
     private static final String POSTCODE = "PostCode";
-
-    @Mock
-    private UserRepository userRepository;
 
     @Mock
     private CaseDataAccessControl caseDataAccessControl;
@@ -169,17 +162,11 @@ class MergeDataToSearchResultOperationTest {
             .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType()).build())
             .withField(labelField)
             .build();
-        mockAccessProfiles();
 
         doAnswer(i -> i.getArgument(1)).when(dateTimeSearchResultProcessor).execute(Mockito.any(),
             Mockito.any());
 
-        classUnderTest = new MergeDataToSearchResultOperation(userRepository, dateTimeSearchResultProcessor);
-    }
-
-    private void mockAccessProfiles() {
-        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
-            .thenReturn(Sets.newHashSet());
+        classUnderTest = new MergeDataToSearchResultOperation(dateTimeSearchResultProcessor, caseDataAccessControl);
     }
 
     @Test
@@ -259,7 +246,8 @@ class MergeDataToSearchResultOperationTest {
                 searchResultFieldWithInvalidRole)
             .build();
 
-        doReturn(true).when(userRepository).anyRoleEqualsTo(searchResultFieldWithValidRole.getRole());
+        doReturn(true).when(caseDataAccessControl)
+            .anyAccessProfileEqualsTo(CASE_TYPE_ID, searchResultFieldWithValidRole.getRole());
 
         final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult,
             caseDetailsList, NO_ERROR);
@@ -306,8 +294,10 @@ class MergeDataToSearchResultOperationTest {
                 searchResultFieldWithInvalidRole)
             .build();
 
-        doReturn(true).when(userRepository).anyRoleEqualsTo(searchResultFieldWithValidRole.getRole());
-        doReturn(true).when(userRepository).anyRoleEqualsTo(searchResultFieldWithValidRole2.getRole());
+        doReturn(true).when(caseDataAccessControl)
+            .anyAccessProfileEqualsTo(CASE_TYPE_ID, searchResultFieldWithValidRole.getRole());
+        doReturn(true).when(caseDataAccessControl)
+            .anyAccessProfileEqualsTo(CASE_TYPE_ID, searchResultFieldWithValidRole2.getRole());
 
         final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult,
             caseDetailsList, NO_ERROR);
@@ -350,7 +340,8 @@ class MergeDataToSearchResultOperationTest {
                 searchResultFieldWithValidRole)
             .build();
 
-        doReturn(true).when(userRepository).anyRoleEqualsTo(searchResultFieldWithValidRole.getRole());
+        doReturn(true).when(caseDataAccessControl)
+            .anyAccessProfileEqualsTo(CASE_TYPE_ID, searchResultFieldWithValidRole.getRole());
 
 
         final SearchResultView searchResultView = classUnderTest.execute(caseTypeDefinition, searchResult,
