@@ -9,7 +9,6 @@ import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentAttributesResou
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRequestResource;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResource;
-import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleRequestResource;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
@@ -17,7 +16,6 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.ActorIdType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -57,6 +55,9 @@ public class RoleAssignmentService implements AccessControl {
                                                      final Set<String> roles,
                                                      final boolean replaceExisting) {
 
+        var roleCategory = roleAssignmentCategoryService.getRoleCategory(userId);
+        log.debug("user: {} has roleCategory: {}", userId, roleCategory);
+
         RoleRequestResource roleRequest = RoleRequestResource.builder()
             .assignerId(userId)
             .process(RoleAssignmentRepository.DEFAULT_PROCESS)
@@ -72,7 +73,7 @@ public class RoleAssignmentService implements AccessControl {
                 .roleName(roleName)
                 .classification(Classification.RESTRICTED.name())
                 .grantType(GrantType.SPECIFIC.name())
-                .roleCategory(RoleCategory.PROFESSIONAL.name())
+                .roleCategory(roleCategory.name())
                 .readOnly(false)
                 .beginTime(Instant.now())
                 .attributes(RoleAssignmentAttributesResource.builder()
@@ -93,22 +94,18 @@ public class RoleAssignmentService implements AccessControl {
     }
 
     public RoleAssignments getRoleAssignments(String userId) {
-        // TODO: RDM-10924 - move roleCategory from here to the POST roleAssignments operation once it is implemented
-        RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(userId);
-        log.debug("user: {} has roleCategory: {}", userId, roleCategory);
-
-        RoleAssignmentResponse roleAssignmentResponse = roleAssignmentRepository.getRoleAssignments(userId);
+        final var roleAssignmentResponse = roleAssignmentRepository.getRoleAssignments(userId);
         return roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
     }
 
     public List<String> getCaseReferencesForAGivenUser(String userId) {
-        final RoleAssignments roleAssignments = this.getRoleAssignments(userId);
+        final var roleAssignments = this.getRoleAssignments(userId);
         return getValidCaseIds(roleAssignments.getRoleAssignments());
     }
 
     public List<String> getCaseReferencesForAGivenUser(String userId, CaseTypeDefinition caseTypeDefinition) {
 
-        final RoleAssignments roleAssignments = this.getRoleAssignments(userId);
+        final var roleAssignments = this.getRoleAssignments(userId);
         List<RoleAssignment> filteredRoleAssignments = roleAssignmentsFilteringService
                 .filter(roleAssignments, caseTypeDefinition).getFilteredMatchingRoleAssignments();
 
@@ -130,13 +127,13 @@ public class RoleAssignmentService implements AccessControl {
     }
 
     public List<CaseAssignedUserRole> findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds) {
-        final RoleAssignmentResponse roleAssignmentResponse =
+        final var roleAssignmentResponse =
             roleAssignmentRepository.findRoleAssignmentsByCasesAndUsers(caseIds, userIds);
 
-        final RoleAssignments roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
+        final var roleAssignments = roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
         var caseIdError = new RuntimeException(RoleAssignmentAttributes.ATTRIBUTE_NOT_DEFINED);
         return roleAssignments.getRoleAssignments().stream()
-            .filter(roleAssignment -> isValidRoleAssignment(roleAssignment))
+            .filter(this::isValidRoleAssignment)
             .map(roleAssignment ->
                 new CaseAssignedUserRole(
                     roleAssignment.getAttributes().getCaseId().orElseThrow(() -> caseIdError),

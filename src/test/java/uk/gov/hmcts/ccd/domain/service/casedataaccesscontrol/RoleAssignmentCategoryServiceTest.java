@@ -17,8 +17,8 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.CITIZEN;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.JUDICIAL;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.LEGAL_OPERATIONS;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.PROFESSIONAL;
-import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.STAFF;
 
 @DisplayName("RoleAssignmentCategoryService")
 class RoleAssignmentCategoryServiceTest {
@@ -95,14 +95,14 @@ class RoleAssignmentCategoryServiceTest {
         }
 
         @Test
-        void shouldGetRoleCategoryForStaffUser() {
+        void shouldGetRoleCategoryForLegalOperationsUser() {
 
             given(idamRepository.getUserRoles(USER_ID))
                 .willReturn(singletonList("caseworker"));
 
             RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
 
-            assertThat(roleCategory, is(STAFF));
+            assertThat(roleCategory, is(LEGAL_OPERATIONS));
         }
 
     }

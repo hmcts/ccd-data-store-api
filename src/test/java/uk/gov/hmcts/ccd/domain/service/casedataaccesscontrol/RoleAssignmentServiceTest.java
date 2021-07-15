@@ -50,7 +50,11 @@ import static org.mockito.BDDMockito.verify;
 class RoleAssignmentServiceTest {
 
     private static final String USER_ID = "user1";
+    private static final String USER_ID_2 = "user1";
     private static final String CASE_ID = "111111";
+
+    private static final RoleCategory ROLE_CATEGORY_4_USER_1 = RoleCategory.PROFESSIONAL;
+    private static final RoleCategory ROLE_CATEGORY_4_USER_2 = RoleCategory.JUDICIAL;
 
     private final List<String> caseIds = Arrays.asList("111", "222");
     private final List<String> userIds = Arrays.asList("111", "222");
@@ -79,11 +83,12 @@ class RoleAssignmentServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        given(roleAssignmentCategoryService.getRoleCategory(USER_ID)).willReturn(RoleCategory.PROFESSIONAL);
+        given(roleAssignmentCategoryService.getRoleCategory(USER_ID)).willReturn(ROLE_CATEGORY_4_USER_1);
     }
 
     @Nested
     @DisplayName("createCaseRoleAssignments()")
+    @SuppressWarnings("ConstantConditions")
     class CreateCaseRoleAssignments {
 
         private ArgumentCaptor<RoleAssignmentRequestResource> roleAssignmentRequestResourceCaptor;
@@ -118,13 +123,25 @@ class RoleAssignmentServiceTest {
 
             // THEN
             assertThat(roleAssignments, is(mockedRoleAssignments));
+            // verify RoleCategory has been loaded from service
+            verify(roleAssignmentCategoryService).getRoleCategory(USER_ID);
             // verify data passed to repository has correct values
             verify(roleAssignmentRepository).createRoleAssignment(roleAssignmentRequestResourceCaptor.capture());
             RoleAssignmentRequestResource assignmentRequest = roleAssignmentRequestResourceCaptor.getValue();
             assertAll(
-                () -> assertCorrectlyPopulatedRoleRequest(caseDetails, replaceExisting, assignmentRequest.getRequest()),
+                () -> assertCorrectlyPopulatedRoleRequest(
+                    caseDetails,
+                    USER_ID,
+                    replaceExisting,
+                    assignmentRequest.getRequest()
+                ),
 
-                () -> assertCorrectlyPopulatedRequestedRoles(caseDetails, roles, assignmentRequest.getRequestedRoles())
+                () -> assertCorrectlyPopulatedRequestedRoles(
+                    caseDetails,
+                    roles,
+                    ROLE_CATEGORY_4_USER_1,
+                    assignmentRequest.getRequestedRoles()
+                )
             );
         }
 
@@ -136,41 +153,57 @@ class RoleAssignmentServiceTest {
             Set<String> roles = Set.of("[ROLE1]", "[ROLE2]");
             boolean replaceExisting = true;
 
+            given(roleAssignmentCategoryService.getRoleCategory(USER_ID_2)).willReturn(ROLE_CATEGORY_4_USER_2);
+
             // WHEN
             RoleAssignments roleAssignments = roleAssignmentService.createCaseRoleAssignments(caseDetails,
-                                                                                              USER_ID,
+                                                                                              USER_ID_2,
                                                                                               roles,
                                                                                               replaceExisting);
 
             // THEN
             assertThat(roleAssignments, is(mockedRoleAssignments));
+            // verify RoleCategory has been loaded from service
+            verify(roleAssignmentCategoryService).getRoleCategory(USER_ID_2);
             // verify data passed to repository has correct values
             verify(roleAssignmentRepository).createRoleAssignment(roleAssignmentRequestResourceCaptor.capture());
             RoleAssignmentRequestResource assignmentRequest = roleAssignmentRequestResourceCaptor.getValue();
             assertAll(
-                () -> assertCorrectlyPopulatedRoleRequest(caseDetails, replaceExisting, assignmentRequest.getRequest()),
+                () -> assertCorrectlyPopulatedRoleRequest(
+                    caseDetails,
+                    USER_ID_2, // NB: using different USER ID to verify different RoleCategory
+                    replaceExisting,
+                    assignmentRequest.getRequest()
+                ),
 
-                () -> assertCorrectlyPopulatedRequestedRoles(caseDetails, roles, assignmentRequest.getRequestedRoles())
+                () -> assertCorrectlyPopulatedRequestedRoles(
+                    caseDetails,
+                    roles,
+                    ROLE_CATEGORY_4_USER_2, // NB: using different USER ID to verify different RoleCategory
+                    assignmentRequest.getRequestedRoles()
+                )
             );
         }
 
         private void assertCorrectlyPopulatedRoleRequest(final CaseDetails expectedCaseDetails,
+                                                         final String expectedUserId,
                                                          final boolean expectedReplaceExisting,
                                                          final RoleRequestResource actualRoleRequest) {
 
             assertNotNull(actualRoleRequest);
             assertAll(
-                () -> assertEquals(USER_ID, actualRoleRequest.getAssignerId()),
+                () -> assertEquals(expectedUserId, actualRoleRequest.getAssignerId()),
                 () -> assertEquals(RoleAssignmentRepository.DEFAULT_PROCESS, actualRoleRequest.getProcess()),
-                () -> assertEquals(expectedCaseDetails.getReference() + "-" + USER_ID,
+                () -> assertEquals(expectedCaseDetails.getReference() + "-" + expectedUserId,
                         actualRoleRequest.getReference()),
                 () -> assertEquals(expectedReplaceExisting, actualRoleRequest.isReplaceExisting())
             );
         }
 
         private void assertCorrectlyPopulatedRequestedRoles(final CaseDetails expectedCaseDetails,
-                                                             final Set<String> expectedRoles,
-                                                             final List<RoleAssignmentResource> actualRequestedRoles) {
+                                                            final Set<String> expectedRoles,
+                                                            final RoleCategory expectedRoleCategory,
+                                                            final List<RoleAssignmentResource> actualRequestedRoles) {
             assertNotNull(actualRequestedRoles);
             assertEquals(expectedRoles.size(), actualRequestedRoles.size());
 
@@ -179,12 +212,18 @@ class RoleAssignmentServiceTest {
 
             expectedRoles.forEach(roleName -> assertAll(
                 () -> assertTrue(roleMap.containsKey(roleName)),
-                () -> assertCorrectlyPopulatedRoleAssignment(expectedCaseDetails, roleName, roleMap.get(roleName))
+                () -> assertCorrectlyPopulatedRoleAssignment(
+                    expectedCaseDetails,
+                    roleName,
+                    expectedRoleCategory,
+                    roleMap.get(roleName)
+                )
             ));
         }
 
         private void assertCorrectlyPopulatedRoleAssignment(final CaseDetails expectedCaseDetails,
                                                             final String expectedRoleName,
+                                                            final RoleCategory expectedRoleCategory,
                                                             final RoleAssignmentResource actualRoleAssignment) {
 
             assertNotNull(actualRoleAssignment);
@@ -197,7 +236,7 @@ class RoleAssignmentServiceTest {
                 () -> assertEquals(RoleType.CASE.name(), actualRoleAssignment.getRoleType()),
                 () -> assertEquals(Classification.RESTRICTED.name(), actualRoleAssignment.getClassification()),
                 () -> assertEquals(GrantType.SPECIFIC.name(), actualRoleAssignment.getGrantType()),
-                () -> assertEquals(RoleCategory.PROFESSIONAL.name(), actualRoleAssignment.getRoleCategory()),
+                () -> assertEquals(expectedRoleCategory.name(), actualRoleAssignment.getRoleCategory()),
                 () -> assertFalse(actualRoleAssignment.getReadOnly()),
                 () -> assertNotNull(actualRoleAssignment.getBeginTime()),
 
