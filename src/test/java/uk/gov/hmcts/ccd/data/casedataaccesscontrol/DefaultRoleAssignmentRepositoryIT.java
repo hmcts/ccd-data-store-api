@@ -94,9 +94,9 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
             }
         }
 
-        @DisplayName("should return roleAssignments")
+        @DisplayName("should return roleAssignments after successful Create call")
         @Test
-        void shouldReturnRoleAssignments() {
+        void shouldReturnRoleAssignmentsAfterCreateCall() {
 
             // GIVEN
             RoleAssignmentRequestResource assignmentRequest = createAssignmentRequest(Set.of("[ROLE1]", "[ROLE2]"));
@@ -139,9 +139,9 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
             });
         }
 
-        @DisplayName("should error on 400 when POST roleAssignments")
+        @DisplayName("should throw BadRequestException when POST roleAssignments returns a client error")
         @Test
-        void shouldErrorOn400WhenCreateRoleAssignment() {
+        void shouldErrorBadRequestWhenCreateRoleAssignmentReturnsClientError() {
 
             // GIVEN
             RoleAssignmentRequestResource assignmentRequest = createAssignmentRequest(Set.of("[ROLE1]"));
@@ -157,9 +157,9 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
             );
         }
 
-        @DisplayName("should error on 500 when POST roleAssignments")
+        @DisplayName("should throw ServiceException when POST roleAssignments returns a server error")
         @Test
-        void shouldErrorOn500WhenCreateRoleAssignment() {
+        void shouldErrorServiceExceptionWhenCreateRoleAssignmentReturnsServerError() {
 
             // GIVEN
             RoleAssignmentRequestResource assignmentRequest = createAssignmentRequest(Set.of("[ROLE1]"));

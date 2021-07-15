@@ -389,7 +389,7 @@ public class CaseAccessOperation {
 
             List<Long> caseIds = getCaseIdsFromCaseDetailsList(caseDetailsList);
             List<CaseUserEntity> caseUserEntities = caseUserRepository.findCaseUserRoles(caseIds, userIds);
-            return getCaseAssignedUserRolesFrom(caseUserEntities, caseDetailsList);
+            return getCaseAssignedUserRolesFromCaseUserEntities(caseUserEntities, caseDetailsList);
         }
     }
 
@@ -406,12 +406,14 @@ public class CaseAccessOperation {
         } else {
             List<Long> caseIds = getCaseIdsFromCaseDetailsList(caseDetailsList);
             List<CaseUserEntity> caseUserEntities = caseUserRepository.findCaseUserRoles(caseIds, userIds);
-            return getCaseAssignedUserRolesFrom(caseUserEntities, caseDetailsList);
+            return getCaseAssignedUserRolesFromCaseUserEntities(caseUserEntities, caseDetailsList);
         }
     }
 
-    private List<CaseAssignedUserRole> getCaseAssignedUserRolesFrom(List<CaseUserEntity> caseUserEntities,
-                                                                    List<CaseDetails> caseDetailsList) {
+    private List<CaseAssignedUserRole> getCaseAssignedUserRolesFromCaseUserEntities(
+        List<CaseUserEntity> caseUserEntities,
+        List<CaseDetails> caseDetailsList
+    ) {
         Map<String, Long> caseReferenceAndIds = caseDetailsList.stream()
             .collect(Collectors.toMap(CaseDetails::getId, CaseDetails::getReference));
 
