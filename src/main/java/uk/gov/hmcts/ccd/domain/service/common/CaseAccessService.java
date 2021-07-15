@@ -86,16 +86,25 @@ public class CaseAccessService {
     }
 
     public Optional<List<Long>> getGrantedCaseReferencesForRestrictedRoles(CaseTypeDefinition caseTypeDefinition) {
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            return getGrantedCaseReferencesForRestrictedRolesRA(caseTypeDefinition);
+        } else {
+            return getGrantedCaseReferencesForRestrictedRolesNonRA();
+        }
+    }
+
+    private Optional<List<Long>> getGrantedCaseReferencesForRestrictedRolesRA(CaseTypeDefinition caseTypeDefinition) {
+        final List<Long> caseReferences =
+            roleAssignmentService
+                .getCaseReferencesForAGivenUser(userRepository.getUserId(), caseTypeDefinition)
+                .stream().map(Long::parseLong).collect(Collectors.toList());
+        return Optional.of(caseReferences);
+    }
+
+    private Optional<List<Long>> getGrantedCaseReferencesForRestrictedRolesNonRA() {
         if (userCanOnlyAccessExplicitlyGrantedCases()) {
-            List<Long> caseReferences;
-            if (applicationParams.getEnableAttributeBasedAccessControl()) {
-                caseReferences = roleAssignmentService
-                    .getCaseReferencesForAGivenUser(userRepository.getUserId(), caseTypeDefinition)
-                    .stream().map(Long::parseLong).collect(Collectors.toList());
-            } else {
-                final var ids = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
-                caseReferences = caseDetailsRepository.findCaseReferencesByIds(ids);
-            }
+            final var ids = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
+            final var caseReferences = caseDetailsRepository.findCaseReferencesByIds(ids);
             return Optional.of(caseReferences);
         }
         return Optional.empty();
