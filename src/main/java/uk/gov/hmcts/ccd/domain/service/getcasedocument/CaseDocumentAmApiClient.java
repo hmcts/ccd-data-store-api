@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
 import feign.FeignException;
 import feign.FeignException.FeignClientException;
-import org.springframework.http.HttpHeaders;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
@@ -13,10 +12,6 @@ import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import java.util.List;
-
-import static uk.gov.hmcts.ccd.data.SecurityUtils.SERVICE_AUTHORIZATION;
 
 @Named
 public class CaseDocumentAmApiClient {
@@ -34,16 +29,11 @@ public class CaseDocumentAmApiClient {
     }
 
     public void applyPatch(final CaseDocumentsMetadata caseDocumentsMetadata) {
-        final HttpHeaders headers = securityUtils.authorizationHeaders();
-
         uk.gov.hmcts.reform.ccd.document.am.model.CaseDocumentsMetadata mappedCaseDocumentsMetadata =
             caseDocumentMetadataMapper.convertToAmClientCaseDocumentsMetadata(caseDocumentsMetadata);
 
-        List<String> authHeaders = headers.get(HttpHeaders.AUTHORIZATION);
-        String authorization = authHeaders == null ? null : authHeaders.get(0);
-
-        List<String> serviceAuthHeaders = headers.get(SERVICE_AUTHORIZATION);
-        String serviceAuthorization = serviceAuthHeaders == null ? null : serviceAuthHeaders.get(0);
+        String authorization = securityUtils.getUserBearerToken();
+        String serviceAuthorization = securityUtils.getServiceAuthorization();
 
         try {
             caseDocumentClientApi.patchDocument(authorization, serviceAuthorization, mappedCaseDocumentsMetadata);

@@ -12,9 +12,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpHeaders;
-import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
@@ -41,13 +38,7 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class CaseDocumentAmApiClientTest extends TestFixtures {
     @Mock
-    private RestTemplate restTemplate;
-
-    @Mock
     private SecurityUtils securityUtils;
-
-    @Mock
-    private ApplicationParams applicationParams;
 
     @Mock
     private CaseDocumentMetadataMapper caseDocumentMetadataMapper;
@@ -62,10 +53,8 @@ class CaseDocumentAmApiClientTest extends TestFixtures {
 
     @BeforeEach
     void prepare() {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add(HttpHeaders.AUTHORIZATION, "authString");
-        httpHeaders.add(SecurityUtils.SERVICE_AUTHORIZATION, "serviceAuthString");
-        doReturn(httpHeaders).when(securityUtils).authorizationHeaders();
+        doReturn("authValue").when(securityUtils).getUserBearerToken();
+        doReturn("serviceAuthValue").when(securityUtils).getServiceAuthorization();
     }
 
     @Test
@@ -82,7 +71,6 @@ class CaseDocumentAmApiClientTest extends TestFixtures {
         underTest.applyPatch(documentMetadata);
 
         // THEN
-        verify(securityUtils).authorizationHeaders();
         verify(caseDocumentClientApi).patchDocument(
             anyString(),
             anyString(),
@@ -109,7 +97,6 @@ class CaseDocumentAmApiClientTest extends TestFixtures {
             .isInstanceOf(type)
             .hasMessageContaining(errorMessage);
 
-        verify(securityUtils).authorizationHeaders();
         verify(caseDocumentClientApi).patchDocument(anyString(),anyString(),
             any(uk.gov.hmcts.reform.ccd.document.am.model.CaseDocumentsMetadata.class));
     }

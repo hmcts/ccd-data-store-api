@@ -227,7 +227,7 @@ dependencies {
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
     testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
-    testRuntime "org.junit.platform:junit-platform-commons:1.7.0"
+    testRuntime "org.junit.platform:junit-platform-commons:1.7.1"
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.6.0'
     testCompile group:'org.mockito', name: 'mockito-junit-jupiter', version:'3.6.0'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: powermockVersion
