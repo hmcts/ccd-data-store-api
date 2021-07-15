@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRequestResource;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResource;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleRequestResource;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
@@ -16,7 +18,6 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.ActorIdType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -25,25 +26,30 @@ import uk.gov.hmcts.ccd.domain.service.AccessControl;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class RoleAssignmentService implements AccessControl {
 
     private final RoleAssignmentRepository roleAssignmentRepository;
     private final RoleAssignmentsMapper roleAssignmentsMapper;
     private final RoleAssignmentsFilteringService roleAssignmentsFilteringService;
+    private final RoleAssignmentCategoryService roleAssignmentCategoryService;
 
     @Autowired
     public RoleAssignmentService(@Qualifier(CachedRoleAssignmentRepository.QUALIFIER)
                                          RoleAssignmentRepository roleAssignmentRepository,
                                  RoleAssignmentsMapper roleAssignmentsMapper,
-                                 RoleAssignmentsFilteringService roleAssignmentsFilteringService) {
+                                 RoleAssignmentsFilteringService roleAssignmentsFilteringService,
+                                 RoleAssignmentCategoryService roleAssignmentCategoryService) {
         this.roleAssignmentRepository = roleAssignmentRepository;
         this.roleAssignmentsMapper = roleAssignmentsMapper;
         this.roleAssignmentsFilteringService = roleAssignmentsFilteringService;
+        this.roleAssignmentCategoryService = roleAssignmentCategoryService;
     }
 
     public RoleAssignments createCaseRoleAssignments(final CaseDetails caseDetails,
@@ -87,6 +93,10 @@ public class RoleAssignmentService implements AccessControl {
     }
 
     public RoleAssignments getRoleAssignments(String userId) {
+        // TODO: RDM-10924 - move roleCategory from here to the POST roleAssignments operation once it is implemented
+        RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(userId);
+        log.debug("user: {} has roleCategory: {}", userId, roleCategory);
+
         RoleAssignmentResponse roleAssignmentResponse = roleAssignmentRepository.getRoleAssignments(userId);
         return roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
     }
@@ -100,7 +110,7 @@ public class RoleAssignmentService implements AccessControl {
 
         final RoleAssignments roleAssignments = this.getRoleAssignments(userId);
         List<RoleAssignment> filteredRoleAssignments = roleAssignmentsFilteringService
-                .filter(roleAssignments, caseTypeDefinition);
+                .filter(roleAssignments, caseTypeDefinition).getFilteredMatchingRoleAssignments();
 
         return getValidCaseIds(filteredRoleAssignments);
     }
@@ -109,6 +119,7 @@ public class RoleAssignmentService implements AccessControl {
         return roleAssignmentsList.stream()
             .filter(this::isValidRoleAssignment)
             .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
+            .filter(Objects::nonNull)
             .flatMap(Optional::stream)
             .collect(Collectors.toList());
     }

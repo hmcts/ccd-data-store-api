@@ -6,12 +6,20 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
@@ -36,16 +44,6 @@ import uk.gov.hmcts.ccd.domain.service.search.CaseSearchesViewAccessControl;
 import uk.gov.hmcts.ccd.domain.service.search.SearchResultDefinitionService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -121,9 +119,6 @@ class CaseSearchResultViewGeneratorTest {
     private static final LocalDateTime LAST_MODIFIED_DATE = LocalDateTime.of(1987, 12, 4, 17, 30);
     private static final LocalDateTime LAST_STATE_MODIFIED_DATE = LocalDateTime.of(2015, 6, 17, 20, 45);
     private static final SecurityClassification SECURITY_CLASSIFICATION = SecurityClassification.PUBLIC;
-
-    @Mock
-    private UserRepository userRepository;
 
     @Mock
     private CaseDataAccessControl caseDataAccessControl;
@@ -324,11 +319,11 @@ class CaseSearchResultViewGeneratorTest {
         when(securityClassificationService.userHasEnoughSecurityClassificationForField(any(), any(), any()))
             .thenReturn(true);
 
-        classUnderTest = new CaseSearchResultViewGenerator(userRepository,
-            caseTypeService, searchResultDefinitionService, dateTimeSearchResultProcessor,
-            caseSearchesViewAccessControl);
+        classUnderTest = new CaseSearchResultViewGenerator(caseTypeService, searchResultDefinitionService,
+            dateTimeSearchResultProcessor, caseSearchesViewAccessControl, caseDataAccessControl);
 
-        when(caseDataAccessControl.generateAccessMetadata(any())).thenReturn(new CaseAccessMetadata());
+        when(caseDataAccessControl.generateAccessMetadata(anyString()))
+            .thenReturn(new CaseAccessMetadata());
     }
 
     private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
@@ -489,13 +484,13 @@ class CaseSearchResultViewGeneratorTest {
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
 
-        when(userRepository.anyRoleMatches(any())).thenReturn(true);
-        when(userRepository.anyRoleEqualsTo(any())).thenReturn(true);
-        when(userRepository.anyRoleEqualsAnyOf(any())).thenReturn(true);
-        when(userRepository.anyRoleEqualsTo(searchResultFieldWithInvalidRole.getRole())).thenReturn(false);
+        when(caseDataAccessControl.anyAccessProfileEqualsTo(anyString(), anyString())).thenReturn(true);
+        when(caseDataAccessControl.anyAccessProfileEqualsTo(CASE_TYPE_ID_1,
+            searchResultFieldWithInvalidRole.getRole())).thenReturn(false);
 
         final CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult,
             WORKBASKET, Collections.emptyList());
+        when(caseDataAccessControl.anyAccessProfileEqualsTo(anyString(), anyString())).thenReturn(true);
 
         assertAll(
             () -> assertThat(caseSearchResultView.getHeaders().get(0).getFields().size(), is(3)),
@@ -571,10 +566,9 @@ class CaseSearchResultViewGeneratorTest {
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
 
-        when(userRepository.anyRoleMatches(any())).thenReturn(true);
-        when(userRepository.anyRoleEqualsTo(any())).thenReturn(true);
-        when(userRepository.anyRoleEqualsAnyOf(any())).thenReturn(true);
-        when(userRepository.anyRoleEqualsTo(searchResultFieldWithInvalidRole.getRole())).thenReturn(false);
+        when(caseDataAccessControl.anyAccessProfileEqualsTo(anyString(), anyString())).thenReturn(true);
+        when(caseDataAccessControl.anyAccessProfileEqualsTo(CASE_TYPE_ID_1,
+            searchResultFieldWithInvalidRole.getRole())).thenReturn(false);
 
         final CaseSearchResultView caseSearchResultView =
             classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET, Collections.emptyList());
@@ -609,7 +603,8 @@ class CaseSearchResultViewGeneratorTest {
 
         when(searchResultDefinitionService.getSearchResultDefinition(any(), any(), any())).thenReturn(searchResult);
 
-        doReturn(true).when(userRepository).anyRoleEqualsTo(searchResultFieldWithValidRole.getRole());
+        doReturn(true).when(caseDataAccessControl)
+            .anyAccessProfileEqualsTo(CASE_TYPE_ID_1, searchResultFieldWithValidRole.getRole());
 
 
         CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET,
@@ -633,7 +628,8 @@ class CaseSearchResultViewGeneratorTest {
         caseAccessMetadata.setAccessGrants(List.of(GrantType.SPECIFIC, GrantType.BASIC));
         caseAccessMetadata.setAccessProcess(AccessProcess.CHALLENGED);
 
-        when(caseDataAccessControl.generateAccessMetadata(any())).thenReturn(caseAccessMetadata);
+        when(caseDataAccessControl.generateAccessMetadata(anyString()))
+            .thenReturn(caseAccessMetadata);
 
         CaseSearchResultView caseSearchResultView = classUnderTest.execute(CASE_TYPE_ID_1, caseSearchResult, WORKBASKET,
             Collections.emptyList());
