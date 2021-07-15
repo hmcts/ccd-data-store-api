@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -41,11 +42,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.BASIC;
-import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.CHALLENGED;
-import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.SPECIFIC;
-import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.STANDARD;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment.builder;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.BASIC;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.CHALLENGED;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.SPECIFIC;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.STANDARD;
 
 class DefaultCaseDataAccessControlTest {
 
@@ -91,15 +92,14 @@ class DefaultCaseDataAccessControlTest {
     @Mock
     private FilteredRoleAssignments filteredRoleAssignments;
 
+    @InjectMocks
     private DefaultCaseDataAccessControl defaultCaseDataAccessControl;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
         accessProfileService = spy(new AccessProfileServiceImpl(new AuthorisationMapper()));
-        defaultCaseDataAccessControl = new DefaultCaseDataAccessControl(roleAssignmentService, securityUtils,
-            roleAssignmentsFilteringService, pseudoRoleAssignmentsGenerator, applicationParams,
-            accessProfileService, pseudoRoleToAccessProfileGenerator, caseDefinitionRepository, caseDetailsRepository);
+
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.data.casedataaccesscontrol;
+package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums;
 
 public enum RoleCategory {
     PROFESSIONAL,
