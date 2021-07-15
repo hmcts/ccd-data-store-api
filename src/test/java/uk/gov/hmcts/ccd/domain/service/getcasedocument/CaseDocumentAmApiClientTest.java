@@ -119,7 +119,7 @@ class CaseDocumentAmApiClientTest extends TestFixtures {
             .caseId(CASE_REFERENCE)
             .caseTypeId("Some-Case-ID")
             .jurisdictionId(JURISDICTION_ID)
-            .documentHashToken(emptyList())
+            .documentHashTokens(emptyList())
             .build();
     }
 

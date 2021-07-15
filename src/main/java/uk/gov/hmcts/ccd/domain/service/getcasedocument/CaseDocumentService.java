@@ -94,7 +94,7 @@ public class CaseDocumentService {
                 .caseId(caseId)
                 .caseTypeId(caseTypeId)
                 .jurisdictionId(jurisdictionId)
-                .documentHashToken(documentHashes)
+                .documentHashTokens(documentHashes)
                 .build();
 
             caseDocumentAmApiClient.applyPatch(documentMetadata);
