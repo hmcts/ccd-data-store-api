@@ -1,0 +1,13 @@
+{
+  "_guid_": "Common_Response_Header_Base",
+
+  "Cache-Control" : "[[ANYTHING_PRESENT]]",
+  "Content-Length" : "[[ANYTHING_PRESENT]]",
+  "Content-Type" : "application/json",
+  "Date" : "[[ANYTHING_PRESENT]]",
+  "Expires" : "[[ANYTHING_PRESENT]]",
+  "Pragma" : "no-cache",
+  "X-Content-Type-Options" : "nosniff",
+  "X-Frame-Options" : "DENY",
+  "X-Xss-Protection" : "1; mode=block"
+}

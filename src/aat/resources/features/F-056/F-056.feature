@@ -77,6 +77,9 @@ Scenario: must update successfully the respective fields with ACL permissions fo
 
     Given a user with [an active citizen profile in CCD with update permissions for certain fields but not for others in a given case type],
       And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Citizen_Case_Creation],
+      And a successful call [by a privileged user with full ACL to create a case of this case type] as in [Befta_Jurisdiction2_Document_Upload_1],
+      And a successful call [by a privileged user with full ACL to create a case of this case type] as in [Befta_Jurisdiction2_Document_Upload_2],
+      And a successful call [by a privileged user with full ACL to create a case of this case type] as in [Befta_Jurisdiction2_Document_Upload_3],
       And another successful call [by a privileged user with full ACL to create a case of this case type] as in [Befta_Jurisdiction2_Default_Citizen_Case_Creation_Data],
       And another successful call [to get an update event token for the case just created] as in [S-584-Prerequisite_Citizen_Token_For_Update_Case],
 

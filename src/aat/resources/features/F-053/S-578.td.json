@@ -13,18 +13,6 @@
     "_extends_": "BeftaCitizen2"
 	},
 
-	"request": {
-		"body": {
-			"data": {
-				"DocumentField2":{
-					"document_url":"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
-					"document_binary_url":"{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
-					"document_filename":"Elastic Search test Case.png --> updated by Citizen"
-				}
-			}
-		}
-	},
-
 	"expectedResponse": {
 		"_extends_": "Common_201_Response",
 		"headers": {
@@ -49,15 +37,15 @@
 			"security_classification" : "PUBLIC",
 			"data" : {
 				"_extends_": "Befta_Citizen_Case_Data",
-				"DocumentField4" : {
-					"document_url" : "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870",
-					"document_filename" : "Screenshot 2019-11-14 at 1.57.32 pm.png",
-					"document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870/binary"
-				},
 				"DocumentField2" : {
-					"document_url" : "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
-					"document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Befta_Jurisdiction2_Document_Upload_2][customValues][documentIdInTheResponse]}",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Befta_Jurisdiction2_Document_Upload_2][customValues][documentIdInTheResponse]}/binary",
 					"document_filename" : "Elastic Search test Case.png --> updated by Citizen"
+				},
+				"DocumentField4" : {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Befta_Jurisdiction2_Document_Upload_3][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Document_Upload_3][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Befta_Jurisdiction2_Document_Upload_3][customValues][documentIdInTheResponse]}/binary"
 				}
 			},
 			"data_classification" : {

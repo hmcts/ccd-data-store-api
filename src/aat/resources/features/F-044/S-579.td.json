@@ -32,14 +32,15 @@
 			"case_data": {
 				"_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data",
 				"DocumentField2": {
-					"document_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
-					"document_binary_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Befta_Jurisdiction2_Document_Upload_2][customValues][documentIdInTheResponse]}",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Befta_Jurisdiction2_Document_Upload_2][customValues][documentIdInTheResponse]}/binary",
 					"document_filename": "Elastic Search test Case.png"
 				}
 			},
 			"data_classification" : {
-				"_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification"
-			},
+				"_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification",
+        "DocumentField2": "PUBLIC"
+      },
 			"supplementary_data": null,
 			"after_submit_callback_response": null,
 			"callback_response_status_code": null,
@@ -47,8 +48,9 @@
 			"delete_draft_response_status_code": null,
 			"delete_draft_response_status": null,
 			"security_classifications" : {
-				"_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification"
-			}
+				"_extends_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification",
+        "DocumentField2": "PUBLIC"
+      }
 		}
 	}
 }

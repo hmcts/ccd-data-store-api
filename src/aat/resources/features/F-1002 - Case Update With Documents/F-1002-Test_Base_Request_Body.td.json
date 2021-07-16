@@ -1,0 +1,43 @@
+{
+  "_guid_": "F-1002-Test_Base_Request_Body",
+  "productName": "CCD Data Store",
+  "operationName": "Submit Event for an Existing Case",
+
+  "specs": [
+    "an active caseworker profile in CCD with full permissions on a document field",
+    "contains an Event Id received from upstream"
+  ],
+
+  "method": "POST",
+  "uri": "cases/{cid}/events",
+
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1002-Case_Creation_Data][testData][actualResponse][body][id]}"
+    },
+    "headers": {
+      "Authorization": "[[DEFAULT_AUTO_VALUE]]",
+      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]",
+      "Content-Type": "application/json;charset=UTF-8",
+      "experimental": true
+    },
+    "body": {
+      "data": {
+      },
+      "event": {
+        "id": "UPDATE",
+        "summary": "",
+        "description": ""
+      },
+      "ignore_warning": false,
+      "draft_id": null
+    }
+  }
+}

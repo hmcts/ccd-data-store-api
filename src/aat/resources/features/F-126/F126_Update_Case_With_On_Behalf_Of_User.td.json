@@ -58,11 +58,6 @@
       "state" : "[[ANYTHING_PRESENT]]",
       "security_classification" : "PUBLIC",
       "data" : {
-        "DocumentField4" : {
-          "document_url" : "[[ANYTHING_PRESENT]]",
-          "document_filename" : "[[ANYTHING_PRESENT]]",
-          "document_binary_url" : "[[ANYTHING_PRESENT]]"
-        },
         "MoneyGBPField" : "[[ANYTHING_PRESENT]]",
         "FixedListField" : "[[ANYTHING_PRESENT]]",
         "AddressUKField" : {
@@ -85,11 +80,6 @@
         "FixedRadioListField" : "[[ANYTHING_PRESENT]]",
         "DateTimeField" : null,
         "PhoneUKField" : null,
-        "DocumentField7" : {
-          "document_url" : "[[ANYTHING_PRESENT]]",
-          "document_filename" : "[[ANYTHING_PRESENT]]",
-          "document_binary_url" : "[[ANYTHING_PRESENT]]"
-        },
         "NumberField" : "111111222222",
         "MultiSelectListField" : [ "OPTION5", "OPTION4", "OPTION3" ],
         "YesOrNoField" : "Yes",
@@ -100,7 +90,6 @@
         "CollectionField" : [ ]
       },
       "data_classification" : {
-        "DocumentField4" : "PUBLIC",
         "MoneyGBPField" : "PUBLIC",
         "FixedListField" : "PUBLIC",
         "AddressUKField" : {
@@ -118,7 +107,6 @@
         "FixedRadioListField" : "PUBLIC",
         "DateTimeField" : "PUBLIC",
         "PhoneUKField" : "PUBLIC",
-        "DocumentField7" : "PUBLIC",
         "NumberField" : "PUBLIC",
         "MultiSelectListField" : "PUBLIC",
         "YesOrNoField" : "PUBLIC",

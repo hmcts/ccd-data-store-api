@@ -1,9 +1,7 @@
 {
 	"_guid_": "Befta_Jurisdiction2_Default_Full_Case_Data_Security_Classification",
 
-	"DocumentField4": "PUBLIC",
 	"MoneyGBPField": "PUBLIC",
-	"DocumentField3": "PUBLIC",
 	"FixedListField": "PUBLIC",
 	"AddressUKField": {
 		"value": {
@@ -17,14 +15,9 @@
 		},
 		"classification": "PUBLIC"
 	},
-	"DocumentField6": "PUBLIC",
-	"DocumentField5": "PUBLIC",
-	"DocumentField2": "PUBLIC",
-	"DocumentField1": "PUBLIC",
 	"FixedRadioListField": "PUBLIC",
 	"DateTimeField": "PUBLIC",
 	"PhoneUKField": "PUBLIC",
-	"DocumentField7": "PUBLIC",
 	"NumberField": "PUBLIC",
 	"MultiSelectListField": "PUBLIC",
 	"YesOrNoField": "PUBLIC",

@@ -1,0 +1,29 @@
+{
+  "_guid_": "Befta_Jurisdiction2_Document_Upload_3",
+  "_extends_": "Default_Document_Upload_Data_Base",
+  "specs": [
+    "by a privileged user with full ACL to create a case of this case type"
+  ],
+  "request": {
+    "body": {
+      "arrayInMap": [
+        {
+          "key": "classification",
+          "value": "PUBLIC"
+        },
+        {
+          "key": "caseTypeId",
+          "value": "BEFTA_CASETYPE_2_2"
+        },
+        {
+          "key": "jurisdictionId",
+          "value": "BEFTA_JURISDICTION_2"
+        },
+        {
+          "key": "files",
+          "filePath": "features/common/files/Sample.pdf"
+        }
+      ]
+    }
+  }
+}

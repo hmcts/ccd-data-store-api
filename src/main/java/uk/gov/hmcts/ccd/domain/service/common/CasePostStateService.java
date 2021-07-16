@@ -12,7 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.EventPostStateDefinition;
 public class CasePostStateService {
 
     private final PrioritiseEnablingCondition prioritiseEnablingCondition;
-    private CasePostStateEvaluationService casePostStateEvaluationService;
+    private final CasePostStateEvaluationService casePostStateEvaluationService;
 
     @Inject
     public CasePostStateService(PrioritiseEnablingCondition prioritiseEnablingCondition,
@@ -24,9 +24,8 @@ public class CasePostStateService {
     public String evaluateCaseState(CaseEventDefinition caseEventDefinition, CaseDetails caseDetails) {
         List<EventPostStateDefinition> eventPostStateDefinitions = prioritiseEnablingCondition
             .prioritiseEventPostStates(caseEventDefinition.getPostStates());
-        String postStateReference = casePostStateEvaluationService
+        return casePostStateEvaluationService
             .evaluatePostStateCondition(eventPostStateDefinitions, caseDetails.getCaseDataAndMetadata());
-        return postStateReference;
     }
 
 }

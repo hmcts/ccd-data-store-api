@@ -1,0 +1,30 @@
+{
+  "_guid_": "S-1034",
+  "_extends_": "F-1003-Test_Base_data",
+  "title": "must get an error response for a non-existing Hashtoken",
+  "specs": [
+    "contains a non-existing Hashtoken"
+  ],
+  "request": {
+    "body": {
+      "data": {
+        "DocumentField1": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary",
+          "document_hash": "Non Existing Hash Token"
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "body": {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.DocumentTokenException",
+      "message" : "The user has provided an invalid hashToken for document {\"timestamp\":\"2020-04-29T10:33:58.676+0000\",\"status\":403,\"error\":\"Forbidden\",\"message\":\"0c84e136-b4fa-49c8-b81b-ea3e65c4a41a\",\"path\":\"/cases/documents/attachToCase\"}",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

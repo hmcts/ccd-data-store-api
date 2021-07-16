@@ -1,27 +1,20 @@
 {
 	"_guid_": "F-032_Case_Creation_Data_With_Document",
-	"_extends_": "Standard_Full_Case_Creation_Data",
+	"_extends_": "Befta_Jurisdiction2_Default_Full_Case_Creation_Data",
+
+  "specs": [
+    "by same user to create a case of this case type"
+  ],
 
 	"request": {
-		"body": {
+    "body": {
 			"data": {
-				"_extends_": "Standard_Full_Case_Data_With_Document",
-				"CollectionField": [
-					"__befta_replace__",
-					{
-						"id": "CollectionField1",
-						"value": "Alias 1"
-					},
-					{
-						"id": "CollectionField2",
-						"value": "Alias 2"
-					}
-				],
-				"MultiSelectListField": [
-					"__befta_replace__",
-					"OPTION2",
-					"OPTION4"
-				]
+        "DocumentField1": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][customValues][documentIdInTheResponse]}",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][customValues][documentIdInTheResponse]}/binary",
+          "document_filename": "${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_hash": "${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][testData][actualResponse][body][documents][0][hashToken]}"
+        }
 			}
 		}
 	},
@@ -29,34 +22,17 @@
 	"expectedResponse": {
 		"body": {
 			"case_data": {
-				"_extends_": "Standard_Full_Case_Data_With_Document",
-				"DocumentField": {
+				"DocumentField1": {
 					"document_url": "[[ANYTHING_PRESENT]]",
-					"document_binary_url": "[[ANYTHING_PRESENT]]"
-				},
-				"CollectionField": [
-					"__befta_replace__",
-					{
-						"id": "CollectionField1",
-						"value": "Alias 1"
-					},
-					{
-						"id": "CollectionField2",
-						"value": "Alias 2"
-					}
-				],
-				"MultiSelectListField": [
-					"__befta_replace__",
-					"OPTION2",
-					"OPTION4"
-				]
+					"document_binary_url": "[[ANYTHING_PRESENT]]",
+					"document_filename": "[[ANYTHING_PRESENT]]"
+				}
 			},
 			"data_classification": {
-				"DocumentField": "PUBLIC"
+				"DocumentField1": "PUBLIC"
 			},
-			"supplementary_data": null,
 			"security_classifications": {
-				"DocumentField": "PUBLIC"
+				"DocumentField1": "PUBLIC"
 			}
 		}
 	}

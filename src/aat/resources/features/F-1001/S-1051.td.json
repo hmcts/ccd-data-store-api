@@ -1,0 +1,58 @@
+
+{
+  "title": "must successfully receive a document am data with a list of permissions",
+  "_extends_": "F-1001_Test_Data_Base",
+  "_guid_": "S-1051",
+  "productName": "CCD Data Store",
+  "operationName": "Get Document AM Data",
+  "method": "GET",
+  "uri": "/cases/{caseId}/documents/{documentId}",
+
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+    }
+  },
+  "specs": [
+    "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
+    "an active Solicitor profile having full permissions on the same case type",
+    "has the case id just created where a document id is associated",
+    "contains the requested document am data",
+    "by a privileged user with full ACL to create a case of this case type",
+    "is to attach the document uploaded above to a new case"
+  ],
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][S-1051-Case_Creation_Main][testData][actualResponse][body][id]}",
+      "documentId": "${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers" : {
+      "Content-Type" : "application/json;charset=UTF-8",
+      "Content-Length" : "[[ANY_INTEGER_NOT_NULLABLE]]",
+      "Content-Encoding": "gzip"
+    },
+    "body": {
+      "_links": {
+        "self": {
+          "href": "{{TEST_URL}}/cases/${[scenarioContext][childContexts][S-1051-Case_Creation_Main][testData][actualResponse][body][id]}/documents/${[scenarioContext][testData][request][pathVariables][documentId]}"
+        }
+      },
+      "documentMetadata": {
+        "caseId": "${[scenarioContext][childContexts][S-1051-Case_Creation_Main][testData][actualResponse][body][id]}",
+        "documentPermissions": {
+          "id": "${[scenarioContext][testData][request][pathVariables][documentId]}",
+          "permissions": [
+            "READ"
+          ]
+        }
+      }
+    }
+  }
+}

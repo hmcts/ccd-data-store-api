@@ -1,0 +1,85 @@
+{
+  "DocumentField4": {
+    "document_url": "http://dm-store:8080/documents/f5bd63a2-65c5-435e-a972-98ed658ad7d6",
+    "document_filename": "Screenshot 2020-03-05 at 08.53.03.png",
+    "document_binary_url": "http://dm-store:8080/documents/f5bd63a2-65c5-435e-a972-98ed658ad7d6/binary"
+  },
+  "MoneyGBPField": "750000",
+  "DocumentField3": {
+    "document_url": "http://dm-store:8080/documents/320233b8-fb61-4b58-8731-23c83638c9c6",
+    "document_filename": "Screenshot 2020-02-26 at 10.07.51.png",
+    "document_binary_url": "http://dm-store:8080/documents/320233b8-fb61-4b58-8731-23c83638c9c6/binary"
+  },
+  "FixedListField": null,
+  "AddressUKField": {
+    "County": null,
+    "Country": null,
+    "PostCode": null,
+    "PostTown": null,
+    "AddressLine1": null,
+    "AddressLine2": null,
+    "AddressLine3": null
+  },
+  "DocumentField6": {
+    "document_url": "http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d",
+    "document_filename": "Screenshot 2020-03-24 at 08.38.47.png",
+    "document_binary_url": "http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d/binary"
+  },
+  "DocumentField5": {
+    "document_url": "http://dm-store:8080/documents/0dfa903c-993d-4fa4-9bc4-b97d6352b862",
+    "document_filename": "Screenshot 2020-03-03 at 16.56.56.png",
+    "document_binary_url": "http://dm-store:8080/documents/0dfa903c-993d-4fa4-9bc4-b97d6352b862/binary"
+  },
+  "DocumentField2": {
+    "document_url": "http://dm-store:8080/documents/e16f2ae0-d6ce-4bd0-a652-47b3c4d86292",
+    "document_filename": "Screenshot 2020-02-19 at 17.17.42.png",
+    "document_binary_url": "http://dm-store:8080/documents/e16f2ae0-d6ce-4bd0-a652-47b3c4d86292/binary"
+  },
+  "DocumentField1": {
+    "document_url": "http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d",
+    "document_filename": "Screenshot 2020-03-24 at 08.38.47.png",
+    "document_binary_url": "http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d/binary"
+  },
+  "ComplexField": {
+    "ComplexTextField": null,
+    "ComplexNestedField": {
+      "NestedNumberField": 12335,
+      "NestedCollectionTextField": [],
+      "DocumentField7": {
+        "document_url": "http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976",
+        "document_filename": "Screenshot 2020-02-24 at 13.32.03.png",
+        "document_binary_url": "http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976/binary"
+      }
+    },
+    "ComplexFixedListField": null
+  },
+  "FixedRadioListField": null,
+  "DateTimeField": null,
+  "PhoneUKField": null,
+  "NumberField": null,
+  "MultiSelectListField": [],
+  "YesOrNoField": "yes",
+  "EmailField": null,
+  "MyField": "Test",
+  "TextField": "hi Dharm",
+  "DateField": null,
+  "TextAreaField": null,
+  "CollectionField": [],
+  "ComplexField2": {
+    "ComplexTextField": null,
+    "ComplexNestedField": [
+      {
+        "DocumentField10": {
+          "document_url": "http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0222",
+          "document_filename": "Screenshot 2020-02-24 at 13.32.03.png",
+          "document_binary_url": "http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0222/binary"
+        }
+      }
+    ],
+    "DocumentField11": {
+      "document_url": "http://dm-store:8080/documents/335a9a09-7a51-40e9-8196-6b9e26fce6ff",
+      "document_filename": "Screenshot 2020-02-24 at 13.32.03.png"
+    }
+  }
+}
+

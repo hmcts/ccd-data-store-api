@@ -1,0 +1,8 @@
+{
+  "_guid_": "Default_Document_Upload_3",
+  "_extends_": "Default_Document_Upload_Data",
+
+  "specs": [
+    "by same user to upload another document with mandatory metadata"
+  ]
+}

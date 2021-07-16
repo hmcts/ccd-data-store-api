@@ -31,3 +31,6 @@ nbdist/
 out/
 /BEFTA Report for Smoke Tests/
 /BEFTA Report for Functional Tests/
+
+### MacOS
+.DS_Store

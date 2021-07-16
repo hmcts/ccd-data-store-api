@@ -1,0 +1,45 @@
+{
+  "title": "must receive an error response for an active Solicitor profile who does not have READ access",
+  "_guid_": "S-1052",
+  "_extends_": "F-1001_Test_Data_Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "Get Document AM Data",
+  "method": "GET",
+  "uri": "/cases/{caseId}/documents/{documentId}",
+
+  "specs": [
+    "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
+    "an active Solicitor profile having full permissions on the same case type",
+    "has the case id just created where a document id is associated",
+    "contains the requested document am data",
+    "contains active Solicitor profile who does not have READ access"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2.solicitor.1@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD]]"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][S-1052-Case_Creation_Main][testData][actualResponse][body][id]}",
+      "documentId": "${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "exception" : "uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentNotFoundException",
+      "message" : "Document ${[scenarioContext][testData][request][pathVariables][documentId]} is not found in the case : ${[scenarioContext][childContexts][S-1052-Case_Creation_Main][testData][actualResponse][body][id]}",
+      "path" : "/cases/${[scenarioContext][childContexts][S-1052-Case_Creation_Main][testData][actualResponse][body][id]}/documents/${[scenarioContext][testData][request][pathVariables][documentId]}",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

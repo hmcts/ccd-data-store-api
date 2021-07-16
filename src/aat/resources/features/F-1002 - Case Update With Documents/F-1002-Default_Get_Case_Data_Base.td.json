@@ -1,0 +1,116 @@
+{
+  "_guid_": "F-1002-Default_Get_Case_Data_Base",
+  "productName": "CCD Data Store",
+  "operationName": "Get case details",
+  "method": "GET",
+  "uri": "/cases/{cid}",
+  "specs": [
+    "to retrieve case details by case id"
+  ],
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+    }
+  },
+  "request": {
+    "headers": {
+      "Authorization": "[[DEFAULT_AUTO_VALUE]]",
+      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]",
+      "experimental": true
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+
+    "body": {
+      "_links": {
+        "self": {
+          "href": "{{TEST_URL}}/cases/${[scenarioContext][childContexts][F-1002-Case_Creation_Data][testData][actualResponse][body][id]}/events"
+        }
+      },
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_JURISDICTION_2",
+      "case_type": "BEFTA_CASETYPE_2_1",
+      "created_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "last_modified_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "last_state_modified_on": "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "state": "TODO",
+      "security_classification": "PUBLIC",
+      "data": {
+        "MoneyGBPField": "111100",
+        "FixedListField": "VALUE3",
+        "AddressUKField": {
+          "County": null,
+          "Country": null,
+          "PostCode": null,
+          "PostTown": null,
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null
+        },
+        "ComplexField": {
+          "ComplexTextField": null,
+          "ComplexNestedField": {
+            "NestedNumberField": null,
+            "NestedCollectionTextField": []
+          },
+          "ComplexFixedListField": null
+        },
+        "FixedRadioListField": "RADIOVALUE2",
+        "DateTimeField": null,
+        "PhoneUKField": null,
+        "NumberField": "111111222222",
+        "MultiSelectListField": [
+          "OPTION5",
+          "OPTION4",
+          "OPTION3"
+        ],
+        "YesOrNoField": "Yes",
+        "EmailField": "testemail@gmail.com",
+        "TextField": "sometextfield",
+        "DateField": "2222-01-02",
+        "TextAreaField": "textarea",
+        "CollectionField": []
+      },
+      "data_classification": {
+        "MoneyGBPField": "PUBLIC",
+        "FixedListField": "PUBLIC",
+        "AddressUKField": {
+          "classification": "PUBLIC",
+          "value": {
+            "County": "PUBLIC",
+            "Country": "PUBLIC",
+            "PostCode": "PUBLIC",
+            "PostTown": "PUBLIC",
+            "AddressLine1": "PUBLIC",
+            "AddressLine2": "PUBLIC",
+            "AddressLine3": "PUBLIC"
+          }
+        },
+        "FixedRadioListField": "PUBLIC",
+        "DateTimeField": "PUBLIC",
+        "PhoneUKField": "PUBLIC",
+        "NumberField": "PUBLIC",
+        "MultiSelectListField": "PUBLIC",
+        "YesOrNoField": "PUBLIC",
+        "EmailField": "PUBLIC",
+        "TextField": "PUBLIC",
+        "DateField": "PUBLIC",
+        "TextAreaField": "PUBLIC",
+        "CollectionField": {
+          "classification": "PUBLIC",
+          "value": []
+        }
+      },
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+    }
+  }
+}

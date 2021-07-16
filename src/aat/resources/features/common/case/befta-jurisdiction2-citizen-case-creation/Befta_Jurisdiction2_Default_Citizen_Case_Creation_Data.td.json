@@ -15,7 +15,25 @@
 		},
 		"body": {
 			"data": {
-				"_extends_": "Befta_Jurisdiction2_Default_Citizen_Case_Data"
+				"_extends_": "Befta_Citizen_Case_Data",
+        "DocumentField1": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][customValues][documentIdInTheResponse]}/binary",
+          "document_hash": "${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_1][testData][actualResponse][body][documents][0][hashToken]}"
+        },
+        "DocumentField2": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_2][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_2][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_2][customValues][documentIdInTheResponse]}/binary",
+          "document_hash": "${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_2][testData][actualResponse][body][documents][0][hashToken]}"
+        },
+        "DocumentField4": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_3][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_3][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_3][customValues][documentIdInTheResponse]}/binary",
+          "document_hash": "${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_3][testData][actualResponse][body][documents][0][hashToken]}"
+        }
 			}
 		}
 	},
@@ -39,15 +57,15 @@
 			"security_classification": "PUBLIC",
 			"case_data": {
 				"_extends_": "Befta_Citizen_Case_Data",
+        "DocumentField2": {
+          "document_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_2][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_2][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_2][customValues][documentIdInTheResponse]}/binary"
+        },
 				"DocumentField4": {
-					"document_url": "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870",
-					"document_binary_url": "{{DM_STORE_BASE_URL}}/documents/e56f0aea-4a5f-46d5-82d3-01b536420870/binary",
-					"document_filename": "Screenshot 2019-11-14 at 1.57.32 pm.png"
-				},
-				"DocumentField2": {
-					"document_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943",
-					"document_binary_url": "{{DM_STORE_BASE_URL}}/documents/ae5c9e4b-1385-483e-b1b7-607e75dd3943/binary",
-					"document_filename": "Elastic Search test Case.png"
+          "document_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_3][customValues][documentIdInTheResponse]}",
+          "document_filename" : "${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_3][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][siblingContexts][Befta_Jurisdiction2_Document_Upload_3][customValues][documentIdInTheResponse]}/binary"
 				}
 			},
 			"data_classification" : {

@@ -1,0 +1,20 @@
+{
+  "ComplexField": {
+    "ComplexTextField": null,
+    "ComplexNestedField": {
+      "NestedNumberField": 12345,
+      "NestedCollectionTextField": [
+        {
+          "DocumentField7": {
+            "document_url": "http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976",
+            "document_filename": "Screenshot 2020-02-24 at 13.32.03.png",
+            "document_binary_url": "http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976/binary",
+            "document_hash": "dummyToken"
+          }
+        }
+      ]
+    },
+    "ComplexFixedListField": null
+  }
+}
+

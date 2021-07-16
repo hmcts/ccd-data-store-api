@@ -1,0 +1,67 @@
+[
+  {
+    "document_url": "http://dm-store:8080/documents/5a16b8ed-c62f-41b3-b3c9-1df20b6a9979",
+    "document_filename": "E_1_AA_Claimant details.xlsx",
+    "document_binary_url": "http://dm-store:8080/documents/5a16b8ed-c62f-41b3-b3c9-1df20b6a9979/binary"
+  },
+  {
+    "document_url": "http://dm-store:8080/documents/19de0db3-37c6-4191-a81d-c31a1379a9ca",
+    "document_filename": "E_1_BBClaimant details.xlsx",
+    "document_binary_url": "http://dm-store:8080/documents/19de0db3-37c6-4191-a81d-c31a1379a9ca/binary"
+  },
+  {
+    "document_url": "http://dm-store:8080/documents/f51456a2-7b25-4855-844a-81c9763bc02c",
+    "document_filename": "E_2_AA_Claimant details.xlsx",
+    "document_binary_url": "http://dm-store:8080/documents/f51456a2-7b25-4855-844a-81c9763bc02c/binary"
+  },
+  {
+    "document_url": "http://dm-store:8080/documents/2b01ebbc-d6e5-4ee5-9a80-58b28cb623ec",
+    "document_filename": "E_2_BB_Claimant details.xlsx",
+    "document_binary_url": "http://dm-store:8080/documents/2b01ebbc-d6e5-4ee5-9a80-58b28cb623ec/binary"
+  },
+  {
+    "document_url": "http://dm-store:8080/documents/c6924316-4146-441d-a66d-6e181c48cb09",
+    "document_filename": "E_3_AA_Claimant details.pdf",
+    "document_binary_url": "http://dm-store:8080/documents/c6924316-4146-441d-a66d-6e181c48cb09/binary"
+  },
+  {
+    "document_url": "http://dm-store:8080/documents/77ad6295-59ce-4167-8f1e-4aa711ba2c00",
+    "document_filename": "E_3_BB_Claimant details.pdf",
+    "document_binary_url": "http://dm-store:8080/documents/77ad6295-59ce-4167-8f1e-4aa711ba2c00/binary"
+  },
+  {
+    "document_url": "http://dm-store:8080/documents/80e9471e-0f67-42ef-8739-170aa1942363",
+    "document_filename": "E_3_CC_Claimant details.pdf",
+    "document_binary_url": "http://dm-store:8080/documents/80e9471e-0f67-42ef-8739-170aa1942363/binary"
+  },
+  {
+    "document_url": "http://dm-store:8080/documents/84f04693-56ae-4aad-97e8-d1fc7592acea",
+    "document_filename": "B_Document Inside Complex Type.docx",
+    "document_binary_url": "http://dm-store:8080/documents/84f04693-56ae-4aad-97e8-d1fc7592acea/binary"
+  },
+  {
+    "document_url": "http://dm-store:8080/documents/f8e7f506-e8bd-4886-bd08-d4f70e9c84f6",
+    "document_filename": "D_1_Collection of Complex Type with Documents.docx",
+    "document_binary_url": "http://dm-store:8080/documents/f8e7f506-e8bd-4886-bd08-d4f70e9c84f6/binary"
+  },
+  {
+    "document_url": "http://dm-store:8080/documents/cdab9cf7-1b38-4245-9c91-e098d28f6404",
+    "document_filename": "D_2_Collection of Complex Type with Documents.docx",
+    "document_binary_url": "http://dm-store:8080/documents/cdab9cf7-1b38-4245-9c91-e098d28f6404/binary"
+  },
+  {
+    "document_url": "http://dm-store:8080/documents/f1f9a2c2-c309-4060-8f77-1800be0c85a8",
+    "document_filename": "A_Simple Document.docx",
+    "document_binary_url": "http://dm-store:8080/documents/f1f9a2c2-c309-4060-8f77-1800be0c85a8/binary"
+  },
+  {
+    "document_url": "http://dm-store:8080/documents/7654b1e0-5df6-47c4-a5a0-3ec79fc78cfb",
+    "document_filename": "C_1_Collection of Documents.docx",
+    "document_binary_url": "http://dm-store:8080/documents/7654b1e0-5df6-47c4-a5a0-3ec79fc78cfb/binary"
+  },
+  {
+    "document_url": "http://dm-store:8080/documents/f6d623f2-db67-4a01-ae6e-3b6ee14a8b20",
+    "document_filename": "C_2_Collection of Documents.docx",
+    "document_binary_url": "http://dm-store:8080/documents/f6d623f2-db67-4a01-ae6e-3b6ee14a8b20/binary"
+  }
+]
