@@ -139,6 +139,7 @@ public class CaseUpdateViewEvent {
 
     public void setAccessProcess(String accessProcess) {
         this.accessProcess = accessProcess;
+    }
 
     public String getTitleDisplay() {
         return titleDisplay;
