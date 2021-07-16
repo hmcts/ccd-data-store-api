@@ -9,9 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
 @EnableCaching
+@Profile("!test")
 public class CachingConfiguration {
 
     @Autowired
@@ -61,8 +63,9 @@ public class CachingConfiguration {
                 .setEvictionPolicy(applicationParams.getDefinitionCacheEvictionPolicy())
                 .setMaxSizePolicy(MaxSizePolicy.PER_NODE)
                 .setSize(applicationParams.getDefinitionCacheMaxSize());
-        return new MapConfig().setName(name)
+        MapConfig mapConfig = new MapConfig().setName(name)
                 .setEvictionConfig(evictionConfig);
+        return mapConfig;
     }
 
 }
