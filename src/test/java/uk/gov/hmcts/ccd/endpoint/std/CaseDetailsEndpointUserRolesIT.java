@@ -30,6 +30,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataCo
 public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
     private static final String JURISDICTION = "PROBATE";
     private static final String TEST_EVENT_ID = "TEST_EVENT";
+    private static final String GET_PAGINATED_SEARCH_METADATA_CITIZENS
+        = "/citizens/0/jurisdictions/PROBATE/case-types/TestAddressBookCase/cases/pagination_metadata";
     private static final String UID = "123";
     private static final String CASE_TYPE_CREATOR_ROLE = "TestAddressBookCreatorCase";
     private static final String CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS = "TestAddressBookCreatorNoCreateAccessCase";
@@ -38,6 +40,7 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
     private WebApplicationContext wac;
     private MockMvc mockMvc;
     private JdbcTemplate template;
+    private static final String REFERENCE_2 = "1504259907353545";
 
     @Before
     public void setUp() {
@@ -50,6 +53,7 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
     public void shouldReturn201WhenPostCreateCaseWithCreatorRoleWithNoDataForCaseworker() throws Exception {
         final String description = "A very long comment.......";
         final String summary = "Short comment";
+
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_CREATOR_ROLE
             + "/cases";
 
@@ -61,6 +65,7 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
         caseDetailsToSave.setEvent(triggeringEvent);
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_CREATOR_ROLE, TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
+
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
@@ -117,6 +122,7 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
         final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_CREATOR_ROLE, TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
+
         final MvcResult mvcResult = mockMvc.perform(post(URL)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(caseDetailsToSave))
@@ -165,6 +171,15 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
     public void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRoleForCitizen() throws Exception {
         shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess("citizens",
             CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS);
+    }
+
+    /**
+     * Checks that we have the expected test data set size, this is to ensure
+     * that state filtering is correct.
+     */
+    private void assertCaseDataResultSetSize() {
+        final int count = template.queryForObject("SELECT count(1) as n FROM case_data",Integer.class);
+        assertEquals("Incorrect case data size", NUMBER_OF_CASES, count);
     }
 
     private void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccess(String role, String caseType)

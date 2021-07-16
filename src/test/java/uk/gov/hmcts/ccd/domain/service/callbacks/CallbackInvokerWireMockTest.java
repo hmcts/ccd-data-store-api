@@ -109,7 +109,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
                 + "event Test"));
         final Duration between = Duration.between(start, Instant.now());
         // 0s retryInterval + 0.5s readTimeout and no follow up retries
-        assertThat((int) between.toMillis(), lessThan(1500));
+        assertThat((int) between.toMillis(), lessThan(2500));
         verify(exactly(1), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
     }
 
