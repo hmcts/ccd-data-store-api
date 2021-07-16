@@ -12,7 +12,9 @@ import uk.gov.hmcts.ccd.auditlog.aop.AuditContextHolder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 public class AuditInterceptor extends HandlerInterceptorAdapter {
@@ -59,24 +61,33 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
         AuditContext context = (auditContext != null) ? auditContext : new AuditContext();
         context.setHttpStatus(response.getStatus());
 
-        if (request.getMethod() != null && httpMethodList.contains(request.getMethod().toUpperCase())) {
-            context.setHttpMethod(request.getMethod());
+        String requestMethod = request.getMethod();
+        if (requestMethod != null && httpMethodList.contains(requestMethod.toUpperCase())) {
+            context.setHttpMethod(requestMethod);
         } else {
             context.setHttpMethod(BAD_VALUE_TOKEN);
             LOG.error("Error while validating Http Method with value {} as it did not meet validation criteria:{}",
-                request.getMethod(), httpMethodList);
+                encodeString(requestMethod), httpMethodList);
         }
 
         context.setRequestPath(request.getRequestURI());
 
-        if (request.getHeader(REQUEST_ID) == null || request.getHeader(REQUEST_ID).matches(REQUEST_ID_PATTERN)) {
-            context.setRequestId(request.getHeader(REQUEST_ID));
+        String requestId = request.getHeader(REQUEST_ID);
+        if (requestId == null || requestId.matches(REQUEST_ID_PATTERN)) {
+            context.setRequestId(requestId);
         } else {
             context.setRequestId(BAD_VALUE_TOKEN);
             LOG.error("Error while validating Request Id with value {} as it did not meet validation criteria:{}",
-                request.getHeader(REQUEST_ID), REQUEST_ID_PATTERN);
+                encodeString(requestId), REQUEST_ID_PATTERN);
         }
         return context;
     }
 
+    private String encodeString(String value) {
+        if (value == null) {
+            value = "";
+        }
+
+        return Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
+    }
 }
