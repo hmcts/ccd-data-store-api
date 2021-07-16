@@ -1,0 +1,6 @@
+{
+  "_guid_": "RestrictedCaseworker",
+
+  "username": "[[$CCD_RESTRICTED_CASEWORKER_EMAIL]]",
+  "password": "[[$CCD_RESTRICTED_CASEWORKER_PASSWORD]]"
+}
