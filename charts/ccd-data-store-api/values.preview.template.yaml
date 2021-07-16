@@ -32,6 +32,7 @@ java:
     ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"
     LOG_CALLBACK_DETAILS:
     
+    ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
     ENABLE_ATTRIBUTE_BASED_ACCESS_CONTROL: true
     ENABLE_PSEUDO_ROLE_ASSIGNMENTS_GENERATION: true
     ENABLE_PSEUDO_ACCESS_PROFILES_GENERATION: true
