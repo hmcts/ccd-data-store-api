@@ -31,6 +31,10 @@ java:
     ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
     ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"
     LOG_CALLBACK_DETAILS:
+    
+    ENABLE_ATTRIBUTE_BASED_ACCESS_CONTROL: true
+    ENABLE_PSEUDO_ROLE_ASSIGNMENTS_GENERATION: true
+    ENABLE_PSEUDO_ACCESS_PROFILES_GENERATION: true
   postgresql:
     enabled: true
 
