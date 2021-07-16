@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
 
 @ToString
-public class CaseTypeDefinition implements Serializable, Cloneable {
+public class CaseTypeDefinition implements Serializable {
     private static final long serialVersionUID = 5688786015302840008L;
     private String id;
     private String description;
@@ -191,10 +191,5 @@ public class CaseTypeDefinition implements Serializable, Cloneable {
             .filter(caseField -> LABEL.equals(caseField.getFieldTypeDefinition().getType()))
             .collect(Collectors.toMap(CaseFieldDefinition::getId, caseField ->
                 JsonNodeFactory.instance.textNode(caseField.getLabel())));
-    }
-
-    @JsonIgnore
-    public CaseTypeDefinition shallowClone() throws CloneNotSupportedException {
-        return (CaseTypeDefinition) super.clone();
     }
 }

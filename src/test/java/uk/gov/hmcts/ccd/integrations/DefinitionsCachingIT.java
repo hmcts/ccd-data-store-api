@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.integrations;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,20 +26,15 @@ import uk.gov.hmcts.ccd.domain.model.definition.SearchInputFieldsDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchResultDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WorkbasketInputFieldsDefinition;
-import uk.gov.hmcts.ccd.endpoint.exceptions.DataProcessingException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -88,7 +84,6 @@ public class DefinitionsCachingIT {
     @Mock
     SearchInputFieldsDefinition searchInputFieldsDefinition;
 
-    CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
 
     List<WizardPage> wizardPageList = Collections.emptyList();
 
@@ -108,11 +103,7 @@ public class DefinitionsCachingIT {
             .getJurisdictionFromDefinitionStore("J2");
         doReturn(JURISDICTION_DEFINITION_3).when(this.caseDefinitionRepository)
             .getJurisdictionFromDefinitionStore("J3");
-        doReturn(Arrays.asList(JURISDICTION_DEFINITION_1, JURISDICTION_DEFINITION_2, JURISDICTION_DEFINITION_3))
-            .when(this.caseDefinitionRepository)
-            .getJurisdictions(Arrays.asList("J1", "J2", "J3"));
-        doReturn(caseTypeDefinition).when(this.caseDefinitionRepository).getCaseType(ID_1);
-        doReturn(mockCaseTypeDefinition).when(this.caseDefinitionRepository).getCaseType(ID_2);
+        doReturn(mockCaseTypeDefinition).when(this.caseDefinitionRepository).getCaseType(ID_1);
     }
 
     @Test
@@ -127,24 +118,44 @@ public class DefinitionsCachingIT {
     }
 
     @Test
-    public void testJurisdictionsListsAreCached() {
-        verify(caseDefinitionRepository, times(0)).getJurisdictions(Arrays.asList("J1", "J2", "J3"));
-        cachedCaseDefinitionRepository.getJurisdictions(Arrays.asList("J1", "J2", "J3"));
-        verify(caseDefinitionRepository, times(1)).getJurisdictions(Arrays.asList("J1", "J2", "J3"));
-        cachedCaseDefinitionRepository.getJurisdictions(Arrays.asList("J3", "J2", "J1"));
-        verify(caseDefinitionRepository, times(1)).getJurisdictions(Arrays.asList("J1", "J2", "J3"));
-        verify(caseDefinitionRepository, times(0)).getJurisdictions(Arrays.asList("J3", "J2", "J1"));
-        cachedCaseDefinitionRepository.getJurisdictions(Arrays.asList("J1", "J3", "J2"));
-        verify(caseDefinitionRepository, times(1)).getJurisdictions(Arrays.asList("J1", "J2", "J3"));
-        verify(caseDefinitionRepository, times(0)).getJurisdictions(Arrays.asList("J1", "J3", "J2"));
-        cachedCaseDefinitionRepository.getJurisdictions(Arrays.asList("J2", "J3", "J1"));
-        verify(caseDefinitionRepository, times(1)).getJurisdictions(Arrays.asList("J1", "J2", "J3"));
-        verify(caseDefinitionRepository, times(0)).getJurisdictions(Arrays.asList("J2", "J3", "J1"));
+    public void testTtlBasedEvictionOfJurisdictionLists() throws InterruptedException {
+        Assert.assertEquals(3, applicationParams.getJurisdictionTTLSecs());
+
+        verify(caseDefinitionRepository, times(0)).getJurisdictionFromDefinitionStore("J2");
+        caseDefinitionRepository.getJurisdiction("J2");
+        verify(caseDefinitionRepository, times(1)).getJurisdictionFromDefinitionStore("J2");
+
+        caseDefinitionRepository.getJurisdiction("J2");
+        caseDefinitionRepository.getJurisdiction("J2");
+        caseDefinitionRepository.getJurisdiction("J2");
+        verify(caseDefinitionRepository, times(1)).getJurisdictionFromDefinitionStore("J2");
+
+        TimeUnit.SECONDS.sleep(1);
+        caseDefinitionRepository.getJurisdiction("J2");
+        caseDefinitionRepository.getJurisdiction("J2");
+        caseDefinitionRepository.getJurisdiction("J2");
+        verify(caseDefinitionRepository, times(1)).getJurisdictionFromDefinitionStore("J2");
+
+        TimeUnit.SECONDS.sleep(1);
+        caseDefinitionRepository.getJurisdiction("J2");
+        caseDefinitionRepository.getJurisdiction("J2");
+        caseDefinitionRepository.getJurisdiction("J2");
+        verify(caseDefinitionRepository, times(1)).getJurisdictionFromDefinitionStore("J2");
+
+        TimeUnit.SECONDS.sleep(1);
+        verify(caseDefinitionRepository, times(1)).getJurisdictionFromDefinitionStore("J2");
+        caseDefinitionRepository.getJurisdiction("J2");
+        verify(caseDefinitionRepository, times(2)).getJurisdictionFromDefinitionStore("J2");
+
+        caseDefinitionRepository.getJurisdiction("J2");
+        caseDefinitionRepository.getJurisdiction("J2");
+        caseDefinitionRepository.getJurisdiction("J2");
+        verify(caseDefinitionRepository, times(2)).getJurisdictionFromDefinitionStore("J2");
     }
 
     @Test
     public void testCaseDefinitionLatestVersionsAreCached() {
-        assertEquals(3, applicationParams.getLatestVersionTTLSecs());
+        Assert.assertEquals(3, applicationParams.getLatestVersionTTLSecs());
         verify(caseDefinitionRepository, times(0)).getLatestVersion(ID_2);
         cachedCaseDefinitionRepository.getLatestVersion(ID_2);
         verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_2);
@@ -155,27 +166,49 @@ public class DefinitionsCachingIT {
     }
 
     @Test
-    public void testCaseDefinitionAreCached() {
-        CaseTypeDefinition caseTypeDefinition1 = cachedCaseDefinitionRepository.getCaseType(ID_1);
-        CaseTypeDefinition caseTypeDefinition2 = cachedCaseDefinitionRepository.getCaseType(ID_1);
-        CaseTypeDefinition caseTypeDefinition3 = cachedCaseDefinitionRepository.getCaseType(ID_1);
+    public void testTtlBasedEvictionOfCaseDefinitionLatestVersion() throws InterruptedException {
+        Assert.assertEquals(3, applicationParams.getLatestVersionTTLSecs());
 
-        assertNotEquals(caseTypeDefinition1, caseTypeDefinition2);
-        assertNotEquals(caseTypeDefinition2, caseTypeDefinition3);
+        verify(caseDefinitionRepository, times(0)).getLatestVersion(ID_3);
+        caseDefinitionRepository.getLatestVersion(ID_3);
+        verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_3);
+
+        caseDefinitionRepository.getLatestVersion(ID_3);
+        caseDefinitionRepository.getLatestVersion(ID_3);
+        caseDefinitionRepository.getLatestVersion(ID_3);
+        verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_3);
+
+        TimeUnit.SECONDS.sleep(1);
+        caseDefinitionRepository.getLatestVersion(ID_3);
+        caseDefinitionRepository.getLatestVersion(ID_3);
+        caseDefinitionRepository.getLatestVersion(ID_3);
+        verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_3);
+
+        TimeUnit.SECONDS.sleep(4);
+        verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_3);
+        caseDefinitionRepository.getLatestVersion(ID_3);
+        verify(caseDefinitionRepository, times(2)).getLatestVersion(ID_3);
+
+        caseDefinitionRepository.getLatestVersion(ID_3);
+        caseDefinitionRepository.getLatestVersion(ID_3);
+        caseDefinitionRepository.getLatestVersion(ID_3);
+        verify(caseDefinitionRepository, times(2)).getLatestVersion(ID_3);
+    }
+
+    @Test
+    public void testCaseDefinitionAreCached() {
+
+        cachedCaseDefinitionRepository.getCaseType(ID_1);
+        cachedCaseDefinitionRepository.getCaseType(ID_1);
+        cachedCaseDefinitionRepository.getCaseType(ID_1);
+
         verify(caseDefinitionRepository, times(1)).getCaseType(VERSION_1, ID_1);
         verify(caseDefinitionRepository, times(1)).getCaseType(ID_1);
     }
 
     @Test
-    public void testCaseDefinitionCloningException() throws CloneNotSupportedException {
-        doThrow(CloneNotSupportedException.class).when(mockCaseTypeDefinition).shallowClone();
-
-        assertThrows(DataProcessingException.class, () -> cachedCaseDefinitionRepository.getCaseType(ID_2),
-            String.format("Unable to clone case type definition for CaseTypeId %s.", ID_2));
-    }
-
-    @Test
     public void testWorkbasketInputDefinitionsAreCached() {
+
         doReturn(workbasketInputFieldsDefinition).when(this.httpUIDefinitionGateway)
             .getWorkbasketInputFieldsDefinitions(VERSION_1, ID_1);
 
@@ -188,6 +221,7 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testWorkbasketResultAreCached() {
+
         doReturn(searchResult).when(this.httpUIDefinitionGateway).getWorkBasketResult(VERSION_1, ID_1);
 
         uiDefinitionRepository.getWorkBasketResult(ID_1);
@@ -199,6 +233,7 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testSearchResultAreCached() {
+
         doReturn(searchResult).when(this.httpUIDefinitionGateway).getSearchResult(VERSION_1, ID_1);
 
         uiDefinitionRepository.getSearchResult(ID_1);
@@ -210,6 +245,7 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testCaseTabsAreCached() {
+
         doReturn(caseTypeTabsDefinition).when(this.httpUIDefinitionGateway).getCaseTypeTabsCollection(VERSION_1, ID_1);
 
         uiDefinitionRepository.getCaseTabCollection(ID_1);
@@ -221,6 +257,7 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testSearchInputDefinitionsAreCached() {
+
         doReturn(searchInputFieldsDefinition).when(this.httpUIDefinitionGateway)
             .getSearchInputFieldDefinitions(VERSION_1, ID_1);
 
@@ -233,6 +270,7 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testWizardPageDefinitionsAreCached() {
+
         doReturn(wizardPageList).when(this.httpUIDefinitionGateway).getWizardPageCollection(VERSION_1, ID_1, EVENT_ID);
 
         uiDefinitionRepository.getWizardPageCollection(ID_1, EVENT_ID);
@@ -247,6 +285,7 @@ public class DefinitionsCachingIT {
         ctdv.setVersion(version);
         return ctdv;
     }
+
 
     @Test
     public void testBannersCached() {

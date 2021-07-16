@@ -50,9 +50,12 @@ public class UserService {
         List<JurisdictionDefinition> jurisdictionDefinitions = new ArrayList<>();
 
         LOGGER.debug("Will get jurisdiction(s) '{}' from repository.", jurisdictionIds);
-        if (jurisdictionIds != null && !jurisdictionIds.isEmpty()) {
-            jurisdictionDefinitions = caseDefinitionRepository.getJurisdictions(jurisdictionIds);
-        }
+        jurisdictionIds.stream().forEach(id -> {
+            JurisdictionDefinition jurisdictionDefinition = caseDefinitionRepository.getJurisdiction(id);
+            if (jurisdictionDefinition != null) {
+                jurisdictionDefinitions.add(jurisdictionDefinition);
+            }
+        });
 
         return createUserProfile(idamProperties, userId, jurisdictionDefinitions);
     }
@@ -85,4 +88,7 @@ public class UserService {
         .toArray(JurisdictionDisplayProperties[]::new);
     }
 
+    public List<String> getUserRolesJurisdictions() {
+        return userRepository.getCaseworkerUserRolesJurisdictions();
+    }
 }

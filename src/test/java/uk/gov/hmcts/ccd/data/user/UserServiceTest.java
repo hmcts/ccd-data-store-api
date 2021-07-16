@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.data.user;
 
 import com.google.common.collect.Lists;
-
-import java.util.Arrays;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,9 +18,9 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 public class UserServiceTest {
@@ -60,60 +58,50 @@ public class UserServiceTest {
 
     @Test
     public void testReturnsUserProfileDiscardingUnknownJurisdictions() {
+
         when(userRepoMock.getUserDetails()).thenReturn(mockIdamProps);
         UserDefault userDefaultMock = userDefault();
         when(userRepoMock.getUserDefaultSettings("email")).thenReturn(userDefaultMock);
         when(jurisdictionsResolver.getJurisdictions()).thenReturn(Lists.newArrayList("J1", "J2", "J3"));
-        when(caseDefinitionRepoMock.getJurisdictions(Arrays.asList("J1", "J2", "J3")))
-            .thenReturn(Arrays.asList(j1, j2, unknownJurisdictionDefinition));
+        when(caseDefinitionRepoMock.getJurisdiction("J1")).thenReturn(j1);
+        when(caseDefinitionRepoMock.getJurisdiction("J2")).thenReturn(j2);
+        when(caseDefinitionRepoMock.getJurisdiction("J3")).thenReturn(unknownJurisdictionDefinition);
         when(jurisdictionMapperMock.toResponse(j1)).thenReturn(jdp1);
         when(jurisdictionMapperMock.toResponse(j2)).thenReturn(jdp2);
         when(jurisdictionMapperMock.toResponse(unknownJurisdictionDefinition)).thenReturn(jdp3);
 
         UserProfile userProfile = userService.getUserProfile();
 
-        assertEquals(mockIdamProps, userProfile.getUser().getIdamProperties());
+        assertThat(userProfile.getUser().getIdamProperties(), is(mockIdamProps));
         assertThat(userProfile.getJurisdictions(),
             equalTo(new JurisdictionDisplayProperties[] { jdp1, jdp2, jdp3 }));
         WorkbasketDefault workbasketDefault = userProfile.getDefaultSettings().getWorkbasketDefault();
-        assertEquals("J1", workbasketDefault.getJurisdictionId());
-        assertEquals("CT", workbasketDefault.getCaseTypeId());
-        assertEquals("ST", workbasketDefault.getStateId());
+        assertThat(workbasketDefault.getJurisdictionId(), is("J1"));
+        assertThat(workbasketDefault.getCaseTypeId(), is("CT"));
+        assertThat(workbasketDefault.getStateId(), is("ST"));
     }
 
     @Test
     public void testReturnsUserProfileNoWorkBasketDefaults() {
+
         when(userRepoMock.getUserDetails()).thenReturn(mockIdamProps);
         when(userRepoMock.getUserDefaultSettings("email"))
             .thenThrow(new ResourceNotFoundException("No User profile exists for this userId email"));
         when(jurisdictionsResolver.getJurisdictions()).thenReturn(Lists.newArrayList("J1", "J2", "J3"));
-        when(caseDefinitionRepoMock.getJurisdictions(Arrays.asList("J1", "J2", "J3")))
-            .thenReturn(Arrays.asList(j1, j2, unknownJurisdictionDefinition));
+        when(caseDefinitionRepoMock.getJurisdiction("J1")).thenReturn(j1);
+        when(caseDefinitionRepoMock.getJurisdiction("J2")).thenReturn(j2);
+        when(caseDefinitionRepoMock.getJurisdiction("J3")).thenReturn(unknownJurisdictionDefinition);
         when(jurisdictionMapperMock.toResponse(j1)).thenReturn(jdp1);
         when(jurisdictionMapperMock.toResponse(j2)).thenReturn(jdp2);
         when(jurisdictionMapperMock.toResponse(unknownJurisdictionDefinition)).thenReturn(jdp3);
 
         UserProfile userProfile = userService.getUserProfile();
 
-        assertEquals(mockIdamProps, userProfile.getUser().getIdamProperties());
+        assertThat(userProfile.getUser().getIdamProperties(), is(mockIdamProps));
         assertThat(userProfile.getJurisdictions(),
             equalTo(new JurisdictionDisplayProperties[] { jdp1, jdp2, jdp3 }));
         WorkbasketDefault workbasketDefault = userProfile.getDefaultSettings().getWorkbasketDefault();
         assertNull(workbasketDefault);
-    }
-
-    @Test
-    public void testReturnsUserProfileWithEmptyJurisdictions() {
-        when(userRepoMock.getUserDetails()).thenReturn(mockIdamProps);
-        UserDefault userDefaultMock = userDefault();
-        when(userRepoMock.getUserDefaultSettings("email")).thenReturn(userDefaultMock);
-        when(jurisdictionsResolver.getJurisdictions()).thenReturn(null);
-
-        UserProfile userProfile = userService.getUserProfile();
-
-        assertEquals(mockIdamProps, userProfile.getUser().getIdamProperties());
-        assertThat(userProfile.getJurisdictions(),
-            equalTo(new JurisdictionDisplayProperties[] { }));
     }
 
     private UserDefault userDefault() {

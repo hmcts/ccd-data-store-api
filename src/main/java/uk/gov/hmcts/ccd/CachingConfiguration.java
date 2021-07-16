@@ -32,6 +32,7 @@ public class CachingConfiguration {
     private void configCaches(Config config) {
         final int definitionCacheMaxIdle = applicationParams.getDefinitionCacheMaxIdleSecs();
         final int latestVersionTTL = applicationParams.getLatestVersionTTLSecs();
+        config.addMapConfig(newMapConfigWithMaxIdle("caseTypeDefinitionsCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("workBasketResultCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("searchResultCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("searchCasesResultCache", definitionCacheMaxIdle));
@@ -39,13 +40,20 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithMaxIdle("workbasketInputDefinitionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("caseTabCollectionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("wizardPageCollectionCache", definitionCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("userRolesCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("userInfoCache", applicationParams.getUserCacheTTLSecs()));
         config.addMapConfig(newMapConfigWithMaxIdle("bannersCache", latestVersionTTL));
         config.addMapConfig(newMapConfigWithMaxIdle("jurisdictionUiConfigsCache", latestVersionTTL));
+        config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", latestVersionTTL));
+        config.addMapConfig(newMapConfigWithTtl("jurisdictionCache", applicationParams.getJurisdictionTTLSecs()));
     }
 
     private MapConfig newMapConfigWithMaxIdle(final String name, final Integer maxIdle) {
         return newMapConfig(name).setMaxIdleSeconds(maxIdle);
+    }
+
+    private MapConfig newMapConfigWithTtl(final String name, final Integer ttl) {
+        return newMapConfig(name).setTimeToLiveSeconds(ttl);
     }
 
     private MapConfig newMapConfig(final String name) {
@@ -53,9 +61,8 @@ public class CachingConfiguration {
                 .setEvictionPolicy(applicationParams.getDefinitionCacheEvictionPolicy())
                 .setMaxSizePolicy(MaxSizePolicy.PER_NODE)
                 .setSize(applicationParams.getDefinitionCacheMaxSize());
-
         return new MapConfig().setName(name)
-            .setEvictionConfig(evictionConfig);
+                .setEvictionConfig(evictionConfig);
     }
 
 }

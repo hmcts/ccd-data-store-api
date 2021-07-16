@@ -61,7 +61,7 @@ class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         "classpath:sql/insert_case_users_valid_case_ids.sql"
     })
     void shouldGetSelfCaseUserRolesAssigned() throws Exception {
-        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
+        MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 
         final MvcResult result = mockMvc.perform(get(getCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)

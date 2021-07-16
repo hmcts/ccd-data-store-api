@@ -111,7 +111,7 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldGetJurisdictionsDefinitionForGivenList() {
+    public void shouldGetJurisdictionsDefinition() {
         List<JurisdictionDefinition> allJurisdictionDefinitions =
             newArrayList("PROBATE", "DIVORCE", "SSCS").stream()
                 .map(id -> caseDefinitionRepository.getJurisdiction(id)).collect(Collectors.toList());
@@ -120,47 +120,6 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
             () -> assertThat(allJurisdictionDefinitions, hasSize(3)),
             () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("SSCS")))),
             () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("PROBATE"))))
-        );
-    }
-
-    @Test
-    public void shouldGetAllJurisdictionsDefinitionForGivenList() {
-        List<JurisdictionDefinition> allJurisdictionDefinitions = caseDefinitionRepository
-            .getJurisdictions(newArrayList("PROBATE", "DIVORCE", "SSCS"));
-
-        assertAll(
-            () -> assertThat(allJurisdictionDefinitions, hasSize(3)),
-            () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("SSCS")))),
-            () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("PROBATE")))),
-            () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("DIVORCE"))))
-        );
-    }
-
-    @Test
-    public void shouldGetAllJurisdictionsDefinitionForEmptyList() {
-        List<JurisdictionDefinition> allJurisdictionDefinitions = caseDefinitionRepository
-            .getJurisdictions(newArrayList());
-
-        assertAll(
-            () -> assertThat(allJurisdictionDefinitions, hasSize(4)),
-            () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("SSCS")))),
-            () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("Test Case Role")))),
-            () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("PROBATE")))),
-            () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("DIVORCE"))))
-        );
-    }
-
-    @Test
-    public void shouldGetAllJurisdictionsDefinitionForNull() {
-        List<JurisdictionDefinition> allJurisdictionDefinitions = caseDefinitionRepository
-            .getJurisdictions(null);
-
-        assertAll(
-            () -> assertThat(allJurisdictionDefinitions, hasSize(4)),
-            () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("SSCS")))),
-            () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("Test Case Role")))),
-            () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("PROBATE")))),
-            () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("DIVORCE"))))
         );
     }
 
