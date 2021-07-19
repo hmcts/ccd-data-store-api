@@ -35,6 +35,7 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -216,6 +217,7 @@ class CaseDocumentServiceTest extends TestFixtures {
     @Test
     void testShouldApplyCaseDocumentPatch() {
         // Given
+        doReturn(true).when(applicationParams).isAttachDocumentEnabled();
         final List<DocumentHashToken> documentHashTokens = List.of(HASH_TOKEN_A1, HASH_TOKEN_A2);
         doNothing().when(caseDocumentAmApiClient).applyPatch(any(CaseDocumentsMetadata.class));
 
@@ -224,6 +226,19 @@ class CaseDocumentServiceTest extends TestFixtures {
 
         // Then
         verify(caseDocumentAmApiClient).applyPatch(any(CaseDocumentsMetadata.class));
+    }
+
+    @Test
+    void testShouldNotApplyCaseDocumentPatchWhenFeaturedDisabled() {
+        // Given
+        doReturn(false).when(applicationParams).isAttachDocumentEnabled();
+        final List<DocumentHashToken> documentHashTokens = List.of(HASH_TOKEN_A1, HASH_TOKEN_A2);
+
+        // When
+        underTest.attachCaseDocuments(CASE_REFERENCE, CASE_TYPE_ID, JURISDICTION_ID, documentHashTokens);
+
+        // Then
+        verify(caseDocumentAmApiClient, never()).applyPatch(any(CaseDocumentsMetadata.class));
     }
 
     @Test
@@ -247,6 +262,14 @@ class CaseDocumentServiceTest extends TestFixtures {
             .doesNotThrowAnyException();
     }
 
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideValidHashTokenParameters() {
+        return Stream.of(
+            Arguments.of(emptyList()),
+            Arguments.of(List.of(HASH_TOKEN_A1, HASH_TOKEN_A2))
+        );
+    }
+
     @Test
     void testShouldNotCheckDocumentsForHashToken() {
         // GIVEN
@@ -257,13 +280,5 @@ class CaseDocumentServiceTest extends TestFixtures {
             .doesNotThrowAnyException();
 
         verifyZeroInteractions(documentUtils);
-    }
-
-    @SuppressWarnings("unused")
-    private static Stream<Arguments> provideValidHashTokenParameters() {
-        return Stream.of(
-            Arguments.of(emptyList()),
-            Arguments.of(List.of(HASH_TOKEN_A1, HASH_TOKEN_A2))
-        );
     }
 }

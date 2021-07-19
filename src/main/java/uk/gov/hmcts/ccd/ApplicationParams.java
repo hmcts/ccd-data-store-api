@@ -47,12 +47,6 @@ public class ApplicationParams {
     @Value("${ccd.case-definition.host}")
     private String caseDefinitionHost;
 
-    @Value("${ccd.case-document-am-api.base_url}")
-    private String caseDocumentAmApiHost;
-
-    @Value("${ccd.case-document-am-api.attachDocumentPath}")
-    private String attachDocumentPath;
-
     @Value("${ccd.draft.host}")
     private String draftHost;
 
@@ -157,6 +151,9 @@ public class ApplicationParams {
 
     @Value("${document.hash.check.enabled}")
     private boolean enableDocumentHashCheck;
+
+    @Value("${ccd.case-document-am-api.attachDocumentEnabled:true}")
+    private boolean attachDocumentEnabled;
 
     public static String encode(final String stringToEncode) {
         try {
@@ -388,15 +385,6 @@ public class ApplicationParams {
         return elasticSearchRequestTimeout;
     }
 
-    public String getCaseDocumentAmApiHost() {
-        return caseDocumentAmApiHost;
-    }
-
-    public String getAttachDocumentPath() {
-        return attachDocumentPath;
-    }
-
-
     public List<Integer> getAuditLogIgnoreStatuses() {
         return auditLogIgnoreStatuses;
     }
@@ -427,5 +415,9 @@ public class ApplicationParams {
 
     public boolean isDocumentHashCheckingEnabled() {
         return enableDocumentHashCheck;
+    }
+
+    public boolean isAttachDocumentEnabled() {
+        return attachDocumentEnabled;
     }
 }
