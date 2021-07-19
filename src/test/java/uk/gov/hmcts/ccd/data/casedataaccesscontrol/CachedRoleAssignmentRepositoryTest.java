@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -31,6 +32,28 @@ class CachedRoleAssignmentRepositoryTest {
 
         doReturn(roleAssignmentResponse).when(roleAssignmentRepositoryMock).getRoleAssignments(userId);
         classUnderTest = new CachedRoleAssignmentRepository(roleAssignmentRepositoryMock);
+    }
+
+    @Test
+    @DisplayName("should create role assignments in decorated repository")
+    void shouldCreateRoleAssignmentInDefaultRepository() {
+
+        // GIVEN
+        RoleAssignmentRequestResource assignmentRequest = Mockito.mock(RoleAssignmentRequestResource.class);
+        RoleAssignmentRequestResponse expectedResponse = Mockito.mock(RoleAssignmentRequestResponse.class);
+
+        doReturn(expectedResponse)
+            .when(roleAssignmentRepositoryMock).createRoleAssignment(assignmentRequest);
+
+        // WHEN
+        RoleAssignmentRequestResponse roleAssignmentRequestResponse
+            = classUnderTest.createRoleAssignment(assignmentRequest);
+
+        // THEN
+        assertAll(
+            () -> assertThat(expectedResponse, is(roleAssignmentRequestResponse)),
+            () -> verify(roleAssignmentRepositoryMock, times(1)).createRoleAssignment(assignmentRequest)
+        );
     }
 
     @Test

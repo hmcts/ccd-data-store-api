@@ -20,7 +20,7 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.ProfileCaseState;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
@@ -46,9 +46,9 @@ import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -223,7 +223,7 @@ class AuthorisedGetCaseViewOperationTest {
 
         assertAll(
             () -> verify(authorisedGetCaseViewOperation).execute(CASE_REFERENCE),
-            () -> assertEquals(actualCaseView.getTabs()[0], CASE_VIEW_TAB_WITH_MIXED_FIELDS),
+            () -> assertThat(actualCaseView.getTabs()[0], is(CASE_VIEW_TAB_WITH_MIXED_FIELDS)),
             () -> assertThat(actualCaseView.getTabs()[0].getFields().length, is(2))
         );
     }
@@ -240,8 +240,8 @@ class AuthorisedGetCaseViewOperationTest {
         assertAll(
             () -> verify(authorisedGetCaseViewOperation).execute(CASE_REFERENCE),
             () -> assertThat(actualCaseView.getTabs().length, is(2)),
-            () -> assertNotEquals(actualCaseView.getTabs()[0], CASE_VIEW_TAB_WITH_ROLE_NOT_ALLOWED),
-            () -> assertNotEquals(actualCaseView.getTabs()[1], CASE_VIEW_TAB_WITH_ROLE_NOT_ALLOWED)
+            () -> assertThat(actualCaseView.getTabs()[0], is(not(CASE_VIEW_TAB_WITH_ROLE_NOT_ALLOWED))),
+            () -> assertThat(actualCaseView.getTabs()[1], is(not(CASE_VIEW_TAB_WITH_ROLE_NOT_ALLOWED)))
         );
     }
 
@@ -256,8 +256,8 @@ class AuthorisedGetCaseViewOperationTest {
         assertAll(
             () -> verify(authorisedGetCaseViewOperation).execute(CASE_REFERENCE),
             () -> assertThat(actualCaseView.getTabs().length, is(2)),
-            () -> assertNotEquals(actualCaseView.getTabs()[0], CASE_VIEW_TAB_WITH_UNALLOWED_FIELD),
-            () -> assertNotEquals(actualCaseView.getTabs()[1], CASE_VIEW_TAB_WITH_UNALLOWED_FIELD)
+            () -> assertThat(actualCaseView.getTabs()[0], is(not(CASE_VIEW_TAB_WITH_UNALLOWED_FIELD))),
+            () -> assertThat(actualCaseView.getTabs()[1], is(not(CASE_VIEW_TAB_WITH_UNALLOWED_FIELD)))
         );
     }
 

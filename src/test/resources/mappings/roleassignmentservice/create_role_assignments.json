@@ -1,0 +1,14 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPathPattern": "/am/role-assignments"
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "roleassignmentservice/create_role_assignments.json.hbs",
+    "transformers": ["response-template"]
+  }
+}

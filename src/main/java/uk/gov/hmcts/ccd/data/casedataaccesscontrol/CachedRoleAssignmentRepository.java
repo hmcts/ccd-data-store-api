@@ -26,6 +26,11 @@ public class CachedRoleAssignmentRepository implements RoleAssignmentRepository 
     }
 
     @Override
+    public RoleAssignmentRequestResponse createRoleAssignment(RoleAssignmentRequestResource assignmentRequest) {
+        return roleAssignmentRepository.createRoleAssignment(assignmentRequest);
+    }
+
+    @Override
     public RoleAssignmentResponse getRoleAssignments(String userId) {
         return roleAssignments.computeIfAbsent(userId, e -> roleAssignmentRepository.getRoleAssignments(userId));
     }

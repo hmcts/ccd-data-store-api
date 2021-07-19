@@ -7,6 +7,11 @@ import java.util.Optional;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.ActorIdType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
@@ -40,7 +45,7 @@ public class BaseFilter {
         return createRoleAssignment(caseId, jurisdiction,
             Instant.now().minus(1, ChronoUnit.DAYS),
             Instant.now().plus(1, ChronoUnit.DAYS),
-            "PUBLIC");
+            Classification.PUBLIC.name());
     }
 
     protected RoleAssignment createRoleAssignment(String caseId,
@@ -48,13 +53,15 @@ public class BaseFilter {
                                                   Instant startDate,
                                                   Instant endDate,
                                                   String securityClassification) {
-        return createRoleAssignment(caseId,
+        return createRoleAssignment(
+            caseId,
             jurisdiction,
             startDate,
             endDate,
             securityClassification,
             Optional.of(""),
-            Optional.of(""));
+            Optional.of("")
+        );
     }
 
     protected RoleAssignment createRoleAssignment(String caseId,
@@ -64,29 +71,15 @@ public class BaseFilter {
                                                   String securityClassification,
                                                   Optional<String> region,
                                                   Optional<String> location) {
-        RoleAssignment roleAssignment = RoleAssignment.builder().build();
-
-        roleAssignment.setActorId("Actor1");
-        roleAssignment.setRoleName(ROLE_NAME_1);
-        roleAssignment.setActorIdType("IDAM");
-        roleAssignment.setRoleType("ORGANISATION");
-        roleAssignment.setClassification(securityClassification);
-        roleAssignment.setGrantType("BASIC");
-        roleAssignment.setRoleCategory("JUDICIAL");
-        roleAssignment.setReadOnly(false);
-        roleAssignment.setBeginTime(startDate);
-        roleAssignment.setEndTime(endDate);
-        roleAssignment.setCreated(Instant.now());
-        roleAssignment.setAuthorisations(Lists.newArrayList());
-
-        // role assignment attributes
-        RoleAssignmentAttributes roleAssignmentAttributes = createRoleAssignmentAttributes(Optional.of(caseId),
+        return createRoleAssignment(
+            startDate,
+            endDate,
+            securityClassification,
+            Optional.of(caseId),
             Optional.of(jurisdiction),
             region,
-            location);
-        roleAssignment.setAttributes(roleAssignmentAttributes);
-
-        return roleAssignment;
+            location
+        );
     }
 
     protected RoleAssignment createRoleAssignment(Instant startDate,
@@ -100,11 +93,11 @@ public class BaseFilter {
 
         roleAssignment.setActorId("Actor1");
         roleAssignment.setRoleName(ROLE_NAME_1);
-        roleAssignment.setActorIdType("IDAM");
-        roleAssignment.setRoleType("ORGANISATION");
+        roleAssignment.setActorIdType(ActorIdType.IDAM.name());
+        roleAssignment.setRoleType(RoleType.ORGANISATION.name());
         roleAssignment.setClassification(securityClassification);
-        roleAssignment.setGrantType("BASIC");
-        roleAssignment.setRoleCategory("JUDICIAL");
+        roleAssignment.setGrantType(GrantType.BASIC.name());
+        roleAssignment.setRoleCategory(RoleCategory.JUDICIAL.name());
         roleAssignment.setReadOnly(false);
         roleAssignment.setBeginTime(startDate);
         roleAssignment.setEndTime(endDate);
