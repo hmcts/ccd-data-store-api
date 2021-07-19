@@ -9,8 +9,8 @@ import java.util.regex.Pattern;
 
 import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.CITIZEN;
 import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.JUDICIAL;
+import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.LEGAL_OPERATIONS;
 import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.PROFESSIONAL;
-import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.STAFF;
 
 @Service
 public class RoleAssignmentCategoryService {
@@ -37,7 +37,7 @@ public class RoleAssignmentCategoryService {
         } else if (hasJudicialRole(idamUserRoles)) {
             return JUDICIAL;
         } else {
-            return STAFF;
+            return LEGAL_OPERATIONS;
         }
     }
 
