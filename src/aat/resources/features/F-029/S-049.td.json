@@ -811,7 +811,8 @@
       "show_summary": true,
       "show_event_notes": null,
       "end_button_label": null,
-      "can_save_draft": null
+      "can_save_draft": null,
+      "title_display": null
     }
   }
 }

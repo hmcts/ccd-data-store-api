@@ -182,6 +182,8 @@ dependencies {
 
     implementation "io.github.openfeign:feign-httpclient:11.0"
 
+    implementation group: 'net.minidev', name: 'json-smart', version: '2.4.7'
+
     testCompile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
     compile group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
 
@@ -252,7 +254,7 @@ dependencies {
     compile 'org.jooq:jool-java-8:0.9.14'
     compile 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
-    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.0.0'
+    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.2.0'
     testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.2.0'
 
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
