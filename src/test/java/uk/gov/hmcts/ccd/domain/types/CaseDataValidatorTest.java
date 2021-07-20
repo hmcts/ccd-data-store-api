@@ -229,7 +229,6 @@ public class CaseDataValidatorTest extends WireMockBaseTest {
         assertEquals(result.toString(), 0, result.size());
     }
 
-    @Test
     public void validDynamicListInCollection() throws Exception {
         final String DATA = "{\n"
             + "        \"TextAreaField\": \"textAreaField1\",\n"
