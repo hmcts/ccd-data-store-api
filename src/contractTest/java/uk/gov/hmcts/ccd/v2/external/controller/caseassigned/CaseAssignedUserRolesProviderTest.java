@@ -18,8 +18,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.v2.external.controller.CaseAssignedUserRolesController;
+import uk.gov.hmcts.ccd.v2.external.controller.TestIdamConfiguration;
 
 import java.util.Arrays;
 
@@ -33,10 +35,10 @@ import static org.mockito.Mockito.when;
 @TestPropertySource(locations = "/application.properties")
 @WebMvcTest({CaseAssignedUserRolesController.class})
 @AutoConfigureMockMvc(addFilters = false)
-@ContextConfiguration(classes = {CaseAssignedUserRolesProviderTestContext.class})
+@ContextConfiguration(classes = {CaseAssignedUserRolesProviderTestContext.class, TestIdamConfiguration.class})
 @IgnoreNoPactsToVerify
 @ActiveProfiles("CASE_ASSIGNED")
-public class CaseAssignedUserRolesProviderTest {
+public class CaseAssignedUserRolesProviderTest extends WireMockBaseTest {
 
     @Autowired
     ApplicationParams applicationParams;
