@@ -23,7 +23,7 @@ public class SortOrderQueryBuilder {
         metaData.getSortOrderFields().forEach(sortOrderField -> {
             String caseFieldId = sortOrderField.getCaseFieldId();
             if (!caseFieldId.matches(CASE_FIELD_ID_PATTERN)) {
-                throw new BadRequestException("Field Names Invalid");
+                throw new BadRequestException("Sort order field is invalid.");
             }
             if (sortOrderField.isMetadata()) {
                 sb.append(getMataFieldName(caseFieldId));
