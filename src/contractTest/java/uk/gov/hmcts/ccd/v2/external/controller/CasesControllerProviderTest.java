@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditService;
 import uk.gov.hmcts.ccd.data.casedetails.query.UserAuthorisationSecurity;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -59,7 +60,7 @@ import static org.mockito.Mockito.when;
 })
 @ActiveProfiles("SECURITY_MOCK")
 @IgnoreNoPactsToVerify
-public class CasesControllerProviderTest {
+public class CasesControllerProviderTest extends WireMockBaseTest {
 
     private static final String CASEWORKER_USERNAME = "caseworkerUsername";
     private static final String CASEWORKER_PASSWORD = "caseworkerPassword";
@@ -140,7 +141,6 @@ public class CasesControllerProviderTest {
         BaseType.setCaseDefinitionRepository(contractTestCaseDefinitionRepository);
         when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
         when(userAuthorisation.getUserId()).thenReturn("userId");
-
     }
 
     @State({"A Get Case is requested"})

@@ -93,6 +93,9 @@ env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 withPipeline(type, product, component) {
     onMaster {
         enableSlackNotifications('#ccd-master-builds')
+        enablePactAs([
+                AppPipelineDsl.PactRoles.PROVIDER
+        ])
     }
     if (env.BRANCH_NAME.equalsIgnoreCase(dataStoreApiDevelopPr)) {
         enableSlackNotifications('#ccd-develop-builds')
@@ -103,6 +106,9 @@ withPipeline(type, product, component) {
     }
     onPR {
         enableSlackNotifications('#ccd-pr-builds')
+        enablePactAs([
+                AppPipelineDsl.PactRoles.PROVIDER
+        ])
     }
 
     // Check if the build should be wired to an environment higher than 'preview'.
