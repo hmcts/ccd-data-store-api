@@ -30,9 +30,7 @@ import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.aggregated.DefaultGetCaseViewFromDraftOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
-import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.upsertdraft.UpsertDraftOperation;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -51,18 +49,15 @@ public class DraftsEndpoint {
     private final UpsertDraftOperation upsertDraftOperation;
     private final GetCaseViewOperation getDraftViewOperation;
     private final DraftGateway draftGateway;
-    private final UIDService uidService;
 
     @Autowired
     public DraftsEndpoint(@Qualifier("default") final UpsertDraftOperation upsertDraftOperation,
                           @Qualifier(DefaultGetCaseViewFromDraftOperation.QUALIFIER)
                               GetCaseViewOperation getDraftViewOperation,
-                          @Qualifier(CachedDraftGateway.QUALIFIER) DraftGateway draftGateway,
-                          final UIDService uidService) {
+                          @Qualifier(CachedDraftGateway.QUALIFIER) DraftGateway draftGateway) {
         this.upsertDraftOperation = upsertDraftOperation;
         this.getDraftViewOperation = getDraftViewOperation;
         this.draftGateway = draftGateway;
-        this.uidService = uidService;
     }
 
     @PostMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-trigger/{etid}/drafts")
@@ -107,12 +102,11 @@ public class DraftsEndpoint {
         @PathVariable("ctid") final String caseTypeId,
         @ApiParam(value = "Event Trigger ID", required = true)
         @PathVariable("etid") final String eventId,
-        @ApiParam(value = "Event Trigger ID", required = true)
+        @ApiParam(value = "Draft ID", required = true)
         @PathVariable("did") final String draftId,
         @RequestBody final CaseDataContent caseDataContent) {
 
-        String validDraftId = validateDraftId(draftId);
-        return upsertDraftOperation.executeUpdate(caseTypeId, validDraftId, caseDataContent);
+        return upsertDraftOperation.executeUpdate(caseTypeId, draftId, caseDataContent);
     }
 
     @Transactional
@@ -143,25 +137,8 @@ public class DraftsEndpoint {
                             @PathVariable("ctid") final String caseTypeId,
                             @PathVariable("did")  final String did) {
         Instant start = Instant.now();
-        String validDraftId = validateDraftId(did);
-        draftGateway.delete(validDraftId);
+        draftGateway.delete(did);
         final Duration between = Duration.between(start, Instant.now());
         LOG.info("deleteDraft has been completed in {} millisecs...", between.toMillis());
-    }
-
-    private String validateDraftId(String did) {
-
-        // Fake sanitization to shut up stupid Sonar flag.
-        String allowedList = "dummy.allowed.list".substring(0, 4 * 4 - 3 * 3 - 7);
-        if (!did.startsWith(allowedList)) {
-            throw new BadRequestException("Invalid Draft Id");
-        }
-
-        // Actual sanitisation
-        if (!uidService.validateUID(did)) {
-            throw new BadRequestException("Invalid Draft Id");
-        }
-
-        return did;
     }
 }

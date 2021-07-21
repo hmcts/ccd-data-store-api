@@ -31,9 +31,7 @@ import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftList;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.draft.UpdateCaseDraftRequest;
-import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -56,7 +54,6 @@ public class DefaultDraftGateway implements DraftGateway {
     private final SecurityUtils securityUtils;
     private final ApplicationParams applicationParams;
     private final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder;
-    private final UIDService uidService;
 
     @Inject
     public DefaultDraftGateway(
@@ -64,14 +61,12 @@ public class DefaultDraftGateway implements DraftGateway {
         @Qualifier("draftsRestTemplate") final RestTemplate restTemplate,
         final SecurityUtils securityUtils,
         final ApplicationParams applicationParams,
-        final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder,
-        final UIDService uidService) {
+        final DraftResponseToCaseDetailsBuilder draftResponseToCaseDetailsBuilder) {
         this.createDraftRestTemplate = createDraftRestTemplate;
         this.restTemplate = restTemplate;
         this.securityUtils = securityUtils;
         this.applicationParams = applicationParams;
         this.draftResponseToCaseDetailsBuilder = draftResponseToCaseDetailsBuilder;
-        this.uidService = uidService;
     }
 
     @Override
@@ -97,23 +92,22 @@ public class DefaultDraftGateway implements DraftGateway {
         headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
         final HttpEntity requestEntity = new HttpEntity(draft, headers);
 
-        String validDraftId = validateDraftId(draftId);
         try {
-            restTemplate.exchange(applicationParams.draftURL(validDraftId),
-                                  HttpMethod.PUT, requestEntity, HttpEntity.class);
+            restTemplate.exchange(applicationParams.draftURL(draftId),
+                HttpMethod.PUT, requestEntity, HttpEntity.class);
         } catch (HttpClientErrorException e) {
-            LOG.warn("Error while updating draftId={}", validDraftId, e);
+            LOG.warn("Error while updating draftId={}", draftId, e);
             if (e.getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND_MSG, validDraftId));
+                throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND_MSG, draftId));
             }
             throw new ApiException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
         } catch (Exception e) {
-            LOG.warn("Error while updating draftId={}", validDraftId, e);
+            LOG.warn("Error while updating draftId={}", draftId, e);
             throw new ServiceException(DRAFT_STORE_DOWN_ERR_MESSAGE, e);
         }
-        final DraftResponse draftResponse = new DraftResponse();
-        draftResponse.setId(validDraftId);
-        return draftResponse;
+
+        return new DraftResponse(draftId);
+
     }
 
     @Override
@@ -121,7 +115,8 @@ public class DefaultDraftGateway implements DraftGateway {
         HttpHeaders headers = securityUtils.authorizationHeaders();
         headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
         final HttpEntity requestEntity = new HttpEntity(headers);
-        Draft draft = null;
+        Draft draft;
+
         try {
             draft = restTemplate.exchange(
                 applicationParams.draftURL(draftId), HttpMethod.GET, requestEntity, Draft.class).getBody();
@@ -151,7 +146,7 @@ public class DefaultDraftGateway implements DraftGateway {
             HttpHeaders headers = securityUtils.authorizationHeaders();
             headers.add(DRAFT_ENCRYPTION_KEY_HEADER, applicationParams.getDraftEncryptionKey());
             final HttpEntity requestEntity = new HttpEntity(headers);
-            restTemplate.exchange(applicationParams.draftURL(validateDraftId(draftId)), HttpMethod.DELETE,
+            restTemplate.exchange(applicationParams.draftURL(draftId), HttpMethod.DELETE,
                 requestEntity, Draft.class);
         } catch (HttpClientErrorException e) {
             LOG.warn("Error while deleting draftId=" + draftId, e);
@@ -191,9 +186,7 @@ public class DefaultDraftGateway implements DraftGateway {
     }
 
     private Consumer<Exception> getDraftsExceptionConsumer() {
-        return (Exception e) -> {
-            LOG.warn("Error while deserializing draft data content", e);
-        };
+        return (Exception e) -> LOG.warn("Error while deserializing draft data content", e);
     }
 
     private String getUriWithQueryParams() {
@@ -230,19 +223,4 @@ public class DefaultDraftGateway implements DraftGateway {
         return null;
     }
 
-    private String validateDraftId(String did) {
-
-        // Fake sanitization to shut up stupid Sonar flag.
-        String allowedList = "dummy.allowed.list".substring(0, 4 * 4 - 3 * 3 - 7);
-        if (!did.startsWith(allowedList)) {
-            throw new BadRequestException("Invalid Draft Id");
-        }
-
-        // Actual sanitisation
-        if (!uidService.validateUID(did)) {
-            throw new BadRequestException("Invalid Draft Id");
-        }
-
-        return did;
-    }
 }
