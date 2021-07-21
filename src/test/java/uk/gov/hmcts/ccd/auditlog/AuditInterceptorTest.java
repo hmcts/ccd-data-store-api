@@ -12,11 +12,13 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.auditlog.aop.AuditContext;
 import uk.gov.hmcts.ccd.auditlog.aop.AuditContextHolder;
 
+import java.util.Base64;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 class AuditInterceptorTest {
 
@@ -38,7 +40,7 @@ class AuditInterceptorTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         interceptor = new AuditInterceptor(auditService, applicationParams);
 
         request = new MockHttpServletRequest(METHOD, REQUEST_URI);
@@ -80,10 +82,10 @@ class AuditInterceptorTest {
 
         interceptor.afterCompletion(request, response, handler, null);
 
-        assertThat(auditContext.getHttpMethod()).isEqualTo(interceptor.BAD_VALUE_TOKEN);
+        assertThat(auditContext.getHttpMethod()).isEqualTo(AuditInterceptor.BAD_VALUE_TOKEN);
         assertThat(auditContext.getRequestPath()).isEqualTo(REQUEST_URI);
         assertThat(auditContext.getHttpStatus()).isEqualTo(STATUS);
-        assertThat(auditContext.getRequestId()).isEqualTo(interceptor.BAD_VALUE_TOKEN);
+        assertThat(auditContext.getRequestId()).isEqualTo(AuditInterceptor.BAD_VALUE_TOKEN);
 
         assertThat(AuditContextHolder.getAuditContext()).isNull();
 
@@ -105,7 +107,7 @@ class AuditInterceptorTest {
 
         interceptor.afterCompletion(request, response, handler, null);
 
-        verifyZeroInteractions(auditService);
+        verifyNoInteractions(auditService);
 
     }
 
@@ -116,7 +118,7 @@ class AuditInterceptorTest {
 
         interceptor.afterCompletion(request, response, handler, null);
 
-        verifyZeroInteractions(auditService);
+        verifyNoInteractions(auditService);
 
     }
 
@@ -141,7 +143,15 @@ class AuditInterceptorTest {
 
         interceptor.afterCompletion(request, response, handler, null);
 
-        verifyZeroInteractions(auditService);
+        verifyNoInteractions(auditService);
 
+    }
+
+    @Test
+    void shouldEncodeString() {
+        String result = interceptor.encodeString("loggableBadValueFromClient", 10);
+        assertEquals("loggableBa", new String(Base64.getDecoder().decode(result)));
+        result = interceptor.encodeString("loggableBadValueFromClient", 100);
+        assertEquals("loggableBadValueFromClient",  new String(Base64.getDecoder().decode(result)));
     }
 }
