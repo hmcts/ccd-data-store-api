@@ -14,16 +14,16 @@ Feature: External create event
 #    Then a negative response is received
 #    And the response has all other details as expected.
 #
-#  @S-131.2
-#  Scenario: User cannot create event with missing CaseField C Access for a new field
-#    Given a case that has just been created as in [F-131_CreateCase],
-#    And a successful call [to create a token for event creation] as in [S-131.2_Token_Creation]
-#    And a user [with no C access to a field in the new event]
-#    When a request is prepared with appropriate values,
-#    And the request [attempts to create an event for the previously created case]
-#    And it is submitted to call the [create event] operation of [CCD Data Store],
-#    Then a negative response is received
-#    And the response has all other details as expected.
+  @S-131.2
+  Scenario: User cannot create event with missing CaseField C Access for a new field
+    Given a case that has just been created as in [F-131_CreateCase],
+    And a successful call [to create a token for event creation] as in [S-131.2_Token_Creation]
+    And a user [with no C access to a field in the new event]
+    When a request is prepared with appropriate values,
+    And the request [attempts to create an event for the previously created case]
+    And it is submitted to call the [create event] operation of [CCD Data Store],
+    Then a negative response is received
+    And the response has all other details as expected.
 
 #  @S-131.3
 #  Scenario: User cannot create event with missing CaseState C Access for the cases current state
