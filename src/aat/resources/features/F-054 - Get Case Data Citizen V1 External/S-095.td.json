@@ -10,8 +10,8 @@
 	],
 
 	"user": {
-    "_extends_": "CaseworkerAutotest"
-  },
+	    "_extends_": "CaseworkerAutotest"
+	},
 
 	"expectedResponse": {
 		"_extends_": "Common_403_Response",

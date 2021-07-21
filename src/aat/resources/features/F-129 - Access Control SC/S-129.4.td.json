@@ -1,0 +1,30 @@
+{
+  "_guid_": "S-129.4",
+  "_extends_": "F-129_Test_Data_Base",
+
+  "specs": [
+    "idam roles which only have a max Security Classification of PUBLIC",
+    "tries to retrieve the PUBLIC SC case that was previously created",
+    "returns the case"
+  ],
+
+  "users" : {
+    "invokingUser": {
+      "_extends_" : "CaseworkerAutotest"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body" : {
+      "data": {
+        "PublicTextField" : "public text"
+      },
+      "data_classification" : {
+        "PublicTextField" : "PUBLIC",
+        "PrivateTextField" : "PRIVATE",
+        "RestrictedTextField" : "RESTRICTED"
+      }
+    }
+  }
+}
