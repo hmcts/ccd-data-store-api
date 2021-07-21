@@ -894,7 +894,7 @@ public class SecurityClassificationServiceTest {
                     "         \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
                     "       },\n" +
                     "       {\n" +
-                    "         \"classification\": \"RESTRICTED\",\n" +
+                    "         \"classification\": \"PRIVATE\",\n" +
                     "         \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
                     "       },\n" +
                     "       {\n" +
@@ -913,14 +913,16 @@ public class SecurityClassificationServiceTest {
             assertAll(
                 () -> assertThat(resultNode.has("Aliases"), is(true)),
                 () -> assertThat(resultNode.get("Aliases").isArray(), is(true)),
-                () -> assertThat(resultNode.get("Aliases").size(), is(2))
+                () -> assertThat(resultNode.get("Aliases").size(), is(3))
             );
             final JsonNode aliases = resultNode.get("Aliases");
             final String alias1 = aliases.get(0).get("value").textValue();
-            final String alias3 = aliases.get(1).get("value").textValue();
+            final String alias2 = aliases.get(1).get("value").textValue();
+            final String alias3 = aliases.get(2).get("value").textValue();
 
             assertAll("Restricted Alias #2 should have been removed",
                 () -> assertThat(alias1, is("Alias #1")),
+                () -> assertThat(alias2, is("Alias #2")),
                 () -> assertThat(alias3, is("Alias #3"))
             );
         }
@@ -948,13 +950,13 @@ public class SecurityClassificationServiceTest {
 
             assertAll(
                 () -> assertThat(item1Collection1.isArray(), is(true)),
-                () -> assertThat(item1Collection1.size(), is(1)),
+                () -> assertThat(item1Collection1.size(), is(2)),
                 () -> assertThat(item2Collection1.isArray(), is(true)),
-                () -> assertThat(item2Collection1.size(), is(1))
+                () -> assertThat(item2Collection1.size(), is(2))
             );
 
             final String item1_1 = item1Collection1.get(0).get("value").textValue();
-            final String item2_2 = item2Collection1.get(0).get("value").textValue();
+            final String item2_2 = item2Collection1.get(1).get("value").textValue();
 
             assertAll(
                 () -> assertThat(item1_1, equalTo("ITEM_1_1")),
@@ -980,7 +982,7 @@ public class SecurityClassificationServiceTest {
                     "                }," +
                     "                {" +
                     "                  \"id\": \"ITEM_1_2\"," +
-                    "                  \"classification\": \"RESTRICTED\"" +
+                    "                  \"classification\": \"PRIVATE\"" +
                     "                }" +
                     "              ]" +
                     "            }" +
@@ -995,7 +997,7 @@ public class SecurityClassificationServiceTest {
                     "              \"value\": [" +
                     "                {" +
                     "                  \"id\": \"ITEM_2_1\"," +
-                    "                  \"classification\": \"RESTRICTED\"" +
+                    "                  \"classification\": \"PRIVATE\"" +
                     "                }," +
                     "                {" +
                     "                  \"id\": \"ITEM_2_2\"," +
@@ -1127,12 +1129,12 @@ public class SecurityClassificationServiceTest {
                     "       \"value\": [\n" +
                     "         {  \n" +
                     "            \"value\":{  \n" +
-                    "               \"Address\":\"RESTRICTED\",\n" +
+                    "               \"Address\":\"PRIVATE\",\n" +
                     "               \"Notes\": {\n" +
                     "                   \"classification\": \"PRIVATE\",\n" +
                     "                   \"value\": {\n" +
                     "                     \"Note1\": \"PRIVATE\",\n" +
-                    "                     \"Note2\": \"RESTRICTED\"\n" +
+                    "                     \"Note2\": \"PRIVATE\"\n" +
                     "                   }\n" +
                     "                }" +
                     "            },\n" +
@@ -1144,7 +1146,7 @@ public class SecurityClassificationServiceTest {
                     "               \"Notes\": {\n" +
                     "                   \"classification\": \"PRIVATE\",\n" +
                     "                   \"value\": {\n" +
-                    "                     \"Note1\": \"RESTRICTED\",\n" +
+                    "                     \"Note1\": \"PRIVATE\",\n" +
                     "                     \"Note2\": \"PRIVATE\"\n" +
                     "                   }" +
                     "               }" +
@@ -1163,16 +1165,16 @@ public class SecurityClassificationServiceTest {
             JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.get("Addresses").get(0).get(ID), is(equalTo(getTextNode(FIRST_CHILD_ID)))),
-                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).has("Address"), is(false)),
+                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).has("Address"), is(true)),
                 () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).get("Notes").get("Note1"),
                     is(equalTo(getTextNode("someNote11")))),
-                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).get("Notes").has("Note2"), is(false)),
+                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).get("Notes").has("Note2"), is(true)),
 
                 () -> assertThat(resultNode.get("Addresses").get(1).get(ID),
                     is(equalTo(getTextNode(SECOND_CHILD_ID)))),
                 () -> assertThat(resultNode.get("Addresses").get(1).get(VALUE).get("Address"),
                     is(equalTo(getTextNode("address2")))),
-                () -> assertThat(resultNode.get("Addresses").get(1).get(VALUE).get("Notes").has("Note1"), is(false)),
+                () -> assertThat(resultNode.get("Addresses").get(1).get(VALUE).get("Notes").has("Note1"), is(true)),
                 () -> assertThat(resultNode.get("Addresses").get(1).get(VALUE).get("Notes").get("Note2"),
                     is(equalTo(getTextNode("someNote22"))))
             );
@@ -1214,12 +1216,12 @@ public class SecurityClassificationServiceTest {
                     "       \"value\": [\n" +
                     "         {  \n" +
                     "            \"value\":{  \n" +
-                    "               \"Address\":\"RESTRICTED\",\n" +
+                    "               \"Address\":\"PRIVATE\",\n" +
                     "               \"Notes\": {\n" +
                     "                   \"classification\": \"PRIVATE\",\n" +
                     "                   \"value\": {\n" +
                     "                     \"Note1\": \"PRIVATE\",\n" +
-                    "                     \"Note2\": \"RESTRICTED\"\n" +
+                    "                     \"Note2\": \"PRIVATE\"\n" +
                     "                   }\n" +
                     "                }" +
                     "            },\n" +
@@ -1236,12 +1238,12 @@ public class SecurityClassificationServiceTest {
 
             JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
-                () -> assertThat(resultNode.get("Addresses").size(), is(equalTo(1))),
+                () -> assertThat(resultNode.get("Addresses").size(), is(equalTo(2))),
                 () -> assertThat(resultNode.get("Addresses").get(0).get(ID), is(equalTo(getTextNode(FIRST_CHILD_ID)))),
-                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).has("Address"), is(false)),
+                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).has("Address"), is(true)),
                 () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).get("Notes").get("Note1"),
                     is(equalTo(getTextNode("someNote11")))),
-                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).get("Notes").has("Note2"), is(false))
+                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).get("Notes").has("Note2"), is(true))
             );
         }
 
@@ -1287,7 +1289,7 @@ public class SecurityClassificationServiceTest {
             final JsonNode addresses = resultNode.get("Addresses");
             assertThat(addresses, is(notNullValue()));
             assertAll(
-                () -> assertThat(addresses.size(), equalTo(1)),
+                () -> assertThat(addresses.size(), equalTo(2)),
                 () -> assertThat(addresses.get(0).get(ID),
                     is(equalTo(jsonNodeFactory.textNode(FIRST_CHILD_ID)))),
                 () -> assertThat(addresses.get(0).get(VALUE),
@@ -1424,19 +1426,19 @@ public class SecurityClassificationServiceTest {
                     "        \"value\": [  \n" +
                     "          { \"value\":{  \n" +
                     "               \"Name\":\"PRIVATE\",\n" +
-                    "               \"BirthDate\":\"RESTRICTED\",\n" +
-                    "               \"Gender\":\"PUBLIC\",\n" +
-                    "               \"ApplicantRelation\":\"RESTRICTED\",\n" +
-                    "               \"RespondentRelation\":\"RESTRICTED\"\n" +
+                    "               \"BirthDate\":\"PRIVATE\",\n" +
+                    "               \"Gender\":\"PRIVATE\",\n" +
+                    "               \"ApplicantRelation\":\"PRIVATE\",\n" +
+                    "               \"RespondentRelation\":\"PRIVATE\"\n" +
                     "            },\n" +
                     "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
                     "          },\n" +
                     "          { \"value\":{  \n" +
-                    "               \"Name\":\"PUBLIC\",\n" +
+                    "               \"Name\":\"PRIVATE\",\n" +
                     "               \"BirthDate\":\"PRIVATE\",\n" +
-                    "               \"Gender\":\"PUBLIC\",\n" +
-                    "               \"ApplicantRelation\":\"PUBLIC\",\n" +
-                    "               \"RespondentRelation\":\"PUBLIC\"\n" +
+                    "               \"Gender\":\"PRIVATE\",\n" +
+                    "               \"ApplicantRelation\":\"PRIVATE\",\n" +
+                    "               \"RespondentRelation\":\"PRIVATE\"\n" +
                     "            },\n" +
                     "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
                     "          }\n" +
@@ -1470,10 +1472,10 @@ public class SecurityClassificationServiceTest {
                     is(equalTo(getTextNode(FIRST_CHILD_ID)))),
                 () -> assertThat(resultNode.get("ChildrenDet").get(0).get(VALUE).get("Name"),
                     is(equalTo(getTextNode("First Childs Name")))),
-                () -> assertThat(resultNode.get("ChildrenDet").get(0).get(VALUE).has("BirthDate"), is(false)),
+                () -> assertThat(resultNode.get("ChildrenDet").get(0).get(VALUE).has("BirthDate"), is(true)),
                 () -> assertThat(resultNode.get("ChildrenDet").get(0).get(VALUE).get("Gender"),
                     is(equalTo(getTextNode("Male")))),
-                () -> assertThat(resultNode.get("ChildrenDet").get(0).get(VALUE).has("ApplicantRelation"), is(false)),
+                () -> assertThat(resultNode.get("ChildrenDet").get(0).get(VALUE).has("ApplicantRelation"), is(true)),
                 () -> assertThat(resultNode.get("ChildrenDet").get(1).get(ID),
                     is(equalTo(getTextNode(SECOND_CHILD_ID)))),
                 () -> assertThat(resultNode.get("ChildrenDet").get(1).get(VALUE).get("Name"),

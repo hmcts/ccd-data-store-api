@@ -108,7 +108,7 @@ public class SecurityValidationService {
 
     private void validateCollection(JsonNode callbackClassificationItem, JsonNode defaultClassificationItem) {
         for (JsonNode callbackItem : callbackClassificationItem) {
-            JsonNode defaultItem = getDataClassificationForData(callbackItem, defaultClassificationItem.iterator());
+            JsonNode defaultItem = getDataClassificationForData(defaultClassificationItem.iterator());
             if (defaultItem.isNull()) {
                 LOG.warn("No defaultClassificationItem for callbackItem={}", callbackItem);
                 throw new ValidationException(VALIDATION_ERR_MSG);
