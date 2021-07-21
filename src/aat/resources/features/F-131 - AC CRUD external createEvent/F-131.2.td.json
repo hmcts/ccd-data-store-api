@@ -1,0 +1,42 @@
+{
+  "_guid_" : "S-131.2",
+  "_extends_" : "F-131_Test_Data_Base",
+
+  "specs" : [
+    "with no C access to a field in the new event",
+    "attempts to create an event for the previously created case"
+  ],
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][F-131_CreateCase][testData][actualResponse][body][id]}"
+    },
+
+    "headers": {
+      "experimental": true
+    },
+    "body": {
+      "data": {
+        "TextField5" : "value5"
+      },
+      "event": {
+        "id" : "event2"
+      },
+      "ignore_warning": false,
+      "event_token": "${[scenarioContext][childContexts][S-131.2_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_404_Response",
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message" : "No field found",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

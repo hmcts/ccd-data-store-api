@@ -1,0 +1,68 @@
+{
+  "_guid_" : "S-132.2",
+
+  "productName": "CCD Data Store",
+  "operationName": "get case events",
+  "method": "GET",
+  "uri": "/cases/{caseId}/events",
+
+  "specs" : [
+    "get case events",
+    "with no R access to an event",
+    "only contains the event the user has R access to"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "username": "master.caseworker@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][F-131_CreateCase][testData][actualResponse][body][id]}"
+    },
+    "headers": {
+      "experimental": true
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_" : "Common_200_Response",
+    "body" : {
+      "auditEvents": [
+        {
+          "id": "createCase",
+          "summary": "",
+          "description": "",
+          "user_id": "[[ANYTHING_PRESENT]]",
+          "user_last_name": "befta",
+          "user_first_name": "master",
+          "event_name": "Create a case",
+          "created_date": "[[ANYTHING_PRESENT]]",
+          "case_type_id": "FT_CRUD",
+          "case_type_version": "[[ANYTHING_PRESENT]]",
+          "state_id": "CaseCreated",
+          "state_name": "Create case",
+          "data": null,
+          "data_classification": null,
+          "security_classification": "PUBLIC",
+          "significant_item": null,
+          "proxied_by": null,
+          "proxied_by_last_name": null,
+          "proxied_by_first_name": null,
+          "security_classifications": null
+        }
+      ],
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      }
+    }
+  }
+
+
+}

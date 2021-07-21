@@ -1,0 +1,44 @@
+{
+  "_guid_": "F-130_Test_Data_Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "external create case",
+  "method": "POST",
+  "uri": "/case-types/{ctid}/cases",
+
+  "specs" : [
+    "an active profile in CCD"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "username": "master.caseworker@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "ctid": "FT_CRUD"
+    },
+    "headers": {
+      "experimental": true
+    },
+    "body": {
+      "data": {
+      },
+      "event": {
+        "summary": "",
+        "description": ""
+      },
+      "ignore_warning": false,
+      "event_data": {
+      }
+    }
+  },
+
+  "expectedResponse": {
+
+  }
+}

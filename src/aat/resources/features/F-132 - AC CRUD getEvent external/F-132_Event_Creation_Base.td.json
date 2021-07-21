@@ -1,0 +1,44 @@
+{
+  "_guid_": "F-132_Event_Creation_Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "create event",
+  "method": "POST",
+  "uri": "/cases/{caseId}/events",
+
+  "specs" : [
+    "create event",
+    "to create event"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "username": "master.caseworker@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+    },
+    "headers": {
+      "experimental": true
+    },
+    "body": {
+      "data": {
+      },
+      "event": {
+        "summary": "",
+        "description": ""
+      },
+      "ignore_warning": false,
+      "event_data": {
+      }
+    }
+  },
+
+  "expectedResponse": {
+
+  }
+}
