@@ -14,7 +14,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.aggregated.WorkbasketDefault;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.Matchers.equalTo;
@@ -85,8 +84,7 @@ public class UserServiceTest {
     public void testReturnsUserProfileNoWorkBasketDefaults() {
 
         when(userRepoMock.getUserDetails()).thenReturn(mockIdamProps);
-        when(userRepoMock.getUserDefaultSettings("email"))
-            .thenThrow(new ResourceNotFoundException("No User profile exists for this userId email"));
+        when(userRepoMock.getUserDefaultSettings("email")).thenReturn(null);
         when(jurisdictionsResolver.getJurisdictions()).thenReturn(Lists.newArrayList("J1", "J2", "J3"));
         when(caseDefinitionRepoMock.getJurisdiction("J1")).thenReturn(j1);
         when(caseDefinitionRepoMock.getJurisdiction("J2")).thenReturn(j2);
