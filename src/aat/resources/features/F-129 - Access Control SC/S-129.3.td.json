@@ -1,0 +1,31 @@
+{
+  "_guid_": "S-129.3",
+  "_extends_": "F-129_Test_Data_Base",
+
+  "specs": [
+    "idam roles which only have a max Security Classification of RESTRICTED",
+    "shows fields with a SC of PUBLIC, PRIVATE or RESTRICTED"
+  ],
+
+  "users" : {
+    "invokingUser": {
+      "_extends_" : "RestrictedCaseworker"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body" : {
+      "data": {
+        "PublicTextField": "public text",
+        "PrivateTextField": "private text",
+        "RestrictedTextField": "restricted text"
+      },
+      "data_classification" : {
+        "PublicTextField" : "PUBLIC",
+        "PrivateTextField" : "PRIVATE",
+        "RestrictedTextField" : "RESTRICTED"
+      }
+    }
+  }
+}
