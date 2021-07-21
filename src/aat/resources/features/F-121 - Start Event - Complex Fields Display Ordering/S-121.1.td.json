@@ -1,5 +1,5 @@
 {
-	"_guid_": "S-121.5",
+	"_guid_": "S-121.1",
 	"_extends_": "F-121_Test_Data_Base",
 	"title": "must validate date in a right format",
 
@@ -11,14 +11,14 @@
 	"request": {
     "pathVariables": {
       "ctid": "FT_ComplexFieldsOrdering",
-      "etid": "CREATE5"
+      "etid": "CREATE1"
     }
   },
 
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
 		"headers": {
-      "Content-Encoding": "gzip",
+			"Content-Encoding": "gzip",
 			"Content-Type": "application/json",
 			"Connection": "[[ANYTHING_PRESENT]]",
 			"Keep-Alive": "[[ANYTHING_PRESENT]]",
@@ -26,8 +26,8 @@
 			"Strict-Transport-Security": "[[ANYTHING_NULLABLE]]"
 		},
 		"body": {
-      "id": "CREATE5",
-      "name": "Create case 5",
+      "id": "CREATE1",
+      "name": "Create case 1",
       "description": "[[ANYTHING_PRESENT]]",
       "case_id": null,
       "case_fields": [
@@ -573,65 +573,24 @@
               "_extends_": "CaseworkerBeftaMasterAccessControlList"
             }
           ]
-        },
-        {
-          "id": "Name",
-          "label": "Name",
-          "hidden": false,
-          "value": null,
-          "metadata": false,
-          "hint_text": null,
-          "field_type": {
-            "id": "Text",
-            "type": "Text",
-            "min": null,
-            "max": null,
-            "regular_expression": null,
-            "fixed_list_items": [],
-            "complex_fields": [],
-            "collection_field_type": null
-          },
-          "validation_expr": null,
-          "security_label": "PUBLIC",
-          "order": null,
-          "formatted_value": null,
-          "display_context": "OPTIONAL",
-          "display_context_parameter": null,
-          "show_condition": null,
-          "show_summary_change_option": true,
-          "show_summary_content_option": null,
-          "retain_hidden_value": null,
-          "publish" : false,
-          "publish_as" : null,
-          "acls": [
-            {
-              "_extends_": "CaseworkerBeftaMasterAccessControlList"
-            }
-          ]
         }
       ],
       "event_token": "[[ANYTHING_PRESENT]]",
       "wizard_pages": [
         {
-          "id": "CREATE5first",
+          "id": "CREATE1first",
           "label": "First page",
           "order": 1,
           "wizard_page_fields": [
             {
               "case_field_id": "Address1",
-              "order": null,
+              "order": 2,
               "page_column_no": null,
               "complex_field_overrides": []
             },
             {
               "case_field_id": "Address2",
               "order": 1,
-              "page_column_no": null,
-              "complex_field_overrides": []
-            },
-            {
-              "case_field_id": "Name",
-              "order": null,
               "page_column_no": null,
               "complex_field_overrides": []
             }
@@ -645,11 +604,12 @@
       "show_event_notes": null,
       "end_button_label": null,
       "can_save_draft": null,
+      "title_display": null,
       "_links": {
         "self": {
           "href": "[[ANYTHING_PRESENT]]"
         }
       }
     }
-  }
+	}
 }

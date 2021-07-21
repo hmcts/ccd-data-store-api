@@ -182,6 +182,8 @@ dependencies {
 
     implementation "io.github.openfeign:feign-httpclient:11.0"
 
+    implementation group: 'net.minidev', name: 'json-smart', version: '2.4.7'
+
     testCompile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
     compile group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
 
@@ -250,7 +252,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.0.0'
+    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.2.0'
     testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.2.0'
 
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
@@ -275,7 +277,7 @@ dependencyManagement {
         dependency 'com.google.guava:guava:30.1-jre'
 
         // CVE-2019-0232 - Java and Command Line injections in Windows
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.43') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.50') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
