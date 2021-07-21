@@ -149,6 +149,9 @@ public class ApplicationParams {
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
 
+    @Value("#{'${case.data.issue.logging.jurisdictions}'.split(',')}")
+    private List<String> caseDataIssueLoggingJurisdictions;
+
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -405,5 +408,9 @@ public class ApplicationParams {
 
     public Integer getCasesIndexNameCaseTypeIdGroupPosition() {
         return casesIndexNameCaseTypeIdGroupPosition;
+    }
+
+    public List<String> getCaseDataIssueLoggingJurisdictions() {
+        return caseDataIssueLoggingJurisdictions;
     }
 }

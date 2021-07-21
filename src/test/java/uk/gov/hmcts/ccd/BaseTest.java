@@ -51,6 +51,7 @@ import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.DocumentsOperation;
+import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.types.BaseType;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.client.DocumentManagementRestClient;
 
@@ -110,6 +111,8 @@ public abstract class BaseTest {
     @Inject
     @Qualifier(DefaultDraftGateway.QUALIFIER)
     private DraftGateway draftGateway;
+    @Inject
+    private CaseDataIssueLogger caseDataIssueLogger;
     @Inject
     private CallbackService callbackService;
     @Inject
