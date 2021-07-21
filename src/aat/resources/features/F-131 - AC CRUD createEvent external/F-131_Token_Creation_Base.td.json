@@ -49,7 +49,7 @@
         "jurisdiction" : "BEFTA_MASTER",
         "state" : "[[ANYTHING_PRESENT]]",
         "version" : "[[ANYTHING_PRESENT]]",
-        "case_type_id" : "FT_CRUD",
+        "case_type_id" : "[[ANYTHING_PRESENT]]",
         "created_date" : "[[ANYTHING_PRESENT]]",
         "last_modified" : "[[ANYTHING_PRESENT]]",
         "last_state_modified_date" : "[[ANYTHING_PRESENT]]",
@@ -64,7 +64,7 @@
         "delete_draft_response_status" : null,
         "security_classifications" : "[[ANYTHING_PRESENT]]"
       },
-      "event_id" : "event2"
+      "event_id" : "[[ANYTHING_PRESENT]]"
     }
   }
 }
