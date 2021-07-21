@@ -19,7 +19,7 @@
 			"ctid": "AAT"
 		},
 		"queryParams": {
-			"userId": "${[scenarioContext][testData][users][invokingUser][id]}"
+			"userId": "${[scenarioContext][theInvokingUser][id]}"
 		}
 	},
 
