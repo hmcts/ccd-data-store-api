@@ -109,13 +109,13 @@ class SubmitCaseTransactionTest {
         MockitoAnnotations.initMocks(this);
 
         submitCaseTransaction = new SubmitCaseTransaction(caseDetailsRepository,
-                                                          caseAuditEventRepository,
-                                                          caseTypeService,
-                                                          callbackInvoker,
-                                                          uidService,
-                                                          securityClassificationService,
-                                                          caseUserRepository,
-                                                          userAuthorisation, messageService);
+            caseAuditEventRepository,
+            caseTypeService,
+            callbackInvoker,
+            uidService,
+            securityClassificationService,
+            caseUserRepository,
+            userAuthorisation, messageService);
 
         event = buildEvent();
         caseTypeDefinition = buildCaseType();
@@ -134,9 +134,9 @@ class SubmitCaseTransactionTest {
         doReturn(CASE_ID).when(savedCaseDetails).getId();
 
         doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition,
-                                                                             null,
-                                                                             this.caseDetails, caseTypeDefinition,
-                                                                             IGNORE_WARNING);
+            null,
+            this.caseDetails, caseTypeDefinition,
+            IGNORE_WARNING);
 
     }
 
@@ -161,11 +161,11 @@ class SubmitCaseTransactionTest {
     @DisplayName("should persist case")
     void shouldPersistCase() {
         final CaseDetails actualCaseDetails = submitCaseTransaction.submitCase(event,
-                                                                               caseTypeDefinition,
-                                                                               idamUser,
-                                                                               caseEventDefinition,
-                                                                               this.caseDetails,
-                                                                               IGNORE_WARNING);
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING);
 
         final InOrder order = inOrder(caseDetails, caseDetails, caseDetailsRepository);
 
@@ -185,11 +185,11 @@ class SubmitCaseTransactionTest {
         final ArgumentCaptor<MessageContext> messageCandidateCaptor = ArgumentCaptor.forClass(MessageContext.class);
 
         submitCaseTransaction.submitCase(event,
-                                         caseTypeDefinition,
-                                         idamUser,
-                                         caseEventDefinition,
-                                         this.caseDetails,
-                                         IGNORE_WARNING);
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING);
 
         assertAll(
             () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
@@ -205,10 +205,10 @@ class SubmitCaseTransactionTest {
 
         submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
-                                         idamUser,
+            idamUser,
             caseEventDefinition,
-                                         this.caseDetails,
-                                         IGNORE_WARNING);
+            this.caseDetails,
+            IGNORE_WARNING);
 
         assertAll(
             () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
@@ -220,15 +220,15 @@ class SubmitCaseTransactionTest {
     @DisplayName("when creator has access level GRANTED, then it should grant access to creator")
     void shouldGrantAccessToAccessLevelGrantedCreator() {
         when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
-
         submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
-                                         idamUser,
+            idamUser,
             caseEventDefinition,
-                                         this.caseDetails,
-                                         IGNORE_WARNING);
+            this.caseDetails,
+            IGNORE_WARNING);
 
-        verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID), IDAM_ID, CREATOR.getRole());
+        verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID),
+            IDAM_ID, CREATOR.getRole());
     }
 
     @Test
@@ -237,11 +237,11 @@ class SubmitCaseTransactionTest {
         when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.ALL);
 
         submitCaseTransaction.submitCase(event,
-                                         caseTypeDefinition,
-                                         idamUser,
-                                         caseEventDefinition,
-                                         this.caseDetails,
-                                         IGNORE_WARNING);
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING);
 
         verifyZeroInteractions(caseUserRepository);
     }
@@ -251,13 +251,13 @@ class SubmitCaseTransactionTest {
     void shouldInvokeCallback() {
         submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
-                                         idamUser,
+            idamUser,
             caseEventDefinition,
-                                         this.caseDetails,
-                                         IGNORE_WARNING);
+            this.caseDetails,
+            IGNORE_WARNING);
 
         verify(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition, null, caseDetails, caseTypeDefinition,
-                IGNORE_WARNING);
+            IGNORE_WARNING);
     }
 
     private void assertAuditEvent(final AuditEvent auditEvent) {

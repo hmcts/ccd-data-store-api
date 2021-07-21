@@ -1,16 +1,16 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
 import com.google.common.collect.Lists;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -91,8 +91,8 @@ class CachedCaseUserRepositoryTest {
         userIds.add("123456");
         userIds.add("123457");
         List<CaseUserEntity> caseUserEntities = new ArrayList<>();
-        caseUserEntities.add(new CaseUserEntity(1234L, "123456", "[CREATOR]"));
-        caseUserEntities.add(new CaseUserEntity(1235L, "123457", "[SOLICITOR]"));
+        caseUserEntities.add(new CaseUserEntity(1234L, "123456", "[CREATOR]", null));
+        caseUserEntities.add(new CaseUserEntity(1235L, "123457", "[SOLICITOR]", null));
         doReturn(caseUserEntities).when(caseUserRepository).findCaseUserRoles(anyList(), anyList());
 
         List<CaseUserEntity> returned = classUnderTest.findCaseUserRoles(caseIds, userIds);

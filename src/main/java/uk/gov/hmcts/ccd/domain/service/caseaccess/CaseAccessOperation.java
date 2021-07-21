@@ -1,15 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.caseaccess;
 
 import com.google.common.collect.Lists;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.util.set.Sets;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,6 +22,15 @@ import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidCaseRoleException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 @Service
@@ -46,7 +46,7 @@ public class CaseAccessOperation {
     public CaseAccessOperation(final @Qualifier(CachedCaseUserRepository.QUALIFIER)
                                    CaseUserRepository caseUserRepository,
                                @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
-                                   final CaseDetailsRepository caseDetailsRepository,
+                               final CaseDetailsRepository caseDetailsRepository,
                                @Qualifier(CachedCaseRoleRepository.QUALIFIER) CaseRoleRepository caseRoleRepository,
                                @Qualifier("default") SupplementaryDataRepository supplementaryDataRepository) {
         this.caseUserRepository = caseUserRepository;
@@ -243,15 +243,15 @@ public class CaseAccessOperation {
 
         Map<Long, List<CaseAssignedUserRoleWithOrganisation>> caseUserRolesWhichHaveAnOrgId =
             cauRolesByCaseId.entrySet().stream()
-            .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
-                // filter out no organisation_id and [CREATOR] case role
-                .filter(caseUserRole ->
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
+                    // filter out no organisation_id and [CREATOR] case role
+                    .filter(caseUserRole ->
                         StringUtils.isNoneBlank(caseUserRole.getOrganisationId())
                             && !caseUserRole.getCaseRole().equalsIgnoreCase(CREATOR.getRole()))
-                .collect(Collectors.toList())))
-            // filter cases that have no remaining roles
-            .entrySet().stream().filter(e -> !e.getValue().isEmpty())
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    .collect(Collectors.toList())))
+                // filter cases that have no remaining roles
+                .entrySet().stream().filter(e -> !e.getValue().isEmpty())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         // if empty list this processing is not required
         if (caseUserRolesWhichHaveAnOrgId.isEmpty()) {
@@ -344,7 +344,9 @@ public class CaseAccessOperation {
                                      Set<String> targetCaseRoles) {
         targetCaseRoles.stream()
             .filter(targetRole -> !currentCaseRoles.contains(targetRole))
-            .forEach(targetRole -> caseUserRepository.grantAccess(caseId, userId, targetRole));
+            .forEach(targetRole -> caseUserRepository.grantAccess(caseId,
+                userId,
+                targetRole));
     }
 
     private void revokeRemovedCaseRoles(String userId,

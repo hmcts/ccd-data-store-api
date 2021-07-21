@@ -1,12 +1,12 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.google.common.collect.Maps.newHashMap;
 

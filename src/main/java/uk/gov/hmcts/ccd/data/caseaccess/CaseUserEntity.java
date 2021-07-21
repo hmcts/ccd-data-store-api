@@ -1,12 +1,12 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
-import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "case_users")
@@ -66,26 +66,32 @@ public class CaseUserEntity implements Serializable {
         public void setCaseRole(String caseRole) {
             this.caseRole = caseRole;
         }
+
     }
 
     @EmbeddedId
     private CasePrimaryKey casePrimaryKey;
+
+    @Column(name = "role_category")
+    private String roleCategory;
+
 
     public CaseUserEntity() {
         // needed for hibernate
     }
 
     CaseUserEntity(Long caseDataId, String userId) {
-        this(caseDataId, userId, GlobalCaseRole.CREATOR.getRole());
+        this(caseDataId, userId, GlobalCaseRole.CREATOR.getRole(), null);
     }
 
-    CaseUserEntity(Long caseDataId, String userId, String caseRole) {
+    CaseUserEntity(Long caseDataId, String userId, String caseRole, String roleCategory) {
         CasePrimaryKey casePrimaryKey = new CasePrimaryKey();
         casePrimaryKey.caseDataId = caseDataId;
         casePrimaryKey.userId = userId;
         casePrimaryKey.caseRole = caseRole;
 
         this.casePrimaryKey = casePrimaryKey;
+        this.roleCategory = roleCategory;
     }
 
     public CasePrimaryKey getCasePrimaryKey() {
@@ -94,6 +100,14 @@ public class CaseUserEntity implements Serializable {
 
     public void setCasePrimaryKey(CasePrimaryKey casePrimaryKey) {
         this.casePrimaryKey = casePrimaryKey;
+    }
+
+    public String getRoleCategory() {
+        return roleCategory;
+    }
+
+    public void setRoleCategory(String roleCategory) {
+        this.roleCategory = roleCategory;
     }
 
 }
