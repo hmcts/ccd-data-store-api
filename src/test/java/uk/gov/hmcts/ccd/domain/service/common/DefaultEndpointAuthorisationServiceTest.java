@@ -52,7 +52,7 @@ class DefaultEndpointAuthorisationServiceTest {
     void shouldReturnTrueWhenUserHasSolicitorRoleAndUserHasAccessToCase() {
         CaseDetails caseDetails = mock(CaseDetails.class);
         when(this.userRepository.getUserRoles()).thenReturn(Sets.newHashSet("caseworker-probate-solicitor"));
-        when(this.caseAccessService.canOnlyViewExplicitlyGrantedCases()).thenReturn(true);
+        when(this.caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()).thenReturn(true);
         when(this.caseAccessService.isExplicitAccessGranted(caseDetails)).thenReturn(true);
         boolean canAccess = this.userRoleValidator.isAccessAllowed(caseDetails);
         assertTrue(canAccess);
@@ -63,7 +63,7 @@ class DefaultEndpointAuthorisationServiceTest {
         CaseDetails caseDetails = mock(CaseDetails.class);
         when(caseDetails.getJurisdiction()).thenReturn("PROBATE");
         when(this.userRepository.getUserRoles()).thenReturn(Sets.newHashSet("caseworker-probate-solicitor"));
-        when(this.caseAccessService.canOnlyViewExplicitlyGrantedCases()).thenReturn(false);
+        when(this.caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()).thenReturn(false);
         when(this.caseAccessService.isJurisdictionAccessAllowed(anyString())).thenReturn(true);
         boolean canAccess = this.userRoleValidator.isAccessAllowed(caseDetails);
         assertTrue(canAccess);
@@ -74,7 +74,7 @@ class DefaultEndpointAuthorisationServiceTest {
         CaseDetails caseDetails = mock(CaseDetails.class);
         when(caseDetails.getJurisdiction()).thenReturn("PROBATE");
         when(this.userRepository.getUserRoles()).thenReturn(Sets.newHashSet("caseworker-probate-solicitor"));
-        when(this.caseAccessService.canOnlyViewExplicitlyGrantedCases()).thenReturn(false);
+        when(this.caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()).thenReturn(false);
         when(this.caseAccessService.isJurisdictionAccessAllowed(anyString())).thenReturn(false);
         boolean canAccess = this.userRoleValidator.isAccessAllowed(caseDetails);
         assertFalse(canAccess);

@@ -664,7 +664,7 @@
             }
           ],
           "display_context": "OPTIONAL",
-          "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)",
+          "display_context_parameter": "#COLLECTION(allowDelete,allowInsert,allowUpdate)",
           "show_condition": null,
           "show_summary_change_option": false,
           "show_summary_content_option": null,
@@ -938,7 +938,7 @@
                       ],
                       "complexACLs": [],
                       "display_context": null,
-                      "display_context_parameter": "#COLLECTION(allowDelete,allowInsert)",
+                      "display_context_parameter": "#COLLECTION(allowDelete,allowInsert,allowUpdate)",
                       "retain_hidden_value": null,
                       "formatted_value": null
                     }

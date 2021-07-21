@@ -1,5 +1,11 @@
 package uk.gov.hmcts.ccd.data.casedetails.query;
 
+import org.apache.commons.collections.CollectionUtils;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -14,12 +20,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import org.apache.commons.collections.CollectionUtils;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
-import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 
 public abstract class CaseDetailsQueryBuilder<T> {
 
@@ -49,6 +49,11 @@ public abstract class CaseDetailsQueryBuilder<T> {
 
         predicates.add(cb.in(root.get("id")).value(cuQuery));
 
+        return this;
+    }
+
+    public CaseDetailsQueryBuilder whereGrantedAccessOnlyForRA(List<Long> caseReferences) {
+        predicates.add(cb.in(root.get("reference")).value(caseReferences));
         return this;
     }
 

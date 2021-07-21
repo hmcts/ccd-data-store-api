@@ -4,4 +4,6 @@ import java.util.Set;
 
 public interface CaseRoleRepository {
     Set<String> getCaseRoles(String caseTypeId);
+
+    Set<String> getRoles(String caseTypeId);
 }

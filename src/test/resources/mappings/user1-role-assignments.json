@@ -1,0 +1,121 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/am/role-assignments/actors/123"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "roleAssignmentResponse" : [
+        {
+          "id": "4d96923f-891a-4cb1-863e-9bec44d1689d",
+          "actorIdType": "IDAM",
+          "actorId": "0d929387-1419-41e6-9178-9aea8c838289",
+          "roleType": "CASE",
+          "roleName": "[Defendant]",
+          "classification": "PUBLIC",
+          "grantType": "STANDARD",
+          "roleCategory": "JUDICIAL",
+          "readOnly": false,
+          "beginTime": "2021-01-01T00:00:00Z",
+          "endTime": "2022-01-01T00:00:00Z",
+          "created": "2020-12-23T06:37:58.096065Z",
+          "attributes": {
+            "contractType": "SALARIED",
+            "jurisdiction": "divorce",
+            "caseId": "1619532860727729",
+            "region": "south-east"
+          },
+          "authorisations": []
+        },
+        {
+          "id": "e6fc5ebb-63e3-4613-9cfc-b3f9b1559571",
+          "actorIdType": "IDAM",
+          "actorId": "7eca30e1-ffce-4ed2-a8a1-0dd267d1958f",
+          "roleType": "CASE",
+          "roleName": "[Claimant]",
+          "classification": "PUBLIC",
+          "grantType": "STANDARD",
+          "roleCategory": "JUDICIAL",
+          "readOnly": false,
+          "beginTime": "2021-02-01T00:00:00Z",
+          "endTime": "2022-01-01T00:00:00Z",
+          "created": "2020-12-23T06:37:58.096065Z",
+          "attributes": {
+            "contractType": "SALARIED",
+            "jurisdiction": "divorce",
+            "caseId": "1575978305974222",
+            "region": "south-east"
+          },
+          "authorisations": []
+        },
+        {
+          "id": "6d7d10af-b4a4-425b-a0cc-315bbb828361",
+          "actorIdType": "IDAM",
+          "actorId": "123",
+          "roleType": "ORGANISATION",
+          "roleName": "judge",
+          "classification": "PUBLIC",
+          "grantType": "STANDARD",
+          "roleCategory": "JUDICIAL",
+          "readOnly": false,
+          "beginTime": "2021-02-01T00:00:00Z",
+          "endTime": "2022-01-01T00:00:00Z",
+          "created": "2020-12-23T06:37:58.096065Z",
+          "attributes": {
+            "contractType": "SALARIED",
+            "jurisdiction": "divorce",
+            "caseId": "1596134840593121",
+            "region": "south-east"
+          },
+          "authorisations": []
+        },
+        {
+          "id": "5d96923f-891a-4cb1-863e-9bec54d1689c",
+          "actorIdType": "IDAM",
+          "actorId": "123",
+          "roleType": "CASE",
+          "roleName": "judge",
+          "classification": "PUBLIC",
+          "grantType": "STANDARD",
+          "roleCategory": "JUDICIAL",
+          "readOnly": false,
+          "beginTime": "2019-01-01T00:00:00Z",
+          "endTime": "2020-01-01T00:00:00Z",
+          "created": "2020-12-23T06:37:58.096065Z",
+          "attributes": {
+            "contractType": "SALARIED",
+            "jurisdiction": "divorce",
+            "caseId": "1596109944711818",
+            "region": "south-east"
+          },
+          "authorisations": []
+        },
+        {
+          "id": "6d96923f-991a-4cb1-863e-9bec44d1689a",
+          "actorIdType": "IDAM",
+          "actorId": "123",
+          "roleType": "CASE",
+          "roleName": "judge",
+          "classification": "PUBLIC",
+          "grantType": "STANDARD",
+          "roleCategory": "JUDICIAL",
+          "readOnly": false,
+          "beginTime": "2022-01-01T00:00:00Z",
+          "endTime": "2023-01-01T00:00:00Z",
+          "created": "2020-12-23T06:37:58.096065Z",
+          "attributes": {
+            "contractType": "SALARIED",
+            "jurisdiction": "divorce",
+            "caseId": "1596109944711818",
+            "region": "south-east"
+          },
+          "authorisations": []
+        }
+      ]
+    }
+  }
+}

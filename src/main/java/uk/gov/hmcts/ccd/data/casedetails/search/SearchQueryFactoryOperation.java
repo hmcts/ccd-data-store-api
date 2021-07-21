@@ -1,21 +1,21 @@
 package uk.gov.hmcts.ccd.data.casedetails.search;
 
+import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-
-import com.google.common.collect.Maps;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Named
 @Singleton
@@ -36,19 +36,22 @@ public class SearchQueryFactoryOperation {
     private final UserAuthorisation userAuthorisation;
     private final SortOrderQueryBuilder sortOrderQueryBuilder;
     private final AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
+    private final RoleAssignmentService roleAssignmentService;
 
     public SearchQueryFactoryOperation(CriterionFactory criterionFactory,
                                        EntityManager entityManager,
                                        ApplicationParams applicationParam,
                                        UserAuthorisation userAuthorisation,
                                        SortOrderQueryBuilder sortOrderQueryBuilder,
-                                       AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService) {
+                                       AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService,
+                                       RoleAssignmentService roleAssignmentService) {
         this.criterionFactory = criterionFactory;
         this.entityManager = entityManager;
         this.applicationParam = applicationParam;
         this.userAuthorisation = userAuthorisation;
         this.sortOrderQueryBuilder = sortOrderQueryBuilder;
         this.authorisedCaseDefinitionDataService = authorisedCaseDefinitionDataService;
+        this.roleAssignmentService = roleAssignmentService;
     }
 
     public Query build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
@@ -77,7 +80,13 @@ public class SearchQueryFactoryOperation {
     }
 
     private String addUserCaseAccessClause(Map<String, Object> params) {
-        if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
+        if (applicationParam.getEnableAttributeBasedAccessControl()) {
+            List<String> caseIds = roleAssignmentService.getCaseReferencesForAGivenUser(userAuthorisation.getUserId());
+            if (caseIds != null && caseIds.size() > 0) {
+                params.put("case_ids", caseIds);
+                return " AND reference IN (:case_ids)";
+            }
+        } else if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             params.put("user_id", userAuthorisation.getUserId());
             return " AND id IN (SELECT cu.case_data_id FROM case_users AS cu WHERE user_id = :user_id)";
         }

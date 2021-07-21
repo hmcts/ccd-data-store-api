@@ -16,6 +16,11 @@ import static java.util.stream.Collectors.toList;
 @Named
 @Singleton
 public class ApplicationParams {
+    @Value("${idam.data-store.system-user.username}")
+    private String dataStoreSystemUserId;
+
+    @Value("${idam.data-store.system-user.password}")
+    private String dataStoreSystemUserPassword;
 
     @Value("#{'${ccd.s2s-authorised.services.case_user_roles}'.split(',')}")
     private List<String> authorisedServicesForCaseUserRoles;
@@ -46,6 +51,9 @@ public class ApplicationParams {
 
     @Value("${ccd.case-definition.host}")
     private String caseDefinitionHost;
+
+    @Value("${role.assignment.api.host}")
+    private String roleAssignmentServiceHost;
 
     @Value("${ccd.draft.host}")
     private String draftHost;
@@ -146,8 +154,33 @@ public class ApplicationParams {
     @Value("${ccd.access-control.caseworker.role.regex}")
     private String ccdAccessControlCaseworkerRoleRegex;
 
+    @Value("${enable-attribute-based-access-control}")
+    private boolean enableAttributeBasedAccessControl;
+
+    @Value("${enable-pseudo-role-assignments-generation}")
+    private boolean enablePseudoRoleAssignmentsGeneration;
+
+    @Value("${enable-pseudo-access-profiles-generation}")
+    private boolean enablePseudoAccessProfilesGeneration;
+
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
+
+    public String getDataStoreSystemUserId() {
+        return dataStoreSystemUserId;
+    }
+
+    public void setDataStoreSystemUserId(String dateStoreSystemUserId) {
+        this.dataStoreSystemUserId = dateStoreSystemUserId;
+    }
+
+    public String getDataStoreSystemUserPassword() {
+        return dataStoreSystemUserPassword;
+    }
+
+    public void setDataStoreSystemUserPassword(String dataStoreSystemUserPassword) {
+        this.dataStoreSystemUserPassword = dataStoreSystemUserPassword;
+    }
 
     public static String encode(final String stringToEncode) {
         try {
@@ -257,6 +290,25 @@ public class ApplicationParams {
 
     public String caseRolesURL() {
         return caseDefinitionHost + "/api/data/caseworkers/uid/jurisdictions/jid/case-types";
+    }
+
+    public String accessProfileRolesURL(String caseTypeId) {
+        return String.format(
+            "%s/api/data/caseworkers/uid/jurisdictions/jid/case-types/%s/access/profile/roles", caseDefinitionHost,
+            encode(caseTypeId)
+        );
+    }
+
+    public String roleAssignmentBaseURL() {
+        return roleAssignmentServiceHost + "/am/role-assignments";
+    }
+
+    public String amGetRoleAssignmentsURL() {
+        return roleAssignmentBaseURL() + "/actors/{uid}";
+    }
+
+    public String amQueryRoleAssignmentsURL() {
+        return roleAssignmentBaseURL() + "/query";
     }
 
     public String userDefaultSettingsURL() {
@@ -393,6 +445,18 @@ public class ApplicationParams {
 
     public String getCcdAccessControlCaseworkerRoleRegex() {
         return ccdAccessControlCaseworkerRoleRegex;
+    }
+
+    public boolean getEnableAttributeBasedAccessControl() {
+        return enableAttributeBasedAccessControl;
+    }
+
+    public boolean getEnablePseudoRoleAssignmentsGeneration() {
+        return enablePseudoRoleAssignmentsGeneration;
+    }
+
+    public boolean getEnablePseudoAccessProfilesGeneration() {
+        return enablePseudoAccessProfilesGeneration;
     }
 
     public List<String> getCcdAccessControlCitizenRoles() {

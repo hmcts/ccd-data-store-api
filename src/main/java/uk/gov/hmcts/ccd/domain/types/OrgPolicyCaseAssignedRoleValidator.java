@@ -38,7 +38,7 @@ public class OrgPolicyCaseAssignedRoleValidator implements FieldIdBasedValidator
 
     private List<ValidationResult> validateOrganisationPolicy(ValidationContext validationContext) {
         final String caseTypeId = validationContext.getCaseTypeId();
-        final Set<String> caseRoles = caseRoleRepository.getCaseRoles(caseTypeId);
+        final Set<String> caseRoles = caseRoleRepository.getRoles(caseTypeId);
         final List<ValidationResult> errors = new ArrayList<>();
         validateContent(validationContext, caseRoles, errors);
         if (errors.isEmpty()) {

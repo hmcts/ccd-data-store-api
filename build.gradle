@@ -143,9 +143,10 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: reformLogging
 
     compile 'uk.gov.hmcts.reform:properties-volume-spring-boot-starter:0.0.4'
-    implementation 'org.mapstruct:mapstruct-jdk8:1.3.0.Final'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.2.0.Final', 'org.projectlombok:lombok:1.18.12'
-    testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.2.0.Final', 'org.projectlombok:lombok:1.18.12'
+    implementation 'org.mapstruct:mapstruct-jdk8:1.3.1.Final'
+    implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final', 'org.projectlombok:lombok:1.18.12'
+    testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final', 'org.projectlombok:lombok:1.18.12'
 
     compile('org.springframework.boot:spring-boot-starter-actuator')
 
@@ -171,7 +172,7 @@ dependencies {
     compile group: 'org.yaml', name: 'snakeyaml', version: '1.26'
     compile group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.1'
-    compile group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '1.3.1'
+    compile group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
     compile "org.bouncycastle:bcprov-jdk15on:1.61", "org.bouncycastle:bcpkix-jdk15on:1.61"
 
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client'
@@ -566,7 +567,7 @@ jsonSchema2Pojo {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "build/generated-sources/**/*.java,**/AuditRepository.java,**/CaseDetailsEndpoint.java,**/MidEventCallback.java,**/UIDefinitionRepository.java,**/CachedUIDefinitionGateway.java,**/CaseAccessEndpoint.java,**/UICaseSearchController.java,**/CaseSearchResultViewGenerator.java,**/CaseTypeService.java,**/DefaultCaseDefinitionRepository.java"
+        property "sonar.exclusions", "build/generated-sources/**/*.java,**/AuditRepository.java,**/CaseDetailsEndpoint.java,**/MidEventCallback.java,**/UIDefinitionRepository.java,**/CachedUIDefinitionGateway.java,**/CaseAccessEndpoint.java,**/UICaseSearchController.java,**/CaseSearchResultViewGenerator.java,**/CaseTypeService.java,**/DefaultCaseDefinitionRepository.java,**/CaseDetailsQueryBuilder.java,**/BeginDateEndDateMatcher.java,**/CaseIdMatcher.java,**/LocationMatcher.java,**/RegionMatcher.java"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"

@@ -9,6 +9,12 @@ java:
           alias: CCD_DRAFT_ENCRYPTION_KEY
         - name: ccd-data-s2s-secret
           alias: DATA_STORE_IDAM_KEY
+        - name: idam-data-store-client-secret
+          alias: IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET
+        - name: idam-data-store-system-user-username
+          alias: IDAM_DATA_STORE_SYSTEM_USER_USERNAME
+        - name: idam-data-store-system-user-password
+          alias: IDAM_DATA_STORE_SYSTEM_USER_PASSWORD
   environment:
     AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY: "2dcb834e-768e-4429-9050-ab15af959995"
     DATA_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"

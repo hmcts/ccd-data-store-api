@@ -140,7 +140,7 @@ class DefaultGetEventsOperationTest {
     void shouldFindEventAndDelegateCallToRepository() {
         doReturn(Optional.of(event)).when(auditEventRepository).findByEventId(EVENT_ID);
 
-        Optional<AuditEvent> optionalAuditEvent = listEventsOperation.getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID);
+        Optional<AuditEvent> optionalAuditEvent = listEventsOperation.getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID);
 
         assertThat(optionalAuditEvent.isPresent(), is(true));
         AuditEvent output = optionalAuditEvent.get();
@@ -156,6 +156,6 @@ class DefaultGetEventsOperationTest {
         doReturn(Optional.empty()).when(auditEventRepository).findByEventId(EVENT_ID);
 
         assertThrows(ResourceNotFoundException.class, () ->
-                listEventsOperation.getEvent(JURISDICTION_ID, CASE_TYPE_ID, EVENT_ID));
+                listEventsOperation.getEvent(caseDetails, CASE_TYPE_ID, EVENT_ID));
     }
 }
