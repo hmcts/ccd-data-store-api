@@ -29,7 +29,7 @@
     "responseCode": 201,
     "responseMessage": "OK",
     "body": {
-      "state": "CaseDeleted",
+      "state": "CaseRevoked",
       "case_data": {
         "_extends_": "FT_ConditionalPostState_Base_Case_Data",
         "TextField": "amended",

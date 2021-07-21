@@ -18,7 +18,7 @@ public class CaseEventEnablingService {
 
     public Boolean isEventEnabled(String enablingCondition,
                                   CaseDetails caseDetails) {
-        if (StringUtils.isNotEmpty(enablingCondition)) {
+        if (enablingCondition != null && StringUtils.isNotEmpty(enablingCondition)) {
             return this.enablingConditionParser.evaluate(enablingCondition,
                 caseDetails.getCaseDataAndMetadata());
         }
