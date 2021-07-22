@@ -67,7 +67,7 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
         }
 
         // if it is a create access and accessProfile is not an organisation, it will not add the caseTypeDefinition.
-        if (caseDataAccessControl.shouldItRemoveCaseDefinitionBaseOnRoleType(
+        if (caseDataAccessControl.shouldRemoveCaseDefinition(
             accessProfiles, access, caseTypeDefinition.getId()
         )) {
             return Optional.empty();

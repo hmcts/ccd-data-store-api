@@ -79,7 +79,7 @@ public class RoleAssignmentService implements AccessControl {
 
     private RoleAssignments getOrganisationRA(List<RoleAssignment> roleAssignmentsList) {
         return RoleAssignments.builder().roleAssignments(roleAssignmentsList.stream()
-            .filter(this::isValidOrganisationRA)
+            .filter(this::isValidOrganisation)
             .collect(Collectors.toList())).build();
     }
 
@@ -88,7 +88,7 @@ public class RoleAssignmentService implements AccessControl {
         return roleAssignment.isNotExpiredRoleAssignment() && isCaseRoleType;
     }
 
-    private boolean isValidOrganisationRA(RoleAssignment roleAssignment) {
+    private boolean isValidOrganisation(RoleAssignment roleAssignment) {
         final boolean isOrgRole = roleAssignment.getRoleType().equals(RoleType.ORGANISATION.name());
         return roleAssignment.isNotExpiredRoleAssignment() && isOrgRole;
     }

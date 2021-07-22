@@ -29,7 +29,7 @@ public interface CaseDataAccessControl {
 
     boolean anyAccessProfileEqualsTo(String caseTypeId, String accessProfile);
 
-    boolean shouldItRemoveCaseDefinitionBaseOnRoleType(Set<AccessProfile> accessProfiles,
-                                                       Predicate<AccessControlList> access,
-                                                       String caseTypeId);
+    boolean shouldRemoveCaseDefinition(Set<AccessProfile> accessProfiles,
+                                       Predicate<AccessControlList> access,
+                                       String caseTypeId);
 }

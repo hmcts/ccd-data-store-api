@@ -87,13 +87,13 @@ public class CaseAccessService {
 
     public Optional<List<Long>> getGrantedCaseReferencesForRestrictedRoles(CaseTypeDefinition caseTypeDefinition) {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
-            return getGrantedCaseReferencesForRestrictedRolesRA(caseTypeDefinition);
+            return getGrantedCaseReferences(caseTypeDefinition);
         } else {
-            return getGrantedCaseReferencesForRestrictedRolesNonRA();
+            return getGrantedCaseReferences();
         }
     }
 
-    private Optional<List<Long>> getGrantedCaseReferencesForRestrictedRolesRA(CaseTypeDefinition caseTypeDefinition) {
+    private Optional<List<Long>> getGrantedCaseReferences(CaseTypeDefinition caseTypeDefinition) {
         final List<Long> caseReferences =
             roleAssignmentService
                 .getCaseReferencesForAGivenUser(userRepository.getUserId(), caseTypeDefinition)
@@ -101,7 +101,7 @@ public class CaseAccessService {
         return Optional.of(caseReferences);
     }
 
-    private Optional<List<Long>> getGrantedCaseReferencesForRestrictedRolesNonRA() {
+    private Optional<List<Long>> getGrantedCaseReferences() {
         if (userCanOnlyAccessExplicitlyGrantedCases()) {
             final var ids = caseUserRepository.findCasesUserIdHasAccessTo(userRepository.getUserId());
             final var caseReferences = caseDetailsRepository.findCaseReferencesByIds(ids);

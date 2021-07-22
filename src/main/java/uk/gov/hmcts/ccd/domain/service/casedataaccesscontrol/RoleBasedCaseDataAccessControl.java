@@ -86,9 +86,9 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
 
     //Not applicable for enable-attribute-based-access-control=false.
     @Override
-    public boolean shouldItRemoveCaseDefinitionBaseOnRoleType(Set<AccessProfile> accessProfiles,
-                                                              Predicate<AccessControlList> access,
-                                                              String caseTypeId) {
+    public boolean shouldRemoveCaseDefinition(Set<AccessProfile> accessProfiles,
+                                              Predicate<AccessControlList> access,
+                                              String caseTypeId) {
         return false;
     }
 

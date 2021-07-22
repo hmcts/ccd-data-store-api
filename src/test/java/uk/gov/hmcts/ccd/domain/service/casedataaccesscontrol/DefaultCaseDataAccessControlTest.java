@@ -139,7 +139,7 @@ class DefaultCaseDataAccessControlTest {
 
         var accessProfiles = createAccessProfiles(USER_ROLES);
         var result = defaultCaseDataAccessControl
-            .shouldItRemoveCaseDefinitionBaseOnRoleType(accessProfiles, accessMap.get("create"), CASE_TYPE_1);
+            .shouldRemoveCaseDefinition(accessProfiles, accessMap.get("create"), CASE_TYPE_1);
 
         verifyRemoveDefintion(caseDefinitionRepository, securityUtils, roleAssignmentService,
             roleAssignmentsFilteringService, applicationParams, accessProfileService);
@@ -166,7 +166,7 @@ class DefaultCaseDataAccessControlTest {
 
         var accessProfiles = createAccessProfiles(USER_ROLES);
         var result = defaultCaseDataAccessControl
-            .shouldItRemoveCaseDefinitionBaseOnRoleType(accessProfiles, accessMap.get("read"), CASE_TYPE_1);
+            .shouldRemoveCaseDefinition(accessProfiles, accessMap.get("read"), CASE_TYPE_1);
 
         verifyRemoveDefintion(caseDefinitionRepository, securityUtils, roleAssignmentService,
             roleAssignmentsFilteringService, applicationParams, accessProfileService);
@@ -193,7 +193,7 @@ class DefaultCaseDataAccessControlTest {
 
         var accessProfiles = createAccessProfiles(USER_ROLES);
         var result = defaultCaseDataAccessControl
-            .shouldItRemoveCaseDefinitionBaseOnRoleType(accessProfiles, accessMap.get("create"), CASE_TYPE_1);
+            .shouldRemoveCaseDefinition(accessProfiles, accessMap.get("create"), CASE_TYPE_1);
 
         verifyRemoveDefintion(caseDefinitionRepository, securityUtils, roleAssignmentService,
             roleAssignmentsFilteringService, applicationParams, accessProfileService);

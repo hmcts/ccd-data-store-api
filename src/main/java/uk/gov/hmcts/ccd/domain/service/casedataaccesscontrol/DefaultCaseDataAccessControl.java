@@ -82,11 +82,10 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         return generateAllTypesOfProfilesByCaseTypeId(caseTypeId, true);
     }
 
-    private Set<AccessProfile> generateAllTypesOfProfilesByCaseTypeId(String caseTypeId, boolean isACreationProfile) {
-
+    private Set<AccessProfile> generateAllTypesOfProfilesByCaseTypeId(String caseTypeId, boolean isCreationProfile) {
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         final RoleAssignments roleAssignments;
-        if (isACreationProfile) {
+        if (isCreationProfile) {
             roleAssignments = roleAssignmentService.getRoleAssignmentsForCreate(securityUtils.getUserId());
         } else {
             roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
@@ -253,15 +252,12 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     }
 
     @Override
-    public boolean shouldItRemoveCaseDefinitionBaseOnRoleType(Set<AccessProfile> accessProfiles,
-                                                              Predicate<AccessControlList> access,
-                                                              String caseTypeId) {
+    public boolean shouldRemoveCaseDefinition(Set<AccessProfile> accessProfiles,
+                                              Predicate<AccessControlList> access,
+                                              String caseTypeId) {
         // In R.A if the access is create the RoleType has to be organisation.
         final var accessProfile = generateCreationAccessProfilesByCaseTypeId(caseTypeId);
-        if (access.test(getCreateAccessControlList()) && accessProfile.isEmpty()) {
-            return true;
-        }
-        return false;
+        return access.test(getCreateAccessControlList()) && accessProfile.isEmpty();
     }
 
     private AccessControlList getCreateAccessControlList() {
