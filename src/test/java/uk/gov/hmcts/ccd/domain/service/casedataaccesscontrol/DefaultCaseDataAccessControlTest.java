@@ -71,7 +71,7 @@ class DefaultCaseDataAccessControlTest {
 
     private static final String CASE_TYPE_1 = "TEST_CASE_TYPE";
     private HashMap<String, Predicate<AccessControlList>> accessMap;
-    private final Set<String> USER_ROLES = newHashSet(ROLE_NAME_1, ROLE_NAME_2, ROLE_NAME_3);
+    private final Set<String> userRoles = newHashSet(ROLE_NAME_1, ROLE_NAME_2, ROLE_NAME_3);
 
     @Mock
     private RoleAssignmentService roleAssignmentService;
@@ -137,7 +137,7 @@ class DefaultCaseDataAccessControlTest {
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
         doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
 
-        var accessProfiles = createAccessProfiles(USER_ROLES);
+        var accessProfiles = createAccessProfiles(userRoles);
         var result = defaultCaseDataAccessControl
             .shouldRemoveCaseDefinition(accessProfiles, accessMap.get("create"), CASE_TYPE_1);
 
@@ -164,7 +164,7 @@ class DefaultCaseDataAccessControlTest {
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
         doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
 
-        var accessProfiles = createAccessProfiles(USER_ROLES);
+        var accessProfiles = createAccessProfiles(userRoles);
         var result = defaultCaseDataAccessControl
             .shouldRemoveCaseDefinition(accessProfiles, accessMap.get("read"), CASE_TYPE_1);
 
@@ -175,8 +175,9 @@ class DefaultCaseDataAccessControlTest {
 
     @Test
     void itShouldNotRemoveCaseDefinitionBaseOnRoleTypeDueToEmptyRA() {
-        CaseTypeDefinition caseTypeDefinition =  createCaseTypeDefinition(ROLE_NAME_1);
-        List<RoleAssignment> filteredRoleAssignmentsEmpty = new ArrayList<>();
+
+        CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
+
         doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
         doReturn(USER_ID).when(securityUtils).getUserId();
         RoleAssignments roleAssignments = mock(RoleAssignments.class);
@@ -184,6 +185,7 @@ class DefaultCaseDataAccessControlTest {
         Map<String, String> roleAndGrantType = Maps.newHashMap();
         roleAndGrantType.put(ROLE_NAME_1, BASIC.name());
         List<RoleAssignment> roleAssignments1 = createFilteringResults(roleAndGrantType);
+        var filteredRoleAssignmentsEmpty = new ArrayList<>();
         doReturn(filteredRoleAssignmentsEmpty).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
         doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
@@ -191,7 +193,7 @@ class DefaultCaseDataAccessControlTest {
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
         doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
 
-        var accessProfiles = createAccessProfiles(USER_ROLES);
+        var accessProfiles = createAccessProfiles(userRoles);
         var result = defaultCaseDataAccessControl
             .shouldRemoveCaseDefinition(accessProfiles, accessMap.get("create"), CASE_TYPE_1);
 
@@ -200,7 +202,12 @@ class DefaultCaseDataAccessControlTest {
         assertTrue(result);
     }
 
-    private static void verifyRemoveDefintion(CaseDefinitionRepository caseDefinitionRepository, SecurityUtils securityUtils, RoleAssignmentService roleAssignmentService, RoleAssignmentsFilteringService roleAssignmentsFilteringService, ApplicationParams applicationParams, AccessProfileServiceImpl accessProfileService) {
+    private static void verifyRemoveDefintion(CaseDefinitionRepository caseDefinitionRepository,
+                                              SecurityUtils securityUtils, RoleAssignmentService roleAssignmentService,
+                                              RoleAssignmentsFilteringService roleAssignmentsFilteringService,
+                                              ApplicationParams applicationParams,
+                                              AccessProfileServiceImpl accessProfileService) {
+
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
         verify(securityUtils).getUserId();
         verify(roleAssignmentService).getRoleAssignmentsForCreate(anyString());
