@@ -15,7 +15,7 @@
 	],
 
 	"user": {
-    "_extends_": "CaseworkerAutotest"
+	    "_extends_": "CaseworkerAutotest"
 	},
 
 	"request": {
