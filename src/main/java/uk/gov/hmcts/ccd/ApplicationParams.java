@@ -260,7 +260,7 @@ public class ApplicationParams {
     }
 
     public String userDefaultSettingsURL() {
-        return userProfileHost + "/user-profile/users?uid={uid}";
+        return userProfileHost + "/user-profile/users";
     }
 
     public String getTokenSecret() {
