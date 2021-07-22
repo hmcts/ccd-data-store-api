@@ -48,7 +48,6 @@ public abstract class WireMockBaseTest extends BaseTest {
 
         LOG.info("Wire mock test, host url is {}", hostUrl);
 
-        ReflectionTestUtils.setField(applicationParams, "caseDocumentAmApiHost", hostUrl);
         ReflectionTestUtils.setField(applicationParams, "caseDefinitionHost", hostUrl);
         ReflectionTestUtils.setField(applicationParams, "uiDefinitionHost", hostUrl);
         ReflectionTestUtils.setField(applicationParams, "userProfileHost", hostUrl);

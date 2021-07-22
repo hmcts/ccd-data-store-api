@@ -85,18 +85,20 @@ public class CaseDocumentService {
                                     final String caseTypeId,
                                     final String jurisdictionId,
                                     final List<DocumentHashToken> documentHashes) {
-        if (documentHashes.isEmpty()) {
-            return;
+        if (applicationParams.isAttachDocumentEnabled()) {
+            if (documentHashes.isEmpty()) {
+                return;
+            }
+
+            final CaseDocumentsMetadata documentMetadata = CaseDocumentsMetadata.builder()
+                .caseId(caseId)
+                .caseTypeId(caseTypeId)
+                .jurisdictionId(jurisdictionId)
+                .documentHashTokens(documentHashes)
+                .build();
+
+            caseDocumentAmApiClient.applyPatch(documentMetadata);
         }
-
-        final CaseDocumentsMetadata documentMetadata = CaseDocumentsMetadata.builder()
-            .caseId(caseId)
-            .caseTypeId(caseTypeId)
-            .jurisdictionId(jurisdictionId)
-            .documentHashToken(documentHashes)
-            .build();
-
-        caseDocumentAmApiClient.applyPatch(documentMetadata);
     }
 
     void validate(final List<DocumentHashToken> documentHashes) {

@@ -1,55 +1,47 @@
 package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.ccd.ApplicationParams;
+import feign.FeignException;
+import feign.FeignException.FeignClientException;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.search.CaseDocumentsMetadata;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.DocumentTokenException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 @Named
 public class CaseDocumentAmApiClient {
-    private final RestTemplate restTemplate;
+    private final CaseDocumentClientApi caseDocumentClientApi;
     private final SecurityUtils securityUtils;
-    private final ApplicationParams applicationParams;
+    private final CaseDocumentMetadataMapper caseDocumentMetadataMapper;
 
     @Inject
-    public CaseDocumentAmApiClient(final RestTemplate restTemplate,
+    public CaseDocumentAmApiClient(final CaseDocumentClientApi caseDocumentClientApi,
                                    final SecurityUtils securityUtils,
-                                   final ApplicationParams applicationParams) {
-        this.restTemplate = restTemplate;
+                                   final CaseDocumentMetadataMapper caseDocumentMetadataMapper) {
+        this.caseDocumentClientApi = caseDocumentClientApi;
         this.securityUtils = securityUtils;
-        this.applicationParams = applicationParams;
+        this.caseDocumentMetadataMapper = caseDocumentMetadataMapper;
     }
 
     public void applyPatch(final CaseDocumentsMetadata caseDocumentsMetadata) {
-        final HttpHeaders headers = securityUtils.authorizationHeaders();
-        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        final HttpEntity<CaseDocumentsMetadata> requestEntity = new HttpEntity<>(caseDocumentsMetadata, headers);
+        uk.gov.hmcts.reform.ccd.document.am.model.CaseDocumentsMetadata mappedCaseDocumentsMetadata =
+            caseDocumentMetadataMapper.convertToAmClientCaseDocumentsMetadata(caseDocumentsMetadata);
+
+        String authorization = securityUtils.getUserBearerToken();
+        String serviceAuthorization = securityUtils.getServiceAuthorization();
 
         try {
-            restTemplate.exchange(
-                applicationParams.getCaseDocumentAmApiHost().concat(applicationParams.getAttachDocumentPath()),
-                HttpMethod.PATCH,
-                requestEntity,
-                Void.class
-            );
-        } catch (HttpClientErrorException restClientException) {
-            if (restClientException.getStatusCode() != HttpStatus.FORBIDDEN) {
-                exceptionScenarios(restClientException);
+            caseDocumentClientApi.patchDocument(authorization, serviceAuthorization, mappedCaseDocumentsMetadata);
+        } catch (FeignException feignException) {
+            if (!(feignException instanceof FeignClientException.Forbidden)) {
+                exceptionScenarios(feignException);
             }
-            final String badDocument = restClientException.getResponseBodyAsString();
+            final String badDocument = feignException.getMessage();
 
             throw new DocumentTokenException(
                 String.format("The user has provided an invalid hashToken for document %s", badDocument)
@@ -57,11 +49,11 @@ public class CaseDocumentAmApiClient {
         }
     }
 
-    private void exceptionScenarios(HttpClientErrorException restClientException) {
-        if (restClientException.getStatusCode() == HttpStatus.BAD_REQUEST) {
-            throw new BadSearchRequest(restClientException.getMessage());
-        } else if (restClientException.getStatusCode() == HttpStatus.NOT_FOUND) {
-            throw new ResourceNotFoundException(restClientException.getMessage());
+    private void exceptionScenarios(FeignException feignException) {
+        if (feignException instanceof FeignClientException.BadRequest) {
+            throw new BadSearchRequest(feignException.getMessage());
+        } else if (feignException instanceof FeignClientException.NotFound) {
+            throw new ResourceNotFoundException(feignException.getMessage());
         } else {
             throw new ServiceException("The downstream CCD AM application has failed");
         }

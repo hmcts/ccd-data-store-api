@@ -18,11 +18,11 @@ public class CaseDocumentsMetadata {
     public CaseDocumentsMetadata(String caseId,
                                  String caseTypeId,
                                  String jurisdictionId,
-                                 List<DocumentHashToken> documentHashToken) {
+                                 List<DocumentHashToken> documentHashTokens) {
         this.caseId = caseId;
         this.caseTypeId = caseTypeId;
         this.jurisdictionId = jurisdictionId;
-        this.documentHashToken = documentHashToken;
+        this.documentHashTokens = documentHashTokens;
     }
 
     @JsonProperty
@@ -35,6 +35,6 @@ public class CaseDocumentsMetadata {
     private String jurisdictionId;
 
     @JsonProperty("documentHashTokens")
-    private List<DocumentHashToken> documentHashToken;
+    private List<DocumentHashToken> documentHashTokens;
 
 }
