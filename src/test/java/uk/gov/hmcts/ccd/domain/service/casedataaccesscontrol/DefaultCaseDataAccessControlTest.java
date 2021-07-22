@@ -442,7 +442,7 @@ class DefaultCaseDataAccessControlTest {
         Optional<CaseDetails> optionalCaseDetails = Optional.of(caseDetails);
         doReturn(optionalCaseDetails).when(caseDetailsRepository).findByReference(anyString());
 
-        RoleAssignments roleAssignments = new RoleAssignments();
+        RoleAssignments roleAssignments = new RoleAssignments(caseDefinitionRepository);
         doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
 
         doReturn(enablePseudoRolesAssignmentGeneration)

@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,18 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import javax.inject.Inject;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -36,6 +22,18 @@ import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
 
 @SuppressWarnings("checkstyle:SummaryJavadoc")
 // partial javadoc attributes added prior to checkstyle implementation in module
@@ -214,7 +212,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     public JurisdictionDefinition getJurisdictionFromDefinitionStore(String jurisdictionId) {
-        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(
+        List<JurisdictionDefinition> jurisdictionDefinitions = getAllJurisdiction(
                 Optional.of(Arrays.asList(jurisdictionId)));
         if (jurisdictionDefinitions.isEmpty()) {
             return null;
@@ -225,7 +223,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Override
     public List<String> getCaseTypesIDsByJurisdictions(List<String> jurisdictionIds) {
 
-        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(
+        List<JurisdictionDefinition> jurisdictionDefinitions = getAllJurisdiction(
                 Optional.of(jurisdictionIds));
         if (jurisdictionDefinitions.isEmpty()) {
             LOG.warn("Definitions not found for requested jurisdictions {}", jurisdictionIds);
@@ -237,7 +235,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     @Override
     public List<String> getAllCaseTypesIDs() {
-        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(
+        List<JurisdictionDefinition> jurisdictionDefinitions = getAllJurisdiction(
                 Optional.ofNullable(null));
         return getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
     }
@@ -248,7 +246,8 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 .collect(Collectors.toList());
     }
 
-    private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
+    @Override
+    public List<JurisdictionDefinition> getAllJurisdiction(Optional<List<String>> jurisdictionIds) {
         try {
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
             if (jurisdictionIds.isPresent()) {

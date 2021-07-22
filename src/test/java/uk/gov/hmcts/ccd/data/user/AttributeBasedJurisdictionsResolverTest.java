@@ -73,20 +73,24 @@ class AttributeBasedJurisdictionsResolverTest {
             RoleAssignments.builder()
                 .roleAssignments(asList(
                     RoleAssignment.builder()
+                        .grantType("CASE")
                         .roleName(DIVORCE_SOLICITOR_ROLE)
                         .actorId(USER_ID)
                         .attributes(RoleAssignmentAttributes.builder()
                             .jurisdiction(Optional.of(DIVORCE_JURISDICTION)).build()).build(),
                     RoleAssignment.builder()
+                        .grantType("CASE")
                         .roleName(DIVORCE_SOLICITOR_ROLE)
                         .actorId(USER_ID)
                         .attributes(null).build(),
                     RoleAssignment.builder()
+                        .grantType("CASE")
                         .roleName(CASEWORKER_CMC_ROLE)
                         .actorId(USER_ID)
                         .attributes(RoleAssignmentAttributes.builder()
                             .caseId(Optional.of(CASE_ID)).build()).build(),
                     RoleAssignment.builder()
+                        .grantType("CASE")
                         .roleName(PROBATE_SOLICITOR_ROLE)
                         .actorId(USER_ID)
                         .attributes(RoleAssignmentAttributes.builder()

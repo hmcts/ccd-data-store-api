@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Maps.newHashMap;
@@ -91,6 +92,12 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     public JurisdictionDefinition getJurisdiction(String jurisdictionId) {
         LOGGER.debug("Will get jurisdiction '{}' from repository.", jurisdictionId);
         return caseDefinitionRepository.getJurisdiction(jurisdictionId);
+    }
+
+    @Override
+    public List<JurisdictionDefinition> getAllJurisdiction(Optional<List<String>> jurisdictionIds) {
+        LOGGER.debug("Will get jurisdictions '{}' from repository.", jurisdictionIds);
+        return caseDefinitionRepository.getAllJurisdiction(jurisdictionIds);
     }
 
     @Override

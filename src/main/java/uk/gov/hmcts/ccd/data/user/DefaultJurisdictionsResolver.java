@@ -30,7 +30,14 @@ public class DefaultJurisdictionsResolver implements JurisdictionsResolver {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
             return attributeBasedJurisdictionsResolver.getJurisdictions();
         } else {
-            return idamJurisdictionsResolver.getJurisdictions();
+            List<String> jurisdictions = idamJurisdictionsResolver.getJurisdictions();
+            List<String> roleJurisdictions = idamJurisdictionsResolver.getJurisdictions();
+            roleJurisdictions.forEach(role -> {
+                if (!jurisdictions.contains(role)){
+                    jurisdictions.add(role);
+                }
+            });
+            return jurisdictions;
         }
     }
 }
