@@ -391,7 +391,7 @@ idea {
     }
     module {
         apt {
-            // whether generated sources dirs are ad-client.proded as generated sources root
+            // whether generated sources dirs are added as generated sources root
             addGeneratedSourcesDirs = true
             // whether the annotationProcessor/apt and testAnnotationProcessor/testApt dependencies are added as module dependencies
             addAptDependencies = true
