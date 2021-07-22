@@ -125,11 +125,20 @@ public class CaseAccessService {
     }
 
     public Set<AccessProfile> getCaseCreationRoles(String caseTypeId) {
-        return Sets.union(getAccessProfiles(caseTypeId), getCaseCreationCaseRoles());
+        return Sets.union(getCreationAccessProfiles(caseTypeId), getCaseCreationCaseRoles());
     }
 
     public Set<AccessProfile> getAccessProfiles(String caseTypeId) {
         Set<AccessProfile> accessProfiles = caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
+        if (accessProfiles == null) {
+            throw new ValidationException("Cannot find access profiles for the user");
+        }
+        return accessProfiles;
+    }
+
+    public Set<AccessProfile> getCreationAccessProfiles(String caseTypeId) {
+        Set<AccessProfile> accessProfiles =
+            caseDataAccessControl.generateCreationAccessProfilesByCaseTypeId(caseTypeId);
         if (accessProfiles == null) {
             throw new ValidationException("Cannot find access profiles for the user");
         }

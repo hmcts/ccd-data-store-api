@@ -12,10 +12,12 @@ import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
@@ -44,6 +46,11 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
 
     @Override
     public Set<AccessProfile> generateAccessProfilesByCaseTypeId(String caseTypeId) {
+        return userRoleToAccessProfiles(userRepository.getUserRoles());
+    }
+
+    @Override
+    public Set<AccessProfile> generateCreationAccessProfilesByCaseTypeId(String caseTypeId) {
         return userRoleToAccessProfiles(userRepository.getUserRoles());
     }
 
@@ -77,6 +84,14 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
         return userRepository.anyRoleEqualsTo(userRole);
     }
 
+    //Not applicable for enable-attribute-based-access-control=false.
+    @Override
+    public boolean shouldItRemoveCaseDefinitionBaseOnRoleType(Set<AccessProfile> accessProfiles,
+                                                              Predicate<AccessControlList> access,
+                                                              String caseTypeId) {
+        return false;
+    }
+
     @Override
     public CaseAccessMetadata generateAccessMetadataWithNoCaseId() {
         return new CaseAccessMetadata();
@@ -88,4 +103,6 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
             .map(AccessProfile::new)
             .collect(Collectors.toSet());
     }
+
+
 }

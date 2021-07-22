@@ -1,11 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.google.common.collect.Sets;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -15,6 +10,12 @@ import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 @Qualifier(AuthorisedGetUserProfileOperation.QUALIFIER)
@@ -62,6 +63,13 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
                                                       Predicate<AccessControlList> access) {
         if (caseTypeDefinition == null || CollectionUtils.isEmpty(accessProfiles)
             || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, access)) {
+            return Optional.empty();
+        }
+
+        // if it is a create access and accessProfile is not an organisation, it will not add the caseTypeDefinition.
+        if (caseDataAccessControl.shouldItRemoveCaseDefinitionBaseOnRoleType(
+            accessProfiles, access, caseTypeDefinition.getId()
+        )) {
             return Optional.empty();
         }
 

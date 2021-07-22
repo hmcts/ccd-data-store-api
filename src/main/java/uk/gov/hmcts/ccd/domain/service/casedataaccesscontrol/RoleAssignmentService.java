@@ -45,9 +45,13 @@ public class RoleAssignmentService implements AccessControl {
         // TODO: RDM-10924 - move roleCategory from here to the POST roleAssignments operation once it is implemented
         RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(userId);
         log.debug("user: {} has roleCategory: {}", userId, roleCategory);
-
         RoleAssignmentResponse roleAssignmentResponse = roleAssignmentRepository.getRoleAssignments(userId);
         return roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
+    }
+
+    public RoleAssignments getRoleAssignmentsForCreate(String userId) {
+        final var roleAssignments = getRoleAssignments(userId);
+        return getOrganisationRA(roleAssignments.getRoleAssignments());
     }
 
     public List<String> getCaseReferencesForAGivenUser(String userId) {
@@ -73,9 +77,20 @@ public class RoleAssignmentService implements AccessControl {
             .collect(Collectors.toList());
     }
 
+    private RoleAssignments getOrganisationRA(List<RoleAssignment> roleAssignmentsList) {
+        return RoleAssignments.builder().roleAssignments(roleAssignmentsList.stream()
+            .filter(this::isValidOrganisationRA)
+            .collect(Collectors.toList())).build();
+    }
+
     private boolean isValidRoleAssignment(RoleAssignment roleAssignment) {
         final boolean isCaseRoleType = roleAssignment.getRoleType().equals(RoleType.CASE.name());
         return roleAssignment.isNotExpiredRoleAssignment() && isCaseRoleType;
+    }
+
+    private boolean isValidOrganisationRA(RoleAssignment roleAssignment) {
+        final boolean isOrgRole = roleAssignment.getRoleType().equals(RoleType.ORGANISATION.name());
+        return roleAssignment.isNotExpiredRoleAssignment() && isOrgRole;
     }
 
     public List<CaseAssignedUserRole> findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds) {

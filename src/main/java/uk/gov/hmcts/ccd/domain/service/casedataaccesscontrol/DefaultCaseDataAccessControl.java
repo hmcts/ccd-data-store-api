@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Component
@@ -72,13 +74,29 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     // for the user and filters access profiles based on the case type.
     @Override
     public Set<AccessProfile> generateAccessProfilesByCaseTypeId(String caseTypeId) {
+        return generateAllTypesOfProfilesByCaseTypeId(caseTypeId, false);
+    }
+
+    @Override
+    public Set<AccessProfile> generateCreationAccessProfilesByCaseTypeId(String caseTypeId) {
+        return generateAllTypesOfProfilesByCaseTypeId(caseTypeId, true);
+    }
+
+    private Set<AccessProfile> generateAllTypesOfProfilesByCaseTypeId(String caseTypeId, boolean isACreationProfile) {
+
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
-        RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
+        final RoleAssignments roleAssignments;
+        if (isACreationProfile) {
+            roleAssignments = roleAssignmentService.getRoleAssignmentsForCreate(securityUtils.getUserId());
+        } else {
+            roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
+        }
         List<RoleAssignment> filteredRoleAssignments = roleAssignmentsFilteringService
             .filter(roleAssignments, caseTypeDefinition).getFilteredMatchingRoleAssignments();
 
         return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments, caseTypeDefinition));
     }
+
 
     @Override
     public Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference) {
@@ -232,5 +250,23 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         return roleAssignments.stream()
             .map(roleAssignment -> GrantType.valueOf(roleAssignment.getGrantType()))
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean shouldItRemoveCaseDefinitionBaseOnRoleType(Set<AccessProfile> accessProfiles,
+                                                              Predicate<AccessControlList> access,
+                                                              String caseTypeId) {
+        // In R.A if the access is create the RoleType has to be organisation.
+        final var accessProfile = generateCreationAccessProfilesByCaseTypeId(caseTypeId);
+        if (access.test(getCreateAccessControlList()) && accessProfile.isEmpty()) {
+            return true;
+        }
+        return false;
+    }
+
+    private AccessControlList getCreateAccessControlList() {
+        var accessControlList = new AccessControlList();
+        accessControlList.setCreate(true);
+        return accessControlList;
     }
 }
