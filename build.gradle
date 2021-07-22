@@ -237,6 +237,7 @@ dependencies {
     testCompile group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
     testCompile 'io.github.openfeign:feign-jackson:9.7.0'
     testCompile 'pl.allegro.tech:embedded-elasticsearch:2.7.0'
+    testCompile 'com.github.hmcts:fortify-client:1.2.0:all'
 
     // for sonar analysis
     testCompile group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
@@ -390,7 +391,7 @@ idea {
     }
     module {
         apt {
-            // whether generated sources dirs are added as generated sources root
+            // whether generated sources dirs are ad-client.proded as generated sources root
             addGeneratedSourcesDirs = true
             // whether the annotationProcessor/apt and testAnnotationProcessor/testApt dependencies are added as module dependencies
             addAptDependencies = true
@@ -728,6 +729,12 @@ sourceSets {
             srcDir('src/contractTest/resources')
         }
     }
+}
+
+task fortifyScan(type: JavaExec)  {
+    main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
+    classpath += sourceSets.test.runtimeClasspath
+    jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
 task highLevelDataSetup(type: JavaExec) {
