@@ -6,12 +6,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
@@ -39,11 +40,10 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -56,8 +56,8 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
+@ExtendWith(MockitoExtension.class)
 class CaseAccessOperationTest {
-
     private static final String JURISDICTION = "CMC";
     private static final String WRONG_JURISDICTION = "DIVORCE";
     private static final String CASE_TYPE_ID = "Application";
@@ -76,7 +76,7 @@ class CaseAccessOperationTest {
     private static final String ORGANISATION = "ORGANISATION";
     private static final String ORGANISATION_OTHER = "ORGANISATION_OTHER";
 
-    @Mock
+    @Mock(lenient = true)
     private CaseDetailsRepository caseDetailsRepository;
 
     @Mock
@@ -99,11 +99,7 @@ class CaseAccessOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-
         configureCaseRepository(JURISDICTION);
-        configureCaseRoleRepository();
-        configureCaseUserRepository();
     }
 
 
@@ -116,11 +112,6 @@ class CaseAccessOperationTest {
 
         @Captor
         ArgumentCaptor<Set<String>> rolesCaptor;
-
-        @BeforeEach
-        void setUp() {
-            MockitoAnnotations.openMocks(this);
-        }
 
         @Test
         @DisplayName("should grant access to user")
@@ -218,10 +209,14 @@ class CaseAccessOperationTest {
 
         @BeforeEach
         void setUp() {
-            MockitoAnnotations.openMocks(this);
+            when(caseRoleRepository.getCaseRoles(CASE_TYPE_ID)).thenReturn(Sets.newHashSet(CASE_ROLE,
+                CASE_ROLE_CREATOR,
+                CASE_ROLE_OTHER,
+                CASE_ROLE_GRANTED));
 
             caseDetails = new CaseDetails();
             caseDetails.setId(CASE_ID.toString());
+            caseDetails.setReference(CASE_REFERENCE);
             caseDetails.setCaseTypeId(CASE_TYPE_ID);
         }
 
@@ -334,6 +329,7 @@ class CaseAccessOperationTest {
 
             // GIVEN
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+            when(caseUserRepository.findCaseRoles(CASE_ID, USER_ID)).thenReturn(List.of(CASE_ROLE_GRANTED));
 
             // WHEN
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE));
@@ -353,6 +349,7 @@ class CaseAccessOperationTest {
 
             // GIVEN
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+            when(caseUserRepository.findCaseRoles(CASE_ID, USER_ID)).thenReturn(List.of(CASE_ROLE_GRANTED));
 
             // WHEN
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE_GRANTED));
@@ -471,7 +468,7 @@ class CaseAccessOperationTest {
         void shouldReturnEmptyListIfUserHasAccessToNoCasesForRA() {
 
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
-            when(caseUserRepository.findCasesUserIdHasAccessTo(USER_ID))
+            when(roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID))
                 .thenReturn(new ArrayList<>());
 
             List<String> usersCases = caseAccessOperation.findCasesUserIdHasAccessTo(USER_ID);
@@ -497,8 +494,6 @@ class CaseAccessOperationTest {
 
         @BeforeEach
         void setUp() {
-            MockitoAnnotations.openMocks(this);
-
             configureCaseRepository(null);
         }
 
@@ -778,7 +773,7 @@ class CaseAccessOperationTest {
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_OTHER)
             );
             // behave as no existing case roles
-            mockExistingCaseUserRoles(new ArrayList<>());
+            mockExistingCaseUserRolesForRA(new ArrayList<>());
 
             // ACT
             caseAccessOperation.addCaseUserRoles(caseUserRoles);
@@ -1195,12 +1190,10 @@ class CaseAccessOperationTest {
                     CASE_ROLE_OTHER, ORGANISATION_OTHER)
 
             );
-            // ** CASE_REFERENCE_OTHER + USER_ID_OTHER as exiting relationship
-            // (i.e. to check adjusting count still works in multiple)
-            when(caseUserRepository.findCaseUserRoles(
-                argThat(arg -> arg.contains(CASE_ID) && arg.contains(CASE_ID_OTHER)),
-                argThat(arg -> arg.contains(USER_ID) && arg.contains(USER_ID_OTHER))
-            )).thenReturn(Collections.singletonList(
+            // register existing case role
+            mockExistingCaseUserRoles(List.of(
+                // ** CASE_REFERENCE_OTHER + USER_ID_OTHER as exiting relationship
+                // (i.e. to check adjusting count still works in multiple)
                 createCaseUserEntity(CASE_ID_OTHER, CASE_ROLE_OTHER, USER_ID_OTHER)
             ));
 
@@ -1260,13 +1253,10 @@ class CaseAccessOperationTest {
                     CASE_ROLE_OTHER, ORGANISATION_OTHER)
 
             );
-            // ** CASE_REFERENCE_OTHER + USER_ID_OTHER as exiting relationship
-            // (i.e. to check adjusting count still works in multiple)
-            when(roleAssignmentService.findRoleAssignmentsByCasesAndUsers(
-                argThat(arg -> arg.contains(CASE_REFERENCE.toString())
-                            && arg.contains(CASE_REFERENCE_OTHER.toString())),
-                argThat(arg -> arg.contains(USER_ID) && arg.contains(USER_ID_OTHER))
-            )).thenReturn(Collections.singletonList(
+            // register existing case role
+            mockExistingCaseUserRolesForRA(List.of(
+                // ** CASE_REFERENCE_OTHER + USER_ID_OTHER as exiting relationship
+                // (i.e. to check adjusting count still works in multiple)
                 new CaseAssignedUserRole(CASE_REFERENCE_OTHER.toString(), USER_ID_OTHER, CASE_ROLE_OTHER)
             ));
 
@@ -1293,21 +1283,6 @@ class CaseAccessOperationTest {
                 );
 
             verifyNoInteractions(caseUserRepository);
-        }
-
-        private void mockExistingCaseUserRoles(List<CaseUserEntity> existingCaseUserRoles) {
-            when(caseUserRepository.findCaseUserRoles(
-                argThat(arg -> arg.contains(CASE_ID) || arg.contains(CASE_ID_OTHER)),
-                argThat(arg -> arg.contains(USER_ID)))
-            ).thenReturn(existingCaseUserRoles);
-        }
-
-        private void mockExistingCaseUserRolesForRA(List<CaseAssignedUserRole> existingCaseUserRoles) {
-            when(roleAssignmentService.findRoleAssignmentsByCasesAndUsers(
-                argThat(arg -> arg.contains(CASE_REFERENCE.toString())
-                            || arg.contains(CASE_REFERENCE_OTHER.toString())),
-                argThat(arg -> arg.contains(USER_ID)))
-            ).thenReturn(existingCaseUserRoles);
         }
 
     }
@@ -1659,11 +1634,24 @@ class CaseAccessOperationTest {
         @Test
         @DisplayName("should find case assigned user roles")
         void shouldGetCaseAssignedUserRoles() {
-            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
-            List<Long> caseReferences = Lists.newArrayList(CASE_REFERENCE);
-            List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences,
-                Lists.newArrayList());
 
+            // GIVEN
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+
+            // register existing case role
+            mockExistingCaseUserRoles(List.of(
+                createCaseUserEntity(CASE_ID, CASE_ROLE, USER_ID),
+                createCaseUserEntity(CASE_ID, CASE_ROLE_CREATOR, USER_ID)
+            ));
+
+            List<Long> caseReferences = Lists.newArrayList(CASE_REFERENCE);
+            final List<String> userIds = Lists.newArrayList();
+
+            // WHEN
+            List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences,
+                userIds);
+
+            // THEN
             assertNotNull(caseAssignedUserRoles);
             assertEquals(2, caseAssignedUserRoles.size());
             assertEquals(CASE_ROLE, caseAssignedUserRoles.get(0).getCaseRole());
@@ -1673,28 +1661,43 @@ class CaseAccessOperationTest {
         @Test
         @DisplayName("RA set to true, should find case assigned user roles")
         void shouldGetCaseAssignedUserRolesForRA() {
+
+            // GIVEN
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+
+            // register existing case role
+            mockExistingCaseUserRolesForRA(List.of(
+                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE),
+                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR)
+            ));
+
             final var caseReferences = Lists.newArrayList(CASE_REFERENCE);
             final List<String> userIds = Lists.newArrayList();
-            when(roleAssignmentService.findRoleAssignmentsByCasesAndUsers(anyList(),anyList()))
-                .thenReturn(getCaseAssignedUserRoles());
 
+            // WHEN
             List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences,
                 userIds);
 
+            // THEN
             assertNotNull(caseAssignedUserRoles);
-            assertEquals(1, caseAssignedUserRoles.size());
+            assertEquals(2, caseAssignedUserRoles.size());
             assertEquals(CASE_ROLE, caseAssignedUserRoles.get(0).getCaseRole());
+            assertEquals(CASE_ROLE_CREATOR, caseAssignedUserRoles.get(1).getCaseRole());
         }
 
         @Test
         @DisplayName("should return empty result for non existing cases")
         void shouldReturnEmptyResultOnNonExistingCases() {
+
+            // GIVEN
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
             List<Long> caseReferences = Lists.newArrayList(CASE_NOT_FOUND);
+
+            // WHEN
             List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences,
                 Lists.newArrayList());
 
+            // THEN
             assertNotNull(caseAssignedUserRoles);
             assertEquals(0, caseAssignedUserRoles.size());
         }
@@ -1702,20 +1705,21 @@ class CaseAccessOperationTest {
         @Test
         @DisplayName("RA set to true, should return empty result for non existing cases")
         void shouldReturnEmptyResultOnNonExistingCasesForRA() {
+
+            // GIVEN
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+
             List<Long> caseReferences = Lists.newArrayList(CASE_NOT_FOUND);
+
+            // WHEN
             List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences,
                 Lists.newArrayList());
 
+            // THEN
             assertNotNull(caseAssignedUserRoles);
             assertEquals(0, caseAssignedUserRoles.size());
         }
 
-        private List<CaseAssignedUserRole> getCaseAssignedUserRoles() {
-            return Collections.singletonList(
-                new CaseAssignedUserRole("caseDataId", "userId", CASE_ROLE)
-            );
-        }
     }
 
 
@@ -1735,22 +1739,6 @@ class CaseAccessOperationTest {
                                   .findByReference(jurisdiction, CASE_NOT_FOUND);
         doReturn(Optional.empty()).when(caseDetailsRepository)
                                   .findByReference(WRONG_JURISDICTION, CASE_REFERENCE);
-    }
-
-    private void configureCaseRoleRepository() {
-        when(caseRoleRepository.getCaseRoles(CASE_TYPE_ID)).thenReturn(Sets.newHashSet(CASE_ROLE,
-                                                                                       CASE_ROLE_CREATOR,
-                                                                                       CASE_ROLE_OTHER,
-                                                                                       CASE_ROLE_GRANTED));
-    }
-
-    private void configureCaseUserRepository() {
-        when(caseUserRepository.findCaseRoles(CASE_ID,
-                                              USER_ID)).thenReturn(Collections.singletonList(CASE_ROLE_GRANTED));
-        CaseUserEntity caseUserEntity = createCaseUserEntity(CASE_ID, CASE_ROLE, USER_ID);
-        CaseUserEntity caseUserEntity1 = createCaseUserEntity(CASE_ID, CASE_ROLE_CREATOR, USER_ID);
-        when(caseUserRepository.findCaseUserRoles(anyList(), anyList()))
-            .thenReturn(Arrays.asList(caseUserEntity, caseUserEntity1));
     }
 
     private CaseUserEntity createCaseUserEntity(Long caseDataId, String caseRole, String userId) {
@@ -1774,6 +1762,21 @@ class CaseAccessOperationTest {
 
     private String getOrgUserCountSupDataKey(String organisationId) {
         return "orgs_assigned_users." + organisationId;
+    }
+
+    private void mockExistingCaseUserRoles(List<CaseUserEntity> existingCaseUserRoles) {
+        when(caseUserRepository.findCaseUserRoles(
+            argThat(arg -> arg.contains(CASE_ID) || arg.contains(CASE_ID_OTHER)),
+            argThat(arg -> arg.contains(USER_ID) || arg.isEmpty()))
+        ).thenReturn(existingCaseUserRoles);
+    }
+
+    private void mockExistingCaseUserRolesForRA(List<CaseAssignedUserRole> existingCaseUserRoles) {
+        when(roleAssignmentService.findRoleAssignmentsByCasesAndUsers(
+            argThat(arg -> arg.contains(CASE_REFERENCE.toString())
+                        || arg.contains(CASE_REFERENCE_OTHER.toString())),
+            argThat(arg -> arg.contains(USER_ID) || arg.isEmpty()))
+        ).thenReturn(existingCaseUserRoles);
     }
 
 }

@@ -83,9 +83,9 @@ class RoleAssignmentsMapperTest {
         }
 
         @Test
-        void shouldMapNullRoleAssignmentRequest() {
+        void shouldMapNullRoleAssignmentResponse() {
             RoleAssignmentRequestResponse response = RoleAssignmentRequestResponse.builder()
-                .roleAssignmentRequest(null)
+                .roleAssignmentResponse(null)
                 .build();
 
             RoleAssignments mapped = instance.toRoleAssignments(response);
@@ -233,11 +233,11 @@ class RoleAssignmentsMapperTest {
     private static RoleAssignmentRequestResponse createRoleAssignmentRequestResponse(
         List<RoleAssignmentResource> requestedRoles) {
 
-        RoleAssignmentRequestResource roleAssignmentRequest = RoleAssignmentRequestResource
+        RoleAssignmentRequestResource roleAssignmentResponse = RoleAssignmentRequestResource
             .builder().requestedRoles(requestedRoles).build();
 
         return RoleAssignmentRequestResponse.builder()
-            .roleAssignmentRequest(roleAssignmentRequest)
+            .roleAssignmentResponse(roleAssignmentResponse)
             .build();
     }
 
@@ -253,7 +253,7 @@ class RoleAssignmentsMapperTest {
             .id(id)
             .actorIdType(ActorIdType.IDAM.name())
             .actorId("aecfec12-1f9a-40cb-bd8c-7a9f3506e67c")
-            .roleType(RoleType.CASE.name()) 
+            .roleType(RoleType.CASE.name())
             .roleName("judiciary")
             .classification(Classification.PUBLIC.name())
             .grantType(GrantType.STANDARD.name())

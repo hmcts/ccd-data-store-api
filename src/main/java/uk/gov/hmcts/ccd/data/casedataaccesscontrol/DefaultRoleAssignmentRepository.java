@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -68,13 +69,14 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
             final HttpEntity<Object> requestEntity =
                 new HttpEntity<>(assignmentRequest, securityUtils.authorizationHeaders());
 
-            final var encodedUrl = UriComponentsBuilder.fromHttpUrl(applicationParams.roleAssignmentBaseURL())
-                .build().toUriString();
-            return restTemplate.exchange(new URI(encodedUrl),
-                HttpMethod.POST, requestEntity,
-                RoleAssignmentRequestResponse.class).getBody();
+            return restTemplate.exchange(
+                applicationParams.roleAssignmentBaseURL(),
+                HttpMethod.POST,
+                requestEntity,
+                RoleAssignmentRequestResponse.class
+            ).getBody();
 
-        } catch (Exception e) {
+        } catch (HttpStatusCodeException e) {
             log.warn("Error while creating Role Assignments", e);
             throw mapException(e, "creating");
         }

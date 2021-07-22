@@ -4,11 +4,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRequestResource;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRequestResponse;
@@ -47,10 +47,11 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.verify;
 
 @DisplayName("RoleAssignmentService")
+@ExtendWith(MockitoExtension.class)
 class RoleAssignmentServiceTest {
 
     private static final String USER_ID = "user1";
-    private static final String USER_ID_2 = "user1";
+    private static final String USER_ID_2 = "user2";
     private static final String CASE_ID = "111111";
 
     private static final RoleCategory ROLE_CATEGORY_4_USER_1 = RoleCategory.PROFESSIONAL;
@@ -61,30 +62,31 @@ class RoleAssignmentServiceTest {
 
     @Mock
     private RoleAssignmentRepository roleAssignmentRepository;
+
     @Mock
     private RoleAssignmentsMapper roleAssignmentsMapper;
+
     @Mock
     private RoleAssignments mockedRoleAssignments;
+
     @Mock
     private RoleAssignmentResponse mockedRoleAssignmentResponse;
+
     @Mock
     private RoleAssignmentsFilteringService roleAssignmentFilteringService;
+
     @Mock
     private CaseTypeDefinition caseTypeDefinition;
+
     @Mock
     private FilteredRoleAssignments filteredRoleAssignments;
+
     @Mock
     private RoleAssignmentCategoryService roleAssignmentCategoryService;
 
     @InjectMocks
     private RoleAssignmentService roleAssignmentService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-
-        given(roleAssignmentCategoryService.getRoleCategory(USER_ID)).willReturn(ROLE_CATEGORY_4_USER_1);
-    }
 
     @Nested
     @DisplayName("createCaseRoleAssignments()")
@@ -97,7 +99,7 @@ class RoleAssignmentServiceTest {
         void setUp() {
 
             RoleAssignmentRequestResponse roleAssignmentRequestResponse
-                = Mockito.mock(RoleAssignmentRequestResponse.class);
+                = RoleAssignmentRequestResponse.builder().build();
 
             given(roleAssignmentRepository.createRoleAssignment(any(RoleAssignmentRequestResource.class)))
                 .willReturn(roleAssignmentRequestResponse);
@@ -114,6 +116,8 @@ class RoleAssignmentServiceTest {
             CaseDetails caseDetails = createCaseDetails();
             Set<String> roles = Set.of("[ROLE1]");
             boolean replaceExisting = false;
+
+            given(roleAssignmentCategoryService.getRoleCategory(USER_ID)).willReturn(ROLE_CATEGORY_4_USER_1);
 
             // WHEN
             RoleAssignments roleAssignments = roleAssignmentService.createCaseRoleAssignments(caseDetails,
@@ -133,11 +137,12 @@ class RoleAssignmentServiceTest {
                     caseDetails,
                     USER_ID,
                     replaceExisting,
-                    assignmentRequest.getRequest()
+                    assignmentRequest.getRoleRequest()
                 ),
 
                 () -> assertCorrectlyPopulatedRequestedRoles(
                     caseDetails,
+                    USER_ID,
                     roles,
                     ROLE_CATEGORY_4_USER_1,
                     assignmentRequest.getRequestedRoles()
@@ -173,11 +178,12 @@ class RoleAssignmentServiceTest {
                     caseDetails,
                     USER_ID_2, // NB: using different USER ID to verify different RoleCategory
                     replaceExisting,
-                    assignmentRequest.getRequest()
+                    assignmentRequest.getRoleRequest()
                 ),
 
                 () -> assertCorrectlyPopulatedRequestedRoles(
                     caseDetails,
+                    USER_ID_2, // NB: using different USER ID to verify different RoleCategory
                     roles,
                     ROLE_CATEGORY_4_USER_2, // NB: using different USER ID to verify different RoleCategory
                     assignmentRequest.getRequestedRoles()
@@ -201,6 +207,7 @@ class RoleAssignmentServiceTest {
         }
 
         private void assertCorrectlyPopulatedRequestedRoles(final CaseDetails expectedCaseDetails,
+                                                            final String expectedUserId,
                                                             final Set<String> expectedRoles,
                                                             final RoleCategory expectedRoleCategory,
                                                             final List<RoleAssignmentResource> actualRequestedRoles) {
@@ -214,6 +221,7 @@ class RoleAssignmentServiceTest {
                 () -> assertTrue(roleMap.containsKey(roleName)),
                 () -> assertCorrectlyPopulatedRoleAssignment(
                     expectedCaseDetails,
+                    expectedUserId,
                     roleName,
                     expectedRoleCategory,
                     roleMap.get(roleName)
@@ -222,13 +230,14 @@ class RoleAssignmentServiceTest {
         }
 
         private void assertCorrectlyPopulatedRoleAssignment(final CaseDetails expectedCaseDetails,
+                                                            final String expectedUserId,
                                                             final String expectedRoleName,
                                                             final RoleCategory expectedRoleCategory,
                                                             final RoleAssignmentResource actualRoleAssignment) {
 
             assertNotNull(actualRoleAssignment);
             assertAll(
-                () -> assertEquals(USER_ID, actualRoleAssignment.getActorId()),
+                () -> assertEquals(expectedUserId, actualRoleAssignment.getActorId()),
                 () -> assertEquals(expectedRoleName, actualRoleAssignment.getRoleName()),
 
                 // defaults

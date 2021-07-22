@@ -81,6 +81,7 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
     class CreateRoleAssignment {
 
         private StubMapping badRasStub;
+        private final String createUrl = "/am/role-assignments";
 
         @BeforeEach
         void setUp() {
@@ -107,11 +108,11 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
             // THEN
             assertNotNull(response);
             // verify response can deserialize at least the items supplied (and a select few others)
-            assertNotNull(response.getRoleAssignmentRequest());
+            assertNotNull(response.getRoleAssignmentResponse());
             // :: verify header
-            assertNotNull(response.getRoleAssignmentRequest().getRequest());
-            RoleRequestResource roleRequestHeader = response.getRoleAssignmentRequest().getRequest();
-            RoleRequestResource suppliedRoleRequestHeader = assignmentRequest.getRequest();
+            assertNotNull(response.getRoleAssignmentResponse().getRoleRequest());
+            RoleRequestResource roleRequestHeader = response.getRoleAssignmentResponse().getRoleRequest();
+            RoleRequestResource suppliedRoleRequestHeader = assignmentRequest.getRoleRequest();
             assertAll(
                 () -> assertThat(roleRequestHeader.getAssignerId(), is(suppliedRoleRequestHeader.getAssignerId())),
                 () -> assertThat(roleRequestHeader.getProcess(), is(suppliedRoleRequestHeader.getProcess())),
@@ -123,11 +124,11 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
             );
             // :: verify roles
             assertThat(
-                response.getRoleAssignmentRequest().getRequestedRoles().size(),
+                response.getRoleAssignmentResponse().getRequestedRoles().size(),
                 is(assignmentRequest.getRequestedRoles().size())
             );
 
-            Map<String, RoleAssignmentResource> roleMap = response.getRoleAssignmentRequest().getRequestedRoles()
+            Map<String, RoleAssignmentResource> roleMap = response.getRoleAssignmentResponse().getRequestedRoles()
                 .stream().collect(Collectors.toMap(RoleAssignmentResource::getRoleName, role -> role));
 
             assignmentRequest.getRequestedRoles().forEach(suppliedRequestedRole -> {
@@ -145,7 +146,7 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
 
             // GIVEN
             RoleAssignmentRequestResource assignmentRequest = createAssignmentRequest(Set.of("[ROLE1]"));
-            badRasStub = WireMock.stubFor(WireMock.post(urlMatching("/am/role-assignments")).willReturn(badRequest()));
+            badRasStub = WireMock.stubFor(WireMock.post(urlMatching(createUrl)).willReturn(badRequest()));
 
             // WHEN / THEN
             final BadRequestException exception = assertThrows(BadRequestException.class,
@@ -163,7 +164,7 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
 
             // GIVEN
             RoleAssignmentRequestResource assignmentRequest = createAssignmentRequest(Set.of("[ROLE1]"));
-            badRasStub = WireMock.stubFor(WireMock.post(urlMatching("/am/role-assignments")).willReturn(serverError()));
+            badRasStub = WireMock.stubFor(WireMock.post(urlMatching(createUrl)).willReturn(serverError()));
 
             // WHEN / THEN
             final ServiceException exception = assertThrows(ServiceException.class,
@@ -204,7 +205,7 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
                 .collect(Collectors.toList());
 
             return RoleAssignmentRequestResource.builder()
-                .request(roleRequest)
+                .roleRequest(roleRequest)
                 .requestedRoles(requestedRoles)
                 .build();
         }

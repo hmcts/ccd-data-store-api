@@ -2,11 +2,11 @@ package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import com.google.common.collect.Maps;
 import org.assertj.core.util.Lists;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -48,6 +48,7 @@ import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantTyp
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.SPECIFIC;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.STANDARD;
 
+@ExtendWith(MockitoExtension.class)
 class DefaultCaseDataAccessControlTest {
 
     private static final String ROLE_NAME_1 = "TEST_ROLE_1";
@@ -72,7 +73,8 @@ class DefaultCaseDataAccessControlTest {
     @Mock
     private RoleAssignmentsFilteringService roleAssignmentsFilteringService;
 
-    private AccessProfileServiceImpl accessProfileService;
+    private final AccessProfileService accessProfileService =
+        spy(new AccessProfileServiceImpl(new AuthorisationMapper()));
 
     @Mock
     private PseudoRoleAssignmentsGenerator pseudoRoleAssignmentsGenerator;
@@ -81,26 +83,16 @@ class DefaultCaseDataAccessControlTest {
     private ApplicationParams applicationParams;
 
     @Mock
-    private PseudoRoleToAccessProfileGenerator pseudoRoleToAccessProfileGenerator;
-
-    @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
 
-    @Mock
+    @Mock(lenient = true)
     private CaseDetailsRepository caseDetailsRepository;
 
-    @Mock
+    @Mock(lenient = true)
     private FilteredRoleAssignments filteredRoleAssignments;
 
     @InjectMocks
     private DefaultCaseDataAccessControl defaultCaseDataAccessControl;
-
-    @BeforeEach
-    void setUp() {
-        accessProfileService = spy(new AccessProfileServiceImpl(new AuthorisationMapper()));
-
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void generateAccessProfilesByCaseTypeId() {

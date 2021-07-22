@@ -22,7 +22,7 @@ public interface RoleAssignmentsMapper {
             return null;
         }
 
-        var roleAssignments = map(roleAssignmentRequestResponse.getRoleAssignmentRequest());
+        var roleAssignments = map(roleAssignmentRequestResponse.getRoleAssignmentResponse());
 
         return roleAssignments != null ? roleAssignments : new RoleAssignments();
     }

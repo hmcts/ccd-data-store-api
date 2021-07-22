@@ -85,7 +85,7 @@ public class RoleAssignmentService implements AccessControl {
             .collect(Collectors.toList());
 
         RoleAssignmentRequestResource assignmentRequest = RoleAssignmentRequestResource.builder()
-            .request(roleRequest)
+            .roleRequest(roleRequest)
             .requestedRoles(requestedRoles)
             .build();
 

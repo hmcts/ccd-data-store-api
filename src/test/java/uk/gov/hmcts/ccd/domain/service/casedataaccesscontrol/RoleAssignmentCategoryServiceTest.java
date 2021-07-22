@@ -1,12 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
 import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 
@@ -21,7 +21,9 @@ import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCate
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.PROFESSIONAL;
 
 @DisplayName("RoleAssignmentCategoryService")
+@ExtendWith(MockitoExtension.class)
 class RoleAssignmentCategoryServiceTest {
+
     private static final String USER_ID = "12345";
 
     @Mock
@@ -29,11 +31,6 @@ class RoleAssignmentCategoryServiceTest {
 
     @InjectMocks
     private RoleAssignmentCategoryService roleAssignmentCategoryService;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Nested
     @DisplayName("getRoleCategory()")
