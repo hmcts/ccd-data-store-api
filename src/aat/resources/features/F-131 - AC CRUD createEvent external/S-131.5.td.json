@@ -4,8 +4,7 @@
 
   "specs" : [
     "with no U access for the CaseType",
-    "attempts to create an event for the previously created case",
-    "does not display the newly created text field"
+    "attempts to create an event for the previously created case"
   ],
 
   "request": {

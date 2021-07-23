@@ -2,14 +2,14 @@
   "_guid_": "S-131.5_CreateCase_Token_Creation",
 
   "productName": "CCD Data Store",
-  "operationName": "Start event creation as a Case worker_1",
+  "operationName": "Start event creation as a Case worker",
 
   "method": "GET",
   "uri": "/case-types/FT_CRUD_3/event-triggers/{etid}",
 
   "specs": [
-    "to create a token for a case creation",
-    "to create a token for a event creation"
+    "to create a token for case creation",
+    "to create a token for event creation"
   ],
 
   "users": {

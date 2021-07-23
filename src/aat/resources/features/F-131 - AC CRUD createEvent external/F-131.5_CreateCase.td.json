@@ -2,7 +2,7 @@
   "_guid_": "F-131.5_CreateCase",
 
   "productName": "CCD Data Store",
-  "operationName": "external create a case",
+  "operationName": "external create case",
   "method": "POST",
   "uri": "/case-types/{ctid}/cases",
 

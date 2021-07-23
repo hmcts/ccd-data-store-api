@@ -1,6 +1,6 @@
 {
   "_guid_" : "S-131.5_Token_Creation",
-  "_extends_" : "S-131.5_CreateCase_Token_Creation",
+  "_extends_" : "F-131_Token_Creation_Base",
 
   "request": {
     "_extends_": "Common_Request",
