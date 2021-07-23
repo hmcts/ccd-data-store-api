@@ -1,0 +1,57 @@
+{
+  "_guid_" : "S-131.5",
+  "_extends_" : "F-131_Test_Data_Base",
+
+  "specs" : [
+    "with no U access for the CaseType",
+    "attempts to create an event for the previously created case",
+    "does not display the newly created text field"
+  ],
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][F-131.5_CreateCase][testData][actualResponse][body][id]}"
+    },
+
+    "headers": {
+      "experimental": true
+    },
+    "body": {
+      "data": {
+        "TextField" : "value"
+      },
+      "event": {
+        "id" : "event1"
+      },
+      "ignore_warning": false,
+      "event_token": "${[scenarioContext][childContexts][S-131.5_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_" : "Common_404_Response",
+      "headers": {
+        "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+        "Connection" : "keep-alive",
+        "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v2+json;charset=UTF-8",
+        "Date" : "[[ANYTHING_PRESENT]]",
+        "Expires" : "0",
+        "Keep-Alive" : "[[ANYTHING_PRESENT]]",
+        "Pragma" : "no-cache",
+        "Transfer-Encoding" : "chunked",
+        "X-Content-Type-Options" : "nosniff",
+        "X-Frame-Options" : "DENY",
+        "X-XSS-Protection" : "1; mode=block"
+      },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "No case type found",
+      "path": "[[ANYTHING_PRESENT]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+
+  }
+}
