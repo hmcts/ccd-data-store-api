@@ -129,7 +129,7 @@ class AuthorisedGetUserProfileOperationTest {
                 assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().get(0).getEvents().size(), is(4))
         );
     }
-    
+
     @Test
     @DisplayName("should return UserProfile for create organisation")
     public void executeForCreate() {
