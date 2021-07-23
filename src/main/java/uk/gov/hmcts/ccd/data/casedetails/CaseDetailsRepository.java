@@ -20,7 +20,7 @@ public interface CaseDetailsRepository {
      * @return Case details
      * @deprecated Use {@link CaseDetailsRepository#findByReference(String, Long)} instead.
      */
-    @Deprecated
+   // @Deprecated
     CaseDetails findById(Long id);
 
     List<Long> findCaseReferencesByIds(List<Long> ids);
@@ -40,7 +40,7 @@ public interface CaseDetailsRepository {
      * @return Case details
      * @deprecated Use {@link CaseDetailsRepository#findByReference(String, Long)} instead.
      */
-    @Deprecated
+    //@Deprecated
     CaseDetails findByReference(Long caseReference);
 
     /**
@@ -52,7 +52,7 @@ public interface CaseDetailsRepository {
      * @return Case details
      * @deprecated Use {@link CaseDetailsRepository#findByReference(String, String)} instead.
      */
-    @Deprecated
+    //@Deprecated
     CaseDetails findUniqueCase(String jurisdictionId,
                                String caseTypeId,
                                String caseReference);

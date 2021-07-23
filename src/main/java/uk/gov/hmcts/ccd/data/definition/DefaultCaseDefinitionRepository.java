@@ -37,7 +37,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
-@SuppressWarnings("checkstyle:SummaryJavadoc")
+//@SuppressWarnings("checkstyle:SummaryJavadoc")
 // partial javadoc attributes added prior to checkstyle implementation in module
 @Service
 @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
@@ -65,8 +65,8 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     /**
      * @deprecated current implementation has serious performance issues
      */
-    @Deprecated
-    @SuppressWarnings("squid:S1133")
+    //@Deprecated
+  //  @SuppressWarnings("squid:S1133")
     @Override
     public List<CaseTypeDefinition> getCaseTypesForJurisdiction(final String jurisdictionId) {
         try {

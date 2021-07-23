@@ -34,6 +34,7 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
         }
 
         return Optional.ofNullable(caseDetailsRepository.findUniqueCase(jurisdictionId, caseTypeId, caseReference));
+       //return Optional.ofNullable(caseDetailsRepository.findUniqueCase(jurisdictionId, caseTypeId, caseReference));
     }
 
     @Override
@@ -43,5 +44,6 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
         }
 
         return Optional.ofNullable(caseDetailsRepository.findByReference(Long.valueOf(caseReference)));
+       // return Optional.ofNullable(caseDetailsRepository.findByReference(Long.valueOf(caseReference)))
     }
 }

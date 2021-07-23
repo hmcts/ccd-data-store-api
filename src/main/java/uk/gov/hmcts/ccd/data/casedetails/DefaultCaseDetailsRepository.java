@@ -36,7 +36,7 @@ import java.util.Optional;
 @Named
 @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
 @Singleton
-@SuppressWarnings("checkstyle:SummaryJavadoc")
+//@SuppressWarnings("checkstyle:SummaryJavadoc")
 // partial javadoc attributes added prior to checkstyle implementation in module
 public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
@@ -100,7 +100,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
      * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
      */
     @Override
-    @Deprecated
+   // @Deprecated
     public CaseDetails findById(final Long id) {
         return findById(null, id).orElse(null);
     }
@@ -131,7 +131,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
      * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
      */
     @Override
-    @Deprecated
+    //@Deprecated
     public CaseDetails findByReference(final Long caseReference) {
         return findByReference(null, caseReference).orElseThrow(() -> new ResourceNotFoundException("No case found"));
     }
@@ -144,7 +144,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
      * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, String)} instead
      */
     @Override
-    @Deprecated
+    //@Deprecated
     public CaseDetails findUniqueCase(final String jurisdiction,
                                       final String caseTypeId,
                                       final String reference) {

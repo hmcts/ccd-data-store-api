@@ -121,14 +121,14 @@ public class QueryEndpoint {
     /*
      * @deprecated see https://tools.hmcts.net/jira/browse/RDM-1421
      */
-    @Deprecated
+    //@Deprecated
     @Transactional
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types", method = RequestMethod.GET)
     @ApiOperation(value = "Get case types")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of case types for the given access criteria"),
         @ApiResponse(code = 404, message = "No case types found for given access criteria")})
-    @SuppressWarnings("squid:CallToDeprecatedMethod")
+    //@SuppressWarnings("squid:CallToDeprecatedMethod")
     public List<CaseTypeDefinition> getCaseTypes(@PathVariable("jid") final String jurisdictionId,
                                                  @RequestParam(value = "access", required = true) String access) {
         return getCaseTypesOperation.execute(jurisdictionId, ofNullable(accessMap.get(access))

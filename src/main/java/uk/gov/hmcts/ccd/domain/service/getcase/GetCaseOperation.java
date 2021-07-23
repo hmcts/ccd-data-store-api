@@ -16,7 +16,7 @@ public interface GetCaseOperation {
      *
      * @deprecated Use {@link GetCaseOperation#execute(String)} instead
      */
-    @Deprecated
+   // @Deprecated
     Optional<CaseDetails> execute(final String jurisdictionId, final String caseTypeId, final String caseReference);
 
     /**
