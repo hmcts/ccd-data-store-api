@@ -83,6 +83,28 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
     }
 
     @Override
+    public void deleteRoleAssignmentsByQuery(List<RoleAssignmentQuery> queryRequests) {
+        try {
+            final HttpEntity<Object> requestEntity = new HttpEntity<>(
+                MultipleQueryRequestResource.builder().queryRequests(queryRequests).build(),
+                securityUtils.authorizationHeaders()
+            );
+
+            restTemplate.exchange(
+                applicationParams.amDeleteByQueryRoleAssignmentsURL(),
+                HttpMethod.POST,
+                requestEntity,
+                Void.class
+            );
+
+        } catch (HttpStatusCodeException e) {
+            log.warn("Error while deleting Role Assignments", e);
+            throw mapException(e, "deleting");
+        }
+
+    }
+
+    @Override
     public RoleAssignmentResponse getRoleAssignments(String userId) {
         try {
             HttpHeaders headers = securityUtils.authorizationHeaders();

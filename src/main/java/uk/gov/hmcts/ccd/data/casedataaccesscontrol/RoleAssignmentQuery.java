@@ -26,4 +26,12 @@ public class RoleAssignmentQuery {
         this.attributes = Attributes.builder().caseId(caseIds).build();
         this.roleType = List.of(RoleType.CASE.name());
     }
+
+    public RoleAssignmentQuery(String caseId, String userId, List<String> roleNames) {
+        this.actorId = List.of(userId);
+        this.attributes = Attributes.builder().caseId(List.of(caseId)).build();
+        this.roleType = List.of(RoleType.CASE.name());
+        this.roleName = roleNames;
+    }
+
 }

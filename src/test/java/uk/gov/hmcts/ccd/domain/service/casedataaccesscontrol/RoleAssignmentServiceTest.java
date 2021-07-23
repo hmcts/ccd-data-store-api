@@ -6,9 +6,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentQuery;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRequestResource;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRequestResponse;
@@ -18,6 +20,7 @@ import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleRequestResource;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentsDeleteRequest;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.ActorIdType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
@@ -28,6 +31,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +42,7 @@ import java.util.stream.Collectors;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -45,6 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.verify;
+import static org.mockito.Mockito.never;
 
 @DisplayName("RoleAssignmentService")
 @ExtendWith(MockitoExtension.class)
@@ -274,6 +280,147 @@ class RoleAssignmentServiceTest {
         }
 
     }
+
+    @Nested
+    @DisplayName("deleteRoleAssignments()")
+    @SuppressWarnings({"ConstantConditions", "FieldCanBeLocal"})
+    class DeleteRoleAssignments {
+
+        @Captor
+        private ArgumentCaptor<List<RoleAssignmentQuery>> queryRequestsCaptor;
+
+        private final String role1 = "[ROLE1]";
+        private final String role2 = "[ROLE2]";
+
+        @Test
+        void shouldDoNothingForNullDeleteRequests() {
+
+            // GIVEN
+            List<RoleAssignmentsDeleteRequest> deleteRequests = null;
+
+            // WHEN
+            roleAssignmentService.deleteRoleAssignments(deleteRequests);
+
+            // THEN
+            verify(roleAssignmentRepository, never()).deleteRoleAssignmentsByQuery(any());
+        }
+
+        @Test
+        void shouldDoNothingForEmptyDeleteRequests() {
+
+            // GIVEN
+            List<RoleAssignmentsDeleteRequest> deleteRequests = new ArrayList<>();
+
+            // WHEN
+            roleAssignmentService.deleteRoleAssignments(deleteRequests);
+
+            // THEN
+            verify(roleAssignmentRepository, never()).deleteRoleAssignmentsByQuery(any());
+        }
+
+        @Test
+        void shouldDeleteForSingleDeleteRequests() {
+
+            // GIVEN
+            List<RoleAssignmentsDeleteRequest> deleteRequests = List.of(
+                RoleAssignmentsDeleteRequest.builder()
+                    .caseId(CASE_ID)
+                    .userId(USER_ID)
+                    .roleNames(List.of(role1)).build()
+            );
+
+            // WHEN
+            roleAssignmentService.deleteRoleAssignments(deleteRequests);
+
+            // THEN
+            // verify data passed to repository has correct values
+            verify(roleAssignmentRepository).deleteRoleAssignmentsByQuery(queryRequestsCaptor.capture());
+            List<RoleAssignmentQuery> queryRequests = queryRequestsCaptor.getValue();
+
+            assertAll(
+                () -> assertEquals(deleteRequests.size(), queryRequests.size()),
+                () -> assertCorrectlyPopulatedRoleAssignmentQueries(deleteRequests, queryRequests)
+            );
+        }
+
+        @Test
+        void shouldDeleteForMultipleDeleteRequests() {
+
+            // GIVEN
+            List<RoleAssignmentsDeleteRequest> deleteRequests = List.of(
+                RoleAssignmentsDeleteRequest.builder()
+                    .caseId(CASE_ID)
+                    .userId(USER_ID)
+                    .roleNames(List.of(role1)).build(),
+
+                RoleAssignmentsDeleteRequest.builder()
+                    .caseId(CASE_ID)
+                    .userId(USER_ID_2) // NB: using different user ID in test data to match assert function's map
+                    .roleNames(List.of(role1, role2)).build()
+            );
+
+            // WHEN
+            roleAssignmentService.deleteRoleAssignments(deleteRequests);
+
+            // THEN
+            // verify data passed to repository has correct values
+            verify(roleAssignmentRepository).deleteRoleAssignmentsByQuery(queryRequestsCaptor.capture());
+            List<RoleAssignmentQuery> queryRequests = queryRequestsCaptor.getValue();
+
+            assertAll(
+                () -> assertEquals(deleteRequests.size(), queryRequests.size()),
+                () -> assertCorrectlyPopulatedRoleAssignmentQueries(deleteRequests, queryRequests)
+            );
+        }
+
+        private void assertCorrectlyPopulatedRoleAssignmentQueries(
+            final List<RoleAssignmentsDeleteRequest> expectedDeleteRequests,
+            final List<RoleAssignmentQuery> actualRoleAssignmentQueries
+        ) {
+            assertNotNull(actualRoleAssignmentQueries);
+            assertEquals(expectedDeleteRequests.size(), actualRoleAssignmentQueries.size());
+
+            // create map by userID (NB: this relies on the test data using a unique user_id for each query)
+            Map<String, RoleAssignmentQuery> queryMapByUser = actualRoleAssignmentQueries.stream()
+                .collect(Collectors.toMap(query -> query.getActorId().get(0), query -> query));
+
+            expectedDeleteRequests.forEach(expectedDeleteRequest -> assertAll(
+                () -> assertTrue(queryMapByUser.containsKey(expectedDeleteRequest.getUserId())),
+                () -> assertCorrectlyPopulatedRoleAssignmentQuery(
+                    expectedDeleteRequest,
+                    queryMapByUser.get(expectedDeleteRequest.getUserId())
+                )
+            ));
+        }
+
+        private void assertCorrectlyPopulatedRoleAssignmentQuery(
+            final RoleAssignmentsDeleteRequest expectedDeleteRequest,
+            final RoleAssignmentQuery actualRoleAssignmentQuery
+        ) {
+            assertNotNull(actualRoleAssignmentQuery);
+            assertAll(
+                // verify format
+                () -> assertEquals(1, actualRoleAssignmentQuery.getAttributes().getCaseId().size()),
+                () -> assertEquals(1, actualRoleAssignmentQuery.getActorId().size()),
+                () -> assertEquals(1, actualRoleAssignmentQuery.getRoleType().size()),
+                () -> assertEquals(
+                    expectedDeleteRequest.getRoleNames().size(), actualRoleAssignmentQuery.getRoleName().size()
+                ),
+
+                // verify data
+                () -> assertEquals(
+                    expectedDeleteRequest.getCaseId(), actualRoleAssignmentQuery.getAttributes().getCaseId().get(0)
+                ),
+                () -> assertEquals(expectedDeleteRequest.getUserId(), actualRoleAssignmentQuery.getActorId().get(0)),
+                () -> assertEquals(RoleType.CASE.name(), actualRoleAssignmentQuery.getRoleType().get(0)),
+                () -> assertArrayEquals(
+                    expectedDeleteRequest.getRoleNames().toArray(), actualRoleAssignmentQuery.getRoleName().toArray()
+                )
+            );
+        }
+
+    }
+
 
     private RoleAssignments getRoleAssignments() {
 

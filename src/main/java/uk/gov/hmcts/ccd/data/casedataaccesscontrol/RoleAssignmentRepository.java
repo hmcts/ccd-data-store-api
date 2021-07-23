@@ -8,6 +8,8 @@ public interface RoleAssignmentRepository {
 
     RoleAssignmentRequestResponse createRoleAssignment(RoleAssignmentRequestResource assignmentRequest);
 
+    void deleteRoleAssignmentsByQuery(List<RoleAssignmentQuery> queryRequests);
+
     RoleAssignmentResponse getRoleAssignments(String userId);
 
     RoleAssignmentResponse findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds);
