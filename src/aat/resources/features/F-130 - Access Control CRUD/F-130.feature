@@ -1,4 +1,4 @@
-@F-130
+@F-130 @ash
 Feature: Create Case External API CRUD Tests
 
   Background: Load test data for the scenario
@@ -14,8 +14,8 @@ Feature: Create Case External API CRUD Tests
     And the response has all other details as expected
     And the response [does not contain the filed with no R CRUD access]
 
-#  Scenario: User cannot submit case creation without CaseType C Access
-#  Scenario: User cannot submit case creation without CaseEvent C Access
+#  Scenario: User cannot submit case creation without CaseType C Access DONE
+#  Scenario: User cannot submit case creation without CaseEvent C Access DONE
 
   @S-130.2
   Scenario: User cannot submit case creation containing a field without CaseField C Access

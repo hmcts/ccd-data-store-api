@@ -1,4 +1,4 @@
-@F-133
+@F-133 @ash
 Feature: external get case
 
   Background: Load test data for the scenario
@@ -7,8 +7,8 @@ Feature: external get case
     @S-133.1
   Scenario: User without CaseState Access R cannot see the case
     Given a case that has just been created as in [F-131_CreateCase],
-    And a successful call [to create a token for event creation] as in [S-132.2_Event5_Token_Creation]
-    And a successful call [to create event] as in [S-132.2_Event5_Creation]
+    And a successful call [to create a token for event creation] as in [S-133.1_Event_Token_Creation]
+    And a successful call [to create event] as in [S-133.1_Event_Creation]
     And a user with [no R access to case state]
     When a request is prepared with appropriate values,
     And the request [attempts to get the previously created case]
