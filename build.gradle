@@ -450,7 +450,6 @@ jsonSchema2Pojo {
     useBigDecimals = false
 
     // Whether to include hashCode and equals methods in generated Java types.
-    Code and equals methods in generated Java types.
     includeHashcodeAndEquals = true
 
     // Whether to include a toString method in generated Java types.
