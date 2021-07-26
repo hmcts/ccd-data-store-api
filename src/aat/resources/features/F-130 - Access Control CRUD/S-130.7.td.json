@@ -8,7 +8,7 @@
 
   "request": {
     "pathVariables": {
-      "ctid": "FT_CRUD_4"
+      "ctid": "FT_CRUD_2"
     },
     "body": {
       "data":
@@ -33,7 +33,7 @@
       "status": 500,
       "error": "Unexpected Error",
       "message": "caseDetails is marked non-null but is null",
-      "path": "/case-types/FT_CRUD_4/cases",
+      "path": "/case-types/FT_CRUD_2/cases",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null
