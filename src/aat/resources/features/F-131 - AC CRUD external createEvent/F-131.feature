@@ -16,7 +16,6 @@ Feature: External create event
     Then a negative response is received
     And the response has all other details as expected.
 
-#  Scenario: User cannot create event with missing CaseField C Access for a new field
 
   @S-131.2
   Scenario: User cannot create event with missing CaseField C Access for a new field
