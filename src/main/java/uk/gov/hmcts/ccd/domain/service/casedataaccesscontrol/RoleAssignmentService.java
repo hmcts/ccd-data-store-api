@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,11 +18,6 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -48,6 +47,12 @@ public class RoleAssignmentService implements AccessControl {
 
         RoleAssignmentResponse roleAssignmentResponse = roleAssignmentRepository.getRoleAssignments(userId);
         return roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
+    }
+
+    public List<RoleAssignment> getRoleAssignments(String userId, CaseTypeDefinition caseTypeDefinition) {
+        final RoleAssignments roleAssignments = this.getRoleAssignments(userId);
+        return roleAssignmentsFilteringService
+            .filter(roleAssignments, caseTypeDefinition).getFilteredMatchingRoleAssignments();
     }
 
     public List<String> getCaseReferencesForAGivenUser(String userId) {
