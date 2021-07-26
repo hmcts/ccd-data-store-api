@@ -1,26 +1,20 @@
 {
-  "_guid_": "S-130.1",
-  "_extends_" : "F-130_Test_Data_Base",
-
-  "specs" : [
-    "does not contain the filed with no R CRUD access"
-  ],
+  "_guid_": "S-132.2_Event5_Creation",
+  "_extends_": "F-132_Event_Creation_Base",
 
   "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "caseId": "${[scenarioContext][parentContext][childContexts][F-131_CreateCase][testData][actualResponse][body][id]}"
+    },
     "body": {
-
       "data": {
-        "TextField": "value1",
-        "TextField2": "value2"
+        "TextField": "value1"
       },
       "event": {
-        "id": "createCase"
+        "id": "moveToStateNoCAccess"
       },
-      "event_token": "${[scenarioContext][childContexts][S-130.1_Get_Event_Trigger][testData][actualResponse][body][token]}",
-      "event_data": {
-        "TextField": "value1",
-        "TextField2": "value2"
-      }
+      "event_token": "${[scenarioContext][parentContext][childContexts][S-132.2_Event5_Token_Creation][testData][actualResponse][body][token]}"
     }
   },
 
@@ -29,7 +23,7 @@
     "headers": {
       "Content-Length": "[[ANY_NULLABLE]]",
       "Content-Encoding": "[[ANY_NULLABLE]]",
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v2+json;charset=UTF-8",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json;charset=UTF-8",
       "Connection": "[[ANYTHING_PRESENT]]",
       "Keep-Alive": "[[ANYTHING_PRESENT]]",
       "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
@@ -47,10 +41,10 @@
       "created_on": "[[ANYTHING_PRESENT]]",
       "last_modified_on": "[[ANYTHING_PRESENT]]",
       "last_state_modified_on": "[[ANYTHING_PRESENT]]",
-      "state": "CaseCreated",
+      "state": "state2",
       "security_classification": "PUBLIC",
       "data": {
-        "TextField": "value1"
+        "TextField" : "value1"
       },
       "data_classification": {
         "TextField": "PUBLIC"
@@ -61,5 +55,7 @@
       "delete_draft_response_status_code": null,
       "delete_draft_response_status": null
     }
+
   }
+
 }
