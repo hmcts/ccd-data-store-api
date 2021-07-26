@@ -6,7 +6,7 @@
   "request": {
     "pathVariables": {
       "etid": "event5",
-      "caseId": "${[scenarioContext][parentContext][childContexts][F-131_CreateCase][testData][actualResponse][body][id]}"
+      "caseId": "${[scenarioContext][parentContext][childContexts][F-133_CreateCase][testData][actualResponse][body][id]}"
     }
   },
 

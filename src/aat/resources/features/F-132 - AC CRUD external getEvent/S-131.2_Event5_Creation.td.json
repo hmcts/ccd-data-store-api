@@ -5,7 +5,7 @@
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
-      "caseId": "${[scenarioContext][parentContext][childContexts][F-131_CreateCase][testData][actualResponse][body][id]}"
+      "caseId": "${[scenarioContext][parentContext][childContexts][F-132_CreateCase][testData][actualResponse][body][id]}"
     },
     "body": {
       "data": {

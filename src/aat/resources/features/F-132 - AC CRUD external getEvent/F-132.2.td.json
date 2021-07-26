@@ -22,7 +22,7 @@
   "request": {
     "_extends_": "Common_Request",
     "pathVariables": {
-      "caseId": "${[scenarioContext][childContexts][F-131_CreateCase][testData][actualResponse][body][id]}"
+      "caseId": "${[scenarioContext][childContexts][F-132_CreateCase][testData][actualResponse][body][id]}"
     },
     "headers": {
       "experimental": true

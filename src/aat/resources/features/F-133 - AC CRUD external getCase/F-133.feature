@@ -1,12 +1,12 @@
-@F-133 @ash
-Feature: external get case
+@F-133 @crud
+Feature: Get Case External API CRUD Tests
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
     @S-133.1
   Scenario: User without CaseState Access R cannot see the case
-    Given a case that has just been created as in [F-131_CreateCase],
+    Given a case that has just been created as in [F-133_CreateCase],
     And a successful call [to create a token for event creation] as in [S-133.1_Event_Token_Creation]
     And a successful call [to create event] as in [S-133.1_Event_Creation]
     And a user with [no R access to case state]
