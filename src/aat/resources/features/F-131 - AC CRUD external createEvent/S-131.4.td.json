@@ -14,9 +14,6 @@
       "caseId": "${[scenarioContext][childContexts][F-131_CreateCase][testData][actualResponse][body][id]}"
     },
 
-    "headers": {
-      "experimental": true
-    },
     "body": {
       "data": {
         "TextField2" : "value2"
@@ -24,7 +21,6 @@
       "event": {
         "id" : "event3"
       },
-      "ignore_warning": false,
       "event_token": "${[scenarioContext][childContexts][S-131.4_Token_Creation][testData][actualResponse][body][token]}"
     }
   },
@@ -32,17 +28,10 @@
   "expectedResponse": {
     "_extends_" : "Common_201_Response",
     "headers": {
-      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
       "Connection" : "keep-alive",
       "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v2+json;charset=UTF-8",
-      "Date" : "[[ANYTHING_PRESENT]]",
-      "Expires" : "0",
       "Keep-Alive" : "[[ANYTHING_PRESENT]]",
-      "Pragma" : "no-cache",
-      "Transfer-Encoding" : "chunked",
-      "X-Content-Type-Options" : "nosniff",
-      "X-Frame-Options" : "DENY",
-      "X-XSS-Protection" : "1; mode=block"
+      "Transfer-Encoding" : "chunked"
     },
     "body" : {
       "_links": {

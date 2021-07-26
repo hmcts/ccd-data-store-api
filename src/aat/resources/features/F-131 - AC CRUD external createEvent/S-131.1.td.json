@@ -13,9 +13,6 @@
       "caseId": "${[scenarioContext][childContexts][F-131_CreateCase][testData][actualResponse][body][id]}"
     },
 
-    "headers": {
-      "experimental": true
-    },
     "body": {
       "data": {
         "TextField4" : "value4"
@@ -23,7 +20,6 @@
       "event": {
         "id" : "event1"
       },
-      "ignore_warning": false,
       "event_token": "${[scenarioContext][childContexts][S-131.1_Token_Creation][testData][actualResponse][body][token]}"
     }
   },
