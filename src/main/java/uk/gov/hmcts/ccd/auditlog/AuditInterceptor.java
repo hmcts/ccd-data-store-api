@@ -12,7 +12,9 @@ import uk.gov.hmcts.ccd.auditlog.aop.AuditContextHolder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 public class AuditInterceptor extends HandlerInterceptorAdapter {
@@ -24,6 +26,7 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
     protected static final List<String> httpMethodList =
         Arrays.asList("GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "TRACE");
     public static final String BAD_VALUE_TOKEN = "<bad value not written to logs>";
+    private static final int LOGGABLE_BAD_VALUE_LENGTH = 100;
 
     private final AuditService auditService;
     private final ApplicationParams applicationParams;
@@ -59,24 +62,34 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
         AuditContext context = (auditContext != null) ? auditContext : new AuditContext();
         context.setHttpStatus(response.getStatus());
 
-        if (request.getMethod() != null && httpMethodList.contains(request.getMethod().toUpperCase())) {
-            context.setHttpMethod(request.getMethod());
+        String requestMethod = request.getMethod();
+        if (requestMethod != null && httpMethodList.contains(requestMethod.toUpperCase())) {
+            context.setHttpMethod(requestMethod);
         } else {
             context.setHttpMethod(BAD_VALUE_TOKEN);
-            LOG.error("Error while validating Http Method with value {} as it did not meet validation criteria:{}",
-                request.getMethod(), httpMethodList);
+            LOG.error("Error validating Http Method with Base-64 value {} as it didn't meet validation criteria:{}",
+                encodeString(requestMethod, LOGGABLE_BAD_VALUE_LENGTH), httpMethodList);
         }
 
         context.setRequestPath(request.getRequestURI());
 
-        if (request.getHeader(REQUEST_ID) == null || request.getHeader(REQUEST_ID).matches(REQUEST_ID_PATTERN)) {
-            context.setRequestId(request.getHeader(REQUEST_ID));
+        String requestId = request.getHeader(REQUEST_ID);
+        if (requestId == null || requestId.matches(REQUEST_ID_PATTERN)) {
+            context.setRequestId(requestId);
         } else {
             context.setRequestId(BAD_VALUE_TOKEN);
-            LOG.error("Error while validating Request Id with value {} as it did not meet validation criteria:{}",
-                request.getHeader(REQUEST_ID), REQUEST_ID_PATTERN);
+            LOG.error("Error validating Request Id with Base-64 value {} as it didn't meet validation criteria:{}",
+                encodeString(requestId, LOGGABLE_BAD_VALUE_LENGTH), REQUEST_ID_PATTERN);
         }
         return context;
     }
 
+    public String encodeString(String value, int loggableBadValueLength) {
+        if (value == null) {
+            return null;
+        }
+
+        value = value.length() < loggableBadValueLength ? value : value.substring(0, loggableBadValueLength);
+        return Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
+    }
 }

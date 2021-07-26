@@ -34,12 +34,16 @@
     "body" : {
       "auditEvents": [
         {
+          "__ordering__": "unordered",
+          "__elementId__": "role"
+        },
+        {
           "id": "createCase",
           "summary": "",
           "description": "",
           "user_id": "[[ANYTHING_PRESENT]]",
-          "user_last_name": "befta",
-          "user_first_name": "master",
+          "user_last_name": "Master",
+          "user_first_name": "Befta",
           "event_name": "Create a case",
           "created_date": "[[ANYTHING_PRESENT]]",
           "case_type_id": "FT_CRUD",

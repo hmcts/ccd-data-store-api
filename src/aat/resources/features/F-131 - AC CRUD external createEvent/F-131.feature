@@ -1,4 +1,4 @@
-@F-131
+@F-131 @ash
 Feature: External create event
 
   Background: Load test data for the scenario

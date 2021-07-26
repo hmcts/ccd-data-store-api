@@ -9,10 +9,10 @@
     },
     "body": {
       "data": {
-        "TextField4": "value4"
+        "TextField": "value1"
       },
       "event": {
-        "id": "event5"
+        "id": "moveToStateNoCAccess"
       },
       "event_token": "${[scenarioContext][parentContext][childContexts][S-132.2_Event5_Token_Creation][testData][actualResponse][body][token]}"
     }
@@ -23,7 +23,7 @@
     "headers": {
       "Content-Length": "[[ANY_NULLABLE]]",
       "Content-Encoding": "[[ANY_NULLABLE]]",
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v2+json;charset=UTF-8",
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json;charset=UTF-8",
       "Connection": "[[ANYTHING_PRESENT]]",
       "Keep-Alive": "[[ANYTHING_PRESENT]]",
       "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
@@ -41,14 +41,12 @@
       "created_on": "[[ANYTHING_PRESENT]]",
       "last_modified_on": "[[ANYTHING_PRESENT]]",
       "last_state_modified_on": "[[ANYTHING_PRESENT]]",
-      "state": "CaseCreated",
+      "state": "state2",
       "security_classification": "PUBLIC",
       "data": {
-        "TextField4": "value4",
         "TextField" : "value1"
       },
       "data_classification": {
-        "TextField4": "PUBLIC",
         "TextField": "PUBLIC"
       },
       "after_submit_callback_response": null,

@@ -5,7 +5,7 @@
 
   "request": {
     "pathVariables": {
-      "etid": "event5",
+      "etid": "moveToStateNoCAccess",
       "caseId": "${[scenarioContext][parentContext][childContexts][F-131_CreateCase][testData][actualResponse][body][id]}"
     }
   },
@@ -13,7 +13,7 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body" : {
-      "event_id" : "event5"
+      "event_id" : "moveToStateNoCAccess"
     }
   }
 }

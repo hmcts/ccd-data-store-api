@@ -1,13 +1,19 @@
 {
-  "_guid_" : "S-131.2_Token_Creation",
+  "_guid_" : "S-133.1_Event_Token_Creation",
   "_extends_" : "F-131_Token_Creation_Base",
 
+
   "request": {
-    "_extends_": "Common_Request",
     "pathVariables": {
-      "etid": "event2",
+      "etid": "event5",
       "caseId": "${[scenarioContext][parentContext][childContexts][F-131_CreateCase][testData][actualResponse][body][id]}"
     }
-  }
+  },
 
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body" : {
+      "event_id" : "event5"
+    }
+  }
 }
