@@ -449,7 +449,8 @@ jsonSchema2Pojo {
     // that this configuration overrides useDoubleNumbers
     useBigDecimals = false
 
-    // Whether to include hashCode and equals methods in generated Java types.
+    // Whether to include h
+    Code and equals methods in generated Java types.
     includeHashcodeAndEquals = true
 
     // Whether to include a toString method in generated Java types.
@@ -787,7 +788,7 @@ task functional() {
             args = [
                      '--threads', '10',
                      '--plugin', "json:${rootDir}/target/cucumber.json",
-                     '--tags', '@ash',
+                     '--tags', 'not @Ignore',
                      '--glue', 'uk.gov.hmcts.befta.player',
                      '--glue', 'uk.gov.hmcts.ccd.datastore.befta', 'src/aat/resources/features'
                    ]
