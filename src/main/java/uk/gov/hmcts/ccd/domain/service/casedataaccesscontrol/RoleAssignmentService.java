@@ -114,6 +114,12 @@ public class RoleAssignmentService implements AccessControl {
         return roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
     }
 
+    public List<RoleAssignment> getRoleAssignments(String userId, CaseTypeDefinition caseTypeDefinition) {
+        final RoleAssignments roleAssignments = this.getRoleAssignments(userId);
+        return roleAssignmentsFilteringService
+            .filter(roleAssignments, caseTypeDefinition).getFilteredMatchingRoleAssignments();
+    }
+
     public RoleAssignments getRoleAssignmentsForCreate(String userId) {
         final var roleAssignments = getRoleAssignments(userId);
         return getOrganisationRA(roleAssignments.getRoleAssignments());
