@@ -4,6 +4,8 @@ Feature: External create event
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
+#  Scenario: User cannot create event with missing CaseEvent C Access
+
   @S-131.1
   Scenario: User cannot create event with missing CaseEvent C Access
     Given a case that has just been created as in [F-131_CreateCase],
