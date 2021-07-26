@@ -6,18 +6,18 @@
 
   "request": {
     "pathVariables" : {
-      "ctid" : "FT_CRUD_2"
+      "ctid" : "FT_CRUD_5"
     },
     "body": {
       "data": {
-        "TextField1": "value1"
+        "TextField": "value1"
       },
       "event": {
         "id": "createCase"
       },
       "event_token": "${[scenarioContext][childContexts][S-130.1_Get_Event_Trigger][testData][actualResponse][body][token]}",
       "event_data": {
-        "TextField1": "value1"
+        "TextField": "value1"
       }
     }
   },
@@ -27,7 +27,7 @@
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
       "message": "No event found",
-      "path": "/case-types/FT_CRUD_2/cases",
+      "path": "/case-types/FT_CRUD_5/cases",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null

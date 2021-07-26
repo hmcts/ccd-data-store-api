@@ -6,7 +6,7 @@
 
   "request": {
     "pathVariables" : {
-      "ctid" : "FT_CRUD_1"
+      "ctid" : "FT_CRUD_4"
     },
     "body": {
       "data": {
@@ -27,7 +27,7 @@
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
       "message": "No case type found",
-      "path": "/case-types/FT_CRUD_1/cases",
+      "path": "/case-types/FT_CRUD_4/cases",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null
