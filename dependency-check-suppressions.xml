@@ -30,6 +30,8 @@
 	<suppress>
 		<cve>CVE-2021-29425</cve>
 		<cve>CVE-2021-27568</cve>
+		<cve>CVE-2021-33037</cve>
+		<cve>CVE-2021-30640</cve>
 	</suppress>
 
 </suppressions>
