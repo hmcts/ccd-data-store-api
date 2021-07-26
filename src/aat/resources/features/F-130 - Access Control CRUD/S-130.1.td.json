@@ -3,7 +3,7 @@
   "_extends_" : "F-130_Test_Data_Base",
 
   "specs" : [
-    "does not contain the filed with no R CRUD access"
+    "does not contain the field with no R CRUD access"
   ],
 
   "request": {

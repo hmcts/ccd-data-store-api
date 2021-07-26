@@ -1,4 +1,4 @@
-@F-130 @ash
+@F-130
 Feature: Create Case External API CRUD Tests
 
   Background: Load test data for the scenario
@@ -12,7 +12,7 @@ Feature: Create Case External API CRUD Tests
     And it is submitted to call the [external create case] operation of [CCD Data Store],
     Then a positive response is received
     And the response has all other details as expected
-    And the response [does not contain the filed with no R CRUD access]
+    And the response [does not contain the field with no R CRUD access]
 
   @S-130.2
   Scenario: User cannot submit case creation containing a field without CaseField C Access
