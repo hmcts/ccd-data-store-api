@@ -23,7 +23,7 @@ import static org.hamcrest.Matchers.not;
 
 @Ignore
 // FIXME : RDM-7635 - has to mock opendId jwks responses with proper Key set (RS256 public / private key).
-public class ServiceToServiceIT extends IntegrationTest {
+public class ServiceToServiceIT {
 
     private static final String SERVICE_TOKEN = "ServiceToken";
     private static final String INVALID_SERVICE_TOKEN = "InvalidServiceToken";
