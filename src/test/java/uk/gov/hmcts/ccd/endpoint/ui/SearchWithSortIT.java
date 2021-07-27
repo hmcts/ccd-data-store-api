@@ -121,7 +121,7 @@ public class SearchWithSortIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_search_sort_cases.sql"})
-    public void expectBadRequestError() throws Exception {
+    public void expectBadRequestErrorForMalformattedDateParam() throws Exception {
         MvcResult result = mockMvc.perform(get(GET_CASES)
             .contentType(JSON_CONTENT_TYPE)
             .param("view", WORKBASKET)
