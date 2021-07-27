@@ -205,7 +205,7 @@ public class CaseAccessOperation {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
             List<RoleAssignmentsDeleteRequest> deleteRequests = new ArrayList<>();
 
-            // group by case
+            // for each case
             filteredCauRolesByCaseDetails.forEach((caseDetails, requestedAssignments) -> {
                 // group by user
                 Map<String, List<String>> caseRolesByUserAndCase = requestedAssignments.stream()
@@ -218,7 +218,7 @@ public class CaseAccessOperation {
                                 .collect(Collectors.toList())
                         )));
 
-                // for each user in case: add list of all case-roles to revoke to the delete requests
+                // for each user in current case: add list of all case-roles to revoke to the delete requests
                 caseRolesByUserAndCase.forEach((userId, roleNames) ->
                     deleteRequests.add(RoleAssignmentsDeleteRequest.builder()
                         .caseId(caseDetails.getReferenceAsString())
@@ -228,7 +228,7 @@ public class CaseAccessOperation {
                 ));
             });
 
-            // submit list of all delete requests
+            // submit list of all delete requests from all cases
             roleAssignmentService.deleteRoleAssignments(deleteRequests);
         } else {
             filteredCauRolesByCaseDetails.forEach((caseDetails, requestedAssignments) -> {

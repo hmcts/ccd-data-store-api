@@ -11,6 +11,6 @@ import java.util.List;
 @Jacksonized
 public class MultipleQueryRequestResource {
 
-    List<RoleAssignmentQuery> queryRequests;
+    private final List<RoleAssignmentQuery> queryRequests;
 
 }

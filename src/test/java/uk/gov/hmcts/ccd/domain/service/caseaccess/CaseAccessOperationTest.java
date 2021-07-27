@@ -122,13 +122,13 @@ class CaseAccessOperationTest {
         @DisplayName("should grant access to user")
         void shouldGrantAccess() {
 
-            // GIVEN
+            // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
 
-            // WHEN
+            // ACT
             caseAccessOperation.grantAccess(JURISDICTION, CASE_REFERENCE.toString(), USER_ID);
 
-            // THEN
+            // ASSERT
             assertAll(
                 () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_REFERENCE),
                 () -> verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CREATOR.getRole()),
@@ -140,13 +140,13 @@ class CaseAccessOperationTest {
         @DisplayName("RA set to true, should grant access to user")
         void shouldGrantAccessForRA() {
 
-            // GIVEN
+            // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
 
-            // WHEN
+            // ACT
             caseAccessOperation.grantAccess(JURISDICTION, CASE_REFERENCE.toString(), USER_ID);
 
-            // THEN
+            // ASSERT
             assertAll(
                 () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_REFERENCE),
                 () -> {
@@ -239,13 +239,13 @@ class CaseAccessOperationTest {
         @DisplayName("should grant access when added case role valid")
         void shouldGrantAccessForCaseRole() {
 
-            // GIVEN
+            // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
 
-            // WHEN
+            // ACT
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE));
 
-            // THEN
+            // ASSERT
             verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
         }
 
@@ -253,13 +253,13 @@ class CaseAccessOperationTest {
         @DisplayName("RA set to true, should grant access when added case role valid")
         void shouldGrantAccessForCaseRoleForRA() {
 
-            // GIVEN
+            // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
 
-            // WHEN
+            // ACT
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE));
 
-            // THEN
+            // ASSERT
             verify(roleAssignmentService).createCaseRoleAssignments(
                 eq(caseDetails),
                 eq(USER_ID),
@@ -282,13 +282,13 @@ class CaseAccessOperationTest {
         @DisplayName("should grant access when added case roles contains global [CREATOR]")
         void shouldGrantAccessForCaseRoleCreator() {
 
-            // GIVEN
+            // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
 
-            // WHEN
+            // ACT
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE, CREATOR.getRole()));
 
-            // THEN
+            // ASSERT
             assertAll(
                 () -> verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE),
                 () -> verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CREATOR.getRole()),
@@ -300,13 +300,13 @@ class CaseAccessOperationTest {
         @DisplayName("RA set to true, should grant access when added case roles contains global [CREATOR]")
         void shouldGrantAccessForCaseRoleCreatorForRA() {
 
-            // GIVEN
+            // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
 
-            // WHEN
+            // ACT
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE, CREATOR.getRole()));
 
-            // THEN
+            // ASSERT
             verify(roleAssignmentService).createCaseRoleAssignments(
                 eq(caseDetails),
                 eq(USER_ID),
@@ -332,14 +332,14 @@ class CaseAccessOperationTest {
             // NB: test not valid for 'Attribute Based Access Control' as :
             //     RAS submission with `replaceExisting = true` does not require us to revokeRemoved.
 
-            // GIVEN
+            // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
             when(caseUserRepository.findCaseRoles(CASE_ID, USER_ID)).thenReturn(List.of(CASE_ROLE_GRANTED));
 
-            // WHEN
+            // ACT
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE));
 
-            // THEN
+            // ASSERT
             assertAll(
                 () -> verify(caseUserRepository).revokeAccess(CASE_ID, USER_ID, CASE_ROLE_GRANTED),
                 () -> verifyNoInteractions(roleAssignmentService)
@@ -352,14 +352,14 @@ class CaseAccessOperationTest {
             // NB: test not valid for 'Attribute Based Access Control' as :
             //     RAS submission with `replaceExisting = true` does not require us to ignoreGranted.
 
-            // GIVEN
+            // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
             when(caseUserRepository.findCaseRoles(CASE_ID, USER_ID)).thenReturn(List.of(CASE_ROLE_GRANTED));
 
-            // WHEN
+            // ACT
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE_GRANTED));
 
-            // THEN
+            // ASSERT
             assertAll(
                 () -> verify(caseUserRepository, never()).grantAccess(CASE_ID, USER_ID, CASE_ROLE_GRANTED),
                 () -> verifyNoInteractions(roleAssignmentService)
@@ -379,13 +379,13 @@ class CaseAccessOperationTest {
         @DisplayName("should revoke access to user")
         void shouldRevokeAccess() {
 
-            // GIVEN
+            // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
 
-            // WHEN
+            // ACT
             caseAccessOperation.revokeAccess(JURISDICTION, CASE_REFERENCE.toString(), USER_ID);
 
-            // THEN
+            // ASSERT
             assertAll(
                 () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_REFERENCE),
                 () -> verify(caseUserRepository).revokeAccess(CASE_ID, USER_ID, CREATOR.getRole()),
@@ -397,13 +397,13 @@ class CaseAccessOperationTest {
         @DisplayName("RA set to true, should revoke access to user")
         void shouldRevokeAccessForRA() {
 
-            // GIVEN
+            // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
 
-            // WHEN
+            // ACT
             caseAccessOperation.revokeAccess(JURISDICTION, CASE_REFERENCE.toString(), USER_ID);
 
-            // THEN
+            // ASSERT
             assertAll(
                 () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_REFERENCE),
                 () -> {
@@ -2203,7 +2203,7 @@ class CaseAccessOperationTest {
         @DisplayName("should find case assigned user roles")
         void shouldGetCaseAssignedUserRoles() {
 
-            // GIVEN
+            // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
 
             // register existing case role
@@ -2215,11 +2215,11 @@ class CaseAccessOperationTest {
             List<Long> caseReferences = Lists.newArrayList(CASE_REFERENCE);
             final List<String> userIds = Lists.newArrayList();
 
-            // WHEN
+            // ACT
             List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences,
                 userIds);
 
-            // THEN
+            // ASSERT
             assertNotNull(caseAssignedUserRoles);
             assertEquals(2, caseAssignedUserRoles.size());
             assertEquals(CASE_ROLE, caseAssignedUserRoles.get(0).getCaseRole());
@@ -2230,7 +2230,7 @@ class CaseAccessOperationTest {
         @DisplayName("RA set to true, should find case assigned user roles")
         void shouldGetCaseAssignedUserRolesForRA() {
 
-            // GIVEN
+            // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
 
             // register existing case role
@@ -2242,11 +2242,11 @@ class CaseAccessOperationTest {
             final var caseReferences = Lists.newArrayList(CASE_REFERENCE);
             final List<String> userIds = Lists.newArrayList();
 
-            // WHEN
+            // ACT
             List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences,
                 userIds);
 
-            // THEN
+            // ASSERT
             assertNotNull(caseAssignedUserRoles);
             assertEquals(2, caseAssignedUserRoles.size());
             assertEquals(CASE_ROLE, caseAssignedUserRoles.get(0).getCaseRole());
@@ -2257,15 +2257,15 @@ class CaseAccessOperationTest {
         @DisplayName("should return empty result for non existing cases")
         void shouldReturnEmptyResultOnNonExistingCases() {
 
-            // GIVEN
+            // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
             List<Long> caseReferences = Lists.newArrayList(CASE_NOT_FOUND);
 
-            // WHEN
+            // ACT
             List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences,
                 Lists.newArrayList());
 
-            // THEN
+            // ASSERT
             assertNotNull(caseAssignedUserRoles);
             assertEquals(0, caseAssignedUserRoles.size());
         }
@@ -2274,16 +2274,16 @@ class CaseAccessOperationTest {
         @DisplayName("RA set to true, should return empty result for non existing cases")
         void shouldReturnEmptyResultOnNonExistingCasesForRA() {
 
-            // GIVEN
+            // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
 
             List<Long> caseReferences = Lists.newArrayList(CASE_NOT_FOUND);
 
-            // WHEN
+            // ACT
             List<CaseAssignedUserRole> caseAssignedUserRoles = caseAccessOperation.findCaseUserRoles(caseReferences,
                 Lists.newArrayList());
 
-            // THEN
+            // ASSERT
             assertNotNull(caseAssignedUserRoles);
             assertEquals(0, caseAssignedUserRoles.size());
         }

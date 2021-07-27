@@ -9,10 +9,10 @@ import java.util.List;
 @Getter
 public class RoleAssignmentsDeleteRequest {
 
-    String caseId;
+    private final String caseId;
 
-    String userId;
+    private final String userId;
 
-    List<String> roleNames;
+    private final List<String> roleNames;
 
 }
