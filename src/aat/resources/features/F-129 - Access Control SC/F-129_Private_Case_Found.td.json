@@ -1,0 +1,36 @@
+{
+  "_guid_": "F-129_Private_Case_Found",
+  "_extends_": "F-129_Test_Data_Base",
+
+  "specs": [
+    "to retrieve the Private SC case"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_" : "RestrictedCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][SC_Private_Case_Created][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_" : "Common_200_Response",
+    "body": {
+      "case_type" : "SC_Private",
+      "security_classification" : "PRIVATE",
+
+      "data": {
+        "PrivateTextField" : "private text"
+      },
+      "data_classification" : {
+        "PrivateTextField" : "PRIVATE"
+      }
+    }
+  }
+}
+

@@ -89,7 +89,11 @@ withNightlyPipeline(type, product, component) {
     enableDbMigration('ccd')
     disableLegacyDeployment()
     enableHighLevelDataSetup()
+    enableFortifyScan()
 
+    after('fortify-scan') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+    }
     after('test') {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'

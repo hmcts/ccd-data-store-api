@@ -1,0 +1,12 @@
+{
+  "_guid_": "F-129.5_Restricted_Case_Not_Found",
+  "_extends_": "F-129_Restricted_Case_Not_Found",
+
+  "users": {
+    "invokingUser": {
+      "_extends_" : "PrivateCaseworker"
+    }
+  }
+
+}
+
