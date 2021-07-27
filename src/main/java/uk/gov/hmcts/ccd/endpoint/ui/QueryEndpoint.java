@@ -171,7 +171,7 @@ public class QueryEndpoint {
                                       @PathVariable("ctid") final String caseTypeId,
                                       @RequestParam java.util.Map<String, String> params) {
         String validCaseTypeId = validateCaseTypeId(caseTypeId);
-        validateDate(Arrays.asList(params.get(CREATED_DATE.getParameterName()),
+        validateDates(Arrays.asList(params.get(CREATED_DATE.getParameterName()),
             params.get(LAST_MODIFIED_DATE.getParameterName()),
             params.get(LAST_STATE_MODIFIED_DATE.getParameterName())));
 
@@ -345,7 +345,7 @@ public class QueryEndpoint {
         return caseTypeId;
     }
 
-    private boolean validateDate(List<String> datesToValidate) {
+    private boolean validateDates(List<String> datesToValidate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         List<String> invalidDates = new ArrayList<>();
         for (String d: datesToValidate) {
