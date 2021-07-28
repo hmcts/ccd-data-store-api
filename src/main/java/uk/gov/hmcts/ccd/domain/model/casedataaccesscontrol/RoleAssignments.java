@@ -38,20 +38,22 @@ public class RoleAssignments {
             .filter(roleAssignment -> !roleAssignment.getGrantType().equals(GrantType.BASIC.name()))
             .collect(Collectors.toList())
             .forEach(roleAssignmentAttributes -> {
-            if (roleAssignmentAttributes.getAttributes() != null) {
-                if (Objects.nonNull(roleAssignmentAttributes.getAttributes().getJurisdiction())) {
-                    String jurisdiction = roleAssignmentAttributes.getAttributes().getJurisdiction().orElse(null);
-                    jurisdictions.add(jurisdiction);
-                } else if (Objects.nonNull(roleAssignmentAttributes.getAttributes().getCaseType())) {
-                    jurisdictions.add(caseDefinitionRepository
-                        .getCaseType(roleAssignmentAttributes.getAttributes().getCaseType().get()).getJurisdictionId());
-                } else if (Objects.nonNull(roleAssignmentAttributes.getRoleType())
-                    && roleAssignmentAttributes.getRoleType().contentEquals(ORGANISATION)) {
-                    caseDefinitionRepository.getJurisdictionsFromDefinitionStore(Optional.empty())
-                        .forEach(jurisdictionDefinition -> jurisdictions.add(jurisdictionDefinition.getId()));
+                if (roleAssignmentAttributes.getAttributes() != null) {
+                    if (Objects.nonNull(roleAssignmentAttributes.getAttributes().getJurisdiction())) {
+                        String jurisdiction = roleAssignmentAttributes
+                            .getAttributes().getJurisdiction().orElse(null);
+                        jurisdictions.add(jurisdiction);
+                    } else if (Objects.nonNull(roleAssignmentAttributes.getAttributes().getCaseType())) {
+                        jurisdictions.add(caseDefinitionRepository
+                            .getCaseType(roleAssignmentAttributes
+                                .getAttributes().getCaseType().get()).getJurisdictionId());
+                    } else if (Objects.nonNull(roleAssignmentAttributes.getRoleType())
+                        && roleAssignmentAttributes.getRoleType().contentEquals(ORGANISATION)) {
+                        caseDefinitionRepository.getAllJurisdictionsFromDefinitionStore(Optional.empty())
+                            .forEach(jurisdictionDefinition -> jurisdictions.add(jurisdictionDefinition.getId()));
+                    }
                 }
-            }
-        });
+            });
         return jurisdictions;
     }
 

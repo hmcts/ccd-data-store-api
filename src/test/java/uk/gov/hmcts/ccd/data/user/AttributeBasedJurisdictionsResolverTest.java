@@ -175,7 +175,9 @@ class AttributeBasedJurisdictionsResolverTest {
         given(userRepository.getUser()).willReturn(idamUser);
         final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setId("jurisdictionId");
-        given(caseDefinitionRepository.getJurisdictionsFromDefinitionStore(Optional.of(List.of("caseTypeId")))).willReturn(List.of(jurisdictionDefinition));
+        given(caseDefinitionRepository
+            .getAllJurisdictionsFromDefinitionStore(Optional.of(List.of("caseTypeId"))))
+            .willReturn(List.of(jurisdictionDefinition));
 
         given(roleAssignmentService.getRoleAssignments(USER_ID)).willReturn(
             RoleAssignments.builder()
@@ -212,7 +214,6 @@ class AttributeBasedJurisdictionsResolverTest {
         final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
         doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType("caseTypeId");
-//        doReturn("jurisdictionId").when(caseDefinitionRepository).getCaseType("caseTypeId").getJurisdictionId();
 
         given(roleAssignmentService.getRoleAssignments(USER_ID)).willReturn(
             RoleAssignments.builder()
@@ -221,7 +222,8 @@ class AttributeBasedJurisdictionsResolverTest {
                         .grantType(GrantType.CHALLENGED.name())
                         .roleName(DIVORCE_SOLICITOR_ROLE)
                         .actorId(USER_ID)
-                        .attributes(RoleAssignmentAttributes.builder().caseType(Optional.of("caseTypeId")).build()).build(),
+                        .attributes(RoleAssignmentAttributes.builder()
+                            .caseType(Optional.of("caseTypeId")).build()).build(),
                     RoleAssignment.builder()
                         .grantType(GrantType.CHALLENGED.name())
                         .roleName(PROBATE_SOLICITOR_ROLE)

@@ -246,7 +246,13 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 .collect(Collectors.toList());
     }
 
-    public List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
+    @Override
+    public List<JurisdictionDefinition> getAllJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
+        return getJurisdictionsFromDefinitionStore (jurisdictionIds);
+    }
+
+
+    private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
         try {
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
             if (jurisdictionIds.isPresent()) {
