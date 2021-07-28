@@ -248,9 +248,8 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     @Override
     public List<JurisdictionDefinition> getAllJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
-        return getJurisdictionsFromDefinitionStore (jurisdictionIds);
+        return getJurisdictionsFromDefinitionStore(jurisdictionIds);
     }
-
 
     private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
         try {
