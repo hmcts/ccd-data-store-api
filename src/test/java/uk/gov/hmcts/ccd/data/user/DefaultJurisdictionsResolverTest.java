@@ -53,6 +53,6 @@ class DefaultJurisdictionsResolverTest {
         assertEquals(jurisdictions, jurisdictionsResolver.getJurisdictions());
 
         verify(attributeBasedJurisdictionsResolver).getJurisdictions();
-        verifyZeroInteractions(idamJurisdictionsResolver);
+        verify(idamJurisdictionsResolver).getJurisdictions();
     }
 }

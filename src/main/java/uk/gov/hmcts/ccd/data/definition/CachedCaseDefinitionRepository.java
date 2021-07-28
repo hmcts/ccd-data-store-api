@@ -95,14 +95,13 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
-    public List<JurisdictionDefinition> getAllJurisdiction(Optional<List<String>> jurisdictionIds) {
-        LOGGER.debug("Will get jurisdictions '{}' from repository.", jurisdictionIds);
-        return caseDefinitionRepository.getAllJurisdiction(jurisdictionIds);
+    public List<String> getCaseTypesIDsByJurisdictions(List<String> jurisdictionIds) {
+        return caseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictionIds);
     }
 
     @Override
-    public List<String> getCaseTypesIDsByJurisdictions(List<String> jurisdictionIds) {
-        return caseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictionIds);
+    public List<JurisdictionDefinition> getJurisdictionsFromDefinitionStoreAll(Optional<List<String>> jurisdictionIds) {
+        return caseDefinitionRepository.getJurisdictionsFromDefinitionStoreAll(jurisdictionIds);
     }
 
     @Override

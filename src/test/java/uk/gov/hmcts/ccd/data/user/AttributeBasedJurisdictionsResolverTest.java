@@ -4,10 +4,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 
 import java.util.Collections;
@@ -19,6 +23,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 class AttributeBasedJurisdictionsResolverTest {
@@ -36,6 +41,9 @@ class AttributeBasedJurisdictionsResolverTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private CaseDefinitionRepository caseDefinitionRepository;
 
     @Mock
     private RoleAssignmentService roleAssignmentService;
@@ -103,5 +111,130 @@ class AttributeBasedJurisdictionsResolverTest {
         assertThat(result.size(), is(2));
         assertTrue(result.contains(DIVORCE_JURISDICTION));
         assertTrue(result.contains(PROBATE_JURISDICTION));
+    }
+
+    @Test
+    public void shouldReturnJurisdictionsWhereGrantIsNotBasic() {
+        given(idamUser.getId()).willReturn(USER_ID);
+        given(userRepository.getUser()).willReturn(idamUser);
+
+        given(roleAssignmentService.getRoleAssignments(USER_ID)).willReturn(
+            RoleAssignments.builder()
+                .roleAssignments(asList(
+                    RoleAssignment.builder()
+                        .grantType(GrantType.BASIC.name())
+                        .roleName(DIVORCE_SOLICITOR_ROLE)
+                        .actorId(USER_ID)
+                        .attributes(RoleAssignmentAttributes.builder()
+                            .jurisdiction(Optional.of(DIVORCE_JURISDICTION)).build()).build(),
+                    RoleAssignment.builder()
+                        .grantType(GrantType.CHALLENGED.name())
+                        .roleName(PROBATE_SOLICITOR_ROLE)
+                        .actorId(USER_ID)
+                        .attributes(RoleAssignmentAttributes.builder()
+                            .jurisdiction(Optional.of(PROBATE_JURISDICTION)).build()).build()
+                ))
+                .build()
+        );
+        List<String> result = jurisdictionsResolver.getJurisdictions();
+        assertThat(result.size(), is(1));
+        assertTrue(result.contains(PROBATE_JURISDICTION));
+    }
+
+    @Test
+    public void shouldReturnJurisdictionsWhereNoJurisdictionProvided() {
+        given(idamUser.getId()).willReturn(USER_ID);
+        given(userRepository.getUser()).willReturn(idamUser);
+
+        given(roleAssignmentService.getRoleAssignments(USER_ID)).willReturn(
+            RoleAssignments.builder()
+                .roleAssignments(asList(
+                    RoleAssignment.builder()
+                        .grantType(GrantType.CHALLENGED.name())
+                        .roleName(DIVORCE_SOLICITOR_ROLE)
+                        .actorId(USER_ID)
+                        .attributes(RoleAssignmentAttributes.builder().build()).build(),
+                    RoleAssignment.builder()
+                        .grantType(GrantType.CHALLENGED.name())
+                        .roleName(PROBATE_SOLICITOR_ROLE)
+                        .actorId(USER_ID)
+                        .attributes(RoleAssignmentAttributes.builder()
+                            .jurisdiction(Optional.of(PROBATE_JURISDICTION)).build()).build()
+                ))
+                .build()
+        );
+
+        List<String> result = jurisdictionsResolver.getJurisdictions();
+        assertThat(result.size(), is(1));
+        assertTrue(result.contains(PROBATE_JURISDICTION));
+    }
+
+    @Test
+    public void shouldReturnJurisdictionsWhereNoCaseTypeOrJurisdictionProvided() {
+        given(idamUser.getId()).willReturn(USER_ID);
+        given(userRepository.getUser()).willReturn(idamUser);
+        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setId("jurisdictionId");
+        given(caseDefinitionRepository.getJurisdictionsFromDefinitionStoreAll(Optional.of(List.of("caseTypeId")))).willReturn(List.of(jurisdictionDefinition));
+
+        given(roleAssignmentService.getRoleAssignments(USER_ID)).willReturn(
+            RoleAssignments.builder()
+                .roleAssignments(asList(
+                    RoleAssignment.builder()
+                        .grantType(GrantType.CHALLENGED.name())
+                        .roleName(DIVORCE_SOLICITOR_ROLE)
+                        .actorId(USER_ID)
+                        .roleType("ORGANISATION")
+                        .attributes(RoleAssignmentAttributes.builder().build()).build(),
+                    RoleAssignment.builder()
+                        .grantType(GrantType.CHALLENGED.name())
+                        .roleName(PROBATE_SOLICITOR_ROLE)
+                        .actorId(USER_ID)
+                        .attributes(RoleAssignmentAttributes.builder()
+                            .jurisdiction(Optional.of(PROBATE_JURISDICTION)).build()).build()
+                ))
+                .build()
+        );
+
+        List<String> result = jurisdictionsResolver.getJurisdictions();
+        assertThat(result.size(), is(2));
+        assertTrue(result.contains(PROBATE_JURISDICTION));
+        assertTrue(result.contains("jurisdictionId"));
+    }
+
+    @Test
+    public void shouldReturnJurisdictionsWhereCaseTypeProvided() {
+        given(idamUser.getId()).willReturn(USER_ID);
+        given(userRepository.getUser()).willReturn(idamUser);
+        final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setId("jurisdictionId");
+
+        final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
+        caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType("caseTypeId");
+//        doReturn("jurisdictionId").when(caseDefinitionRepository).getCaseType("caseTypeId").getJurisdictionId();
+
+        given(roleAssignmentService.getRoleAssignments(USER_ID)).willReturn(
+            RoleAssignments.builder()
+                .roleAssignments(asList(
+                    RoleAssignment.builder()
+                        .grantType(GrantType.CHALLENGED.name())
+                        .roleName(DIVORCE_SOLICITOR_ROLE)
+                        .actorId(USER_ID)
+                        .attributes(RoleAssignmentAttributes.builder().caseType(Optional.of("caseTypeId")).build()).build(),
+                    RoleAssignment.builder()
+                        .grantType(GrantType.CHALLENGED.name())
+                        .roleName(PROBATE_SOLICITOR_ROLE)
+                        .actorId(USER_ID)
+                        .attributes(RoleAssignmentAttributes.builder()
+                            .jurisdiction(Optional.of(PROBATE_JURISDICTION)).build()).build()
+                ))
+                .build()
+        );
+
+        List<String> result = jurisdictionsResolver.getJurisdictions();
+        assertThat(result.size(), is(2));
+        assertTrue(result.contains(PROBATE_JURISDICTION));
+        assertTrue(result.contains("jurisdictionId"));
     }
 }

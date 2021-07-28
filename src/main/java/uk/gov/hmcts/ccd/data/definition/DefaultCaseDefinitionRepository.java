@@ -212,7 +212,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     public JurisdictionDefinition getJurisdictionFromDefinitionStore(String jurisdictionId) {
-        List<JurisdictionDefinition> jurisdictionDefinitions = getAllJurisdiction(
+        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(
                 Optional.of(Arrays.asList(jurisdictionId)));
         if (jurisdictionDefinitions.isEmpty()) {
             return null;
@@ -223,7 +223,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Override
     public List<String> getCaseTypesIDsByJurisdictions(List<String> jurisdictionIds) {
 
-        List<JurisdictionDefinition> jurisdictionDefinitions = getAllJurisdiction(
+        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(
                 Optional.of(jurisdictionIds));
         if (jurisdictionDefinitions.isEmpty()) {
             LOG.warn("Definitions not found for requested jurisdictions {}", jurisdictionIds);
@@ -235,7 +235,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     @Override
     public List<String> getAllCaseTypesIDs() {
-        List<JurisdictionDefinition> jurisdictionDefinitions = getAllJurisdiction(
+        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(
                 Optional.ofNullable(null));
         return getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
     }
@@ -246,23 +246,22 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<JurisdictionDefinition> getAllJurisdiction(Optional<List<String>> jurisdictionIds) {
+    private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
         try {
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
             if (jurisdictionIds.isPresent()) {
                 builder.queryParam("ids", String.join(",", jurisdictionIds.get()));
             }
             LOG.debug("Retrieving jurisdiction object(s) from definition store for Jurisdiction IDs: {}.",
-                    jurisdictionIds.orElse(Collections.emptyList()));
+                jurisdictionIds.orElse(Collections.emptyList()));
             HttpEntity<List<JurisdictionDefinition>> requestEntity = new HttpEntity<>(
-                    securityUtils.authorizationHeaders());
+                securityUtils.authorizationHeaders());
 
             List<JurisdictionDefinition> jurisdictionDefinitionList = restTemplate
-                    .exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity,
-                            new ParameterizedTypeReference<List<JurisdictionDefinition>>() {
-                            })
-                    .getBody();
+                .exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity,
+                    new ParameterizedTypeReference<List<JurisdictionDefinition>>() {
+                    })
+                .getBody();
             if (jurisdictionDefinitionList == null) {
                 jurisdictionDefinitionList = Collections.emptyList();
             }
@@ -271,9 +270,9 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving jurisdictions definition", e);
             if (e instanceof HttpClientErrorException
-                    && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 LOG.warn("Jurisdiction object(s) configured for user couldn't be found on definition store: {}.",
-                        jurisdictionIds.orElse(Collections.emptyList()));
+                    jurisdictionIds.orElse(Collections.emptyList()));
                 return new ArrayList<>();
             } else {
                 throw new ServiceException("Problem retrieving jurisdictions definition because of " + e.getMessage());
@@ -281,4 +280,37 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         }
     }
 
+    public List<JurisdictionDefinition> getJurisdictionsFromDefinitionStoreAll (Optional<List<String>> jurisdictionIds) {
+        try {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
+            if (jurisdictionIds.isPresent()) {
+                builder.queryParam("ids", String.join(",", jurisdictionIds.get()));
+            }
+            LOG.debug("Retrieving jurisdiction object(s) from definition store for Jurisdiction IDs: {}.",
+                jurisdictionIds.orElse(Collections.emptyList()));
+            HttpEntity<List<JurisdictionDefinition>> requestEntity = new HttpEntity<>(
+                securityUtils.authorizationHeaders());
+
+            List<JurisdictionDefinition> jurisdictionDefinitionList = restTemplate
+                .exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity,
+                    new ParameterizedTypeReference<List<JurisdictionDefinition>>() {
+                    })
+                .getBody();
+            if (jurisdictionDefinitionList == null) {
+                jurisdictionDefinitionList = Collections.emptyList();
+            }
+            LOG.debug("Retrieved jurisdiction object(s) from definition store: {}.", jurisdictionDefinitionList);
+            return jurisdictionDefinitionList;
+        } catch (Exception e) {
+            LOG.warn("Error while retrieving jurisdictions definition", e);
+            if (e instanceof HttpClientErrorException
+                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                LOG.warn("Jurisdiction object(s) configured for user couldn't be found on definition store: {}.",
+                    jurisdictionIds.orElse(Collections.emptyList()));
+                return new ArrayList<>();
+            } else {
+                throw new ServiceException("Problem retrieving jurisdictions definition because of " + e.getMessage());
+            }
+        }
+    }
 }
