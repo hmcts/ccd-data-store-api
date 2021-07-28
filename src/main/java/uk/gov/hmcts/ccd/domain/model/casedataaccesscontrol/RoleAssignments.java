@@ -47,7 +47,7 @@ public class RoleAssignments {
                         .getCaseType(roleAssignmentAttributes.getAttributes().getCaseType().get()).getJurisdictionId());
                 } else if (Objects.nonNull(roleAssignmentAttributes.getRoleType())
                     && roleAssignmentAttributes.getRoleType().contentEquals(ORGANISATION)) {
-                    caseDefinitionRepository.getJurisdictionsFromDefinitionStoreAll(Optional.empty())
+                    caseDefinitionRepository.getJurisdictionsFromDefinitionStore(Optional.empty())
                         .forEach(jurisdictionDefinition -> jurisdictions.add(jurisdictionDefinition.getId()));
                 }
             }

@@ -175,7 +175,7 @@ class AttributeBasedJurisdictionsResolverTest {
         given(userRepository.getUser()).willReturn(idamUser);
         final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setId("jurisdictionId");
-        given(caseDefinitionRepository.getJurisdictionsFromDefinitionStoreAll(Optional.of(List.of("caseTypeId")))).willReturn(List.of(jurisdictionDefinition));
+        given(caseDefinitionRepository.getJurisdictionsFromDefinitionStore(Optional.of(List.of("caseTypeId")))).willReturn(List.of(jurisdictionDefinition));
 
         given(roleAssignmentService.getRoleAssignments(USER_ID)).willReturn(
             RoleAssignments.builder()

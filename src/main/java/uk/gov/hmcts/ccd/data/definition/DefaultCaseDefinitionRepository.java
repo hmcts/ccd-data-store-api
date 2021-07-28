@@ -246,41 +246,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 .collect(Collectors.toList());
     }
 
-    private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
-        try {
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
-            if (jurisdictionIds.isPresent()) {
-                builder.queryParam("ids", String.join(",", jurisdictionIds.get()));
-            }
-            LOG.debug("Retrieving jurisdiction object(s) from definition store for Jurisdiction IDs: {}.",
-                jurisdictionIds.orElse(Collections.emptyList()));
-            HttpEntity<List<JurisdictionDefinition>> requestEntity = new HttpEntity<>(
-                securityUtils.authorizationHeaders());
-
-            List<JurisdictionDefinition> jurisdictionDefinitionList = restTemplate
-                .exchange(builder.build().encode().toUri(), HttpMethod.GET, requestEntity,
-                    new ParameterizedTypeReference<List<JurisdictionDefinition>>() {
-                    })
-                .getBody();
-            if (jurisdictionDefinitionList == null) {
-                jurisdictionDefinitionList = Collections.emptyList();
-            }
-            LOG.debug("Retrieved jurisdiction object(s) from definition store: {}.", jurisdictionDefinitionList);
-            return jurisdictionDefinitionList;
-        } catch (Exception e) {
-            LOG.warn("Error while retrieving jurisdictions definition", e);
-            if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                LOG.warn("Jurisdiction object(s) configured for user couldn't be found on definition store: {}.",
-                    jurisdictionIds.orElse(Collections.emptyList()));
-                return new ArrayList<>();
-            } else {
-                throw new ServiceException("Problem retrieving jurisdictions definition because of " + e.getMessage());
-            }
-        }
-    }
-
-    public List<JurisdictionDefinition> getJurisdictionsFromDefinitionStoreAll (Optional<List<String>> jurisdictionIds) {
+    public List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
         try {
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
             if (jurisdictionIds.isPresent()) {
