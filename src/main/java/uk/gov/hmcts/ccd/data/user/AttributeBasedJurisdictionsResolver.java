@@ -42,7 +42,7 @@ public class AttributeBasedJurisdictionsResolver implements JurisdictionsResolve
         return filterJurisdictions(roleAssignments);
     }
 
-    public List<String> filterJurisdictions(RoleAssignments roleAssignmentsList) {
+    private List<String> filterJurisdictions(RoleAssignments roleAssignmentsList) {
         List<String> jurisdictions = new ArrayList<>();
         roleAssignmentsList.getRoleAssignments().stream()
             .filter(roleAssignment -> !roleAssignment.getGrantType().equals(GrantType.BASIC.name()))
