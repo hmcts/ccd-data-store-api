@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
 import java.util.List;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -42,20 +43,46 @@ public class AccessControlGrantTypeESQueryBuilder {
     }
 
     public BoolQueryBuilder createQuery(String caseTypeId) {
-
         List<RoleAssignment> roleAssignments = getRoleAssignments(caseTypeId);
+
+        BoolQueryBuilder standardQuery = standardGrantTypeQueryBuilder.createQuery(roleAssignments);
+        BoolQueryBuilder challengedQuery = challengedGrantTypeQueryBuilder.createQuery(roleAssignments);
+        BoolQueryBuilder orgQuery = QueryBuilders.boolQuery();
+
+        if (standardQuery.hasClauses()) {
+            orgQuery.should(standardQuery);
+        }
+        if (challengedQuery.hasClauses()) {
+            orgQuery.should(challengedQuery);
+        }
+
+        BoolQueryBuilder excludedQuery = excludedGrantTypeQueryBuilder.createQuery(roleAssignments);
+        if (excludedQuery.hasClauses()) {
+            orgQuery.mustNot(excludedQuery);
+        }
 
         BoolQueryBuilder basicQuery = basicGrantTypeQueryBuilder.createQuery(roleAssignments);
         BoolQueryBuilder specificQuery = specificGrantTypeQueryBuilder.createQuery(roleAssignments);
-        BoolQueryBuilder standardQuery = standardGrantTypeQueryBuilder.createQuery(roleAssignments);
-        BoolQueryBuilder challengedQuery = challengedGrantTypeQueryBuilder.createQuery(roleAssignments);
 
-        BoolQueryBuilder orgQuery =  standardQuery.should(challengedQuery);
+        BoolQueryBuilder nonOrgQuery = QueryBuilders.boolQuery();
+        if (basicQuery.hasClauses()) {
+            nonOrgQuery.should(basicQuery);
+        }
 
-        BoolQueryBuilder excludedQuery = excludedGrantTypeQueryBuilder.createQuery(roleAssignments);
-        orgQuery.mustNot(excludedQuery);
+        if (specificQuery.hasClauses()) {
+            nonOrgQuery.should(orgQuery);
+        }
 
-        return basicQuery.should(specificQuery).should(orgQuery);
+        BoolQueryBuilder grantTypeQuery = QueryBuilders.boolQuery();
+        if (nonOrgQuery.hasClauses()) {
+            grantTypeQuery.should(nonOrgQuery);
+        }
+
+        if (orgQuery.hasClauses()) {
+            grantTypeQuery.should(orgQuery);
+        }
+
+        return grantTypeQuery;
     }
 
     private List<RoleAssignment> getRoleAssignments(String caseTypeId) {
