@@ -220,7 +220,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
-    testCompile ('com.opentable.components:otj-pg-embedded:0.12.0')
+    testImplementation("org.testcontainers:postgresql:1.15.2")
     testCompile ('com.github.tomakehurst:wiremock-jre8:2.25.1')
     testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE')
     // To avoid compiler warnings about @API annotations in JUnit5 code.
@@ -265,6 +265,7 @@ dependencies {
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server'
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-core'
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
+
 }
 // end::dependencies[]
 
