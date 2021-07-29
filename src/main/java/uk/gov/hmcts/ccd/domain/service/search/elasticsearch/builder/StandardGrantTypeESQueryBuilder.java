@@ -2,10 +2,9 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.stereotype.Component;
@@ -33,41 +32,21 @@ public class StandardGrantTypeESQueryBuilder implements GrantTypeESQueryBuilder 
                 Optional<String> jurisdiction = roleAssignment.getAttributes().getJurisdiction();
                 BoolQueryBuilder innerQuery = QueryBuilders.boolQuery();
 
-                if (jurisdiction.isPresent()) {
-                    innerQuery.must(QueryBuilders.matchQuery(JURISDICTION_FIELD_COL, jurisdiction));
+                if (StringUtils.isNotBlank(jurisdiction.orElse(""))) {
+                    innerQuery.must(QueryBuilders.matchQuery(JURISDICTION_FIELD_COL, jurisdiction.get()));
                 }
 
                 Optional<String> region = roleAssignment.getAttributes().getRegion();
-                if (region.isPresent()) {
-                    innerQuery.must(QueryBuilders.matchQuery(REGION, region));
+                if (StringUtils.isNotBlank(region.orElse(""))) {
+                    innerQuery.must(QueryBuilders.matchQuery(REGION, region.get()));
                 }
 
                 Optional<String> location = roleAssignment.getAttributes().getLocation();
-                if (location.isPresent()) {
-                    innerQuery.must(QueryBuilders.matchQuery(LOCATION, location));
+                if (StringUtils.isNotBlank(location.orElse(""))) {
+                    innerQuery.must(QueryBuilders.matchQuery(LOCATION, location.get()));
                 }
                 boolQueryBuilder.should(innerQuery);
             });
-
-        addJurisdictions(streamSupplier, boolQueryBuilder);
-
-        Set<String> regions = streamSupplier.get()
-            .map(roleAssignment -> roleAssignment.getAttributes().getRegion().orElse(""))
-            .filter(region -> region.length() > 0)
-            .collect(Collectors.toSet());
-
-        if (regions.size() > 0) {
-            boolQueryBuilder.must(QueryBuilders.termsQuery(REGION, regions));
-        }
-
-        Set<String> locations = streamSupplier.get()
-            .map(roleAssignment -> roleAssignment.getAttributes().getLocation().orElse(""))
-            .filter(location -> location.length() > 0)
-            .collect(Collectors.toSet());
-
-        if (locations.size() > 0) {
-            boolQueryBuilder.must(QueryBuilders.termsQuery(LOCATION, regions));
-        }
 
         return boolQueryBuilder;
     }

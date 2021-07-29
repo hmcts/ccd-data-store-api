@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.data.casedetails.search.builder;
+package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,7 +6,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 
-abstract class GrantTypeQueryBuilderTest {
+abstract class GrantTypeESQueryBuilderTest {
 
     protected static final RoleAssignment createRoleAssignment(GrantType grantType,
                                                                String roleType,
@@ -18,12 +18,12 @@ abstract class GrantTypeQueryBuilderTest {
     }
 
     protected static final RoleAssignment createRoleAssignment(GrantType grantType,
-                                                             String roleType,
-                                                             String classification,
-                                                             String jurisdiction,
-                                                             String location,
-                                                             String region,
-                                                             List<String> autorisations) {
+                                                               String roleType,
+                                                               String classification,
+                                                               String jurisdiction,
+                                                               String location,
+                                                               String region,
+                                                               List<String> autorisations) {
         return createRoleAssignment(grantType, roleType, classification,
             jurisdiction, location, region, autorisations, "");
     }
