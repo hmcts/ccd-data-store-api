@@ -59,7 +59,7 @@ class AttributeBasedJurisdictionsResolverTest {
     }
 
     @Test
-    public void shouldReturnNoJurisdictionsForEmptyRoleAssignments() {
+    void shouldReturnNoJurisdictionsForEmptyRoleAssignments() {
         given(idamUser.getId()).willReturn(USER_ID);
         given(userRepository.getUser()).willReturn(idamUser);
 
@@ -75,7 +75,7 @@ class AttributeBasedJurisdictionsResolverTest {
     }
 
     @Test
-    public void shouldReturnJurisdictionsForValidRoleAssignments() {
+    void shouldReturnJurisdictionsForValidRoleAssignments() {
         given(idamUser.getId()).willReturn(USER_ID);
         given(userRepository.getUser()).willReturn(idamUser);
 
@@ -116,7 +116,7 @@ class AttributeBasedJurisdictionsResolverTest {
     }
 
     @Test
-    public void shouldReturnJurisdictionsOnlyWhereGrantIsNotBasic() {
+    void shouldReturnJurisdictionsOnlyWhereGrantIsNotBasic() {
         given(idamUser.getId()).willReturn(USER_ID);
         given(userRepository.getUser()).willReturn(idamUser);
 
@@ -144,7 +144,7 @@ class AttributeBasedJurisdictionsResolverTest {
     }
 
     @Test
-    public void shouldReturnJurisdictionsWhereNoJurisdictionProvided() {
+    void shouldReturnJurisdictionsWhereNoJurisdictionProvided() {
         given(idamUser.getId()).willReturn(USER_ID);
         given(userRepository.getUser()).willReturn(idamUser);
 
@@ -172,7 +172,7 @@ class AttributeBasedJurisdictionsResolverTest {
     }
 
     @Test
-    public void shouldReturnJurisdictionsWhereNoCaseTypeOrJurisdictionProvided() {
+    void shouldReturnJurisdictionsWhereNoCaseTypeOrJurisdictionProvided() {
         given(idamUser.getId()).willReturn(USER_ID);
         given(userRepository.getUser()).willReturn(idamUser);
         final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
@@ -207,7 +207,7 @@ class AttributeBasedJurisdictionsResolverTest {
     }
 
     @Test
-    public void shouldReturnJurisdictionsWhereCaseTypeProvided() {
+    void shouldReturnJurisdictionsWhereCaseTypeProvided() {
         given(idamUser.getId()).willReturn(USER_ID);
         given(userRepository.getUser()).willReturn(idamUser);
         final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
