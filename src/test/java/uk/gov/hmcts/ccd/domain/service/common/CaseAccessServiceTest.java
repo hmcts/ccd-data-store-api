@@ -650,7 +650,7 @@ class CaseAccessServiceTest {
             Set<AccessProfile> caseRoles = caseAccessService.getCaseCreationRoles("CASE_TYPE_ID");
 
             assertAll(
-                () -> assertThat(caseRoles.size(), Is.is(3))
+                () -> assertThat(caseRoles.size(), Is.is(1))
             );
         }
 
@@ -678,15 +678,14 @@ class CaseAccessServiceTest {
             Set<AccessProfile> caseRoles = caseAccessService.getCaseCreationRoles("CASE_TYPE_ID");
 
             assertAll(
-                () -> assertThat(caseRoles.size(), Is.is(3))
+                () -> assertThat(caseRoles.size(), Is.is(1))
             );
         }
 
         @Test
         @DisplayName("should throw exception when no user role found")
         void getCreateCaseRolesThrows() {
-            when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString())).thenReturn(null);
-
+            when(caseDataAccessControl.generateCreationAccessProfilesByCaseTypeId(anyString())).thenReturn(null);
             assertThrows(ValidationException.class, () -> caseAccessService.getCaseCreationRoles("CASE_TYPE_ID"));
         }
     }
