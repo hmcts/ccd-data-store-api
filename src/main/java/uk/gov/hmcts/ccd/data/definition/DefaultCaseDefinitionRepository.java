@@ -246,9 +246,10 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(value = "allJurisdictionsCache")
     @Override
-    public List<JurisdictionDefinition> getAllJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
-        return getJurisdictionsFromDefinitionStore(jurisdictionIds);
+    public List<JurisdictionDefinition> getAllJurisdictionsFromDefinitionStore() {
+        return getJurisdictionsFromDefinitionStore(Optional.of(Collections.emptyList()));
     }
 
     private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {

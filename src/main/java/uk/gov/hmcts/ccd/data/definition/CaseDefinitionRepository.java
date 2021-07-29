@@ -6,7 +6,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface CaseDefinitionRepository {
     List<CaseTypeDefinition> getCaseTypesForJurisdiction(String jurisdictionId);
@@ -27,7 +26,7 @@ public interface CaseDefinitionRepository {
 
     List<String> getCaseTypesIDsByJurisdictions(List<String> jurisdictionIds);
 
-    List<JurisdictionDefinition> getAllJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds);
+    List<JurisdictionDefinition> getAllJurisdictionsFromDefinitionStore();
 
     List<String> getAllCaseTypesIDs();
 }
