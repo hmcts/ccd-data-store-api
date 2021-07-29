@@ -24,7 +24,6 @@ public class DefaultSupplementaryDataRepository implements SupplementaryDataRepo
 
     private List<SupplementaryDataQueryBuilder> queryBuilders;
 
-
     @Autowired
     public DefaultSupplementaryDataRepository(final List<SupplementaryDataQueryBuilder> queryBuilders) {
         this.queryBuilders = queryBuilders;
