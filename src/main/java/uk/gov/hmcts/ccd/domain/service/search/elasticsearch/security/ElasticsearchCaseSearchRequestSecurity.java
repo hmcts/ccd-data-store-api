@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder.AccessControlGrantTypeESQueryBuilder;
 
 import java.util.List;
 
@@ -20,12 +21,15 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
 
     private final List<CaseSearchFilter> caseSearchFilters;
     private final ObjectMapperService objectMapperService;
+    private final AccessControlGrantTypeESQueryBuilder grantTypeESQueryBuilder;
 
     @Autowired
     public ElasticsearchCaseSearchRequestSecurity(List<CaseSearchFilter> caseSearchFilters,
-                                                  ObjectMapperService objectMapperService) {
+                                                  ObjectMapperService objectMapperService,
+                                                  AccessControlGrantTypeESQueryBuilder grantTypeESQueryBuilder) {
         this.caseSearchFilters = caseSearchFilters;
         this.objectMapperService = objectMapperService;
+        this.grantTypeESQueryBuilder = grantTypeESQueryBuilder;
     }
 
     @Override
@@ -37,6 +41,9 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
     private String addFiltersToQuery(CaseSearchRequest caseSearchRequest) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder.must(QueryBuilders.wrapperQuery(caseSearchRequest.getQueryValue()));
+        BoolQueryBuilder grantTypeQueryBuilder = grantTypeESQueryBuilder
+            .createQuery(caseSearchRequest.getCaseTypeId());
+        boolQueryBuilder.must(grantTypeQueryBuilder);
 
         caseSearchFilters.forEach(filter ->
             filter.getFilter(caseSearchRequest.getCaseTypeId()).ifPresent(boolQueryBuilder::filter));

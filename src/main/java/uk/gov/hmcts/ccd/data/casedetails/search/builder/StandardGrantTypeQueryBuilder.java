@@ -2,7 +2,7 @@ package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,38 +23,31 @@ public class StandardGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
             .filter(roleAssignment -> roleAssignment.getAuthorisations() == null
                 || roleAssignment.getAuthorisations().size() == 0);
 
-        String classificationQuery = createClassification(params, streamSupplier.get());
+        String regionAndLocationQuery = streamSupplier.get()
+            .map(roleAssignment -> {
+                Optional<String> jurisdiction = roleAssignment.getAttributes().getJurisdiction();
+                String innerQuery = "";
+                if (jurisdiction.isPresent()) {
+                    innerQuery = JURISDICTION + "=" + jurisdiction.get();
+                }
 
-        Set<String> jurisdictions = streamSupplier.get()
-            .map(roleAssignment -> roleAssignment.getAttributes().getJurisdiction().orElse(""))
-            .filter(jurisdiction -> jurisdiction.length() > 0)
-            .collect(Collectors.toSet());
+                Optional<String> region = roleAssignment.getAttributes().getRegion();
+                if (region.isPresent()) {
+                    innerQuery = innerQuery + getOperator(innerQuery, " AND ") + REGION + "=" + region.get();
+                }
 
-        String tmpQuery = classificationQuery;
+                Optional<String> location = roleAssignment.getAttributes().getLocation();
+                if (location.isPresent()) {
+                    innerQuery = innerQuery + getOperator(innerQuery, " AND ") + REGION + "=" + region.get();
+                }
+                return StringUtils.isNotBlank(innerQuery) ? String.format(QUERY_WRAPPER, innerQuery) : innerQuery;
+            }).collect(Collectors.joining(" OR "));
 
-        if (jurisdictions.size() > 0) {
-            params.put("jurisdictions", jurisdictions);
-            tmpQuery = tmpQuery + getOperator(tmpQuery," AND ") + JURISDICTION + " in (:jurisdictions)";
-        }
+        String tmpQuery = createClassification(params, streamSupplier.get());
 
-        Set<String> regions = streamSupplier.get()
-            .map(roleAssignment -> roleAssignment.getAttributes().getRegion().orElse(""))
-            .filter(region -> region.length() > 0)
-            .collect(Collectors.toSet());
-
-        if (regions.size() > 0) {
-            params.put("regions", regions);
-            tmpQuery = tmpQuery + getOperator(tmpQuery," AND ") + REGION + " in (:regions)";
-        }
-
-        Set<String> locations = streamSupplier.get()
-            .map(roleAssignment -> roleAssignment.getAttributes().getLocation().orElse(""))
-            .filter(location -> location.length() > 0)
-            .collect(Collectors.toSet());
-
-        if (locations.size() > 0) {
-            params.put("locations", locations);
-            tmpQuery = tmpQuery + getOperator(tmpQuery," AND ") + LOCATION + " in (:locations)";
+        if (StringUtils.isNotBlank(regionAndLocationQuery)) {
+            tmpQuery = tmpQuery + getOperator(tmpQuery, " AND ")
+                + String.format(QUERY_WRAPPER, regionAndLocationQuery);
         }
 
         return StringUtils.isNotBlank(tmpQuery) ? String.format(QUERY_WRAPPER, tmpQuery) : tmpQuery;
