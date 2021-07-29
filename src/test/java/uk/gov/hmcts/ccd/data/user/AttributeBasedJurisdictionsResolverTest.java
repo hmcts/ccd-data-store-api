@@ -53,7 +53,9 @@ class AttributeBasedJurisdictionsResolverTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        jurisdictionsResolver = new AttributeBasedJurisdictionsResolver(userRepository, roleAssignmentService);
+        jurisdictionsResolver = new AttributeBasedJurisdictionsResolver(userRepository,
+            roleAssignmentService,
+            caseDefinitionRepository);
     }
 
     @Test
@@ -90,7 +92,7 @@ class AttributeBasedJurisdictionsResolverTest {
                         .grantType("CASE")
                         .roleName(DIVORCE_SOLICITOR_ROLE)
                         .actorId(USER_ID)
-                        .attributes(null).build(),
+                        .attributes(RoleAssignmentAttributes.builder().build()).build(),
                     RoleAssignment.builder()
                         .grantType("CASE")
                         .roleName(CASEWORKER_CMC_ROLE)
@@ -109,12 +111,12 @@ class AttributeBasedJurisdictionsResolverTest {
 
         List<String> result = jurisdictionsResolver.getJurisdictions();
         assertThat(result.size(), is(2));
-        assertTrue(result.contains(DIVORCE_JURISDICTION));
-        assertTrue(result.contains(PROBATE_JURISDICTION));
+        assertTrue(result.contains(DIVORCE_JURISDICTION.toLowerCase()));
+        assertTrue(result.contains(PROBATE_JURISDICTION.toLowerCase()));
     }
 
     @Test
-    public void shouldReturnJurisdictionsWhereGrantIsNotBasic() {
+    public void shouldReturnJurisdictionsOnlyWhereGrantIsNotBasic() {
         given(idamUser.getId()).willReturn(USER_ID);
         given(userRepository.getUser()).willReturn(idamUser);
 
@@ -138,7 +140,7 @@ class AttributeBasedJurisdictionsResolverTest {
         );
         List<String> result = jurisdictionsResolver.getJurisdictions();
         assertThat(result.size(), is(1));
-        assertTrue(result.contains(PROBATE_JURISDICTION));
+        assertTrue(result.contains(PROBATE_JURISDICTION.toLowerCase()));
     }
 
     @Test
@@ -166,7 +168,7 @@ class AttributeBasedJurisdictionsResolverTest {
 
         List<String> result = jurisdictionsResolver.getJurisdictions();
         assertThat(result.size(), is(1));
-        assertTrue(result.contains(PROBATE_JURISDICTION));
+        assertTrue(result.contains(PROBATE_JURISDICTION.toLowerCase()));
     }
 
     @Test
@@ -200,8 +202,8 @@ class AttributeBasedJurisdictionsResolverTest {
 
         List<String> result = jurisdictionsResolver.getJurisdictions();
         assertThat(result.size(), is(2));
-        assertTrue(result.contains(PROBATE_JURISDICTION));
-        assertTrue(result.contains("jurisdictionId"));
+        assertTrue(result.contains(PROBATE_JURISDICTION.toLowerCase()));
+        assertTrue(result.contains("jurisdictionId".toLowerCase()));
     }
 
     @Test
@@ -236,7 +238,7 @@ class AttributeBasedJurisdictionsResolverTest {
 
         List<String> result = jurisdictionsResolver.getJurisdictions();
         assertThat(result.size(), is(2));
-        assertTrue(result.contains(PROBATE_JURISDICTION));
-        assertTrue(result.contains("jurisdictionId"));
+        assertTrue(result.contains(PROBATE_JURISDICTION.toLowerCase()));
+        assertTrue(result.contains("jurisdictionId".toLowerCase()));
     }
 }
