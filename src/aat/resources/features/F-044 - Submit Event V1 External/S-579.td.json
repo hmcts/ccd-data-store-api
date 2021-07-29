@@ -34,8 +34,7 @@
 				"DocumentField2": {
           "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Befta_Jurisdiction2_Document_Upload_2][customValues][documentIdInTheResponse]}",
           "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Befta_Jurisdiction2_Document_Upload_2][customValues][documentIdInTheResponse]}/binary",
-					"document_filename": "Elastic Search test Case.png",
-          "document_hash": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Document_Upload_2][testData][actualResponse][body][documents][0][hashToken]}"
+					"document_filename": "Elastic Search test Case.png"
 				}
 			},
 			"data_classification" : {
