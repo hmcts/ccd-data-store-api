@@ -20,13 +20,13 @@ public interface GrantTypeQueryBuilder {
 
     String JURISDICTION = "jurisdiction";
 
-    String CASE_ID = "case_id";
+    String REFERENCE = "reference";
 
     String CASE_TYPE_ID = "case_type_id";
 
-    String LOCATION = "location";
+    String LOCATION = "data" + " #>> '{location}'";
 
-    String REGION = "region";
+    String REGION = "data" + " #>> '{region}'";
 
     String createQuery(List<RoleAssignment> roleAssignments, Map<String, Object> params);
 

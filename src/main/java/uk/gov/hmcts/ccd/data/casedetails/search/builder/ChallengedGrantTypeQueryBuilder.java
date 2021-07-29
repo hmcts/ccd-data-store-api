@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -24,13 +25,11 @@ public class ChallengedGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
             .filter(roleAssignment -> GrantType.CHALLENGED.name().equals(roleAssignment.getGrantType()));
 
         Set<String> jurisdictions = streamSupplier.get()
-            .map(roleAssignment -> roleAssignment.getAttributes().getJurisdiction().orElse(""))
-            .filter(jurisdiction -> jurisdiction.length() > 0)
+            .map(roleAssignment -> roleAssignment.getAttributes().getJurisdiction())
+            .flatMap(Optional::stream)
             .collect(Collectors.toSet());
 
-        String classificationQuery = createClassification(params, streamSupplier.get());
-
-        String tmpQuery = classificationQuery;
+        String tmpQuery = createClassification(params, streamSupplier.get());;
 
         if (jurisdictions.size() > 0) {
             params.put("jurisdictions", jurisdictions);

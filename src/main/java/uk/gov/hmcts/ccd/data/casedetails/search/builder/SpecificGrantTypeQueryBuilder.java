@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -23,13 +24,11 @@ public class SpecificGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
             .filter(roleAssignment -> roleAssignment.getAuthorisations() == null
                 || roleAssignment.getAuthorisations().size() == 0);
 
-        String classficationQuery = createClassification(params, streamSupplier.get());
-
-        String tmpQuery = classficationQuery;
+        String tmpQuery = createClassification(params, streamSupplier.get());
 
         Set<String> jurisdictions = streamSupplier.get()
-            .map(roleAssignment -> roleAssignment.getAttributes().getJurisdiction().orElse(""))
-            .filter(jurisdiction -> jurisdiction.length() > 0)
+            .map(roleAssignment -> roleAssignment.getAttributes().getJurisdiction())
+            .flatMap(Optional::stream)
             .collect(Collectors.toSet());
 
         if (jurisdictions.size() > 0) {
@@ -37,14 +36,14 @@ public class SpecificGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
             tmpQuery = tmpQuery +  getOperator(tmpQuery, " AND ") + JURISDICTION + " in (:jurisdictions)";
         }
 
-        Set<String> caseIds = streamSupplier.get()
-            .map(roleAssignment -> roleAssignment.getAttributes().getCaseId().orElse(""))
-            .filter(caseId -> caseId.length() > 0)
+        Set<String> caseReferences = streamSupplier.get()
+            .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
+            .flatMap(Optional::stream)
             .collect(Collectors.toSet());
 
-        if (caseIds.size() > 0) {
-            params.put("case_ids", caseIds);
-            tmpQuery = tmpQuery +  getOperator(tmpQuery, " AND ") + CASE_ID + " in (:case_ids)";
+        if (caseReferences.size() > 0) {
+            params.put("case_ids", caseReferences);
+            tmpQuery = tmpQuery +  getOperator(tmpQuery, " AND ") + REFERENCE + " in (:case_ids)";
         }
 
         return StringUtils.isNotBlank(tmpQuery) ? String.format(QUERY_WRAPPER, tmpQuery) : tmpQuery;

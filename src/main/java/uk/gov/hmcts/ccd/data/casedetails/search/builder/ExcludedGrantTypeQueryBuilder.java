@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -24,17 +25,16 @@ public class ExcludedGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
         Supplier<Stream<RoleAssignment>> streamSupplier = () -> roleAssignments.stream()
             .filter(roleAssignment -> GrantType.EXCLUDED.name().equals(roleAssignment.getGrantType()));
 
-        Set<String> caseIds = streamSupplier.get()
-            .map(roleAssignment -> roleAssignment.getAttributes().getCaseId().orElse(""))
-            .filter(caseId -> caseId.length() > 0)
+        Set<String> caseReferences = streamSupplier.get()
+            .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
+            .flatMap(Optional::stream)
             .collect(Collectors.toSet());
 
-        String classificationQuery = createClassification(params, streamSupplier.get());
+        String tmpQuery = createClassification(params, streamSupplier.get());
 
-        String tmpQuery = classificationQuery;
-        if (StringUtils.isNotBlank(classificationQuery)  && caseIds.size() > 0) {
-            params.put("case_ids", caseIds);
-            tmpQuery = tmpQuery + getOperator(tmpQuery, " AND ") + String.format(QUERY, CASE_ID);
+        if (caseReferences.size() > 0) {
+            params.put("case_ids", caseReferences);
+            tmpQuery = tmpQuery + getOperator(tmpQuery, " AND ") + String.format(QUERY, REFERENCE);
         }
 
         return StringUtils.isNotBlank(tmpQuery) ? String.format(QUERY_WRAPPER, tmpQuery) : tmpQuery;

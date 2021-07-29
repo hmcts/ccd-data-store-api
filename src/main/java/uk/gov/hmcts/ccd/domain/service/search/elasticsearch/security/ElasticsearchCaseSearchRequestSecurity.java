@@ -1,17 +1,17 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
-import java.util.List;
-
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.List;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder.AccessControlGrantTypeESQueryBuilder;
 
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.QUERY;
 
@@ -20,12 +20,15 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
 
     private final List<CaseSearchFilter> caseSearchFilters;
     private final ObjectMapperService objectMapperService;
+    private final AccessControlGrantTypeESQueryBuilder grantTypeESQueryBuilder;
 
     @Autowired
     public ElasticsearchCaseSearchRequestSecurity(List<CaseSearchFilter> caseSearchFilters,
-                                                  ObjectMapperService objectMapperService) {
+                                                  ObjectMapperService objectMapperService,
+                                                  AccessControlGrantTypeESQueryBuilder grantTypeESQueryBuilder) {
         this.caseSearchFilters = caseSearchFilters;
         this.objectMapperService = objectMapperService;
+        this.grantTypeESQueryBuilder = grantTypeESQueryBuilder;
     }
 
     @Override
@@ -37,6 +40,9 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
     private String addFiltersToQuery(CaseSearchRequest caseSearchRequest) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder.must(QueryBuilders.wrapperQuery(caseSearchRequest.getQueryValue()));
+        BoolQueryBuilder grantTypeQueryBuilder = grantTypeESQueryBuilder
+            .createQuery(caseSearchRequest.getCaseTypeId());
+        boolQueryBuilder.must(grantTypeQueryBuilder);
 
         caseSearchFilters.forEach(filter ->
             filter.getFilter(caseSearchRequest.getCaseTypeId()).ifPresent(boolQueryBuilder::filter));

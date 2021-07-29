@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 
@@ -19,6 +20,7 @@ public class AccessControlGrantTypeQueryBuilder {
     private final ChallengedGrantTypeQueryBuilder challengedGrantTypeQueryBuilder;
     private final ExcludedGrantTypeQueryBuilder excludedGrantTypeQueryBuilder;
 
+    @Autowired
     public AccessControlGrantTypeQueryBuilder(BasicGrantTypeQueryBuilder basicGrantTypeQueryBuilder,
                                               SpecificGrantTypeQueryBuilder specificGrantTypeQueryBuilder,
                                               StandardGrantTypeQueryBuilder standardGrantTypeQueryBuilder,
@@ -37,9 +39,7 @@ public class AccessControlGrantTypeQueryBuilder {
         String standardQuery = standardGrantTypeQueryBuilder.createQuery(roleAssignments, params);
         String challengedQuery = challengedGrantTypeQueryBuilder.createQuery(roleAssignments, params);
 
-        String orgQuery = formatQuery(standardQuery, challengedQuery);
-
-        String tmpQuery = orgQuery;
+        String tmpQuery = mergeQuery(standardQuery, challengedQuery, " OR ");
         String excludedQuery = excludedGrantTypeQueryBuilder.createQuery(roleAssignments, params);
         if (StringUtils.isNotBlank(excludedQuery)) {
             tmpQuery = tmpQuery
@@ -48,7 +48,7 @@ public class AccessControlGrantTypeQueryBuilder {
             tmpQuery = String.format(QUERY, tmpQuery);
         }
 
-        String nonOrgQuery = formatQuery(basicQuery, specificQuery);
+        String nonOrgQuery = mergeQuery(basicQuery, specificQuery, " OR ");
         if (StringUtils.isNotBlank(nonOrgQuery)) {
             tmpQuery = nonOrgQuery
                 + getOperator(tmpQuery, " OR ")
@@ -58,12 +58,13 @@ public class AccessControlGrantTypeQueryBuilder {
         return StringUtils.isNotBlank(tmpQuery) ? String.format(FINAL_QUERY, tmpQuery) : tmpQuery;
     }
 
-    private String formatQuery(String queryOne,
-                               String queryTwo) {
+    private String mergeQuery(String queryOne,
+                              String queryTwo,
+                              String operator) {
         String tmpQuery = queryOne;
 
         if (StringUtils.isNotBlank(queryTwo)) {
-            return String.format(QUERY, tmpQuery + getOperator(tmpQuery, " OR ") + queryTwo);
+            return String.format(QUERY, tmpQuery + getOperator(tmpQuery, operator) + queryTwo);
         }
         return StringUtils.isNotBlank(tmpQuery) ? String.format(QUERY, tmpQuery) : tmpQuery;
     }

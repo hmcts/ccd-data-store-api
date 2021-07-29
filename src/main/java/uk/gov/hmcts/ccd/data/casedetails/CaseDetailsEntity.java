@@ -1,8 +1,7 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import uk.gov.hmcts.ccd.data.JsonDataConverter;
-
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -15,7 +14,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Version;
-import java.time.LocalDateTime;
+import uk.gov.hmcts.ccd.data.JsonDataConverter;
 
 @SuppressWarnings("checkstyle:OperatorWrap")
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
@@ -77,8 +76,8 @@ public class CaseDetailsEntity {
     public static final String DATA_COL = "data";
     public static final String DATA_CLASSIFICATION_COL = "data_classification";
     public static final String SUPPLEMENTARY_DATA_COL = "supplementary_data";
-
-
+    public static final String LOCATION = "location";
+    public static final String REGION = "region";
 
     @Id
     @Column(name = ID_FIELD_COL)

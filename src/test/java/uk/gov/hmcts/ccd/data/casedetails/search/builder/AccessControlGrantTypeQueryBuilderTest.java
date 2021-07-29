@@ -53,7 +53,7 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             .createQuery(Lists.newArrayList(roleAssignment, specificRoleAssignment), Maps.newHashMap());
         String expectedValue =  " AND ( ( ( security_classification in (:classifications) ) "
             + "OR ( security_classification in (:classifications) "
-            + "AND jurisdiction in (:jurisdictions) AND case_id in (:case_ids) ) ) )";
+            + "AND jurisdiction in (:jurisdictions) AND reference in (:case_ids) ) ) )";
         assertNotNull(query);
         assertEquals(expectedValue, query);
     }
@@ -74,13 +74,12 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
         String query = accessControlGrantTypeQueryBuilder.createQuery(Lists.newArrayList(roleAssignment,
             specificRoleAssignment, challengedRoleAssignment, standardRoleAssignment), Maps.newHashMap());
 
-
-        String expectedValue =  " AND ( ( ( security_classification in (:classifications) )"
-            + " OR ( security_classification in (:classifications) "
-            + "AND jurisdiction in (:jurisdictions) AND case_id in (:case_ids) ) )"
-            + " OR ( ( security_classification in (:classifications) AND jurisdiction in (:jurisdictions) "
-            + "AND region in (:regions) AND location in (:locations) ) OR "
-            + "( security_classification in (:classifications) AND jurisdiction in (:jurisdictions) ) ) )";
+        String expectedValue =  " AND ( ( ( security_classification in (:classifications) ) "
+            + "OR ( security_classification in (:classifications) "
+            + "AND jurisdiction in (:jurisdictions) AND reference in (:case_ids) ) ) "
+            + "OR ( ( security_classification in (:classifications) "
+            + "AND ( ( jurisdiction=Test AND data #>> '{region}'=reg1 AND data #>> '{region}'=reg1 ) ) ) "
+            + "OR ( security_classification in (:classifications) AND jurisdiction in (:jurisdictions) ) ) )";
 
         assertNotNull(query);
         assertEquals(expectedValue, query);
@@ -107,15 +106,12 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             specificRoleAssignment, challengedRoleAssignment,
             standardRoleAssignment, excludedRoleAssignment), Maps.newHashMap());
 
-
         String expectedValue =  " AND ( ( ( security_classification in (:classifications) ) "
             + "OR ( security_classification in (:classifications) AND jurisdiction in (:jurisdictions) "
-            + "AND case_id in (:case_ids) ) ) "
-            + "OR ( ( ( security_classification in (:classifications) AND jurisdiction in (:jurisdictions) "
-            + "AND region in (:regions) AND location in (:locations) ) "
+            + "AND reference in (:case_ids) ) ) OR ( ( ( security_classification in (:classifications) "
+            + "AND ( ( jurisdiction=Test AND data #>> '{region}'=reg1 AND data #>> '{region}'=reg1 ) ) ) "
             + "OR ( security_classification in (:classifications) AND jurisdiction in (:jurisdictions) ) ) "
-            + "AND NOT ( security_classification in (:classifications) AND case_id in (:case_ids) ) ) )";
-
+            + "AND NOT ( security_classification in (:classifications) AND reference in (:case_ids) ) ) )";
 
         assertNotNull(query);
         assertEquals(expectedValue, query);
