@@ -76,8 +76,8 @@ public class CaseDetailsEntity {
     public static final String DATA_COL = "data";
     public static final String DATA_CLASSIFICATION_COL = "data_classification";
     public static final String SUPPLEMENTARY_DATA_COL = "supplementary_data";
-    public static final String LOCATION = "location";
-    public static final String REGION = "region";
+    public static final String LOCATION = "data.location";
+    public static final String REGION = "data.region";
 
     @Id
     @Column(name = ID_FIELD_COL)
