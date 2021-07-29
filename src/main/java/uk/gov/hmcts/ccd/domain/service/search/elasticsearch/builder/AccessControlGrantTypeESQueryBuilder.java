@@ -70,7 +70,7 @@ public class AccessControlGrantTypeESQueryBuilder {
         }
 
         if (specificQuery.hasClauses()) {
-            nonOrgQuery.should(orgQuery);
+            nonOrgQuery.should(specificQuery);
         }
 
         BoolQueryBuilder grantTypeQuery = QueryBuilders.boolQuery();
