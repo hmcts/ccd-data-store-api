@@ -22,7 +22,7 @@ import static org.hamcrest.Matchers.not;
 
 @Ignore
 // FIXME : RDM-7635 - has to mock opendId jwks responses with proper Key set (RS256 public / private key).
-public class IdamIT extends IntegrationTest {
+public class IdamIT {
 
     private static final String CASE_URL =
         "/caseworkers/123/jurisdictions/TEST/case-types/TestAddressBook/cases/1234123412341238";
