@@ -33,17 +33,17 @@ public class StandardGrantTypeESQueryBuilder implements GrantTypeESQueryBuilder 
                 BoolQueryBuilder innerQuery = QueryBuilders.boolQuery();
 
                 if (StringUtils.isNotBlank(jurisdiction.orElse(""))) {
-                    innerQuery.must(QueryBuilders.matchQuery(JURISDICTION_FIELD_COL, jurisdiction.get()));
+                    innerQuery.must(QueryBuilders.termQuery(JURISDICTION_FIELD_COL, jurisdiction.get()));
                 }
 
                 Optional<String> region = roleAssignment.getAttributes().getRegion();
                 if (StringUtils.isNotBlank(region.orElse(""))) {
-                    innerQuery.must(QueryBuilders.matchQuery(REGION, region.get()));
+                    innerQuery.must(QueryBuilders.termQuery(REGION, region.get()));
                 }
 
                 Optional<String> location = roleAssignment.getAttributes().getLocation();
                 if (StringUtils.isNotBlank(location.orElse(""))) {
-                    innerQuery.must(QueryBuilders.matchQuery(LOCATION, location.get()));
+                    innerQuery.must(QueryBuilders.termQuery(LOCATION, location.get()));
                 }
                 boolQueryBuilder.should(innerQuery);
             });
