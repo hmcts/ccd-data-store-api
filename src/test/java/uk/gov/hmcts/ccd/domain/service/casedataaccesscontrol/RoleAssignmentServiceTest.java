@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @DisplayName("RoleAssignmentService")
 class RoleAssignmentServiceTest {
@@ -100,6 +102,24 @@ class RoleAssignmentServiceTest {
             RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(USER_ID);
 
             assertThat(roleAssignments, is(mockedRoleAssignments));
+        }
+    }
+
+    @Nested
+    @DisplayName("getRoleAssignmentsForCreate()")
+    class GetRoleAssignmentsForCreate {
+
+        @Test
+        public void shouldGetRoleAssignmentsForCreate() {
+            final var expectedResult =  new RoleAssignments();
+            expectedResult.setRoleAssignments(new ArrayList<>());
+            given(roleAssignmentRepository.getRoleAssignments(USER_ID))
+                .willReturn(mockedRoleAssignmentResponse);
+            given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))
+                .willReturn(mockedRoleAssignments);
+            final var roleAssignments = roleAssignmentService.getRoleAssignmentsForCreate(USER_ID);
+            verify(roleAssignmentCategoryService).getRoleCategory(USER_ID);
+            assertThat(roleAssignments, is(expectedResult));
         }
     }
 
