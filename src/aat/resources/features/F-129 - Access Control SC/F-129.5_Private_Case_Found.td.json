@@ -1,0 +1,12 @@
+{
+  "_guid_": "F-129.5_Private_Case_Found",
+  "_extends_": "F-129_Private_Case_Found",
+
+  "users": {
+    "invokingUser": {
+      "_extends_" : "PrivateCaseworker"
+    }
+  }
+
+}
+

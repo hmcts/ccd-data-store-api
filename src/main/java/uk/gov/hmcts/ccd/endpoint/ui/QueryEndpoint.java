@@ -48,7 +48,11 @@ import uk.gov.hmcts.ccd.v2.V2;
 import javax.inject.Inject;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -167,6 +171,10 @@ public class QueryEndpoint {
                                       @PathVariable("ctid") final String caseTypeId,
                                       @RequestParam java.util.Map<String, String> params) {
         String validCaseTypeId = validateCaseTypeId(caseTypeId);
+        validateDates(Arrays.asList(params.get(CREATED_DATE.getParameterName()),
+            params.get(LAST_MODIFIED_DATE.getParameterName()),
+            params.get(LAST_STATE_MODIFIED_DATE.getParameterName())));
+
         final String view = params.get("view");
         MetaData metadata = new MetaData(validCaseTypeId, jurisdictionId);
         metadata.setState(param(params, STATE.getParameterName()));
@@ -335,6 +343,24 @@ public class QueryEndpoint {
             throw new BadRequestException(V2.Error.CASE_TYPE_INVALID);
         }
         return caseTypeId;
+    }
+
+    private boolean validateDates(List<String> datesToValidate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        List<String> invalidDates = new ArrayList<>();
+        for (String d: datesToValidate) {
+            if (d != null) {
+                try {
+                    LocalDate date = formatter.parse(d, LocalDate::from);
+                } catch (DateTimeParseException e) {
+                    invalidDates.add(d);
+                }
+            }
+        }
+        if (!invalidDates.isEmpty()) {
+            throw new BadRequestException(V2.Error.DATE_STRING_INVALID + String.join(", ", invalidDates));
+        }
+        return true;
     }
 
 }

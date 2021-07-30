@@ -186,6 +186,8 @@ dependencies {
 
     implementation "io.github.openfeign:feign-httpclient:11.0"
 
+    implementation group: 'net.minidev', name: 'json-smart', version: '2.4.7'
+
     testCompile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
     compile group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
 
@@ -222,7 +224,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
-    testCompile ('com.opentable.components:otj-pg-embedded:0.12.0')
+    testImplementation("org.testcontainers:postgresql:1.15.2")
     testCompile ('com.github.tomakehurst:wiremock-jre8:2.25.1')
     testCompile ('org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE')
     // To avoid compiler warnings about @API annotations in JUnit5 code.
@@ -239,6 +241,7 @@ dependencies {
     testCompile group: 'com.xebialabs.restito', name: 'restito', version: '0.9.3'
     testCompile 'io.github.openfeign:feign-jackson:9.7.0'
     testCompile 'pl.allegro.tech:embedded-elasticsearch:2.7.0'
+    testCompile 'com.github.hmcts:fortify-client:1.2.0:all'
 
     // for sonar analysis
     testCompile group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
@@ -254,7 +257,7 @@ dependencies {
     }
     compile 'org.jooq:jool-java-8:0.9.14'
 
-    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.0.0'
+    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.2.0'
     testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.2.0'
 
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
@@ -266,6 +269,7 @@ dependencies {
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server'
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-core'
     contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
+
 }
 // end::dependencies[]
 
@@ -279,7 +283,7 @@ dependencyManagement {
         dependency 'com.google.guava:guava:30.1-jre'
 
         // CVE-2019-0232 - Java and Command Line injections in Windows
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.43') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.50') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -730,6 +734,12 @@ sourceSets {
             srcDir('src/contractTest/resources')
         }
     }
+}
+
+task fortifyScan(type: JavaExec)  {
+    main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
+    classpath += sourceSets.test.runtimeClasspath
+    jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
 task highLevelDataSetup(type: JavaExec) {
