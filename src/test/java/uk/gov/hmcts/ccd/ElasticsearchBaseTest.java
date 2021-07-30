@@ -11,58 +11,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.Builder;
 import lombok.Singular;
-import org.apache.commons.io.IOUtils;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import pl.allegro.tech.embeddedelasticsearch.EmbeddedElastic;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 
-import java.io.IOException;
 import java.util.List;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
-import static uk.gov.hmcts.ccd.ElasticsearchITConfiguration.INDEX_TYPE;
-import static uk.gov.hmcts.ccd.ElasticsearchITConfiguration.INDICES;
-import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SORT;
-import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SOURCE;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SORT;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SOURCE;
 
 
 public abstract class ElasticsearchBaseTest extends WireMockBaseTest {
-
-    private static final String DATA_DIR = "elasticsearch/data";
-
-    @BeforeAll
-    public static void initElastic(@Autowired EmbeddedElastic embeddedElastic) throws IOException,
-                                                                                      InterruptedException {
-        embeddedElastic.start();
-        initData(embeddedElastic);
-    }
-
-    @AfterAll
-    public static void tearDownElastic(@Autowired EmbeddedElastic embeddedElastic) {
-        embeddedElastic.stop();
-    }
-
-    private static void initData(EmbeddedElastic embeddedElastic) throws IOException {
-        PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
-        for (String idx : INDICES) {
-            Resource[] resources =
-                resourceResolver.getResources(String.format("classpath:%s/%s/*.json", DATA_DIR, idx));
-            for (Resource resource : resources) {
-                String caseString = IOUtils.toString(resource.getInputStream(), UTF_8);
-                embeddedElastic.index(idx, INDEX_TYPE, caseString);
-            }
-        }
-    }
 
     public ElasticsearchTestRequest caseReferenceRequest(String caseReference) {
         return ElasticsearchTestRequest.builder()
