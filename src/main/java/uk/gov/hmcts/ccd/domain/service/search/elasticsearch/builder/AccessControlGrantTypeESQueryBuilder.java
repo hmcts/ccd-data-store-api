@@ -4,7 +4,9 @@ import java.util.List;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -29,6 +31,7 @@ public class AccessControlGrantTypeESQueryBuilder {
                                                 StandardGrantTypeESQueryBuilder standardGrantTypeQueryBuilder,
                                                 ChallengedGrantTypeESQueryBuilder challengedGrantTypeQueryBuilder,
                                                 ExcludedGrantTypeESQueryBuilder excludedGrantTypeQueryBuilder,
+                                                @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                                 CaseDefinitionRepository caseDefinitionRepository,
                                                 RoleAssignmentService roleAssignmentService,
                                                 UserAuthorisation userAuthorisation) {

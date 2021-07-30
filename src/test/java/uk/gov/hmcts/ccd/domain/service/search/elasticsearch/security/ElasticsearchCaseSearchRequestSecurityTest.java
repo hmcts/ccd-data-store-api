@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Collections;
 import java.util.Optional;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,6 +53,7 @@ class ElasticsearchCaseSearchRequestSecurityTest {
                 objectMapperService, grantTypeESQueryBuilder);
         when(searchRequestJsonNode.has(QUERY)).thenReturn(true);
         when(searchRequestJsonNode.has(NATIVE_ES_QUERY)).thenReturn(false);
+        when(grantTypeESQueryBuilder.createQuery(anyString())).thenReturn(QueryBuilders.boolQuery());
     }
 
     @Test
