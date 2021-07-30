@@ -1178,8 +1178,9 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_SOLICITOR);
 
             assertAll(
-                () -> assertThat(caseSearchResult.getTotal(), is(1L)),
-                () -> assertThat(caseSearchResult.getCases().get(0).getReference(), is(1589460125872336L))
+                () -> assertThat(caseSearchResult.getTotal(), is(2L)),
+                () -> assertThat(caseSearchResult.getCases().get(0).getReference(), is(1589460125872336L)),
+                () -> assertThat(caseSearchResult.getCases().get(1).getReference(), is(1589460099608691L))
             );
         }
 
@@ -1192,7 +1193,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_RESTRICTED);
 
             assertAll(
-                () -> assertThat(caseSearchResult.getTotal(), is(3L))
+                () -> assertThat(caseSearchResult.getTotal(), is(4L))
             );
         }
 
