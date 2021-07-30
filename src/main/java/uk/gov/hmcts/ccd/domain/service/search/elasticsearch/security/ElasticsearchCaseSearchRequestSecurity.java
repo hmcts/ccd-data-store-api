@@ -43,7 +43,7 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
         boolQueryBuilder.must(QueryBuilders.wrapperQuery(caseSearchRequest.getQueryValue()));
         BoolQueryBuilder grantTypeQueryBuilder = grantTypeESQueryBuilder
             .createQuery(caseSearchRequest.getCaseTypeId());
-        boolQueryBuilder.must(grantTypeQueryBuilder);
+        boolQueryBuilder.filter(grantTypeQueryBuilder);
 
         caseSearchFilters.forEach(filter ->
             filter.getFilter(caseSearchRequest.getCaseTypeId()).ifPresent(boolQueryBuilder::filter));
