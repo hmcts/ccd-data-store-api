@@ -144,18 +144,13 @@ class AttributeBasedJurisdictionsResolverTest {
     }
 
     @Test
-    void shouldReturnJurisdictionsWhereNoJurisdictionProvided() {
+    void shouldReturnJurisdictionsWhereJurisdictionProvided() {
         given(idamUser.getId()).willReturn(USER_ID);
         given(userRepository.getUser()).willReturn(idamUser);
 
         given(roleAssignmentService.getRoleAssignments(USER_ID)).willReturn(
             RoleAssignments.builder()
                 .roleAssignments(asList(
-                    RoleAssignment.builder()
-                        .grantType(GrantType.CHALLENGED.name())
-                        .roleName(DIVORCE_SOLICITOR_ROLE)
-                        .actorId(USER_ID)
-                        .attributes(RoleAssignmentAttributes.builder().build()).build(),
                     RoleAssignment.builder()
                         .grantType(GrantType.CHALLENGED.name())
                         .roleName(PROBATE_SOLICITOR_ROLE)

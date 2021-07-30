@@ -48,26 +48,19 @@ public class AttributeBasedJurisdictionsResolver implements JurisdictionsResolve
             .filter(roleAssignment -> !roleAssignment.getGrantType().equals(GrantType.BASIC.name()))
             .forEach(roleAssignments -> {
                 if (Objects.nonNull(roleAssignments.getAttributes().getJurisdiction())) {
-                    doesJurisdictionExist(roleAssignments
-                        .getAttributes().getJurisdiction().get(), jurisdictions);
+                    jurisdictions.add(roleAssignments
+                        .getAttributes().getJurisdiction().get());
                 } else if (Objects.nonNull(roleAssignments.getAttributes().getCaseType())) {
-                    doesJurisdictionExist(caseDefinitionRepository
+                    jurisdictions.add(caseDefinitionRepository
                         .getCaseType(roleAssignments
-                            .getAttributes().getCaseType().get()).getJurisdictionId(), jurisdictions);
+                            .getAttributes().getCaseType().get()).getJurisdictionId());
                 } else if (Objects.nonNull(roleAssignments.getRoleType())
                     && roleAssignments.getRoleType().equalsIgnoreCase(ORGANISATION)) {
                     caseDefinitionRepository.getAllJurisdictionsFromDefinitionStore()
                         .forEach(jurisdictionDefinition ->
-                            doesJurisdictionExist(jurisdictionDefinition.getId(), jurisdictions));
+                            jurisdictions.add(jurisdictionDefinition.getId()));
                 }
             });
-        return jurisdictions;
-    }
-
-    private List<String> doesJurisdictionExist(String jurisdiction, List<String> jurisdictions) {
-        if (!jurisdictions.contains(jurisdiction.toLowerCase())) {
-            jurisdictions.add(jurisdiction.toLowerCase());
-        }
         return jurisdictions;
     }
 }
