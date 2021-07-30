@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data.user;
 
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
@@ -44,8 +45,10 @@ public class AttributeBasedJurisdictionsResolver implements JurisdictionsResolve
 
     private List<String> filterJurisdictions(RoleAssignments roleAssignmentsList) {
         List<String> jurisdictions = new ArrayList<>();
+        MutableBoolean continueProcessing = new MutableBoolean(Boolean.TRUE);
         roleAssignmentsList.getRoleAssignments().stream()
             .filter(roleAssignment -> !roleAssignment.getGrantType().equals(GrantType.BASIC.name()))
+            .takeWhile(t -> continueProcessing.getValue())
             .forEach(roleAssignments -> {
                 if (Objects.nonNull(roleAssignments.getAttributes().getJurisdiction())) {
                     jurisdictions.add(roleAssignments
@@ -59,6 +62,7 @@ public class AttributeBasedJurisdictionsResolver implements JurisdictionsResolve
                     caseDefinitionRepository.getAllJurisdictionsFromDefinitionStore()
                         .forEach(jurisdictionDefinition ->
                             jurisdictions.add(jurisdictionDefinition.getId()));
+                    continueProcessing.setFalse();
                 }
             });
         return jurisdictions;

@@ -31,8 +31,8 @@ public class DefaultJurisdictionsResolver implements JurisdictionsResolver {
     public List<String> getJurisdictions() {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
             List<String> jurisdictions = attributeBasedJurisdictionsResolver.getJurisdictions();
-
             List<String> roleJurisdictions = idamJurisdictionsResolver.getJurisdictions();
+
             return Stream.concat(jurisdictions.stream(), roleJurisdictions.stream())
                 .map(String::toLowerCase)
                 .distinct()

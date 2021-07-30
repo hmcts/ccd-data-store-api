@@ -111,8 +111,8 @@ class AttributeBasedJurisdictionsResolverTest {
 
         List<String> result = jurisdictionsResolver.getJurisdictions();
         assertThat(result.size(), is(2));
-        assertTrue(result.contains(DIVORCE_JURISDICTION.toLowerCase()));
-        assertTrue(result.contains(PROBATE_JURISDICTION.toLowerCase()));
+        assertTrue(result.contains(DIVORCE_JURISDICTION));
+        assertTrue(result.contains(PROBATE_JURISDICTION));
     }
 
     @Test
@@ -140,7 +140,7 @@ class AttributeBasedJurisdictionsResolverTest {
         );
         List<String> result = jurisdictionsResolver.getJurisdictions();
         assertThat(result.size(), is(1));
-        assertTrue(result.contains(PROBATE_JURISDICTION.toLowerCase()));
+        assertTrue(result.contains(PROBATE_JURISDICTION));
     }
 
     @Test
@@ -163,7 +163,7 @@ class AttributeBasedJurisdictionsResolverTest {
 
         List<String> result = jurisdictionsResolver.getJurisdictions();
         assertThat(result.size(), is(1));
-        assertTrue(result.contains(PROBATE_JURISDICTION.toLowerCase()));
+        assertTrue(result.contains(PROBATE_JURISDICTION));
     }
 
     @Test
@@ -172,9 +172,11 @@ class AttributeBasedJurisdictionsResolverTest {
         given(userRepository.getUser()).willReturn(idamUser);
         final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setId("jurisdictionId");
+        final JurisdictionDefinition jurisdictionDefinition1 = new JurisdictionDefinition();
+        jurisdictionDefinition1.setId(PROBATE_JURISDICTION);
         given(caseDefinitionRepository
             .getAllJurisdictionsFromDefinitionStore())
-            .willReturn(List.of(jurisdictionDefinition));
+            .willReturn(List.of(jurisdictionDefinition, jurisdictionDefinition1));
 
         given(roleAssignmentService.getRoleAssignments(USER_ID)).willReturn(
             RoleAssignments.builder()
@@ -197,8 +199,8 @@ class AttributeBasedJurisdictionsResolverTest {
 
         List<String> result = jurisdictionsResolver.getJurisdictions();
         assertThat(result.size(), is(2));
-        assertTrue(result.contains(PROBATE_JURISDICTION.toLowerCase()));
-        assertTrue(result.contains("jurisdictionId".toLowerCase()));
+        assertTrue(result.contains(PROBATE_JURISDICTION));
+        assertTrue(result.contains("jurisdictionId"));
     }
 
     @Test
@@ -233,7 +235,7 @@ class AttributeBasedJurisdictionsResolverTest {
 
         List<String> result = jurisdictionsResolver.getJurisdictions();
         assertThat(result.size(), is(2));
-        assertTrue(result.contains(PROBATE_JURISDICTION.toLowerCase()));
-        assertTrue(result.contains("jurisdictionId".toLowerCase()));
+        assertTrue(result.contains(PROBATE_JURISDICTION));
+        assertTrue(result.contains("jurisdictionId"));
     }
 }
