@@ -300,6 +300,10 @@ public class CaseController {
         @ApiResponse(
             code = 422,
             message = V2.Error.CASE_FIELD_INVALID
+        ),
+        @ApiResponse(
+            code = 504,
+            message = V2.Error.CALLBACK_EXCEPTION
         )
     })
     @LogAudit(operationType = CREATE_CASE, caseId = "#result.body.reference",
@@ -423,8 +427,7 @@ public class CaseController {
         return status(HttpStatus.OK).body(new SupplementaryDataResource(supplementaryDataUpdated));
     }
 
-    private ResponseEntity<CaseResource> createCaseEvent(@PathVariable("caseId") String caseId,
-                                                         @RequestBody CaseDataContent content) {
+    private ResponseEntity<CaseResource> createCaseEvent(String caseId, CaseDataContent content) {
         if (!caseReferenceService.validateUID(caseId)) {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
@@ -433,10 +436,9 @@ public class CaseController {
         return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content));
     }
 
-    private ResponseEntity<CaseResource> getCaseResourceResponseEntity(@PathVariable("caseTypeId") String caseTypeId,
-                                                                       @RequestBody CaseDataContent content,
-                                                                       @RequestParam(value = "ignore-warning",
-                                                                           required = false) Boolean ignoreWarning) {
+    private ResponseEntity<CaseResource> getCaseResourceResponseEntity(String caseTypeId,
+                                                                       CaseDataContent content,
+                                                                       Boolean ignoreWarning) {
 
         final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
         return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content, ignoreWarning));
