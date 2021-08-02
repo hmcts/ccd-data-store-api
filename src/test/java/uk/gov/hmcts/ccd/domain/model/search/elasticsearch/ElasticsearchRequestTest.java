@@ -190,7 +190,7 @@ class ElasticsearchRequestTest {
         List<String> resultAsList =
                 new ObjectMapper().readValue(result.traverse(), new TypeReference<ArrayList<String>>(){});
         assertAll(
-            () -> assertThat(result.size(), is(9)),
+            () -> assertThat(result.size(), is(8)),
             () -> assertThat(resultAsList, hasItem(CASE_REFERENCE.getDbColumnName())),
             () -> assertThat(resultAsList, hasItem(LAST_STATE_MODIFIED_DATE.getDbColumnName())),
             () -> assertThat(resultAsList, hasItem(CREATED_DATE.getDbColumnName())),
@@ -198,8 +198,7 @@ class ElasticsearchRequestTest {
             () -> assertThat(resultAsList, hasItem(JURISDICTION.getDbColumnName())),
             () -> assertThat(resultAsList, hasItem(SECURITY_CLASSIFICATION.getDbColumnName())),
             () -> assertThat(resultAsList, hasItem(LAST_MODIFIED_DATE.getDbColumnName())),
-            () -> assertThat(resultAsList, hasItem(STATE.getDbColumnName())),
-            () -> assertThat(resultAsList, hasItem(DATA_CLASSIFICATION_COL))
+            () -> assertThat(resultAsList, hasItem(STATE.getDbColumnName()))
         );
     }
 
@@ -211,7 +210,7 @@ class ElasticsearchRequestTest {
             JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"data.name\"], \"query\":{}}");
             ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
-            String result = elasticsearchRequest.toFinalRequest();
+            String result = elasticsearchRequest.toFinalRequest(true);
 
             JsonNode jsonResult = mapper.readTree(result);
             JsonNode sourceNode = jsonResult.get("_source");
@@ -238,7 +237,7 @@ class ElasticsearchRequestTest {
             JsonNode queryNode = queryAsJsonNode("{\"query\":{}}");
             ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
-            String result = elasticsearchRequest.toFinalRequest();
+            String result = elasticsearchRequest.toFinalRequest(true);
 
             JsonNode jsonResult = mapper.readTree(result);
             JsonNode sourceNode = jsonResult.get("_source");
@@ -266,7 +265,7 @@ class ElasticsearchRequestTest {
                     + "[\"Field1\",\"Field2\"]}");
             ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
-            String result = elasticsearchRequest.toFinalRequest();
+            String result = elasticsearchRequest.toFinalRequest(true);
 
             JsonNode jsonResult = mapper.readTree(result);
             JsonNode sourceNode = jsonResult.get("_source");

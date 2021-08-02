@@ -47,14 +47,14 @@ class CaseSearchEndpointTest {
     @Test
     void searchCaseDetailsInvokesOperation() throws JsonProcessingException {
         CaseSearchResult result = mock(CaseSearchResult.class);
-        when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class))).thenReturn(result);
+        when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class), any())).thenReturn(result);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
         JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
         ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode);
         when(elasticsearchQueryHelper.validateAndConvertRequest(any())).thenReturn(elasticSearchRequest);
         List<String> caseTypeIds = singletonList(CASE_TYPE_ID);
 
-        final CaseSearchResult caseSearchResult = endpoint.searchCases(caseTypeIds, searchRequest);
+        final CaseSearchResult caseSearchResult = endpoint.searchCases(caseTypeIds, searchRequest, true);
 
         verify(elasticsearchQueryHelper).validateAndConvertRequest(eq(searchRequest));
         verify(caseSearchOperation).execute(argThat(crossCaseTypeSearchRequest -> {
@@ -64,7 +64,7 @@ class CaseSearchEndpointTest {
             assertThat(crossCaseTypeSearchRequest.isMultiCaseTypeSearch(), is(false));
             assertThat(crossCaseTypeSearchRequest.getAliasFields().size(), is(0));
             return true;
-        }));
+        }), any());
         assertThat(caseSearchResult, is(result));
     }
 }

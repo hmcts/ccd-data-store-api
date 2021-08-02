@@ -1,18 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-import static org.jooq.lambda.function.Functions.not;
-import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.NullNode;
@@ -35,6 +22,19 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchCaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static org.jooq.lambda.function.Functions.not;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 @Service
 @Qualifier(AuthorisedCaseSearchOperation.QUALIFIER)
@@ -71,12 +71,12 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     }
 
     @Override
-    public CaseSearchResult execute(CrossCaseTypeSearchRequest searchRequest) {
+    public CaseSearchResult execute(CrossCaseTypeSearchRequest searchRequest, Boolean dataClassification) {
         List<CaseTypeDefinition> authorisedCaseTypes = getAuthorisedCaseTypes(searchRequest);
         CrossCaseTypeSearchRequest authorisedSearchRequest =
             createAuthorisedSearchRequest(authorisedCaseTypes, searchRequest);
 
-        return searchCasesAndFilterFieldsByAccess(authorisedCaseTypes, authorisedSearchRequest);
+        return searchCasesAndFilterFieldsByAccess(authorisedCaseTypes, authorisedSearchRequest, dataClassification);
     }
 
     private List<CaseTypeDefinition> getAuthorisedCaseTypes(CrossCaseTypeSearchRequest searchRequest) {
@@ -102,12 +102,13 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     }
 
     private CaseSearchResult searchCasesAndFilterFieldsByAccess(List<CaseTypeDefinition> authorisedCaseTypes,
-                                                                CrossCaseTypeSearchRequest authorisedSearchRequest) {
+                                                                CrossCaseTypeSearchRequest authorisedSearchRequest,
+                                                                Boolean dataClassification) {
         if (authorisedCaseTypes.isEmpty()) {
             return CaseSearchResult.EMPTY;
         }
 
-        CaseSearchResult result = caseSearchOperation.execute(authorisedSearchRequest);
+        CaseSearchResult result = caseSearchOperation.execute(authorisedSearchRequest, dataClassification);
         filterCaseDataByCaseType(authorisedCaseTypes, result.getCases(), authorisedSearchRequest);
 
         return result;

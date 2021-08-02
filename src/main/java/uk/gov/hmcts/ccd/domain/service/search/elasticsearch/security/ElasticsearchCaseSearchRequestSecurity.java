@@ -29,9 +29,9 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
     }
 
     @Override
-    public CaseSearchRequest createSecuredSearchRequest(CaseSearchRequest caseSearchRequest) {
+    public CaseSearchRequest createSecuredSearchRequest(CaseSearchRequest caseSearchRequest, Boolean dataClassification) {
         String queryClauseWithSecurityFilters = addFiltersToQuery(caseSearchRequest);
-        return createNewCaseSearchRequest(caseSearchRequest, queryClauseWithSecurityFilters);
+        return createNewCaseSearchRequest(caseSearchRequest, queryClauseWithSecurityFilters, dataClassification);
     }
 
     private String addFiltersToQuery(CaseSearchRequest caseSearchRequest) {
@@ -51,9 +51,9 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
         return searchSourceBuilder.toString();
     }
 
-    private CaseSearchRequest createNewCaseSearchRequest(CaseSearchRequest caseSearchRequest, String queryWithFilters) {
+    private CaseSearchRequest createNewCaseSearchRequest(CaseSearchRequest caseSearchRequest, String queryWithFilters, Boolean dataClassification) {
         ObjectNode searchRequestJsonNode =
-            objectMapperService.convertStringToObject(caseSearchRequest.toJsonString(), ObjectNode.class);
+            objectMapperService.convertStringToObject(caseSearchRequest.toJsonString(dataClassification), ObjectNode.class);
         ObjectNode queryNode = objectMapperService.convertStringToObject(queryWithFilters, ObjectNode.class);
         searchRequestJsonNode.set(QUERY, queryNode.get(QUERY));
 

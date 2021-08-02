@@ -61,8 +61,8 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     @Override
-    public CaseSearchResult execute(CrossCaseTypeSearchRequest request) {
-        MultiSearchResult result = search(request);
+    public CaseSearchResult execute(CrossCaseTypeSearchRequest request, Boolean dataClassification) {
+        MultiSearchResult result = search(request, dataClassification);
         if (result.isSucceeded()) {
             return toCaseDetailsSearchResult(result, request);
         } else {
@@ -70,8 +70,8 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         }
     }
 
-    private MultiSearchResult search(CrossCaseTypeSearchRequest request) {
-        MultiSearch multiSearch = secureAndTransformSearchRequest(request);
+    private MultiSearchResult search(CrossCaseTypeSearchRequest request, Boolean dataClassification) {
+        MultiSearch multiSearch = secureAndTransformSearchRequest(request, dataClassification);
         try {
             return jestClient.execute(multiSearch);
         } catch (IOException e) {
@@ -79,19 +79,19 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         }
     }
 
-    private MultiSearch secureAndTransformSearchRequest(CrossCaseTypeSearchRequest request) {
+    private MultiSearch secureAndTransformSearchRequest(CrossCaseTypeSearchRequest request, Boolean dataClassification) {
         Collection<Search> securedSearches = request.getCaseTypeIds()
             .stream()
-            .map(caseTypeId -> createSecuredSearch(caseTypeId, request))
+            .map(caseTypeId -> createSecuredSearch(caseTypeId, request, dataClassification))
             .collect(toList());
 
         return new MultiSearch.Builder(securedSearches).build();
     }
 
-    private Search createSecuredSearch(String caseTypeId, CrossCaseTypeSearchRequest request) {
+    private Search createSecuredSearch(String caseTypeId, CrossCaseTypeSearchRequest request, Boolean dataClassification) {
         CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(
-            new CaseSearchRequest(caseTypeId, request.getElasticSearchRequest()));
-        return new Search.Builder(securedSearchRequest.toJsonString())
+            new CaseSearchRequest(caseTypeId, request.getElasticSearchRequest()), dataClassification);
+        return new Search.Builder(securedSearchRequest.toJsonString(dataClassification))
             .addIndex(getCaseIndexName(caseTypeId))
             .addType(getCaseIndexType())
             .build();

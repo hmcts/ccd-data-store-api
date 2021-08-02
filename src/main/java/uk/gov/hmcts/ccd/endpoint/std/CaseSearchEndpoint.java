@@ -92,7 +92,8 @@ public class CaseSearchEndpoint {
             + "search results, please state the alias fields to be returned in the _source property for e.g."
             + " \"_source\":[\"alias.customer\",\"alias.postcode\"]",
             required = true)
-        @RequestBody String jsonSearchRequest) {
+        @RequestBody String jsonSearchRequest,
+        @RequestParam(value = "data_classification", required = false) Boolean dataClassification) {
 
         Instant start = Instant.now();
         validateCtid(caseTypeIds);
@@ -109,7 +110,8 @@ public class CaseSearchEndpoint {
             .withSearchRequest(elasticsearchRequest)
             .build();
 
-        CaseSearchResult result = caseSearchOperation.execute(request);
+        dataClassification = (dataClassification == null)? true : dataClassification.booleanValue();
+        CaseSearchResult result = caseSearchOperation.execute(request, dataClassification);
 
         Duration between = Duration.between(start, Instant.now());
         log.debug("searchCases execution completed in {} millisecs...", between.toMillis());

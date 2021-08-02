@@ -132,17 +132,17 @@ class ElasticsearchCaseSearchOperationTest {
                 .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class), any()))
                 .thenReturn(request);
 
-            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest);
+            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest, true);
 
             assertAll(
                 () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList(caseDetails))),
                 () -> assertThat(caseSearchResult.getTotal(), equalTo(1L)),
                 () -> verify(jestClient).execute(any(MultiSearch.class)),
                 () -> verify(applicationParams).getCasesIndexType(),
-                () -> verify(caseSearchRequestSecurity).createSecuredSearchRequest(any(CaseSearchRequest.class)));
+                () -> verify(caseSearchRequestSecurity).createSecuredSearchRequest(any(CaseSearchRequest.class), any()));
         }
 
         @Test
@@ -172,10 +172,10 @@ class ElasticsearchCaseSearchOperationTest {
                 .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class), any()))
                 .thenReturn(request);
 
-            assertThrows(ServiceException.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
+            assertThrows(ServiceException.class, () -> searchOperation.execute(crossCaseTypeSearchRequest, true));
         }
 
         @Test
@@ -203,10 +203,10 @@ class ElasticsearchCaseSearchOperationTest {
                 .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class), any()))
                 .thenReturn(request);
 
-            assertThrows(ServiceException.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
+            assertThrows(ServiceException.class, () -> searchOperation.execute(crossCaseTypeSearchRequest, true));
         }
 
         @Test
@@ -236,10 +236,10 @@ class ElasticsearchCaseSearchOperationTest {
                 .withCaseTypes(Collections.singletonList("aaa"))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class), any()))
                 .thenReturn(request);
 
-            assertThrows(ServiceException.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
+            assertThrows(ServiceException.class, () -> searchOperation.execute(crossCaseTypeSearchRequest, true));
         }
 
         @Test
@@ -280,10 +280,10 @@ class ElasticsearchCaseSearchOperationTest {
                 .withCaseTypes(Collections.singletonList("casetypeid1_cases"))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class), any()))
                 .thenReturn(request);
 
-            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest);
+            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest, true);
 
             assertAll(
                 () -> assertThat(caseSearchResult.getCaseTypesResults().get(0).getCaseTypeId(),
@@ -328,10 +328,10 @@ class ElasticsearchCaseSearchOperationTest {
                 .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class), any()))
                 .thenReturn(request1, request2);
 
-            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest);
+            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest, true);
 
             assertAll(
                 () -> assertThat(caseSearchResult.getCases(), equalTo(newArrayList(caseDetails, caseDetails))),
@@ -339,7 +339,7 @@ class ElasticsearchCaseSearchOperationTest {
                 () -> verify(jestClient).execute(any(MultiSearch.class)),
                 () -> verify(applicationParams, times(2)).getCasesIndexType(),
                 () -> verify(caseSearchRequestSecurity, times(2)).createSecuredSearchRequest(
-                    any(CaseSearchRequest.class)));
+                    any(CaseSearchRequest.class), any()));
         }
 
     }
@@ -381,10 +381,10 @@ class ElasticsearchCaseSearchOperationTest {
                 .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class), any()))
                 .thenReturn(request1, request2);
 
-            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest);
+            CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest, true);
 
             assertAll(
                 () -> assertThat(caseSearchResult.getCases().size(), equalTo(0)),
@@ -393,7 +393,7 @@ class ElasticsearchCaseSearchOperationTest {
                 () -> verify(jestClient).execute(any(MultiSearch.class)),
                 () -> verify(applicationParams, times(2)).getCasesIndexType(),
                 () -> verify(caseSearchRequestSecurity, times(2))
-                    .createSecuredSearchRequest(any(CaseSearchRequest.class)));
+                    .createSecuredSearchRequest(any(CaseSearchRequest.class), any()));
         }
 
     }
@@ -413,10 +413,10 @@ class ElasticsearchCaseSearchOperationTest {
                 .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class), any()))
                 .thenReturn(request);
 
-            assertThrows(BadSearchRequest.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
+            assertThrows(BadSearchRequest.class, () -> searchOperation.execute(crossCaseTypeSearchRequest, true));
         }
 
         @Test
@@ -439,10 +439,10 @@ class ElasticsearchCaseSearchOperationTest {
                 .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
                 .withSearchRequest(elasticsearchRequest)
                 .build();
-            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class)))
+            when(caseSearchRequestSecurity.createSecuredSearchRequest(any(CaseSearchRequest.class), any()))
                 .thenReturn(request);
 
-            assertThrows(BadSearchRequest.class, () -> searchOperation.execute(crossCaseTypeSearchRequest));
+            assertThrows(BadSearchRequest.class, () -> searchOperation.execute(crossCaseTypeSearchRequest, true));
         }
 
     }

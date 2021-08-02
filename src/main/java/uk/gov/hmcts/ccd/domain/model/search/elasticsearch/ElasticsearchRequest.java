@@ -41,7 +41,6 @@ public class ElasticsearchRequest {
         for (String metadata : MetaData.CaseField.getColumnNames()) {
             METADATA_FIELDS.add(new TextNode(metadata));
         }
-        METADATA_FIELDS.add(new TextNode(DATA_CLASSIFICATION_COL));
     }
 
     public ElasticsearchRequest(@NonNull JsonNode searchRequest) {
@@ -123,17 +122,19 @@ public class ElasticsearchRequest {
      * Custom properties supported by CCD will be merged appropriately to generate a native Elasticsearch request.
      * @return JSON string representing the Elasticsearch request object.
      */
-    public String toFinalRequest() {
+    public String toFinalRequest(Boolean dataClassification) {
         JsonNode mergedRequest = nativeSearchRequest.deepCopy();
 
-        ((ObjectNode) mergedRequest).set(SOURCE, mergedSourceFields());
+        ((ObjectNode) mergedRequest).set(SOURCE, mergedSourceFields(dataClassification));
 
         return mergedRequest.toString();
     }
 
-    private ArrayNode mergedSourceFields() {
+    private ArrayNode mergedSourceFields(Boolean dataClassification) {
         ArrayNode sourceFields = METADATA_FIELDS.deepCopy();
-
+     //   if (dataClassification) {
+            sourceFields.add(new TextNode(DATA_CLASSIFICATION_COL));
+    //    }
         if (hasSourceFields()) {
             sourceFields.addAll((ArrayNode) getSource());
         } else {
