@@ -16,6 +16,7 @@ import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataServ
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -108,7 +109,7 @@ class SearchQueryFactoryOperationTest {
 
         verify(sortOrderQueryBuilder).buildSortOrderClause(metadata);
         verify(userAuthorisation, times(1)).getUserId();
-        verify(roleAssignmentService).getCaseReferencesForAGivenUser(anyString());
+        verify(roleAssignmentService).getRoleAssignments(anyString(), anyObject());
         verify(entityManager).createNativeQuery(anyString(), any(Class.class));
     }
 
