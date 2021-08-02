@@ -59,7 +59,7 @@ public class CaseSearchEndpoint {
 
     @Autowired
     public CaseSearchEndpoint(@Qualifier(AuthorisedCaseSearchOperation.QUALIFIER)
-                                      CaseSearchOperation caseSearchOperation,
+                                  CaseSearchOperation caseSearchOperation,
                               @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                   CaseDefinitionRepository caseDefinitionRepository,
                               @Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository,
@@ -95,6 +95,7 @@ public class CaseSearchEndpoint {
         @RequestBody String jsonSearchRequest,
         @RequestParam(value = "data_classification", required = false) Boolean dataClassification) {
 
+        dataClassification = (dataClassification == null) ? true : dataClassification.booleanValue();
         Instant start = Instant.now();
         validateCtid(caseTypeIds);
 
@@ -110,7 +111,6 @@ public class CaseSearchEndpoint {
             .withSearchRequest(elasticsearchRequest)
             .build();
 
-        dataClassification = (dataClassification == null)? true : dataClassification.booleanValue();
         CaseSearchResult result = caseSearchOperation.execute(request, dataClassification);
 
         Duration between = Duration.between(start, Instant.now());

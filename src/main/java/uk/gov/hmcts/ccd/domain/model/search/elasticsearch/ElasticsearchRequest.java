@@ -120,6 +120,7 @@ public class ElasticsearchRequest {
     /**
      * Creates a JSON string representing the Elasticsearch request object.
      * Custom properties supported by CCD will be merged appropriately to generate a native Elasticsearch request.
+     *
      * @return JSON string representing the Elasticsearch request object.
      */
     public String toFinalRequest(Boolean dataClassification) {
@@ -132,9 +133,9 @@ public class ElasticsearchRequest {
 
     private ArrayNode mergedSourceFields(Boolean dataClassification) {
         ArrayNode sourceFields = METADATA_FIELDS.deepCopy();
-     //   if (dataClassification) {
+        if (dataClassification) {
             sourceFields.add(new TextNode(DATA_CLASSIFICATION_COL));
-    //    }
+        }
         if (hasSourceFields()) {
             sourceFields.addAll((ArrayNode) getSource());
         } else {

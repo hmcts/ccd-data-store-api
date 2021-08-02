@@ -142,7 +142,8 @@ class ElasticsearchCaseSearchOperationTest {
                 () -> assertThat(caseSearchResult.getTotal(), equalTo(1L)),
                 () -> verify(jestClient).execute(any(MultiSearch.class)),
                 () -> verify(applicationParams).getCasesIndexType(),
-                () -> verify(caseSearchRequestSecurity).createSecuredSearchRequest(any(CaseSearchRequest.class), any()));
+                () -> verify(caseSearchRequestSecurity)
+                    .createSecuredSearchRequest(any(CaseSearchRequest.class), any()));
         }
 
         @Test

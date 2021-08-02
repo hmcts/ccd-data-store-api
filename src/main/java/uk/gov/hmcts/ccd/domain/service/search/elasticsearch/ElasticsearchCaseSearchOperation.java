@@ -79,7 +79,8 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         }
     }
 
-    private MultiSearch secureAndTransformSearchRequest(CrossCaseTypeSearchRequest request, Boolean dataClassification) {
+    private MultiSearch secureAndTransformSearchRequest(CrossCaseTypeSearchRequest request,
+                                                        Boolean dataClassification) {
         Collection<Search> securedSearches = request.getCaseTypeIds()
             .stream()
             .map(caseTypeId -> createSecuredSearch(caseTypeId, request, dataClassification))
@@ -88,7 +89,8 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         return new MultiSearch.Builder(securedSearches).build();
     }
 
-    private Search createSecuredSearch(String caseTypeId, CrossCaseTypeSearchRequest request, Boolean dataClassification) {
+    private Search createSecuredSearch(String caseTypeId, CrossCaseTypeSearchRequest request,
+                                       Boolean dataClassification) {
         CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(
             new CaseSearchRequest(caseTypeId, request.getElasticSearchRequest()), dataClassification);
         return new Search.Builder(securedSearchRequest.toJsonString(dataClassification))
