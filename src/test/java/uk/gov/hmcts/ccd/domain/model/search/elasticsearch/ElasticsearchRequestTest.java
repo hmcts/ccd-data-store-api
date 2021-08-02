@@ -260,6 +260,32 @@ class ElasticsearchRequestTest {
         }
 
         @Test
+        void shouldSetSourceFieldsWhenDataClassificationIsFalse() throws Exception {
+            JsonNode queryNode = queryAsJsonNode("{\"query\":{}}");
+            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
+
+            String result = elasticsearchRequest.toFinalRequest(false);
+
+            JsonNode jsonResult = mapper.readTree(result);
+            JsonNode sourceNode = jsonResult.get("_source");
+            List<String> sourceFields =
+                new ObjectMapper().readValue(sourceNode.traverse(), new TypeReference<ArrayList<String>>(){});
+
+            assertAll(
+                () -> assertThat(sourceFields.size(), is(9)),
+                () -> assertThat(sourceFields, hasItem(DATA_COL)),
+                () -> assertThat(sourceFields, hasItem(CASE_REFERENCE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(LAST_STATE_MODIFIED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(CREATED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(CASE_TYPE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(JURISDICTION.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(SECURITY_CLASSIFICATION.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(LAST_MODIFIED_DATE.getDbColumnName())),
+                () -> assertThat(sourceFields, hasItem(STATE.getDbColumnName()))
+            );
+        }
+
+        @Test
         void shouldSetSourceFieldsWhenSupplementaryDataIsProvidedInRequest() throws Exception {
             JsonNode queryNode = queryAsJsonNode("{\"native_es_query\":{\"query\":{}},\"supplementary_data\":"
                     + "[\"Field1\",\"Field2\"]}");
