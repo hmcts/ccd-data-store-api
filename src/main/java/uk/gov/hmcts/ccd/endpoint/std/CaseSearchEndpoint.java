@@ -92,16 +92,13 @@ public class CaseSearchEndpoint {
             + "search results, please state the alias fields to be returned in the _source property for e.g."
             + " \"_source\":[\"alias.customer\",\"alias.postcode\"]",
             required = true)
-        @RequestBody String jsonSearchRequest,
-        @RequestParam(value = "data-classification", required = false) Boolean dataClassification) {
-
-        dataClassification = (dataClassification == null )? true : dataClassification.booleanValue();
+        @RequestBody String jsonSearchRequest) {
 
         Instant start = Instant.now();
         validateCtid(caseTypeIds);
 
         ElasticsearchRequest elasticsearchRequest =
-            elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest, dataClassification);
+            elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
 
         if (!elasticsearchRequest.hasRequestedSupplementaryData()) {
             elasticsearchRequest.setRequestedSupplementaryData(ElasticsearchRequest.WILDCARD);

@@ -93,7 +93,7 @@ class ElasticsearchCaseSearchOperationTest {
 
     private final ObjectNode searchRequestJsonNode = JsonNodeFactory.instance.objectNode();
 
-    private final ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(searchRequestJsonNode,true);
+    private final ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(searchRequestJsonNode);
 
     @BeforeEach
     void setUp() {

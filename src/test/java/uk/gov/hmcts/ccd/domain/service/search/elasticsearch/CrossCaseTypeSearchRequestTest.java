@@ -28,7 +28,7 @@ class CrossCaseTypeSearchRequestTest {
         String query = "{}";
         assertThrows(BadSearchRequest.class, () -> new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(singletonList("caseType"))
-            .withSearchRequest(new ElasticsearchRequest(objectMapper.readValue(query, JsonNode.class),true))
+            .withSearchRequest(new ElasticsearchRequest(objectMapper.readValue(query, JsonNode.class)))
             .build());
     }
 
@@ -40,7 +40,7 @@ class CrossCaseTypeSearchRequestTest {
         @DisplayName("should build non-multi-case-type search request")
         void shouldBuildNonMultiCaseTypeSearch() throws Exception {
             String query = "{\"query\":{}}";
-            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(objectMapper.readTree(query),true);
+            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(objectMapper.readTree(query));
             List<String> caseTypeIds = singletonList("CT");
             CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
                 .withSearchRequest(elasticsearchRequest)
@@ -57,7 +57,7 @@ class CrossCaseTypeSearchRequestTest {
         @DisplayName("should build multi-case-type search request")
         void shouldBuildMultiCaseTypeSearch() throws Exception {
             String query = "{\"_source\":[\"alias.name\"], \"query\":{}}";
-            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(objectMapper.readTree(query),true);
+            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(objectMapper.readTree(query));
             List<String> caseTypeIds = Arrays.asList("CT", "PT");
             CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
                 .withSearchRequest(elasticsearchRequest)

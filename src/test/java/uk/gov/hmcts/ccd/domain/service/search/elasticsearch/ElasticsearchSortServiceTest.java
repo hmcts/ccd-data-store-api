@@ -123,7 +123,7 @@ class ElasticsearchSortServiceTest {
         when(elasticsearchMappings.isDefaultTextMetadata(eq(MetaData.CaseField.LAST_MODIFIED_DATE.getDbColumnName())))
             .thenReturn(false);
         ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(objectMapperES.readValue(QUERY_STRING,
-            ObjectNode.class), true);
+            ObjectNode.class));
 
         elasticsearchSortService.applyConfiguredSort(elasticsearchRequest, CASE_TYPE_A, SEARCH);
 
@@ -147,7 +147,7 @@ class ElasticsearchSortServiceTest {
         when(elasticsearchMappings.isDefaultTextCaseData(eq(COLLECTION_TEXT_FIELD_TYPE))).thenReturn(true);
         when(elasticsearchMappings.isDefaultTextCaseData(eq(COLLECTION_DATE_FIELD_TYPE))).thenReturn(false);
         ElasticsearchRequest elasticsearchRequest =
-            new ElasticsearchRequest(objectMapperES.readValue(QUERY_STRING, ObjectNode.class), true);
+            new ElasticsearchRequest(objectMapperES.readValue(QUERY_STRING, ObjectNode.class));
 
         elasticsearchSortService.applyConfiguredSort(elasticsearchRequest, CASE_TYPE_A, WORKBASKET);
 
@@ -165,7 +165,7 @@ class ElasticsearchSortServiceTest {
             .build());
         String searchRequest = "{\"query\":{},\"sort\":[{\"data.TextField.keyword\":\"ASC\"}]}";
         ElasticsearchRequest elasticsearchRequest =
-            new ElasticsearchRequest(objectMapperES.readValue(searchRequest, ObjectNode.class), true);
+            new ElasticsearchRequest(objectMapperES.readValue(searchRequest, ObjectNode.class));
 
         elasticsearchSortService.applyConfiguredSort(elasticsearchRequest, CASE_TYPE_A, SEARCH);
 
@@ -179,7 +179,7 @@ class ElasticsearchSortServiceTest {
     void shouldApplyDefaultSortWhenNoSortsAreConfigured() throws JsonProcessingException {
         String searchRequest = "{\"query\":{}}";
         ElasticsearchRequest elasticsearchRequest =
-            new ElasticsearchRequest(objectMapperES.readValue(searchRequest, ObjectNode.class), true);
+            new ElasticsearchRequest(objectMapperES.readValue(searchRequest, ObjectNode.class));
 
         elasticsearchSortService.applyConfiguredSort(elasticsearchRequest, CASE_TYPE_A, SEARCH);
 
@@ -193,7 +193,7 @@ class ElasticsearchSortServiceTest {
     void shouldThrowExceptionWhenSortOrderCaseFieldIsNotInCaseType() throws JsonProcessingException {
         sortOrderFields.add(SortOrderField.sortOrderWith().caseFieldId("UnknownCaseField").direction(ASC).build());
         ElasticsearchRequest elasticsearchRequest =
-            new ElasticsearchRequest(objectMapperES.readValue(QUERY_STRING, ObjectNode.class), true);
+            new ElasticsearchRequest(objectMapperES.readValue(QUERY_STRING, ObjectNode.class));
 
         ServiceException exception = assertThrows(ServiceException.class,
             () -> elasticsearchSortService.applyConfiguredSort(elasticsearchRequest, CASE_TYPE_A, WORKBASKET));

@@ -37,7 +37,7 @@ class ElasticsearchRequestTest {
     void hasSourceFieldsShouldReturnFalseWhenSourceIsMissing() throws JsonProcessingException {
         JsonNode queryNode = queryAsJsonNode("{\"query\":{\"match_all\": {}}}");
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
-                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode, true);
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
 
         assertFalse(elasticsearchRequest.hasSourceFields());
     }
@@ -46,7 +46,7 @@ class ElasticsearchRequestTest {
     void hasSourceFieldsShouldReturnTrueWhenSourceIsProvided() throws JsonProcessingException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"data.Field\"],\"query\":{\"match_all\": {}}}");
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
-                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode, true);
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
 
         assertTrue(elasticsearchRequest.hasSourceFields());
     }
@@ -55,7 +55,7 @@ class ElasticsearchRequestTest {
     void hasSourceFieldsShouldReturnFalseWhenSourceIsEmpty() throws JsonProcessingException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[],\"query\":{\"match_all\": {}}}");
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
-                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode, true);
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
 
         assertFalse(elasticsearchRequest.hasSourceFields());
     }
@@ -64,7 +64,7 @@ class ElasticsearchRequestTest {
     void hasSourceFieldsShouldReturnFalseWhenSourceOnlyHasWildcard() throws JsonProcessingException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"*\"],\"query\":{\"match_all\": {}}}");
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
-                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode, true);
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
 
         assertFalse(elasticsearchRequest.hasSourceFields());
     }
@@ -73,7 +73,7 @@ class ElasticsearchRequestTest {
     void hasSourceFieldsShouldReturnFalseWhenSourceIsFalse() throws JsonProcessingException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\": false,\"query\":{\"match_all\": {}}}");
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
-                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode,true);
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
 
         assertFalse(elasticsearchRequest.hasSourceFields());
     }
@@ -82,7 +82,7 @@ class ElasticsearchRequestTest {
     void hasSourceFieldsShouldReturnFalseWhenSourceIsTrue() throws JsonProcessingException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\": true,\"query\":{\"match_all\": {}}}");
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
-                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode,true);
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
 
         assertFalse(elasticsearchRequest.hasSourceFields());
     }
@@ -92,7 +92,7 @@ class ElasticsearchRequestTest {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"data.CaseDataField\",\"reference\",\"state\","
                                              + "\"data.OtherCaseDataField\"],\"query\":{\"match_all\": {}}}");
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
-                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode,true);
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
 
         List<String> requestedFields = elasticsearchRequest.getRequestedFields();
 
@@ -110,7 +110,7 @@ class ElasticsearchRequestTest {
         JsonNode queryNode =
                 queryAsJsonNode("{\"_source\":[\"reference\",\"INVALID\"],\"query\":{\"match_all\": {}}}");
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
-                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode,true);
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
 
         List<String> requestedFields = elasticsearchRequest.getRequestedFields();
 
@@ -124,7 +124,7 @@ class ElasticsearchRequestTest {
     void shouldReturnNoRequestedFieldsWhenOnlyWildcardIsRequested() throws JsonProcessingException {
         JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"*\"],\"query\":{\"match_all\": {}}}");
         uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest elasticsearchRequest =
-                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode,true);
+                new uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest(queryNode);
 
         List<String> requestedFields = elasticsearchRequest.getRequestedFields();
 
@@ -136,7 +136,7 @@ class ElasticsearchRequestTest {
         JsonNode queryNode = queryAsJsonNode("{\"native_es_query\":{\"_source\":[\"data.CaseDataField\","
               + "\"reference\",\"state\",\"data.OtherCaseDataField\"],\"query\":{\"match_all\": {}}},"
                + "\"supplementary_data\":[\"SupDataField\"]}");
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode,true);
+        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
         assertAll(
             () -> assertThat(elasticsearchRequest.getQuery().toString(), is("{\"match_all\":{}}")),
@@ -149,7 +149,7 @@ class ElasticsearchRequestTest {
     @Test
     void shouldHandleWrappedQueryFormatWithoutSupplementaryData() throws Exception {
         JsonNode queryNode = queryAsJsonNode("{\"native_es_query\":{\"query\":{\"match_all\": {}}}}");
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode,true);
+        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
         assertAll(
             () -> assertThat(elasticsearchRequest.getQuery().toString(), is("{\"match_all\":{}}")),
@@ -161,7 +161,7 @@ class ElasticsearchRequestTest {
     @Test
     void shouldSetNativeQueryWhenProvidedInWrapperObject() throws Exception {
         JsonNode queryNode = queryAsJsonNode("{\"native_es_query\":{\"_source\":[\"data.name\"], \"query\":{}}}");
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode,true);
+        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
         assertAll(
             () -> assertThat(elasticsearchRequest.getNativeSearchRequest().toString(),
@@ -174,7 +174,7 @@ class ElasticsearchRequestTest {
     void shouldSetSupplementaryData() throws Exception {
         JsonNode queryNode =
                 queryAsJsonNode("{\"native_es_query\":{\"query\":{}},\"supplementary_data\":[\"Field1\",\"Field2\"]}");
-        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode,true);
+        ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
         assertAll(
             () -> assertThat(elasticsearchRequest.hasRequestedSupplementaryData(), is(true)),
@@ -184,13 +184,13 @@ class ElasticsearchRequestTest {
     }
 
     @Test
-    void shouldSetMetadataFieldsArrayNodeMinusDataClassification() throws Exception {
+    void shouldSetMetadataFieldsArrayNode() throws Exception {
         ArrayNode result = ElasticsearchRequest.METADATA_FIELDS;
 
         List<String> resultAsList =
                 new ObjectMapper().readValue(result.traverse(), new TypeReference<ArrayList<String>>(){});
         assertAll(
-            () -> assertThat(result.size(), is(8)),
+            () -> assertThat(result.size(), is(9)),
             () -> assertThat(resultAsList, hasItem(CASE_REFERENCE.getDbColumnName())),
             () -> assertThat(resultAsList, hasItem(LAST_STATE_MODIFIED_DATE.getDbColumnName())),
             () -> assertThat(resultAsList, hasItem(CREATED_DATE.getDbColumnName())),
@@ -198,7 +198,8 @@ class ElasticsearchRequestTest {
             () -> assertThat(resultAsList, hasItem(JURISDICTION.getDbColumnName())),
             () -> assertThat(resultAsList, hasItem(SECURITY_CLASSIFICATION.getDbColumnName())),
             () -> assertThat(resultAsList, hasItem(LAST_MODIFIED_DATE.getDbColumnName())),
-            () -> assertThat(resultAsList, hasItem(STATE.getDbColumnName()))
+            () -> assertThat(resultAsList, hasItem(STATE.getDbColumnName())),
+            () -> assertThat(resultAsList, hasItem(DATA_CLASSIFICATION_COL))
         );
     }
 
@@ -208,7 +209,7 @@ class ElasticsearchRequestTest {
         @Test
         void shouldSetSourceFieldsWhenSourceIsProvidedInRequest() throws Exception {
             JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"data.name\"], \"query\":{}}");
-            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode,true);
+            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
             String result = elasticsearchRequest.toFinalRequest();
 
@@ -235,7 +236,7 @@ class ElasticsearchRequestTest {
         @Test
         void shouldSetSourceFieldsWhenSourceIsNotProvidedInRequest() throws Exception {
             JsonNode queryNode = queryAsJsonNode("{\"query\":{}}");
-            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode,true);
+            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
             String result = elasticsearchRequest.toFinalRequest();
 
@@ -263,7 +264,7 @@ class ElasticsearchRequestTest {
         void shouldSetSourceFieldsWhenSupplementaryDataIsProvidedInRequest() throws Exception {
             JsonNode queryNode = queryAsJsonNode("{\"native_es_query\":{\"query\":{}},\"supplementary_data\":"
                     + "[\"Field1\",\"Field2\"]}");
-            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode,true);
+            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
             String result = elasticsearchRequest.toFinalRequest();
 

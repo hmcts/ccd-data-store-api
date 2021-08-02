@@ -72,7 +72,7 @@ class AuthorisedCaseSearchOperationTest {
 
     private final ObjectNode searchRequestJsonNode = JsonNodeFactory.instance.objectNode();
 
-    private ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(searchRequestJsonNode, true);
+    private ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(searchRequestJsonNode);
 
     @InjectMocks
     private AuthorisedCaseSearchOperation authorisedCaseDetailsSearchOperation;

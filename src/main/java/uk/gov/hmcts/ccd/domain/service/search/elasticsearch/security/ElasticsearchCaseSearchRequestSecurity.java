@@ -58,6 +58,6 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
         searchRequestJsonNode.set(QUERY, queryNode.get(QUERY));
 
         return new CaseSearchRequest(caseSearchRequest.getCaseTypeId(),
-            new ElasticsearchRequest(searchRequestJsonNode, true));
+            new ElasticsearchRequest(searchRequestJsonNode));
     }
 }

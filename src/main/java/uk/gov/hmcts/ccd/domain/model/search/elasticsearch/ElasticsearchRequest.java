@@ -41,14 +41,10 @@ public class ElasticsearchRequest {
         for (String metadata : MetaData.CaseField.getColumnNames()) {
             METADATA_FIELDS.add(new TextNode(metadata));
         }
-     //   METADATA_FIELDS.add(new TextNode(DATA_CLASSIFICATION_COL));
+        METADATA_FIELDS.add(new TextNode(DATA_CLASSIFICATION_COL));
     }
 
-
-    public ElasticsearchRequest(@NonNull JsonNode searchRequest, Boolean dataClassification) {
-        if (dataClassification) {
-            METADATA_FIELDS.add(new TextNode(DATA_CLASSIFICATION_COL));
-        }
+    public ElasticsearchRequest(@NonNull JsonNode searchRequest) {
         initRequest(searchRequest);
     }
 

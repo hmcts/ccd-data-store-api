@@ -68,15 +68,15 @@ class UICaseSearchControllerTest {
         CaseSearchResultView caseSearchResultView = mock(CaseSearchResultView.class);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
         JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
-        ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode, true);
-        when(elasticsearchQueryHelper.validateAndConvertRequest(any(), any())).thenReturn(elasticSearchRequest);
+        ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode);
+        when(elasticsearchQueryHelper.validateAndConvertRequest(any())).thenReturn(elasticSearchRequest);
         when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class))).thenReturn(caseSearchResult);
         when(caseSearchResultViewGenerator.execute(any(), any(), any(), any())).thenReturn(caseSearchResultView);
 
         final ResponseEntity<CaseSearchResultViewResource> response = controller
             .searchCases(CASE_TYPE_ID, WORKBASKET, searchRequest);
 
-        verify(elasticsearchQueryHelper).validateAndConvertRequest(eq(searchRequest), eq(true));
+        verify(elasticsearchQueryHelper).validateAndConvertRequest(eq(searchRequest));
         verify(caseSearchOperation).execute(argThat(crossCaseTypeSearchRequest -> {
             assertThat(crossCaseTypeSearchRequest.getSearchRequestJsonNode(), is(searchRequestNode));
             assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().size(), is(1));

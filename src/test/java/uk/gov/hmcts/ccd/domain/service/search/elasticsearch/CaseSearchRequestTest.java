@@ -27,7 +27,7 @@ class CaseSearchRequestTest {
     void setUp() throws IOException {
         MockitoAnnotations.initMocks(this);
         caseSearchRequest = new CaseSearchRequest(CASE_TYPE_ID,
-                new ElasticsearchRequest(objectMapper.readValue(FULL_QUERY, JsonNode.class),true));
+                new ElasticsearchRequest(objectMapper.readValue(FULL_QUERY, JsonNode.class)));
     }
 
     @Test
@@ -41,6 +41,6 @@ class CaseSearchRequestTest {
     void shouldThrowExceptionWhenQueryNodeNotFound() {
         String query = "{}";
         assertThrows(BadSearchRequest.class, () -> new CaseSearchRequest(CASE_TYPE_ID,
-            new ElasticsearchRequest(objectMapper.readValue(query, JsonNode.class),true)));
+            new ElasticsearchRequest(objectMapper.readValue(query, JsonNode.class))));
     }
 }

@@ -153,7 +153,7 @@ public class UICaseSearchController {
                                      @RequestBody String jsonSearchRequest) {
         Instant start = Instant.now();
 
-        ElasticsearchRequest searchRequest = elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest, true);
+        ElasticsearchRequest searchRequest = elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
         String useCaseUppercase = (Strings.isNullOrEmpty(useCase) || searchRequest.hasSourceFields())
                 ? null : useCase.toUpperCase(Locale.ENGLISH);
         elasticsearchSortService.applyConfiguredSort(searchRequest, caseTypeId, useCaseUppercase);
