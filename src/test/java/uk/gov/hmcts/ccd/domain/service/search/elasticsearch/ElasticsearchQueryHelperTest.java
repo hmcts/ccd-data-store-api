@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -101,7 +100,7 @@ class ElasticsearchQueryHelperTest {
     void shouldConvertNativeQueryToElasticSearchRequest() {
         String searchRequest = "{\"query\":{},\"sort\":[{\"data.TextField.keyword\":\"ASC\"}]}";
 
-        ElasticsearchRequest elasticsearchRequest = elasticsearchQueryHelper.validateAndConvertRequest(searchRequest);
+        ElasticsearchRequest elasticsearchRequest = elasticsearchQueryHelper.validateAndConvertRequest(searchRequest, true);
 
         assertAll(
             () -> assertThat(elasticsearchRequest.getNativeSearchRequest().toString(), is(searchRequest))
@@ -112,7 +111,7 @@ class ElasticsearchQueryHelperTest {
     void shouldConvertWrappedQueryToElasticSearchRequest() {
         String searchRequest = "{\"native_es_query\":{\"query\":{}},\"supplementary_data\":[\"Field1\",\"Field2\"]}}";
 
-        ElasticsearchRequest elasticsearchRequest = elasticsearchQueryHelper.validateAndConvertRequest(searchRequest);
+        ElasticsearchRequest elasticsearchRequest = elasticsearchQueryHelper.validateAndConvertRequest(searchRequest, true);
 
         assertAll(
             () -> assertThat(elasticsearchRequest.getNativeSearchRequest().toString(), is("{\"query\":{}}")),
@@ -125,7 +124,7 @@ class ElasticsearchQueryHelperTest {
         String searchRequest = blacklistedQuery();
 
         BadSearchRequest exception = assertThrows(BadSearchRequest.class,
-            () -> elasticsearchQueryHelper.validateAndConvertRequest(searchRequest));
+            () -> elasticsearchQueryHelper.validateAndConvertRequest(searchRequest, true));
 
         assertAll(
             () -> assertThat(exception.getMessage(), is("Query of type 'query_string' is not allowed"))
@@ -137,7 +136,7 @@ class ElasticsearchQueryHelperTest {
         String searchRequest = "{\"native_es_query\":{\"query\":{}},\"supplementary_data\":{\"object\":\"value\"}}}";
 
         BadSearchRequest exception = assertThrows(BadSearchRequest.class, () ->
-            elasticsearchQueryHelper.validateAndConvertRequest(searchRequest));
+            elasticsearchQueryHelper.validateAndConvertRequest(searchRequest, true));
 
         assertAll(
             () -> MatcherAssert.assertThat(exception.getMessage(), is("Requested supplementary_data must be an"
@@ -150,7 +149,7 @@ class ElasticsearchQueryHelperTest {
         String searchRequest = "{\"native_es_query\":{\"query\":{}},\"supplementary_data\":[{\"array\":\"object\"}]}}";
 
         BadSearchRequest exception = assertThrows(BadSearchRequest.class, () ->
-            elasticsearchQueryHelper.validateAndConvertRequest(searchRequest));
+            elasticsearchQueryHelper.validateAndConvertRequest(searchRequest, true));
 
         assertAll(
             () -> MatcherAssert.assertThat(exception.getMessage(), is("Requested supplementary_data must be an"
@@ -165,7 +164,7 @@ class ElasticsearchQueryHelperTest {
         String searchRequest = "{\"native_es_query\":{\"query\":,{}},\"supplementary_data\":[{\"array\":\"object\"}]}}";
 
         BadRequestException exception = assertThrows(BadRequestException.class, () ->
-            elasticsearchQueryHelper.validateAndConvertRequest(searchRequest));
+            elasticsearchQueryHelper.validateAndConvertRequest(searchRequest, true));
 
         assertAll(
             () -> MatcherAssert.assertThat(exception.getMessage(), is("Request requires correctly formatted JSON, "

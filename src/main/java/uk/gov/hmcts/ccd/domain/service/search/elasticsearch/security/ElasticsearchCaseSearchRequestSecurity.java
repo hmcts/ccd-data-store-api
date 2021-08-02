@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
-import java.util.List;
-
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -9,9 +7,11 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
+
+import java.util.List;
 
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.QUERY;
 
@@ -58,6 +58,6 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
         searchRequestJsonNode.set(QUERY, queryNode.get(QUERY));
 
         return new CaseSearchRequest(caseSearchRequest.getCaseTypeId(),
-            new ElasticsearchRequest(searchRequestJsonNode));
+            new ElasticsearchRequest(searchRequestJsonNode, true));
     }
 }

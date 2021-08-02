@@ -9,9 +9,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
 
 import java.util.List;
@@ -50,13 +50,13 @@ class CaseSearchEndpointTest {
         when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class))).thenReturn(result);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
         JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
-        ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode);
-        when(elasticsearchQueryHelper.validateAndConvertRequest(any())).thenReturn(elasticSearchRequest);
+        ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode, true);
+        when(elasticsearchQueryHelper.validateAndConvertRequest(any(), any())).thenReturn(elasticSearchRequest);
         List<String> caseTypeIds = singletonList(CASE_TYPE_ID);
 
-        final CaseSearchResult caseSearchResult = endpoint.searchCases(caseTypeIds, searchRequest);
+        final CaseSearchResult caseSearchResult = endpoint.searchCases(caseTypeIds, searchRequest, true);
 
-        verify(elasticsearchQueryHelper).validateAndConvertRequest(eq(searchRequest));
+        verify(elasticsearchQueryHelper).validateAndConvertRequest(eq(searchRequest), eq(true));
         verify(caseSearchOperation).execute(argThat(crossCaseTypeSearchRequest -> {
             assertThat(crossCaseTypeSearchRequest.getSearchRequestJsonNode(), is(searchRequestNode));
             assertThat(crossCaseTypeSearchRequest.getCaseTypeIds().size(), is(1));

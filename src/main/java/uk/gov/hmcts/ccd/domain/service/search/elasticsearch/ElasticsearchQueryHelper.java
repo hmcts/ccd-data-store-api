@@ -34,7 +34,7 @@ public class ElasticsearchQueryHelper {
         this.objectMapperService = objectMapperService;
     }
 
-    public ElasticsearchRequest validateAndConvertRequest(String jsonSearchRequest) {
+    public ElasticsearchRequest validateAndConvertRequest(String jsonSearchRequest, Boolean dataClassification) {
         rejectBlackListedQuery(jsonSearchRequest);
         JsonNode searchRequestNode;
         try {
@@ -43,7 +43,7 @@ public class ElasticsearchQueryHelper {
             throw new BadRequestException("Request requires correctly formatted JSON, " + ex.getMessage());
         }
         validateSupplementaryData(searchRequestNode);
-        return new ElasticsearchRequest(searchRequestNode);
+        return new ElasticsearchRequest(searchRequestNode, dataClassification);
     }
 
     private void rejectBlackListedQuery(String jsonSearchRequest) {

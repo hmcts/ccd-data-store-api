@@ -1,11 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
-import java.io.IOException;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +8,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+
+import java.io.IOException;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CaseSearchRequestTest {
     private static final String CASE_TYPE_ID = "caseTypeId";
@@ -27,7 +27,7 @@ class CaseSearchRequestTest {
     void setUp() throws IOException {
         MockitoAnnotations.initMocks(this);
         caseSearchRequest = new CaseSearchRequest(CASE_TYPE_ID,
-                new ElasticsearchRequest(objectMapper.readValue(FULL_QUERY, JsonNode.class)));
+                new ElasticsearchRequest(objectMapper.readValue(FULL_QUERY, JsonNode.class),true));
     }
 
     @Test
@@ -41,6 +41,6 @@ class CaseSearchRequestTest {
     void shouldThrowExceptionWhenQueryNodeNotFound() {
         String query = "{}";
         assertThrows(BadSearchRequest.class, () -> new CaseSearchRequest(CASE_TYPE_ID,
-            new ElasticsearchRequest(objectMapper.readValue(query, JsonNode.class))));
+            new ElasticsearchRequest(objectMapper.readValue(query, JsonNode.class),true)));
     }
 }

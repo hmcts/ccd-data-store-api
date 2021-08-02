@@ -1,5 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -9,14 +17,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
-import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 
 class CrossCaseTypeSearchRequestTest {
 
@@ -28,7 +28,7 @@ class CrossCaseTypeSearchRequestTest {
         String query = "{}";
         assertThrows(BadSearchRequest.class, () -> new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(singletonList("caseType"))
-            .withSearchRequest(new ElasticsearchRequest(objectMapper.readValue(query, JsonNode.class)))
+            .withSearchRequest(new ElasticsearchRequest(objectMapper.readValue(query, JsonNode.class),true))
             .build());
     }
 
@@ -40,7 +40,7 @@ class CrossCaseTypeSearchRequestTest {
         @DisplayName("should build non-multi-case-type search request")
         void shouldBuildNonMultiCaseTypeSearch() throws Exception {
             String query = "{\"query\":{}}";
-            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(objectMapper.readTree(query));
+            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(objectMapper.readTree(query),true);
             List<String> caseTypeIds = singletonList("CT");
             CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
                 .withSearchRequest(elasticsearchRequest)
@@ -57,7 +57,7 @@ class CrossCaseTypeSearchRequestTest {
         @DisplayName("should build multi-case-type search request")
         void shouldBuildMultiCaseTypeSearch() throws Exception {
             String query = "{\"_source\":[\"alias.name\"], \"query\":{}}";
-            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(objectMapper.readTree(query));
+            ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(objectMapper.readTree(query),true);
             List<String> caseTypeIds = Arrays.asList("CT", "PT");
             CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
                 .withSearchRequest(elasticsearchRequest)

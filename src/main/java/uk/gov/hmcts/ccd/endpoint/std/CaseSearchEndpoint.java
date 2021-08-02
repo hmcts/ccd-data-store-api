@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
@@ -93,13 +92,16 @@ public class CaseSearchEndpoint {
             + "search results, please state the alias fields to be returned in the _source property for e.g."
             + " \"_source\":[\"alias.customer\",\"alias.postcode\"]",
             required = true)
-        @RequestBody String jsonSearchRequest) {
+        @RequestBody String jsonSearchRequest,
+        @RequestParam(value = "data-classification", required = false) Boolean dataClassification) {
+
+        dataClassification = (dataClassification == null )? true : dataClassification.booleanValue();
 
         Instant start = Instant.now();
         validateCtid(caseTypeIds);
 
         ElasticsearchRequest elasticsearchRequest =
-            elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest);
+            elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest, dataClassification);
 
         if (!elasticsearchRequest.hasRequestedSupplementaryData()) {
             elasticsearchRequest.setRequestedSupplementaryData(ElasticsearchRequest.WILDCARD);
