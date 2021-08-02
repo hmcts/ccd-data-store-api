@@ -10,6 +10,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -45,6 +47,7 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
+import uk.gov.hmcts.ccd.v2.V2;
 
 class QueryEndpointTest {
 
@@ -168,6 +171,7 @@ class QueryEndpointTest {
         void shouldCallSearchQueryOperation() {
             Map<String, String> params = new HashMap<>();
             Map<String, String> sanitised = new HashMap<>();
+            params.put("created_date", "2021-06-28");
             SearchResultView searchResultView = new SearchResultView();
             when(fieldMapSanitizerOperation.execute(params)).thenReturn(sanitised);
             when(searchQueryOperation.execute(eq(null), any(MetaData.class), eq(sanitised)))
@@ -177,6 +181,53 @@ class QueryEndpointTest {
 
             assertThat(result, is(searchResultView));
             verify(searchQueryOperation).execute(eq(null), any(MetaData.class), eq(sanitised));
+        }
+
+        @Test
+        @DisplayName("Should should throw bad request exception")
+        void shouldThrowBadRequestException() {
+            String expectedErrorMessage = V2.Error.DATE_STRING_INVALID + "2021-06-28T::.000";
+            Map<String, String> params = new HashMap<>();
+            Map<String, String> sanitised = new HashMap<>();
+            params.put("created_date", "2021-06-28T::.000");
+            params.put("last_modified_date", "2021-06-29T::.000");
+
+            Exception exception = assertThrows(BadRequestException.class, () -> {
+                queryEndpoint.searchNew("DIVORCE", "DIVORCE", params);
+            });
+            assertTrue(exception.getMessage().contains(expectedErrorMessage));
+        }
+
+        @Test
+        @DisplayName("Should should throw bad request exception for 3rd date")
+        void shouldThrowBadRequestExceptionForLastDate() {
+            Map<String, String> params = new HashMap<>();
+            Map<String, String> sanitised = new HashMap<>();
+            params.put("created_date", "2021-06-28");
+            params.put("last_state_modified_date", "2021-06-29");
+            params.put("last_modified_date", "2021-06-30T::.000");
+
+            Exception exception = assertThrows(BadRequestException.class, () -> {
+                queryEndpoint.searchNew("DIVORCE", "DIVORCE", params);
+            });
+            String expectedErrorMessage = V2.Error.DATE_STRING_INVALID + "2021-06-30T::.000";
+            assertTrue(exception.getMessage().contains(expectedErrorMessage));
+        }
+
+        @Test
+        @DisplayName("Should should throw bad request exception for 2nd and 3rd date")
+        void shouldThrowBadRequestExceptionForTwoDates() {
+            Map<String, String> params = new HashMap<>();
+            Map<String, String> sanitised = new HashMap<>();
+            params.put("created_date", "2021-06-28");
+            params.put("last_state_modified_date", "2021-06-29T::.000");
+            params.put("last_modified_date", "2021-06-30T::.000");
+
+            Exception exception = assertThrows(BadRequestException.class, () -> {
+                queryEndpoint.searchNew("DIVORCE", "DIVORCE", params);
+            });
+            String expectedErrorMessage = V2.Error.DATE_STRING_INVALID + "2021-06-30T::.000, 2021-06-29T::.000";
+            assertTrue(exception.getMessage().contains(expectedErrorMessage));
         }
 
     }
