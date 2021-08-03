@@ -186,7 +186,7 @@ public class ApplicationParams {
     }
 
     public String draftURL(String draftId) {
-        return draftHost + "/drafts/" + draftId;
+        return draftHost + "/drafts/" + encode(draftId);
     }
 
     public String getDraftEncryptionKey() {
