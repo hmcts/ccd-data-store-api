@@ -101,7 +101,8 @@ class AuthorisedCaseSearchOperationTest {
             CaseDetails caseDetails = new CaseDetails();
             caseDetails.setCaseTypeId(CASE_TYPE_ID_1);
             CaseSearchResult searchResult = new CaseSearchResult(1L, singletonList(caseDetails));
-            when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class), anyBoolean())).thenReturn(searchResult);
+            when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class),
+                anyBoolean())).thenReturn(searchResult);
 
             Map<String, JsonNode> unFilteredData = new HashMap<>();
             caseDetails.setData(unFilteredData);
@@ -176,7 +177,8 @@ class AuthorisedCaseSearchOperationTest {
             caseDetails.setCaseTypeId(CASE_TYPE_ID_1);
             caseTypeDefinition.setSearchAliasFields(getSearchAliasFields());
             searchResult = new CaseSearchResult(1L, singletonList(caseDetails));
-            when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class), anyBoolean())).thenReturn(searchResult);
+            when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class),
+                anyBoolean())).thenReturn(searchResult);
             when(objectMapperService.createEmptyJsonNode()).thenReturn(JsonNodeFactory.instance.objectNode());
             when(objectMapperService.convertJsonNodeToMap(any(JsonNode.class))).thenReturn(transformedData);
         }
@@ -184,7 +186,8 @@ class AuthorisedCaseSearchOperationTest {
         @Test
         @DisplayName("should transform search results to alias names defined in source filter")
         void shouldTransformMultiCaseTypeSearchResults() {
-            when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class), anyBoolean())).thenReturn(searchResult);
+            when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class),
+                anyBoolean())).thenReturn(searchResult);
 
             ObjectNode dataNode = JsonNodeFactory.instance.objectNode();
             dataNode.set("firstName", JsonNodeFactory.instance.textNode("Baker"));

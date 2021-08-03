@@ -71,7 +71,8 @@ class UICaseSearchControllerTest {
         JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
         ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode);
         when(elasticsearchQueryHelper.validateAndConvertRequest(any())).thenReturn(elasticSearchRequest);
-        when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class), anyBoolean())).thenReturn(caseSearchResult);
+        when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class),
+            anyBoolean())).thenReturn(caseSearchResult);
         when(caseSearchResultViewGenerator.execute(any(), any(), any(), any())).thenReturn(caseSearchResultView);
 
         final ResponseEntity<CaseSearchResultViewResource> response = controller
