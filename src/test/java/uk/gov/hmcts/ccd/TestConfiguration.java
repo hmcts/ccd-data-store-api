@@ -1,11 +1,6 @@
 package uk.gov.hmcts.ccd;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,21 +11,19 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.ContextCleanupListener;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opentable.db.postgres.embedded.EmbeddedPostgres;
-
-import javax.annotation.PreDestroy;
-import javax.sql.DataSource;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Arrays;
-
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+
+import java.io.IOException;
+import java.util.Arrays;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @Configuration
 @Profile("test")
@@ -39,10 +32,6 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 class TestConfiguration extends ContextCleanupListener {
 
     private final ApplicationParams applicationParams;
-
-    private final PostgresUtil postgresUtil;
-
-    private EmbeddedPostgres pg;
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -105,9 +94,8 @@ class TestConfiguration extends ContextCleanupListener {
             + "]";
 
     @Autowired
-    TestConfiguration(final ApplicationParams applicationParams, final PostgresUtil postgresUtil) {
+    TestConfiguration(final ApplicationParams applicationParams) {
         this.applicationParams = applicationParams;
-        this.postgresUtil = postgresUtil;
     }
 
     @Bean
@@ -132,17 +120,6 @@ class TestConfiguration extends ContextCleanupListener {
         when(caseDefinitionRepository.getJurisdiction(anyString())).thenCallRealMethod();
         when(caseDefinitionRepository.getJurisdictionFromDefinitionStore(anyString())).thenCallRealMethod();
         return caseDefinitionRepository;
-    }
-
-    @Bean
-    DataSource dataSource() throws IOException, SQLException {
-        pg = postgresUtil.embeddedPostgres();
-        return postgresUtil.dataSource(pg);
-    }
-
-    @PreDestroy
-    void contextDestroyed() throws IOException {
-        postgresUtil.contextDestroyed(pg);
     }
 
     @Bean
