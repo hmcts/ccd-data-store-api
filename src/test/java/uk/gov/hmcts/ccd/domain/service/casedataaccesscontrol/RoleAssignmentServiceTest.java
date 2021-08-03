@@ -1,5 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import com.google.common.collect.Lists;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,14 +19,9 @@ import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.MatcherType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -188,6 +189,29 @@ class RoleAssignmentServiceTest {
 
             List<String> resultCases =
                 roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID, caseTypeDefinition);
+
+            assertTrue(resultCases.size() == 2);
+            roleAssignmentFilteringService.filter(roleAssignments, caseTypeDefinition);
+        }
+
+        @Test
+        public void shouldGetRoleAssignmentsBasedOnExcluded() {
+
+            given(roleAssignmentRepository.getRoleAssignments(USER_ID))
+                .willReturn(mockedRoleAssignmentResponse);
+
+            RoleAssignments roleAssignments = getRoleAssignments();
+            given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))
+                .willReturn(roleAssignments);
+
+            given(filteredRoleAssignments.getFilteredMatchingRoleAssignments())
+                .willReturn(roleAssignments.getRoleAssignments());
+            given(roleAssignmentFilteringService.filter(roleAssignments, caseTypeDefinition,
+                Lists.newArrayList(MatcherType.GRANTTYPE)))
+                .willReturn(filteredRoleAssignments);
+
+            List<RoleAssignment> resultCases =
+                roleAssignmentService.getRoleAssignments(USER_ID, caseTypeDefinition);
 
             assertTrue(resultCases.size() == 2);
             roleAssignmentFilteringService.filter(roleAssignments, caseTypeDefinition);

@@ -12,6 +12,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 public class JurisdictionMatcher implements RoleAttributeMatcher {
 
     @Override
+    public MatcherType getType() {
+        return MatcherType.JURISDICTION;
+    }
+
+    @Override
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseDetails caseDetails) {
         return matchJurisdiction(roleAssignment, caseDetails.getJurisdiction());
     }

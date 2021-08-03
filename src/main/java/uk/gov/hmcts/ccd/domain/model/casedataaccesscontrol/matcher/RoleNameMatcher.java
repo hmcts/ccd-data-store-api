@@ -13,6 +13,11 @@ import java.util.List;
 public class RoleNameMatcher implements RoleAttributeMatcher {
 
     @Override
+    public MatcherType getType() {
+        return MatcherType.ROLENAME;
+    }
+
+    @Override
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseTypeDefinition caseTypeDefinition) {
         String roleName = roleAssignment.getRoleName();
         List<RoleToAccessProfileDefinition> roleToAccessProfiles = caseTypeDefinition.getRoleToAccessProfiles();

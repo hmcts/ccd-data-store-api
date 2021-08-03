@@ -12,6 +12,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 public class RegionMatcher implements RoleAttributeMatcher {
 
     @Override
+    public MatcherType getType() {
+        return MatcherType.REGION;
+    }
+
+    @Override
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseDetails caseDetails) {
         String caseRegion = getRegion(caseDetails).orElse("");
         log.debug("Match role assignment region {} and case details region {} for role assignment {}",

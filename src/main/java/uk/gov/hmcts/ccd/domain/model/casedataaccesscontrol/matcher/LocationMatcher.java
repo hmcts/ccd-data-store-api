@@ -12,6 +12,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 public class LocationMatcher implements RoleAttributeMatcher {
 
     @Override
+    public MatcherType getType() {
+        return MatcherType.LOCATION;
+    }
+
+    @Override
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseDetails caseDetails) {
         String caseLocation = getLocation(caseDetails).orElse(EMPTY_STR);
         log.debug("Match role assignment location {} with case details location {} for role assignment {}",

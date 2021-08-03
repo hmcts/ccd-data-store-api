@@ -118,7 +118,7 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
 
         BoolQueryBuilder orgQuery = (BoolQueryBuilder) query.should().get(1);
         assertNotNull(orgQuery);
-        assertEquals(2, orgQuery.should().size());
+        assertEquals(1, orgQuery.should().size());
         assertEquals(0, orgQuery.mustNot().size());
     }
 
@@ -154,7 +154,7 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
 
         BoolQueryBuilder orgQuery = (BoolQueryBuilder) query.should().get(1);
         assertNotNull(orgQuery);
-        assertEquals(2, orgQuery.should().size());
+        assertEquals(1, orgQuery.should().size());
         assertEquals(1, orgQuery.mustNot().size());
     }
 }

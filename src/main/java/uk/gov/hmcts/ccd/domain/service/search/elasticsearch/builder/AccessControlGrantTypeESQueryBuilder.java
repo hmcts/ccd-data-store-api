@@ -59,9 +59,15 @@ public class AccessControlGrantTypeESQueryBuilder {
             orgQuery.should(challengedQuery);
         }
 
+        BoolQueryBuilder orgQueryWithExcluded = QueryBuilders.boolQuery();
+
         BoolQueryBuilder excludedQuery = excludedGrantTypeQueryBuilder.createQuery(roleAssignments);
         if (excludedQuery.hasClauses()) {
-            orgQuery.mustNot(excludedQuery);
+            orgQueryWithExcluded.mustNot(excludedQuery);
+        }
+
+        if (orgQuery.hasClauses()) {
+            orgQueryWithExcluded.should(orgQuery);
         }
 
         BoolQueryBuilder basicQuery = basicGrantTypeQueryBuilder.createQuery(roleAssignments);
@@ -81,8 +87,8 @@ public class AccessControlGrantTypeESQueryBuilder {
             grantTypeQuery.should(nonOrgQuery);
         }
 
-        if (orgQuery.hasClauses()) {
-            grantTypeQuery.should(orgQuery);
+        if (orgQueryWithExcluded.hasClauses()) {
+            grantTypeQuery.should(orgQueryWithExcluded);
         }
 
         return grantTypeQuery;
