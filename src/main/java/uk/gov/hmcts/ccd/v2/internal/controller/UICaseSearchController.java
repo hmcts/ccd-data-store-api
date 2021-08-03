@@ -168,7 +168,7 @@ public class UICaseSearchController {
             .withSearchRequest(searchRequest)
             .build();
 
-        CaseSearchResult caseSearchResult = caseSearchOperation.execute(request, true);
+        CaseSearchResult caseSearchResult = caseSearchOperation.execute(request, false);
         CaseSearchResultView caseSearchResultView = caseSearchResultViewGenerator
             .execute(caseTypeId, caseSearchResult, useCaseUppercase, requestedFields);
 

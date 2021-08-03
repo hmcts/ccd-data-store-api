@@ -123,7 +123,7 @@ public class ElasticsearchRequest {
      *
      * @return JSON string representing the Elasticsearch request object.
      */
-    public String toFinalRequest(Boolean dataClassification) {
+    public String toFinalRequest(boolean dataClassification) {
         JsonNode mergedRequest = nativeSearchRequest.deepCopy();
 
         ((ObjectNode) mergedRequest).set(SOURCE, mergedSourceFields(dataClassification));
@@ -131,7 +131,7 @@ public class ElasticsearchRequest {
         return mergedRequest.toString();
     }
 
-    private ArrayNode mergedSourceFields(Boolean dataClassification) {
+    private ArrayNode mergedSourceFields(boolean dataClassification) {
         ArrayNode sourceFields = METADATA_FIELDS.deepCopy();
         if (dataClassification) {
             sourceFields.add(new TextNode(DATA_CLASSIFICATION_COL));

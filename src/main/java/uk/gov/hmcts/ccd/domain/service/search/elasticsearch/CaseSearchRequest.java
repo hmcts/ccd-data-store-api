@@ -45,7 +45,7 @@ public class CaseSearchRequest {
         return elasticsearchRequest.getQuery().toString();
     }
 
-    public String toJsonString(Boolean dataClassification) {
+    public String toJsonString(boolean dataClassification) {
         String jsonString = elasticsearchRequest.toFinalRequest(dataClassification);
         log.debug("json search request: {}", jsonString);
         return jsonString;

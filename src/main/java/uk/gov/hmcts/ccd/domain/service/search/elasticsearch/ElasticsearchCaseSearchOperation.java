@@ -61,7 +61,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     @Override
-    public CaseSearchResult execute(CrossCaseTypeSearchRequest request, Boolean dataClassification) {
+    public CaseSearchResult execute(CrossCaseTypeSearchRequest request, boolean dataClassification) {
         MultiSearchResult result = search(request, dataClassification);
         if (result.isSucceeded()) {
             return toCaseDetailsSearchResult(result, request);
@@ -70,7 +70,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         }
     }
 
-    private MultiSearchResult search(CrossCaseTypeSearchRequest request, Boolean dataClassification) {
+    private MultiSearchResult search(CrossCaseTypeSearchRequest request, boolean dataClassification) {
         MultiSearch multiSearch = secureAndTransformSearchRequest(request, dataClassification);
         try {
             return jestClient.execute(multiSearch);
@@ -80,7 +80,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     private MultiSearch secureAndTransformSearchRequest(CrossCaseTypeSearchRequest request,
-                                                        Boolean dataClassification) {
+                                                        boolean dataClassification) {
         Collection<Search> securedSearches = request.getCaseTypeIds()
             .stream()
             .map(caseTypeId -> createSecuredSearch(caseTypeId, request, dataClassification))
@@ -90,7 +90,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     private Search createSecuredSearch(String caseTypeId, CrossCaseTypeSearchRequest request,
-                                       Boolean dataClassification) {
+                                       boolean dataClassification) {
         CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(
             new CaseSearchRequest(caseTypeId, request.getElasticSearchRequest()), dataClassification);
         return new Search.Builder(securedSearchRequest.toJsonString(dataClassification))

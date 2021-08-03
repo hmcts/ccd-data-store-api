@@ -93,9 +93,8 @@ public class CaseSearchEndpoint {
             + " \"_source\":[\"alias.customer\",\"alias.postcode\"]",
             required = true)
         @RequestBody String jsonSearchRequest,
-        @RequestParam(value = "data_classification", required = false) Boolean dataClassification) {
+        @RequestParam(value = "data_classification", defaultValue = "true") boolean dataClassification) {
 
-        dataClassification = (dataClassification == null) ? true : dataClassification.booleanValue();
         Instant start = Instant.now();
         validateCtid(caseTypeIds);
 

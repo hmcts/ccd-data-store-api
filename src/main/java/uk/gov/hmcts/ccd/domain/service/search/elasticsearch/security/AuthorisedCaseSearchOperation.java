@@ -71,7 +71,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     }
 
     @Override
-    public CaseSearchResult execute(CrossCaseTypeSearchRequest searchRequest, Boolean dataClassification) {
+    public CaseSearchResult execute(CrossCaseTypeSearchRequest searchRequest, boolean dataClassification) {
         List<CaseTypeDefinition> authorisedCaseTypes = getAuthorisedCaseTypes(searchRequest);
         CrossCaseTypeSearchRequest authorisedSearchRequest =
             createAuthorisedSearchRequest(authorisedCaseTypes, searchRequest);
@@ -103,7 +103,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
 
     private CaseSearchResult searchCasesAndFilterFieldsByAccess(List<CaseTypeDefinition> authorisedCaseTypes,
                                                                 CrossCaseTypeSearchRequest authorisedSearchRequest,
-                                                                Boolean dataClassification) {
+                                                                boolean dataClassification) {
         if (authorisedCaseTypes.isEmpty()) {
             return CaseSearchResult.EMPTY;
         }
