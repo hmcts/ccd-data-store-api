@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import com.google.common.collect.Maps;
 import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,12 +28,18 @@ import uk.gov.hmcts.ccd.domain.service.AuthorisationMapper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+import static com.google.common.collect.Sets.newHashSet;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -47,6 +54,9 @@ import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantTyp
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.CHALLENGED;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.SPECIFIC;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.STANDARD;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultCaseDataAccessControlTest {
@@ -63,6 +73,8 @@ class DefaultCaseDataAccessControlTest {
     private static final String AUTHORISATION_2 = "TEST_AUTH_2";
 
     private static final String CASE_TYPE_1 = "TEST_CASE_TYPE";
+    private HashMap<String, Predicate<AccessControlList>> accessMap;
+    private final Set<String> userRoles = newHashSet(ROLE_NAME_1, ROLE_NAME_2, ROLE_NAME_3);
 
     @Mock
     private RoleAssignmentService roleAssignmentService;
@@ -94,14 +106,22 @@ class DefaultCaseDataAccessControlTest {
     @InjectMocks
     private DefaultCaseDataAccessControl defaultCaseDataAccessControl;
 
+    @BeforeEach
+    void setUp() {
+        this.accessMap = Maps.newHashMap();
+        accessMap.put("create", CAN_CREATE);
+        accessMap.put("update", CAN_UPDATE);
+        accessMap.put("read", CAN_READ);
+    }
+
     @Test
-    void generateAccessProfilesByCaseTypeId() {
+    void itShouldRemoveCaseDefinitionBaseOnRoleType() {
         CaseTypeDefinition caseTypeDefinition =  createCaseTypeDefinition(ROLE_NAME_1);
 
         doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
         doReturn(USER_ID).when(securityUtils).getUserId();
         RoleAssignments roleAssignments = mock(RoleAssignments.class);
-        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignmentsForCreate(anyString());
         Map<String, String> roleAndGrantType = Maps.newHashMap();
         roleAndGrantType.put(ROLE_NAME_1, BASIC.name());
         List<RoleAssignment> roleAssignments1 = createFilteringResults(roleAndGrantType);
@@ -112,19 +132,95 @@ class DefaultCaseDataAccessControlTest {
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
         doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
 
-        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
-            .generateAccessProfilesByCaseTypeId(CASE_TYPE_1);
+        var accessProfiles = createAccessProfiles(userRoles);
+        var result = defaultCaseDataAccessControl
+            .shouldRemoveCaseDefinition(accessProfiles, accessMap.get("create"), CASE_TYPE_1);
 
-        assertNotNull(accessProfiles);
-        assertEquals(1, accessProfiles.size());
+        verifyRemoveDefintion(caseDefinitionRepository, securityUtils, roleAssignmentService,
+            roleAssignmentsFilteringService, applicationParams, accessProfileService);
+        assertFalse(result);
+    }
+
+    @Test
+    void itShouldNotRemoveCaseDefinitionBaseOnRoleTypeDueReadAccess() {
+        CaseTypeDefinition caseTypeDefinition =  createCaseTypeDefinition(ROLE_NAME_1);
+
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        doReturn(USER_ID).when(securityUtils).getUserId();
+        RoleAssignments roleAssignments = mock(RoleAssignments.class);
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignmentsForCreate(anyString());
+        Map<String, String> roleAndGrantType = Maps.newHashMap();
+        roleAndGrantType.put(ROLE_NAME_1, BASIC.name());
+        List<RoleAssignment> roleAssignments1 = createFilteringResults(roleAndGrantType);
+        doReturn(roleAssignments1).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
+
+        doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+        doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
+
+        var accessProfiles = createAccessProfiles(userRoles);
+        var result = defaultCaseDataAccessControl
+            .shouldRemoveCaseDefinition(accessProfiles, accessMap.get("read"), CASE_TYPE_1);
+
+        verifyRemoveDefintion(caseDefinitionRepository, securityUtils, roleAssignmentService,
+            roleAssignmentsFilteringService, applicationParams, accessProfileService);
+        assertFalse(result);
+    }
+
+    @Test
+    void itShouldNotRemoveCaseDefinitionBaseOnRoleTypeDueToEmptyRA() {
+
+        CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
+
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        doReturn(USER_ID).when(securityUtils).getUserId();
+        RoleAssignments roleAssignments = mock(RoleAssignments.class);
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignmentsForCreate(anyString());
+        Map<String, String> roleAndGrantType = Maps.newHashMap();
+        roleAndGrantType.put(ROLE_NAME_1, BASIC.name());
+        List<RoleAssignment> roleAssignments1 = createFilteringResults(roleAndGrantType);
+        var filteredRoleAssignmentsEmpty = new ArrayList<>();
+        doReturn(filteredRoleAssignmentsEmpty).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
+
+        doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+        doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
+
+        var accessProfiles = createAccessProfiles(userRoles);
+        var result = defaultCaseDataAccessControl
+            .shouldRemoveCaseDefinition(accessProfiles, accessMap.get("create"), CASE_TYPE_1);
+
+        verifyRemoveDefintion(caseDefinitionRepository, securityUtils, roleAssignmentService,
+            roleAssignmentsFilteringService, applicationParams, accessProfileService);
+        assertTrue(result);
+    }
+
+    private static void verifyRemoveDefintion(CaseDefinitionRepository caseDefinitionRepository,
+                                              SecurityUtils securityUtils, RoleAssignmentService roleAssignmentService,
+                                              RoleAssignmentsFilteringService roleAssignmentsFilteringService,
+                                              ApplicationParams applicationParams,
+                                              AccessProfileService accessProfileService) {
+
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
         verify(securityUtils).getUserId();
-        verify(roleAssignmentService).getRoleAssignments(anyString());
+        verify(roleAssignmentService).getRoleAssignmentsForCreate(anyString());
         verify(roleAssignmentsFilteringService).filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
         verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
         verify(applicationParams).getEnablePseudoAccessProfilesGeneration();
         verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
     }
+
+
+    private Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+        return userRoles.stream()
+            .map(userRole -> AccessProfile.builder().readOnly(false)
+                .accessProfile(userRole)
+                .build())
+            .collect(Collectors.toSet());
+    }
+
 
     @Test
     void shouldReturnEmptyAccessProfilesWhenAccessProfilesHasExcludeGrantType() {

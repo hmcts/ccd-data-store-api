@@ -114,6 +114,11 @@ public class RoleAssignmentService implements AccessControl {
         return roleAssignmentsMapper.toRoleAssignments(roleAssignmentResponse);
     }
 
+    public RoleAssignments getRoleAssignmentsForCreate(String userId) {
+        final var roleAssignments = getRoleAssignments(userId);
+        return getOrganisationRA(roleAssignments.getRoleAssignments());
+    }
+
     public List<String> getCaseReferencesForAGivenUser(String userId) {
         final var roleAssignments = this.getRoleAssignments(userId);
         return getValidCaseIds(roleAssignments.getRoleAssignments());
@@ -137,9 +142,20 @@ public class RoleAssignmentService implements AccessControl {
             .collect(Collectors.toList());
     }
 
+    private RoleAssignments getOrganisationRA(List<RoleAssignment> roleAssignmentsList) {
+        return RoleAssignments.builder().roleAssignments(roleAssignmentsList.stream()
+            .filter(this::isValidOrganisation)
+            .collect(Collectors.toList())).build();
+    }
+
     private boolean isValidRoleAssignment(RoleAssignment roleAssignment) {
         final boolean isCaseRoleType = roleAssignment.getRoleType().equals(RoleType.CASE.name());
         return roleAssignment.isNotExpiredRoleAssignment() && isCaseRoleType;
+    }
+
+    private boolean isValidOrganisation(RoleAssignment roleAssignment) {
+        final boolean isOrgRole = roleAssignment.getRoleType().equals(RoleType.ORGANISATION.name());
+        return roleAssignment.isNotExpiredRoleAssignment() && isOrgRole;
     }
 
     public List<CaseAssignedUserRole> findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds) {
