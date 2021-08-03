@@ -19,6 +19,7 @@ import java.util.List;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.argThat;
@@ -47,7 +48,7 @@ class CaseSearchEndpointTest {
     @Test
     void searchCaseDetailsInvokesOperation() throws JsonProcessingException {
         CaseSearchResult result = mock(CaseSearchResult.class);
-        when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class), any())).thenReturn(result);
+        when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class), anyBoolean())).thenReturn(result);
         String searchRequest = "{\"query\": {\"match\": \"blah blah\"}}";
         JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
         ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode);
@@ -64,7 +65,7 @@ class CaseSearchEndpointTest {
             assertThat(crossCaseTypeSearchRequest.isMultiCaseTypeSearch(), is(false));
             assertThat(crossCaseTypeSearchRequest.getAliasFields().size(), is(0));
             return true;
-        }), any());
+        }), anyBoolean());
         assertThat(caseSearchResult, is(result));
     }
 }

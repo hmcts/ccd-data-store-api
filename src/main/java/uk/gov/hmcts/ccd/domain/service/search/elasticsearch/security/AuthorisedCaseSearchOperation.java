@@ -109,14 +109,15 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         }
 
         CaseSearchResult result = caseSearchOperation.execute(authorisedSearchRequest, dataClassification);
-        filterCaseDataByCaseType(authorisedCaseTypes, result.getCases(), authorisedSearchRequest);
+        filterCaseDataByCaseType(authorisedCaseTypes, result.getCases(), authorisedSearchRequest, dataClassification);
 
         return result;
     }
 
     private void filterCaseDataByCaseType(List<CaseTypeDefinition> authorisedCaseTypes,
                                           List<CaseDetails> cases,
-                                          CrossCaseTypeSearchRequest authorisedSearchRequest) {
+                                          CrossCaseTypeSearchRequest authorisedSearchRequest,
+                                          boolean dataClassification) {
         Map<String, CaseTypeDefinition> caseTypeIdByCaseType = authorisedCaseTypes
             .stream()
             .collect(Collectors.toMap(CaseTypeDefinition::getId, Function.identity()));
@@ -125,14 +126,16 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
             .filter(caseDetails -> caseTypeIdByCaseType.containsKey(caseDetails.getCaseTypeId()))
             .forEach(caseDetails -> filterCaseData(caseTypeIdByCaseType.get(caseDetails.getCaseTypeId()),
                                                    caseDetails,
-                                                   authorisedSearchRequest));
+                                                   authorisedSearchRequest,
+                                                   dataClassification));
     }
 
     private void filterCaseData(CaseTypeDefinition authorisedCaseType,
                                 CaseDetails caseDetails,
-                                CrossCaseTypeSearchRequest authorisedSearchRequest) {
+                                CrossCaseTypeSearchRequest authorisedSearchRequest,
+                                boolean dataClassification) {
         filterCaseDataByAclAccess(authorisedCaseType, caseDetails);
-        filterCaseDataBySecurityClassification(caseDetails);
+        filterCaseDataBySecurityClassification(caseDetails, dataClassification);
         filterCaseDataForMultiCaseTypeSearch(authorisedSearchRequest, authorisedCaseType, caseDetails);
     }
 
@@ -144,8 +147,9 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         caseDetails.setData(jsonNodeToCaseData(accessFilteredData));
     }
 
-    private void filterCaseDataBySecurityClassification(CaseDetails caseDetails) {
-        classificationService.applyClassification(caseDetails);
+    private void filterCaseDataBySecurityClassification(CaseDetails caseDetails,
+                                                        boolean dataClassification) {
+        classificationService.applyClassification(caseDetails, dataClassification);
     }
 
     /**
