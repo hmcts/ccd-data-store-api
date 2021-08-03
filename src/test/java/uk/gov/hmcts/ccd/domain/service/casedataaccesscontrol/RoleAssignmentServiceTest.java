@@ -28,6 +28,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -302,14 +303,41 @@ class RoleAssignmentServiceTest {
 
         @Test
         void shouldGetRoleAssignments() {
+
+            // GIVEN
             given(roleAssignmentRepository.getRoleAssignments(USER_ID))
                 .willReturn(mockedRoleAssignmentResponse);
             given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))
                 .willReturn(mockedRoleAssignments);
 
+            // WHEN
             RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(USER_ID);
 
+            // THEN
             assertThat(roleAssignments, is(mockedRoleAssignments));
+        }
+    }
+
+    @Nested
+    @DisplayName("getRoleAssignmentsForCreate()")
+    class GetRoleAssignmentsForCreate {
+
+        @Test
+        void shouldGetRoleAssignmentsForCreate() {
+
+            // GIVEN
+            final var expectedResult =  new RoleAssignments();
+            expectedResult.setRoleAssignments(new ArrayList<>());
+            given(roleAssignmentRepository.getRoleAssignments(USER_ID))
+                .willReturn(mockedRoleAssignmentResponse);
+            given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))
+                .willReturn(mockedRoleAssignments);
+
+            // WHEN
+            final var roleAssignments = roleAssignmentService.getRoleAssignmentsForCreate(USER_ID);
+
+            // THEN
+            assertThat(roleAssignments, is(expectedResult));
         }
     }
 
