@@ -13,6 +13,7 @@ Scenario: must return 201 if the grant is successful for a user to a valid case 
     Given a user with [an active profile in CCD],
       And a user [testUser - with an active profile in CCD],
       And a case that has just been created as in [Standard_Full_Case_Creation_Data],
+      And a call [to verify testUser has been granted no case roles for the case] will get the expected response as in [F-045_Verify_Granted_No_Case_Roles_for_Case],
 
      When a request is prepared with appropriate values,
       And the request [uses the id of the case just created],
@@ -20,7 +21,8 @@ Scenario: must return 201 if the grant is successful for a user to a valid case 
 
      Then a positive response is received,
       And the response [has the 201 return code],
-      And the response has all other details as expected.
+      And the response has all other details as expected,
+      And a call [to verify testUser has been granted a case role for the case] will get the expected response as in [F-045_Verify_Granted_Case_Role_for_Case].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @S-152
@@ -96,5 +98,24 @@ Scenario: must return negative response when case id contains some non-numeric c
      Then a negative response is received,
       And the response [has the 400 return code],
       And the response has all other details as expected.
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+@S-045.07
+Scenario: must grant without removing other case roles
+
+    Given a user with [an active profile in CCD],
+      And a user [testUser - with an active profile in CCD],
+      And a case that has just been created as in [F-045_Befta_Jurisdiction2_Full_Case_Creation_Data],
+      And a call [to grant an extra case-role to the case] will get the expected response as in [F-045_Grant_Case_Role],
+      And a call [to verify testUser has been granted the extra case role for the case] will get the expected response as in [F-045_Verify_Granted_Extra_Case_Role_for_Case],
+
+     When a request is prepared with appropriate values,
+      And the request [uses the id of the case just created],
+      And it is submitted to call the [Grant access to case] operation of [CCD Data Store],
+
+     Then a positive response is received,
+      And the response [has the 201 return code],
+      And the response has all other details as expected,
+      And a call [to verify testUser has been granted multiple case roles for the case] will get the expected response as in [F-045_Verify_Granted_Multiple_Case_Roles_for_Case].
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

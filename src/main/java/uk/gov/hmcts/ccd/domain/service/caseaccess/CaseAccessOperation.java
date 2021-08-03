@@ -73,7 +73,13 @@ public class CaseAccessOperation {
         final var caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
 
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
-            roleAssignmentService.createCaseRoleAssignments(caseDetails, userId, Set.of(CREATOR.getRole()), true);
+            var currentRoles
+                = roleAssignmentService.findRoleAssignmentsByCasesAndUsers(List.of(caseReference), List.of(userId));
+
+            // if user does not have CREATOR role for case
+            if (currentRoles.stream().noneMatch(cauRole -> cauRole.getCaseRole().equals(CREATOR.getRole()))) {
+                roleAssignmentService.createCaseRoleAssignments(caseDetails, userId, Set.of(CREATOR.getRole()), false);
+            }
         } else {
             caseUserRepository.grantAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
         }
