@@ -4,8 +4,10 @@ import com.google.common.collect.Maps;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -13,9 +15,9 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -47,15 +49,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.BASIC;
-import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.CHALLENGED;
-import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.SPECIFIC;
-import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType.STANDARD;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment.builder;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.BASIC;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.CHALLENGED;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.SPECIFIC;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.STANDARD;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_UPDATE;
 
+@ExtendWith(MockitoExtension.class)
 class DefaultCaseDataAccessControlTest {
 
     private static final String ROLE_NAME_1 = "TEST_ROLE_1";
@@ -82,7 +85,8 @@ class DefaultCaseDataAccessControlTest {
     @Mock
     private RoleAssignmentsFilteringService roleAssignmentsFilteringService;
 
-    private AccessProfileServiceImpl accessProfileService;
+    private final AccessProfileService accessProfileService =
+        spy(new AccessProfileServiceImpl(new AuthorisationMapper()));
 
     @Mock
     private PseudoRoleAssignmentsGenerator pseudoRoleAssignmentsGenerator;
@@ -91,32 +95,23 @@ class DefaultCaseDataAccessControlTest {
     private ApplicationParams applicationParams;
 
     @Mock
-    private PseudoRoleToAccessProfileGenerator pseudoRoleToAccessProfileGenerator;
-
-    @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
 
-    @Mock
+    @Mock(lenient = true)
     private CaseDetailsRepository caseDetailsRepository;
 
-    @Mock
+    @Mock(lenient = true)
     private FilteredRoleAssignments filteredRoleAssignments;
 
+    @InjectMocks
     private DefaultCaseDataAccessControl defaultCaseDataAccessControl;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
-        accessProfileService = spy(new AccessProfileServiceImpl(new AuthorisationMapper()));
-        defaultCaseDataAccessControl = new DefaultCaseDataAccessControl(roleAssignmentService, securityUtils,
-            roleAssignmentsFilteringService, pseudoRoleAssignmentsGenerator, applicationParams,
-            accessProfileService, pseudoRoleToAccessProfileGenerator, caseDefinitionRepository, caseDetailsRepository);
-
         this.accessMap = Maps.newHashMap();
         accessMap.put("create", CAN_CREATE);
         accessMap.put("update", CAN_UPDATE);
         accessMap.put("read", CAN_READ);
-
     }
 
     @Test
@@ -206,7 +201,7 @@ class DefaultCaseDataAccessControlTest {
                                               SecurityUtils securityUtils, RoleAssignmentService roleAssignmentService,
                                               RoleAssignmentsFilteringService roleAssignmentsFilteringService,
                                               ApplicationParams applicationParams,
-                                              AccessProfileServiceImpl accessProfileService) {
+                                              AccessProfileService accessProfileService) {
 
         verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
         verify(securityUtils).getUserId();

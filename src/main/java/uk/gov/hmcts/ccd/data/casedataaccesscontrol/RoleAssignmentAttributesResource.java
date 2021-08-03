@@ -1,19 +1,21 @@
 package uk.gov.hmcts.ccd.data.casedataaccesscontrol;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.util.Optional;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 /**
  * Used Optional<Striing> in this class, this will help to have three different values for the object when
  * JSON de-serialisation is invoked.

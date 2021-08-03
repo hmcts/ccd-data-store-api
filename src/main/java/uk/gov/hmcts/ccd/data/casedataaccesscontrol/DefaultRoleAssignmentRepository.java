@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -42,9 +43,9 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
         "No Role Assignments found for userIds=%s and casesIds=%s when getting from Role Assignment Service because of %s";
 
     public static final String ROLE_ASSIGNMENTS_CLIENT_ERROR =
-        "Client error when getting Role Assignments from Role Assignment Service because of %s";
+        "Client error when %s Role Assignments from Role Assignment Service because of %s";
     public static final String ROLE_ASSIGNMENT_SERVICE_ERROR =
-        "Problem getting Role Assignments from Role Assignment Service because of %s";
+        "Problem %s Role Assignments from Role Assignment Service because of %s";
     private static final String GZIP_POSTFIX = "--gzip";
 
     private final ApplicationParams applicationParams;
@@ -63,6 +64,25 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
     }
 
     @Override
+    public RoleAssignmentRequestResponse createRoleAssignment(RoleAssignmentRequestResource assignmentRequest) {
+        try {
+            final HttpEntity<Object> requestEntity =
+                new HttpEntity<>(assignmentRequest, securityUtils.authorizationHeaders());
+
+            return restTemplate.exchange(
+                applicationParams.roleAssignmentBaseURL(),
+                HttpMethod.POST,
+                requestEntity,
+                RoleAssignmentRequestResponse.class
+            ).getBody();
+
+        } catch (HttpStatusCodeException e) {
+            log.warn("Error while creating Role Assignments", e);
+            throw mapException(e, "creating");
+        }
+    }
+
+    @Override
     public RoleAssignmentResponse getRoleAssignments(String userId) {
         try {
             HttpHeaders headers = securityUtils.authorizationHeaders();
@@ -77,11 +97,8 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
                 && ((HttpClientErrorException) e).getRawStatusCode() == HttpStatus.NOT_FOUND.value()) {
                 throw new ResourceNotFoundException(String.format(ROLE_ASSIGNMENTS_NOT_FOUND,
                                                                   userId, e.getMessage()));
-            } else if (e instanceof HttpClientErrorException
-                && HttpStatus.valueOf(((HttpClientErrorException) e).getRawStatusCode()).is4xxClientError()) {
-                throw new BadRequestException(String.format(ROLE_ASSIGNMENTS_CLIENT_ERROR, e.getMessage()));
             } else {
-                throw new ServiceException(String.format(ROLE_ASSIGNMENT_SERVICE_ERROR, e.getMessage()));
+                throw mapException(e, "getting");
             }
         }
     }
@@ -174,11 +191,20 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
         if (exception instanceof HttpClientErrorException
             && ((HttpClientErrorException) exception).getRawStatusCode() == HttpStatus.NOT_FOUND.value()) {
             return resourceNotFoundException;
-        } else if (exception instanceof HttpClientErrorException
-            && HttpStatus.valueOf(((HttpClientErrorException) exception).getRawStatusCode()).is4xxClientError()) {
-            return new BadRequestException(String.format(ROLE_ASSIGNMENTS_CLIENT_ERROR, exception.getMessage()));
         } else {
-            return new ServiceException(String.format(ROLE_ASSIGNMENT_SERVICE_ERROR, exception.getMessage()));
+            return mapException(exception, "getting");
+        }
+    }
+
+    private RuntimeException mapException(Exception exception, String processDescription) {
+
+        if (exception instanceof HttpClientErrorException
+            && HttpStatus.valueOf(((HttpClientErrorException) exception).getRawStatusCode()).is4xxClientError()) {
+            return new BadRequestException(
+                String.format(ROLE_ASSIGNMENTS_CLIENT_ERROR, processDescription, exception.getMessage()));
+        } else {
+            return new ServiceException(
+                String.format(ROLE_ASSIGNMENT_SERVICE_ERROR, processDescription, exception.getMessage()));
         }
     }
 
