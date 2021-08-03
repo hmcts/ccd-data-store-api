@@ -57,18 +57,18 @@ class ElasticsearchCaseSearchRequestSecurityTest {
         CaseSearchRequest caseSearchRequest = mock(CaseSearchRequest.class);
         doReturn(CASE_TYPE_ID).when(caseSearchRequest).getCaseTypeId();
         doReturn("{}").when(caseSearchRequest).getQueryValue();
-        doReturn("").when(caseSearchRequest).toJsonString(true);
+        doReturn("").when(caseSearchRequest).toJsonString();
         doReturn(Optional.of(mock(QueryBuilder.class))).when(caseSearchFilter).getFilter(CASE_TYPE_ID);
         doReturn(searchRequestJsonNode).when(objectMapperService).convertStringToObject(anyString(),
                 eq(ObjectNode.class));
         doReturn(searchRequestJsonNode).when(searchRequestJsonNode).get(anyString());
 
-        querySecurity.createSecuredSearchRequest(caseSearchRequest, true);
+        querySecurity.createSecuredSearchRequest(caseSearchRequest);
 
         assertAll(
             () -> verify(caseSearchRequest).getQueryValue(),
             () -> verify(caseSearchFilter).getFilter(CASE_TYPE_ID),
-            () -> verify(caseSearchRequest).toJsonString(true),
+            () -> verify(caseSearchRequest).toJsonString(),
             () -> verify(searchRequestJsonNode).set(anyString(), any(JsonNode.class)),
             () -> verify(objectMapperService, times(2)).convertStringToObject(anyString(), eq(ObjectNode.class))
         );

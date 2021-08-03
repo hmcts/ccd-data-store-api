@@ -210,7 +210,7 @@ class ElasticsearchRequestTest {
             JsonNode queryNode = queryAsJsonNode("{\"_source\":[\"data.name\"], \"query\":{}}");
             ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
-            String result = elasticsearchRequest.toFinalRequest(true);
+            String result = elasticsearchRequest.toFinalRequest();
 
             JsonNode jsonResult = mapper.readTree(result);
             JsonNode sourceNode = jsonResult.get("_source");
@@ -237,7 +237,7 @@ class ElasticsearchRequestTest {
             JsonNode queryNode = queryAsJsonNode("{\"query\":{}}");
             ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
-            String result = elasticsearchRequest.toFinalRequest(true);
+            String result = elasticsearchRequest.toFinalRequest();
 
             JsonNode jsonResult = mapper.readTree(result);
             JsonNode sourceNode = jsonResult.get("_source");
@@ -264,7 +264,7 @@ class ElasticsearchRequestTest {
             JsonNode queryNode = queryAsJsonNode("{\"query\":{}}");
             ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
-            String result = elasticsearchRequest.toFinalRequest(false);
+            String result = elasticsearchRequest.toFinalRequest();
 
             JsonNode jsonResult = mapper.readTree(result);
             JsonNode sourceNode = jsonResult.get("_source");
@@ -291,7 +291,7 @@ class ElasticsearchRequestTest {
                     + "[\"Field1\",\"Field2\"]}");
             ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(queryNode);
 
-            String result = elasticsearchRequest.toFinalRequest(true);
+            String result = elasticsearchRequest.toFinalRequest();
 
             JsonNode jsonResult = mapper.readTree(result);
             JsonNode sourceNode = jsonResult.get("_source");
