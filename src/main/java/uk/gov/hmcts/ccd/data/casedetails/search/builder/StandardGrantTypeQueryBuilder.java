@@ -28,25 +28,27 @@ public class StandardGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
                 Optional<String> jurisdiction = roleAssignment.getAttributes().getJurisdiction();
                 String innerQuery = "";
                 if (jurisdiction.isPresent()) {
-                    innerQuery = JURISDICTION + "=" + jurisdiction.get();
+                    innerQuery = String.format("%s='%s'", JURISDICTION, jurisdiction.get());
                 }
 
                 Optional<String> region = roleAssignment.getAttributes().getRegion();
                 if (region.isPresent()) {
-                    innerQuery = innerQuery + getOperator(innerQuery, " AND ") + REGION + "=" + region.get();
+                    innerQuery = innerQuery + getOperator(innerQuery, AND)
+                        + String.format("%s='%s'", REGION, region.get());
                 }
 
                 Optional<String> location = roleAssignment.getAttributes().getLocation();
                 if (location.isPresent()) {
-                    innerQuery = innerQuery + getOperator(innerQuery, " AND ") + REGION + "=" + region.get();
+                    innerQuery = innerQuery + getOperator(innerQuery, AND)
+                        + String.format("%s='%s'", LOCATION, location.get());
                 }
                 return StringUtils.isNotBlank(innerQuery) ? String.format(QUERY_WRAPPER, innerQuery) : innerQuery;
             }).collect(Collectors.joining(" OR "));
 
-        String tmpQuery = createClassification(params, streamSupplier.get());
+        String tmpQuery = createClassification(params, "classifications_standard", streamSupplier.get());
 
         if (StringUtils.isNotBlank(regionAndLocationQuery)) {
-            tmpQuery = tmpQuery + getOperator(tmpQuery, " AND ")
+            tmpQuery = tmpQuery + getOperator(tmpQuery, AND)
                 + String.format(QUERY_WRAPPER, regionAndLocationQuery);
         }
 

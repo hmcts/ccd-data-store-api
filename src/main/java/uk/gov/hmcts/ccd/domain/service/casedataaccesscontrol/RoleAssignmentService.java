@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleRequestResource;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.MatcherType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentsDeleteRequest;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.ActorIdType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
@@ -117,7 +119,8 @@ public class RoleAssignmentService implements AccessControl {
     public List<RoleAssignment> getRoleAssignments(String userId, CaseTypeDefinition caseTypeDefinition) {
         final RoleAssignments roleAssignments = this.getRoleAssignments(userId);
         return roleAssignmentsFilteringService
-            .filter(roleAssignments, caseTypeDefinition).getFilteredMatchingRoleAssignments();
+            .filter(roleAssignments, caseTypeDefinition, Lists.newArrayList(MatcherType.GRANTTYPE))
+            .getFilteredMatchingRoleAssignments();
     }
 
     public RoleAssignments getRoleAssignmentsForCreate(String userId) {

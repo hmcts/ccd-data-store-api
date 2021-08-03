@@ -17,7 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public class ChallengedGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
 
-    private static final String QUERY = "%s in (:jurisdictions)";
+    private static final String QUERY = "%s in (:%s)";
 
     @Override
     public String createQuery(List<RoleAssignment> roleAssignments, Map<String, Object> params) {
@@ -29,12 +29,13 @@ public class ChallengedGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
             .flatMap(Optional::stream)
             .collect(Collectors.toSet());
 
-        String tmpQuery = createClassification(params, streamSupplier.get());;
+        String tmpQuery = createClassification(params, "classifications_challenged", streamSupplier.get());;
 
         if (jurisdictions.size() > 0) {
-            params.put("jurisdictions", jurisdictions);
+            String paramName = "jurisdictions_challenged";
+            params.put(paramName, jurisdictions);
             return String.format(QUERY_WRAPPER,
-                tmpQuery + getOperator(tmpQuery, " AND ") + String.format(QUERY, JURISDICTION));
+                tmpQuery + getOperator(tmpQuery, AND) + String.format(QUERY, JURISDICTION, paramName));
         }
 
         return EMPTY;

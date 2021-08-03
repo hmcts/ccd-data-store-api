@@ -11,6 +11,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 public class GrantTypeMatcher implements RoleAttributeMatcher {
 
     @Override
+    public MatcherType getType() {
+        return MatcherType.GRANTTYPE;
+    }
+
+    @Override
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseTypeDefinition caseTypeDefinition) {
         boolean matchedGrantType = !GrantType.EXCLUDED.name().equals(roleAssignment.getGrantType());
         log.debug("Role Assignment id: {}, roleName: {} - Matching GrantType to {}",

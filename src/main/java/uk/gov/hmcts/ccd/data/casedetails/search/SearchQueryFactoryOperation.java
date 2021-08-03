@@ -9,7 +9,6 @@ import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
@@ -100,11 +99,7 @@ public class SearchQueryFactoryOperation {
             List<RoleAssignment> roleAssignments = roleAssignmentService
                 .getRoleAssignments(userAuthorisation.getUserId(), caseTypeDefinition);
 
-            String query = accessControlGrantTypeQueryBuilder.createQuery(roleAssignments, params);
-
-            if (StringUtils.isNotBlank(query)) {
-                return "AND (" + query + ")";
-            }
+            return accessControlGrantTypeQueryBuilder.createQuery(roleAssignments, params);
 
         } else if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             params.put("user_id", userAuthorisation.getUserId());

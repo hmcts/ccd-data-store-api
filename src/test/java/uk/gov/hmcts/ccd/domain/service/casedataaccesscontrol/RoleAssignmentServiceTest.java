@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import com.google.common.collect.Lists;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,6 +29,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.MatcherType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 
@@ -94,6 +97,26 @@ class RoleAssignmentServiceTest {
     @InjectMocks
     private RoleAssignmentService roleAssignmentService;
 
+    private RoleAssignments getRoleAssignments() {
+
+        final Instant currentTIme = Instant.now();
+        final long oneHour = 3600000;
+
+        final RoleAssignmentAttributes roleAssignmentAttributes =
+            RoleAssignmentAttributes.builder().caseId(Optional.of(CASE_ID)).build();
+
+        final List<RoleAssignment> roleAssignments = Arrays.asList(
+
+            RoleAssignment.builder().actorId("actorId").roleType(RoleType.CASE.name())
+                .attributes(roleAssignmentAttributes)
+                .beginTime(currentTIme.minusMillis(oneHour)).endTime(currentTIme.plusMillis(oneHour)).build(),
+
+            RoleAssignment.builder().actorId("actorId1").roleType(RoleType.CASE.name())
+                .attributes(roleAssignmentAttributes)
+                .beginTime(currentTIme.minusMillis(oneHour)).endTime(currentTIme.plusMillis(oneHour)).build()
+        );
+        return RoleAssignments.builder().roleAssignments(roleAssignments).build();
+    }
 
     @Nested
     @DisplayName("createCaseRoleAssignments()")
@@ -596,6 +619,28 @@ class RoleAssignmentServiceTest {
             verify(roleAssignmentFilteringService).filter(roleAssignments, caseTypeDefinition);
         }
 
+        @Test
+        public void shouldGetRoleAssignmentsBasedOnExcluded() {
+
+            given(roleAssignmentRepository.getRoleAssignments(USER_ID))
+                .willReturn(mockedRoleAssignmentResponse);
+
+            RoleAssignments roleAssignments = getRoleAssignments();
+            given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))
+                .willReturn(roleAssignments);
+
+            given(filteredRoleAssignments.getFilteredMatchingRoleAssignments())
+                .willReturn(roleAssignments.getRoleAssignments());
+            given(roleAssignmentFilteringService.filter(roleAssignments, caseTypeDefinition,
+                Lists.newArrayList(MatcherType.GRANTTYPE)))
+                .willReturn(filteredRoleAssignments);
+
+            List<RoleAssignment> resultCases =
+                roleAssignmentService.getRoleAssignments(USER_ID, caseTypeDefinition);
+
+            Assert.assertTrue(resultCases.size() == 2);
+            roleAssignmentFilteringService.filter(roleAssignments, caseTypeDefinition);
+        }
     }
 
     /**

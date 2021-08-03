@@ -12,7 +12,7 @@ public interface GrantTypeQueryBuilder {
 
     String QUERY_WRAPPER = "( %s )";
 
-    String QUERY = "%s in (:classifications)";
+    String QUERY = "%s in (:%s)";
 
     String EMPTY = "";
 
@@ -28,17 +28,20 @@ public interface GrantTypeQueryBuilder {
 
     String REGION = "data" + " #>> '{region}'";
 
+    String AND = " AND ";
+
     String createQuery(List<RoleAssignment> roleAssignments, Map<String, Object> params);
 
-    default String createClassification(Map<String, Object> params, Stream<RoleAssignment> roleAssignmentStream) {
+    default String createClassification(Map<String, Object> params, String paramName,
+                                        Stream<RoleAssignment> roleAssignmentStream) {
         Set<String> classifications = roleAssignmentStream
             .map(roleAssignment -> roleAssignment.getClassification())
             .filter(classification -> StringUtils.isNotBlank(classification))
             .collect(Collectors.toSet());
 
         if (classifications.size() > 0) {
-            params.put("classifications", classifications);
-            return String.format(QUERY, SECURITY_CLASSIFICATION);
+            params.put(paramName, classifications);
+            return String.format(QUERY, SECURITY_CLASSIFICATION, paramName);
         }
 
         return EMPTY;

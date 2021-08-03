@@ -18,23 +18,24 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public class ExcludedGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
 
-    private static final String QUERY = "%s in (:case_ids)";
+    private static final String QUERY = "%s in (:%s)";
 
     @Override
     public String createQuery(List<RoleAssignment> roleAssignments, Map<String, Object> params) {
         Supplier<Stream<RoleAssignment>> streamSupplier = () -> roleAssignments.stream()
             .filter(roleAssignment -> GrantType.EXCLUDED.name().equals(roleAssignment.getGrantType()));
 
+        String tmpQuery = createClassification(params, "classifications_excluded", streamSupplier.get());
+
         Set<String> caseReferences = streamSupplier.get()
             .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
             .flatMap(Optional::stream)
             .collect(Collectors.toSet());
 
-        String tmpQuery = createClassification(params, streamSupplier.get());
-
         if (caseReferences.size() > 0) {
-            params.put("case_ids", caseReferences);
-            tmpQuery = tmpQuery + getOperator(tmpQuery, " AND ") + String.format(QUERY, REFERENCE);
+            String paramName = "case_ids_excluded";
+            params.put(paramName, caseReferences);
+            tmpQuery = tmpQuery + getOperator(tmpQuery, AND) + String.format(QUERY, REFERENCE, paramName);
         }
 
         return StringUtils.isNotBlank(tmpQuery) ? String.format(QUERY_WRAPPER, tmpQuery) : tmpQuery;

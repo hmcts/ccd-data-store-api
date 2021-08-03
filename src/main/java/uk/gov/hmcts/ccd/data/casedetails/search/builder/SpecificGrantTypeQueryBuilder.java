@@ -24,7 +24,7 @@ public class SpecificGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
             .filter(roleAssignment -> roleAssignment.getAuthorisations() == null
                 || roleAssignment.getAuthorisations().size() == 0);
 
-        String tmpQuery = createClassification(params, streamSupplier.get());
+        String tmpQuery = createClassification(params, "classifications_specific", streamSupplier.get());
 
         Set<String> jurisdictions = streamSupplier.get()
             .map(roleAssignment -> roleAssignment.getAttributes().getJurisdiction())
@@ -32,8 +32,8 @@ public class SpecificGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
             .collect(Collectors.toSet());
 
         if (jurisdictions.size() > 0) {
-            params.put("jurisdictions", jurisdictions);
-            tmpQuery = tmpQuery +  getOperator(tmpQuery, " AND ") + JURISDICTION + " in (:jurisdictions)";
+            params.put("jurisdictions_specific", jurisdictions);
+            tmpQuery = tmpQuery +  getOperator(tmpQuery, AND) + JURISDICTION + " in (:jurisdictions_specific)";
         }
 
         Set<String> caseReferences = streamSupplier.get()
@@ -42,8 +42,8 @@ public class SpecificGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
             .collect(Collectors.toSet());
 
         if (caseReferences.size() > 0) {
-            params.put("case_ids", caseReferences);
-            tmpQuery = tmpQuery +  getOperator(tmpQuery, " AND ") + REFERENCE + " in (:case_ids)";
+            params.put("case_ids_specific", caseReferences);
+            tmpQuery = tmpQuery +  getOperator(tmpQuery, AND) + REFERENCE + " in (:case_ids_specific)";
         }
 
         return StringUtils.isNotBlank(tmpQuery) ? String.format(QUERY_WRAPPER, tmpQuery) : tmpQuery;

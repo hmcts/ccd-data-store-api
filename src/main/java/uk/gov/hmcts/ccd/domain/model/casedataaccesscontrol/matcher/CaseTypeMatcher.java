@@ -11,6 +11,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 public class CaseTypeMatcher implements RoleAttributeMatcher {
 
     @Override
+    public MatcherType getType() {
+        return MatcherType.CASETYPE;
+    }
+
+    @Override
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseDetails caseDetails) {
         return matchCaseType(roleAssignment,
             "Matching role assignment case type {} with case details case type {} for role assignment {}",

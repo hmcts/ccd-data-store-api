@@ -11,6 +11,11 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 public class BeginDateEndDateMatcher implements RoleAttributeMatcher {
 
     @Override
+    public MatcherType getType() {
+        return MatcherType.BEGINENDDATE;
+    }
+
+    @Override
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseDetails caseDetails) {
         return matchBeginEndDates(roleAssignment);
     }
