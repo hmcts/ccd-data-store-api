@@ -59,12 +59,13 @@ class RoleAssignmentServiceTest {
     private static final String USER_ID = "user1";
     private static final String USER_ID_2 = "user2";
     private static final String CASE_ID = "111111";
+    private static final String CASE_ID_2 = "222222";
 
     private static final RoleCategory ROLE_CATEGORY_4_USER_1 = RoleCategory.PROFESSIONAL;
     private static final RoleCategory ROLE_CATEGORY_4_USER_2 = RoleCategory.JUDICIAL;
 
-    private final List<String> caseIds = Arrays.asList("111", "222");
-    private final List<String> userIds = Arrays.asList("111", "222");
+    private final List<String> caseIds = Arrays.asList(CASE_ID, CASE_ID_2);
+    private final List<String> userIds = Arrays.asList(USER_ID, USER_ID_2);
 
     @Mock
     private RoleAssignmentRepository roleAssignmentRepository;
@@ -422,27 +423,6 @@ class RoleAssignmentServiceTest {
     }
 
 
-    private RoleAssignments getRoleAssignments() {
-
-        final Instant currentTIme = Instant.now();
-        final long oneHour = 3600000;
-
-        final RoleAssignmentAttributes roleAssignmentAttributes =
-            RoleAssignmentAttributes.builder().caseId(Optional.of(CASE_ID)).build();
-
-        final List<RoleAssignment> roleAssignments = Arrays.asList(
-
-            RoleAssignment.builder().actorId("actorId").roleType(RoleType.CASE.name())
-                .attributes(roleAssignmentAttributes)
-                .beginTime(currentTIme.minusMillis(oneHour)).endTime(currentTIme.plusMillis(oneHour)).build(),
-
-            RoleAssignment.builder().actorId("actorId1").roleType(RoleType.CASE.name())
-                .attributes(roleAssignmentAttributes)
-                .beginTime(currentTIme.minusMillis(oneHour)).endTime(currentTIme.plusMillis(oneHour)).build()
-        );
-        return RoleAssignments.builder().roleAssignments(roleAssignments).build();
-    }
-
     @Nested
     @DisplayName("getRoleAssignments()")
     class GetRoleAssignments {
@@ -462,6 +442,7 @@ class RoleAssignmentServiceTest {
             // THEN
             assertThat(roleAssignments, is(mockedRoleAssignments));
         }
+
     }
 
     @Nested
@@ -490,57 +471,88 @@ class RoleAssignmentServiceTest {
 
     @Nested
     @DisplayName("findRoleAssignmentsByCasesAndUsers()")
-    class GetRoleAssignmentsByCasesAndUsers {
+    class FindRoleAssignmentsByCasesAndUsers {
 
         @Test
-        void shouldGetRoleAssignments() {
+        void shouldFindRoleAssignments() {
 
+            // GIVEN
             given(roleAssignmentRepository.findRoleAssignmentsByCasesAndUsers(caseIds, userIds))
                 .willReturn(mockedRoleAssignmentResponse);
 
             given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))
-                .willReturn(getRoleAssignments());
+                .willReturn(createTestRoleAssignments(CASE_ID));
 
+            // WHEN
             final List<CaseAssignedUserRole> caseAssignedUserRole =
                 roleAssignmentService.findRoleAssignmentsByCasesAndUsers(caseIds, userIds);
 
+            // THEN
             assertEquals(2, caseAssignedUserRole.size());
             assertThat(caseAssignedUserRole.get(0).getCaseDataId(), is(CASE_ID));
         }
 
     }
 
+
     @Nested
     @DisplayName("getCaseReferencesForAGivenUser(String userId)")
-    class GetCaseIdsForAGivenUser {
+    class GetCaseReferencesForAGivenUser {
 
         @Test
-        void shouldGetRoleAssignments() {
+        void shouldGetReferencesWithoutDuplicatesSingleCase() {
 
+            // GIVEN
             given(roleAssignmentRepository.getRoleAssignments(USER_ID))
                 .willReturn(mockedRoleAssignmentResponse);
 
             given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))
-                .willReturn(getRoleAssignments());
+                .willReturn(createTestRoleAssignments(CASE_ID));
 
+            // WHEN
             List<String> resultCases =
                 roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID);
 
-            assertEquals(2, resultCases.size());
+            // THEN
+            assertEquals(1, resultCases.size());
+            assertEquals(CASE_ID, resultCases.get(0));
         }
-    }
-
-    @Nested
-    @DisplayName("getCaseReferencesForAGivenUser(String userId, CaseTypeDefinition caseTypeDefinition)")
-    class GetCaseIdsForAGivenUserAndCaseTypeDefinition {
 
         @Test
-        void shouldGetRoleAssignments() {
+        void shouldGetReferencesWithoutDuplicatesMultipleCases() {
 
+            // GIVEN
             given(roleAssignmentRepository.getRoleAssignments(USER_ID))
                 .willReturn(mockedRoleAssignmentResponse);
 
-            RoleAssignments roleAssignments = getRoleAssignments();
+            given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))
+                .willReturn(createTestRoleAssignmentsMultipleCases());
+
+            // WHEN
+            List<String> resultCases =
+                roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID);
+
+            // THEN
+            assertEquals(2, resultCases.size());
+            assertTrue(resultCases.containsAll(caseIds));
+        }
+
+    }
+
+
+    @Nested
+    @DisplayName("getCaseReferencesForAGivenUser(String userId, CaseTypeDefinition caseTypeDefinition)")
+    class GetCaseReferencesForAGivenUserAndCaseType {
+
+        @Test
+        void shouldGetCaseReferencesWithoutDuplicatesSingleCase() {
+
+            // GIVEN
+            given(roleAssignmentRepository.getRoleAssignments(USER_ID))
+                .willReturn(mockedRoleAssignmentResponse);
+
+            // test role assignments: single case with two case-roles
+            RoleAssignments roleAssignments = createTestRoleAssignments(CASE_ID);
             given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))
                 .willReturn(roleAssignments);
 
@@ -549,11 +561,76 @@ class RoleAssignmentServiceTest {
             given(roleAssignmentFilteringService.filter(roleAssignments, caseTypeDefinition))
                 .willReturn(filteredRoleAssignments);
 
+            // WHEN
             List<String> resultCases =
                 roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID, caseTypeDefinition);
 
-            assertEquals(2, resultCases.size());
-            roleAssignmentFilteringService.filter(roleAssignments, caseTypeDefinition);
+            // THEN
+            assertEquals(1, resultCases.size()); // single case
+            verify(roleAssignmentFilteringService).filter(roleAssignments, caseTypeDefinition);
         }
+
+        @Test
+        void shouldGetCaseReferencesWithoutDuplicatesMultipleCases() {
+
+            // GIVEN
+            given(roleAssignmentRepository.getRoleAssignments(USER_ID))
+                .willReturn(mockedRoleAssignmentResponse);
+
+            // test role assignments: two cases each with two case-roles
+            RoleAssignments roleAssignments = createTestRoleAssignmentsMultipleCases();
+            given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))
+                .willReturn(roleAssignments);
+
+            given(filteredRoleAssignments.getFilteredMatchingRoleAssignments())
+                .willReturn(roleAssignments.getRoleAssignments());
+            given(roleAssignmentFilteringService.filter(roleAssignments, caseTypeDefinition))
+                .willReturn(filteredRoleAssignments);
+
+            // WHEN
+            List<String> resultCases =
+                roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID, caseTypeDefinition);
+
+            // THEN
+            assertEquals(2, resultCases.size()); // multiple cases
+            verify(roleAssignmentFilteringService).filter(roleAssignments, caseTypeDefinition);
+        }
+
     }
+
+    /**
+     *  Create test role assignments: single case with two case-roles.
+     */
+    private RoleAssignments createTestRoleAssignments(String caseId) {
+        final Instant currentTIme = Instant.now();
+        final long oneHour = 3600000;
+
+        final RoleAssignmentAttributes roleAssignmentAttributes =
+            RoleAssignmentAttributes.builder().caseId(Optional.of(caseId)).build();
+
+        final List<RoleAssignment> roleAssignments = Arrays.asList(
+
+            RoleAssignment.builder().actorId(USER_ID).roleType(RoleType.CASE.name())
+                .attributes(roleAssignmentAttributes)
+                .beginTime(currentTIme.minusMillis(oneHour)).endTime(currentTIme.plusMillis(oneHour)).build(),
+
+            RoleAssignment.builder().actorId(USER_ID).roleType(RoleType.CASE.name())
+                .attributes(roleAssignmentAttributes)
+                .beginTime(currentTIme.minusMillis(oneHour)).endTime(currentTIme.plusMillis(oneHour)).build()
+        );
+        return RoleAssignments.builder().roleAssignments(roleAssignments).build();
+    }
+
+    /**
+     *  Create multiple test role assignments: two cases each with two case-roles.
+     */
+    private RoleAssignments createTestRoleAssignmentsMultipleCases() {
+        List<RoleAssignment> roleAssignments = new ArrayList<>();
+
+        roleAssignments.addAll(createTestRoleAssignments(CASE_ID).getRoleAssignments());
+        roleAssignments.addAll(createTestRoleAssignments(CASE_ID_2).getRoleAssignments());
+
+        return RoleAssignments.builder().roleAssignments(roleAssignments).build();
+    }
+
 }
