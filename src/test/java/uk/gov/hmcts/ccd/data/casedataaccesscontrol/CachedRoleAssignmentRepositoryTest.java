@@ -6,6 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
+
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -17,7 +20,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 @ExtendWith(MockitoExtension.class)
 class CachedRoleAssignmentRepositoryTest {
 
-    private final String userId = "USERID1";
+    private static final String USER_ID = "user1";
+    private static final String CASE_ID = "111111";
 
     @Mock
     private RoleAssignmentRepository roleAssignmentRepositoryMock;
@@ -51,23 +55,39 @@ class CachedRoleAssignmentRepositoryTest {
     }
 
     @Test
+    @DisplayName("should delete role assignments by query in decorated repository")
+    void shouldDeleteRoleAssignmentByQueryInDefaultRepository() {
+
+        // GIVEN
+        List<RoleAssignmentQuery> queryRequests = List.of(
+            new RoleAssignmentQuery(CASE_ID, USER_ID, List.of(GlobalCaseRole.CREATOR.getRole()))
+        );
+
+        // WHEN
+        classUnderTest.deleteRoleAssignmentsByQuery(queryRequests);
+
+        // THEN
+        verify(roleAssignmentRepositoryMock).deleteRoleAssignmentsByQuery(queryRequests);
+    }
+
+    @Test
     @DisplayName("should initially retrieve role assignments from decorated repository")
     void shouldGetRoleAssignmentsFromDefaultRepository() {
 
         // GIVEN
-        doReturn(roleAssignmentResponse).when(roleAssignmentRepositoryMock).getRoleAssignments(userId);
+        doReturn(roleAssignmentResponse).when(roleAssignmentRepositoryMock).getRoleAssignments(USER_ID);
 
         // WHEN 1
-        RoleAssignmentResponse roleAssignments = classUnderTest.getRoleAssignments(userId);
+        RoleAssignmentResponse roleAssignments = classUnderTest.getRoleAssignments(USER_ID);
 
         // THEN 1
         assertAll(
             () -> assertThat(roleAssignments, is(roleAssignmentResponse)),
-            () -> verify(roleAssignmentRepositoryMock).getRoleAssignments(userId)
+            () -> verify(roleAssignmentRepositoryMock).getRoleAssignments(USER_ID)
         );
 
         // WHEN 2
-        RoleAssignmentResponse roleAssignments2 = classUnderTest.getRoleAssignments(userId);
+        RoleAssignmentResponse roleAssignments2 = classUnderTest.getRoleAssignments(USER_ID);
 
         // THEN 2
         assertAll(

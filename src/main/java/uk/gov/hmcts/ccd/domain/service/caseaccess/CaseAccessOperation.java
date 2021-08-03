@@ -16,6 +16,7 @@ import uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentsDeleteRequest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
@@ -83,7 +84,17 @@ public class CaseAccessOperation {
         final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(jurisdictionId,
             Long.valueOf(caseReference));
         final var caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
-        caseUserRepository.revokeAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
+
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            var deleteRequest = RoleAssignmentsDeleteRequest.builder()
+                    .caseId(caseReference)
+                    .userId(userId)
+                    .roleNames(List.of(CREATOR.getRole()))
+                    .build();
+            roleAssignmentService.deleteRoleAssignments(List.of(deleteRequest));
+        } else {
+            caseUserRepository.revokeAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
+        }
     }
 
     @Transactional
@@ -186,19 +197,49 @@ public class CaseAccessOperation {
         Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseDetails =
             getMapOfCaseAssignedUserRolesByCaseDetails(caseUserRoles);
 
-        // Ignore case user role mappings that are NOT exist in the database silently.
-        // Also they shouldn't effect counters.
+        // Ignore case user role mappings that DO NOT exist
+        // NB: also required so they don't effect revoked user counts.
         Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> filteredCauRolesByCaseDetails =
-            filterExistingCauRoles(cauRolesByCaseDetails);
+            findAndFilterOnExistingCauRoles(cauRolesByCaseDetails);
 
-        filteredCauRolesByCaseDetails.forEach((caseDetails, requestedAssignments) -> {
-                Long caseId = Long.parseLong(caseDetails.getId());
-                requestedAssignments.forEach(requestedAssignment ->
-                    caseUserRepository.revokeAccess(caseId, requestedAssignment.getUserId(),
-                        requestedAssignment.getCaseRole())
-                );
-            }
-        );
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            List<RoleAssignmentsDeleteRequest> deleteRequests = new ArrayList<>();
+
+            // for each case
+            filteredCauRolesByCaseDetails.forEach((caseDetails, requestedAssignments) -> {
+                // group by user
+                Map<String, List<String>> caseRolesByUserAndCase = requestedAssignments.stream()
+                    .collect(Collectors.groupingBy(
+                        CaseAssignedUserRoleWithOrganisation::getUserId,
+                        Collectors.collectingAndThen(
+                            Collectors.toList(),
+                            roles -> roles.stream()
+                                .map(CaseAssignedUserRoleWithOrganisation::getCaseRole)
+                                .collect(Collectors.toList())
+                        )));
+
+                // for each user in current case: add list of all case-roles to revoke to the delete requests
+                caseRolesByUserAndCase.forEach((userId, roleNames) ->
+                    deleteRequests.add(RoleAssignmentsDeleteRequest.builder()
+                        .caseId(caseDetails.getReferenceAsString())
+                        .userId(userId)
+                        .roleNames(roleNames)
+                        .build()
+                ));
+            });
+
+            // submit list of all delete requests from all cases
+            roleAssignmentService.deleteRoleAssignments(deleteRequests);
+        } else {
+            filteredCauRolesByCaseDetails.forEach((caseDetails, requestedAssignments) -> {
+                    Long caseId = Long.parseLong(caseDetails.getId());
+                    requestedAssignments.forEach(requestedAssignment ->
+                        caseUserRepository.revokeAccess(caseId, requestedAssignment.getUserId(),
+                            requestedAssignment.getCaseRole())
+                    );
+                }
+            );
+        }
 
         // determine counters after removal of requested mappings so that same function can be re-used
         // (i.e user still has an association to a case).
@@ -213,45 +254,37 @@ public class CaseAccessOperation {
         );
     }
 
-    private Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> filterExistingCauRoles(
+    private Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> findAndFilterOnExistingCauRoles(
         Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseDetails
     ) {
-        List<Long> caseIds = getCaseIdsFromMap(cauRolesByCaseDetails);
-        List<String> userIds = getUserIdsFromMap(cauRolesByCaseDetails);
-
-        // find existing Case-User relationships for all the cases + users found
-        Map<Long, List<CaseUserEntity>> existingCaseUserRolesByCaseId =
-            caseUserRepository.findCaseUserRoles(caseIds, userIds).stream()
+        // find existing Case-User relationships and group by case reference
+        Map<String, List<CaseAssignedUserRole>> existingCaseUserRolesByCaseReference =
+            findCaseUserRoles(cauRolesByCaseDetails).stream()
                 .collect(Collectors.groupingBy(
-                    caseUserEntity -> caseUserEntity.getCasePrimaryKey().getCaseDataId(),
+                    CaseAssignedUserRole::getCaseDataId,
                     Collectors.toList()
                 ));
 
         return cauRolesByCaseDetails.entrySet().stream()
             .collect(Collectors.toMap(Map.Entry::getKey,
-                entry -> filterExistingCauRoles(
+                entry -> filterOnExistingCauRoles(
                     entry.getValue(),
-                    existingCaseUserRolesByCaseId.getOrDefault(
-                        Long.parseLong(entry.getKey().getId()),
+                    existingCaseUserRolesByCaseReference.getOrDefault(
+                        entry.getKey().getReferenceAsString(),
                         new ArrayList<>()
                     )
                 )));
     }
 
-    private List<CaseAssignedUserRoleWithOrganisation> filterExistingCauRoles(
+    private List<CaseAssignedUserRoleWithOrganisation> filterOnExistingCauRoles(
         List<CaseAssignedUserRoleWithOrganisation> inputCauRoles,
-        List<CaseUserEntity> existingCauRoles) {
+        List<CaseAssignedUserRole> existingCauRoles) {
         return inputCauRoles.stream()
             .filter(cauRole -> existingCauRoles.stream()
-                .anyMatch(entity -> entity.getCasePrimaryKey().getCaseRole().equalsIgnoreCase(cauRole.getCaseRole())
-                    && entity.getCasePrimaryKey().getUserId().equalsIgnoreCase(cauRole.getUserId())))
+                .anyMatch(entity -> entity.getCaseRole().equalsIgnoreCase(cauRole.getCaseRole())
+                    && entity.getUserId().equalsIgnoreCase(cauRole.getUserId())
+                    && entity.getCaseDataId().equalsIgnoreCase(cauRole.getCaseDataId())))
             .collect(Collectors.toList());
-    }
-
-    private List<Long> getCaseIdsFromMap(
-        Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseDetails
-    ) {
-        return getCaseIdsFromCaseDetailsList(new ArrayList<>(cauRolesByCaseDetails.keySet()));
     }
 
     private List<Long> getCaseIdsFromCaseDetailsList(List<CaseDetails> caseDetailsList) {

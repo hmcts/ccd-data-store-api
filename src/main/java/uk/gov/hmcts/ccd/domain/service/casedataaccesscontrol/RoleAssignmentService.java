@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.CachedRoleAssignmentRepository;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentAttributesResource;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentQuery;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRequestResource;
 import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResource;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleRequestResource;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentsDeleteRequest;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.ActorIdType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
@@ -91,6 +93,20 @@ public class RoleAssignmentService implements AccessControl {
 
         var roleAssignmentRequestResponse = roleAssignmentRepository.createRoleAssignment(assignmentRequest);
         return roleAssignmentsMapper.toRoleAssignments(roleAssignmentRequestResponse);
+    }
+
+    public void deleteRoleAssignments(List<RoleAssignmentsDeleteRequest> deleteRequests) {
+        if (deleteRequests != null && !deleteRequests.isEmpty()) {
+            List<RoleAssignmentQuery> queryRequests = deleteRequests.stream()
+                .map(request -> new RoleAssignmentQuery(
+                    request.getCaseId(),
+                    request.getUserId(),
+                    request.getRoleNames())
+                )
+                .collect(Collectors.toList());
+
+            roleAssignmentRepository.deleteRoleAssignmentsByQuery(queryRequests);
+        }
     }
 
     public RoleAssignments getRoleAssignments(String userId) {
