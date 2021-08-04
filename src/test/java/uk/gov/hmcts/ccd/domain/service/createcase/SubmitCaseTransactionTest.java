@@ -267,8 +267,7 @@ class SubmitCaseTransactionTest {
             idamUser,
             caseEventDefinition,
             this.caseDetails,
-            IGNORE_WARNING
-        );
+            IGNORE_WARNING);
 
         assertAll(
             () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
@@ -280,7 +279,6 @@ class SubmitCaseTransactionTest {
     @DisplayName("when creator has access level GRANTED, then it should grant access to creator")
     void shouldGrantAccessToAccessLevelGrantedCreator() {
         when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
-
         submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
             idamUser,
@@ -288,7 +286,8 @@ class SubmitCaseTransactionTest {
             this.caseDetails,
             IGNORE_WARNING);
 
-        verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID), IDAM_ID, CREATOR.getRole());
+        verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID),
+            IDAM_ID, CREATOR.getRole());
     }
 
     @Test

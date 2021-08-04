@@ -19,7 +19,7 @@
 			"ctid": "AAT"
 		},
 		"body": {
-			"id": "Test User"
+			"id": "${[scenarioContext][theInvokingUser][id]}"
 		}
 	}
 }
