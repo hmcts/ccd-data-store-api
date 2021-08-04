@@ -154,6 +154,12 @@ public class ApplicationParams {
 
     @Value("${ccd.case-document-am-api.attachDocumentEnabled:true}")
     private boolean attachDocumentEnabled;
+    
+    @Value("${idam.data-store.system-user.username}")
+    private String dataStoreSystemUserId;
+
+    @Value("${idam.data-store.system-user.password}")
+    private String dataStoreSystemUserPassword;
 
     public static String encode(final String stringToEncode) {
         try {
@@ -419,5 +425,21 @@ public class ApplicationParams {
 
     public boolean isAttachDocumentEnabled() {
         return attachDocumentEnabled;
+    }
+    
+    public String getDataStoreSystemUserId() {
+        return dataStoreSystemUserId;
+    }
+
+    public void setDataStoreSystemUserId(String dateStoreSystemUserId) {
+        this.dataStoreSystemUserId = dateStoreSystemUserId;
+    }
+
+    public String getDataStoreSystemUserPassword() {
+        return dataStoreSystemUserPassword;
+    }
+
+    public void setDataStoreSystemUserPassword(String dataStoreSystemUserPassword) {
+        this.dataStoreSystemUserPassword = dataStoreSystemUserPassword;
     }
 }

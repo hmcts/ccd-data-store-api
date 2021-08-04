@@ -29,6 +29,12 @@ java:
           alias: ELASTIC_SEARCH_PASSWORD
         - name: AppInsightsInstrumentationKey
           alias: azure.application-insights.instrumentation-key
+        - name: idam-data-store-client-secret
+          alias: IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET
+        - name: idam-data-store-system-user-username
+          alias: IDAM_DATA_STORE_SYSTEM_USER_USERNAME
+        - name: idam-data-store-system-user-password
+          alias: IDAM_DATA_STORE_SYSTEM_USER_PASSWORD
 
   environment:
     DATA_STORE_DB_PORT: 5432
