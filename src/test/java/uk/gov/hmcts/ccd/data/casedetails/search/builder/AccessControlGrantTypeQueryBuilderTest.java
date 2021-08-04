@@ -52,8 +52,8 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
         String query = accessControlGrantTypeQueryBuilder
             .createQuery(Lists.newArrayList(roleAssignment, specificRoleAssignment), Maps.newHashMap());
         String expectedValue =  " AND ( ( ( security_classification in (:classifications) ) "
-            + "OR ( security_classification in (:classifications) "
-            + "AND jurisdiction in (:jurisdictions) AND reference in (:case_ids) ) ) )";
+            + "OR ( security_classification in (:classifications_specific) "
+            + "AND jurisdiction in (:jurisdictions_specific) AND reference in (:case_ids_specific) ) ) )";
         assertNotNull(query);
         assertEquals(expectedValue, query);
     }
@@ -75,11 +75,13 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             specificRoleAssignment, challengedRoleAssignment, standardRoleAssignment), Maps.newHashMap());
 
         String expectedValue =  " AND ( ( ( security_classification in (:classifications) ) "
-            + "OR ( security_classification in (:classifications) "
-            + "AND jurisdiction in (:jurisdictions) AND reference in (:case_ids) ) ) "
-            + "OR ( ( security_classification in (:classifications) "
-            + "AND ( ( jurisdiction=Test AND data #>> '{region}'=reg1 AND data #>> '{region}'=reg1 ) ) ) "
-            + "OR ( security_classification in (:classifications) AND jurisdiction in (:jurisdictions) ) ) )";
+            + "OR ( security_classification in (:classifications_specific) "
+            + "AND jurisdiction in (:jurisdictions_specific) "
+            + "AND reference in (:case_ids_specific) ) ) "
+            + "OR ( ( security_classification in (:classifications_standard)"
+            + " AND ( ( jurisdiction='Test' AND data #>> '{region}'='reg1' AND data #>> '{location}'='loc1' ) ) ) "
+            + "OR ( security_classification in (:classifications_challenged) "
+            + "AND jurisdiction in (:jurisdictions_challenged) ) ) )";
 
         assertNotNull(query);
         assertEquals(expectedValue, query);
@@ -107,11 +109,26 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             standardRoleAssignment, excludedRoleAssignment), Maps.newHashMap());
 
         String expectedValue =  " AND ( ( ( security_classification in (:classifications) ) "
-            + "OR ( security_classification in (:classifications) AND jurisdiction in (:jurisdictions) "
-            + "AND reference in (:case_ids) ) ) OR ( ( ( security_classification in (:classifications) "
-            + "AND ( ( jurisdiction=Test AND data #>> '{region}'=reg1 AND data #>> '{region}'=reg1 ) ) ) "
-            + "OR ( security_classification in (:classifications) AND jurisdiction in (:jurisdictions) ) ) "
-            + "AND NOT ( security_classification in (:classifications) AND reference in (:case_ids) ) ) )";
+            + "OR ( security_classification in (:classifications_specific) AND jurisdiction in (:jurisdictions_specific) "
+            + "AND reference in (:case_ids_specific) ) ) OR ( ( ( security_classification in (:classifications_standard) "
+            + "AND ( ( jurisdiction='Test' AND data #>> '{region}'='reg1' AND data #>> '{location}'='loc1' ) ) ) "
+            + "OR ( security_classification in (:classifications_challenged) AND jurisdiction in (:jurisdictions_challenged) ) ) "
+            + "AND NOT ( security_classification in (:classifications_excluded) AND reference in (:case_ids_excluded) ) ) )";
+
+        assertNotNull(query);
+        assertEquals(expectedValue, query);
+    }
+
+    @Test
+    void shouldReturnOnlyExcludedOrganisationalQuery() {
+        RoleAssignment excludedRoleAssignment = createRoleAssignment(GrantType.EXCLUDED,
+            "CASE", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
+
+        String query = accessControlGrantTypeQueryBuilder
+            .createQuery(Lists.newArrayList(excludedRoleAssignment), Maps.newHashMap());
+
+        String expectedValue =  " AND NOT ( security_classification in "
+            + "(:classifications_excluded) AND reference in (:case_ids_excluded) )";
 
         assertNotNull(query);
         assertEquals(expectedValue, query);

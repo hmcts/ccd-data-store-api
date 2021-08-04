@@ -30,6 +30,10 @@ public interface GrantTypeQueryBuilder {
 
     String AND = " AND ";
 
+    String OR = " OR ";
+
+    String AND_NOT = " AND NOT ";
+
     String createQuery(List<RoleAssignment> roleAssignments, Map<String, Object> params);
 
     default String createClassification(Map<String, Object> params, String paramName,

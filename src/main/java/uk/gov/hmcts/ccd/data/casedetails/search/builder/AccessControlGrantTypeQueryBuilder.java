@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 
+import static uk.gov.hmcts.ccd.data.casedetails.search.builder.GrantTypeQueryBuilder.AND_NOT;
+import static uk.gov.hmcts.ccd.data.casedetails.search.builder.GrantTypeQueryBuilder.OR;
+
 @Component
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public class AccessControlGrantTypeQueryBuilder {
@@ -39,19 +42,27 @@ public class AccessControlGrantTypeQueryBuilder {
         String standardQuery = standardGrantTypeQueryBuilder.createQuery(roleAssignments, params);
         String challengedQuery = challengedGrantTypeQueryBuilder.createQuery(roleAssignments, params);
 
-        String tmpQuery = mergeQuery(standardQuery, challengedQuery, " OR ");
+        String orgQuery = mergeQuery(standardQuery, challengedQuery, OR);
+        String tmpQuery = orgQuery;
         String excludedQuery = excludedGrantTypeQueryBuilder.createQuery(roleAssignments, params);
         if (StringUtils.isNotBlank(excludedQuery)) {
             tmpQuery = tmpQuery
-                + getOperator(tmpQuery, " AND NOT ")
+                + getOperator(tmpQuery, AND_NOT)
                 + excludedQuery;
             tmpQuery = String.format(QUERY, tmpQuery);
         }
 
-        String nonOrgQuery = mergeQuery(basicQuery, specificQuery, " OR ");
+        String nonOrgQuery = mergeQuery(basicQuery, specificQuery, OR);
+
+        if (StringUtils.isBlank(nonOrgQuery)
+            && StringUtils.isBlank(orgQuery)
+            && StringUtils.isNotBlank(excludedQuery)) {
+            return AND_NOT + excludedQuery;
+        }
+
         if (StringUtils.isNotBlank(nonOrgQuery)) {
             tmpQuery = nonOrgQuery
-                + getOperator(tmpQuery, " OR ")
+                + getOperator(tmpQuery, OR)
                 + tmpQuery;
         }
 
