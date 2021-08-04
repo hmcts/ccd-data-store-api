@@ -38,7 +38,8 @@ class ChallengedGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap());
 
         assertNotNull(query);
-        String expectedValue = "( security_classification in (:classifications) AND jurisdiction in (:jurisdictions) )";
+        String expectedValue = "( security_classification in (:classifications_challenged)"
+            + " AND jurisdiction in (:jurisdictions_challenged) )";
         assertEquals(expectedValue, query);
     }
 }
