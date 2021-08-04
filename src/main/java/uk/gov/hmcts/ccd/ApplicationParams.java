@@ -303,6 +303,10 @@ public class ApplicationParams {
         return roleAssignmentServiceHost + "/am/role-assignments";
     }
 
+    public String amDeleteByQueryRoleAssignmentsURL() {
+        return roleAssignmentBaseURL() + "/query/delete";
+    }
+
     public String amGetRoleAssignmentsURL() {
         return roleAssignmentBaseURL() + "/actors/{uid}";
     }

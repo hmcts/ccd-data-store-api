@@ -26,6 +26,16 @@ public class CachedRoleAssignmentRepository implements RoleAssignmentRepository 
     }
 
     @Override
+    public RoleAssignmentRequestResponse createRoleAssignment(RoleAssignmentRequestResource assignmentRequest) {
+        return roleAssignmentRepository.createRoleAssignment(assignmentRequest);
+    }
+
+    @Override
+    public void deleteRoleAssignmentsByQuery(List<RoleAssignmentQuery> queryRequests) {
+        roleAssignmentRepository.deleteRoleAssignmentsByQuery(queryRequests);
+    }
+
+    @Override
     public RoleAssignmentResponse getRoleAssignments(String userId) {
         return roleAssignments.computeIfAbsent(userId, e -> roleAssignmentRepository.getRoleAssignments(userId));
     }
@@ -34,4 +44,5 @@ public class CachedRoleAssignmentRepository implements RoleAssignmentRepository 
     public RoleAssignmentResponse findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds) {
         return roleAssignmentRepository.findRoleAssignmentsByCasesAndUsers(caseIds,userIds);
     }
+
 }

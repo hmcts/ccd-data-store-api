@@ -2,20 +2,27 @@ package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
 import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.BaseFilter;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 
+@SuppressWarnings({"ConstantConditions", "UnnecessaryLocalVariable"})
 class BeginDateEndDateMatcherTest extends BaseFilter {
 
     private BeginDateEndDateMatcher classUnderTest;
+
+    private final Instant beforeCurrentDate1 = Instant.now().minus(2, ChronoUnit.DAYS);
+    private final Instant beforeCurrentDate2 = Instant.now().minus(1, ChronoUnit.DAYS);
+    private final Instant afterCurrentDate1 = Instant.now().plus(1, ChronoUnit.DAYS);
+    private final Instant afterCurrentDate2 = Instant.now().plus(2, ChronoUnit.DAYS);
 
     @BeforeEach
     void setUp() {
@@ -23,57 +30,123 @@ class BeginDateEndDateMatcherTest extends BaseFilter {
     }
 
     @Test
-    void shouldMatchWhenCurrentDateIsWithInBeginDateAndEndDate() {
+    void shouldMatchWhenBeginDateAndEndDateAreNull() {
+
+        // GIVEN
+        Instant beginDate = null;
+        Instant endDate = null;
+
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
-            Instant.now().minus(1, ChronoUnit.DAYS),
-            Instant.now().plus(2, ChronoUnit.DAYS),
-            "PRIVATE", null, null);
+            beginDate, endDate, Classification.PRIVATE.name(), Optional.empty(), Optional.empty());
 
-
-        CaseDetails caseDetails = mockCaseDetails();
-        assertTrue(classUnderTest.matchAttribute(roleAssignment, caseDetails));
+        // WHEN / THEN
+        assertTrue(classUnderTest.matchAttribute(roleAssignment, mockCaseDetails()));
+        assertTrue(classUnderTest.matchAttribute(roleAssignment, mockCaseTypeDefinition()));
     }
 
     @Test
-    void shouldNotMatchWhenBeginDateIsNull() {
-        RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_2, JURISDICTION_1, null,
-            Instant.now().plus(2, ChronoUnit.DAYS),
-            "PRIVATE", null, null);
+    void shouldMatchWhenCurrentDateIsWithInBeginDateAndEndDate() {
 
-        CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED, JURISDICTION_2);
-        assertFalse(classUnderTest.matchAttribute(roleAssignment, caseDetails));
+        // GIVEN
+        Instant beginDate = beforeCurrentDate1;
+        Instant endDate = afterCurrentDate1;
+
+        RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
+            beginDate, endDate, Classification.PRIVATE.name(), Optional.empty(), Optional.empty());
+
+        // WHEN / THEN
+        assertTrue(classUnderTest.matchAttribute(roleAssignment, mockCaseDetails()));
+        assertTrue(classUnderTest.matchAttribute(roleAssignment, mockCaseTypeDefinition()));
     }
 
     @Test
-    void shouldNotMatchWhenEndDateIsNull() {
+    void shouldMatchWhenBeginDateIsNullAndEndDateIsAfterCurrentDate() {
+
+        // GIVEN
+        Instant beginDate = null;
+        Instant endDate = afterCurrentDate1;
+
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_2, JURISDICTION_1,
-            Instant.now().plus(1, ChronoUnit.DAYS),
-            null,
-            "PRIVATE", null, null);
+            beginDate, endDate, Classification.PRIVATE.name(), Optional.empty(), Optional.empty());
 
-        CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED, JURISDICTION_2);
-        classUnderTest.matchAttribute(roleAssignment, caseDetails);
+        // WHEN / THEN
+        assertTrue(classUnderTest.matchAttribute(roleAssignment, mockCaseDetails()));
+        assertTrue(classUnderTest.matchAttribute(roleAssignment, mockCaseTypeDefinition()));
     }
 
     @Test
-    void shouldNotMatchWhenBeginDateAndEndDateAreBeforeCurrent() {
-        RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_2, JURISDICTION_1,
-            Instant.now().minus(3, ChronoUnit.DAYS),
-            Instant.now().minus(1, ChronoUnit.DAYS),
-            "PRIVATE", null, null);
+    void shouldMatchWhenEndDateIsNullAndBeginDateIsBeforeCurrentDate() {
 
-        CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED, JURISDICTION_2);
-        assertFalse(classUnderTest.matchAttribute(roleAssignment, caseDetails));
+        // GIVEN
+        Instant beginDate = beforeCurrentDate1;
+        Instant endDate = null;
+
+        RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_2, JURISDICTION_1,
+            beginDate, endDate, Classification.PRIVATE.name(), Optional.empty(), Optional.empty());
+
+        // WHEN / THEN
+        assertTrue(classUnderTest.matchAttribute(roleAssignment, mockCaseDetails()));
+        assertTrue(classUnderTest.matchAttribute(roleAssignment, mockCaseTypeDefinition()));
     }
 
     @Test
-    void shouldNotMatchWhenBeginDateAndEndDateAreAfterCurrent() {
-        RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_2, JURISDICTION_1,
-            Instant.now().plus(1, ChronoUnit.DAYS),
-            Instant.now().plus(2, ChronoUnit.DAYS),
-            "PRIVATE", null, null);
+    void shouldNotMatchWhenBeginDateIsNullAndEndDateIsBeforeCurrentDate() {
 
-        CaseDetails caseDetails = mockCaseDetails(SecurityClassification.RESTRICTED, JURISDICTION_2);
-        assertFalse(classUnderTest.matchAttribute(roleAssignment, caseDetails));
+        // GIVEN
+        Instant beginDate = null;
+        Instant endDate = beforeCurrentDate1;
+
+        RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_2, JURISDICTION_1,
+            beginDate, endDate, Classification.PRIVATE.name(), Optional.empty(), Optional.empty());
+
+        // WHEN / THEN
+        assertFalse(classUnderTest.matchAttribute(roleAssignment, mockCaseDetails()));
+        assertFalse(classUnderTest.matchAttribute(roleAssignment, mockCaseTypeDefinition()));
     }
+
+    @Test
+    void shouldNotMatchWhenEndDateIsNullAndBeginDateIsAfterCurrentDate() {
+
+        // GIVEN
+        Instant beginDate = afterCurrentDate1;
+        Instant endDate = null;
+
+        RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_2, JURISDICTION_1,
+            beginDate, endDate, Classification.PRIVATE.name(), Optional.empty(), Optional.empty());
+
+        // WHEN / THEN
+        assertFalse(classUnderTest.matchAttribute(roleAssignment, mockCaseDetails()));
+        assertFalse(classUnderTest.matchAttribute(roleAssignment, mockCaseTypeDefinition()));
+    }
+
+    @Test
+    void shouldNotMatchWhenBeginDateAndEndDateAreBeforeCurrentDate() {
+
+        // GIVEN
+        Instant beginDate = beforeCurrentDate1;
+        Instant endDate = beforeCurrentDate2;
+
+        RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_2, JURISDICTION_1,
+            beginDate, endDate, Classification.PRIVATE.name(), Optional.empty(), Optional.empty());
+
+        // WHEN / THEN
+        assertFalse(classUnderTest.matchAttribute(roleAssignment, mockCaseDetails()));
+        assertFalse(classUnderTest.matchAttribute(roleAssignment, mockCaseTypeDefinition()));
+    }
+
+    @Test
+    void shouldNotMatchWhenBeginDateAndEndDateAreAfterCurrentDate() {
+
+        // GIVEN
+        Instant beginDate = afterCurrentDate1;
+        Instant endDate = afterCurrentDate2;
+
+        RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_2, JURISDICTION_1,
+            beginDate, endDate, Classification.PRIVATE.name(), Optional.empty(), Optional.empty());
+
+        // WHEN / THEN
+        assertFalse(classUnderTest.matchAttribute(roleAssignment, mockCaseDetails()));
+        assertFalse(classUnderTest.matchAttribute(roleAssignment, mockCaseTypeDefinition()));
+    }
+
 }

@@ -1,12 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
 import uk.gov.hmcts.ccd.security.idam.IdamRepository;
 
 import static java.util.Arrays.asList;
@@ -14,33 +15,29 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
-import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.CITIZEN;
-import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.JUDICIAL;
-import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.PROFESSIONAL;
-import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.STAFF;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.CITIZEN;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.JUDICIAL;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.LEGAL_OPERATIONS;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory.PROFESSIONAL;
 
 @DisplayName("RoleAssignmentCategoryService")
+@ExtendWith(MockitoExtension.class)
 class RoleAssignmentCategoryServiceTest {
+
     private static final String USER_ID = "12345";
 
     @Mock
     private IdamRepository idamRepository;
 
+    @InjectMocks
     private RoleAssignmentCategoryService roleAssignmentCategoryService;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.initMocks(this);
-
-        roleAssignmentCategoryService = new RoleAssignmentCategoryService(idamRepository);
-    }
 
     @Nested
     @DisplayName("getRoleCategory()")
     class GetRoleCategory {
 
         @Test
-        public void shouldGetRoleCategoryForSolicitorUser() {
+        void shouldGetRoleCategoryForSolicitorUser() {
 
             given(idamRepository.getUserRoles(USER_ID))
                 .willReturn(asList("caseworker", "caseworker-autotest1-solicitor"));
@@ -51,7 +48,7 @@ class RoleAssignmentCategoryServiceTest {
         }
 
         @Test
-        public void shouldGetRoleCategoryForLocalAuthorityUser() {
+        void shouldGetRoleCategoryForLocalAuthorityUser() {
 
             given(idamRepository.getUserRoles(USER_ID))
                 .willReturn(asList("caseworker", "caseworker-autotest1-localAuthority"));
@@ -62,7 +59,7 @@ class RoleAssignmentCategoryServiceTest {
         }
 
         @Test
-        public void shouldGetRoleCategoryForCitizenUser() {
+        void shouldGetRoleCategoryForCitizenUser() {
 
             given(idamRepository.getUserRoles(USER_ID))
                 .willReturn(singletonList("citizen"));
@@ -73,7 +70,7 @@ class RoleAssignmentCategoryServiceTest {
         }
 
         @Test
-        public void shouldGetRoleCategoryForLetterHolderUser() {
+        void shouldGetRoleCategoryForLetterHolderUser() {
 
             given(idamRepository.getUserRoles(USER_ID))
                 .willReturn(singletonList("letter-holder"));
@@ -84,7 +81,7 @@ class RoleAssignmentCategoryServiceTest {
         }
 
         @Test
-        public void shouldGetRoleCategoryForPanelMemberUser() {
+        void shouldGetRoleCategoryForPanelMemberUser() {
 
             given(idamRepository.getUserRoles(USER_ID))
                 .willReturn(singletonList("judge1-panelmember"));
@@ -95,14 +92,16 @@ class RoleAssignmentCategoryServiceTest {
         }
 
         @Test
-        public void shouldGetRoleCategoryForStaffUser() {
+        void shouldGetRoleCategoryForLegalOperationsUser() {
 
             given(idamRepository.getUserRoles(USER_ID))
                 .willReturn(singletonList("caseworker"));
 
             RoleCategory roleCategory = roleAssignmentCategoryService.getRoleCategory(USER_ID);
 
-            assertThat(roleCategory, is(STAFF));
+            assertThat(roleCategory, is(LEGAL_OPERATIONS));
         }
+
     }
+
 }
