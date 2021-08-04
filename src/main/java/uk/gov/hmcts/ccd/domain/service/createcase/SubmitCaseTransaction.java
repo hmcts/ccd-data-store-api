@@ -104,7 +104,6 @@ public class SubmitCaseTransaction {
         final CaseDetails savedCaseDetails =
             saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse, event, caseTypeDefinition, idamUser,
                 caseEventDefinition, newCaseDetails);
-
         if (AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             caseUserRepository.grantAccess(Long.valueOf(savedCaseDetails.getId()),
                                            idamUser.getId(),
