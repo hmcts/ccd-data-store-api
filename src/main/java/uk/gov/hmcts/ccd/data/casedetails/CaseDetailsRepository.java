@@ -17,10 +17,11 @@ public interface CaseDetailsRepository {
     /**
      * Find by identifier.
      *
-    // * @param id Internal case ID
+     * @param id Internal case ID
      * @return Case details
      * @deprecated Use {@link CaseDetailsRepository#findByReference(String, Long)} instead.
      */
+
      @Deprecated
      CaseDetails findById(Long id);
 
@@ -47,9 +48,9 @@ public interface CaseDetailsRepository {
     /**
      * Find unique case.
      *
-   //  * @param jurisdictionId Case's jurisdiction ID
-   //   * @param caseTypeId Case's type ID
-   //  * @param caseReference Public case reference
+     * @param jurisdictionId Case's jurisdiction ID
+     * @param caseTypeId Case's type ID
+     * @param caseReference Public case reference
      * @return Case details
      * @deprecated Use {@link CaseDetailsRepository#findByReference(String, String)} instead.
      */
