@@ -425,6 +425,7 @@ public class ApplicationParams {
 
     public boolean isAttachDocumentEnabled() {
         return attachDocumentEnabled;
+    }
 
     public String getDataStoreSystemUserId() {
         return dataStoreSystemUserId;

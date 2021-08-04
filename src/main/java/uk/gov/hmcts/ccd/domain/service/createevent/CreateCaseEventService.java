@@ -146,6 +146,7 @@ public class CreateCaseEventService {
         validatePreState(caseDetails, caseEventDefinition);
 
         content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, caseEventDefinition));
+        final String oldState = caseDetails.getState();
 
         // Logic start from here to attach document with case ID
 
@@ -183,7 +184,6 @@ public class CreateCaseEventService {
             caseDetailsAfterCallback
         );
 
-        final String oldState = caseDetails.getState();
         final CaseDetails savedCaseDetails = saveCaseDetails(
             caseDetailsInDatabase,
             caseDetailsAfterCallbackWithoutHashes,
