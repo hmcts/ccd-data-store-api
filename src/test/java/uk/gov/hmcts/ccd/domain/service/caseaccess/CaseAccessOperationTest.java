@@ -2,13 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.caseaccess;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,14 +13,22 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentCategoryService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidCaseRoleException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -80,6 +81,9 @@ class CaseAccessOperationTest {
     @Mock
     private SupplementaryDataRepository supplementaryDataRepository;
 
+    @Mock
+    private RoleAssignmentCategoryService roleAssignmentCategoryService;
+
     @InjectMocks
     private uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation caseAccessOperation;
 
@@ -91,6 +95,7 @@ class CaseAccessOperationTest {
         configureCaseRepository(JURISDICTION);
         configureCaseRoleRepository();
         configureCaseUserRepository();
+        configureCaseAccessService();
     }
 
     @Nested
@@ -104,7 +109,10 @@ class CaseAccessOperationTest {
 
             assertAll(
                 () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_REFERENCE),
-                () -> verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CREATOR.getRole())
+                () -> verify(caseUserRepository).grantAccess(
+                    CASE_ID,
+                    USER_ID,
+                    CREATOR.getRole())
             );
         }
 
@@ -115,7 +123,10 @@ class CaseAccessOperationTest {
                 () -> assertThrows(CaseNotFoundException.class,
                     () -> caseAccessOperation.grantAccess(JURISDICTION, CASE_NOT_FOUND.toString(), USER_ID)),
                 () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_NOT_FOUND),
-                () -> verify(caseUserRepository, never()).grantAccess(CASE_ID, USER_ID, CREATOR.getRole())
+                () -> verify(caseUserRepository, never()).grantAccess(
+                    CASE_ID,
+                    USER_ID,
+                    CREATOR.getRole())
             );
         }
 
@@ -126,7 +137,10 @@ class CaseAccessOperationTest {
                 () -> assertThrows(CaseNotFoundException.class,
                     () -> caseAccessOperation.grantAccess(WRONG_JURISDICTION, CASE_REFERENCE.toString(), USER_ID)),
                 () -> verify(caseDetailsRepository).findByReference(WRONG_JURISDICTION, CASE_REFERENCE),
-                () -> verify(caseUserRepository, never()).grantAccess(CASE_ID, USER_ID, CREATOR.getRole())
+                () -> verify(caseUserRepository, never()).grantAccess(
+                    CASE_ID,
+                    USER_ID,
+                    CREATOR.getRole())
             );
         }
     }
@@ -167,7 +181,10 @@ class CaseAccessOperationTest {
 
             assertAll(
                 () -> verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE),
-                () -> verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CREATOR.getRole())
+                () -> verify(caseUserRepository).grantAccess(
+                    CASE_ID,
+                    USER_ID,
+                    CREATOR.getRole())
             );
         }
 
@@ -184,7 +201,10 @@ class CaseAccessOperationTest {
         void shouldIgnoreGrantedCaseRoles() {
             caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE_GRANTED));
 
-            verify(caseUserRepository, never()).grantAccess(CASE_ID, USER_ID, CASE_ROLE_GRANTED);
+            verify(caseUserRepository, never()).grantAccess(
+                CASE_ID,
+                USER_ID,
+                CASE_ROLE_GRANTED);
         }
     }
 
@@ -287,7 +307,10 @@ class CaseAccessOperationTest {
             caseAccessOperation.addCaseUserRoles(caseUserRoles);
 
             // ASSERT
-            verify(caseUserRepository, times(1)).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
+            verify(caseUserRepository, times(1)).grantAccess(
+                CASE_ID,
+                USER_ID,
+                CASE_ROLE);
         }
 
         @Test
@@ -326,8 +349,14 @@ class CaseAccessOperationTest {
             caseAccessOperation.addCaseUserRoles(caseUserRoles);
 
             // ASSERT
-            verify(caseUserRepository, times(1)).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
-            verify(caseUserRepository, times(1)).grantAccess(CASE_ID_OTHER, USER_ID, CASE_ROLE);
+            verify(caseUserRepository, times(1)).grantAccess(
+                CASE_ID,
+                USER_ID,
+                CASE_ROLE);
+            verify(caseUserRepository, times(1)).grantAccess(
+                CASE_ID_OTHER,
+                USER_ID,
+                CASE_ROLE);
         }
 
         @Test
@@ -347,8 +376,10 @@ class CaseAccessOperationTest {
             // NB: only one lookup per case reference
             verify(caseDetailsRepository, times(1)).findByReference(null, CASE_REFERENCE);
             // standard grant access check for all case user roles
-            verify(caseUserRepository, times(1)).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
-            verify(caseUserRepository, times(1)).grantAccess(CASE_ID, USER_ID, CASE_ROLE_OTHER);
+            verify(caseUserRepository, times(1)).grantAccess(
+                CASE_ID, USER_ID, CASE_ROLE);
+            verify(caseUserRepository, times(1)).grantAccess(
+                CASE_ID, USER_ID, CASE_ROLE_OTHER);
         }
 
         @Test
@@ -381,7 +412,8 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(supplementaryDataRepository, times(1))
-                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), 1L);
+                .incrementSupplementaryData(CASE_REFERENCE.toString(),
+                    getOrgUserCountSupDataKey(ORGANISATION), 1L);
         }
 
         @Test
@@ -448,7 +480,8 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(supplementaryDataRepository, times(1))
-                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), 1L);
+                .incrementSupplementaryData(CASE_REFERENCE.toString(),
+                    getOrgUserCountSupDataKey(ORGANISATION), 1L);
         }
 
         @Test
@@ -471,7 +504,8 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(supplementaryDataRepository, times(1))
-                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION),1L);
+                .incrementSupplementaryData(CASE_REFERENCE.toString(),
+                    getOrgUserCountSupDataKey(ORGANISATION),1L);
         }
 
         @Test
@@ -495,7 +529,8 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(supplementaryDataRepository, times(1))
-                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION),1L);
+                .incrementSupplementaryData(CASE_REFERENCE.toString(),
+                    getOrgUserCountSupDataKey(ORGANISATION),1L);
         }
 
         @Test
@@ -564,7 +599,8 @@ class CaseAccessOperationTest {
             // ASSERT
             // verify CASE_REFERENCE/CASE_ID
             verify(supplementaryDataRepository, times(1))
-                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), 2L);
+                .incrementSupplementaryData(CASE_REFERENCE.toString(),
+                    getOrgUserCountSupDataKey(ORGANISATION), 2L);
             verify(supplementaryDataRepository, times(1))
                 .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION_OTHER),
                     2L);
@@ -634,7 +670,8 @@ class CaseAccessOperationTest {
             caseAccessOperation.removeCaseUserRoles(caseUserRoles);
 
             // ASSERT
-            verify(caseUserRepository, times(1)).revokeAccess(CASE_ID, USER_ID, CASE_ROLE_CREATOR);
+            verify(caseUserRepository, times(1))
+                .revokeAccess(CASE_ID, USER_ID, CASE_ROLE_CREATOR);
         }
 
         @Test
@@ -699,7 +736,8 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(supplementaryDataRepository, times(1))
-                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), -1L);
+                .incrementSupplementaryData(CASE_REFERENCE.toString(),
+                    getOrgUserCountSupDataKey(ORGANISATION), -1L);
         }
 
         @Test
@@ -767,7 +805,8 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(supplementaryDataRepository, times(1))
-                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), -1L);
+                .incrementSupplementaryData(CASE_REFERENCE.toString(),
+                    getOrgUserCountSupDataKey(ORGANISATION), -1L);
         }
 
         @Test
@@ -795,7 +834,8 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(supplementaryDataRepository, times(1))
-                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), -1L);
+                .incrementSupplementaryData(CASE_REFERENCE.toString(),
+                    getOrgUserCountSupDataKey(ORGANISATION), -1L);
         }
 
         @Test
@@ -822,7 +862,8 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(supplementaryDataRepository, times(1))
-                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), -1L);
+                .incrementSupplementaryData(CASE_REFERENCE.toString(),
+                    getOrgUserCountSupDataKey(ORGANISATION), -1L);
         }
 
         @Test
@@ -908,7 +949,8 @@ class CaseAccessOperationTest {
             // ASSERT
             // verify CASE_REFERENCE/CASE_ID
             verify(supplementaryDataRepository, times(1))
-                .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), -1L);
+                .incrementSupplementaryData(CASE_REFERENCE.toString(),
+                    getOrgUserCountSupDataKey(ORGANISATION), -1L);
             verify(supplementaryDataRepository, times(1))
                 .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION_OTHER),
                     -1L);
@@ -965,6 +1007,10 @@ class CaseAccessOperationTest {
                                   .findByReference(jurisdiction, CASE_NOT_FOUND);
         doReturn(Optional.empty()).when(caseDetailsRepository)
                                   .findByReference(WRONG_JURISDICTION, CASE_REFERENCE);
+    }
+
+    private void configureCaseAccessService() {
+        doReturn(RoleCategory.PROFESSIONAL).when(roleAssignmentCategoryService).getRoleCategory(any());
     }
 
     private void configureCaseRoleRepository() {
