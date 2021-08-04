@@ -69,7 +69,6 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             throw new BadSearchRequest(result.getErrorMessage());
         }
     }
-
     private MultiSearchResult search(CrossCaseTypeSearchRequest request) {
         MultiSearch multiSearch = secureAndTransformSearchRequest(request);
         try {
@@ -91,8 +90,12 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     private Search createSecuredSearch(String caseTypeId, CrossCaseTypeSearchRequest request) {
         CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(
             new CaseSearchRequest(caseTypeId, request.getElasticSearchRequest()));
+
+        final var indexName =
+            request.isACaseRequest() ? getCaseIndexName(caseTypeId) : getEventCaseIndexName(caseTypeId);
+
         return new Search.Builder(securedSearchRequest.toJsonString())
-            .addIndex(getCaseIndexName(caseTypeId))
+            .addIndex(indexName)
             .addType(getCaseIndexType())
             .build();
     }
@@ -130,7 +133,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         if (hitsIsNotEmpty(response)) {
             String indexName = getIndexName(response);
             caseTypeResults.add(new CaseTypeResults(getCaseTypeIDFromIndex(indexName,
-                crossCaseTypeSearchRequest.getCaseTypeIds()),
+                crossCaseTypeSearchRequest.getCaseTypeIds(), crossCaseTypeSearchRequest),
                 response.searchResult.getTotal())
             );
         }
@@ -147,9 +150,15 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         return response.searchResult.getJsonObject().getAsJsonObject(HITS).get(HITS).getAsJsonArray().size() != 0;
     }
 
-    private String getCaseTypeIDFromIndex(final String index, List<String> caseTypeIds) {
-        String caseTypeIdGroupRegex = applicationParams.getCasesIndexNameCaseTypeIdGroup();
-        int caseTypeIdGroupPosition = applicationParams.getCasesIndexNameCaseTypeIdGroupPosition();
+    private String getCaseTypeIDFromIndex(final String index, List<String> caseTypeIds, CrossCaseTypeSearchRequest request) {
+        final var caseTypeIdGroupRegex = request.isACaseRequest() ?
+            applicationParams.getCasesIndexNameCaseTypeIdGroup() :
+            applicationParams.getCasesEventIndexNameCaseTypeIdGroup();
+
+        final var caseTypeIdGroupPosition = request.isACaseRequest() ?
+            applicationParams.getCasesIndexNameCaseTypeIdGroupPosition() :
+            applicationParams.getCasesEventIndexNameCaseTypeIdGroupPosition();
+
         Pattern pattern = Pattern.compile(caseTypeIdGroupRegex);
         Matcher m = pattern.matcher(index);
         if (m.matches() && m.groupCount() > 1) {
@@ -186,6 +195,10 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     private String getCaseIndexName(String caseTypeId) {
         return format(applicationParams.getCasesIndexNameFormat(), caseTypeId.toLowerCase());
+    }
+
+    private String getEventCaseIndexName(String caseTypeId) {
+        return format(applicationParams.getEventCasesIndexNameFormat(), caseTypeId.toLowerCase());
     }
 
     private String getCaseIndexType() {

@@ -38,16 +38,26 @@ public class CrossCaseTypeSearchRequest {
     private final ElasticsearchRequest elasticsearchRequest;
     private final boolean multiCaseTypeSearch;
     private final List<String> aliasFields = new ArrayList<>();
+    private final String entitySearch;
 
     private CrossCaseTypeSearchRequest(List<String> caseTypeIds,
                                        ElasticsearchRequest elasticsearchRequest,
                                        boolean multiCaseTypeSearch,
-                                       List<String> aliasFields) {
+                                       List<String> aliasFields, String entitySearch) {
+        this.entitySearch = entitySearch;
         this.caseTypeIds.addAll(caseTypeIds);
         this.elasticsearchRequest = elasticsearchRequest;
         this.multiCaseTypeSearch = multiCaseTypeSearch;
         this.aliasFields.addAll(aliasFields);
         validateJsonSearchRequest();
+    }
+
+    public String getEntitySearch() {
+        return entitySearch;
+    }
+
+    public boolean isACaseRequest(){
+        return (this.getEntitySearch().equals(ElasticsearchRequest.CASE));
     }
 
     public List<String> getCaseTypeIds() {
@@ -86,6 +96,12 @@ public class CrossCaseTypeSearchRequest {
         private ElasticsearchRequest elasticsearchRequest;
         private boolean multiCaseTypeSearch;
         private final List<String> sourceFilterAliasFields = new ArrayList<>();
+        private String entitySearchName;
+
+        public Builder withEntitySearchName(String entitySearchName) {
+            this.entitySearchName = entitySearchName;
+            return this;
+        }
 
         public Builder withCaseTypes(List<String> caseTypeIds) {
             if (caseTypeIds != null) {
@@ -137,7 +153,7 @@ public class CrossCaseTypeSearchRequest {
         public CrossCaseTypeSearchRequest build() {
             setSourceFilterAliasFields();
             return new CrossCaseTypeSearchRequest(caseTypeIds, elasticsearchRequest, multiCaseTypeSearch,
-                                                  sourceFilterAliasFields);
+                                                  sourceFilterAliasFields, entitySearchName);
         }
 
     }

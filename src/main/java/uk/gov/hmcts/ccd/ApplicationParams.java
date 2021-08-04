@@ -130,6 +130,15 @@ public class ApplicationParams {
     @Value("${search.cases.index.name.case-type-id.group.position}")
     private Integer casesIndexNameCaseTypeIdGroupPosition;
 
+    @Value("${search.event.cases.index.name.format}")
+    private String  eventCasesIndexNameFormat;
+
+    @Value("${search.event.cases.index.name.case-type-id.group}")
+    private String casesEventIndexNameCaseTypeIdGroup;
+
+    @Value("${search.event.cases.index.name.case-type-id.group.position}")
+    private Integer casesEventIndexNameCaseTypeIdGroupPosition;
+
     @Value("${search.cases.index.name.type}")
     private String casesIndexType;
 
@@ -469,5 +478,21 @@ public class ApplicationParams {
 
     public Integer getCasesIndexNameCaseTypeIdGroupPosition() {
         return casesIndexNameCaseTypeIdGroupPosition;
+    }
+
+    public String getEventCasesIndexNameFormat() {
+        return eventCasesIndexNameFormat;
+    }
+
+    public void setEventCasesIndexNameFormat(String eventCasesIndexNameFormat) {
+        this.eventCasesIndexNameFormat = eventCasesIndexNameFormat;
+    }
+
+    public String getCasesEventIndexNameCaseTypeIdGroup() {
+        return casesEventIndexNameCaseTypeIdGroup;
+    }
+
+    public Integer getCasesEventIndexNameCaseTypeIdGroupPosition() {
+        return casesEventIndexNameCaseTypeIdGroupPosition;
     }
 }

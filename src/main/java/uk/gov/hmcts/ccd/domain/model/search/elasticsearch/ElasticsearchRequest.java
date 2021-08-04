@@ -30,6 +30,8 @@ public class ElasticsearchRequest {
     public static final String CASE_DATA_PREFIX = "data.";
     public static final String SUPPLEMENTARY_DATA_PREFIX = "supplementary_data.";
     public static final String COLLECTION_VALUE_SUFFIX = ".value";
+    public static final String EVENT_CASE = "event_case";
+    public static final String CASE = "case";
     public static final String WILDCARD = "*";
     public static final ArrayNode METADATA_FIELDS;
 
