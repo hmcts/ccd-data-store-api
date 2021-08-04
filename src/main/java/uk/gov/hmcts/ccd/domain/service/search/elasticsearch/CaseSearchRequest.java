@@ -24,10 +24,12 @@ public class CaseSearchRequest {
 
     private final String caseTypeId;
     private ElasticsearchRequest elasticsearchRequest;
+    private final String entitySearch;
 
-    public CaseSearchRequest(String caseTypeId, ElasticsearchRequest elasticsearchRequest) {
+    public CaseSearchRequest(String caseTypeId, ElasticsearchRequest elasticsearchRequest, String entitySearch) {
         this.caseTypeId = caseTypeId;
         this.elasticsearchRequest = elasticsearchRequest;
+        this.entitySearch = entitySearch;
         validateJsonSearchRequest();
     }
 
@@ -49,5 +51,13 @@ public class CaseSearchRequest {
         String jsonString = elasticsearchRequest.toFinalRequest();
         log.debug("json search request: {}", jsonString);
         return jsonString;
+    }
+
+    public String getEntitySearch() {
+        return entitySearch;
+    }
+
+    public boolean isACaseRequest(){
+        return (this.getEntitySearch().equals(ElasticsearchRequest.CASE));
     }
 }

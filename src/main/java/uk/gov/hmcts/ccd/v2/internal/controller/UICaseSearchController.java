@@ -168,6 +168,7 @@ public class UICaseSearchController {
         CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(Collections.singletonList(caseTypeId))
             .withSearchRequest(searchRequest)
+            .withEntitySearchName(ElasticsearchRequest.CASE)
             .build();
 
         CaseSearchResult caseSearchResult = caseSearchOperation.execute(request);

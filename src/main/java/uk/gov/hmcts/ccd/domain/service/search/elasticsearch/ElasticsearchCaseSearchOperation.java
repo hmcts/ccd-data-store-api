@@ -89,7 +89,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
 
     private Search createSecuredSearch(String caseTypeId, CrossCaseTypeSearchRequest request) {
         CaseSearchRequest securedSearchRequest = caseSearchRequestSecurity.createSecuredSearchRequest(
-            new CaseSearchRequest(caseTypeId, request.getElasticSearchRequest()));
+            new CaseSearchRequest(caseTypeId, request.getElasticSearchRequest(), request.getEntitySearch()));
 
         final var indexName =
             request.isACaseRequest() ? getCaseIndexName(caseTypeId) : getEventCaseIndexName(caseTypeId);
