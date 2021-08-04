@@ -127,7 +127,8 @@ class ElasticsearchCaseSearchOperationTest {
             when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
 
-            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
+            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest,
+                ElasticsearchRequest.CASE);
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
                 .withSearchRequest(elasticsearchRequest)
@@ -167,7 +168,8 @@ class ElasticsearchCaseSearchOperationTest {
             when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
 
-            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
+            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest,
+                ElasticsearchRequest.CASE);
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
                 .withSearchRequest(elasticsearchRequest)
@@ -198,7 +200,8 @@ class ElasticsearchCaseSearchOperationTest {
             when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
 
-            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
+            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest,
+                ElasticsearchRequest.CASE);
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
                 .withSearchRequest(elasticsearchRequest)
@@ -231,7 +234,8 @@ class ElasticsearchCaseSearchOperationTest {
             when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
 
-            CaseSearchRequest request = new CaseSearchRequest("aaa", elasticsearchRequest);
+            CaseSearchRequest request = new CaseSearchRequest("aaa", elasticsearchRequest,
+                ElasticsearchRequest.CASE);
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(Collections.singletonList("aaa"))
                 .withSearchRequest(elasticsearchRequest)
@@ -275,7 +279,8 @@ class ElasticsearchCaseSearchOperationTest {
             when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
 
-            CaseSearchRequest request = new CaseSearchRequest("casetypeid1_cases", elasticsearchRequest);
+            CaseSearchRequest request = new CaseSearchRequest("casetypeid1_cases", elasticsearchRequest,
+                ElasticsearchRequest.CASE);
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(Collections.singletonList("casetypeid1_cases"))
                 .withSearchRequest(elasticsearchRequest)
@@ -322,8 +327,10 @@ class ElasticsearchCaseSearchOperationTest {
             when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
 
-            CaseSearchRequest request1 = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
-            CaseSearchRequest request2 = new CaseSearchRequest(CASE_TYPE_ID_2, elasticsearchRequest);
+            CaseSearchRequest request1 = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest,
+                ElasticsearchRequest.CASE);
+            CaseSearchRequest request2 = new CaseSearchRequest(CASE_TYPE_ID_2, elasticsearchRequest,
+                ElasticsearchRequest.CASE);
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
                 .withSearchRequest(elasticsearchRequest)
@@ -375,8 +382,10 @@ class ElasticsearchCaseSearchOperationTest {
             when(mapper.dtosToCaseDetailsList(newArrayList(caseDetailsDTO))).thenReturn(newArrayList(caseDetails));
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
 
-            CaseSearchRequest request1 = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
-            CaseSearchRequest request2 = new CaseSearchRequest(CASE_TYPE_ID_2, elasticsearchRequest);
+            CaseSearchRequest request1 = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest,
+                ElasticsearchRequest.CASE);
+            CaseSearchRequest request2 = new CaseSearchRequest(CASE_TYPE_ID_2, elasticsearchRequest,
+                ElasticsearchRequest.CASE);
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
                 .withSearchRequest(elasticsearchRequest)
@@ -408,7 +417,8 @@ class ElasticsearchCaseSearchOperationTest {
             MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
             when(multiSearchResult.isSucceeded()).thenReturn(false);
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
-            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
+            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest,
+                ElasticsearchRequest.CASE);
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(Collections.singletonList(CASE_TYPE_ID_1))
                 .withSearchRequest(elasticsearchRequest)
@@ -434,7 +444,8 @@ class ElasticsearchCaseSearchOperationTest {
             when(multiSearchResult.isSucceeded()).thenReturn(true);
             when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
             when(jestClient.execute(any(MultiSearch.class))).thenReturn(multiSearchResult);
-            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
+            CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest,
+                ElasticsearchRequest.CASE);
             CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = new CrossCaseTypeSearchRequest.Builder()
                 .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
                 .withSearchRequest(elasticsearchRequest)
