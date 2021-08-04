@@ -65,7 +65,8 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     public List<CaseTypeDefinition> getCaseTypesForJurisdiction(final String jurisdictionId) {
         try {
             final HttpEntity<CaseTypeDefinition> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
-            return Arrays.asList(Objects.requireNonNull(restTemplate.exchange(applicationParams.jurisdictionCaseTypesDefURL(jurisdictionId),
+            return Arrays.asList(Objects.requireNonNull(restTemplate.exchange(
+                applicationParams.jurisdictionCaseTypesDefURL(jurisdictionId),
                 HttpMethod.GET, requestEntity, CaseTypeDefinition[].class).getBody()));
         } catch (Exception e) {
             LOG.warn("Error while retrieving base type", e);
@@ -117,9 +118,10 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Override
     public List<FieldTypeDefinition> getBaseTypes() {
         try {
-            final HttpEntity <CaseTypeDefinition> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
-            return Arrays.asList(Objects.requireNonNull(restTemplate.exchange(applicationParams.baseTypesURL(), HttpMethod.GET, requestEntity,
-                FieldTypeDefinition[].class).getBody()));
+            final HttpEntity <CaseTypeDefinition> requestEntity =
+                new HttpEntity <> (securityUtils.authorizationHeaders());
+            return Arrays.asList(Objects.requireNonNull(restTemplate.exchange(applicationParams.baseTypesURL(),
+                HttpMethod.GET,requestEntity,FieldTypeDefinition[].class).getBody()));
         } catch (Exception e) {
             LOG.warn("Error while retrieving base types", e);
             if (e instanceof HttpClientErrorException
@@ -138,7 +140,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     public UserRole getUserRoleClassifications(String userRole) {
         try {
             final HttpEntity <CaseTypeDefinition>requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
-            final Map<String, String> queryParams = new HashMap<>();
+            final Map<String, String> queryParams = new HashMap <> ();
             queryParams.put("userRole", encodeBase64(userRole));
             return restTemplate.exchange(applicationParams.userRoleClassification(), HttpMethod.GET, requestEntity,
                     UserRole.class, queryParams).getBody();
@@ -161,7 +163,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             if (userRoles.isEmpty()) {
                 return Collections.emptyList();
             }
-            final HttpEntity <CaseTypeDefinition>requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
+            final HttpEntity <CaseTypeDefinition>requestEntity = new HttpEntity <> (securityUtils.authorizationHeaders());
             final Map<String, String> queryParams = new HashMap<>();
             queryParams.put("roles", StringUtils.join(userRoles, ","));
             return Arrays.asList(Objects.requireNonNull(restTemplate.exchange(applicationParams.userRolesClassificationsURL(), HttpMethod.GET,

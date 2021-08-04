@@ -29,9 +29,9 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
     public Optional<CaseDetails> execute(final String jurisdictionId,
                                          final String caseTypeId,
                                          final String caseReference) {
-       if (!uidService.validateUID(caseReference)) {
+        if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
-         }
+        }
 
         //return Optional.ofNullable(caseDetailsRepository.findUniqueCase(jurisdictionId, caseTypeId, caseReference));
         return Optional.ofNullable(caseDetailsRepository.findUniqueCase(jurisdictionId, caseTypeId, caseReference));

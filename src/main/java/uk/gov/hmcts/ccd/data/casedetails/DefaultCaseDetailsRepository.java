@@ -90,16 +90,16 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     public Optional<CaseDetails> findById(String jurisdiction, Long id) {
         return find(jurisdiction, id, null).map(this.caseDetailsMapper::entityToModel);
     }
-    // **
-    //  * @param id Internal case ID
-    //   * @return Case details if found; null otherwise
-    //   * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
-    //   */
+    /**
+     * @param id Internal case ID
+     * @return Case details if found; null otherwise
+     * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
+     */
      @Override
      @Deprecated
-        public CaseDetails findById(final Long id) {
-            return findById(null, id).orElse(null);
-      }
+     public CaseDetails findById(final Long id) {
+        return findById(null, id).orElse(null);
+    }
 
     @Override
     public List<Long> findCaseReferencesByIds(final List<Long> ids) {
@@ -133,10 +133,10 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     /**
-    // * @param jurisdiction Jurisdiction's ID
-    // * @param caseTypeId   Case's type ID
-   //  * @param reference    Case unique 16-digit reference
-     * @return Case details if found; null otherwise
+     * @param jurisdiction Jurisdiction's ID
+     * @param caseTypeId   Case's type ID
+     * @param reference    Case unique 16-digit reference
+     * @return Case details if found; null otherwise.
      * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, String)} instead
      */
     @Override
@@ -148,10 +148,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
-
-    //public List findByMetaDataAndFieldData(final MetaData metadata,
-      //                                         final Map<String, String> dataSearchParams)
-    public List <CaseDetails>findByMetaDataAndFieldData(final MetaData metadata,
+    public List<CaseDetails> findByMetaDataAndFieldData(final MetaData metadata,
                                            final Map<String, String> dataSearchParams) {
         final Query query = getQuery(metadata, dataSearchParams, false);
         paginate(query, metadata.getPage());

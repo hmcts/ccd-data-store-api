@@ -133,8 +133,8 @@ public class CaseDetailsEndpoint {
         final Instant start = Instant.now();
         final CaseDetails caseDetails = getCaseOperation.execute(jurisdictionId, caseTypeId, caseId)
             .orElseThrow(() -> new CaseNotFoundException(jurisdictionId, caseTypeId, caseId));
-      // final CaseDetails caseDetails = getCaseOperation.execute(String caseReference)
-      //    .orElse(()-> new CaseNotFoundException(String caseReference))  ;
+        // final CaseDetails caseDetails = getCaseOperation.execute(String caseReference)
+        //    .orElse(()-> new CaseNotFoundException(String caseReference))  ;
         final Duration duration = Duration.between(start, Instant.now());
         appInsights.trackRequest("findCaseDetailsForCaseworker", duration.toMillis(), true);
         return caseDetails;
