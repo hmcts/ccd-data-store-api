@@ -63,8 +63,8 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
         return caseDetailsRepository.findCaseReferencesByIds(ids);
     }
 
-    @Override
-    public CaseDetails findByReference(final Long caseReference) {
+   @Override
+   public CaseDetails findByReference(final Long caseReference) {
         final Function<String, Optional<CaseDetails>> findFunction = key ->
             ofNullable(caseDetailsRepository.findByReference(caseReference));
         return referenceToCaseDetails.computeIfAbsent(caseReference.toString(), findFunction).orElse(null);
@@ -92,6 +92,7 @@ public class CachedCaseDetailsRepository implements CaseDetailsRepository {
         return referenceToCaseDetails.computeIfAbsent(reference, key ->
             caseDetailsRepository.findByReferenceWithNoAccessControl(reference));
     }
+
 
     @Override
     public CaseDetails findUniqueCase(final String jurisdictionId,

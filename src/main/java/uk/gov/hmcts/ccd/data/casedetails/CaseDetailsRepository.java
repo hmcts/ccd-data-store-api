@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface CaseDetailsRepository {
+
     CaseDetails set(CaseDetails caseDetails);
 
     Optional<CaseDetails> findById(String jurisdiction, Long id);
@@ -16,22 +17,22 @@ public interface CaseDetailsRepository {
     /**
      * Find by identifier.
      *
-     * @param id Internal case ID
+    // * @param id Internal case ID
      * @return Case details
      * @deprecated Use {@link CaseDetailsRepository#findByReference(String, Long)} instead.
      */
-   // @Deprecated
-    CaseDetails findById(Long id);
+     @Deprecated
+     CaseDetails findById(Long id);
 
-    List<Long> findCaseReferencesByIds(List<Long> ids);
+     List<Long> findCaseReferencesByIds(List<Long> ids);
 
-    Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference);
+     Optional<CaseDetails> findByReferenceWithNoAccessControl(String reference);
 
-    Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference);
+     Optional<CaseDetails> findByReference(String jurisdiction, Long caseReference);
 
-    Optional<CaseDetails> findByReference(String jurisdiction, String reference);
+     Optional<CaseDetails> findByReference(String jurisdiction, String reference);
 
-    Optional<CaseDetails> findByReference(String reference);
+     Optional<CaseDetails> findByReference(String reference);
 
     /**
      * Find by reference.
@@ -40,19 +41,20 @@ public interface CaseDetailsRepository {
      * @return Case details
      * @deprecated Use {@link CaseDetailsRepository#findByReference(String, Long)} instead.
      */
-    //@Deprecated
-    CaseDetails findByReference(Long caseReference);
+     @Deprecated
+     CaseDetails findByReference(Long caseReference);
 
     /**
      * Find unique case.
      *
-     * @param jurisdictionId Case's jurisdiction ID
-     * @param caseTypeId Case's type ID
-     * @param caseReference Public case reference
+   //  * @param jurisdictionId Case's jurisdiction ID
+   //   * @param caseTypeId Case's type ID
+   //  * @param caseReference Public case reference
      * @return Case details
      * @deprecated Use {@link CaseDetailsRepository#findByReference(String, String)} instead.
      */
-    //@Deprecated
+
+    @Deprecated
     CaseDetails findUniqueCase(String jurisdictionId,
                                String caseTypeId,
                                String caseReference);

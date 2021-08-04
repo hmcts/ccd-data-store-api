@@ -6,8 +6,8 @@ import java.util.Optional;
 
 public interface GetCaseOperation {
 
-    /**
-     * Execute.
+
+     /* Execute.
      *
      * @param jurisdictionId Case's jurisdiction
      * @param caseTypeId Case's case type
@@ -16,14 +16,15 @@ public interface GetCaseOperation {
      *
      * @deprecated Use {@link GetCaseOperation#execute(String)} instead
      */
-   // @Deprecated
+    @Deprecated
     Optional<CaseDetails> execute(final String jurisdictionId, final String caseTypeId, final String caseReference);
 
     /**
-     * Execute.
-     *
-     * @param caseReference 16-digit universally unique case reference
-     * @return Optional containing CaseDetails when found; empty optional otherwise
+    * Execute.
+        *
+        * @param caseReference 16-digit universally unique case reference
+        * @return Optional containing CaseDetails when found; empty optional otherwise
+
      */
     Optional<CaseDetails> execute(final String caseReference);
 }

@@ -48,7 +48,7 @@ public class DefaultCaseDefinitionRepositoryTest {
 
     @Before
     public void setup() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.initMocks(this); // use OpenMocks instead of initMocks
         doReturn(new HttpHeaders()).when(securityUtils).authorizationHeaders();
         doReturn(new HttpHeaders()).when(securityUtils).userAuthorizationHeaders();
 
