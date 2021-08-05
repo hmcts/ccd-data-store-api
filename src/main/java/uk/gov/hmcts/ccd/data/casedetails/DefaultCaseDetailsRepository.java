@@ -20,8 +20,12 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.persistence.*;
-//import javax.validation.constraints.NotNull;
+import javax.persistence.EntityManager;
+import javax.persistence.OptimisticLockException;
+import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
+import javax.persistence.Query;
+//import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
@@ -90,14 +94,18 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     public Optional<CaseDetails> findById(String jurisdiction, Long id) {
         return find(jurisdiction, id, null).map(this.caseDetailsMapper::entityToModel);
     }
+
     /**
+     * The method  DefaultCaseDetailsRepository#findById(Long)is.
      * @param id Internal case ID
      * @return Case details if found; null otherwise
      * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
      */
-     @Override
-     @Deprecated
-     public CaseDetails findById(final Long id) {
+
+
+    @Override
+    @Deprecated
+    public CaseDetails findById(final Long id) {
         return findById(null, id).orElse(null);
     }
 
@@ -122,6 +130,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     /**
+     * The method  DefaultCaseDetailsRepository#findByReference(Long) has performance issue.
      * @param caseReference Public case reference
      * @return Case details if found; null otherwise.
      * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
@@ -133,10 +142,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     /**
-     * @param jurisdiction Jurisdiction's ID
-     * @param caseTypeId   Case's type ID
-     * @param reference    Case unique 16-digit reference
-     * @return Case details if found; null otherwise.
+     * The method  DefaultCaseDetailsRepository#findUnique(String,String,String) has performance issue.
      * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, String)} instead
      */
     @Override
@@ -149,7 +155,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     @Override
     public List<CaseDetails> findByMetaDataAndFieldData(final MetaData metadata,
-                                           final Map<String, String> dataSearchParams) {
+                                                        final Map<String, String> dataSearchParams) {
         final Query query = getQuery(metadata, dataSearchParams, false);
         paginate(query, metadata.getPage());
         return caseDetailsMapper.entityToModel(query.getResultList());
@@ -169,7 +175,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     // TODO This accepts null values for backward compatibility. Once deprecated methods are removed, parameters should
     //  be annotated with @NotNull
-    private Optional<CaseDetailsEntity> find(String jurisdiction,   Long id, String reference) {
+    private Optional<CaseDetailsEntity> find(String jurisdiction, Long id, String reference) {
         final CaseDetailsQueryBuilder<CaseDetailsEntity> qb = queryBuilderFactory.selectSecured(em);
 
         if (null != jurisdiction) {

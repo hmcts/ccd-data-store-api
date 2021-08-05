@@ -18,7 +18,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.inject.Inject;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -57,10 +64,11 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     /**
+     * The current implementation of getCaseTypesForJurisdictions(String) has serious performance issue.
      * @deprecated current implementation has serious performance issues
      */
     @Deprecated
-    //  @SuppressWarnings("squid:S1133")
+
     @Override
     public List<CaseTypeDefinition> getCaseTypesForJurisdiction(final String jurisdictionId) {
         try {
@@ -91,9 +99,10 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     public CaseTypeDefinition getCaseType(final String caseTypeId) {
         LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
         try {
-            final HttpEntity<CaseTypeDefinition> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
-            final CaseTypeDefinition caseTypeDefinition = restTemplate
-                    .exchange(applicationParams.caseTypeDefURL(caseTypeId), HttpMethod.GET, requestEntity,
+            final HttpEntity<CaseTypeDefinition> requestEntity =
+                new HttpEntity<>(securityUtils.authorizationHeaders());
+            final CaseTypeDefinition caseTypeDefinition =
+                restTemplate.exchange(applicationParams.caseTypeDefURL(caseTypeId), HttpMethod.GET, requestEntity,
                             CaseTypeDefinition.class)
                     .getBody();
             if (caseTypeDefinition != null) {
@@ -118,8 +127,8 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Override
     public List<FieldTypeDefinition> getBaseTypes() {
         try {
-            final HttpEntity <CaseTypeDefinition> requestEntity =
-                new HttpEntity <> (securityUtils.authorizationHeaders());
+            final HttpEntity<CaseTypeDefinition> requestEntity =
+                new HttpEntity<>(securityUtils.authorizationHeaders());
             return Arrays.asList(Objects.requireNonNull(restTemplate.exchange(applicationParams.baseTypesURL(),
                 HttpMethod.GET,requestEntity,FieldTypeDefinition[].class).getBody()));
         } catch (Exception e) {
@@ -139,8 +148,9 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     @Cacheable("userRolesCache")
     public UserRole getUserRoleClassifications(String userRole) {
         try {
-            final HttpEntity <CaseTypeDefinition>requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
-            final Map<String, String> queryParams = new HashMap <> ();
+            final HttpEntity<CaseTypeDefinition> requestEntity =
+                new HttpEntity<>(securityUtils.authorizationHeaders());
+            final Map<String, String> queryParams = new HashMap<>();
             queryParams.put("userRole", encodeBase64(userRole));
             return restTemplate.exchange(applicationParams.userRoleClassification(), HttpMethod.GET, requestEntity,
                     UserRole.class, queryParams).getBody();
@@ -163,10 +173,12 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             if (userRoles.isEmpty()) {
                 return Collections.emptyList();
             }
-            final HttpEntity <CaseTypeDefinition>requestEntity = new HttpEntity <> (securityUtils.authorizationHeaders());
+            final HttpEntity<CaseTypeDefinition>  requestEntity =
+                new HttpEntity<>(securityUtils.authorizationHeaders());
             final Map<String, String> queryParams = new HashMap<>();
             queryParams.put("roles", StringUtils.join(userRoles, ","));
-            return Arrays.asList(Objects.requireNonNull(restTemplate.exchange(applicationParams.userRolesClassificationsURL(), HttpMethod.GET,
+            return Arrays.asList(Objects.requireNonNull(restTemplate.exchange(
+                applicationParams.userRolesClassificationsURL(), HttpMethod.GET,
                 requestEntity, UserRole[].class, queryParams).getBody()));
         } catch (Exception e) {
             LOG.warn("Error while retrieving classification for user roles {} because of ", userRoles, e);
@@ -183,7 +195,8 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     public CaseTypeDefinitionVersion getLatestVersionFromDefinitionStore(String caseTypeId) {
         try {
-            final HttpEntity<CaseTypeDefinition> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
+            final HttpEntity<CaseTypeDefinition> requestEntity =
+                new HttpEntity<>(securityUtils.authorizationHeaders());
             CaseTypeDefinitionVersion version = restTemplate
                     .exchange(applicationParams.caseTypeLatestVersionUrl(caseTypeId), HttpMethod.GET, requestEntity,
                             CaseTypeDefinitionVersion.class)
