@@ -1,0 +1,25 @@
+{
+  "_guid_": "S-1014_Get_Case_Data_Base",
+  "_extends_": "F-1002-Default_Get_Case_Data_Base",
+  "specs": [
+    "to get the same case with unmodified contents from data store"
+  ],
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][S-1014-Update_Event_Token_Creation][testData][Request][pathVariables][cid]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "_links": {
+        "self": {
+          "href": "{{TEST_URL}}/cases/${[scenarioContext][parentContext][childContexts][S-1014-Update_Event_Token_Creation][testData][Request][pathVariables][cid]}"
+        }
+      },
+      "id": "${}${[scenarioContext][parentContext][childContexts][S-1014-Update_Event_Token_Creation][testData][Request][pathVariables][cid]}",
+      "data": {
+      }
+    }
+  }
+}

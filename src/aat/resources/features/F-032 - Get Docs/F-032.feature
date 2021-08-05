@@ -10,8 +10,10 @@ Background:
 @S-124
 Scenario: must retrieve printable documents successfully for correct inputs
 
-    Given a case that has just been created as in [F-032_Case_Creation_Data_With_Document],
-      And a user with [an active profile in CCD],
+  Given a user with [an active profile in CCD],
+      And a successful call [by same user to upload a document with mandatory metadata] as in [Befta_Jurisdiction2_Document_Upload_1],
+      And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation],
+      And another successful call [by same user to create a case of this case type] as in [F-032_Case_Creation_Data_With_Document],
 
      When a request is prepared with appropriate values,
       And the request [contains the case data of the case just created],

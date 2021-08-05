@@ -159,6 +159,9 @@ Scenario: must create and update successfully the respective fields with ACL per
 
     Given a user with [an active Citizen profile in CCD],
       And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Citizen_Case_Creation],
+      And a successful call [by a privileged user with full ACL to create a case of this case type] as in [Befta_Jurisdiction2_Document_Upload_1],
+      And a successful call [by a privileged user with full ACL to create a case of this case type] as in [Befta_Jurisdiction2_Document_Upload_2],
+      And a successful call [by a privileged user with full ACL to create a case of this case type] as in [Befta_Jurisdiction2_Document_Upload_3],
       And another successful call [by a privileged user with full ACL to create a case of this case type] as in [Befta_Jurisdiction2_Default_Citizen_Case_Creation_Data],
       And another successful call [to get an update event token for the case just created] as in [S-578-Prerequisite_Citizen_Token_For_Update_Case],
 
