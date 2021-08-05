@@ -573,7 +573,9 @@ jsonSchema2Pojo {
 sonarqube {
     properties {
         property "sonar.exclusions", "build/generated-sources/**/*.java,**/AuditRepository.java,**/CaseDetailsEndpoint.java,**/MidEventCallback.java,**/UIDefinitionRepository.java,**/CachedUIDefinitionGateway.java,**/CaseAccessEndpoint.java,**/UICaseSearchController.java,**/CaseSearchResultViewGenerator.java,**/CaseTypeService.java,**/DefaultCaseDefinitionRepository.java"
-
+        property "sonar.projectName", "ccd-data-store-api"
+        property "sonar.projectKey", "ccd-data-store-api"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     }
 }
 
