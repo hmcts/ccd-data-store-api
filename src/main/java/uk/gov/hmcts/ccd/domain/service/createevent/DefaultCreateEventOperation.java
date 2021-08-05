@@ -44,7 +44,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
                                        final CaseDataContent content) {
         eventValidator.validate(content.getEvent());
 
-        CreateCaseEventResult caseEventResult = createEventService.createCaseEvent(caseReference, content);
+        final CreateCaseEventResult caseEventResult = createEventService.createCaseEvent(caseReference, content);
 
         if (!isBlank(caseEventResult.getEventTrigger().getCallBackURLSubmittedEvent())) {
             return invokeSubmitedToCallback(caseEventResult);

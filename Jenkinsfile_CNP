@@ -83,6 +83,7 @@ def vaultOverrides = [
 // vars needed for functional tests
 // Other env variables needed for BEFTA.
 env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
+env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
 env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 env.ELASTIC_SEARCH_FTA_ENABLED = "false"

@@ -149,6 +149,12 @@ public class ApplicationParams {
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
 
+    @Value("${document.hash.check.enabled}")
+    private boolean enableDocumentHashCheck;
+
+    @Value("${ccd.case-document-am-api.attachDocumentEnabled:true}")
+    private boolean attachDocumentEnabled;
+
     @Value("${idam.data-store.system-user.username}")
     private String dataStoreSystemUserId;
 
@@ -411,6 +417,14 @@ public class ApplicationParams {
 
     public Integer getCasesIndexNameCaseTypeIdGroupPosition() {
         return casesIndexNameCaseTypeIdGroupPosition;
+    }
+
+    public boolean isDocumentHashCheckingEnabled() {
+        return enableDocumentHashCheck;
+    }
+
+    public boolean isAttachDocumentEnabled() {
+        return attachDocumentEnabled;
     }
 
     public String getDataStoreSystemUserId() {
