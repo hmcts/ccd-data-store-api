@@ -1,0 +1,36 @@
+{
+  "title": "must receive an error response for a non existing document id",
+
+  "_guid_": "S-1053",
+  "_extends_": "F-1001_Test_Data_Base",
+
+  "specs": [
+    "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
+    "has the case id just created but a document id which does not exist"
+  ],
+
+  "productName": "CCD Data Store",
+  "operationName": "Get Document AM Data",
+  "method": "GET",
+  "uri": "/cases/{caseId}/documents/{documentId}",
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][S-1053-Case_Creation_Main][testData][actualResponse][body][id]}",
+      "documentId": "00000000-0000-0000-0000-000000000000"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "exception" : "uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentNotFoundException",
+      "message" : "Document ${[scenarioContext][testData][request][pathVariables][documentId]} is not found in the case : ${[scenarioContext][childContexts][S-1053-Case_Creation_Main][testData][actualResponse][body][id]}",
+      "path" : "/cases/${[scenarioContext][childContexts][S-1053-Case_Creation_Main][testData][actualResponse][body][id]}/documents/${[scenarioContext][testData][request][pathVariables][documentId]}",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

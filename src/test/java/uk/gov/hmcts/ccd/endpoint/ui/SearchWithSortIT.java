@@ -95,6 +95,53 @@ public class SearchWithSortIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_search_sort_cases.sql"})
+    public void workbasketSearchWithSortOrderWithDate() throws Exception {
+        MvcResult result = mockMvc.perform(get(GET_CASES)
+            .contentType(JSON_CONTENT_TYPE)
+            .param("view", WORKBASKET)
+            .param("case_type", TEST_CASE_TYPE)
+            .param("jurisdiction", TEST_JURISDICTION)
+            .param("state", CASE_CREATED)
+            .param("page", "1")
+            .param("created_date", "2016-06-22")
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        String contentAsString = result.getResponse().getContentAsString();
+        final SearchResultView searchResultView = mapper.readValue(contentAsString,
+            SearchResultView.class);
+        final List<SearchResultViewItem> searchResultViewItems = searchResultView.getSearchResultViewItems();
+
+        assertEquals("Incorrect view items count", 2, searchResultViewItems.size());
+
+        assertEquals("John", searchResultViewItems.get(0).getFields().get("PersonFirstName"));
+        assertEquals(null, searchResultViewItems.get(0).getFields().get("PersonAddress"));
+
+        assertEquals("Janet", searchResultViewItems.get(1).getFields().get("PersonFirstName"));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_search_sort_cases.sql"})
+    public void expectBadRequestErrorForMalformattedDateParam() throws Exception {
+        MvcResult result = mockMvc.perform(get(GET_CASES)
+            .contentType(JSON_CONTENT_TYPE)
+            .param("view", WORKBASKET)
+            .param("case_type", TEST_CASE_TYPE)
+            .param("jurisdiction", TEST_JURISDICTION)
+            .param("state", CASE_CREATED)
+            .param("page", "1")
+            .param("created_date", "2016-06-22T::.000")
+            .header(AUTHORIZATION, "Bearer user1"))
+            .andExpect(status().is(400))
+            .andReturn();
+
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_search_sort_cases.sql"})
     public void workbasketSearchWithRoleSpecificSortOrder() throws Exception {
         String roleWithSortOrder = ROLE_TEST_PUBLIC;
         MockUtils.setSecurityAuthorities(authentication, roleWithSortOrder, ROLE_CASEWORKER_PUBLIC,

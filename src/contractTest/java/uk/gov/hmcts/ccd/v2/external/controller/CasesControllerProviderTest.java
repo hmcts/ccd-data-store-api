@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditService;
 import uk.gov.hmcts.ccd.data.casedetails.query.UserAuthorisationSecurity;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -47,7 +48,7 @@ import static org.mockito.Mockito.when;
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
     host = "${PACT_BROKER_URL:localhost}",
     port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
-    @VersionSelector(tag = "master")})
+    @VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
     "server.port=8123", "spring.application.name=PACT_TEST",
     "ccd.document.url.pattern=${CCD_DOCUMENT_URL_PATTERN:https?://(((?:api-gateway.preprod.dm.reform.hmcts.net|"
@@ -59,7 +60,7 @@ import static org.mockito.Mockito.when;
 })
 @ActiveProfiles("SECURITY_MOCK")
 @IgnoreNoPactsToVerify
-public class CasesControllerProviderTest {
+public class CasesControllerProviderTest extends WireMockBaseTest {
 
     private static final String CASEWORKER_USERNAME = "caseworkerUsername";
     private static final String CASEWORKER_PASSWORD = "caseworkerPassword";
@@ -140,7 +141,6 @@ public class CasesControllerProviderTest {
         BaseType.setCaseDefinitionRepository(contractTestCaseDefinitionRepository);
         when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
         when(userAuthorisation.getUserId()).thenReturn("userId");
-
     }
 
     @State({"A Get Case is requested"})
