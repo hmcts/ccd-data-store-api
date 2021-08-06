@@ -1,0 +1,25 @@
+{
+  "_guid_": "S-1012_Get_Case_Data_Base",
+  "_extends_": "F-1002-Default_Get_Case_Data_Base",
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body" : {
+      "_links" : {
+        "self" : {
+          "href" : "{{TEST_URL}}/cases/${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+        }
+      },
+      "id" : "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
+      "data" : {
+        "MoneyGBPField" : "10121012",
+        "EmailField" : "S1012NonDocumentFieldsUpdate@gmail.com",
+        "TextField" : "NonDocumentFieldsUpdate"
+      }
+    }
+  }
+}

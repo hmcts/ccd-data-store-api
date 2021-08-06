@@ -1,0 +1,8 @@
+{
+  "_guid_": "F-1002-Case_Creation_Data",
+  "_extends_": "Befta_Jurisdiction2_Default_Full_Case_Creation_Data",
+
+  "specs": [
+    "by same user to create a case of this case type"
+  ]
+}
