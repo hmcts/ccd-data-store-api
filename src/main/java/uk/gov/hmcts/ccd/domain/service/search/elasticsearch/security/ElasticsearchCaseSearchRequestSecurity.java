@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder.AccessContro
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.QUERY;
 
 @Component
+@Slf4j
 public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequestSecurity {
 
     private final List<CaseSearchFilter> caseSearchFilters;
@@ -54,7 +56,9 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.query(queryBuilder);
 
-        return searchSourceBuilder.toString();
+        String queryString = searchSourceBuilder.toString();
+        log.debug("[[ES Query ]] : " + queryString);
+        return queryString;
     }
 
     private CaseSearchRequest createNewCaseSearchRequest(CaseSearchRequest caseSearchRequest, String queryWithFilters) {
