@@ -92,14 +92,12 @@ public class CaseDataService {
             : JSON_NODE_FACTORY.objectNode();
     }
 
-    private JsonNode getExistingDataClassificationFromArrayOrEmpty(JsonNode existingDataClassificationArray,
-                                                                   JsonNode field) {
+    private JsonNode getExistingDataClassificationFromArrayOrEmpty(JsonNode existingDataClassificationArray) {
         if (!existingDataClassificationArray.has(VALUE)) {
             return JSON_NODE_FACTORY.objectNode();
         }
         Iterator<JsonNode> iterator = existingDataClassificationArray.get(VALUE).iterator();
-        JsonNode dataClassificationForData = getDataClassificationForData(field,
-            iterator);
+        JsonNode dataClassificationForData = getDataClassificationForData(iterator);
         return dataClassificationForData.has(VALUE) ? dataClassificationForData.get(VALUE)
             : JSON_NODE_FACTORY.objectNode();
     }
@@ -129,8 +127,7 @@ public class CaseDataService {
             for (JsonNode field : arrayNode) {
 
                 final JsonNode itemClassification = getExistingDataClassificationFromArrayOrEmpty(
-                    existingDataClassificationNode,
-                    field);
+                    existingDataClassificationNode);
 
                 if (COMPLEX.equalsIgnoreCase(collectionFieldType.getType())) {
                     deduceDefaultClassifications(
