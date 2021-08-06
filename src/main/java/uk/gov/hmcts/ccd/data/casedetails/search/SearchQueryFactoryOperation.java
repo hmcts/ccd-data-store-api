@@ -9,6 +9,7 @@ import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
@@ -25,6 +26,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 
 @Named
 @Singleton
+@Slf4j
 public class SearchQueryFactoryOperation {
 
     private static final String AND = " AND ";
@@ -85,6 +87,7 @@ public class SearchQueryFactoryOperation {
         }
         parametersToBind.forEach((k, v) -> query.setParameter(k, v));
         addParameters(query, criteria);
+        log.debug("[SQL Query ]] : " + queryString);
         return query;
     }
 
