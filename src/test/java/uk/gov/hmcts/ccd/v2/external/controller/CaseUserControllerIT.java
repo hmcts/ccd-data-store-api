@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Sets;
 import com.microsoft.applicationinsights.core.dependencies.google.common.collect.Lists;
 import org.junit.Before;
@@ -17,9 +19,12 @@ import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import javax.inject.Inject;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -37,9 +42,20 @@ public class CaseUserControllerIT extends WireMockBaseTest {
     private AuditRepository auditRepository;
 
     @Before
-    public void setUp() {
+    public void setUp() throws JsonProcessingException {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, "caseworker-probate");
+
+        String uidNoEventAccess = "1234";
+        UserInfo userInfo = UserInfo.builder()
+            .uid(uidNoEventAccess)
+            .roles(com.google.common.collect.Lists.newArrayList(MockUtils.ROLE_CASEWORKER_PUBLIC))
+            .build();
+        stubFor(WireMock.post(urlMatching("/o/token"))
+            .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
+        stubFor(WireMock.get(urlMatching("/api/v1/users/.*"))
+            .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
+
     }
 
     @Test
