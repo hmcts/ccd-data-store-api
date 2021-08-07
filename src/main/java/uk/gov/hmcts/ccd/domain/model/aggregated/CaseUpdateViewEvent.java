@@ -25,6 +25,8 @@ public class CaseUpdateViewEvent {
     private String endButtonLabel;
     @JsonProperty("can_save_draft")
     private Boolean canSaveDraft;
+    @JsonProperty("title_display")
+    private String titleDisplay;
 
     public String getId() {
         return id;
@@ -112,5 +114,13 @@ public class CaseUpdateViewEvent {
 
     public void setCanSaveDraft(Boolean canSaveDraft) {
         this.canSaveDraft = canSaveDraft;
+    }
+
+    public String getTitleDisplay() {
+        return titleDisplay;
+    }
+
+    public void setTitleDisplay(String titleDisplay) {
+        this.titleDisplay = titleDisplay;
     }
 }

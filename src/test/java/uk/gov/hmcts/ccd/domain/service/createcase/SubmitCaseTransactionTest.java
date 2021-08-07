@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +27,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
@@ -31,16 +35,25 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Matchers.notNull;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -68,6 +81,10 @@ class SubmitCaseTransactionTest {
     public static final String URL = "http://www.yahooo.com";
     public static final SignificantItemType DOCUMENT = SignificantItemType.DOCUMENT;
 
+    public static final String COMPLEX = "Complex";
+    public static final String COLLECTION = "Collection";
+
+
     @Mock
     private CaseDetailsRepository caseDetailsRepository;
     @Mock
@@ -94,6 +111,9 @@ class SubmitCaseTransactionTest {
     private UserAuthorisation userAuthorisation;
 
     @Mock
+    private CaseDocumentService caseDocumentService;
+
+    @Mock
     private MessageService messageService;
 
     @InjectMocks
@@ -109,13 +129,16 @@ class SubmitCaseTransactionTest {
         MockitoAnnotations.initMocks(this);
 
         submitCaseTransaction = new SubmitCaseTransaction(caseDetailsRepository,
-                                                          caseAuditEventRepository,
-                                                          caseTypeService,
-                                                          callbackInvoker,
-                                                          uidService,
-                                                          securityClassificationService,
-                                                          caseUserRepository,
-                                                          userAuthorisation, messageService);
+            caseAuditEventRepository,
+            caseTypeService,
+            callbackInvoker,
+            uidService,
+            securityClassificationService,
+            caseUserRepository,
+            userAuthorisation,
+            messageService,
+            caseDocumentService
+        );
 
         event = buildEvent();
         caseTypeDefinition = buildCaseType();
@@ -129,14 +152,16 @@ class SubmitCaseTransactionTest {
 
         doReturn(CASE_UID).when(uidService).generateUID();
 
+        doReturn(caseDetails).when(caseDocumentService).stripDocumentHashes(caseDetails);
+
         doReturn(savedCaseDetails).when(caseDetailsRepository).set(caseDetails);
 
         doReturn(CASE_ID).when(savedCaseDetails).getId();
 
         doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition,
-                                                                             null,
-                                                                             this.caseDetails, caseTypeDefinition,
-                                                                             IGNORE_WARNING);
+            null,
+            this.caseDetails, caseTypeDefinition,
+            IGNORE_WARNING);
 
     }
 
@@ -161,16 +186,17 @@ class SubmitCaseTransactionTest {
     @DisplayName("should persist case")
     void shouldPersistCase() {
         final CaseDetails actualCaseDetails = submitCaseTransaction.submitCase(event,
-                                                                               caseTypeDefinition,
-                                                                               idamUser,
-                                                                               caseEventDefinition,
-                                                                               this.caseDetails,
-                                                                               IGNORE_WARNING);
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING);
 
         final InOrder order = inOrder(caseDetails, caseDetails, caseDetailsRepository);
 
         assertAll(
             () -> assertThat(actualCaseDetails, sameInstance(savedCaseDetails)),
+            () -> verify(caseDocumentService, times(2)).stripDocumentHashes(caseDetails),
             () -> order.verify(caseDetails).setCreatedDate(notNull(LocalDateTime.class)),
             () -> order.verify(caseDetails).setLastStateModifiedDate(notNull(LocalDateTime.class)),
             () -> order.verify(caseDetails).setReference(Long.valueOf(CASE_UID)),
@@ -185,11 +211,11 @@ class SubmitCaseTransactionTest {
         final ArgumentCaptor<MessageContext> messageCandidateCaptor = ArgumentCaptor.forClass(MessageContext.class);
 
         submitCaseTransaction.submitCase(event,
-                                         caseTypeDefinition,
-                                         idamUser,
-                                         caseEventDefinition,
-                                         this.caseDetails,
-                                         IGNORE_WARNING);
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING);
 
         assertAll(
             () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
@@ -199,16 +225,49 @@ class SubmitCaseTransactionTest {
     }
 
     @Test
+    @DisplayName("should create a case")
+    void shouldPersistCreateCaseEvent() throws IOException {
+        CaseDetails inputCaseDetails = new CaseDetails();
+        inputCaseDetails.setCaseTypeId("SomeCaseType");
+        inputCaseDetails.setJurisdiction("SomeJurisdiction");
+        inputCaseDetails.setState("SomeState");
+        AboutToSubmitCallbackResponse response = buildResponse();
+        doReturn(inputCaseDetails).when(caseDocumentService).stripDocumentHashes(inputCaseDetails);
+        doReturn(response).when(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition,
+            null,
+            inputCaseDetails,
+            caseTypeDefinition,
+            IGNORE_WARNING);
+
+        Map<String, JsonNode> dataMap = buildCaseData("SubmitTransactionDocumentUpload.json");
+        inputCaseDetails.setData(dataMap);
+        doReturn(inputCaseDetails).when(caseDetailsRepository).set(inputCaseDetails);
+        doReturn(state).when(caseTypeService).findState(caseTypeDefinition, "SomeState");
+        doNothing().when(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+
+        submitCaseTransaction.submitCase(event,
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            inputCaseDetails,
+            IGNORE_WARNING);
+
+
+        verify(caseDocumentService).attachCaseDocuments(anyString(), anyString(), anyString(), anyList());
+    }
+
+    @Test
     @DisplayName("should persist event with significant document")
     void shouldPersistEventWithSignificantDocument() {
         final ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
 
-        submitCaseTransaction.submitCase(event,
+        submitCaseTransaction.submitCase(
+            event,
             caseTypeDefinition,
-                                         idamUser,
+            idamUser,
             caseEventDefinition,
-                                         this.caseDetails,
-                                         IGNORE_WARNING);
+            this.caseDetails,
+            IGNORE_WARNING);
 
         assertAll(
             () -> verify(caseAuditEventRepository).set(auditEventCaptor.capture()),
@@ -220,15 +279,15 @@ class SubmitCaseTransactionTest {
     @DisplayName("when creator has access level GRANTED, then it should grant access to creator")
     void shouldGrantAccessToAccessLevelGrantedCreator() {
         when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
-
         submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
-                                         idamUser,
+            idamUser,
             caseEventDefinition,
-                                         this.caseDetails,
-                                         IGNORE_WARNING);
+            this.caseDetails,
+            IGNORE_WARNING);
 
-        verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID), IDAM_ID, CREATOR.getRole());
+        verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID),
+            IDAM_ID, CREATOR.getRole());
     }
 
     @Test
@@ -237,11 +296,11 @@ class SubmitCaseTransactionTest {
         when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.ALL);
 
         submitCaseTransaction.submitCase(event,
-                                         caseTypeDefinition,
-                                         idamUser,
-                                         caseEventDefinition,
-                                         this.caseDetails,
-                                         IGNORE_WARNING);
+            caseTypeDefinition,
+            idamUser,
+            caseEventDefinition,
+            this.caseDetails,
+            IGNORE_WARNING);
 
         verifyZeroInteractions(caseUserRepository);
     }
@@ -251,13 +310,13 @@ class SubmitCaseTransactionTest {
     void shouldInvokeCallback() {
         submitCaseTransaction.submitCase(event,
             caseTypeDefinition,
-                                         idamUser,
+            idamUser,
             caseEventDefinition,
-                                         this.caseDetails,
-                                         IGNORE_WARNING);
+            this.caseDetails,
+            IGNORE_WARNING);
 
         verify(callbackInvoker).invokeAboutToSubmitCallback(caseEventDefinition, null, caseDetails, caseTypeDefinition,
-                IGNORE_WARNING);
+            IGNORE_WARNING);
     }
 
     private void assertAuditEvent(final AuditEvent auditEvent) {
@@ -274,6 +333,14 @@ class SubmitCaseTransactionTest {
             () -> assertThat(auditEvent.getEventId(), is(EVENT_ID)),
             () -> assertThat(auditEvent.getSummary(), is(EVENT_SUMMARY)),
             () -> assertThat(auditEvent.getDescription(), is(EVENT_DESC)));
+    }
+
+    private void assertCaseData(final CaseDetails caseDetails) {
+        assertAll("Assert Casedetails",
+            () -> assertThat(caseDetails.getData().get("DocumentField4"), isNotNull()),
+            () -> assertThat(caseDetails.getData().get("DocumentField4").get("document_url"), isNotNull()),
+            () -> assertThat(caseDetails.getData().get("DocumentField4").get("document_binary_url"), isNotNull())
+        );
     }
 
     private void assertAuditEventWithSignificantDocument(final AuditEvent auditEvent) {
@@ -328,4 +395,16 @@ class SubmitCaseTransactionTest {
         idamUser.setEmail(IDAM_EMAIL);
         return idamUser;
     }
+
+    static HashMap<String, JsonNode> buildCaseData(String fileName) throws IOException {
+        InputStream inputStream =
+            SubmitCaseTransactionTest.class.getClassLoader().getResourceAsStream("tests/".concat(fileName));
+
+        HashMap<String, JsonNode> result =
+            new ObjectMapper().readValue(inputStream, new TypeReference<HashMap<String, JsonNode>>() {
+            });
+
+        return result;
+    }
+
 }

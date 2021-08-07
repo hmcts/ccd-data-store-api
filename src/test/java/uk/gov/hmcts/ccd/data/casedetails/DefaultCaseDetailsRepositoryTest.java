@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
@@ -206,6 +207,21 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         // If any input is not correctly sanitized it will cause an exception since query result structure will not be
         // as hibernate expects.
         assertThat(byMetaData.size(), is(0));
+    }
+
+    @Test (expected = BadRequestException.class)
+    public void sanitiseInputMainQuerySortOrderForCaseFieldID() {
+        String caseFieldId = "insert into case users values(1,2,3)";
+
+        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
+        metadata.setSortDirection(Optional.of("Asc"));
+        metadata.addSortOrderField(SortOrderField.sortOrderWith()
+            .caseFieldId(caseFieldId)
+            .metadata(true)
+            .direction("DESC")
+            .build());
+
+        caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
     }
 
     @Test(expected = IllegalArgumentException.class)

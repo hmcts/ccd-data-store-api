@@ -16,6 +16,8 @@ public final class V2 {
         public static final String CASE = "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8";
         public static final String CASE_DOCUMENTS =
             "application/vnd.uk.gov.hmcts.ccd-data-store-api.case-documents.v2+json;charset=UTF-8";
+        public static final String CASE_DOCUMENT = "application/vnd.uk.gov.hmcts.ccd-data-store-api."
+            + "case-document+json;charset=UTF-8;version=1.0";
         public static final String CREATE_EVENT =
             "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-event.v2+json;charset=UTF-8";
         public static final String CREATE_CASE =
@@ -94,6 +96,8 @@ public final class V2 {
         public static final String ROLES_FOR_CASE_ID_NOT_FOUND = "Cannot find user roles or case roles for the case ID";
         public static final String CASE_TYPE_DEF_NOT_FOUND_FOR_CASE_ID = "Cannot find case type definition for case ID";
         public static final String ERROR_CASE_ID_INVALID = "Case ID is not valid";
+        public static final String CASE_DOCUMENT_NOT_FOUND = "Case document not found";
+        public static final String CASE_DOCUMENT_ID_INVALID = "Case document Id is not valid";
         public static final String EMPTY_CASE_ID_LIST = "Case ID list is empty";
         public static final String USER_ID_INVALID = "User ID is not valid";
         public static final String EMPTY_CASE_USER_ROLE_LIST = "Case user roles list is empty";
@@ -113,5 +117,6 @@ public final class V2 {
             "Authentication failure due to invalid / expired tokens (IDAM / S2S).";
         public static final String UNAUTHORISED_S2S_SERVICE = "Unauthorised S2S service";
         public static final String CASE_TYPE_INVALID = "Case Type Id is not valid";
+        public static final String DATE_STRING_INVALID = "Invalid date sent to search case query ";
     }
 }
