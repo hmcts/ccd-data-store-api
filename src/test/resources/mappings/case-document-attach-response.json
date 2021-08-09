@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "PATCH",
+    "url": "/cases/documents/attachToCase"
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+
+    }
+  }
+}

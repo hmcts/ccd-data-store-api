@@ -41,7 +41,7 @@
 
 	<suppress until="2021-08-25">
 		<notes>Elasticsearch versions before 7.13.3 and 6.8.17 an uncontrolled recursion vulnerability
-		 	Suppressed until fix in place	Suppressed until fix in place
+		Suppressed until fix in place
 		</notes>
 		<cve>CVE-2021-22144</cve>
 	</suppress>
