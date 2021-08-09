@@ -51,7 +51,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
-    private final  String repeatables = "because of";
+    private final  String repeatables = " because of ";
     @Qualifier("restTemplate")
     @Autowired
     private final RestTemplate restTemplate;
