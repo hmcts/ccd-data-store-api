@@ -51,6 +51,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
+    private final  String repeatables = "because of";
     @Qualifier("restTemplate")
     @Autowired
     private final RestTemplate restTemplate;
@@ -81,10 +82,10 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             if (e instanceof HttpClientErrorException
                     && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Resource not found when getting case types for Jurisdiction:"
-                        + jurisdictionId + " because of " + e.getMessage());
+                        + jurisdictionId + repeatables + e.getMessage());
             } else {
                 throw new ServiceException("Problem getting case types for the Jurisdiction:" + jurisdictionId
-                        + " because of " + e.getMessage());
+                        + repeatables + e.getMessage());
             }
         }
     }
@@ -97,7 +98,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     @Override
     public CaseTypeDefinition getCaseType(final String caseTypeId) {
-        LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
+
         try {
             final HttpEntity<CaseTypeDefinition> requestEntity =
                 new HttpEntity<>(securityUtils.authorizationHeaders());
@@ -116,10 +117,10 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             if (e instanceof HttpClientErrorException
                     && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Resource not found when getting case type definition for "
-                        + caseTypeId + " because of " + e.getMessage());
+                        + caseTypeId + repeatables + e.getMessage());
             } else {
                 throw new ServiceException(
-                        "Problem getting case type definition for " + caseTypeId + " because of " + e.getMessage());
+                        "Problem getting case type definition for " + caseTypeId + repeatables + e.getMessage());
             }
         }
     }
@@ -162,7 +163,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             } else {
                 LOG.warn("Error while retrieving classification for user role {} because of ", userRole, e);
                 throw new ServiceException("Error while retrieving classification for user role " + userRole
-                        + " because of " + e.getMessage());
+                        + repeatables + e.getMessage());
             }
         }
     }
@@ -183,7 +184,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving classification for user roles {} because of ", userRoles, e);
             throw new ServiceException("Error while retrieving classification for user roles " + userRoles
-                    + " because of " + e.getMessage());
+                    + repeatables + e.getMessage());
         }
     }
 
@@ -260,7 +261,6 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {
         try {
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.jurisdictionDefURL());
-            //  jurisdictionIds.ifPresent(strings -> builder.queryParam("ids", String.join(",", strings)));
             if (jurisdictionIds.isPresent()) {
                 builder.queryParam("ids", String.join(",", jurisdictionIds.get()));
             }

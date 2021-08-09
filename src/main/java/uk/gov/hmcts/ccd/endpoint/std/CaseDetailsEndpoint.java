@@ -70,7 +70,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
 @RequestMapping(path = "/",
     consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(value = "/", description = "Standard case API")
+@Api(value = "/")
 public class CaseDetailsEndpoint {
 
     private final GetCaseOperation getCaseOperation;
@@ -133,8 +133,7 @@ public class CaseDetailsEndpoint {
         final Instant start = Instant.now();
         final CaseDetails caseDetails = getCaseOperation.execute(jurisdictionId, caseTypeId, caseId)
             .orElseThrow(() -> new CaseNotFoundException(jurisdictionId, caseTypeId, caseId));
-        // final CaseDetails caseDetails = getCaseOperation.execute(String caseReference)
-        //    .orElse(()-> new CaseNotFoundException(String caseReference))  ;
+
         final Duration duration = Duration.between(start, Instant.now());
         appInsights.trackRequest("findCaseDetailsForCaseworker", duration.toMillis(), true);
         return caseDetails;
@@ -162,8 +161,6 @@ public class CaseDetailsEndpoint {
 
         return getCaseOperation.execute(jurisdictionId, caseTypeId, caseId)
            .orElseThrow(() -> new CaseNotFoundException(caseId));
-       // return getCaseOperation.execute(String caseReference)
-       //     .orElseThrow(()->new CaseNotFoundException(caseReference))
     }
 
     @Transactional
