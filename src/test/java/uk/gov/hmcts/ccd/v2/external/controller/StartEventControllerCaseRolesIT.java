@@ -8,6 +8,7 @@ import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -40,6 +41,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 @SuppressWarnings("checkstyle:OperatorWrap")
+@ActiveProfiles("NoCaching")
 public class StartEventControllerCaseRolesIT extends WireMockBaseTest {
     private static final String GET_EVENT_TRIGGER_FOR_CASE_TYPE_EXTERNAL =
             "/case-types/CaseRolesCase/event-triggers/CREATE-CASE";
