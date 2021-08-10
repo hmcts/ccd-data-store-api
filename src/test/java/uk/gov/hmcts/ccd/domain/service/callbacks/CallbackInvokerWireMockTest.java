@@ -1,9 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.callbacks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.Lists;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.context.TestPropertySource;
@@ -25,13 +23,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.lessThan;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CallbackResponseBuilder.aCallbackResponse;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
@@ -41,7 +36,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
         "http.client.read.timeout=500"
     })
 public class CallbackInvokerWireMockTest extends WireMockBaseTest {
-    private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+
     private static final ObjectMapper mapper = JacksonUtils.MAPPER;
 
     @Inject
@@ -51,7 +46,6 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     private CaseDetails caseDetails = new CaseDetails();
     private final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
     private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-    private String testUrl;
 
     @Before
     public void setUp() throws Exception {
@@ -59,7 +53,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
         callbackResponse = aCallbackResponse().build();
         caseDetails = newCaseDetails().build();
 
-        testUrl = "http://localhost:" + wiremockPort + "/test-callbackGrrrr";
+        String testUrl = "http://localhost:" + wiremockPort + "/test-callbackGrrrr";
         caseEventDefinition.setCallBackURLAboutToStartEvent(testUrl);
         caseEventDefinition.setName("Test");
     }
@@ -87,7 +81,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
         final Duration between = Duration.between(start, Instant.now());
         // 0s retryInterval + 0.5s readTimeout + 1s retryInterval + 0.5s readTimeout + 3s retryInterval + 0.49s
         // readTimeout
-        assertThat((int) between.toMillis(), greaterThan(5500));
+        assertTrue((int) between.toMillis() > 5500);
         verify(exactly(3), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
     }
 
@@ -105,11 +99,11 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
 
         CallbackException callbackException = assertThrows(CallbackException.class, () ->
             callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, false));
-        Assert.assertThat(callbackException.getMessage(), is("Callback to service has been unsuccessful for "
-                + "event Test"));
+        assertEquals("Callback to service has been unsuccessful for event Test", callbackException.getMessage());
+
         final Duration between = Duration.between(start, Instant.now());
-        // 0s retryInterval + 0.5s readTimeout and no follow up retries
-        assertThat((int) between.toMillis(), lessThan(1500));
+        // 0s retryInterval + 0.5s readTimeout + 1s bufferTimeToAvoidIntermittentBuildFails and no follow up retries
+        assertTrue((int) between.toMillis() < 2500);
         verify(exactly(1), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
     }
 
