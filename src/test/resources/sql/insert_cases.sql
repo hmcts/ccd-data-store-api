@@ -633,6 +633,40 @@ VALUES (16, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '2019-08-24 20:44:53.824'
 );
 
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
+VALUES (20, 'start-event-trigger-test', 'PROBATE', 'CaseCreated', 'PUBLIC',
+        '{
+          "PersonFirstName": "George",
+          "PersonLastName": "Roof",
+          "PersonAddress": {
+            "AddressLine1": "Flat 9",
+            "AddressLine2": "2 Hubble Avenue",
+            "AddressLine3": "ButtonVillie",
+            "Country": "Wales",
+            "Postcode": "W11 5DF"
+          }
+        }',
+        '{
+          "PersonFirstName": "PUBLIC",
+          "PersonLastName": "PUBLIC",
+          "PersonAddress": {
+            "classification" : "PUBLIC",
+            "value" : {
+              "AddressLine1": "PUBLIC",
+              "AddressLine2": "PUBLIC",
+              "AddressLine3": "PUBLIC",
+              "Country": "PUBLIC",
+              "Postcode": "PUBLIC"
+            }
+          },
+          "D8Document": "PUBLIC"
+        }',
+        '1628683658240422',
+        '2016-08-22 20:44:52.824',
+        '2016-08-24 20:44:52.824',
+        '2016-08-24 20:44:52.824'
+);
+
 INSERT INTO case_event (
         case_data_id,
         case_type_id,
