@@ -1027,7 +1027,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         // Check that we have the expected test data set size
         final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
+        assertEquals("Incorrect data initiation", 19, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_CASE_EVENT_ENABLING_CONDITION)
             .contentType(JSON_CONTENT_TYPE)
@@ -1050,7 +1050,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         // Check that we have the expected test data set size
         final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
+        assertEquals("Incorrect data initiation", 19, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_CASE_EVENT_ENABLING_CONDITION)
             .contentType(JSON_CONTENT_TYPE)
