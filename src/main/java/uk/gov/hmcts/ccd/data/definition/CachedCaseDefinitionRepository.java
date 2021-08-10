@@ -112,4 +112,5 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     public CaseDefinitionRepository getCaseDefinitionRepository() {
         return caseDefinitionRepository;
     }
+
 }
