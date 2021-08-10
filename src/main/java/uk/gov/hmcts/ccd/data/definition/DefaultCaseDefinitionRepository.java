@@ -51,7 +51,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
-    private final  String repeatables = " because of ";
+    private static final  String repeatables = " because of ";
     @Qualifier("restTemplate")
     @Autowired
     private final RestTemplate restTemplate;
@@ -65,8 +65,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     /**
-     * The current implementation of getCaseTypesForJurisdictions(String) has serious performance issue.
-     * @deprecated current implementation has serious performance issues
+     *Current implementation has serious performance issues.
      */
     @Deprecated
 
@@ -182,9 +181,9 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 applicationParams.userRolesClassificationsURL(), HttpMethod.GET,
                 requestEntity, UserRole[].class, queryParams).getBody()));
         } catch (Exception e) {
-            LOG.warn("Error while retrieving classification for user roles {} because of ", userRoles, e);
             throw new ServiceException("Error while retrieving classification for user roles " + userRoles
                     + repeatables + e.getMessage());
+
         }
     }
 
@@ -241,8 +240,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             LOG.warn("Definitions not found for requested jurisdictions {}", jurisdictionIds);
             return Collections.emptyList();
         }
-        List<String> caseTypes = getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
-        return caseTypes;
+        return getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
     }
 
     @Override

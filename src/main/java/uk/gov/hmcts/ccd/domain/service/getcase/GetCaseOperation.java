@@ -14,9 +14,9 @@ public interface GetCaseOperation {
      * @param caseReference 16-digit universally unique case reference
      * @return Optional containing CaseDetails when found; empty optional otherwise
      *
-     * @deprecated Use {@link GetCaseOperation#execute(String)} instead
+     * @deprecated replaced by {@link GetCaseOperation#execute(String)}
     */
-    @Deprecated
+    @Deprecated(since = "3.5",forRemoval = false)
     Optional<CaseDetails> execute(final String jurisdictionId, final String caseTypeId, final String caseReference);
 
     /**
