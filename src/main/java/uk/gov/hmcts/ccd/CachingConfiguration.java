@@ -61,9 +61,8 @@ public class CachingConfiguration {
                 .setEvictionPolicy(applicationParams.getDefinitionCacheEvictionPolicy())
                 .setMaxSizePolicy(MaxSizePolicy.PER_NODE)
                 .setSize(applicationParams.getDefinitionCacheMaxSize());
-        MapConfig mapConfig = new MapConfig().setName(name)
+        return new MapConfig().setName(name)
                 .setEvictionConfig(evictionConfig);
-        return mapConfig;
     }
 
 }
