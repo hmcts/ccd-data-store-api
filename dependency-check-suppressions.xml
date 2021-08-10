@@ -47,4 +47,8 @@
 
 	</suppress>
 
+	<suppress>
+		<cve>CVE-2021-22144</cve>
+	</suppress>
+
 </suppressions>
