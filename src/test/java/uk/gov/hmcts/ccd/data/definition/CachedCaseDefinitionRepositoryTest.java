@@ -39,7 +39,7 @@ class CachedCaseDefinitionRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this); // replace initMocks with OpenMocks
+        MockitoAnnotations.initMocks(this);
 
         cachedCaseDefinitionRepository = new CachedCaseDefinitionRepository(caseDefinitionRepository);
     }

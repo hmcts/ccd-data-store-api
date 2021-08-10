@@ -63,7 +63,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
-     public List<UserRole> getClassificationsForUserRoleList(List<String> userRoles) {
+    public List<UserRole> getClassificationsForUserRoleList(List<String> userRoles) {
         List<String> missingRoles = userRoles
             .stream()
             .filter(role -> !userRoleClassifications.containsKey(role))

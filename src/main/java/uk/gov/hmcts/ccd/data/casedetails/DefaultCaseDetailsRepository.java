@@ -36,8 +36,7 @@ import java.util.Optional;
 @Named
 @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
 @Singleton
-//@SuppressWarnings("checkstyle:SummaryJavadoc")
-// partial javadoc attributes added prior to checkstyle implementation in module
+
 public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCaseDetailsRepository.class);
@@ -95,12 +94,11 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     /**
-     * The method  DefaultCaseDetailsRepository#findById(Long)is.
+     * The method  DefaultCaseDetailsRepository#findById(Long) retrieves case Details.
      * @param id Internal case ID
      * @return Case details if found; null otherwise
      * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
      */
-
 
     @Override
     @Deprecated
@@ -129,7 +127,7 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     /**
-     * The method  DefaultCaseDetailsRepository#findByReference(Long) has performance issue.
+     * The method DefaultCaseDetailsRepository#findByReference(Long) finds Case Details by using case reference.
      * @param caseReference Public case reference
      * @return Case details if found; null otherwise.
      * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, Long)} instead
@@ -141,7 +139,11 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     /**
-     * The method  DefaultCaseDetailsRepository#findUnique(String,String,String) has performance issue.
+     * DefaultCaseDetailsRepository#findUnique(String,String,String) Unique case details .
+     * @param jurisdiction Jurisdiction's ID
+     * @param caseTypeId   Case's type ID
+     * @param reference    Case unique 16-digit reference
+     * @return Case details if found; null otherwise
      * @deprecated Use {@link DefaultCaseDetailsRepository#findByReference(String, String)} instead
      */
     @Override
