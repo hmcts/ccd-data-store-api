@@ -32,12 +32,7 @@
           "field_type": {
             "_extends_": "BaseTextFieldType"
           },
-          "formatted_value": null,
-          "acls": [
-            {
-              "_extends_": "CaseworkerAutotest1AccessControlList"
-            }
-          ]
+          "formatted_value": null
         },
         {
           "_extends_": "CaseViewFieldMetadataFalse",
@@ -48,12 +43,7 @@
           "field_type": {
             "_extends_": "BaseNumberFieldType"
           },
-          "formatted_value": null,
-          "acls": [
-            {
-              "_extends_": "CaseworkerAutotest1AccessControlList"
-            }
-          ]
+          "formatted_value": null
         },
         {
           "_extends_": "CaseViewFieldMetadataFalse",
@@ -64,12 +54,7 @@
           "field_type": {
             "_extends_": "BaseYesOrNoFieldType"
           },
-          "formatted_value": null,
-          "acls": [
-            {
-              "_extends_": "CaseworkerAutotest1AccessControlList"
-            }
-          ]
+          "formatted_value": null
         },
         {
           "_extends_": "CaseViewFieldMetadataFalse",
@@ -80,12 +65,7 @@
           "field_type": {
             "_extends_": "BasePhoneUKFieldType"
           },
-          "formatted_value": null,
-          "acls": [
-            {
-              "_extends_": "CaseworkerAutotest1AccessControlList"
-            }
-          ]
+          "formatted_value": null
         },
         {
           "_extends_": "CaseViewFieldMetadataFalse",
@@ -96,12 +76,7 @@
           "field_type": {
             "_extends_": "BaseEmailFieldType"
           },
-          "formatted_value": null,
-          "acls": [
-            {
-              "_extends_": "CaseworkerAutotest1AccessControlList"
-            }
-          ]
+          "formatted_value": null
         },
         {
           "_extends_": "CaseViewFieldMetadataFalse",
@@ -112,12 +87,7 @@
           "field_type": {
             "_extends_": "BaseMoneyGBPFieldType"
           },
-          "formatted_value": null,
-          "acls": [
-            {
-              "_extends_": "CaseworkerAutotest1AccessControlList"
-            }
-          ]
+          "formatted_value": null
         },
         {
           "_extends_": "CaseViewFieldMetadataFalse",
@@ -128,12 +98,7 @@
           "field_type": {
             "_extends_": "BaseDateFieldType"
           },
-          "formatted_value": null,
-          "acls": [
-            {
-              "_extends_": "CaseworkerAutotest1AccessControlList"
-            }
-          ]
+          "formatted_value": null
         },
         {
           "_extends_": "CaseViewFieldMetadataFalse",
@@ -144,12 +109,7 @@
           "field_type": {
             "_extends_": "BaseDateTimeFieldType"
           },
-          "formatted_value": null,
-          "acls": [
-            {
-              "_extends_": "CaseworkerAutotest1AccessControlList"
-            }
-          ]
+          "formatted_value": null
         },
         {
           "_extends_": "CaseViewFieldMetadataFalse",
@@ -160,12 +120,7 @@
           "field_type": {
             "_extends_": "BaseTextAreaFieldType"
           },
-          "formatted_value": null,
-          "acls": [
-            {
-              "_extends_": "CaseworkerAutotest1AccessControlList"
-            }
-          ]
+          "formatted_value": null
         },
         {
           "_extends_": "CaseViewFieldMetadataFalse",
@@ -196,12 +151,7 @@
               }
             ]
           },
-          "formatted_value": null,
-          "acls": [
-            {
-              "_extends_": "CaseworkerAutotest1AccessControlList"
-            }
-          ]
+          "formatted_value": null
         },
         {
           "_extends_": "CaseViewFieldMetadataFalse",
@@ -242,12 +192,7 @@
               }
             ]
           },
-          "formatted_value": null,
-          "acls": [
-            {
-              "_extends_": "CaseworkerAutotest1AccessControlList"
-            }
-          ]
+          "formatted_value": null
         },
         {
           "_extends_": "CaseViewFieldMetadataFalse",
@@ -263,12 +208,7 @@
           },
           "formatted_value": null,
           "display_context_parameter": "#COLLECTION(allowInsert,allowUpdate)",
-          "show_summary_change_option": false,
-          "acls": [
-            {
-              "_extends_": "CaseworkerAutotest1AccessControlList"
-            }
-          ]
+          "show_summary_change_option": false
         },
         {
           "_extends_": "CaseViewFieldMetadataFalse",
@@ -479,12 +419,7 @@
             ]
           },
           "formatted_value": null,
-          "show_summary_change_option": false,
-          "acls": [
-            {
-              "_extends_": "CaseworkerAutotest1AccessControlList"
-            }
-          ]
+          "show_summary_change_option": false
         },
         {
           "_extends_": "CaseViewFieldMetadataFalse",
@@ -610,12 +545,7 @@
             ]
           },
           "formatted_value": null,
-          "show_summary_change_option": false,
-          "acls": [
-            {
-              "_extends_": "CaseworkerAutotest1AccessControlList"
-            }
-          ]
+          "show_summary_change_option": false
         },
         {
           "_extends_": "CaseViewFieldMetadataFalse",
@@ -626,12 +556,7 @@
           "field_type": {
             "_extends_": "BaseDocumentFieldType"
           },
-          "formatted_value": null,
-          "acls": [
-            {
-              "_extends_": "CaseworkerAutotest1AccessControlList"
-            }
-          ]
+          "formatted_value": null
         },
         {
           "_extends_": "CaseViewFieldMetadataFalse",
@@ -659,12 +584,7 @@
               }
             ]
           },
-          "formatted_value": null,
-          "acls": [
-            {
-              "_extends_": "CaseworkerAutotest1AccessControlList"
-            }
-          ]
+          "formatted_value": null
         }
       ],
       "event_token": "[[ANYTHING_PRESENT]]",

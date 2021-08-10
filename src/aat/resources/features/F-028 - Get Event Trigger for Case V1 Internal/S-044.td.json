@@ -56,26 +56,7 @@
           "show_summary_content_option": null,
           "retain_hidden_value": null,
           "publish": false,
-          "publish_as": null,
-          "acls": [
-            {
-              "__ordering__": "ordered"
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "publish_as": null
         },
         {
           "id": "NumberField",
@@ -105,26 +86,7 @@
           "show_summary_content_option": null,
           "retain_hidden_value": null,
           "publish": false,
-          "publish_as": null,
-          "acls": [
-            {
-              "__ordering__": "ordered"
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "publish_as": null
         },
         {
           "id": "YesOrNoField",
@@ -154,26 +116,7 @@
           "show_summary_content_option": null,
           "retain_hidden_value": null,
           "publish": false,
-          "publish_as": null,
-          "acls": [
-            {
-              "__ordering__": "ordered"
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "publish_as": null
         },
         {
           "id": "PhoneUKField",
@@ -203,26 +146,7 @@
           "show_summary_content_option": null,
           "retain_hidden_value": null,
           "publish": false,
-          "publish_as": null,
-          "acls": [
-            {
-              "__ordering__": "ordered"
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "publish_as": null
         },
         {
           "id": "EmailField",
@@ -252,26 +176,7 @@
           "show_summary_content_option": null,
           "retain_hidden_value": null,
           "publish": false,
-          "publish_as": null,
-          "acls": [
-            {
-              "__ordering__": "ordered"
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "publish_as": null
         },
         {
           "id": "MoneyGBPField",
@@ -301,26 +206,7 @@
           "show_summary_content_option": null,
           "retain_hidden_value": null,
           "publish": false,
-          "publish_as": null,
-          "acls": [
-            {
-              "__ordering__": "ordered"
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "publish_as": null
         },
         {
           "id": "DateField",
@@ -350,26 +236,7 @@
           "show_summary_content_option": null,
           "retain_hidden_value": null,
           "publish": false,
-          "publish_as": null,
-          "acls": [
-            {
-              "__ordering__": "ordered"
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "publish_as": null
         },
         {
           "id": "DateTimeField",
@@ -399,26 +266,7 @@
           "show_summary_content_option": null,
           "retain_hidden_value": null,
           "publish": false,
-          "publish_as": null,
-          "acls": [
-            {
-              "__ordering__": "ordered"
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "publish_as": null
         },
         {
           "id": "TextAreaField",
@@ -448,26 +296,7 @@
           "show_summary_content_option": null,
           "retain_hidden_value": null,
           "publish": false,
-          "publish_as": null,
-          "acls": [
-            {
-              "__ordering__": "ordered"
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "publish_as": null
         },
         {
           "id": "FixedListField",
@@ -513,26 +342,7 @@
           "show_summary_content_option": null,
           "retain_hidden_value": null,
           "publish": false,
-          "publish_as": null,
-          "acls": [
-            {
-              "__ordering__": "ordered"
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "publish_as": null
         },
         {
           "id": "MultiSelectListField",
@@ -594,26 +404,7 @@
           "show_summary_content_option": null,
           "retain_hidden_value": null,
           "publish": false,
-          "publish_as": null,
-          "acls": [
-            {
-              "__ordering__": "ordered"
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "publish_as": null
         },
         {
           "id": "CollectionField",
@@ -670,26 +461,7 @@
           "show_summary_content_option": null,
           "retain_hidden_value": null,
           "publish": false,
-          "publish_as": null,
-          "acls": [
-            {
-              "__ordering__": "ordered"
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "publish_as": null
         },
         {
           "id": "ComplexField",
@@ -993,26 +765,7 @@
           "show_summary_content_option": null,
           "retain_hidden_value": null,
           "publish": false,
-          "publish_as": null,
-          "acls": [
-            {
-              "__ordering__": "ordered"
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "publish_as": null
         },
         {
           "id": "AddressUKField",
@@ -1388,26 +1141,7 @@
           "show_summary_content_option": null,
           "retain_hidden_value": null,
           "publish": false,
-          "publish_as": null,
-          "acls": [
-            {
-              "__ordering__": "ordered"
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "publish_as": null
         },
         {
           "id": "DocumentField",
@@ -1437,26 +1171,7 @@
           "show_summary_content_option": null,
           "retain_hidden_value": null,
           "publish": false,
-          "publish_as": null,
-          "acls": [
-            {
-              "__ordering__": "ordered"
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            },
-            {
-              "role": "[[ANYTHING_PRESENT]]",
-              "create": true,
-              "read": true,
-              "update": true,
-              "delete": true
-            }
-          ]
+          "publish_as": null
         }
       ],
       "event_token": "[[ANYTHING_PRESENT]]",

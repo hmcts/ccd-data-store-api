@@ -298,12 +298,7 @@
 					"show_summary_content_option": null,
 					"retain_hidden_value": null,
           "publish" : false,
-          "publish_as" : null,
-					"acls": [
-						{
-							"_extends_": "CaseworkerBeftaMasterAccessControlList"
-						}
-					]
+          "publish_as" : null
 				},
 				{
 					"id": "Address2",
@@ -568,12 +563,7 @@
 					"show_summary_content_option": null,
 					"retain_hidden_value": null,
           "publish" : false,
-          "publish_as" : null,
-					"acls": [
-						{
-							"_extends_": "CaseworkerBeftaMasterAccessControlList"
-						}
-					]
+          "publish_as" : null
 				}
 			],
 			"event_token": "[[ANYTHING_PRESENT]]",

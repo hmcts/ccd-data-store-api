@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
@@ -49,7 +50,7 @@ public class CaseViewField implements CommonField {
     private Boolean publish;
     @JsonProperty("publish_as")
     private String publishAs;
-    @JsonProperty("acls")
+    @JsonIgnore
     private List<AccessControlList> accessControlLists;
     private boolean metadata;
 

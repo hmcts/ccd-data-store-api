@@ -839,12 +839,7 @@
           "show_condition": "NumberField!=\"0\"",
           "retain_hidden_value": true,
           "formatted_value": null,
-          "show_summary_change_option" : true,
-          "acls": [
-            {
-              "_extends_": "CaseworkerBeftaMasterAccessControlList"
-            }
-          ]
+          "show_summary_change_option" : true
         },
         {
           "_extends_": "CaseViewFieldMetadataFalse",
@@ -855,12 +850,7 @@
             "_extends_": "BaseNumberFieldType"
           },
           "formatted_value": null,
-          "show_summary_change_option" : true,
-          "acls": [
-            {
-              "_extends_": "CaseworkerBeftaMasterAccessControlList"
-            }
-          ]
+          "show_summary_change_option" : true
         }
       ],
       "event_token": "[[ANYTHING_PRESENT]]",

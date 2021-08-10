@@ -41,12 +41,7 @@
 						"_extends_": "BaseDateFieldType"
 					},
 					"formatted_value": null,
-					"show_condition": "NumberField!=\"0\"",
-					"acls": [
-						{
-							"_extends_": "CaseworkerBeftaMasterAccessControlList"
-						}
-					]
+					"show_condition": "NumberField!=\"0\""
 				},
 				{
 					"_extends_": "CaseViewFieldMetadataFalse",
@@ -58,12 +53,7 @@
 					},
 					"formatted_value": null,
 					"show_condition": "NumberField!=\"0\"",
-					"retain_hidden_value": false,
-					"acls": [
-						{
-							"_extends_": "CaseworkerBeftaMasterAccessControlList"
-						}
-					]
+					"retain_hidden_value": false
 				},
 				{
 					"_extends_": "CaseViewFieldMetadataFalse",
@@ -75,12 +65,7 @@
 					},
 					"formatted_value": null,
 					"show_condition": "NumberField!=\"0\"",
-					"retain_hidden_value": true,
-					"acls": [
-						{
-							"_extends_": "CaseworkerBeftaMasterAccessControlList"
-						}
-					]
+					"retain_hidden_value": true
 				},
 				{
 					"_extends_": "CaseViewFieldMetadataFalse",
@@ -90,12 +75,7 @@
 					"field_type": {
 						"_extends_": "BaseNumberFieldType"
 					},
-					"formatted_value": null,
-					"acls": [
-						{
-							"_extends_": "CaseworkerBeftaMasterAccessControlList"
-						}
-					]
+					"formatted_value": null
 				}
 			],
 			"event_token": "[[ANYTHING_PRESENT]]",

@@ -65,9 +65,7 @@
 					"show_summary_content_option": null,
                     "retain_hidden_value": null,
 					"publish": null,
-					"publish_as": null,
-					"acls": [
-					]
+					"publish_as": null
 				},
 				{
 					"id": "[LAST_STATE_MODIFIED_DATE]",
@@ -99,9 +97,7 @@
 					"show_summary_content_option": null,
                     "retain_hidden_value": null,
 					"publish": null,
-					"publish_as": null,
-					"acls": [
-					]
+					"publish_as": null
 				},
 				{
 					"id": "[JURISDICTION]",
@@ -133,9 +129,7 @@
 					"show_summary_content_option": null,
                     "retain_hidden_value": null,
 					"publish": null,
-					"publish_as": null,
-					"acls": [
-					]
+					"publish_as": null
 				},
 				{
 					"id": "[CASE_TYPE]",
@@ -167,9 +161,7 @@
 					"show_summary_content_option": null,
                     "retain_hidden_value": null,
 					"publish": null,
-					"publish_as": null,
-					"acls": [
-					]
+					"publish_as": null
 				},
 				{
 					"id": "[SECURITY_CLASSIFICATION]",
@@ -201,9 +193,7 @@
 					"show_summary_content_option": null,
                     "retain_hidden_value": null,
 					"publish": null,
-					"publish_as": null,
-					"acls": [
-					]
+					"publish_as": null
 				},
 				{
 					"id": "[CASE_REFERENCE]",
@@ -235,9 +225,7 @@
 					"show_summary_content_option": null,
                     "retain_hidden_value": null,
 					"publish": null,
-					"publish_as": null,
-					"acls": [
-					]
+					"publish_as": null
 				},
 				{
 					"id": "[CREATED_DATE]",
@@ -269,9 +257,7 @@
 					"show_summary_content_option": null,
                     "retain_hidden_value": null,
 					"publish": null,
-					"publish_as": null,
-					"acls": [
-					]
+					"publish_as": null
 				},
 				{
 					"id": "[LAST_MODIFIED_DATE]",
@@ -303,9 +289,7 @@
 					"show_summary_content_option": null,
                     "retain_hidden_value": null,
 					"publish": null,
-					"publish_as": null,
-					"acls": [
-					]
+					"publish_as": null
 				}
 			],
 			"state": "[[ANYTHING_PRESENT]]",

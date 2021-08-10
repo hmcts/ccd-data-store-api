@@ -31,13 +31,7 @@ public class FieldTypeDefinition implements Serializable {
     public static final String LABEL = "Label";
     public static final String CASE_PAYMENT_HISTORY_VIEWER = "CasePaymentHistoryViewer";
     public static final String CASE_HISTORY_VIEWER = "CaseHistoryViewer";
-    public static final String PREDEFINED_COMPLEX_ADDRESS_GLOBAL = "AddressGlobal";
-    public static final String PREDEFINED_COMPLEX_ORGANISATION_POLICY = "OrganisationPolicy";
-    public static final String PREDEFINED_COMPLEX_CHANGE_ORGANISATION_REQUEST = "ChangeOrganisationRequest";
-    public static final String PREDEFINED_COMPLEX_ADDRESS_GLOBAL_UK = "AddressGlobalUK";
     public static final String PREDEFINED_COMPLEX_ADDRESS_UK = "AddressUK";
-    public static final String PREDEFINED_COMPLEX_ORDER_SUMMARY = "OrderSummary";
-    public static final String PREDEFINED_COMPLEX_CASELINK = "CaseLink";
     public static final String DATETIME = "DateTime";
     public static final String DATE = "Date";
     public static final String DOCUMENT = "Document";
