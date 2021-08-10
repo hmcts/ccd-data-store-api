@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.endpoint.ui;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -30,6 +31,7 @@ import static uk.gov.hmcts.ccd.MockUtils.ROLE_CASEWORKER_PUBLIC;
 import static uk.gov.hmcts.ccd.MockUtils.ROLE_TEST_PUBLIC;
 import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchQueryOperation.WORKBASKET;
 
+@ActiveProfiles("NoCaching")
 public class SearchWithSortIT extends WireMockBaseTest {
 
     private static final String GET_CASES =

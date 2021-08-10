@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
@@ -60,6 +63,25 @@ public abstract class WireMockBaseTest extends BaseTest {
 
     public void verifyWireMock(int count, RequestPatternBuilder postRequestedFor) {
         wireMockServer.verify(count, postRequestedFor);
+    }
+
+    public ObjectMapper objectMapper() {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+
+        return objectMapper;
+    }
+
+    public String objectToJsonString(final Object object) {
+        try {
+            final ObjectMapper objectMapper = objectMapper();
+
+            return objectMapper.writeValueAsString(object);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Configuration
