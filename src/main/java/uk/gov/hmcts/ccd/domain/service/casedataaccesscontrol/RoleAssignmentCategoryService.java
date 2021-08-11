@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 
 import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.CITIZEN;
 import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.JUDICIAL;
-import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.LEGAL_OPERATIONS;
 import static uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory.PROFESSIONAL;
 
 @Service
