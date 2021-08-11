@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import com.fasterxml.jackson.databind.JsonNode;
-//import io.swagger.annotations.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
