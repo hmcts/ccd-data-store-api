@@ -1,11 +1,14 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import com.fasterxml.jackson.databind.JsonNode;
+//import io.swagger.annotations.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.SwaggerDefinition;
+import io.swagger.annotations.Tag;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -70,7 +73,10 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
 @RequestMapping(path = "/",
     consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(value = "/")
+@Api(tags = {"Standard case API"})
+@SwaggerDefinition(tags = {
+    @Tag(name = "Standard case API", description = "Standard case API")
+})
 public class CaseDetailsEndpoint {
 
     private final GetCaseOperation getCaseOperation;

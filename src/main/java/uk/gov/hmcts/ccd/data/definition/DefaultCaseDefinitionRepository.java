@@ -50,7 +50,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
-    private static final  String repeatables = " because of ";
+    private static final  String REPEATABLES = " because of ";
     @Qualifier("restTemplate")
     @Autowired
     private final RestTemplate restTemplate;
@@ -64,7 +64,8 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     /**
-     *Current implementation has serious performance issues.
+     * Retrieves List of CaseTypeDefinition for JurisdictionId.
+     * @deprecated Current implementation has serious performance issues
      */
     @Deprecated
 
@@ -80,10 +81,10 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             if (e instanceof HttpClientErrorException
                     && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Resource not found when getting case types for Jurisdiction:"
-                        + jurisdictionId + repeatables + e.getMessage());
+                        + jurisdictionId + REPEATABLES + e.getMessage());
             } else {
                 throw new ServiceException("Problem getting case types for the Jurisdiction:" + jurisdictionId
-                        + repeatables + e.getMessage());
+                        + REPEATABLES + e.getMessage());
             }
         }
     }
@@ -115,10 +116,10 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             if (e instanceof HttpClientErrorException
                     && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Resource not found when getting case type definition for "
-                        + caseTypeId + repeatables + e.getMessage());
+                        + caseTypeId + REPEATABLES + e.getMessage());
             } else {
                 throw new ServiceException(
-                        "Problem getting case type definition for " + caseTypeId + repeatables + e.getMessage());
+                        "Problem getting case type definition for " + caseTypeId + REPEATABLES + e.getMessage());
             }
         }
     }
@@ -161,7 +162,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             } else {
                 LOG.warn("Error while retrieving classification for user role {} because of ", userRole, e);
                 throw new ServiceException("Error while retrieving classification for user role " + userRole
-                        + repeatables + e.getMessage());
+                        + REPEATABLES + e.getMessage());
             }
         }
     }
@@ -181,7 +182,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 requestEntity, UserRole[].class, queryParams).getBody()));
         } catch (Exception e) {
             throw new ServiceException("Error while retrieving classification for user roles " + userRoles
-                    + repeatables + e.getMessage());
+                    + REPEATABLES + e.getMessage());
 
         }
     }
