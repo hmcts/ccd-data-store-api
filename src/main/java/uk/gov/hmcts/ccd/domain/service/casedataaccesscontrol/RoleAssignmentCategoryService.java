@@ -37,7 +37,7 @@ public class RoleAssignmentCategoryService {
         } else if (hasJudicialRole(idamUserRoles)) {
             return JUDICIAL;
         } else {
-            return LEGAL_OPERATIONS;
+            return CITIZEN;
         }
     }
 
