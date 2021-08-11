@@ -50,7 +50,6 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
-    private static final  String REPEATABLES = " because of ";
     @Qualifier("restTemplate")
     @Autowired
     private final RestTemplate restTemplate;
@@ -80,11 +79,13 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             LOG.warn("Error while retrieving base type", e);
             if (e instanceof HttpClientErrorException
                     && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                throw new ResourceNotFoundException("Resource not found when getting case types for Jurisdiction:"
-                        + jurisdictionId + REPEATABLES + e.getMessage());
+                throw new ResourceNotFoundException(
+                    String.format("Resource not found when getting case types for Jurisdiction: %s because of %s",
+                        jurisdictionId,e.getMessage()));
             } else {
-                throw new ServiceException("Problem getting case types for the Jurisdiction:" + jurisdictionId
-                        + REPEATABLES + e.getMessage());
+                throw new ServiceException(
+                    String.format("Problem getting case types for the Jurisdiction:%s because of %s", jurisdictionId,
+                        e.getMessage()));
             }
         }
     }
@@ -115,11 +116,13 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             LOG.warn("Error while retrieving case type", e);
             if (e instanceof HttpClientErrorException
                     && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                throw new ResourceNotFoundException("Resource not found when getting case type definition for "
-                        + caseTypeId + REPEATABLES + e.getMessage());
+                throw new ResourceNotFoundException(
+                    String.format("Resource not found when getting case type definition for %s because of %s",
+                        caseTypeId,e.getMessage()));
             } else {
                 throw new ServiceException(
-                        "Problem getting case type definition for " + caseTypeId + REPEATABLES + e.getMessage());
+                     String.format("Problem getting case type definition for %s because of %s",
+                         caseTypeId,e.getMessage()));
             }
         }
     }
@@ -157,12 +160,13 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             if (e instanceof HttpClientErrorException
                     && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                LOG.debug("No classification found for user role {} because of ", userRole, e);
+                LOG.debug("No classification found for user role {} because of ",userRole, e);
                 return null;
             } else {
-                LOG.warn("Error while retrieving classification for user role {} because of ", userRole, e);
-                throw new ServiceException("Error while retrieving classification for user role " + userRole
-                        + REPEATABLES + e.getMessage());
+                LOG.warn("Error while retrieving classification for user role {} because of ",userRole, e);
+                throw new ServiceException(
+                    String.format("Error while retrieving classification for user role %s because of %s",userRole,
+                        e.getMessage()));
             }
         }
     }
@@ -181,9 +185,9 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                 applicationParams.userRolesClassificationsURL(), HttpMethod.GET,
                 requestEntity, UserRole[].class, queryParams).getBody()));
         } catch (Exception e) {
-            throw new ServiceException("Error while retrieving classification for user roles " + userRoles
-                    + REPEATABLES + e.getMessage());
-
+            throw new ServiceException(
+                String.format("Error while retrieving classification for user roles %s because of %s ",userRoles,
+                    e.getMessage()));
         }
     }
 
