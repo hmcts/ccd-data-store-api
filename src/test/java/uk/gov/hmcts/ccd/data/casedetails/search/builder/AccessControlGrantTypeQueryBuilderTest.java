@@ -79,8 +79,8 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             + "AND jurisdiction in (:jurisdictions_specific) "
             + "AND reference in (:case_ids_specific) ) ) "
             + "OR ( ( security_classification in (:classifications_standard)"
-            + " AND ( ( jurisdiction='Test' AND data #>> '{caseManagementLocation,region}'='reg1' "
-            + "AND data #>> '{caseManagementLocation,baseLocation}'='loc1' ) ) ) "
+            + " AND ( ( jurisdiction='Test' AND data #>> '{caseManagementLocation,RegionId}'='reg1' "
+            + "AND data #>> '{caseManagementLocation,BaseLocationId}'='loc1' ) ) ) "
             + "OR ( security_classification in (:classifications_challenged) "
             + "AND jurisdiction in (:jurisdictions_challenged) ) ) )";
 
@@ -114,8 +114,8 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             + "AND jurisdiction in (:jurisdictions_specific) "
             + "AND reference in (:case_ids_specific) ) ) "
             + "OR ( ( ( security_classification in (:classifications_standard) "
-            + "AND ( ( jurisdiction='Test' AND data #>> '{caseManagementLocation,region}'='reg1' "
-            + "AND data #>> '{caseManagementLocation,baseLocation}'='loc1' ) ) ) "
+            + "AND ( ( jurisdiction='Test' AND data #>> '{caseManagementLocation,RegionId}'='reg1' "
+            + "AND data #>> '{caseManagementLocation,BaseLocationId}'='loc1' ) ) ) "
             + "OR ( security_classification in (:classifications_challenged) "
             + "AND jurisdiction in (:jurisdictions_challenged) ) ) "
             + "AND NOT ( security_classification in (:classifications_excluded) "
