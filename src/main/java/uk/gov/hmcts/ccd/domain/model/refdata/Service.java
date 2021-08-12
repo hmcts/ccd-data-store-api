@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import java.util.List;
 @Builder
 @Jacksonized
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class Service {
+public class Service implements Serializable {
     long serviceId;
     String orgUnit;
     String businessArea;

@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
@@ -14,7 +15,7 @@ import java.util.List;
 @Builder
 @Jacksonized
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class BuildingLocation {
+public class BuildingLocation implements Serializable {
     String buildingLocationId;
     String buildingLocationName;
     String epimsId;
