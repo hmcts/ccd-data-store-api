@@ -33,7 +33,6 @@ import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
@@ -72,8 +71,7 @@ class AuthorisedCaseSearchOperationTest {
     private CaseDataAccessControl caseDataAccessControl;
     @Mock
     private AccessControlService accessControlService;
-    @Mock
-    private SecurityClassificationServiceImpl classificationService;
+
     @Mock
     private ObjectMapperService objectMapperService;
 
@@ -144,8 +142,7 @@ class AuthorisedCaseSearchOperationTest {
                 () -> verify(objectMapperService).convertObjectToJsonNode(unFilteredData),
                 () -> verify(accessControlService).filterCaseFieldsByAccess(jsonNode,
                     caseTypeDefinition.getCaseFieldDefinitions(), accessProfiles, CAN_READ, false),
-                () -> verify(objectMapperService).convertJsonNodeToMap(jsonNode),
-                () -> verify(classificationService).applyClassification(caseDetails)
+                () -> verify(objectMapperService).convertJsonNodeToMap(jsonNode)
             );
         }
 
@@ -167,8 +164,7 @@ class AuthorisedCaseSearchOperationTest {
                 () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ),
                 () -> verifyZeroInteractions(caseSearchOperation),
                 () -> verifyZeroInteractions(accessControlService),
-                () -> verifyZeroInteractions(userRepository),
-                () -> verifyZeroInteractions(classificationService)
+                () -> verifyZeroInteractions(userRepository)
             );
         }
 
@@ -256,8 +252,7 @@ class AuthorisedCaseSearchOperationTest {
                 () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ),
                 () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_2, CAN_READ),
                 () -> verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class)),
-                () -> verify(caseDataAccessControl).generateAccessProfilesByCaseTypeId(CASE_TYPE_ID_1),
-                () -> verify(classificationService).applyClassification(caseDetails)
+                () -> verify(caseDataAccessControl).generateAccessProfilesByCaseTypeId(CASE_TYPE_ID_1)
             );
         }
     }
