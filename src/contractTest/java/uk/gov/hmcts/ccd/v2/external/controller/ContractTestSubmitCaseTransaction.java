@@ -10,6 +10,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.createcase.SubmitCaseTransaction;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -30,9 +31,11 @@ public class ContractTestSubmitCaseTransaction extends SubmitCaseTransaction {
                                              SecurityClassificationService securityClassificationService,
                                              DefaultCaseUserRepository caseUserRepository,
                                              UserAuthorisation userAuthorisation,
-                                             MessageService messageService) {
+                                             MessageService messageService,
+                                             CaseDocumentService caseDocumentService) {
         super(caseDetailsRepository, caseAuditEventRepository, caseTypeService,
             callbackInvoker, uidService, securityClassificationService,
-            caseUserRepository, userAuthorisation, messageService);
+            caseUserRepository, userAuthorisation, messageService,
+            caseDocumentService);
     }
 }
