@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Data
@@ -14,7 +15,7 @@ import java.time.LocalDate;
 @Builder
 @Jacksonized
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class CourtVenue {
+public class CourtVenue implements Serializable {
     String courtVenueId;
     String siteName;
     String courtName;
