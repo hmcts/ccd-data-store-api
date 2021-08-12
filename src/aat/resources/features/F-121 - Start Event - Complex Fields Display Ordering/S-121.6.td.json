@@ -74,11 +74,6 @@
 								"live_from": null,
 								"live_until": null,
 								"show_condition": null,
-								"acls": [
-									{
-										"_extends_": "CaseworkerBeftaMasterAccessControlList"
-									}
-								],
 								"complexACLs": [],
 								"display_context": null,
 								"display_context_parameter": null,
@@ -126,11 +121,6 @@
 											"live_from": null,
 											"live_until": null,
 											"show_condition": null,
-											"acls": [
-												{
-													"_extends_": "CaseworkerBeftaMasterAccessControlList"
-												}
-											],
 											"complexACLs": [],
 											"display_context": null,
 											"display_context_parameter": null,
@@ -159,11 +149,6 @@
 											"live_from": null,
 											"live_until": null,
 											"show_condition": null,
-											"acls": [
-												{
-													"_extends_": "CaseworkerBeftaMasterAccessControlList"
-												}
-											],
 											"complexACLs": [],
 											"display_context": null,
 											"display_context_parameter": null,
@@ -192,11 +177,6 @@
 											"live_from": null,
 											"live_until": null,
 											"show_condition": null,
-											"acls": [
-												{
-													"_extends_": "CaseworkerBeftaMasterAccessControlList"
-												}
-											],
 											"complexACLs": [],
 											"display_context": null,
 											"display_context_parameter": null,
@@ -225,11 +205,6 @@
 											"live_from": null,
 											"live_until": null,
 											"show_condition": null,
-											"acls": [
-												{
-													"_extends_": "CaseworkerBeftaMasterAccessControlList"
-												}
-											],
 											"complexACLs": [],
 											"display_context": null,
 											"display_context_parameter": null,
@@ -258,11 +233,6 @@
 											"live_from": null,
 											"live_until": null,
 											"show_condition": null,
-											"acls": [
-												{
-													"_extends_": "CaseworkerBeftaMasterAccessControlList"
-												}
-											],
 											"complexACLs": [],
 											"display_context": null,
 											"display_context_parameter": null,
@@ -291,11 +261,6 @@
 											"live_from": null,
 											"live_until": null,
 											"show_condition": null,
-											"acls": [
-												{
-													"_extends_": "CaseworkerBeftaMasterAccessControlList"
-												}
-											],
 											"complexACLs": [],
 											"display_context": null,
 											"display_context_parameter": null,
@@ -324,11 +289,6 @@
 											"live_from": null,
 											"live_until": null,
 											"show_condition": null,
-											"acls": [
-												{
-													"_extends_": "CaseworkerBeftaMasterAccessControlList"
-												}
-											],
 											"complexACLs": [],
 											"display_context": null,
 											"display_context_parameter": null,
@@ -342,11 +302,6 @@
 								"live_from": null,
 								"live_until": null,
 								"show_condition": null,
-								"acls": [
-									{
-										"_extends_": "CaseworkerBeftaMasterAccessControlList"
-									}
-								],
 								"complexACLs": [],
 								"display_context": null,
 								"display_context_parameter": null,
@@ -394,11 +349,6 @@
 											"live_from": null,
 											"live_until": null,
 											"show_condition": null,
-											"acls": [
-												{
-													"_extends_": "CaseworkerBeftaMasterAccessControlList"
-												}
-											],
 											"complexACLs": [],
 											"display_context": null,
 											"display_context_parameter": null,
@@ -427,11 +377,6 @@
 											"live_from": null,
 											"live_until": null,
 											"show_condition": null,
-											"acls": [
-												{
-													"_extends_": "CaseworkerBeftaMasterAccessControlList"
-												}
-											],
 											"complexACLs": [],
 											"display_context": null,
 											"display_context_parameter": null,
@@ -460,11 +405,6 @@
 											"live_from": null,
 											"live_until": null,
 											"show_condition": null,
-											"acls": [
-												{
-													"_extends_": "CaseworkerBeftaMasterAccessControlList"
-												}
-											],
 											"complexACLs": [],
 											"display_context": null,
 											"display_context_parameter": null,
@@ -493,11 +433,6 @@
 											"live_from": null,
 											"live_until": null,
 											"show_condition": null,
-											"acls": [
-												{
-													"_extends_": "CaseworkerBeftaMasterAccessControlList"
-												}
-											],
 											"complexACLs": [],
 											"display_context": null,
 											"display_context_parameter": null,
@@ -526,11 +461,6 @@
 											"live_from": null,
 											"live_until": null,
 											"show_condition": null,
-											"acls": [
-												{
-													"_extends_": "CaseworkerBeftaMasterAccessControlList"
-												}
-											],
 											"complexACLs": [],
 											"display_context": null,
 											"display_context_parameter": null,
@@ -559,11 +489,6 @@
 											"live_from": null,
 											"live_until": null,
 											"show_condition": null,
-											"acls": [
-												{
-													"_extends_": "CaseworkerBeftaMasterAccessControlList"
-												}
-											],
 											"complexACLs": [],
 											"display_context": null,
 											"display_context_parameter": null,
@@ -592,11 +517,6 @@
 											"live_from": null,
 											"live_until": null,
 											"show_condition": null,
-											"acls": [
-												{
-													"_extends_": "CaseworkerBeftaMasterAccessControlList"
-												}
-											],
 											"complexACLs": [],
 											"display_context": null,
 											"display_context_parameter": null,
@@ -610,11 +530,6 @@
 								"live_from": null,
 								"live_until": null,
 								"show_condition": null,
-								"acls": [
-									{
-										"_extends_": "CaseworkerBeftaMasterAccessControlList"
-									}
-								],
 								"complexACLs": [],
 								"display_context": null,
 								"display_context_parameter": null,

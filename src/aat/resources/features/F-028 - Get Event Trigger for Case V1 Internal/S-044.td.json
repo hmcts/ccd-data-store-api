@@ -503,27 +503,6 @@
                 "live_from": null,
                 "live_until": null,
                 "show_condition": null,
-                "acls": [
-                  {
-                    "__ordering__": "ordered"
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true,
-                    "listElementCode": "ComplexTextField"
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true,
-                    "listElementCode": "ComplexTextField"
-                  }
-                ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
@@ -568,27 +547,6 @@
                 "live_from": null,
                 "live_until": null,
                 "show_condition": null,
-                "acls": [
-                  {
-                    "__ordering__": "ordered"
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true,
-                    "listElementCode": "ComplexFixedListField"
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true,
-                    "listElementCode": "ComplexFixedListField"
-                  }
-                ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
@@ -633,25 +591,6 @@
                       "live_from": null,
                       "live_until": null,
                       "show_condition": null,
-                      "acls": [
-                        {
-                          "__ordering__": "ordered"
-                        },
-                        {
-                          "role": "[[ANYTHING_PRESENT]]",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
-                        },
-                        {
-                          "role": "[[ANYTHING_PRESENT]]",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
-                        }
-                      ],
                       "complexACLs": [],
                       "display_context": null,
                       "display_context_parameter": null,
@@ -689,25 +628,6 @@
                       "live_from": null,
                       "live_until": null,
                       "show_condition": null,
-                      "acls": [
-                        {
-                          "__ordering__": "ordered"
-                        },
-                        {
-                          "role": "[[ANYTHING_PRESENT]]",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
-                        },
-                        {
-                          "role": "[[ANYTHING_PRESENT]]",
-                          "create": true,
-                          "read": true,
-                          "update": true,
-                          "delete": true
-                        }
-                      ],
                       "complexACLs": [],
                       "display_context": null,
                       "display_context_parameter": "#COLLECTION(allowDelete,allowInsert,allowUpdate)",
@@ -721,27 +641,6 @@
                 "live_from": null,
                 "live_until": null,
                 "show_condition": null,
-                "acls": [
-                  {
-                    "__ordering__": "ordered"
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true,
-                    "listElementCode": "ComplexNestedField"
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true,
-                    "listElementCode": "ComplexNestedField"
-                  }
-                ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
@@ -812,25 +711,6 @@
                 "live_from": null,
                 "live_until": null,
                 "show_condition": null,
-                "acls": [
-                  {
-                    "__ordering__": "ordered"
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  }
-                ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
@@ -859,25 +739,6 @@
                 "live_from": null,
                 "live_until": null,
                 "show_condition": null,
-                "acls": [
-                  {
-                    "__ordering__": "ordered"
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  }
-                ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
@@ -906,25 +767,6 @@
                 "live_from": null,
                 "live_until": null,
                 "show_condition": null,
-                "acls": [
-                  {
-                    "__ordering__": "ordered"
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  }
-                ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
@@ -953,25 +795,6 @@
                 "live_from": null,
                 "live_until": null,
                 "show_condition": null,
-                "acls": [
-                  {
-                    "__ordering__": "ordered"
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  }
-                ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
@@ -1000,25 +823,6 @@
                 "live_from": null,
                 "live_until": null,
                 "show_condition": null,
-                "acls": [
-                  {
-                    "__ordering__": "ordered"
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  }
-                ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
@@ -1047,25 +851,6 @@
                 "live_from": null,
                 "live_until": null,
                 "show_condition": null,
-                "acls": [
-                  {
-                    "__ordering__": "ordered"
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  }
-                ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
@@ -1094,25 +879,6 @@
                 "live_from": null,
                 "live_until": null,
                 "show_condition": null,
-                "acls": [
-                  {
-                    "__ordering__": "ordered"
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  },
-                  {
-                    "role": "[[ANYTHING_PRESENT]]",
-                    "create": true,
-                    "read": true,
-                    "update": true,
-                    "delete": true
-                  }
-                ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,

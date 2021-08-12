@@ -42,7 +42,6 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     private Integer order;
     @JsonProperty("show_condition")
     private String showConditon = null;
-    @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
     @JsonProperty("complexACLs")
     private List<ComplexACL> complexACLs = new ArrayList<>();
@@ -147,10 +146,12 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     }
 
     @Override
+    @JsonIgnore
     public List<AccessControlList> getAccessControlLists() {
         return accessControlLists;
     }
 
+    @JsonProperty("acls")
     public void setAccessControlLists(List<AccessControlList> accessControlLists) {
         this.accessControlLists = accessControlLists;
     }

@@ -241,12 +241,6 @@
                 "live_from": null,
                 "live_until": null,
                 "show_condition": null,
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerAutotest1AccessControlList",
-                    "listElementCode": "ComplexTextField"
-                  }
-                ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
@@ -294,12 +288,6 @@
                 "live_from": null,
                 "live_until": null,
                 "show_condition": null,
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerAutotest1AccessControlList",
-                    "listElementCode": "ComplexFixedListField"
-                  }
-                ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
@@ -344,11 +332,6 @@
                       "live_from": null,
                       "live_until": null,
                       "show_condition": null,
-                      "acls": [
-                        {
-                          "_extends_": "CaseworkerAutotest1AccessControlList"
-                        }
-                      ],
                       "complexACLs": [],
                       "display_context": null,
                       "display_context_parameter": null,
@@ -386,11 +369,6 @@
                       "live_from": null,
                       "live_until": null,
                       "show_condition": null,
-                      "acls": [
-                        {
-                          "_extends_": "CaseworkerAutotest1AccessControlList"
-                        }
-                      ],
                       "complexACLs": [],
                       "display_context": null,
                       "display_context_parameter": "#COLLECTION(allowInsert,allowUpdate)",
@@ -404,12 +382,6 @@
                 "live_from": null,
                 "live_until": null,
                 "show_condition": null,
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerAutotest1AccessControlList",
-                    "listElementCode": "ComplexNestedField"
-                  }
-                ],
                 "complexACLs": [],
                 "display_context": null,
                 "display_context_parameter": null,
@@ -439,12 +411,7 @@
                   "_extends_": "BaseTextFieldType",
                   "id": "TextMax150",
                   "max": 150
-                },
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerAutotest1AccessControlList"
-                  }
-                ]
+                }
               },
               {
                 "_extends_": "CaseFieldDefinitionWithoutACLs",
@@ -455,12 +422,7 @@
                   "_extends_": "BaseTextFieldType",
                   "id": "TextMax50",
                   "max": 50
-                },
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerAutotest1AccessControlList"
-                  }
-                ]
+                }
               },
               {
                 "_extends_": "CaseFieldDefinitionWithoutACLs",
@@ -471,12 +433,7 @@
                   "_extends_": "BaseTextFieldType",
                   "id": "TextMax50",
                   "max": 50
-                },
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerAutotest1AccessControlList"
-                  }
-                ]
+                }
               },
               {
                 "_extends_": "CaseFieldDefinitionWithoutACLs",
@@ -487,12 +444,7 @@
                   "_extends_": "BaseTextFieldType",
                   "id": "TextMax50",
                   "max": 50
-                },
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerAutotest1AccessControlList"
-                  }
-                ]
+                }
               },
               {
                 "_extends_": "CaseFieldDefinitionWithoutACLs",
@@ -503,12 +455,7 @@
                   "_extends_": "BaseTextFieldType",
                   "id": "TextMax50",
                   "max": 50
-                },
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerAutotest1AccessControlList"
-                  }
-                ]
+                }
               },
               {
                 "_extends_": "CaseFieldDefinitionWithoutACLs",
@@ -519,12 +466,7 @@
                   "_extends_": "BaseTextFieldType",
                   "id": "TextMax14",
                   "max": 14
-                },
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerAutotest1AccessControlList"
-                  }
-                ]
+                }
               },
               {
                 "_extends_": "CaseFieldDefinitionWithoutACLs",
@@ -535,12 +477,7 @@
                   "_extends_": "BaseTextFieldType",
                   "id": "TextMax50",
                   "max": 50
-                },
-                "acls": [
-                  {
-                    "_extends_": "CaseworkerAutotest1AccessControlList"
-                  }
-                ]
+                }
               }
             ]
           },
