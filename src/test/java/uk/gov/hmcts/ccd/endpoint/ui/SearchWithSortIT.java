@@ -22,7 +22,6 @@ import java.util.Map;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -42,10 +41,8 @@ public class SearchWithSortIT extends WireMockBaseTest {
 
     @Inject
     private WebApplicationContext wac;
-
     @Inject
     private ApplicationParams applicationParams;
-
     private MockMvc mockMvc;
 
     @Before
@@ -57,7 +54,7 @@ public class SearchWithSortIT extends WireMockBaseTest {
         ReflectionTestUtils.setField(applicationParams, "paginationPageSize", 3);
 
         stubFor(WireMock.get(urlMatching("/api/data/case-type/TestAddressBookCase/version"))
-            .willReturn(okJson("{\"version\": \"33\"}")));
+            .willReturn(okJson("{\"version\": \"34\"}")));
     }
 
     @Test
@@ -83,16 +80,13 @@ public class SearchWithSortIT extends WireMockBaseTest {
         assertEquals("Incorrect view items count", 4, searchResultViewItems.size());
 
         assertEquals("John", searchResultViewItems.get(0).getFields().get("PersonFirstName"));
-        assertNull(searchResultViewItems.get(0).getFields().get("PersonAddress"));
+        assertEquals(null, searchResultViewItems.get(0).getFields().get("PersonAddress"));
 
-        assertEquals("Janet", searchResultViewItems.get(1).getFields().get("PersonFirstName"));
-        assertEquals("1504259907353529", searchResultViewItems.get(1).getCaseId());
-
+        assertEquals("Angel", searchResultViewItems.get(1).getFields().get("PersonFirstName"));
         assertEquals("George", searchResultViewItems.get(2).getFields().get("PersonFirstName"));
         assertEquals("1504259907353545", searchResultViewItems.get(2).getCaseId());
-
-        assertEquals("Peter", searchResultViewItems.get(3).getFields().get("PersonFirstName"));
-        assertEquals("1504259907353537", searchResultViewItems.get(3).getCaseId());
+        assertEquals("George", searchResultViewItems.get(3).getFields().get("PersonFirstName"));
+        assertEquals("1504259907353548", searchResultViewItems.get(3).getCaseId());
     }
 
     @Test
@@ -119,7 +113,7 @@ public class SearchWithSortIT extends WireMockBaseTest {
         assertEquals("Incorrect view items count", 2, searchResultViewItems.size());
 
         assertEquals("John", searchResultViewItems.get(0).getFields().get("PersonFirstName"));
-        assertNull(searchResultViewItems.get(0).getFields().get("PersonAddress"));
+        assertEquals(null, searchResultViewItems.get(0).getFields().get("PersonAddress"));
 
         assertEquals("Janet", searchResultViewItems.get(1).getFields().get("PersonFirstName"));
     }
@@ -127,8 +121,8 @@ public class SearchWithSortIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_search_sort_cases.sql"})
-    public void expectBadRequestErrorForMalformedDateParam() throws Exception {
-        mockMvc.perform(get(GET_CASES)
+    public void expectBadRequestErrorForMalformattedDateParam() throws Exception {
+        MvcResult result = mockMvc.perform(get(GET_CASES)
             .contentType(JSON_CONTENT_TYPE)
             .param("view", WORKBASKET)
             .param("case_type", TEST_CASE_TYPE)
@@ -139,13 +133,15 @@ public class SearchWithSortIT extends WireMockBaseTest {
             .header(AUTHORIZATION, "Bearer user1"))
             .andExpect(status().is(400))
             .andReturn();
+
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_search_sort_cases.sql"})
     public void workbasketSearchWithRoleSpecificSortOrder() throws Exception {
-        MockUtils.setSecurityAuthorities(authentication, ROLE_TEST_PUBLIC, ROLE_CASEWORKER_PUBLIC,
+        String roleWithSortOrder = ROLE_TEST_PUBLIC;
+        MockUtils.setSecurityAuthorities(authentication, roleWithSortOrder, ROLE_CASEWORKER_PUBLIC,
             ROLE_CASEWORKER_PRIVATE);
         MvcResult result = mockMvc.perform(get(GET_CASES)
             .contentType(JSON_CONTENT_TYPE)
@@ -166,18 +162,17 @@ public class SearchWithSortIT extends WireMockBaseTest {
         assertEquals("Incorrect view items count", 4, searchResultViewItems.size());
 
         assertEquals("John", searchResultViewItems.get(0).getFields().get("PersonFirstName"));
-        assertNull(searchResultViewItems.get(0).getFields().get("PersonAddress"));
+        assertEquals(null, searchResultViewItems.get(0).getFields().get("PersonAddress"));
 
-        assertEquals("Janet", searchResultViewItems.get(1).getFields().get("PersonFirstName"));
-        assertEquals("HX08 5TG", ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress"))
+        assertEquals("Angel", searchResultViewItems.get(1).getFields().get("PersonFirstName"));
+        assertEquals("SE1 4EE", ((Map) searchResultViewItems.get(1).getFields().get("PersonAddress"))
             .get("Postcode"));
 
         assertEquals("George", searchResultViewItems.get(2).getFields().get("PersonFirstName"));
-        assertEquals("W11 5DF", ((Map) searchResultViewItems.get(2).getFields().get("PersonAddress"))
+        assertEquals("W11 5CF", ((Map) searchResultViewItems.get(2).getFields().get("PersonAddress"))
             .get("Postcode"));
-
-        assertEquals("Peter", searchResultViewItems.get(3).getFields().get("PersonFirstName"));
-        assertEquals("SE1 4EE", ((Map) searchResultViewItems.get(3).getFields().get("PersonAddress"))
+        assertEquals("George", searchResultViewItems.get(3).getFields().get("PersonFirstName"));
+        assertEquals("W11 5DF", ((Map) searchResultViewItems.get(3).getFields().get("PersonAddress"))
             .get("Postcode"));
     }
 }
