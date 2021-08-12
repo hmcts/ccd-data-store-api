@@ -139,6 +139,7 @@ public class RoleAssignmentService implements AccessControl {
             .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
             .filter(Objects::nonNull)
             .flatMap(Optional::stream)
+            .distinct()
             .collect(Collectors.toList());
     }
 

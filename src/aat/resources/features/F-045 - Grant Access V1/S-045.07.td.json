@@ -1,0 +1,39 @@
+{
+	"_guid_": "S-045.07",
+	"_extends_": "F-045_Test_Data_Base",
+	"title": "must grant without removing other case roles",
+
+	"specs": [
+		"an active profile in CCD",
+		"testUser - with an active profile in CCD",
+		"uses the id of the case just created",
+		"has the 201 return code"
+	],
+
+	"users": {
+		"invokingUser": {
+			"_extends_": "BeftaCaseworker2Solicitor2"
+		},
+		"testUser": {
+			"_extends_": "BeftaCaseworker2Solicitor3"
+		}
+
+	},
+
+	"request": {
+		"pathVariables": {
+			"jid": "${[scenarioContext][childContexts][F-045_Befta_Jurisdiction2_Full_Case_Creation_Data][testData][actualResponse][body][jurisdiction]}",
+			"ctid": "${[scenarioContext][childContexts][F-045_Befta_Jurisdiction2_Full_Case_Creation_Data][testData][actualResponse][body][case_type_id]}",
+			"cid": "${[scenarioContext][childContexts][F-045_Befta_Jurisdiction2_Full_Case_Creation_Data][testData][actualResponse][body][id]}"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_201_Response",
+		"headers": {
+			"Content-Length": "[[ANYTHING_PRESENT]]",
+			"Content-Type": "[[ANY_STRING_NULLABLE]]",
+			"Vary": "Accept-Encoding"
+		}
+	}
+}
