@@ -145,13 +145,6 @@ public class UIStartEventControllerCaseRolesIT extends WireMockBaseTest {
             .getChildren().get(1);
         assertThat(hobby.getId(), equalTo("hobbies"));
         assertThat(hobby.getDisplayContextParameter(), equalTo("#COLLECTION(allowInsert)"));
-
-        // hobbies ACLs are being overridden from the parent
-        assertThat(hobby.getAccessControlLists().get(0).getAccessProfile(), equalTo("[CAN_CREATE]"));
-        assertThat(hobby.getAccessControlLists().get(0).isCreate(), is(true));
-        assertThat(hobby.getAccessControlLists().get(0).isRead(), is(false));
-        assertThat(hobby.getAccessControlLists().get(0).isUpdate(), is(false));
-        assertThat(hobby.getAccessControlLists().get(0).isDelete(), is(false));
     }
 
     @Test
