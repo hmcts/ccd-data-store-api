@@ -58,7 +58,7 @@ public class StartEventControllerIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void getStartEventTrigger_should_return_200() throws Exception {
-        String caseId = "1628683658240422";
+        String caseId = "1504259907353529";
         String triggerId = "HAS_PRE_STATES_EVENT";
         final String URL =  "/cases/" + caseId + "/event-triggers/" + triggerId;
 
