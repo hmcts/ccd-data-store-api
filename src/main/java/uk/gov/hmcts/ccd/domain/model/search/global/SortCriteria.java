@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.model.std;
+package uk.gov.hmcts.ccd.domain.model.search.global;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -10,10 +10,10 @@ import uk.gov.hmcts.ccd.domain.model.std.validator.ValidSortDirection;
 public class SortCriteria {
 
     @ValidSortBy
-    public String sortBy;
+    private String sortBy;
 
     @ValidSortDirection
-    public String sortDirection;
+    private String sortDirection;
 
 
 }

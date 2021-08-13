@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.model.std;
+package uk.gov.hmcts.ccd.domain.model.search.global;
 
 public enum GlobalSearchSortDirection {
     ASCENDING,

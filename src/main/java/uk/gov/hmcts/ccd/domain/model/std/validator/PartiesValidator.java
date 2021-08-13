@@ -1,33 +1,31 @@
 package uk.gov.hmcts.ccd.domain.model.std.validator;
 
-import org.reflections.ReflectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.gov.hmcts.ccd.domain.model.std.Parties;
+import uk.gov.hmcts.ccd.domain.model.search.global.Party;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Set;
 
-public class PartiesValidator implements ConstraintValidator<ValidPartiesItems, List<Parties>> {
-    private static final Logger LOG = LoggerFactory.getLogger(PartiesValidator.class);
-
+public class PartiesValidator implements ConstraintValidator<ValidPartiesItems, List<Party>> {
 
     @Override
-    public boolean isValid(final List<Parties> partiesList, final ConstraintValidatorContext context) {
-        if (partiesList != null) {
-            Set<Field> sets = ReflectionUtils.getFields(Parties.class);
-            for (Parties parties : partiesList) {
+    public boolean isValid(final List<Party> partyList, final ConstraintValidatorContext context) {
+        if (partyList != null) {
+            for (Party party : partyList) {
                 int partyFields = 0;
-                try {
-                    for (Field field : sets) {
-                        if (field.get(parties) != null) {
-                            partyFields++;
-                        }
-                    }
-                } catch (Exception e) {
-                    LOG.error(e.getMessage());
+                if (party.getPartyName() != null) {
+                    partyFields++;
+                }
+                if (party.getAddressLine1() != null) {
+                    partyFields++;
+                }
+                if (party.getDateOfBirth() != null) {
+                    partyFields++;
+                }
+                if (party.getEmailAddress() != null) {
+                    partyFields++;
+                }
+                if (party.getPostCode() != null) {
+                    partyFields++;
                 }
                 if (partyFields < 2) {
                     return false;

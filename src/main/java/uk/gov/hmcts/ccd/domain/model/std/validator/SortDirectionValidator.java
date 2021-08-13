@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.std.validator;
 
-import uk.gov.hmcts.ccd.domain.model.std.GlobalSearchSortDirection;
+import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortDirection;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -15,7 +15,7 @@ public class SortDirectionValidator implements ConstraintValidator<ValidSortDire
         }
 
         for (GlobalSearchSortDirection value : GlobalSearchSortDirection.values()) {
-            if (sortDirection.equalsIgnoreCase(value.toString())) {
+            if (sortDirection.equalsIgnoreCase(value.name())) {
                 return true;
             }
         }
