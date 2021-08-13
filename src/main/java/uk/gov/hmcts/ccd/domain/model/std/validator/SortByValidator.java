@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.std.validator;
 
-import uk.gov.hmcts.ccd.domain.model.std.GlobalSearchSortCategory;
+import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortCategory;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -15,7 +15,7 @@ public class SortByValidator implements ConstraintValidator<ValidSortBy, String>
         }
 
         for (GlobalSearchSortCategory value : GlobalSearchSortCategory.values()) {
-            if (sortBy.equalsIgnoreCase(value.toString())) {
+            if (sortBy.equalsIgnoreCase(value.getCategoryName())) {
                 return true;
             }
         }

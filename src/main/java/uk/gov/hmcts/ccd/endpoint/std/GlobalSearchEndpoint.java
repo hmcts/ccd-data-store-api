@@ -11,7 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ccd.domain.model.std.GlobalSearchRequestPayload;
+import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
 import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
 import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchService;
 
@@ -24,7 +24,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class GlobalSearchEndpoint {
 
     private final GlobalSearchService globalSearchService;
-    public static final String GLOBAL_SEARCH_PATH = "/globalsearch";
+    public static final String GLOBAL_SEARCH_PATH = "/globalSearch";
 
     @Autowired
     public GlobalSearchEndpoint(GlobalSearchService globalSearchService) {
@@ -50,7 +50,7 @@ public class GlobalSearchEndpoint {
                 + "\n7) " + ValidationError.STATE_ID_LENGTH_INVALID
                 + "\n8) " + ValidationError.CASE_TYPE_ID_LENGTH_INVALID
                 + "\n9) " + ValidationError.CASE_REFERENCE_INVALID
-                + "\n10) " + ValidationError.POSTCODE_INVALID
+                + "\n10) " + ValidationError.START_RECORD_NUMBER_INVALID
                 + "\n11) " + ValidationError.DATE_OF_BIRTH_INVALID,
 
             examples = @Example({
@@ -67,7 +67,7 @@ public class GlobalSearchEndpoint {
         )
     })
     public void searchForCases(@RequestBody @Valid GlobalSearchRequestPayload requestPayload) {
-        GlobalSearchRequestPayload payload = requestPayload.setDefaults();
-        globalSearchService.assembleSearchQuery(payload);
+        requestPayload.setDefaults();
+        globalSearchService.assembleSearchQuery(requestPayload);
     }
 }
