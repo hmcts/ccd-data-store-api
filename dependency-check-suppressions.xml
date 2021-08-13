@@ -47,7 +47,7 @@
 	</suppress>
 
 	<suppress until="2021-08-25">
-		<notes>jakarta.el-3.0.3.jar. Suppressed until fix in place</notes>
 		<cve>CVE-2021-28170</cve>
 	</suppress>
+
 </suppressions>
