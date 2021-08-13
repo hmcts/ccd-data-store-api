@@ -29,7 +29,7 @@ public class CaseDocumentUtils {
         };
 
     public static final String DOCUMENT_URL = "document_url";
-    public static final String DOCUMENT_BINARY_URL = "document_binary";
+    public static final String DOCUMENT_BINARY_URL = "document_url";
     public static final String DOCUMENT_HASH = "document_hash";
     public static final String BINARY = "/binary";
     public static final String HEARING_RECORDINGS = "hearing-recordings";
@@ -73,12 +73,12 @@ public class CaseDocumentUtils {
             .map(node -> node.findParents(DOCUMENT_URL))
             .flatMap(List::stream)
             .filter(Objects::nonNull)
-            .filter(node -> nonHearingRecordingUrl(node))
+            .filter(docNode -> nonHearingRecordingUrl(docNode))
             .collect(Collectors.toList());
     }
 
     private boolean nonHearingRecordingUrl(JsonNode documentNode) {
-        return !documentNode.get(DOCUMENT_URL).textValue().contains(HEARING_RECORDINGS);
+        return !documentNode.get(DOCUMENT_URL).asText().contains(HEARING_RECORDINGS);
     }
 
     public Set<String> getTamperedHashes(@NonNull final List<Tuple2<String, String>> preCallbackHashes,
