@@ -39,17 +39,17 @@ public class GlobalSearchRequestPayload {
             this.setStartRecordNumber(1);
         }
         if (this.getSortCriteria() == null) {
-            SortCriteria sortCriteria = new SortCriteria();
-            sortCriteria.setSortBy(GlobalSearchSortCategory.CREATED_DATE.getCategoryName());
-            sortCriteria.setSortDirection(GlobalSearchSortDirection.ASCENDING.name());
+            SortCriteria criteria = new SortCriteria();
+            criteria.setSortBy(GlobalSearchSortByCategory.CREATED_DATE.getCategoryName());
+            criteria.setSortDirection(GlobalSearchSortDirection.ASCENDING.name());
             List<SortCriteria> sortCriteriaList = new ArrayList<>();
-            sortCriteriaList.add(sortCriteria);
+            sortCriteriaList.add(criteria);
             this.setSortCriteria(sortCriteriaList);
 
         } else {
             for (SortCriteria criteria : this.getSortCriteria()) {
                 if (criteria.getSortBy() == null) {
-                    criteria.setSortBy(GlobalSearchSortCategory.CREATED_DATE.getCategoryName());
+                    criteria.setSortBy(GlobalSearchSortByCategory.CREATED_DATE.getCategoryName());
 
                 } else if (criteria.getSortDirection() == null) {
                     criteria.setSortDirection(GlobalSearchSortDirection.ASCENDING.name());

@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 public class SearchCriteria {
 
-    private List<@Pattern(regexp = "^[\\d*-?]*$", message = ValidationError.CASE_REFERENCE_INVALID) String>
+    private List<@Pattern(regexp = "^[*-?]*$", message = ValidationError.CASE_REFERENCE_INVALID) String>
         caseReferences;
 
     @JsonProperty("CCDJurisdictionIds")
