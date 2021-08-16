@@ -852,22 +852,6 @@ def timestamp() {
     return date.format('yyyy-MM-dd HH:mm:ss')
 }
 
-configurations { codacy }
-dependencies {
-    codacy 'com.github.codacy:codacy-coverage-reporter:-SNAPSHOT'
-}
-task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
-    main = "com.codacy.CodacyCoverageReporter"
-    classpath = configurations.codacy
-    args = [
-            "report",
-            "-l",
-            "Java",
-            "-r",
-            "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
-    ]
-}
-
 cucumberReports {
     outputDir = file("${projectDir}/target/cucumber")
     reports = files("${projectDir}/target/cucumber.json")
