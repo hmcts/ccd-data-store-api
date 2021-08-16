@@ -10,7 +10,7 @@ import javax.validation.ConstraintValidatorContext;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SortByValidatorTest {
+class SortByValidatorTest {
 
     @Mock
     private ConstraintValidatorContext constraintValidatorContext;
