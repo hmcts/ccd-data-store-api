@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data;
 
+import org.awaitility.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -19,8 +20,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static java.util.Collections.emptyList;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_PATH;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_PATH;
@@ -112,33 +114,33 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
     }
 
     @Test
-    void testShouldRefreshBuildingLocationCacheOnScheduleSuccessfully() throws Exception {
+    void testShouldRefreshBuildingLocationCacheOnScheduleSuccessfully() {
         // GIVEN
         cacheContainsInitialReferenceData();
         updateUpstreamReferenceData();
 
-        // WHEN
-        SECONDS.sleep(1);
-
-        // THEN
-        assertThat(underTest.getBuildingLocations())
-            .isNotEmpty()
-            .hasSameElementsAs(updatedBuildingLocations);
+        // WHEN/THEN
+        await()
+            .pollDelay(1500, MICROSECONDS)
+            .atMost(Duration.FIVE_SECONDS)
+            .untilAsserted(() -> assertThat(underTest.getBuildingLocations())
+                .isNotEmpty()
+                .hasSameElementsAs(updatedBuildingLocations));
     }
 
     @Test
-    void testShouldRefreshServicesCacheOnScheduleSuccessfully() throws Exception {
+    void testShouldRefreshServicesCacheOnScheduleSuccessfully() {
         // GIVEN
         cacheContainsInitialReferenceData();
         updateUpstreamReferenceData();
 
-        // WHEN
-        SECONDS.sleep(1);
-
-        // THEN
-        assertThat(underTest.getServices())
-            .isNotEmpty()
-            .hasSameElementsAs(updatedServices);
+        // WHEN/THEN
+        await()
+            .pollDelay(1500, MICROSECONDS)
+            .atMost(Duration.FIVE_SECONDS)
+            .untilAsserted(() -> assertThat(underTest.getServices())
+                .isNotEmpty()
+                .hasSameElementsAs(updatedServices));
     }
 
     @Test
@@ -147,13 +149,13 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
         cacheContainsInitialReferenceData();
         unavailableUpstreamReferenceData();
 
-        // WHEN
-        SECONDS.sleep(1);
-
-        // THEN
-        assertThat(underTest.getBuildingLocations())
-            .isNotEmpty()
-            .hasSameElementsAs(initialBuildingLocations);
+        // WHEN/THEN
+        await()
+            .pollDelay(1500, MICROSECONDS)
+            .atMost(Duration.FIVE_SECONDS)
+            .untilAsserted(() -> assertThat(underTest.getBuildingLocations())
+                .isNotEmpty()
+                .hasSameElementsAs(initialBuildingLocations));
     }
 
     @Test
@@ -162,13 +164,13 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
         cacheContainsInitialReferenceData();
         unavailableUpstreamReferenceData();
 
-        // WHEN
-        SECONDS.sleep(1);
-
-        // THEN
-        assertThat(underTest.getServices())
-            .isNotEmpty()
-            .hasSameElementsAs(initialServices);
+        // WHEN/THEN
+        await()
+            .pollDelay(1500, MICROSECONDS)
+            .atMost(Duration.FIVE_SECONDS)
+            .untilAsserted(() -> assertThat(underTest.getServices())
+                .isNotEmpty()
+                .hasSameElementsAs(initialServices));
     }
 
     private void updateUpstreamReferenceData() {

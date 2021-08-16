@@ -66,14 +66,14 @@ public class ReferenceDataRepository {
             .orElse(Collections.emptyList());
     }
 
-    @Scheduled(fixedRateString = "${reference.data.cache.refresh.rate.in.milliseconds}")
+    @Scheduled(cron = "${reference.data.cache.refresh.rate.cron}")
     public void updateBuildingLocationCache() {
         final List<BuildingLocation> buildingLocations = getBuildingLocations();
         clearCache(BUILDING_LOCATIONS_CACHE);
         updateCache(BUILDING_LOCATIONS_CACHE, buildingLocations);
     }
 
-    @Scheduled(fixedRateString = "${reference.data.cache.refresh.rate.in.milliseconds}")
+    @Scheduled(cron = "${reference.data.cache.refresh.rate.cron}")
     public void updateServicesCache() {
         final List<Service> services = getServices();
         clearCache(SERVICES_CACHE);
@@ -81,7 +81,7 @@ public class ReferenceDataRepository {
     }
 
     void clearCache(final String cacheName) {
-        Optional.ofNullable(cacheManager.getCache(cacheName)).ifPresent(Cache::clear);
+        Optional.ofNullable(cacheManager.getCache(cacheName)).ifPresent(Cache::invalidate);
     }
 
     private <T> void updateCache(final String cacheName, final List<T> newValue) {
