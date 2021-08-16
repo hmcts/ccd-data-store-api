@@ -35,6 +35,7 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
     public List<String> listOfInvalidFields;
     public List<SortCriteria> listOfValidSortCriteria;
     public List<SortCriteria> listOfInvalidSortCriteria;
+    public List<String> listOfValidCaseReferences;
 
     @Before
     public void setUp() throws IOException {
@@ -59,8 +60,11 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
         invalidSortCriteria.setSortDirection("invalid");
         listOfInvalidSortCriteria = new ArrayList<>();
         listOfInvalidSortCriteria.add(invalidSortCriteria);
-
-
+        listOfValidCaseReferences = new ArrayList<>();
+        listOfValidCaseReferences.add("1234123412341234");
+        listOfValidCaseReferences.add("1234-1234-1234-1234");
+        listOfValidCaseReferences.add("1234-1234*");
+        listOfValidCaseReferences.add("1234-1234-1234-123?");
     }
 
     @Test
@@ -77,6 +81,7 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
         searchCriteria.setCcdJurisdictionIds(listOfValidFields);
         searchCriteria.setOtherReferences(listOfValidFields);
         searchCriteria.setStateIds(listOfValidFields);
+        searchCriteria.setCaseReferences(listOfValidCaseReferences);
         Party party = new Party();
         party.setAddressLine1("address");
         party.setPartyName("name");
