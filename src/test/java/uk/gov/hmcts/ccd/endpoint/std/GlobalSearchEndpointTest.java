@@ -5,9 +5,10 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
-import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortCategory;
+import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortByCategory;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortDirection;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
+import uk.gov.hmcts.ccd.domain.model.search.global.SortCriteria;
 import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchService;
 
 import java.util.ArrayList;
@@ -51,10 +52,46 @@ public class GlobalSearchEndpointTest {
         assertAll(
             () -> assertThat(payload.getSearchCriteria(), equalTo(searchCriteria)),
             () -> assertThat(payload.getSortCriteria().get(0).getSortBy(),
-                equalTo(GlobalSearchSortCategory.CREATED_DATE.getCategoryName())),
+                equalTo(GlobalSearchSortByCategory.CREATED_DATE.getCategoryName())),
             () -> assertThat(payload.getSortCriteria().get(0).getSortDirection(),
                 equalTo(GlobalSearchSortDirection.ASCENDING.name())),
             () -> assertThat(payload.getMaxReturnRecordCount(), equalTo(25)),
+            () -> assertThat(payload.getStartRecordNumber(), equalTo(1))
+        );
+    }
+
+    @Test
+    public void shouldReplaceOnlyNullSortCriteriaWithDefault() {
+
+        GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
+        payload.setMaxReturnRecordCount(100);
+        payload.setStartRecordNumber(1);
+        SearchCriteria searchCriteria = new SearchCriteria();
+        searchCriteria.setCaseManagementBaseLocationIds(listOfValidFields);
+        searchCriteria.setCaseManagementRegionIds(listOfValidFields);
+        payload.setSearchCriteria(searchCriteria);
+        SortCriteria sortCriteriaOne = new SortCriteria();
+        sortCriteriaOne.setSortBy(GlobalSearchSortByCategory.CASE_NAME.getCategoryName());
+        SortCriteria sortCriteriaTwo = new SortCriteria();
+        sortCriteriaTwo.setSortDirection(GlobalSearchSortDirection.DESCENDING.name());
+        List<SortCriteria> sortCriteriaList = new ArrayList<>();
+        sortCriteriaList.add(sortCriteriaOne);
+        sortCriteriaList.add(sortCriteriaTwo);
+        payload.setSortCriteria(sortCriteriaList);
+
+        payload.setDefaults();
+
+        assertAll(
+            () -> assertThat(payload.getSearchCriteria(), equalTo(searchCriteria)),
+            () -> assertThat(payload.getSortCriteria().get(1).getSortBy(),
+                equalTo(GlobalSearchSortByCategory.CREATED_DATE.getCategoryName())),
+            () -> assertThat(payload.getSortCriteria().get(1).getSortDirection(),
+                equalTo(GlobalSearchSortDirection.DESCENDING.name())),
+            () -> assertThat(payload.getSortCriteria().get(0).getSortDirection(),
+                equalTo(GlobalSearchSortDirection.ASCENDING.name())),
+            () -> assertThat(payload.getSortCriteria().get(0).getSortBy(),
+                equalTo(GlobalSearchSortByCategory.CASE_NAME.getCategoryName())),
+            () -> assertThat(payload.getMaxReturnRecordCount(), equalTo(100)),
             () -> assertThat(payload.getStartRecordNumber(), equalTo(1))
         );
     }

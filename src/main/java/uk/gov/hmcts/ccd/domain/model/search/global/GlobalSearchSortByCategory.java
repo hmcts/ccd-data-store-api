@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.search.global;
 
-public enum GlobalSearchSortCategory {
+public enum GlobalSearchSortByCategory {
     CASE_NAME("caseName"),
     CASE_MANAGEMENT_CATEGORY_NAME("caseManagementCategoryName"),
     CREATED_DATE("createdDate");
@@ -8,7 +8,7 @@ public enum GlobalSearchSortCategory {
 
     private final String categoryName;
 
-    GlobalSearchSortCategory(String categoryName) {
+    GlobalSearchSortByCategory(String categoryName) {
         this.categoryName = categoryName;
     }
 
