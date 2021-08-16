@@ -9,7 +9,6 @@ import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -42,8 +41,7 @@ public class GlobalSearchRequestPayload {
             SortCriteria criteria = new SortCriteria();
             criteria.setSortBy(GlobalSearchSortByCategory.CREATED_DATE.getCategoryName());
             criteria.setSortDirection(GlobalSearchSortDirection.ASCENDING.name());
-            List<SortCriteria> sortCriteriaList = new ArrayList<>();
-            sortCriteriaList.add(criteria);
+            List<SortCriteria> sortCriteriaList = List.of(criteria);
             this.setSortCriteria(sortCriteriaList);
 
         } else {

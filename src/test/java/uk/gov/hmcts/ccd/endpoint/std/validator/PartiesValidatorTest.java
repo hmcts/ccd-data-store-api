@@ -6,7 +6,6 @@ import uk.gov.hmcts.ccd.domain.model.search.global.Party;
 import uk.gov.hmcts.ccd.domain.model.std.validator.PartiesValidator;
 
 import javax.validation.ConstraintValidatorContext;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -20,7 +19,7 @@ class PartiesValidatorTest {
     ConstraintValidatorContext.ConstraintViolationBuilder constraintViolationBuilder;
 
     private final PartiesValidator validator = new PartiesValidator();
-    private final List<Party> partyList = new ArrayList<>();
+    private List<Party> partyList;
 
     @Test
     void returnsTrueWhenPartyListNull() {
@@ -35,8 +34,7 @@ class PartiesValidatorTest {
         Party secondParty = new Party();
         secondParty.setEmailAddress("someone@cgi.com");
         secondParty.setDateOfBirth("1999-12-01");
-        partyList.add(party);
-        partyList.add(secondParty);
+        partyList = List.of(party, secondParty);
         assertTrue(validator.isValid(partyList, constraintValidatorContext));
     }
 
@@ -47,8 +45,7 @@ class PartiesValidatorTest {
         party.setPartyName("name");
         Party secondParty = new Party();
         secondParty.setEmailAddress("someone@cgi.com");
-        partyList.add(party);
-        partyList.add(secondParty);
+        partyList = List.of(party, secondParty);
         assertFalse(validator.isValid(partyList, constraintValidatorContext));
     }
 
