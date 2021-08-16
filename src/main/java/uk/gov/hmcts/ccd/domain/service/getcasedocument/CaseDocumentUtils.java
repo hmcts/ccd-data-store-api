@@ -32,6 +32,7 @@ public class CaseDocumentUtils {
     public static final String DOCUMENT_BINARY_URL = "document_url";
     public static final String DOCUMENT_HASH = "document_hash";
     public static final String BINARY = "/binary";
+    public static final String HEARING_RECORDINGS = "hearing-recordings";
 
     public List<Tuple2<String, String>> findDocumentsHashes(@NonNull final Map<String, JsonNode> data) {
         final List<JsonNode> documentNodes = findDocumentNodes(data);
@@ -63,7 +64,7 @@ public class CaseDocumentUtils {
         try {
             UUID.fromString(documentId);
         } catch (RuntimeException e) {
-            throw new BadRequestException("The input document id is invalid");
+            throw new BadRequestException(String.format("The input document id %s is invalid uuid", documentId));
         }
     }
 
@@ -72,7 +73,12 @@ public class CaseDocumentUtils {
             .map(node -> node.findParents(DOCUMENT_URL))
             .flatMap(List::stream)
             .filter(Objects::nonNull)
+            .filter(docNode -> nonHearingRecordingUrl(docNode))
             .collect(Collectors.toList());
+    }
+
+    private boolean nonHearingRecordingUrl(JsonNode documentNode) {
+        return !documentNode.get(DOCUMENT_URL).asText().contains(HEARING_RECORDINGS);
     }
 
     public Set<String> getTamperedHashes(@NonNull final List<Tuple2<String, String>> preCallbackHashes,
