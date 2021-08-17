@@ -11,12 +11,12 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.CaseSearchResultView;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
 import uk.gov.hmcts.ccd.domain.service.search.CaseSearchResultViewGenerator;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
-import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchSortService;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
@@ -30,6 +30,7 @@ import static java.util.Collections.emptyMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.argThat;
@@ -70,7 +71,8 @@ class UICaseSearchControllerTest {
         JsonNode searchRequestNode = new ObjectMapper().readTree(searchRequest);
         ElasticsearchRequest elasticSearchRequest = new ElasticsearchRequest(searchRequestNode);
         when(elasticsearchQueryHelper.validateAndConvertRequest(any())).thenReturn(elasticSearchRequest);
-        when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class))).thenReturn(caseSearchResult);
+        when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class),
+            anyBoolean())).thenReturn(caseSearchResult);
         when(caseSearchResultViewGenerator.execute(any(), any(), any(), any())).thenReturn(caseSearchResultView);
 
         final ResponseEntity<CaseSearchResultViewResource> response = controller
@@ -84,7 +86,7 @@ class UICaseSearchControllerTest {
             assertThat(crossCaseTypeSearchRequest.isMultiCaseTypeSearch(), is(false));
             assertThat(crossCaseTypeSearchRequest.getAliasFields().size(), is(0));
             return true;
-        }));
+        }), anyBoolean());
         verify(caseSearchResultViewGenerator).execute(eq(CASE_TYPE_ID), eq(caseSearchResult), eq(WORKBASKET),
             eq(Collections.emptyList()));
         assertAll(

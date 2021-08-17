@@ -164,7 +164,7 @@ public class CasesControllerProviderTest extends WireMockBaseTest {
     @State({"A Search for cases is requested"})
     public void toSearchCasesForACitizen(Map<String, Object> dataMap) {
         CaseDetails caseDetails = setUpCaseDetailsFromStateMap(dataMap);
-        when(elasticsearchCaseSearchOperationMock.execute(any(CrossCaseTypeSearchRequest.class)))
+        when(elasticsearchCaseSearchOperationMock.execute(any(CrossCaseTypeSearchRequest.class), any()))
             .thenReturn(new CaseSearchResult(1L, Arrays.asList(caseDetails), null));
     }
 
