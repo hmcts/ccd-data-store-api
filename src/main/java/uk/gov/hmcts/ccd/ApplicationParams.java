@@ -154,12 +154,15 @@ public class ApplicationParams {
 
     @Value("${ccd.case-document-am-api.attachDocumentEnabled:true}")
     private boolean attachDocumentEnabled;
-    
+
     @Value("${idam.data-store.system-user.username}")
     private String dataStoreSystemUserId;
 
     @Value("${idam.data-store.system-user.password}")
     private String dataStoreSystemUserPassword;
+
+    @Value("#{'${case.data.issue.logging.jurisdictions}'.split(',')}")
+    private List<String> caseDataIssueLoggingJurisdictions;
 
     public static String encode(final String stringToEncode) {
         try {
@@ -198,7 +201,7 @@ public class ApplicationParams {
     }
 
     public String draftURL(String draftId) {
-        return draftHost + "/drafts/" + encode(draftId);
+        return draftHost + "/drafts/" + draftId;
     }
 
     public String getDraftEncryptionKey() {
@@ -272,7 +275,7 @@ public class ApplicationParams {
     }
 
     public String userDefaultSettingsURL() {
-        return userProfileHost + "/user-profile/users";
+        return userProfileHost + "/user-profile/users?uid={uid}";
     }
 
     public String getTokenSecret() {
@@ -426,7 +429,7 @@ public class ApplicationParams {
     public boolean isAttachDocumentEnabled() {
         return attachDocumentEnabled;
     }
-    
+
     public String getDataStoreSystemUserId() {
         return dataStoreSystemUserId;
     }
@@ -441,5 +444,9 @@ public class ApplicationParams {
 
     public void setDataStoreSystemUserPassword(String dataStoreSystemUserPassword) {
         this.dataStoreSystemUserPassword = dataStoreSystemUserPassword;
+    }
+
+    public List<String> getCaseDataIssueLoggingJurisdictions() {
+        return caseDataIssueLoggingJurisdictions;
     }
 }
