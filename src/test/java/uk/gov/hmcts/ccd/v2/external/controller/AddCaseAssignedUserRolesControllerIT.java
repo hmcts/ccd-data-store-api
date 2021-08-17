@@ -72,7 +72,7 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
 
         assertThat(cue.size(), is(1));
         assertEquals(CASE_ROLE_1, cue.get(0).getCasePrimaryKey().getCaseRole());
-        assertEquals(RoleCategory.LEGAL_OPERATIONS.name(), cue.get(0).getRoleCategory());
+        assertEquals(RoleCategory.CITIZEN.name(), cue.get(0).getRoleCategory());
         assertEquals(Long.valueOf(CASE_ID_1), cue.get(0).getCasePrimaryKey().getCaseDataId());
         assertEquals(userId, cue.get(0).getCasePrimaryKey().getUserId());
 
