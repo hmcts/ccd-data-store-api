@@ -32,6 +32,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 class AuthorisedGetUserProfileOperationTest {
@@ -128,6 +129,59 @@ class AuthorisedGetUserProfileOperationTest {
                 assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().get(0).getEvents().size(), is(4))
         );
     }
+
+    @Test
+    @DisplayName("should return UserProfile for create organisation")
+    public void executeForCreate() {
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(eq(notAllowedCaseTypeDefinition),
+            eq(accessProfiles), eq(CAN_CREATE));
+        doReturn(caseStateDefinitions).when(accessControlService).filterCaseStatesByAccess(any(), eq(accessProfiles),
+            eq(CAN_CREATE));
+        doReturn(caseEventDefinitions).when(accessControlService).filterCaseEventsByAccess(any(), eq(accessProfiles),
+            eq(CAN_CREATE));
+        doReturn(userProfile).when(getUserProfileOperation).execute(CAN_CREATE);
+
+        UserProfile userProfile = classUnderTest.execute(CAN_CREATE);
+
+        assertAll(
+            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().size(), is(1)),
+            () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypeDefinitions().size(), is(2)),
+            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions(), everyItem(not(isIn(Arrays
+                .asList(notAllowedCaseTypeDefinition))))),
+            () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypeDefinitions(), everyItem(not(isIn(Arrays
+                .asList(notAllowedCaseTypeDefinition))))),
+            () ->
+                assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().get(0).getStates().size(), is(3)),
+            () ->
+                assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().get(0).getEvents().size(), is(4))
+        );
+    }
+
+
+    @Test
+    @DisplayName("should return UserProfile for create non organisation")
+    public void executeForCreateWithNonOrganisationProfile() {
+        doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(eq(notAllowedCaseTypeDefinition),
+            eq(accessProfiles), eq(CAN_CREATE));
+        doReturn(caseStateDefinitions).when(accessControlService).filterCaseStatesByAccess(any(), eq(accessProfiles),
+            eq(CAN_CREATE));
+        doReturn(caseEventDefinitions).when(accessControlService).filterCaseEventsByAccess(any(), eq(accessProfiles),
+            eq(CAN_CREATE));
+        doReturn(userProfile).when(getUserProfileOperation).execute(CAN_CREATE);
+        doReturn(true).when(caseDataAccessControl).shouldRemoveCaseDefinition(eq(accessProfiles),eq(CAN_CREATE),any());
+
+        UserProfile userProfile = classUnderTest.execute(CAN_CREATE);
+
+        assertAll(
+            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions().size(), is(0)),
+            () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypeDefinitions().size(), is(0)),
+            () -> assertThat(userProfile.getJurisdictions()[0].getCaseTypeDefinitions(), everyItem(not(isIn(Arrays
+                .asList(notAllowedCaseTypeDefinition))))),
+            () -> assertThat(userProfile.getJurisdictions()[1].getCaseTypeDefinitions(), everyItem(not(isIn(Arrays
+                .asList(notAllowedCaseTypeDefinition)))))
+        );
+    }
+
 
     @Test
     @DisplayName("should return empty caseType if the user is not allowed to access any case type")

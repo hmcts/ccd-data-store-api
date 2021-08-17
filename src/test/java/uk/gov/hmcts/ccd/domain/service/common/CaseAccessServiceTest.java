@@ -422,11 +422,8 @@ class CaseAccessServiceTest {
 
             @Test
             @DisplayName("should return granted case ids for user with solicitor role for access control")
-            void shouldReturnCaseIdsForAccessControlTrue() {
+            void shouldReturnCaseIdsForAccessControlForSolicitor() {
                 when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
-
-                when(caseDetailsRepository.findCaseReferencesByIds(CASES_GRANTED)).thenReturn(caseReferences);
-                doReturn(true).when(userRepository).anyRoleMatches(any());
                 when(roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID, caseTypeDefinition)).thenReturn(
                     caseReferences.stream().map(element -> element.toString()).collect(Collectors.toList())
                 );
@@ -438,9 +435,79 @@ class CaseAccessServiceTest {
                     () -> assertThat(result.get(),
                         hasItems(Long.valueOf(CASE_REFERENCE1), Long.valueOf(CASE_REFERENCE2))),
                     () -> verify(userRepository).getUserId(),
-                    () -> verify(userRepository).anyRoleMatches(any()),
                     () -> verify(roleAssignmentService).getCaseReferencesForAGivenUser(USER_ID, caseTypeDefinition)
                 );
+            }
+
+            @Test
+            @DisplayName("should return granted case ids for user with caseworker role for access control")
+            void shouldReturnCaseIdsForAccessControlForCaseWorker() {
+                when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+                when(roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID, caseTypeDefinition)).thenReturn(
+                    caseReferences.stream().map(element -> element.toString()).collect(Collectors.toList())
+                );
+                Optional<List<Long>> result = caseAccessService
+                    .getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
+
+                assertThat(result.isPresent(), is(true));
+                assertAll(
+                    () -> assertThat(result.get(),
+                        hasItems(Long.valueOf(CASE_REFERENCE1), Long.valueOf(CASE_REFERENCE2))),
+                    () -> verify(userRepository).getUserId(),
+                    () -> verify(roleAssignmentService).getCaseReferencesForAGivenUser(USER_ID, caseTypeDefinition)
+                );
+            }
+        }
+
+        @Nested
+        @DisplayName("when a case-worker")
+        class WhenCaseworkerInRA {
+            private final String[] roles = {
+                "caseworker"
+            };
+
+            @BeforeEach
+            void setUp() {
+                withRoles(roles);
+            }
+
+            @Test
+            @DisplayName("Should return granted case ids for user with case-worker role in R.A")
+            void  shouldReturnCaseIds() {
+                when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+                when(roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID, caseTypeDefinition)).thenReturn(
+                    caseReferences.stream().map(element -> element.toString()).collect(Collectors.toList())
+                );
+                final var result = caseAccessService
+                    .getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
+                assertThat(result.isPresent(), is(true));
+                assertGrantedCaseIdsForRA(result.get());
+            }
+        }
+
+        @Nested
+        @DisplayName("when a solicitor")
+        class WhenSolicitorInRA {
+            private final String[] roles = {
+                "solicitor"
+            };
+
+            @BeforeEach
+            void setUp() {
+                withRoles(roles);
+            }
+
+            @Test
+            @DisplayName("Should return granted case ids for user with solicitor role in R.A")
+            void shouldReturnCaseIds() {
+                when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+                when(roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID, caseTypeDefinition)).thenReturn(
+                    caseReferences.stream().map(element -> element.toString()).collect(Collectors.toList())
+                );
+                final var result = caseAccessService
+                    .getGrantedCaseReferencesForRestrictedRoles(caseTypeDefinition);
+                assertThat(result.isPresent(), is(true));
+                assertGrantedCaseIdsForRA(result.get());
             }
         }
 
@@ -525,6 +592,13 @@ class CaseAccessServiceTest {
                 () -> verify(caseUserRepository).findCasesUserIdHasAccessTo(USER_ID)
             );
         }
+
+        private void assertGrantedCaseIdsForRA(List<Long> result) {
+            assertAll(
+                () -> assertThat(result, hasItems(Long.valueOf(CASE_REFERENCE1), Long.valueOf(CASE_REFERENCE2))),
+                () -> verify(userRepository).getUserId()
+            );
+        }
     }
 
 
@@ -576,7 +650,7 @@ class CaseAccessServiceTest {
             Set<AccessProfile> caseRoles = caseAccessService.getCaseCreationRoles("CASE_TYPE_ID");
 
             assertAll(
-                () -> assertThat(caseRoles.size(), Is.is(3))
+                () -> assertThat(caseRoles.size(), Is.is(1))
             );
         }
 
@@ -604,15 +678,14 @@ class CaseAccessServiceTest {
             Set<AccessProfile> caseRoles = caseAccessService.getCaseCreationRoles("CASE_TYPE_ID");
 
             assertAll(
-                () -> assertThat(caseRoles.size(), Is.is(3))
+                () -> assertThat(caseRoles.size(), Is.is(1))
             );
         }
 
         @Test
         @DisplayName("should throw exception when no user role found")
         void getCreateCaseRolesThrows() {
-            when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString())).thenReturn(null);
-
+            when(caseDataAccessControl.generateCreationAccessProfilesByCaseTypeId(anyString())).thenReturn(null);
             assertThrows(ValidationException.class, () -> caseAccessService.getCaseCreationRoles("CASE_TYPE_ID"));
         }
     }

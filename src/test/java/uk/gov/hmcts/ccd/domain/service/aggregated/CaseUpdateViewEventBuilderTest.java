@@ -19,12 +19,15 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.core.StringStartsWith.startsWith;
@@ -37,6 +40,7 @@ import static uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties.CASE_
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseStateBuilder.newState;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.StartEventResultBuilder.newStartEventTrigger;
 
@@ -68,6 +72,9 @@ class CaseUpdateViewEventBuilderTest {
         .withEventToken(TOKEN).build();
     private final List<WizardPage> wizardPageCollection = Lists.newArrayList();
     private final List<CaseViewField> viewFields = Lists.newArrayList();
+    private static final String STATE_ID = "STATE_ID";
+    private static final String TITLE_DISPLAY = "titleDisplay";
+    private final CaseStateDefinition caseStateDefinition = newState().withId(STATE_ID).build();
 
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
@@ -84,6 +91,8 @@ class CaseUpdateViewEventBuilderTest {
     private CaseUpdateViewEventBuilder caseUpdateViewEventBuilder;
     @Mock
     private FieldProcessorService fieldProcessorService;
+    @Mock
+    private CaseTypeService caseTypeService;
 
     @BeforeEach
     void setUp() {
@@ -95,11 +104,15 @@ class CaseUpdateViewEventBuilderTest {
             .thenReturn(wizardPageCollection);
         when(caseViewFieldBuilder.build(caseFieldDefinitions, eventFields, caseDetails.getData()))
             .thenReturn(viewFields);
+        caseDetails.setState(STATE_ID);
+        caseStateDefinition.setTitleDisplay(TITLE_DISPLAY);
+        when(caseTypeService.findState(caseTypeDefinition, STATE_ID)).thenReturn(caseStateDefinition);
 
         caseUpdateViewEventBuilder = new CaseUpdateViewEventBuilder(caseDefinitionRepository,
                                                               uiDefinitionRepository,
                                                               eventTriggerService,
-                                                              caseViewFieldBuilder, fieldProcessorService);
+                                                              caseViewFieldBuilder, fieldProcessorService,
+                                                              caseTypeService);
     }
 
     @Test
@@ -125,6 +138,7 @@ class CaseUpdateViewEventBuilderTest {
             () -> assertThat(caseUpdateViewEvent, hasProperty("caseId", equalTo(CASE_REFERENCE))),
             () -> assertThat(caseUpdateViewEvent, hasProperty("caseFields", equalTo(viewFields))),
             () -> assertThat(caseUpdateViewEvent, hasProperty("wizardPages", equalTo(wizardPageCollection))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("titleDisplay", is(TITLE_DISPLAY))),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
             () -> inOrder.verify(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_TRIGGER_ID),
             () -> inOrder.verify(caseViewFieldBuilder).build(caseFieldDefinitions, eventFields,

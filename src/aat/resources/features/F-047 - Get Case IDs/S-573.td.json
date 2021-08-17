@@ -5,6 +5,7 @@
 
 	"specs": [
 		"an active profile in CCD",
+		"testUser - with an active profile in CCD",
 		"contains a non-existing jurisdiction ID",
 		"code is HTTP-400"
 	],

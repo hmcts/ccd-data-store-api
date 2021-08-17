@@ -1,0 +1,20 @@
+{
+	"_guid_": "F-045_Befta_Jurisdiction2_Full_Case_Creation_Data",
+	"_extends_": "Befta_Jurisdiction2_Default_Full_Case_Creation_Data_solicitor_1",
+
+	"specs": [
+		"to create a full case"
+	],
+
+	"users": {
+		"invokingUser": {
+			"_extends_": "BeftaCaseworker2Solicitor2"
+		}
+	},
+
+	"request": {
+		"body" : {
+			"event_token" : "${[scenarioContext][siblingContexts][F-045_Befta_Jurisdiction2_Full_Case_Creation_Data_Token_Creation][testData][actualResponse][body][token]}"
+		}
+	}
+}

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol;
 
 import lombok.Data;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 
 import java.util.List;
 import java.util.stream.Collectors;
