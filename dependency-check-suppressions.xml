@@ -45,6 +45,10 @@
 		<cve>CVE-2021-22118</cve>
 		<cve>CVE-2021-27568</cve>
 
+		<cve>CVE-2021-28170</cve>
+		<cve>CVE-2021-22119</cve>
+		<cve>CVE-2021-22144</cve>
+
 	</suppress>
 
 </suppressions>
