@@ -1,0 +1,72 @@
+{
+  "_guid_": "F-1003-Base-Root",
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+    }
+  },
+  "request": {
+    "headers": {
+      "Authorization": "[[DEFAULT_AUTO_VALUE]]",
+      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]",
+      "Content-Type": "application/json;charset=UTF-8",
+      "experimental": true
+    },
+    "pathVariables": {
+      "CaseTypeID": "BEFTA_CASETYPE_2_1"
+    },
+    "body": {
+      "data": {
+        "DateField": null,
+        "TextField": "A text fields",
+        "EmailField": "a@b.com",
+        "NumberField": "11111",
+        "ComplexField": {
+          "ComplexTextField": "aefaefa",
+          "ComplexNestedField": {
+            "NestedNumberField": null,
+            "NestedCollectionTextField": []
+          },
+          "ComplexFixedListField": "VALUE2"
+        },
+        "PhoneUKField": "08888899999",
+        "YesOrNoField": "No",
+        "DateTimeField": null,
+        "MoneyGBPField": null,
+        "TextAreaField": "fqeadadfTSFGsfs`f`sfs`f",
+        "AddressUKField": {
+          "County": null,
+          "Country": null,
+          "PostCode": null,
+          "PostTown": null,
+          "AddressLine1": null,
+          "AddressLine2": null,
+          "AddressLine3": null
+        },
+        "DocumentField1": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary",
+          "document_hash": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][hashToken]}"
+        },
+        "FixedListField": "VALUE2",
+        "CollectionField": [],
+        "FixedRadioListField": "RADIOVALUE3",
+        "MultiSelectListField": [
+          "OPTION5",
+          "OPTION4",
+          "OPTION3"
+        ]
+      },
+      "event": {
+        "id": "CREATE",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": false,
+      "draft_id": null
+    }
+  }
+}
