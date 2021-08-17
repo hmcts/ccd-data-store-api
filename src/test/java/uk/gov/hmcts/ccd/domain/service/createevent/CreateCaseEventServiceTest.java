@@ -119,8 +119,6 @@ class CreateCaseEventServiceTest extends TestFixtures {
     @Mock
     private CaseDocumentService caseDocumentService;
 
-    private final Clock fixedClock = Clock.fixed(Instant.parse("2018-08-19T16:02:42.00Z"), ZoneOffset.UTC);
-
     @InjectMocks
     private CreateCaseEventService underTest;
 
