@@ -3,14 +3,12 @@ package uk.gov.hmcts.ccd.domain.model.refdata;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 
-@Data
 @Value
 @Builder
 @Jacksonized

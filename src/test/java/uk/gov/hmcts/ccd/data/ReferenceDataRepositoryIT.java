@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data;
 
+import com.github.tomakehurst.wiremock.http.Fault;
 import org.awaitility.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,11 @@ import java.util.List;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.moreThanOrExactly;
+import static com.github.tomakehurst.wiremock.client.WireMock.resetAllRequests;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,7 +36,7 @@ import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_PATH;
 class ReferenceDataRepositoryIT extends WireMockBaseTest {
 
     private static final String BEARER = "Bearer ";
-    private static final String SERVICE_AUTHORIZATION = "serviceauthorization";
+    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
     private static final String TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODI2MDAyMzN9"
         + ".Lz467pTdzRF0MGQye8QDzoLLY_cxk79ZB3OOYdOR-0PGYK5sVay4lxOvhIa-1VnfizaaDDZUwmPdMwQOUBfpBQ";
     private static final String SERVICE_AUTHORISATION_VALUE = BEARER + TOKEN;
@@ -49,6 +54,7 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
         List.of("buildingLocations", "orgServices")
             .parallelStream()
             .forEach(cacheName -> underTest.clearCache(cacheName));
+        resetAllRequests();
     }
 
     @Test
@@ -67,6 +73,19 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
     }
 
     @Test
+    void testShouldReturnEmptyWhenGetBuildingLocationsFromUpstreamFails() {
+        // GIVEN
+        stubUpstreamFault(BUILDING_LOCATIONS_PATH);
+
+        // WHEN
+        final List<BuildingLocation> actualBuildingLocations = underTest.getBuildingLocations();
+
+        // THEN
+        assertThat(actualBuildingLocations)
+            .isEmpty();
+    }
+
+    @Test
     void testShouldGetServicesSuccessfullyFromUpstream() {
         // GIVEN
         final List<Service> expectedServices = buildServices();
@@ -79,6 +98,19 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
         assertThat(actualServices)
             .isNotEmpty()
             .hasSameElementsAs(expectedServices);
+    }
+
+    @Test
+    void testShouldReturnEmptyWhenGetServicesFromUpstreamFails() {
+        // GIVEN
+        stubUpstreamFault(SERVICES_PATH);
+
+        // WHEN
+        final List<Service> actualServices = underTest.getServices();
+
+        // THEN
+        assertThat(actualServices)
+            .isEmpty();
     }
 
     @Test
@@ -95,6 +127,8 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
         assertThat(actualBuildingLocations)
             .isNotEmpty()
             .hasSameElementsAs(cachedBuildingLocations);
+
+        verify(1, getRequestedFor(urlPathEqualTo(BUILDING_LOCATIONS_PATH)));
     }
 
     @Test
@@ -111,6 +145,8 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
         assertThat(actualServices)
             .isNotEmpty()
             .hasSameElementsAs(cachedServices);
+
+        verify(1, getRequestedFor(urlPathEqualTo(SERVICES_PATH)));
     }
 
     @Test
@@ -126,6 +162,8 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
             .untilAsserted(() -> assertThat(underTest.getBuildingLocations())
                 .isNotEmpty()
                 .hasSameElementsAs(updatedBuildingLocations));
+
+        verify(moreThanOrExactly(2), getRequestedFor(urlPathEqualTo(BUILDING_LOCATIONS_PATH)));
     }
 
     @Test
@@ -141,10 +179,12 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
             .untilAsserted(() -> assertThat(underTest.getServices())
                 .isNotEmpty()
                 .hasSameElementsAs(updatedServices));
+
+        verify(moreThanOrExactly(2), getRequestedFor(urlPathEqualTo(SERVICES_PATH)));
     }
 
     @Test
-    void testShouldNotRefreshBuildingLocationsCacheWhenBuildingLocationsCannotBeRetrieved() throws Exception {
+    void testShouldNotRefreshBuildingLocationsCacheWhenBuildingLocationsCannotBeRetrieved() {
         // GIVEN
         cacheContainsInitialReferenceData();
         unavailableUpstreamReferenceData();
@@ -159,7 +199,7 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
     }
 
     @Test
-    void testShouldNotRefreshServicesCacheWhenServicesCannotBeRetrieved() throws Exception {
+    void testShouldNotRefreshServicesCacheWhenServicesCannotBeRetrieved() {
         // GIVEN
         cacheContainsInitialReferenceData();
         unavailableUpstreamReferenceData();
@@ -171,6 +211,34 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
             .untilAsserted(() -> assertThat(underTest.getServices())
                 .isNotEmpty()
                 .hasSameElementsAs(initialServices));
+    }
+
+    @Test
+    void testThatExceptionShouldNotDisableCacheRefreshScheduler() {
+        // GIVEN
+        cacheContainsInitialReferenceData();
+
+        // WHEN
+        stubUpstreamFault(BUILDING_LOCATIONS_PATH);
+
+        await()
+            .pollDelay(1500, MICROSECONDS)
+            .atMost(Duration.FIVE_SECONDS)
+            .untilAsserted(() -> assertThat(underTest.getBuildingLocations())
+                .isNotEmpty()
+                .hasSameElementsAs(initialBuildingLocations));
+
+        updateUpstreamReferenceData();
+
+        // THEN
+        await()
+            .pollDelay(1500, MICROSECONDS)
+            .atMost(Duration.FIVE_SECONDS)
+            .untilAsserted(() -> assertThat(underTest.getBuildingLocations())
+                .isNotEmpty()
+                .hasSameElementsAs(updatedBuildingLocations));
+
+        verify(moreThanOrExactly(3), getRequestedFor(urlPathEqualTo(BUILDING_LOCATIONS_PATH)));
     }
 
     private void updateUpstreamReferenceData() {
@@ -293,5 +361,11 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
                 .withStatus(HttpStatus.NOT_FOUND.value())
             )
         );
+    }
+
+    private void stubUpstreamFault(final String path) {
+        stubFor(get(urlPathEqualTo(path))
+            .willReturn(aResponse()
+                .withFault(Fault.MALFORMED_RESPONSE_CHUNK)));
     }
 }
