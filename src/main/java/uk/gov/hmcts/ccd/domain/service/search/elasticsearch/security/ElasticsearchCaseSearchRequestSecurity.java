@@ -42,9 +42,7 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
     private String addFiltersToQuery(CaseSearchRequest caseSearchRequest) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder.must(QueryBuilders.wrapperQuery(caseSearchRequest.getQueryValue()));
-        BoolQueryBuilder grantTypeQueryBuilder = grantTypeESQueryBuilder
-            .createQuery(caseSearchRequest.getCaseTypeId());
-        boolQueryBuilder.must(grantTypeQueryBuilder);
+        grantTypeESQueryBuilder.createQuery(caseSearchRequest.getCaseTypeId(), boolQueryBuilder);
 
         caseSearchFilters.forEach(filter ->
             filter.getFilter(caseSearchRequest.getCaseTypeId()).ifPresent(boolQueryBuilder::filter));

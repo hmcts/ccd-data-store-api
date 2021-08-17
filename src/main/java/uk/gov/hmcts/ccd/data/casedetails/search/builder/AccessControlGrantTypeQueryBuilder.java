@@ -97,7 +97,7 @@ public class AccessControlGrantTypeQueryBuilder {
                 + OR + String.format(QUERY, orgQuery + AND_NOT + excludedQuery));
         }
 
-       return EMPTY;
+        return EMPTY;
     }
 
     private String mergeQuery(String queryOne,

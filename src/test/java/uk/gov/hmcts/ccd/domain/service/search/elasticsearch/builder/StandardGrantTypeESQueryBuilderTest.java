@@ -1,16 +1,15 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
 import com.google.common.collect.Lists;
-import org.elasticsearch.index.query.BoolQueryBuilder;
+import java.util.List;
+import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
 
@@ -26,15 +25,11 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
         RoleAssignment standardRoleAssignment = createRoleAssignment(GrantType.STANDARD,
             "CASE", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
 
-        BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
+        List<TermsQueryBuilder> queryBuilder = standardGrantTypeESQueryBuilder
             .createQuery(Lists.newArrayList(standardRoleAssignment));
 
         assertNotNull(queryBuilder);
-        assertTrue(queryBuilder.hasClauses());
-        assertEquals(1, queryBuilder.must().size());
-        assertEquals(1, queryBuilder.should().size());
-        BoolQueryBuilder innerQuery = (BoolQueryBuilder) queryBuilder.should().get(0);
-        assertEquals(3, innerQuery.must().size());
+        assertEquals(4, queryBuilder.size());
     }
 
     @Test
@@ -42,15 +37,11 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
         RoleAssignment standardRoleAssignment = createRoleAssignment(GrantType.STANDARD,
             "CASE", "PRIVATE", "Test", "", "reg1", null, "caseId1");
 
-        BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
+        List<TermsQueryBuilder> queryBuilder = standardGrantTypeESQueryBuilder
             .createQuery(Lists.newArrayList(standardRoleAssignment));
 
         assertNotNull(queryBuilder);
-        assertTrue(queryBuilder.hasClauses());
-        assertEquals(1, queryBuilder.must().size());
-        assertEquals(1, queryBuilder.should().size());
-        BoolQueryBuilder innerQuery = (BoolQueryBuilder) queryBuilder.should().get(0);
-        assertEquals(2, innerQuery.must().size());
+        assertEquals(3, queryBuilder.size());
     }
 
     @Test
@@ -58,15 +49,11 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
         RoleAssignment standardRoleAssignment = createRoleAssignment(GrantType.STANDARD,
             "CASE", "PRIVATE", "Test", "loc1", "", null, "caseId1");
 
-        BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
+        List<TermsQueryBuilder> queryBuilder = standardGrantTypeESQueryBuilder
             .createQuery(Lists.newArrayList(standardRoleAssignment));
 
         assertNotNull(queryBuilder);
-        assertTrue(queryBuilder.hasClauses());
-        assertEquals(1, queryBuilder.must().size());
-        assertEquals(1, queryBuilder.should().size());
-        BoolQueryBuilder innerQuery = (BoolQueryBuilder) queryBuilder.should().get(0);
-        assertEquals(2, innerQuery.must().size());
+        assertEquals(3, queryBuilder.size());
     }
 
     @Test
@@ -74,15 +61,11 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
         RoleAssignment standardRoleAssignment = createRoleAssignment(GrantType.STANDARD,
             "CASE", "PRIVATE", "Test", "", "", null, "caseId1");
 
-        BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
+        List<TermsQueryBuilder> queryBuilder = standardGrantTypeESQueryBuilder
             .createQuery(Lists.newArrayList(standardRoleAssignment));
 
         assertNotNull(queryBuilder);
-        assertTrue(queryBuilder.hasClauses());
-        assertEquals(1, queryBuilder.must().size());
-        assertEquals(1, queryBuilder.should().size());
-        BoolQueryBuilder innerQuery = (BoolQueryBuilder) queryBuilder.should().get(0);
-        assertEquals(1, innerQuery.must().size());
+        assertEquals(2, queryBuilder.size());
     }
 
     @Test
@@ -90,15 +73,11 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
         RoleAssignment standardRoleAssignment = createRoleAssignment(GrantType.STANDARD,
             "CASE", "PRIVATE", "", "", "", null, "caseId1");
 
-        BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
+        List<TermsQueryBuilder> queryBuilder = standardGrantTypeESQueryBuilder
             .createQuery(Lists.newArrayList(standardRoleAssignment));
 
         assertNotNull(queryBuilder);
-        assertTrue(queryBuilder.hasClauses());
-        assertEquals(1, queryBuilder.must().size());
-        assertEquals(1, queryBuilder.should().size());
-        BoolQueryBuilder innerQuery = (BoolQueryBuilder) queryBuilder.should().get(0);
-        assertFalse(innerQuery.hasClauses());
+        assertEquals(1, queryBuilder.size());
     }
 
     @Test
@@ -106,15 +85,11 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
         RoleAssignment standardRoleAssignment = createRoleAssignment(GrantType.STANDARD,
             "CASE", "PRIVATE", "Test", null, "", null, "caseId1");
 
-        BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
+        List<TermsQueryBuilder> queryBuilder = standardGrantTypeESQueryBuilder
             .createQuery(Lists.newArrayList(standardRoleAssignment));
 
         assertNotNull(queryBuilder);
-        assertTrue(queryBuilder.hasClauses());
-        assertEquals(1, queryBuilder.must().size());
-        assertEquals(1, queryBuilder.should().size());
-        BoolQueryBuilder innerQuery = (BoolQueryBuilder) queryBuilder.should().get(0);
-        assertEquals(1, innerQuery.must().size());
+        assertEquals(2, queryBuilder.size());
     }
 
 }
