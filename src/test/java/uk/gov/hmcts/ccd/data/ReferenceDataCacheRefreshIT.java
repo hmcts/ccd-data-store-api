@@ -33,7 +33,7 @@ class ReferenceDataCacheRefreshIT extends WireMockBaseTest implements ReferenceD
     private ReferenceDataRepository underTest;
 
     @BeforeEach
-    void clearCache() {
+    void prepare() {
         List.of("buildingLocations", "orgServices")
             .parallelStream()
             .forEach(cacheName -> underTest.clearCache(cacheName));
