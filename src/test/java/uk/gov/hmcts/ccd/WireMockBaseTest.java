@@ -9,6 +9,7 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.common.FileSource;
 import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformer;
+import com.github.tomakehurst.wiremock.http.Fault;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.ResponseDefinition;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
@@ -22,10 +23,19 @@ import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.cloud.contract.wiremock.WireMockConfigurationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.UUID;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
 @AutoConfigureWireMock(port = 0)
 public abstract class WireMockBaseTest extends BaseTest {
@@ -33,6 +43,12 @@ public abstract class WireMockBaseTest extends BaseTest {
     private static final Logger LOG = LoggerFactory.getLogger(WireMockBaseTest.class);
 
     public static final int NUMBER_OF_CASES = 19;
+
+    private static final String BEARER = "Bearer ";
+    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+    private static final String TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODI2MDAyMzN9"
+        + ".Lz467pTdzRF0MGQye8QDzoLLY_cxk79ZB3OOYdOR-0PGYK5sVay4lxOvhIa-1VnfizaaDDZUwmPdMwQOUBfpBQ";
+    private static final String SERVICE_AUTHORISATION_VALUE = BEARER + TOKEN;
 
     @Value("${wiremock.server.port}")
     protected Integer wiremockPort;
@@ -63,6 +79,47 @@ public abstract class WireMockBaseTest extends BaseTest {
 
     public void verifyWireMock(int count, RequestPatternBuilder postRequestedFor) {
         wireMockServer.verify(count, postRequestedFor);
+    }
+
+    public void stubSuccess(final String path, final String payload, final UUID mappingId) {
+        stubFor(get(urlPathEqualTo(path))
+            .withId(mappingId)
+            .withHeader(SERVICE_AUTHORIZATION, equalTo(SERVICE_AUTHORISATION_VALUE))
+            .willReturn(aResponse()
+                .withHeader(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .withStatus(HttpStatus.OK.value())
+                .withBody(payload)
+            )
+        );
+    }
+
+    public void stubUpstreamFault(final String path, final UUID mappingId) {
+        stubFor(get(urlPathEqualTo(path))
+            .withId(mappingId)
+            .willReturn(aResponse()
+                .withFault(Fault.MALFORMED_RESPONSE_CHUNK)));
+    }
+
+    public void editSuccessStub(final String path, final String payload, final UUID mappingId) {
+        wireMockServer.editStub(get(urlPathEqualTo(path))
+            .withId(mappingId)
+            .withHeader(SERVICE_AUTHORIZATION, equalTo(SERVICE_AUTHORISATION_VALUE))
+            .willReturn(aResponse()
+                .withHeader(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .withStatus(HttpStatus.OK.value())
+                .withBody(payload)
+            )
+        );
+    }
+
+    public void stubNotFound(final String path, final UUID mappingId) {
+        stubFor(get(urlPathEqualTo(path))
+            .withId(mappingId)
+            .withHeader(SERVICE_AUTHORIZATION, equalTo(SERVICE_AUTHORISATION_VALUE))
+            .willReturn(aResponse()
+                .withStatus(HttpStatus.NOT_FOUND.value())
+            )
+        );
     }
 
     public ObjectMapper objectMapper() {

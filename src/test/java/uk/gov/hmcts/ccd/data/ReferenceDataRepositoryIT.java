@@ -1,12 +1,8 @@
 package uk.gov.hmcts.ccd.data;
 
-import com.github.tomakehurst.wiremock.http.Fault;
-import org.awaitility.Duration;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
 import uk.gov.hmcts.ccd.domain.model.refdata.CourtVenue;
@@ -15,36 +11,16 @@ import uk.gov.hmcts.ccd.domain.model.refdata.Service;
 import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.moreThanOrExactly;
-import static com.github.tomakehurst.wiremock.client.WireMock.resetAllRequests;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static java.util.Collections.emptyList;
-import static java.util.concurrent.TimeUnit.MICROSECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_PATH;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_PATH;
 
-@TestPropertySource(locations = "classpath:cache-refresh-schedule.properties")
-class ReferenceDataRepositoryIT extends WireMockBaseTest {
-
-    private static final String BEARER = "Bearer ";
-    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
-    private static final String TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1ODI2MDAyMzN9"
-        + ".Lz467pTdzRF0MGQye8QDzoLLY_cxk79ZB3OOYdOR-0PGYK5sVay4lxOvhIa-1VnfizaaDDZUwmPdMwQOUBfpBQ";
-    private static final String SERVICE_AUTHORISATION_VALUE = BEARER + TOKEN;
-
-    private final List<BuildingLocation> initialBuildingLocations = buildingLocations("1");
-    private final List<BuildingLocation> updatedBuildingLocations = buildingLocations("2");
-    private final List<Service> initialServices = services(11);
-    private final List<Service> updatedServices = services(22);
+class ReferenceDataRepositoryIT extends WireMockBaseTest implements ReferenceDataTestFixtures {
 
     @Inject
     private ReferenceDataRepository underTest;
@@ -54,14 +30,19 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
         List.of("buildingLocations", "orgServices")
             .parallelStream()
             .forEach(cacheName -> underTest.clearCache(cacheName));
-        resetAllRequests();
+
+        List.of(BUILDING_LOCATIONS_STUB_ID, SERVICES_STUB_ID).forEach(id -> {
+            final Optional<StubMapping> stubMapping = Optional.ofNullable(wireMockServer.getSingleStubMapping(id));
+            stubMapping.ifPresent(mapping -> wireMockServer.removeStub(mapping));
+        });
+        wireMockServer.resetRequests();
     }
 
     @Test
     void testShouldGetBuildingLocationsSuccessfullyFromUpstream() {
         // GIVEN
         final List<BuildingLocation> expectedBuildingLocations = buildBuildingLocations();
-        stubSuccess(BUILDING_LOCATIONS_PATH, objectToJsonString(expectedBuildingLocations));
+        stubBuildingLocationsSuccess(expectedBuildingLocations);
 
         // WHEN
         final List<BuildingLocation> actualBuildingLocations = underTest.getBuildingLocations();
@@ -70,12 +51,14 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
         assertThat(actualBuildingLocations)
             .isNotEmpty()
             .hasSameElementsAs(expectedBuildingLocations);
+
+        verifyWireMock(1, getRequestedFor(urlPathEqualTo(BUILDING_LOCATIONS_PATH)));
     }
 
     @Test
     void testShouldReturnEmptyWhenGetBuildingLocationsFromUpstreamFails() {
         // GIVEN
-        stubUpstreamFault(BUILDING_LOCATIONS_PATH);
+        stubUpstreamFault(BUILDING_LOCATIONS_PATH, BUILDING_LOCATIONS_STUB_ID);
 
         // WHEN
         final List<BuildingLocation> actualBuildingLocations = underTest.getBuildingLocations();
@@ -83,13 +66,15 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
         // THEN
         assertThat(actualBuildingLocations)
             .isEmpty();
+
+        verifyWireMock(1, getRequestedFor(urlPathEqualTo(BUILDING_LOCATIONS_PATH)));
     }
 
     @Test
     void testShouldGetServicesSuccessfullyFromUpstream() {
         // GIVEN
         final List<Service> expectedServices = buildServices();
-        stubSuccess(SERVICES_PATH, objectToJsonString(expectedServices));
+        stubServicesSuccess(expectedServices);
 
         // WHEN
         final List<Service> actualServices = underTest.getServices();
@@ -98,12 +83,14 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
         assertThat(actualServices)
             .isNotEmpty()
             .hasSameElementsAs(expectedServices);
+
+        verifyWireMock(1, getRequestedFor(urlPathEqualTo(SERVICES_PATH)));
     }
 
     @Test
     void testShouldReturnEmptyWhenGetServicesFromUpstreamFails() {
         // GIVEN
-        stubUpstreamFault(SERVICES_PATH);
+        stubUpstreamFault(SERVICES_PATH, SERVICES_STUB_ID);
 
         // WHEN
         final List<Service> actualServices = underTest.getServices();
@@ -111,14 +98,14 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
         // THEN
         assertThat(actualServices)
             .isEmpty();
+
+        verifyWireMock(1, getRequestedFor(urlPathEqualTo(SERVICES_PATH)));
     }
 
     @Test
-    void testShouldGetBuildingLocationsSuccessfullyFromCache() {
+    void testShouldGetBuildingLocationsSuccessfullyFromCache() throws Exception {
         // GIVEN
-        stubSuccess(BUILDING_LOCATIONS_PATH, objectToJsonString(initialBuildingLocations));
-        final List<BuildingLocation> cachedBuildingLocations = underTest.getBuildingLocations();
-        removeUpstreamReferenceData();
+        final List<BuildingLocation> cachedBuildingLocations = populateBuildingLocationsCache();
 
         // WHEN
         final List<BuildingLocation> actualBuildingLocations = underTest.getBuildingLocations();
@@ -128,15 +115,13 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
             .isNotEmpty()
             .hasSameElementsAs(cachedBuildingLocations);
 
-        verify(1, getRequestedFor(urlPathEqualTo(BUILDING_LOCATIONS_PATH)));
+        verifyWireMock(1, getRequestedFor(urlPathEqualTo(BUILDING_LOCATIONS_PATH)));
     }
 
     @Test
-    void testShouldGetServicesSuccessfullyFromCache() {
+    void testShouldGetServicesSuccessfullyFromCache() throws Exception {
         // GIVEN
-        stubSuccess(SERVICES_PATH, objectToJsonString(initialServices));
-        final List<Service> cachedServices = underTest.getServices();
-        removeUpstreamReferenceData();
+        final List<Service> cachedServices = populateServicesCache();
 
         // WHEN
         final List<Service> actualServices = underTest.getServices();
@@ -146,139 +131,32 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
             .isNotEmpty()
             .hasSameElementsAs(cachedServices);
 
-        verify(1, getRequestedFor(urlPathEqualTo(SERVICES_PATH)));
+        verifyWireMock(1, getRequestedFor(urlPathEqualTo(SERVICES_PATH)));
     }
 
-    @Test
-    void testShouldRefreshBuildingLocationCacheOnScheduleSuccessfully() {
-        // GIVEN
-        cacheContainsInitialReferenceData();
-        updateUpstreamReferenceData();
-
-        // WHEN/THEN
-        await()
-            .pollDelay(1500, MICROSECONDS)
-            .atMost(Duration.FIVE_SECONDS)
-            .untilAsserted(() -> assertThat(underTest.getBuildingLocations())
-                .isNotEmpty()
-                .hasSameElementsAs(updatedBuildingLocations));
-
-        verify(moreThanOrExactly(2), getRequestedFor(urlPathEqualTo(BUILDING_LOCATIONS_PATH)));
-    }
-
-    @Test
-    void testShouldRefreshServicesCacheOnScheduleSuccessfully() {
-        // GIVEN
-        cacheContainsInitialReferenceData();
-        updateUpstreamReferenceData();
-
-        // WHEN/THEN
-        await()
-            .pollDelay(1500, MICROSECONDS)
-            .atMost(Duration.FIVE_SECONDS)
-            .untilAsserted(() -> assertThat(underTest.getServices())
-                .isNotEmpty()
-                .hasSameElementsAs(updatedServices));
-
-        verify(moreThanOrExactly(2), getRequestedFor(urlPathEqualTo(SERVICES_PATH)));
-    }
-
-    @Test
-    void testShouldNotRefreshBuildingLocationsCacheWhenBuildingLocationsCannotBeRetrieved() {
-        // GIVEN
-        cacheContainsInitialReferenceData();
-        unavailableUpstreamReferenceData();
-
-        // WHEN/THEN
-        await()
-            .pollDelay(1500, MICROSECONDS)
-            .atMost(Duration.FIVE_SECONDS)
-            .untilAsserted(() -> assertThat(underTest.getBuildingLocations())
-                .isNotEmpty()
-                .hasSameElementsAs(initialBuildingLocations));
-    }
-
-    @Test
-    void testShouldNotRefreshServicesCacheWhenServicesCannotBeRetrieved() {
-        // GIVEN
-        cacheContainsInitialReferenceData();
-        unavailableUpstreamReferenceData();
-
-        // WHEN/THEN
-        await()
-            .pollDelay(1500, MICROSECONDS)
-            .atMost(Duration.FIVE_SECONDS)
-            .untilAsserted(() -> assertThat(underTest.getServices())
-                .isNotEmpty()
-                .hasSameElementsAs(initialServices));
-    }
-
-    @Test
-    void testThatExceptionShouldNotDisableCacheRefreshScheduler() {
-        // GIVEN
-        cacheContainsInitialReferenceData();
-
-        // WHEN
-        stubUpstreamFault(BUILDING_LOCATIONS_PATH);
-
-        await()
-            .pollDelay(1500, MICROSECONDS)
-            .atMost(Duration.FIVE_SECONDS)
-            .untilAsserted(() -> assertThat(underTest.getBuildingLocations())
-                .isNotEmpty()
-                .hasSameElementsAs(initialBuildingLocations));
-
-        updateUpstreamReferenceData();
-
-        // THEN
-        await()
-            .pollDelay(1500, MICROSECONDS)
-            .atMost(Duration.FIVE_SECONDS)
-            .untilAsserted(() -> assertThat(underTest.getBuildingLocations())
-                .isNotEmpty()
-                .hasSameElementsAs(updatedBuildingLocations));
-
-        verify(moreThanOrExactly(3), getRequestedFor(urlPathEqualTo(BUILDING_LOCATIONS_PATH)));
-    }
-
-    private void updateUpstreamReferenceData() {
-        stubSuccess(BUILDING_LOCATIONS_PATH, objectToJsonString(updatedBuildingLocations));
-        stubSuccess(SERVICES_PATH, objectToJsonString(updatedServices));
-    }
-
-    private void removeUpstreamReferenceData() {
-        stubSuccess(BUILDING_LOCATIONS_PATH, objectToJsonString(emptyList()));
-        stubSuccess(SERVICES_PATH, objectToJsonString(emptyList()));
-    }
-
-    private void unavailableUpstreamReferenceData() {
-        stubNotFound(BUILDING_LOCATIONS_PATH);
-        stubNotFound(SERVICES_PATH);
-    }
-
-    private void cacheContainsInitialReferenceData() {
-        stubSuccess(BUILDING_LOCATIONS_PATH, objectToJsonString(initialBuildingLocations));
-        stubSuccess(SERVICES_PATH, objectToJsonString(initialServices));
-
+    private List<BuildingLocation> populateBuildingLocationsCache() throws Exception {
+        stubBuildingLocationsSuccess(initialBuildingLocations);
         final List<BuildingLocation> cachedBuildingLocations = underTest.getBuildingLocations();
+        SECONDS.sleep(1);
+
+        return cachedBuildingLocations;
+    }
+
+
+    private List<Service> populateServicesCache() throws Exception {
+        stubServicesSuccess(initialServices);
         final List<Service> cachedServices = underTest.getServices();
+        SECONDS.sleep(1);
 
-        assertThat(cachedBuildingLocations)
-            .isNotEmpty();
-        assertThat(cachedServices)
-            .isNotEmpty();
+        return cachedServices;
     }
 
-    private static List<BuildingLocation> buildingLocations(final String id) {
-        return List.of(BuildingLocation.builder()
-            .buildingLocationId(id)
-            .build());
+    private void stubBuildingLocationsSuccess(final List<BuildingLocation> buildingLocations) {
+        stubSuccess(BUILDING_LOCATIONS_PATH, objectToJsonString(buildingLocations), BUILDING_LOCATIONS_STUB_ID);
     }
 
-    private static List<Service> services(final int id) {
-        return List.of(Service.builder()
-            .serviceId(id)
-            .build());
+    private void stubServicesSuccess(final List<Service> services) {
+        stubSuccess(SERVICES_PATH, objectToJsonString(services), SERVICES_STUB_ID);
     }
 
     private static List<BuildingLocation> buildBuildingLocations() {
@@ -341,31 +219,5 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest {
             .build();
 
         return List.of(service);
-    }
-
-    private void stubSuccess(final String path, final String payload) {
-        stubFor(get(urlPathEqualTo(path))
-            .withHeader(SERVICE_AUTHORIZATION, equalTo(SERVICE_AUTHORISATION_VALUE))
-            .willReturn(aResponse()
-                .withHeader(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .withStatus(HttpStatus.OK.value())
-                .withBody(payload)
-            )
-        );
-    }
-
-    private void stubNotFound(final String path) {
-        stubFor(get(urlPathEqualTo(path))
-            .withHeader(SERVICE_AUTHORIZATION, equalTo(SERVICE_AUTHORISATION_VALUE))
-            .willReturn(aResponse()
-                .withStatus(HttpStatus.NOT_FOUND.value())
-            )
-        );
-    }
-
-    private void stubUpstreamFault(final String path) {
-        stubFor(get(urlPathEqualTo(path))
-            .willReturn(aResponse()
-                .withFault(Fault.MALFORMED_RESPONSE_CHUNK)));
     }
 }

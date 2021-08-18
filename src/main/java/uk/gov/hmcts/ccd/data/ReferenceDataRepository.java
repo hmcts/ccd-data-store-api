@@ -8,7 +8,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
@@ -69,7 +69,7 @@ public class ReferenceDataRepository {
             return Optional.ofNullable(result)
                 .map(Arrays::asList)
                 .orElse(Collections.emptyList());
-        } catch (HttpClientErrorException e) {
+        } catch (RestClientException e) {
             log.error("Error fetching reference data: ", e);
             return Collections.emptyList();
         }
