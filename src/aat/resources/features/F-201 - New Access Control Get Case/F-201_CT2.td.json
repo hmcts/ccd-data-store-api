@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-200.2",
+  "_guid_": "F-201_CT2",
 
   "productName": "CCD Data Store",
   "operationName": "create case",
@@ -8,12 +8,13 @@
 
   "specs": [
     "a role assignment to access CaseType CT2",
-    "attempts to create a case for CT2"
+    "attempts to create a case for CT2",
+    "to create a full case"
   ],
 
   "users" : {
     "invokingUser": {
-      "username": "ac-solicitor1@gmail.com",
+      "username": "ccd.ac.superuser@gmail.com",
       "password": "Pa55word11"
     }
   },
@@ -28,16 +29,16 @@
     },
     "body" : {
       "data": {
-        "F1": null,
-        "F2": null,
-        "F3": null
+        "F1": "a",
+        "F2": "b",
+        "F3": "c"
       },
       "event": {
         "id": "Create",
         "summary": "",
         "description": ""
       },
-      "event_token": "${[scenarioContext][childContexts][CT2_GetToken][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][parentContext][childContexts][F-201_CT2_Token_Creation][testData][actualResponse][body][token]}",
       "ignore_warning": false,
       "draft_id": null
     }
@@ -60,7 +61,9 @@
       "state" : "Unissued1",
       "security_classification" : "PUBLIC",
       "data" : {
-        "F3" : null
+        "F1" : "a",
+        "F2" : "b",
+        "F3" : "c"
       },
       "data_classification" : {
         "F1" : "RESTRICTED",

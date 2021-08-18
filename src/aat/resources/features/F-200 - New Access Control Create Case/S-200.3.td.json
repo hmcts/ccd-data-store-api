@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-200.1",
+  "_guid_": "S-200.3",
 
   "productName": "CCD Data Store",
   "operationName": "create case",
@@ -13,7 +13,7 @@
 
   "users" : {
     "invokingUser": {
-      "username": "ac-solicitor1@gmail.com",
+      "username": "ccd.ac.solicitor1@gmail.com",
       "password": "Pa55word11"
     }
   },
@@ -44,7 +44,7 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_404_Response",
+    "_extends_": "Common_404_Response",a
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
       "message" : "No case type found",

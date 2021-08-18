@@ -1,0 +1,26 @@
+{
+  "roleRequest" : {
+    "assignerId" : "33f1b238-1e96-4816-a9da-b64ac9b943ad",
+    "process" : "ccd-fta-data-setup",
+    "reference" : "33f1b238-1e96-4816-a9da-b64ac9b943ad",
+    "replaceExisting" : true
+  },
+  "requestedRoles" : [
+    {
+      "actorId" : "33f1b238-1e96-4816-a9da-b64ac9b943ad",
+      "actorIdType" : "IDAM",
+      "roleType" : "ORGANISATION",
+      "roleName" : "Solicitor",
+      "roleCategory" : "PROFESSIONAL",
+      "classification" : "RESTRICTED",
+      "grantType" : "STANDARD",
+      "readOnly" : false,
+      "beginTime" : "2021-01-01T00:00:00Z",
+      "endTime" : "2023-01-01T00:00:00Z",
+      "attributes" : {
+        "jurisdiction" : "J1",
+        "caseType" : "CT2"
+      }
+    }
+  ]
+}
