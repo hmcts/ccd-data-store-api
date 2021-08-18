@@ -20,7 +20,6 @@ import java.util.Objects;
 @RequestScope
 public class AttributeBasedJurisdictionsResolver implements JurisdictionsResolver, AccessControl {
     public static final String QUALIFIER = "access-control";
-    public static final String ORGANISATION = "organisation";
 
     private final UserRepository userRepository;
     private final RoleAssignmentService roleAssignmentService;
@@ -48,6 +47,7 @@ public class AttributeBasedJurisdictionsResolver implements JurisdictionsResolve
         MutableBoolean continueProcessing = new MutableBoolean(Boolean.TRUE);
         roleAssignmentsList.getRoleAssignments().stream()
             .filter(roleAssignment -> !roleAssignment.getGrantType().equals(GrantType.BASIC.name()))
+            .filter(roleAssignment -> !roleAssignment.getGrantType().equals(GrantType.EXCLUDED.name()))
             .takeWhile(t -> continueProcessing.getValue())
             .forEach(roleAssignments -> {
                 if (Objects.nonNull(roleAssignments.getAttributes().getJurisdiction())) {
@@ -57,8 +57,7 @@ public class AttributeBasedJurisdictionsResolver implements JurisdictionsResolve
                     jurisdictions.add(caseDefinitionRepository
                         .getCaseType(roleAssignments
                             .getAttributes().getCaseType().get()).getJurisdictionId());
-                } else if (Objects.nonNull(roleAssignments.getRoleType())
-                    && roleAssignments.getRoleType().equalsIgnoreCase(ORGANISATION)) {
+                } else if (roleAssignments.getGrantType().equals(GrantType.STANDARD.name())) {
                     caseDefinitionRepository.getAllJurisdictionsFromDefinitionStore()
                         .forEach(jurisdictionDefinition ->
                             jurisdictions.add(jurisdictionDefinition.getId()));

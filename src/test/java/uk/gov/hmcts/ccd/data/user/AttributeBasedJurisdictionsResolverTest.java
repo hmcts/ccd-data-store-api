@@ -182,13 +182,13 @@ class AttributeBasedJurisdictionsResolverTest {
             RoleAssignments.builder()
                 .roleAssignments(asList(
                     RoleAssignment.builder()
-                        .grantType(GrantType.CHALLENGED.name())
+                        .grantType(GrantType.STANDARD.name())
                         .roleName(DIVORCE_SOLICITOR_ROLE)
                         .actorId(USER_ID)
                         .roleType("ORGANISATION")
                         .attributes(RoleAssignmentAttributes.builder().build()).build(),
                     RoleAssignment.builder()
-                        .grantType(GrantType.CHALLENGED.name())
+                        .grantType(GrantType.STANDARD.name())
                         .roleName(PROBATE_SOLICITOR_ROLE)
                         .actorId(USER_ID)
                         .attributes(RoleAssignmentAttributes.builder()
