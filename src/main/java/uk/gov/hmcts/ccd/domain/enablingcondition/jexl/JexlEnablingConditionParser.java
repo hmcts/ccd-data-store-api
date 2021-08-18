@@ -74,8 +74,7 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
             Optional<Object> value = getValueFromContext(context, variable);
             if (value.isPresent()) {
                 contextData.put(variable, value.get());
-            }
-            else {
+            } else {
                 contextData.put(variable, EVENT_ENABLE_CONDITION_NON_EXISTING_SUB_FIELD);
             }
 
