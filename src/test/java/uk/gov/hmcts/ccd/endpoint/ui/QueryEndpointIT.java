@@ -1044,13 +1044,13 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Case ID", Long.valueOf(1504259907353529L), Long.valueOf(caseView.getCaseId()));
 
         final CaseViewActionableEvent[] actionableEvents = caseView.getActionableEvents();
-        assertEquals("Should only no valid triggers", 0, actionableEvents.length);
+        assertEquals("Should only no valid triggers", 1, actionableEvents.length);
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_event_enabling.sql"})
-    public void shouldNotFilterEventsWhenDataForEventEnablingConditionIsNotPresent() throws Exception {
+    public void eventsWhenDataForEventEnablingConditionIsNotPresent() throws Exception {
 
         // Check that we have the expected test data set size
         final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -1067,7 +1067,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Case ID", Long.valueOf(3479829222340505L), Long.valueOf(caseView.getCaseId()));
 
         final CaseViewActionableEvent[] actionableEvents = caseView.getActionableEvents();
-        assertEquals("Should only no valid triggers", 2, actionableEvents.length);
+        assertEquals("Should only no valid triggers", 1, actionableEvents.length);
     }
 
     @Test
@@ -1090,7 +1090,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertEquals("Unexpected Case ID", Long.valueOf(1504259907353529L), Long.valueOf(caseView.getCaseId()));
 
         final CaseViewActionableEvent[] actionableEvents = caseView.getActionableEvents();
-        assertEquals("Should only no valid triggers", 2, actionableEvents.length);
+        assertEquals("Should only no valid triggers", 1, actionableEvents.length);
     }
 
     @Test

@@ -29,6 +29,8 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(JexlEnablingConditionParser.class);
 
+    private static final String EVENT_ENABLE_CONDITION_NON_EXISTING_SUB_FIELD = "[_*_FNA_*_]";
+
     private final JexlEngine engine;
 
     private final ObjectMapper objectMapper;
@@ -54,11 +56,7 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
             if (expression != null) {
                 JexlScript expressionScript = engine.createScript(expression);
                 Map<String, Object> data = retrieveContextData(caseEventData, expressionScript.getVariables());
-                if (data.isEmpty()) {
-                    return true;
-                } else {
-                    return (Boolean) expressionScript.execute(new MapContext(data));
-                }
+                return (Boolean) expressionScript.execute(new MapContext(data));
             }
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
@@ -77,6 +75,10 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
             if (value.isPresent()) {
                 contextData.put(variable, value.get());
             }
+            else {
+                contextData.put(variable, EVENT_ENABLE_CONDITION_NON_EXISTING_SUB_FIELD);
+            }
+
         }
         return contextData;
     }
