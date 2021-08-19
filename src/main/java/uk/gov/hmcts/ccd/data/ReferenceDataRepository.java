@@ -99,6 +99,7 @@ public class ReferenceDataRepository {
     }
 
     private <T> void putCache(final String cacheName, final List<T> newValue) {
-        Optional.ofNullable(cacheManager.getCache(cacheName)).ifPresent(cache -> cache.put(CACHE_KEY, newValue));
+        Optional.ofNullable(cacheManager.getCache(cacheName))
+            .ifPresent(cache -> cache.putIfAbsent(CACHE_KEY, newValue));
     }
 }
