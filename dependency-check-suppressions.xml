@@ -47,24 +47,27 @@
 	</suppress>
 
 	<suppress until="2021-08-25">
-		<notes>In the Jakarta Expression Language implementation 3.0.3 and earlier, 
+		<notes>In the Jakarta Expression Language implementation 3.0.3 and earlier,
 		a bug in the ELParserTokenManager enables invalid EL expressions to be evaluated as if they were valid.
 		</notes>
 		<cve>CVE-2021-28170</cve>
 	</suppress>
-	
+
 	<suppress until="2021-08-25">
-		<notes>susceptible to a Denial-of-Service (DoS) attack via the initiation of the Authorization Request 
+		<notes>susceptible to a Denial-of-Service (DoS) attack via the initiation of the Authorization Request
 		in an OAuth 2.0 Client Web and WebFlux application
 		</notes>
 		<cve>CVE-2021-22119</cve>
 	</suppress>
 
 	<suppress until="2021-08-25">
-		<notes>susceptible to a Denial-of-Service (DoS) attack via the initiation of the Authorization Request 
+		<notes>susceptible to a Denial-of-Service (DoS) attack via the initiation of the Authorization Request
 		in an OAuth 2.0 Client Web and WebFlux application
 		</notes>
 		<cve>CVE-2021-22119</cve>
+	</suppress>
+	<suppress until="2021-08-25">
+		<cve>CVE-2020-23171</cve>
 	</suppress>
 
 

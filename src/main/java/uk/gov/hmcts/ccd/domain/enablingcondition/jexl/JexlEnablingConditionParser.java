@@ -29,7 +29,7 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(JexlEnablingConditionParser.class);
 
-    private static final String EVENT_ENABLE_CONDITION_NON_EXISTING_SUB_FIELD = "[_*_FNA_*_]";
+    private static final String EVENT_ENABLE_CONDITION_NON_EXISTING_SUB_FIELD = "[__FNA__]";
 
     private final JexlEngine engine;
 
