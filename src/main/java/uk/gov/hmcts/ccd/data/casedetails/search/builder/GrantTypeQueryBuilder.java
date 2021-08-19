@@ -24,9 +24,9 @@ public interface GrantTypeQueryBuilder {
 
     String CASE_TYPE_ID = "case_type_id";
 
-    String LOCATION = "data" + " #>> '{caseManagementLocation,BaseLocationId}'";
+    String LOCATION = "data" + " #>> '{caseManagementLocation,baseLocation}'";
 
-    String REGION = "data" + " #>> '{caseManagementLocation,RegionId}'";
+    String REGION = "data" + " #>> '{caseManagementLocation,region}'";
 
     String AND = " AND ";
 

@@ -34,7 +34,7 @@ public class LocationMatcher implements RoleAttributeMatcher {
 
     private Optional<String> getLocation(CaseDetails caseDetails) {
         JsonNode caseManagementLocation = caseDetails.getData().get(CASE_MANAGEMENT__LOCATION);
-        if (caseManagementLocation != null) {
+        if (caseManagementLocation != null && caseManagementLocation.get(BASE_LOCATION) != null) {
             return Optional.ofNullable(caseManagementLocation.get(BASE_LOCATION).asText());
         }
         return Optional.empty();
