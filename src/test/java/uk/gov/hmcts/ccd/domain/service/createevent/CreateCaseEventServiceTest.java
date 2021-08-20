@@ -61,6 +61,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataCo
 
 class CreateCaseEventServiceTest extends TestFixtures {
 
+    private static final String USER_ID = "123";
     private static final String TOKEN = "eygeyvcey12w2";
     private static final Boolean IGNORE_WARNING = Boolean.TRUE;
     private static final String EVENT_ID = "UpdateCase";
