@@ -842,7 +842,7 @@ task runProviderPactVerification(type:Test) {
     classpath = sourceSets.contractTest.runtimeClasspath
     systemProperty 'pact.verifier.publishResults', System.getProperty('pact.verifier.publishResults')
     systemProperty 'pact.provider.version', project.pactVersion
-    include "uk/gov/hmcts/ccd/v2/external/controller/**"
+    include "uk/gov/hmcts/ccd/v2/external/controller/caseassigned/**"
 }
 
 runProviderPactVerification.finalizedBy pactVerify
