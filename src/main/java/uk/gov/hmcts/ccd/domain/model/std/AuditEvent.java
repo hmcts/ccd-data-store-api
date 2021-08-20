@@ -12,7 +12,12 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 
-@SuppressWarnings("checkstyle:SummaryJavadoc") // Javadoc predates checkstyle implementation in module
+//@SuppressWarnings("checkstyle:SummaryJavadoc") // Javadoc predates checkstyle implementation in module
+
+/**
+ * Javadoc predates checkstyle implementation in module.
+ * Audit Event Class extends Event superclass.
+ */
 @Data
 @NoArgsConstructor
 public class AuditEvent extends Event {
@@ -60,7 +65,7 @@ public class AuditEvent extends Event {
     private String proxiedByFirstName;
 
     /**
-     *
+     * This is a summary for this Deprecated Method.
      * @deprecated Will be removed in version 2.x. Use {@link AuditEvent#dataClassification} instead.
      */
     @Deprecated
