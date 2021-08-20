@@ -36,7 +36,7 @@ class ReferenceDataCacheRefreshIT extends WireMockBaseTest implements ReferenceD
     void prepare() {
         List.of("buildingLocations", "orgServices")
             .parallelStream()
-            .forEach(cacheName -> underTest.clearCache(cacheName));
+            .forEach(cacheName -> underTest.invalidateCache(cacheName));
 
         List.of(BUILDING_LOCATIONS_STUB_ID, SERVICES_STUB_ID).forEach(id -> {
             final Optional<StubMapping> stubMapping = Optional.ofNullable(wireMockServer.getSingleStubMapping(id));

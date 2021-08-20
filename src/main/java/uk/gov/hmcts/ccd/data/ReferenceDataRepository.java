@@ -32,6 +32,7 @@ public class ReferenceDataRepository {
     private static final String BUILDING_LOCATIONS_CACHE = "buildingLocations";
     private static final String SERVICES_CACHE = "orgServices";
     private static final String CACHE_KEY = "#root.method.name";
+    private static final String RESULT_IS_NULL_OR_EMPTY = "#result==null or #result.isEmpty()";
 
     static final String BUILDING_LOCATIONS_PATH = "/refdata/location/building-locations";
     static final String SERVICES_PATH = "/refdata/location/orgServices";
@@ -47,12 +48,12 @@ public class ReferenceDataRepository {
         this.cacheManager = cacheManager;
     }
 
-    @Cacheable(cacheNames = BUILDING_LOCATIONS_CACHE, key = CACHE_KEY)
+    @Cacheable(cacheNames = BUILDING_LOCATIONS_CACHE, key = CACHE_KEY, unless = RESULT_IS_NULL_OR_EMPTY)
     public List<BuildingLocation> getBuildingLocations() {
         return getReferenceData(BUILDING_LOCATIONS_PATH, BuildingLocation[].class);
     }
 
-    @Cacheable(cacheNames = SERVICES_CACHE, key = CACHE_KEY)
+    @Cacheable(cacheNames = SERVICES_CACHE, key = CACHE_KEY, unless = RESULT_IS_NULL_OR_EMPTY)
     public List<Service> getServices() {
         return getReferenceData(SERVICES_PATH, Service[].class);
     }
@@ -89,12 +90,12 @@ public class ReferenceDataRepository {
 
     private <T> void updateCache(final String cacheName, final List<T> newValue) {
         if (!newValue.isEmpty()) {
-            clearCache(cacheName);
+            invalidateCache(cacheName);
             putCache(cacheName, newValue);
         }
     }
 
-    void clearCache(final String cacheName) {
+    void invalidateCache(final String cacheName) {
         Optional.ofNullable(cacheManager.getCache(cacheName)).ifPresent(Cache::invalidate);
     }
 

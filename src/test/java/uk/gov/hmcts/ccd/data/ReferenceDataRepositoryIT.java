@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_PATH;
@@ -29,7 +30,7 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest implements ReferenceDat
     void prepare() {
         List.of("buildingLocations", "orgServices")
             .parallelStream()
-            .forEach(cacheName -> underTest.clearCache(cacheName));
+            .forEach(cacheName -> underTest.invalidateCache(cacheName));
 
         List.of(BUILDING_LOCATIONS_STUB_ID, SERVICES_STUB_ID).forEach(id -> {
             final Optional<StubMapping> stubMapping = Optional.ofNullable(wireMockServer.getSingleStubMapping(id));
@@ -119,6 +120,21 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest implements ReferenceDat
     }
 
     @Test
+    void testShouldNotCacheEmptyBuildingLocations() throws Exception {
+        // GIVEN
+        attemptCachingEmptyBuildingLocations();
+
+        // WHEN
+        final List<BuildingLocation> actualBuildingLocations = underTest.getBuildingLocations();
+
+        // THEN
+        assertThat(actualBuildingLocations)
+            .isEmpty();
+
+        verifyWireMock(2, getRequestedFor(urlPathEqualTo(BUILDING_LOCATIONS_PATH)));
+    }
+
+    @Test
     void testShouldGetServicesSuccessfullyFromCache() throws Exception {
         // GIVEN
         final List<Service> cachedServices = populateServicesCache();
@@ -134,6 +150,21 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest implements ReferenceDat
         verifyWireMock(1, getRequestedFor(urlPathEqualTo(SERVICES_PATH)));
     }
 
+    @Test
+    void testShouldNotCacheEmptyServices() throws Exception {
+        // GIVEN
+        attemptCachingEmptyServices();
+
+        // WHEN
+        final List<Service> actualServices = underTest.getServices();
+
+        // THEN
+        assertThat(actualServices)
+            .isEmpty();
+
+        verifyWireMock(2, getRequestedFor(urlPathEqualTo(SERVICES_PATH)));
+    }
+
     private List<BuildingLocation> populateBuildingLocationsCache() throws Exception {
         stubBuildingLocationsSuccess(initialBuildingLocations);
         final List<BuildingLocation> cachedBuildingLocations = underTest.getBuildingLocations();
@@ -142,6 +173,14 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest implements ReferenceDat
         return cachedBuildingLocations;
     }
 
+    private void attemptCachingEmptyBuildingLocations() throws Exception {
+        stubBuildingLocationsSuccess(emptyList());
+        final List<BuildingLocation> buildingLocations = underTest.getBuildingLocations();
+
+        assertThat(buildingLocations).isEmpty();
+
+        SECONDS.sleep(1);
+    }
 
     private List<Service> populateServicesCache() throws Exception {
         stubServicesSuccess(initialServices);
@@ -149,6 +188,15 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest implements ReferenceDat
         SECONDS.sleep(1);
 
         return cachedServices;
+    }
+
+    private void attemptCachingEmptyServices() throws Exception {
+        stubServicesSuccess(emptyList());
+        final List<Service> services = underTest.getServices();
+
+        assertThat(services).isEmpty();
+
+        SECONDS.sleep(1);
     }
 
     private void stubBuildingLocationsSuccess(final List<BuildingLocation> buildingLocations) {
