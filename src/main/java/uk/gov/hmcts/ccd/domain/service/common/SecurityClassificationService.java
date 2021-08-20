@@ -55,25 +55,33 @@ public class SecurityClassificationService {
     }
 
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails) {
+        return applyClassification(caseDetails, true);
+    }
+
+    public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean includeDataClassification) {
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails.getJurisdiction());
         Optional<CaseDetails> result = Optional.of(caseDetails);
 
         return userClassificationOpt
             .flatMap(securityClassification ->
                 result.filter(caseHasClassificationEqualOrLowerThan(securityClassification))
-                .map(cd -> {
-                    if (cd.getDataClassification() == null) {
-                        LOG.warn("No data classification for case with reference={},"
-                            + " all fields removed", cd.getReference());
-                        cd.setDataClassification(Maps.newHashMap());
-                    }
+                    .map(cd -> {
+                        if (cd.getDataClassification() == null) {
+                            LOG.warn("No data classification for case with reference={},"
+                                + " all fields removed", cd.getReference());
+                            cd.setDataClassification(Maps.newHashMap());
+                        }
 
-                    JsonNode data = filterNestedObject(JacksonUtils.convertValueJsonNode(caseDetails.getData()),
-                        JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
-                        securityClassification);
-                    caseDetails.setData(JacksonUtils.convertValue(data));
-                    return cd;
-                }));
+                        JsonNode data = filterNestedObject(JacksonUtils.convertValueJsonNode(caseDetails.getData()),
+                            JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
+                            securityClassification);
+                        caseDetails.setData(JacksonUtils.convertValue(data));
+
+                        if (!includeDataClassification) {
+                            cd.setDataClassification(Maps.newHashMap());
+                        }
+                        return cd;
+                    }));
     }
 
     public List<AuditEvent> applyClassification(String jurisdictionId, List<AuditEvent> events) {
