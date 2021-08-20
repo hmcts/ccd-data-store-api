@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.data.definition;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.Assert;
 import org.junit.Test;
@@ -15,15 +14,17 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import javax.inject.Inject;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.serverError;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertEquals;
@@ -52,7 +53,7 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldGetCaseTypeDefinitionVersion(){
+    public void shouldGetCaseTypeDefinitionVersion() {
         CaseTypeDefinitionVersion caseTypeDefinitionVersionVersion =
             caseDefinitionRepository.getLatestVersion("TestAddressBookCase");
         Assertions.assertEquals(33,caseTypeDefinitionVersionVersion.getVersion());
@@ -123,7 +124,7 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
                 .map(id -> caseDefinitionRepository.getJurisdiction(id)).collect(Collectors.toList());
 
         assertAll(
-            () -> assertThat(allJurisdictionDefinitions, hasSize(3)),
+            () -> assertThat(allJurisdictionDefinitions, IsCollectionWithSize.hasSize(3)),
             () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("SSCS")))),
             () -> assertThat(allJurisdictionDefinitions, hasItem(hasProperty("id", is("PROBATE"))))
         );
@@ -156,6 +157,7 @@ public class DefaultCaseDefinitionRepositoryIT extends WireMockBaseTest {
         assertThat(exception.getMessage(), startsWith("Problem getting base types definition from definition store "
             + "because of "));
     }
+
     @Test
     public void shouldFailToGetClassificationsForUserRoleList() {
         List<String> userRoles = Arrays.asList("neither_defined", "nor_defined");
