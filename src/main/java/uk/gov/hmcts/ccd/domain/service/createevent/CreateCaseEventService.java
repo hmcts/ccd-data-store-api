@@ -35,6 +35,7 @@ import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -78,13 +79,14 @@ public class CreateCaseEventService {
     private final CasePostStateService casePostStateService;
     private final MessageService messageService;
     private final CaseDocumentService caseDocumentService;
+    private final CaseDataIssueLogger caseDataIssueLogger;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
                                   @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
-                                      final CaseDetailsRepository caseDetailsRepository,
+                                  final CaseDetailsRepository caseDetailsRepository,
                                   @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                      final CaseDefinitionRepository caseDefinitionRepository,
+                                  final CaseDefinitionRepository caseDefinitionRepository,
                                   final CaseAuditEventRepository caseAuditEventRepository,
                                   final EventTriggerService eventTriggerService,
                                   final EventTokenService eventTokenService,
@@ -101,7 +103,8 @@ public class CreateCaseEventService {
                                   final CasePostStateService casePostStateService,
                                   @Qualifier("utcClock") final Clock clock,
                                   @Qualifier("caseEventMessageService") final MessageService messageService,
-                                  final CaseDocumentService caseDocumentService) {
+                                  final CaseDocumentService caseDocumentService,
+                                  final CaseDataIssueLogger caseDataIssueLogger) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -122,6 +125,7 @@ public class CreateCaseEventService {
         this.clock = clock;
         this.messageService = messageService;
         this.caseDocumentService = caseDocumentService;
+        this.caseDataIssueLogger = caseDataIssueLogger;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -255,12 +259,14 @@ public class CreateCaseEventService {
                                         final Optional<String> state,
                                         final LocalDateTime timeNow) {
 
-        if (!state.isPresent()) {
+        if (state.isEmpty()) {
             updateCaseState(caseDetails, caseEventDefinition);
         }
         if (!caseDetails.getState().equalsIgnoreCase(caseDetailsBefore.getState())) {
             caseDetails.setLastStateModifiedDate(timeNow);
         }
+
+        caseDataIssueLogger.logAnyDataIssuesIn(caseDetailsBefore, caseDetails);
         return caseDetailsRepository.set(caseDetails);
     }
 
