@@ -120,6 +120,7 @@ public class CaseController {
     }
 
     @Transactional
+    @ResponseStatus(code = HttpStatus.CREATED)
     @PostMapping(
         path = "/cases/{caseId}/events",
         headers = {
@@ -165,7 +166,6 @@ public class CaseController {
             message = V2.Error.CALLBACK_EXCEPTION
         )
     })
-    @ResponseStatus(HttpStatus.CREATED) // To remove default 200 response from Swagger
     @LogAudit(operationType = UPDATE_CASE, caseId = "#caseId", jurisdiction = "#result.body.jurisdiction",
         caseType = "#result.body.caseType", eventName = "#content.event.eventId")
     public ResponseEntity<CaseResource> createEvent(@ApiParam(value = "Case ID for which the event is being submitted",
@@ -229,16 +229,11 @@ public class CaseController {
                                                         + "}"
                                                         + "\n```", required = true)
                                                     @RequestBody final CaseDataContent content) {
-        if (!caseReferenceService.validateUID(caseId)) {
-            throw new BadRequestException(V2.Error.CASE_ID_INVALID);
-        }
-
-        final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseId, content);
-
-        return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content));
+        return createCaseEvent(caseId, content);
     }
 
     @Transactional
+    @ResponseStatus(code = HttpStatus.CREATED)
     @PostMapping(
         path = "/case-types/{caseTypeId}/cases",
         headers = {
@@ -261,6 +256,10 @@ public class CaseController {
         @ApiResponse(
             code = 400,
             message = V2.Error.MISSING_EVENT_TOKEN
+        ),
+        @ApiResponse(
+            code = 403,
+            message = V2.Error.GRANT_FORBIDDEN
         ),
         @ApiResponse(
             code = 404,
@@ -313,9 +312,7 @@ public class CaseController {
                                                    @RequestBody final CaseDataContent content,
                                                    @RequestParam(value = "ignore-warning", required = false)
                                                        final Boolean ignoreWarning) {
-        final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
-
-        return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content, ignoreWarning));
+        return getCaseResourceResponseEntity(caseTypeId, content, ignoreWarning);
     }
 
     @Transactional
@@ -428,5 +425,22 @@ public class CaseController {
         SupplementaryData supplementaryDataUpdated = supplementaryDataUpdateOperation.updateSupplementaryData(caseId,
             supplementaryDataUpdateRequest);
         return status(HttpStatus.OK).body(new SupplementaryDataResource(supplementaryDataUpdated));
+    }
+
+    private ResponseEntity<CaseResource> createCaseEvent(String caseId, CaseDataContent content) {
+        if (!caseReferenceService.validateUID(caseId)) {
+            throw new BadRequestException(V2.Error.CASE_ID_INVALID);
+        }
+
+        final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseId, content);
+        return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content));
+    }
+
+    private ResponseEntity<CaseResource> getCaseResourceResponseEntity(String caseTypeId,
+                                                                       CaseDataContent content,
+                                                                       Boolean ignoreWarning) {
+
+        final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
+        return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content, ignoreWarning));
     }
 }

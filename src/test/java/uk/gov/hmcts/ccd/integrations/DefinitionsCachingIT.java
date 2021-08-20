@@ -46,6 +46,7 @@ public class DefinitionsCachingIT {
     private static final String ID_2 = "case11";
     private static final String ID_3 = "case111";
     private static final String EVENT_ID = "event1";
+
     private static final int VERSION_1 = 33;
     private static final int VERSION_2 = 3311;
     private static final int VERSION_3 = 331111;
@@ -84,9 +85,7 @@ public class DefinitionsCachingIT {
     @Mock
     SearchInputFieldsDefinition searchInputFieldsDefinition;
 
-
     List<WizardPage> wizardPageList = Collections.emptyList();
-
     List<Banner> bannersList = Collections.emptyList();
 
     @Before
@@ -136,13 +135,7 @@ public class DefinitionsCachingIT {
         caseDefinitionRepository.getJurisdiction("J2");
         verify(caseDefinitionRepository, times(1)).getJurisdictionFromDefinitionStore("J2");
 
-        TimeUnit.SECONDS.sleep(1);
-        caseDefinitionRepository.getJurisdiction("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
-        caseDefinitionRepository.getJurisdiction("J2");
-        verify(caseDefinitionRepository, times(1)).getJurisdictionFromDefinitionStore("J2");
-
-        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.SECONDS.sleep(2);
         verify(caseDefinitionRepository, times(1)).getJurisdictionFromDefinitionStore("J2");
         caseDefinitionRepository.getJurisdiction("J2");
         verify(caseDefinitionRepository, times(2)).getJurisdictionFromDefinitionStore("J2");
@@ -184,7 +177,7 @@ public class DefinitionsCachingIT {
         caseDefinitionRepository.getLatestVersion(ID_3);
         verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_3);
 
-        TimeUnit.SECONDS.sleep(4);
+        TimeUnit.SECONDS.sleep(2);
         verify(caseDefinitionRepository, times(1)).getLatestVersion(ID_3);
         caseDefinitionRepository.getLatestVersion(ID_3);
         verify(caseDefinitionRepository, times(2)).getLatestVersion(ID_3);
@@ -285,7 +278,6 @@ public class DefinitionsCachingIT {
         ctdv.setVersion(version);
         return ctdv;
     }
-
 
     @Test
     public void testBannersCached() {

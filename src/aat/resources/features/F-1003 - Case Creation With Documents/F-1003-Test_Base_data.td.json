@@ -1,0 +1,13 @@
+{
+  "_guid_": "F-1003-Test_Base_data",
+  "_extends_": "F-1003-Base-Root",
+  "productName": "CCD Data Store",
+  "operationName": "Submit Case Creation",
+  "specs": [
+    "an active caseworker profile in CCD with full permissions on a document field",
+    "is to attach the document uploaded above to a new case",
+    "contains necessary details about the document attached to the case"
+  ],
+  "method": "POST",
+  "uri": "case-types/{CaseTypeID}/cases"
+}
