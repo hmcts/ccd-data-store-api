@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.model.search.global;
+package uk.gov.hmcts.ccd.domain.model.refdata;
 
 import java.util.Map;
 

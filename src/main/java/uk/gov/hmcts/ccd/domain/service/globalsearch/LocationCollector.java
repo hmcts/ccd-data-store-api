@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.globalsearch;
 
-import uk.gov.hmcts.ccd.domain.model.search.global.LocationLookup;
+import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
+import uk.gov.hmcts.ccd.domain.model.refdata.LocationLookup;
 
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -12,7 +13,7 @@ import java.util.stream.Collector;
 import static java.util.stream.Collector.Characteristics.IDENTITY_FINISH;
 import static java.util.stream.Collector.Characteristics.UNORDERED;
 
-public class LocationCollector implements Collector<LocationRefData, LocationLookup, LocationLookup> {
+public class LocationCollector implements Collector<BuildingLocation, LocationLookup, LocationLookup> {
 
     @Override
     public Supplier<LocationLookup> supplier() {
@@ -20,7 +21,7 @@ public class LocationCollector implements Collector<LocationRefData, LocationLoo
     }
 
     @Override
-    public BiConsumer<LocationLookup, LocationRefData> accumulator() {
+    public BiConsumer<LocationLookup, BuildingLocation> accumulator() {
         return LocationLookup::add;
     }
 

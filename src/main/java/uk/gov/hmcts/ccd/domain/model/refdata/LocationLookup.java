@@ -1,6 +1,4 @@
-package uk.gov.hmcts.ccd.domain.model.search.global;
-
-import uk.gov.hmcts.ccd.domain.service.globalsearch.LocationRefData;
+package uk.gov.hmcts.ccd.domain.model.refdata;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,9 +7,9 @@ public class LocationLookup {
     private final Map<String, String> locationsMap = new HashMap<>();
     private final Map<String, String> regionsMap = new HashMap<>();
 
-    public void add(final LocationRefData locationRefData) {
-        regionsMap.put(locationRefData.getRegionId(), locationRefData.getRegionName());
-        locationsMap.put(locationRefData.getLocationId(), locationRefData.getLocationName());
+    public void add(final BuildingLocation buildingLocation) {
+        regionsMap.put(buildingLocation.getRegionId(), buildingLocation.getRegion());
+        locationsMap.put(buildingLocation.getBuildingLocationId(), buildingLocation.getBuildingLocationName());
     }
 
     public String getLocationName(final String locationId) {
