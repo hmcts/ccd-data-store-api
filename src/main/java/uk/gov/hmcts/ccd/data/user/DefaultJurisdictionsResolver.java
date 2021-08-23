@@ -34,7 +34,6 @@ public class DefaultJurisdictionsResolver implements JurisdictionsResolver {
             List<String> roleJurisdictions = idamJurisdictionsResolver.getJurisdictions();
 
             return Stream.concat(jurisdictions.stream(), roleJurisdictions.stream())
-                .map(String::toLowerCase)
                 .distinct()
                 .collect(Collectors.toList());
         } else {

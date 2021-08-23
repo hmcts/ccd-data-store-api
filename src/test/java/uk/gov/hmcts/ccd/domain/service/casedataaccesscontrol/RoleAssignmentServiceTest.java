@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
-import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,8 +27,8 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleType;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.MatcherType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 
