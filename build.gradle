@@ -47,7 +47,7 @@ apply plugin: 'se.patrikerdes.use-latest-versions'
 def versions = [
         pact_version: '4.1.7'
 ]
-ext['spring-security.version'] = '5.4.5'
+ext['spring-security.version'] = '5.4.7'
 ext['spring-framework.version'] = '5.3.7'
 
 
@@ -198,6 +198,9 @@ dependencies {
     compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
     compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
     compile group: 'org.awaitility', name: 'awaitility', version: '3.1.6'
+
+    // CVE-2021-28170
+    compile "org.glassfish:jakarta.el:4.0.1"
 
     // CVE-2021-29425
     compile group: 'commons-io', name: 'commons-io', version: '2.8.0'
