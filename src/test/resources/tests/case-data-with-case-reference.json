@@ -1,0 +1,210 @@
+{
+  "id" : 1629297445620678,
+  "jurisdiction" : "BEFTA_MASTER",
+  "state" : "CaseCreated",
+  "version" : 0,
+  "case_type_id" : "FT_MasterCaseType",
+  "created_date" : "2021-08-18T14:37:25.629095",
+  "last_modified" : "2021-08-18T14:37:25.629724",
+  "last_state_modified_date" : "2021-08-18T14:37:25.629095",
+  "security_classification" : "PUBLIC",
+  "case_data" : {
+    "AddressField" : {
+      "AddressLine1" : null,
+      "AddressLine2" : null,
+      "AddressLine3" : null,
+      "Country" : null
+    },
+    "AddressUKField" : {
+      "AddressLine1" : null,
+      "AddressLine2" : null,
+      "AddressLine3" : null,
+      "PostTown" : null,
+      "County" : null,
+      "PostCode" : null,
+      "Country" : null
+    },
+    "MoneyField" : "008",
+    "MarritalStatus" : null,
+    "NumberField" : null,
+    "MultiSelectField" : [ ],
+    "YesNoField" : null,
+    "EmailField" : null,
+    "TextField" : null,
+    "PhoneField" : null,
+    "DateField" : null,
+    "OrganisationPolicyField2" : {
+      "OrgPolicyCaseAssignedRole" : "[Defendant]",
+      "OrgPolicyReference" : null,
+      "Organisation" : {
+        "OrganisationID" : null,
+        "OrganisationName" : null
+      }
+    },
+    "TextAreaField" : null,
+    "OrganisationPolicyField1" : {
+      "OrgPolicyCaseAssignedRole" : "[Claimant]",
+      "OrgPolicyReference" : null,
+      "Organisation" : {
+        "OrganisationID" : null,
+        "OrganisationName" : null
+      }
+    },
+    "CaseLinkField" : {
+      "CaseReference" : "1629297445116784"
+    },
+    "CollectionField" : [ ]
+  },
+  "data_classification" : {
+    "AddressField" : {
+      "classification" : "PUBLIC",
+      "value" : {
+        "AddressLine1" : "PUBLIC",
+        "AddressLine2" : "PUBLIC",
+        "AddressLine3" : "PUBLIC",
+        "Country" : "PUBLIC"
+      }
+    },
+    "AddressUKField" : {
+      "classification" : "PUBLIC",
+      "value" : {
+        "AddressLine1" : "PUBLIC",
+        "AddressLine2" : "PUBLIC",
+        "AddressLine3" : "PUBLIC",
+        "PostTown" : "PUBLIC",
+        "County" : "PUBLIC",
+        "PostCode" : "PUBLIC",
+        "Country" : "PUBLIC"
+      }
+    },
+    "MoneyField" : "PUBLIC",
+    "MarritalStatus" : "PUBLIC",
+    "NumberField" : "PUBLIC",
+    "MultiSelectField" : "PUBLIC",
+    "YesNoField" : "PUBLIC",
+    "EmailField" : "PUBLIC",
+    "TextField" : "PUBLIC",
+    "PhoneField" : "PUBLIC",
+    "DateField" : "PUBLIC",
+    "OrganisationPolicyField2" : {
+      "classification" : "PUBLIC",
+      "value" : {
+        "OrgPolicyCaseAssignedRole" : "PUBLIC",
+        "OrgPolicyReference" : "PUBLIC",
+        "Organisation" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "OrganisationID" : "PUBLIC",
+            "OrganisationName" : "PUBLIC"
+          }
+        }
+      }
+    },
+    "TextAreaField" : "PUBLIC",
+    "OrganisationPolicyField1" : {
+      "classification" : "PUBLIC",
+      "value" : {
+        "OrgPolicyCaseAssignedRole" : "PUBLIC",
+        "OrgPolicyReference" : "PUBLIC",
+        "Organisation" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "OrganisationID" : "PUBLIC",
+            "OrganisationName" : "PUBLIC"
+          }
+        }
+      }
+    },
+    "CaseLinkField" : {
+      "classification" : "PUBLIC",
+      "value" : {
+        "CaseReference" : "PUBLIC"
+      }
+    },
+    "CollectionField" : {
+      "classification" : "PUBLIC",
+      "value" : [ ]
+    }
+  },
+  "supplementary_data" : {
+    "ComplexService": {
+      "service_code": "SC1"
+    }
+  },
+  "after_submit_callback_response" : null,
+  "callback_response_status_code" : null,
+  "callback_response_status" : null,
+  "delete_draft_response_status_code" : null,
+  "delete_draft_response_status" : null,
+  "security_classifications" : {
+    "AddressField" : {
+      "classification" : "PUBLIC",
+      "value" : {
+        "AddressLine1" : "PUBLIC",
+        "AddressLine2" : "PUBLIC",
+        "AddressLine3" : "PUBLIC",
+        "Country" : "PUBLIC"
+      }
+    },
+    "AddressUKField" : {
+      "classification" : "PUBLIC",
+      "value" : {
+        "AddressLine1" : "PUBLIC",
+        "AddressLine2" : "PUBLIC",
+        "AddressLine3" : "PUBLIC",
+        "PostTown" : "PUBLIC",
+        "County" : "PUBLIC",
+        "PostCode" : "PUBLIC",
+        "Country" : "PUBLIC"
+      }
+    },
+    "MoneyField" : "PUBLIC",
+    "MarritalStatus" : "PUBLIC",
+    "NumberField" : "PUBLIC",
+    "MultiSelectField" : "PUBLIC",
+    "YesNoField" : "PUBLIC",
+    "EmailField" : "PUBLIC",
+    "TextField" : "PUBLIC",
+    "PhoneField" : "PUBLIC",
+    "DateField" : "PUBLIC",
+    "OrganisationPolicyField2" : {
+      "classification" : "PUBLIC",
+      "value" : {
+        "OrgPolicyCaseAssignedRole" : "PUBLIC",
+        "OrgPolicyReference" : "PUBLIC",
+        "Organisation" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "OrganisationID" : "PUBLIC",
+            "OrganisationName" : "PUBLIC"
+          }
+        }
+      }
+    },
+    "TextAreaField" : "PUBLIC",
+    "OrganisationPolicyField1" : {
+      "classification" : "PUBLIC",
+      "value" : {
+        "OrgPolicyCaseAssignedRole" : "PUBLIC",
+        "OrgPolicyReference" : "PUBLIC",
+        "Organisation" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "OrganisationID" : "PUBLIC",
+            "OrganisationName" : "PUBLIC"
+          }
+        }
+      }
+    },
+    "CaseLinkField" : {
+      "classification" : "PUBLIC",
+      "value" : {
+        "CaseReference" : "PUBLIC"
+      }
+    },
+    "CollectionField" : {
+      "classification" : "PUBLIC",
+      "value" : [ ]
+    }
+  }
+}
