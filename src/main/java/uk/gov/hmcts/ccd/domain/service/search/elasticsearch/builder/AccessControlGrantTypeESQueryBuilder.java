@@ -53,23 +53,23 @@ public class AccessControlGrantTypeESQueryBuilder {
         BoolQueryBuilder orgQuery = QueryBuilders.boolQuery();
 
         standardQuery.stream()
-            .forEach(query -> orgQuery.must(query));
+            .forEach(query -> orgQuery.should(query));
         challengedQuery.stream()
-            .forEach(query -> orgQuery.must(query));
+            .forEach(query -> orgQuery.should(query));
 
         List<TermsQueryBuilder> excludedTerms = excludedGrantTypeQueryBuilder.createQuery(roleAssignments);
         BoolQueryBuilder excludedQuery = QueryBuilders.boolQuery();
         excludedTerms.stream()
-            .forEach(query -> excludedQuery.must(query));
+            .forEach(query -> excludedQuery.should(query));
 
         BoolQueryBuilder nonOrgQuery = QueryBuilders.boolQuery();
         List<TermsQueryBuilder> basicQuery = basicGrantTypeQueryBuilder.createQuery(roleAssignments);
         basicQuery.stream()
-            .forEach(query -> nonOrgQuery.must(query));
+            .forEach(query -> nonOrgQuery.should(query));
 
         List<TermsQueryBuilder> specificQuery = specificGrantTypeQueryBuilder.createQuery(roleAssignments);
         specificQuery.stream()
-            .forEach(query -> nonOrgQuery.must(query));
+            .forEach(query -> nonOrgQuery.should(query));
 
         if (!nonOrgQuery.hasClauses()
             && !orgQuery.hasClauses()
