@@ -28,18 +28,14 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import javax.inject.Inject;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
-
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.*;
 
 public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
     private static final String GET_CASE = "/internal/cases/1504259907353529";
@@ -71,6 +67,10 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
     public void shouldNotReturnEventHistoryDataForCitizenWhoHasNoAccessToEvents() throws Exception {
+        String roleAssignmentResponseJson = roleAssignmentResponseJson("");
+
+        stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "1234"))
+            .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
 
         UserInfo userInfo = UserInfo.builder()
             .uid(UID_NO_EVENT_ACCESS)
@@ -106,6 +106,13 @@ public class UICaseControllerCaseRolesIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
     public void shouldReturnEventHistoryDataForCitizenWhoHasCaseRoleAccess() throws Exception {
+        String roleAssignmentResponseJson = roleAssignmentResponseJson(
+            roleAssignmentJson("idam:[TEST-EVENT-ACCESS-ROLE]", "PROBATE", "TestAddressBookNoEventAccessToCaseRole",
+                "1504259907353529")
+        );
+
+        stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "123"))
+            .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
 
         assertCaseDataResultSetSize();
 
