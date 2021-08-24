@@ -33,8 +33,11 @@ public interface GrantTypeESQueryBuilder {
 
     default Optional<TermsQueryBuilder> getJurisdictions(Supplier<Stream<RoleAssignment>> streamSupplier) {
         Set<String> jurisdictions = streamSupplier.get()
-            .map(roleAssignment -> roleAssignment.getAttributes().getJurisdiction().orElse(""))
-            .filter(jurisdiction -> jurisdiction.length() > 0)
+            .filter(roleAssignment -> roleAssignment.getAttributes() != null)
+            .map(roleAssignment -> roleAssignment.getAttributes().getJurisdiction())
+            .filter(jurisdictionOptional -> jurisdictionOptional != null)
+            .map(jurisdictionOptional -> jurisdictionOptional.get())
+            .filter(jurisdiction -> StringUtils.isNotBlank(jurisdiction))
             .collect(Collectors.toSet());
 
         if (jurisdictions.size() > 0) {
@@ -45,8 +48,11 @@ public interface GrantTypeESQueryBuilder {
 
     default Optional<TermsQueryBuilder> getCaseReferences(Supplier<Stream<RoleAssignment>> streamSupplier) {
         Set<String> caseReferences = streamSupplier.get()
-            .map(roleAssignment -> roleAssignment.getAttributes().getCaseId().orElse(""))
-            .filter(caseId -> caseId.length() > 0)
+            .filter(roleAssignment -> roleAssignment.getAttributes() != null)
+            .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
+            .filter(caseReferenceOptional -> caseReferenceOptional != null)
+            .map(caseReferenceOptional -> caseReferenceOptional.get())
+            .filter(caseReference -> StringUtils.isNotBlank(caseReference))
             .collect(Collectors.toSet());
 
         if (caseReferences.size() > 0) {
