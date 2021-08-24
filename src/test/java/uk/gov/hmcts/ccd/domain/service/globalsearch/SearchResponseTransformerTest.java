@@ -1,27 +1,48 @@
 package uk.gov.hmcts.ccd.domain.service.globalsearch;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.data.ReferenceDataRepository;
+import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.dto.globalsearch.GlobalSearchResponse;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
 import uk.gov.hmcts.ccd.domain.model.refdata.LocationLookup;
 import uk.gov.hmcts.ccd.domain.model.refdata.Service;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceLookup;
+import uk.gov.hmcts.ccd.domain.service.aggregated.CaseDetailsUtil;
 
 import java.util.List;
+import java.util.Map;
 
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
-class SearchResponseTransformerTest {
+class SearchResponseTransformerTest extends TestFixtures {
+
+    @Mock
+    private DefaultCaseDefinitionRepository caseDefinitionRepository;
+
     @Mock
     private ReferenceDataRepository referenceDataRepository;
 
     @InjectMocks
     private SearchResponseTransformer underTest;
+
+    private static Map<String, JsonNode> CASE_DATA;
+    private static ServiceLookup SERVICE_LOOKUP;
+
+    private final String beftaMasterJurisdictionId = "BEFTA_MASTER";
+    private final String beftaMasterJurisdictionName = "BEFTA Master";
 
     private final BuildingLocation location1 = BuildingLocation.builder()
         .buildingLocationId("L-1")
@@ -36,14 +57,20 @@ class SearchResponseTransformerTest {
         .region("Region 2")
         .build();
 
-    private final Service service1 = Service.builder()
+    private static final Service SERVICE_1 = Service.builder()
         .serviceCode("SC1")
         .serviceShortDescription("Service 1")
         .build();
-    private final Service service2 = Service.builder()
+    private static final Service SERVICE_2 = Service.builder()
         .serviceCode("SC2")
         .serviceShortDescription("Service 2")
         .build();
+
+    @BeforeAll
+    static void prepare() throws Exception {
+        CASE_DATA = fromFileAsMap("case-data-with-case-reference.json");
+        SERVICE_LOOKUP = new ServiceLookup(Map.of("SC1", "Service 1", "SC2", "Service 2"));
+    }
 
     @Test
     void testLocationLookupBuilderFunction() {
@@ -66,7 +93,7 @@ class SearchResponseTransformerTest {
     @Test
     void testServiceLookupBuilderFunction() {
         // GIVEN
-        final List<Service> refData = List.of(this.service1, service2);
+        final List<Service> refData = List.of(SERVICE_1, SERVICE_2);
 
         // WHEN
         final ServiceLookup serviceLookup = SearchResponseTransformer.SERVICE_LOOKUP_FUNCTION.apply(refData);
@@ -79,5 +106,97 @@ class SearchResponseTransformerTest {
                 assertThat(dictionary.getServiceShortDescription("SC2")).isEqualTo("Service 2");
                 assertThat(dictionary.getServiceShortDescription("SC3")).isNull();
             });
+    }
+
+    @Test
+    void testShouldFindCaseReference() {
+        final String actualResult = underTest.findValue(CASE_DATA, "CaseReference");
+
+        assertThat(actualResult)
+            .isNotNull()
+            .isEqualTo("1629297445116784");
+    }
+
+    @Test
+    void testShouldMapState() {
+        // GIVEN
+        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withState("CaseCreated")
+            .withData(emptyMap())
+            .build();
+
+        // WHEN
+        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP);
+
+        // THEN
+        assertThat(actualResult)
+            .isNotNull()
+            .satisfies(result -> assertThat(result.getStateId()).isEqualTo("CaseCreated"));
+    }
+
+    @Test
+    void testShouldMapCaseReference() {
+        // GIVEN
+        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withReference(1629297445116784L)
+            .withData(emptyMap())
+            .build();
+
+        // WHEN
+        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP);
+
+        // THEN
+        assertThat(actualResult)
+            .isNotNull()
+            .satisfies(result -> assertThat(result.getCaseReference()).isEqualTo("1629297445116784"));
+    }
+
+    @Test
+    void testShouldMapJurisdiction() {
+        // GIVEN
+        final JurisdictionDefinition jurisdictionDefinition = buildJurisdictionDefinition();
+        doReturn(jurisdictionDefinition).when(caseDefinitionRepository).getJurisdiction(beftaMasterJurisdictionId);
+        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withJurisdiction(beftaMasterJurisdictionId)
+            .withData(emptyMap())
+            .build();
+
+        // WHEN
+        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP);
+
+        // THEN
+        assertThat(actualResult)
+            .isNotNull()
+            .satisfies(result -> {
+                assertThat(result.getCcdJurisdictionId()).isEqualTo(beftaMasterJurisdictionId);
+                assertThat(result.getCcdJurisdictionName()).isEqualTo(beftaMasterJurisdictionName);
+            });
+    }
+
+    @Test
+    void testShouldMapService() {
+        // GIVEN
+        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withData(CASE_DATA)
+            .build();
+
+        // WHEN
+        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP);
+
+        // THEN
+        assertThat(actualResult)
+            .isNotNull()
+            .satisfies(result -> {
+                assertThat(result.getHmctsServiceId()).isEqualTo("SC1");
+                assertThat(result.getHmctsServiceShortDescription()).isEqualTo("Service 1");
+            });
+    }
+
+    private JurisdictionDefinition buildJurisdictionDefinition() {
+        JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+        jurisdictionDefinition.setId(beftaMasterJurisdictionId);
+        jurisdictionDefinition.setName(beftaMasterJurisdictionName);
+
+        return jurisdictionDefinition;
     }
 }
