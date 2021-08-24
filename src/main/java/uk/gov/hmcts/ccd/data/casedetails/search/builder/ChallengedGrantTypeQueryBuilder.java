@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
@@ -25,8 +26,10 @@ public class ChallengedGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
             .filter(roleAssignment -> GrantType.CHALLENGED.name().equals(roleAssignment.getGrantType()));
 
         Set<String> jurisdictions = streamSupplier.get()
+            .filter(roleAssignment -> roleAssignment.getAttributes() != null)
             .map(roleAssignment -> roleAssignment.getAttributes().getJurisdiction())
-            .flatMap(Optional::stream)
+            .filter(jurisdictionOptional -> jurisdictionOptional != null)
+            .map(jurisdictionOptional -> jurisdictionOptional.get())
             .collect(Collectors.toSet());
 
         String tmpQuery = createClassification(params, "classifications_challenged", streamSupplier.get());;
@@ -38,6 +41,6 @@ public class ChallengedGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
                 tmpQuery + getOperator(tmpQuery, AND) + String.format(QUERY, JURISDICTION, paramName));
         }
 
-        return EMPTY;
+        return StringUtils.isNotBlank(tmpQuery) ? String.format(QUERY_WRAPPER, tmpQuery) : tmpQuery;
     }
 }

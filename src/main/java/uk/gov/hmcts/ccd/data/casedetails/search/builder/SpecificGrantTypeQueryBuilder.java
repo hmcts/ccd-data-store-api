@@ -27,8 +27,10 @@ public class SpecificGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
         String tmpQuery = createClassification(params, "classifications_specific", streamSupplier.get());
 
         Set<String> jurisdictions = streamSupplier.get()
+            .filter(roleAssignment -> roleAssignment.getAttributes() != null)
             .map(roleAssignment -> roleAssignment.getAttributes().getJurisdiction())
-            .flatMap(Optional::stream)
+            .filter(jurisdictionOptional -> jurisdictionOptional != null)
+            .map(jurisdictionOptional -> jurisdictionOptional.get())
             .collect(Collectors.toSet());
 
         if (jurisdictions.size() > 0) {
@@ -37,8 +39,10 @@ public class SpecificGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
         }
 
         Set<String> caseReferences = streamSupplier.get()
+            .filter(roleAssignment -> roleAssignment.getAttributes() != null)
             .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
-            .flatMap(Optional::stream)
+            .filter(caseIdOptional -> caseIdOptional != null)
+            .map(caseIdOptional -> caseIdOptional.get())
             .collect(Collectors.toSet());
 
         if (caseReferences.size() > 0) {

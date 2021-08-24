@@ -28,8 +28,10 @@ public class ExcludedGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
         String tmpQuery = createClassification(params, "classifications_excluded", streamSupplier.get());
 
         Set<String> caseReferences = streamSupplier.get()
+            .filter(roleAssignment -> roleAssignment.getAttributes() != null)
             .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
-            .flatMap(Optional::stream)
+            .filter(caseIdOptional -> caseIdOptional != null)
+            .map(caseIdOptional -> caseIdOptional.get())
             .collect(Collectors.toSet());
 
         if (caseReferences.size() > 0) {
