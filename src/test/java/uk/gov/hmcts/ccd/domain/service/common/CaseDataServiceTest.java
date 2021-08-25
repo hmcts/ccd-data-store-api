@@ -501,10 +501,10 @@ class CaseDataServiceTest {
                 .asCollectionOf("PRIVATE",
                     TestBuildersUtil.collectionClassification(
                         "1",
-                        "PRIVATE"),
+                        "PUBLIC"),
                     TestBuildersUtil.collectionClassification(
                         "2",
-                        "PRIVATE")
+                        "RESTRICTED")
                 )
                 .build();
 
@@ -517,7 +517,7 @@ class CaseDataServiceTest {
         final JsonNode collection = classifications.get("simple_collection");
         assertSimpleCollectionClassification(collection,
             "PRIVATE",
-            "PRIVATE", "PRIVATE");
+            "PUBLIC", "RESTRICTED");
     }
 
     private void assertSimpleCollectionClassification(JsonNode collection,
