@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.data.ReferenceDataRepository;
-import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.dto.globalsearch.GlobalSearchResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.doReturn;
 class SearchResponseTransformerTest extends TestFixtures {
 
     @Mock
-    private DefaultCaseDefinitionRepository caseDefinitionRepository;
+    private CachedCaseDefinitionRepository caseDefinitionRepository;
 
     @Mock
     private ReferenceDataRepository referenceDataRepository;
@@ -40,11 +40,12 @@ class SearchResponseTransformerTest extends TestFixtures {
     private SearchResponseTransformer underTest;
 
     private static Map<String, JsonNode> CASE_DATA;
+    private static Map<String, JsonNode> SUPPLEMENTARY_DATA;
     private static ServiceLookup SERVICE_LOOKUP;
     private static LocationLookup LOCATION_LOOKUP;
 
     private final BuildingLocation location1 = BuildingLocation.builder()
-        .buildingLocationId("L-1")
+        .buildingLocationId("321")
         .buildingLocationName("Location 1")
         .regionId("R-1")
         .region("Region 1")
@@ -52,7 +53,7 @@ class SearchResponseTransformerTest extends TestFixtures {
     private final BuildingLocation location2 = BuildingLocation.builder()
         .buildingLocationId("L-2")
         .buildingLocationName("Location 2")
-        .regionId("R-2")
+        .regionId("123")
         .region("Region 2")
         .build();
 
@@ -67,11 +68,12 @@ class SearchResponseTransformerTest extends TestFixtures {
 
     @BeforeAll
     static void prepare() throws Exception {
-        CASE_DATA = fromFileAsMap("case-data-with-case-reference.json");
+        CASE_DATA = fromFileAsMap("global-search-result-data.json");
+        SUPPLEMENTARY_DATA = fromFileAsMap("global-search-result-supplementary-data.json");
         SERVICE_LOOKUP = new ServiceLookup(Map.of("SC1", "Service 1", "SC2", "Service 2"));
         LOCATION_LOOKUP = new LocationLookup(
-            Map.of("L-1", "Location 1", "L-2", "Location 2"),
-            Map.of("R-1", "Region 1", "R-2", "Region 2")
+            Map.of("321", "Location 1", "L-2", "Location 2"),
+            Map.of("R-1", "Region 1", "123", "Region 2")
         );
     }
 
@@ -87,10 +89,10 @@ class SearchResponseTransformerTest extends TestFixtures {
         assertThat(locationLookup)
             .isNotNull()
             .satisfies(dictionary -> {
-                assertThat(dictionary.getLocationName("L-1")).isEqualTo("Location 1");
+                assertThat(dictionary.getLocationName("321")).isEqualTo("Location 1");
                 assertThat(dictionary.getLocationName("L-0")).isNull();
                 assertThat(dictionary.getLocationName(null)).isNull();
-                assertThat(dictionary.getRegionName("R-2")).isEqualTo("Region 2");
+                assertThat(dictionary.getRegionName("123")).isEqualTo("Region 2");
                 assertThat(dictionary.getRegionName("R-0")).isNull();
                 assertThat(dictionary.getRegionName(null)).isNull();
             });
@@ -116,20 +118,12 @@ class SearchResponseTransformerTest extends TestFixtures {
     }
 
     @Test
-    void testShouldFindCaseReference() {
-        final String actualResult = underTest.findValue(CASE_DATA, "CaseReference");
-
-        assertThat(actualResult)
-            .isNotNull()
-            .isEqualTo("1629297445116784");
-    }
-
-    @Test
     void testShouldMapState() {
         // GIVEN
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withState("CaseCreated")
             .withData(emptyMap())
+            .withSupplementaryData(emptyMap())
             .build();
 
         // WHEN
@@ -148,6 +142,7 @@ class SearchResponseTransformerTest extends TestFixtures {
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withReference(1629297445116784L)
             .withData(emptyMap())
+            .withSupplementaryData(emptyMap())
             .build();
 
         // WHEN
@@ -168,6 +163,7 @@ class SearchResponseTransformerTest extends TestFixtures {
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withJurisdiction(JURISDICTION_ID)
             .withData(emptyMap())
+            .withSupplementaryData(emptyMap())
             .build();
 
         // WHEN
@@ -187,11 +183,11 @@ class SearchResponseTransformerTest extends TestFixtures {
     void testShouldMapCaseType() {
         // GIVEN
         final CaseTypeDefinition caseTypeDefinition = buildCaseTypeDefinition();
-        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(VERSION_NUMBER, CASE_TYPE_ID);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withCaseTypeId(CASE_TYPE_ID)
-            .withVersion(VERSION_NUMBER)
             .withData(emptyMap())
+            .withSupplementaryData(emptyMap())
             .build();
 
         // WHEN
@@ -211,7 +207,8 @@ class SearchResponseTransformerTest extends TestFixtures {
     void testShouldMapService() {
         // GIVEN
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
-            .withData(CASE_DATA)
+            .withSupplementaryData(SUPPLEMENTARY_DATA)
+            .withData(emptyMap())
             .build();
 
         // WHEN
@@ -232,6 +229,7 @@ class SearchResponseTransformerTest extends TestFixtures {
         // GIVEN
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withData(CASE_DATA)
+            .withSupplementaryData(emptyMap())
             .build();
 
         // WHEN
@@ -242,10 +240,70 @@ class SearchResponseTransformerTest extends TestFixtures {
         assertThat(actualResult)
             .isNotNull()
             .satisfies(result -> {
-                assertThat(result.getBaseLocationId()).isEqualTo("L-1");
+                assertThat(result.getBaseLocationId()).isEqualTo("321");
                 assertThat(result.getBaseLocationName()).isEqualTo("Location 1");
-                assertThat(result.getRegionId()).isEqualTo("R-2");
+                assertThat(result.getRegionId()).isEqualTo("123");
                 assertThat(result.getRegionName()).isEqualTo("Region 2");
             });
     }
+
+    @Test
+    void testShouldMapCaseManagementCategory() {
+        // GIVEN
+        final String categoryId = "CATEGORY-A";
+        final String categoryName = "This is the description for category A.";
+        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withData(CASE_DATA)
+            .withSupplementaryData(emptyMap())
+            .build();
+
+        // WHEN
+        final GlobalSearchResponse.Result actualResult =
+            underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+
+        // THEN
+        assertThat(actualResult)
+            .isNotNull()
+            .satisfies(result -> {
+                assertThat(result.getCaseManagementCategoryId()).isEqualTo(categoryId);
+                assertThat(result.getCaseManagementCategoryName()).isEqualTo(categoryName);
+            });
+    }
+
+    @Test
+    void testShouldMapCaseNameHmctsInternal() {
+        // GIVEN
+        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withData(CASE_DATA)
+            .withSupplementaryData(emptyMap())
+            .build();
+
+        // WHEN
+        final GlobalSearchResponse.Result actualResult =
+            underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+
+        // THEN
+        assertThat(actualResult)
+            .isNotNull()
+            .satisfies(result -> assertThat(result.getCaseNameHmctsInternal()).isEqualTo("Internal case name"));
+    }
+
+    @Test
+    void testShouldMapOtherCaseReferences() {
+        // GIVEN
+        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withData(CASE_DATA)
+            .withSupplementaryData(emptyMap())
+            .build();
+
+        // WHEN
+        final GlobalSearchResponse.Result actualResult =
+            underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+
+        // THEN
+        assertThat(actualResult)
+            .isNotNull()
+            .satisfies(result -> assertThat(result.getOtherReferences()).containsExactlyInAnyOrder("Ref1", "Ref2"));
+    }
+
 }
