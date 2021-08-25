@@ -64,15 +64,15 @@ public class SearchResponseTransformer {
         return null;
     }
 
-    GlobalSearchResponse.Result aResult(final CaseDetails caseDetails,
-                                        final ServiceLookup serviceLookup,
-                                        final LocationLookup locationLookup) {
+    GlobalSearchResponse.Result transformResult(final CaseDetails caseDetails,
+                                                final ServiceLookup serviceLookup,
+                                                final LocationLookup locationLookup) {
         final String jurisdictionId = caseDetails.getJurisdiction();
         final String caseTypeId = caseDetails.getCaseTypeId();
         final Optional<JurisdictionDefinition> optionalJurisdiction =
             Optional.ofNullable(caseDefinitionRepository.getJurisdiction(jurisdictionId));
         final Optional<CaseTypeDefinition> optionalCaseType =
-            Optional.ofNullable(caseDefinitionRepository.getCaseType(caseDetails.getVersion(), caseTypeId));
+            findCaseTypeDefinition(caseTypeId, caseDetails.getVersion());
         final Map<String, JsonNode> caseData = caseDetails.getData();
         final String serviceId = findValue(caseData, SERVICE_ID_FIELD);
         final String baseLocationId = findValue(caseData, BASE_LOCATION_ID_FIELD);
@@ -107,6 +107,12 @@ public class SearchResponseTransformer {
             .flatMap(List::stream)
             .filter(Objects::nonNull)
             .findFirst();
+    }
+
+    private Optional<CaseTypeDefinition> findCaseTypeDefinition(final String caseTypeId, final Integer version) {
+        return Optional.ofNullable(version)
+            .map(v -> caseDefinitionRepository.getCaseType(v, caseTypeId))
+            .or(() -> Optional.ofNullable(caseDefinitionRepository.getCaseType(caseTypeId)));
     }
 
 }

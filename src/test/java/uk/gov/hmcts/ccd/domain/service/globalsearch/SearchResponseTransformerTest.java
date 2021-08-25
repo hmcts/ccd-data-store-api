@@ -129,12 +129,12 @@ class SearchResponseTransformerTest extends TestFixtures {
         // GIVEN
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withState("CaseCreated")
-            .withVersion(VERSION_NUMBER)
             .withData(emptyMap())
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+        final GlobalSearchResponse.Result actualResult =
+            underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
         assertThat(actualResult)
@@ -147,12 +147,12 @@ class SearchResponseTransformerTest extends TestFixtures {
         // GIVEN
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withReference(1629297445116784L)
-            .withVersion(VERSION_NUMBER)
             .withData(emptyMap())
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+        final GlobalSearchResponse.Result actualResult =
+            underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
         assertThat(actualResult)
@@ -167,13 +167,12 @@ class SearchResponseTransformerTest extends TestFixtures {
         doReturn(jurisdictionDefinition).when(caseDefinitionRepository).getJurisdiction(JURISDICTION_ID);
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withJurisdiction(JURISDICTION_ID)
-            .withCaseTypeId(CASE_TYPE_ID)
-            .withVersion(VERSION_NUMBER)
             .withData(emptyMap())
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+        final GlobalSearchResponse.Result actualResult =
+            underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
         assertThat(actualResult)
@@ -190,14 +189,14 @@ class SearchResponseTransformerTest extends TestFixtures {
         final CaseTypeDefinition caseTypeDefinition = buildCaseTypeDefinition();
         doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(VERSION_NUMBER, CASE_TYPE_ID);
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
-            .withJurisdiction(JURISDICTION_ID)
             .withCaseTypeId(CASE_TYPE_ID)
             .withVersion(VERSION_NUMBER)
             .withData(emptyMap())
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+        final GlobalSearchResponse.Result actualResult =
+            underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
         assertThat(actualResult)
@@ -212,12 +211,12 @@ class SearchResponseTransformerTest extends TestFixtures {
     void testShouldMapService() {
         // GIVEN
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
-            .withVersion(VERSION_NUMBER)
             .withData(CASE_DATA)
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+        final GlobalSearchResponse.Result actualResult =
+            underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
         assertThat(actualResult)
@@ -232,12 +231,12 @@ class SearchResponseTransformerTest extends TestFixtures {
     void testShouldMapLocationAndRegion() {
         // GIVEN
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
-            .withVersion(VERSION_NUMBER)
             .withData(CASE_DATA)
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+        final GlobalSearchResponse.Result actualResult =
+            underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
         assertThat(actualResult)
