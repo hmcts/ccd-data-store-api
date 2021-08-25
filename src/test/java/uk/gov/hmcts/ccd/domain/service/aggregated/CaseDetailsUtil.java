@@ -33,6 +33,11 @@ public class CaseDetailsUtil extends CaseDetails {
             return this;
         }
 
+        public CaseDetailsBuilder withVersion(Integer version) {
+            caseDetails.setVersion(version);
+            return this;
+        }
+
         public CaseDetailsBuilder withState(String state) {
             caseDetails.setState(state);
             return this;

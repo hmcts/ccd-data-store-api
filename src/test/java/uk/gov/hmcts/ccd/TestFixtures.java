@@ -25,12 +25,13 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 
 public abstract class TestFixtures {
-    private static final Integer VERSION_NUMBER = 1;
-
+    protected static final Integer VERSION_NUMBER = 1;
     protected static final String JURISDICTION_ID = "SSCS";
+    protected static final String JURISDICTION_NAME = "Social Security and Child Support";
     protected static final String CASE_REFERENCE = "1234123412341236";
     protected static final Long REFERENCE = Long.valueOf(CASE_REFERENCE);
     protected static final String CASE_TYPE_ID = "Claim";
+    protected static final String CASE_TYPE_NAME = "Claim Case Type";
     protected static final String STATE = "CreatedState";
     protected static final String POST_STATE = "Updated";
 
@@ -147,14 +148,22 @@ public abstract class TestFixtures {
         return caseEventDefinition;
     }
 
-    protected CaseTypeDefinition buildCaseTypeDefinition() {
+    protected JurisdictionDefinition buildJurisdictionDefinition() {
         final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
         jurisdictionDefinition.setId(JURISDICTION_ID);
+        jurisdictionDefinition.setName(JURISDICTION_NAME);
+
+        return jurisdictionDefinition;
+    }
+
+    protected CaseTypeDefinition buildCaseTypeDefinition() {
+        final JurisdictionDefinition jurisdictionDefinition = buildJurisdictionDefinition();
         final Version version = new Version();
         version.setNumber(VERSION_NUMBER);
 
         CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         caseTypeDefinition.setId(CASE_TYPE_ID);
+        caseTypeDefinition.setName(CASE_TYPE_NAME);
         caseTypeDefinition.setJurisdictionDefinition(jurisdictionDefinition);
         caseTypeDefinition.setVersion(version);
 
