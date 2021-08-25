@@ -129,6 +129,12 @@
   "supplementary_data" : {
     "ComplexService": {
       "service_code": "SC1"
+    },
+    "ComplexLocation": {
+      "NestedField": {
+        "base_location_id": "L-1",
+        "region_id": "R-2"
+      }
     }
   },
   "after_submit_callback_response" : null,

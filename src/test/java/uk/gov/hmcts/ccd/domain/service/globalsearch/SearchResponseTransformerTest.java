@@ -12,6 +12,7 @@ import uk.gov.hmcts.ccd.data.ReferenceDataRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.dto.globalsearch.GlobalSearchResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
 import uk.gov.hmcts.ccd.domain.model.refdata.LocationLookup;
@@ -40,9 +41,7 @@ class SearchResponseTransformerTest extends TestFixtures {
 
     private static Map<String, JsonNode> CASE_DATA;
     private static ServiceLookup SERVICE_LOOKUP;
-
-    private final String beftaMasterJurisdictionId = "BEFTA_MASTER";
-    private final String beftaMasterJurisdictionName = "BEFTA Master";
+    private static LocationLookup LOCATION_LOOKUP;
 
     private final BuildingLocation location1 = BuildingLocation.builder()
         .buildingLocationId("L-1")
@@ -57,11 +56,11 @@ class SearchResponseTransformerTest extends TestFixtures {
         .region("Region 2")
         .build();
 
-    private static final Service SERVICE_1 = Service.builder()
+    private final Service service1 = Service.builder()
         .serviceCode("SC1")
         .serviceShortDescription("Service 1")
         .build();
-    private static final Service SERVICE_2 = Service.builder()
+    private final Service service2 = Service.builder()
         .serviceCode("SC2")
         .serviceShortDescription("Service 2")
         .build();
@@ -70,6 +69,10 @@ class SearchResponseTransformerTest extends TestFixtures {
     static void prepare() throws Exception {
         CASE_DATA = fromFileAsMap("case-data-with-case-reference.json");
         SERVICE_LOOKUP = new ServiceLookup(Map.of("SC1", "Service 1", "SC2", "Service 2"));
+        LOCATION_LOOKUP = new LocationLookup(
+            Map.of("L-1", "Location 1", "L-2", "Location 2"),
+            Map.of("R-1", "Region 1", "R-2", "Region 2")
+        );
     }
 
     @Test
@@ -85,15 +88,18 @@ class SearchResponseTransformerTest extends TestFixtures {
             .isNotNull()
             .satisfies(dictionary -> {
                 assertThat(dictionary.getLocationName("L-1")).isEqualTo("Location 1");
+                assertThat(dictionary.getLocationName("L-0")).isNull();
+                assertThat(dictionary.getLocationName(null)).isNull();
                 assertThat(dictionary.getRegionName("R-2")).isEqualTo("Region 2");
                 assertThat(dictionary.getRegionName("R-0")).isNull();
+                assertThat(dictionary.getRegionName(null)).isNull();
             });
     }
 
     @Test
     void testServiceLookupBuilderFunction() {
         // GIVEN
-        final List<Service> refData = List.of(SERVICE_1, SERVICE_2);
+        final List<Service> refData = List.of(service1, service2);
 
         // WHEN
         final ServiceLookup serviceLookup = SearchResponseTransformer.SERVICE_LOOKUP_FUNCTION.apply(refData);
@@ -105,6 +111,7 @@ class SearchResponseTransformerTest extends TestFixtures {
                 assertThat(dictionary.getServiceShortDescription("SC1")).isEqualTo("Service 1");
                 assertThat(dictionary.getServiceShortDescription("SC2")).isEqualTo("Service 2");
                 assertThat(dictionary.getServiceShortDescription("SC3")).isNull();
+                assertThat(dictionary.getServiceShortDescription(null)).isNull();
             });
     }
 
@@ -122,11 +129,12 @@ class SearchResponseTransformerTest extends TestFixtures {
         // GIVEN
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withState("CaseCreated")
+            .withVersion(VERSION_NUMBER)
             .withData(emptyMap())
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP);
+        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
         assertThat(actualResult)
@@ -139,11 +147,12 @@ class SearchResponseTransformerTest extends TestFixtures {
         // GIVEN
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withReference(1629297445116784L)
+            .withVersion(VERSION_NUMBER)
             .withData(emptyMap())
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP);
+        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
         assertThat(actualResult)
@@ -155,21 +164,47 @@ class SearchResponseTransformerTest extends TestFixtures {
     void testShouldMapJurisdiction() {
         // GIVEN
         final JurisdictionDefinition jurisdictionDefinition = buildJurisdictionDefinition();
-        doReturn(jurisdictionDefinition).when(caseDefinitionRepository).getJurisdiction(beftaMasterJurisdictionId);
+        doReturn(jurisdictionDefinition).when(caseDefinitionRepository).getJurisdiction(JURISDICTION_ID);
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
-            .withJurisdiction(beftaMasterJurisdictionId)
+            .withJurisdiction(JURISDICTION_ID)
+            .withCaseTypeId(CASE_TYPE_ID)
+            .withVersion(VERSION_NUMBER)
             .withData(emptyMap())
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP);
+        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
         assertThat(actualResult)
             .isNotNull()
             .satisfies(result -> {
-                assertThat(result.getCcdJurisdictionId()).isEqualTo(beftaMasterJurisdictionId);
-                assertThat(result.getCcdJurisdictionName()).isEqualTo(beftaMasterJurisdictionName);
+                assertThat(result.getCcdJurisdictionId()).isEqualTo(JURISDICTION_ID);
+                assertThat(result.getCcdJurisdictionName()).isEqualTo(JURISDICTION_NAME);
+            });
+    }
+
+    @Test
+    void testShouldMapCaseType() {
+        // GIVEN
+        final CaseTypeDefinition caseTypeDefinition = buildCaseTypeDefinition();
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(VERSION_NUMBER, CASE_TYPE_ID);
+        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withJurisdiction(JURISDICTION_ID)
+            .withCaseTypeId(CASE_TYPE_ID)
+            .withVersion(VERSION_NUMBER)
+            .withData(emptyMap())
+            .build();
+
+        // WHEN
+        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+
+        // THEN
+        assertThat(actualResult)
+            .isNotNull()
+            .satisfies(result -> {
+                assertThat(result.getCcdCaseTypeId()).isEqualTo(CASE_TYPE_ID);
+                assertThat(result.getCcdCaseTypeName()).isEqualTo(CASE_TYPE_NAME);
             });
     }
 
@@ -177,11 +212,12 @@ class SearchResponseTransformerTest extends TestFixtures {
     void testShouldMapService() {
         // GIVEN
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withVersion(VERSION_NUMBER)
             .withData(CASE_DATA)
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP);
+        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
         assertThat(actualResult)
@@ -192,11 +228,25 @@ class SearchResponseTransformerTest extends TestFixtures {
             });
     }
 
-    private JurisdictionDefinition buildJurisdictionDefinition() {
-        JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
-        jurisdictionDefinition.setId(beftaMasterJurisdictionId);
-        jurisdictionDefinition.setName(beftaMasterJurisdictionName);
+    @Test
+    void testShouldMapLocationAndRegion() {
+        // GIVEN
+        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withVersion(VERSION_NUMBER)
+            .withData(CASE_DATA)
+            .build();
 
-        return jurisdictionDefinition;
+        // WHEN
+        final GlobalSearchResponse.Result actualResult = underTest.aResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+
+        // THEN
+        assertThat(actualResult)
+            .isNotNull()
+            .satisfies(result -> {
+                assertThat(result.getBaseLocationId()).isEqualTo("L-1");
+                assertThat(result.getBaseLocationName()).isEqualTo("Location 1");
+                assertThat(result.getRegionId()).isEqualTo("R-2");
+                assertThat(result.getRegionName()).isEqualTo("Region 2");
+            });
     }
 }

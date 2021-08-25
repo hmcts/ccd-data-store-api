@@ -8,6 +8,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.dto.globalsearch.GlobalSearchResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
 import uk.gov.hmcts.ccd.domain.model.refdata.Service;
@@ -30,6 +31,8 @@ import static uk.gov.hmcts.ccd.domain.service.globalsearch.LocationCollector.toL
 public class SearchResponseTransformer {
 
     private static final String SERVICE_ID_FIELD = "service_code";
+    private static final String BASE_LOCATION_ID_FIELD = "base_location_id";
+    private static final String REGION_ID_FIELD = "region_id";
 
     static Function<List<BuildingLocation>, LocationLookup> LOCATION_LOOKUP_FUNCTION =
         locations -> locations.stream().collect(toLocationLookup());
@@ -54,25 +57,40 @@ public class SearchResponseTransformer {
     public GlobalSearchResponse transform(final CaseSearchResult caseSearchResult) {
 
         final List<Service> services = referenceDataRepository.getServices();
+        final List<BuildingLocation> buildingLocations = referenceDataRepository.getBuildingLocations();
         final ServiceLookup serviceLookup = SERVICE_LOOKUP_FUNCTION.apply(services);
+        final LocationLookup locationLookup = LOCATION_LOOKUP_FUNCTION.apply(buildingLocations);
 
         return null;
     }
 
-    GlobalSearchResponse.Result aResult(final CaseDetails caseDetails, final ServiceLookup serviceLookup) {
+    GlobalSearchResponse.Result aResult(final CaseDetails caseDetails,
+                                        final ServiceLookup serviceLookup,
+                                        final LocationLookup locationLookup) {
         final String jurisdictionId = caseDetails.getJurisdiction();
+        final String caseTypeId = caseDetails.getCaseTypeId();
         final Optional<JurisdictionDefinition> optionalJurisdiction =
             Optional.ofNullable(caseDefinitionRepository.getJurisdiction(jurisdictionId));
+        final Optional<CaseTypeDefinition> optionalCaseType =
+            Optional.ofNullable(caseDefinitionRepository.getCaseType(caseDetails.getVersion(), caseTypeId));
         final Map<String, JsonNode> caseData = caseDetails.getData();
         final String serviceId = findValue(caseData, SERVICE_ID_FIELD);
+        final String baseLocationId = findValue(caseData, BASE_LOCATION_ID_FIELD);
+        final String regionId = findValue(caseData, REGION_ID_FIELD);
 
         return GlobalSearchResponse.Result.builder()
             .stateId(caseDetails.getState())
             .caseReference(caseDetails.getReferenceAsString())
             .ccdJurisdictionId(jurisdictionId)
             .ccdJurisdictionName(optionalJurisdiction.map(JurisdictionDefinition::getName).orElse(null))
+            .ccdCaseTypeId(caseTypeId)
+            .ccdCaseTypeName(optionalCaseType.map(CaseTypeDefinition::getName).orElse(null))
             .hmctsServiceId(serviceId)
             .hmctsServiceShortDescription(serviceLookup.getServiceShortDescription(serviceId))
+            .baseLocationId(baseLocationId)
+            .baseLocationName(locationLookup.getLocationName(baseLocationId))
+            .regionId(regionId)
+            .regionName(locationLookup.getRegionName(regionId))
             .build();
     }
 
