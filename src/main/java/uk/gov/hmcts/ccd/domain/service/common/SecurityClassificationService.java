@@ -165,8 +165,8 @@ public class SecurityClassificationService {
         Iterator<JsonNode> dataCollectionIterator = dataElementValue.iterator();
         while (dataCollectionIterator.hasNext()) {
             JsonNode collectionElement = dataCollectionIterator.next();
-            JsonNode dataClassificationForData =
-                getDataClassificationForData(dataClassificationElement.get(VALUE).iterator());
+            JsonNode dataClassificationForData = getDataClassificationForData(collectionElement,
+                dataClassificationElement.get(VALUE).iterator());
             if (dataClassificationForData.isNull()) {
                 dataCollectionIterator.remove();
                 continue;
