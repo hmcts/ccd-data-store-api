@@ -30,7 +30,7 @@ public class GlobalSearchResponse {
         String stateId;
         String processForAccess;
         String caseReference;
-        String otherReference;
+        List<String> otherReferences;
         @JsonProperty("CCDJurisdictionId")
         String ccdJurisdictionId;
         @JsonProperty("CCDJurisdictionName")
