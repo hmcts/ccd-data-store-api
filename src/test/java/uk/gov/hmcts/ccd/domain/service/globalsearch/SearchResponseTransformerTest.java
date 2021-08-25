@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
 import uk.gov.hmcts.ccd.domain.model.refdata.LocationLookup;
 import uk.gov.hmcts.ccd.domain.model.refdata.Service;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceLookup;
+import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.service.aggregated.CaseDetailsUtil;
 
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.Map;
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class SearchResponseTransformerTest extends TestFixtures {
@@ -66,6 +68,12 @@ class SearchResponseTransformerTest extends TestFixtures {
         .serviceShortDescription("Service 2")
         .build();
 
+    private final List<BuildingLocation> locationsRefData = List.of(location1, location2);
+    private final List<Service> servicesRefData = List.of(service1, service2);
+
+    private final String categoryId = "CATEGORY-A";
+    private final String categoryName = "This is the description for category A.";
+
     @BeforeAll
     static void prepare() throws Exception {
         CASE_DATA = fromFileAsMap("global-search-result-data.json");
@@ -79,11 +87,9 @@ class SearchResponseTransformerTest extends TestFixtures {
 
     @Test
     void testLocationLookupBuilderFunction() {
-        // GIVEN
-        final List<BuildingLocation> refData = List.of(location1, location2);
-
         // WHEN
-        final LocationLookup locationLookup = SearchResponseTransformer.LOCATION_LOOKUP_FUNCTION.apply(refData);
+        final LocationLookup locationLookup =
+            SearchResponseTransformer.LOCATION_LOOKUP_FUNCTION.apply(locationsRefData);
 
         // THEN
         assertThat(locationLookup)
@@ -100,11 +106,8 @@ class SearchResponseTransformerTest extends TestFixtures {
 
     @Test
     void testServiceLookupBuilderFunction() {
-        // GIVEN
-        final List<Service> refData = List.of(service1, service2);
-
         // WHEN
-        final ServiceLookup serviceLookup = SearchResponseTransformer.SERVICE_LOOKUP_FUNCTION.apply(refData);
+        final ServiceLookup serviceLookup = SearchResponseTransformer.SERVICE_LOOKUP_FUNCTION.apply(servicesRefData);
 
         // THEN
         assertThat(serviceLookup)
@@ -250,8 +253,6 @@ class SearchResponseTransformerTest extends TestFixtures {
     @Test
     void testShouldMapCaseManagementCategory() {
         // GIVEN
-        final String categoryId = "CATEGORY-A";
-        final String categoryName = "This is the description for category A.";
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withData(CASE_DATA)
             .withSupplementaryData(emptyMap())
@@ -304,6 +305,63 @@ class SearchResponseTransformerTest extends TestFixtures {
         assertThat(actualResult)
             .isNotNull()
             .satisfies(result -> assertThat(result.getOtherReferences()).containsExactlyInAnyOrder("Ref1", "Ref2"));
+    }
+
+    @Test
+    void testShouldOrchestrateResultTransformation() {
+        // GIVEN
+        final JurisdictionDefinition jurisdictionDefinition = buildJurisdictionDefinition();
+        final CaseTypeDefinition caseTypeDefinition = buildCaseTypeDefinition();
+        doReturn(jurisdictionDefinition).when(caseDefinitionRepository).getJurisdiction(JURISDICTION_ID);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
+        doReturn(servicesRefData).when(referenceDataRepository).getServices();
+        doReturn(locationsRefData).when(referenceDataRepository).getBuildingLocations();
+
+        final CaseSearchResult caseSearchResult = buildCaseSearchResult();
+
+        // WHEN
+        final GlobalSearchResponse actualResponse = underTest.transform(caseSearchResult);
+
+        assertThat(actualResponse)
+            .isNotNull()
+            .satisfies(response -> {
+                final List<GlobalSearchResponse.Result> results = response.getResults();
+                assertThat(results).isNotEmpty();
+                final GlobalSearchResponse.Result result = results.stream().findFirst().get();
+                assertThat(result.getStateId()).isEqualTo("CaseCreated");
+                assertThat(result.getCaseReference()).isEqualTo("1629297445116784");
+                assertThat(result.getCcdJurisdictionId()).isEqualTo(JURISDICTION_ID);
+                assertThat(result.getCcdJurisdictionName()).isEqualTo(JURISDICTION_NAME);
+                assertThat(result.getCcdCaseTypeId()).isEqualTo(CASE_TYPE_ID);
+                assertThat(result.getCcdCaseTypeName()).isEqualTo(CASE_TYPE_NAME);
+                assertThat(result.getHmctsServiceId()).isEqualTo("SC1");
+                assertThat(result.getHmctsServiceShortDescription()).isEqualTo("Service 1");
+                assertThat(result.getBaseLocationId()).isEqualTo("321");
+                assertThat(result.getBaseLocationName()).isEqualTo("Location 1");
+                assertThat(result.getRegionId()).isEqualTo("123");
+                assertThat(result.getRegionName()).isEqualTo("Region 2");
+                assertThat(result.getCaseManagementCategoryId()).isEqualTo(categoryId);
+                assertThat(result.getCaseManagementCategoryName()).isEqualTo(categoryName);
+                assertThat(result.getCaseNameHmctsInternal()).isEqualTo("Internal case name");
+                assertThat(result.getOtherReferences()).containsExactlyInAnyOrder("Ref1", "Ref2");
+            });
+
+        verify(caseDefinitionRepository).getJurisdiction(JURISDICTION_ID);
+        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
+        verify(referenceDataRepository).getServices();
+        verify(referenceDataRepository).getBuildingLocations();
+    }
+
+    private CaseSearchResult buildCaseSearchResult() {
+        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withReference(1629297445116784L)
+            .withState("CaseCreated")
+            .withJurisdiction(JURISDICTION_ID)
+            .withCaseTypeId(CASE_TYPE_ID)
+            .withData(CASE_DATA)
+            .withSupplementaryData(SUPPLEMENTARY_DATA)
+            .build();
+        return new CaseSearchResult(1L, List.of(caseDetails));
     }
 
 }
