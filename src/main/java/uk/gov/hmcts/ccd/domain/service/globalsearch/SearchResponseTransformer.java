@@ -44,7 +44,6 @@ public class SearchResponseTransformer {
     private static final String CASE_NAME_HMCTS_INTERNAL_FIELD = "caseNameHmctsInternal";
     private static final String SEARCH_CRITERIA_FIELD = "SearchCriteria";
     private static final String OTHER_CASE_REFERENCES_FIELD = "OtherCaseReferences";
-    private static final String ACCESS_PROCESS = "access_process";
 
     static Function<List<BuildingLocation>, LocationLookup> LOCATION_LOOKUP_FUNCTION =
         locations -> locations.stream().collect(toLocationLookup());
@@ -67,13 +66,18 @@ public class SearchResponseTransformer {
     }
 
     public GlobalSearchResponse transform(final CaseSearchResult caseSearchResult) {
-
         final List<Service> services = referenceDataRepository.getServices();
         final List<BuildingLocation> buildingLocations = referenceDataRepository.getBuildingLocations();
         final ServiceLookup serviceLookup = SERVICE_LOOKUP_FUNCTION.apply(services);
         final LocationLookup locationLookup = LOCATION_LOOKUP_FUNCTION.apply(buildingLocations);
 
-        return null;
+        final List<GlobalSearchResponse.Result> results = caseSearchResult.getCases().stream()
+            .map(caseDetails -> transformResult(caseDetails, serviceLookup, locationLookup))
+            .collect(Collectors.toUnmodifiableList());
+
+        return GlobalSearchResponse.builder()
+            .results(results)
+            .build();
     }
 
     GlobalSearchResponse.Result transformResult(final CaseDetails caseDetails,
