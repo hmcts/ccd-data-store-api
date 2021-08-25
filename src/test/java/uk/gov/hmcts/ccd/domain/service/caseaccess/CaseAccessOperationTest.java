@@ -116,6 +116,12 @@ class CaseAccessOperationTest {
         ArgumentCaptor<CaseDetails> caseDetailsCaptor;
 
         @Captor
+        ArgumentCaptor<List<String>> caseReferencesCaptor;
+
+        @Captor
+        ArgumentCaptor<List<String>> userIdsCaptor;
+
+        @Captor
         ArgumentCaptor<Set<String>> rolesCaptor;
 
         @Test
@@ -137,11 +143,12 @@ class CaseAccessOperationTest {
         }
 
         @Test
-        @DisplayName("RA set to true, should grant access to user")
-        void shouldGrantAccessForRA() {
+        @DisplayName("RA set to true, should grant access to user, if [CREATOR] not already granted")
+        void shouldGrantAccessForRA_IfNotAlreadyGranted() {
 
             // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+            when(roleAssignmentService.findRoleAssignmentsByCasesAndUsers(any(), any())).thenReturn(new ArrayList<>());
 
             // ACT
             caseAccessOperation.grantAccess(JURISDICTION, CASE_REFERENCE.toString(), USER_ID);
@@ -150,11 +157,24 @@ class CaseAccessOperationTest {
             assertAll(
                 () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_REFERENCE),
                 () -> {
+                    verify(roleAssignmentService)
+                        .findRoleAssignmentsByCasesAndUsers(caseReferencesCaptor.capture(), userIdsCaptor.capture());
+                    List<String> caseReferences = caseReferencesCaptor.getValue();
+                    List<String> userIds = userIdsCaptor.getValue();
+
+                    assertAll(
+                        () -> assertEquals(1, caseReferences.size()),
+                        () -> assertEquals(1, userIds.size()),
+                        () -> assertEquals(CASE_REFERENCE.toString(), caseReferences.get(0)),
+                        () -> assertEquals(USER_ID, userIds.get(0))
+                    );
+                },
+                () -> {
                     verify(roleAssignmentService).createCaseRoleAssignments(
                         caseDetailsCaptor.capture(),
                         eq(USER_ID),
                         rolesCaptor.capture(),
-                        eq(true)
+                        eq(false)
                     );
 
                     CaseDetails caseDetails = caseDetailsCaptor.getValue();
@@ -169,6 +189,46 @@ class CaseAccessOperationTest {
                         () -> assertTrue(roles.contains(CREATOR.getRole()))
                     );
                 },
+                () -> verifyNoInteractions(caseUserRepository)
+            );
+        }
+
+        @Test
+        @DisplayName("RA set to true, should skip grant access to user, if [CREATOR] already granted")
+        void shouldSkipGrantAccessForRA_IfAlreadyGranted() {
+
+            // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+            when(roleAssignmentService.findRoleAssignmentsByCasesAndUsers(any(), any())).thenReturn(List.of(
+                new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CREATOR.getRole())
+            ));
+
+            // ACT
+            caseAccessOperation.grantAccess(JURISDICTION, CASE_REFERENCE.toString(), USER_ID);
+
+            // ASSERT
+            assertAll(
+                () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_REFERENCE),
+                () -> {
+                    verify(roleAssignmentService)
+                        .findRoleAssignmentsByCasesAndUsers(caseReferencesCaptor.capture(), userIdsCaptor.capture());
+
+                    List<String> caseReferences = caseReferencesCaptor.getValue();
+                    List<String> userIds = userIdsCaptor.getValue();
+
+                    assertAll(
+                        () -> assertEquals(1, caseReferences.size()),
+                        () -> assertEquals(1, userIds.size()),
+                        () -> assertEquals(CASE_REFERENCE.toString(), caseReferences.get(0)),
+                        () -> assertEquals(USER_ID, userIds.get(0))
+                    );
+                },
+                () -> verify(roleAssignmentService, never()).createCaseRoleAssignments(
+                    any(CaseDetails.class),
+                    anyString(),
+                    any(),
+                    anyBoolean()
+                ),
                 () -> verifyNoInteractions(caseUserRepository)
             );
         }
