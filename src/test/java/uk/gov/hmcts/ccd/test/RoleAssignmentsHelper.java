@@ -34,4 +34,27 @@ public class RoleAssignmentsHelper {
                + "          \"authorisations\": []\n"
                + "        }";
     }
+
+    public static String userRoleAssignmentJson(String actorId, String roleName, String caseId) {
+        return "        {\n"
+               + "          \"id\": \"e6fc5ebb-63e3-4613-9cfc-b3f9b1559571\",\n"
+               + "          \"actorIdType\": \"IDAM\",\n"
+               + "          \"actorId\": \"" + actorId + "\",\n"
+               + "          \"roleType\": \"CASE\",\n"
+               + "          \"roleName\": \"" + roleName + "\",\n"
+               + "          \"classification\": \"PUBLIC\",\n"
+               + "          \"grantType\": \"STANDARD\",\n"
+               + "          \"roleCategory\": \"SPECIFIC\",\n"
+               + "          \"readOnly\": false,\n"
+               + "          \"beginTime\": \"2021-02-01T00:00:00Z\",\n"
+               + "          \"endTime\": \"2122-01-01T00:00:00Z\",\n"
+               + "          \"created\": \"2020-12-23T06:37:58.096065Z\",\n"
+               + "          \"attributes\": {\n"
+               + "            \"jurisdiction\": \"PROBATE\",\n"
+               + "            \"caseType\": \"TestAddressBookCase\",\n"
+               + "            \"caseId\": \"" + caseId + "\"\n"
+               + "          },\n"
+               + "          \"authorisations\": []\n"
+               + "        }";
+    }
 }
