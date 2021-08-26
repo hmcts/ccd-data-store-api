@@ -24,21 +24,22 @@ public class StandardGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
                 || roleAssignment.getAuthorisations().size() == 0);
 
         String regionAndLocationQuery = streamSupplier.get()
+            .filter(roleAssignment -> roleAssignment.getAttributes() != null)
             .map(roleAssignment -> {
                 Optional<String> jurisdiction = roleAssignment.getAttributes().getJurisdiction();
                 String innerQuery = "";
-                if (jurisdiction.isPresent()) {
+                if (jurisdiction != null && jurisdiction.isPresent()) {
                     innerQuery = String.format("%s='%s'", JURISDICTION, jurisdiction.get());
                 }
 
                 Optional<String> region = roleAssignment.getAttributes().getRegion();
-                if (region.isPresent()) {
+                if (region != null && region.isPresent()) {
                     innerQuery = innerQuery + getOperator(innerQuery, AND)
                         + String.format("%s='%s'", REGION, region.get());
                 }
 
                 Optional<String> location = roleAssignment.getAttributes().getLocation();
-                if (location.isPresent()) {
+                if (location != null && location.isPresent()) {
                     innerQuery = innerQuery + getOperator(innerQuery, AND)
                         + String.format("%s='%s'", LOCATION, location.get());
                 }

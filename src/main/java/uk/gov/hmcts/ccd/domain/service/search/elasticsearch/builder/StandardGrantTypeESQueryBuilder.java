@@ -29,20 +29,24 @@ public class StandardGrantTypeESQueryBuilder implements GrantTypeESQueryBuilder 
         List<TermsQueryBuilder> innerQuery = Lists.newArrayList();
 
         streamSupplier.get()
+            .filter(roleAssignment -> roleAssignment.getAttributes() != null)
             .forEach(roleAssignment -> {
                 Optional<String> jurisdiction = roleAssignment.getAttributes().getJurisdiction();
 
-                if (StringUtils.isNotBlank(jurisdiction.orElse(""))) {
+                if (jurisdiction != null
+                    && StringUtils.isNotBlank(jurisdiction.orElse(""))) {
                     innerQuery.add(QueryBuilders.termsQuery(JURISDICTION_FIELD_KEYWORD_COL, jurisdiction.get()));
                 }
 
                 Optional<String> region = roleAssignment.getAttributes().getRegion();
-                if (StringUtils.isNotBlank(region.orElse(""))) {
+                if (region != null
+                    && StringUtils.isNotBlank(region.orElse(""))) {
                     innerQuery.add(QueryBuilders.termsQuery(REGION, region.get()));
                 }
 
                 Optional<String> location = roleAssignment.getAttributes().getLocation();
-                if (StringUtils.isNotBlank(location.orElse(""))) {
+                if (location != null &&
+                    StringUtils.isNotBlank(location.orElse(""))) {
                     innerQuery.add(QueryBuilders.termsQuery(LOCATION, location.get()));
                 }
             });
