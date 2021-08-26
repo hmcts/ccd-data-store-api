@@ -4,18 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.NonNull;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Qualifier;
-import uk.gov.hmcts.ccd.data.ReferenceDataRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.dto.globalsearch.GlobalSearchResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
-import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
 import uk.gov.hmcts.ccd.domain.model.refdata.LocationLookup;
-import uk.gov.hmcts.ccd.domain.model.refdata.Service;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceLookup;
-import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -23,12 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
-import static java.util.stream.Collectors.toUnmodifiableMap;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.LocationCollector.toLocationLookup;
 
 @Named
 public class SearchResponseTransformer {
@@ -45,42 +37,28 @@ public class SearchResponseTransformer {
     private static final String SEARCH_CRITERIA_FIELD = "SearchCriteria";
     private static final String OTHER_CASE_REFERENCES_FIELD = "OtherCaseReferences";
 
-    static Function<List<BuildingLocation>, LocationLookup> LOCATION_LOOKUP_FUNCTION =
-        locations -> locations.stream().collect(toLocationLookup());
-
-    static Function<List<Service>, ServiceLookup> SERVICE_LOOKUP_FUNCTION = services -> {
-        final Map<String, String> servicesMap = services.stream()
-            .collect(toUnmodifiableMap(Service::getServiceCode, Service::getServiceShortDescription));
-        return new ServiceLookup(servicesMap);
-    };
-
     private final CaseDefinitionRepository caseDefinitionRepository;
-    private final ReferenceDataRepository referenceDataRepository;
 
     @Inject
     public SearchResponseTransformer(@Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                         final CaseDefinitionRepository caseDefinitionRepository,
-                                     final ReferenceDataRepository referenceDataRepository) {
+                                         final CaseDefinitionRepository caseDefinitionRepository) {
         this.caseDefinitionRepository = caseDefinitionRepository;
-        this.referenceDataRepository = referenceDataRepository;
     }
 
-    public GlobalSearchResponse transform(final CaseSearchResult caseSearchResult) {
-        final List<Service> services = referenceDataRepository.getServices();
-        final List<BuildingLocation> buildingLocations = referenceDataRepository.getBuildingLocations();
-        final ServiceLookup serviceLookup = SERVICE_LOOKUP_FUNCTION.apply(services);
-        final LocationLookup locationLookup = LOCATION_LOOKUP_FUNCTION.apply(buildingLocations);
+    public GlobalSearchResponse.ResultInfo transformResultInfo(final Integer maxReturnRecordCount,
+                                                        final Integer startRecordNumber,
+                                                        final Long totalSearchHits,
+                                                        final Integer recordsReturnedCount) {
+        final boolean moreToGo = totalSearchHits > (maxReturnRecordCount + startRecordNumber - 1);
 
-        final List<GlobalSearchResponse.Result> results = caseSearchResult.getCases().stream()
-            .map(caseDetails -> transformResult(caseDetails, serviceLookup, locationLookup))
-            .collect(Collectors.toUnmodifiableList());
-
-        return GlobalSearchResponse.builder()
-            .results(results)
+        return GlobalSearchResponse.ResultInfo.builder()
+            .casesReturned(recordsReturnedCount)
+            .caseStartRecord(startRecordNumber)
+            .moreResultsToGo(moreToGo)
             .build();
     }
 
-    GlobalSearchResponse.Result transformResult(final CaseDetails caseDetails,
+    public GlobalSearchResponse.Result transformResult(final CaseDetails caseDetails,
                                                 final ServiceLookup serviceLookup,
                                                 final LocationLookup locationLookup) {
         final String jurisdictionId = caseDetails.getJurisdiction();
@@ -121,8 +99,7 @@ public class SearchResponseTransformer {
             .build();
     }
 
-    private String findStringValue(@NonNull final Map<String, JsonNode> data,
-                                               @NonNull final String fieldName) {
+    private String findStringValue(@NonNull final Map<String, JsonNode> data, @NonNull final String fieldName) {
         return Optional.ofNullable(data.get(fieldName)).map(JsonNode::asText).orElse(null);
     }
 

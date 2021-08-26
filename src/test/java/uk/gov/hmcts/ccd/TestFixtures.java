@@ -12,6 +12,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.EventPostStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
+import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
+import uk.gov.hmcts.ccd.domain.model.refdata.ServiceReferenceData;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 import java.io.IOException;
@@ -95,6 +97,31 @@ public abstract class TestFixtures {
     protected static final DocumentHashToken HASH_TOKEN_B2 = DocumentHashToken.builder()
         .id("http://dm-store:8080/documents/b5eb1f0e-64cd-4ccb-996a-6915c28fa65d")
         .build();
+
+    protected final BuildingLocation location1 = BuildingLocation.builder()
+        .buildingLocationId("321")
+        .buildingLocationName("Location 1")
+        .regionId("R-1")
+        .region("Region 1")
+        .build();
+    protected final BuildingLocation location2 = BuildingLocation.builder()
+        .buildingLocationId("L-2")
+        .buildingLocationName("Location 2")
+        .regionId("123")
+        .region("Region 2")
+        .build();
+
+    protected final ServiceReferenceData service1 = ServiceReferenceData.builder()
+        .serviceCode("SC1")
+        .serviceShortDescription("Service 1")
+        .build();
+    protected final ServiceReferenceData service2 = ServiceReferenceData.builder()
+        .serviceCode("SC2")
+        .serviceShortDescription("Service 2")
+        .build();
+
+    protected final List<BuildingLocation> locationsRefData = List.of(location1, location2);
+    protected final List<ServiceReferenceData> servicesRefData = List.of(service1, service2);
 
     protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
         .registerModule(new JavaTimeModule());
