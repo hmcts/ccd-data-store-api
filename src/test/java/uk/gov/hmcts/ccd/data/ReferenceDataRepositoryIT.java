@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
 import uk.gov.hmcts.ccd.domain.model.refdata.CourtVenue;
-import uk.gov.hmcts.ccd.domain.model.refdata.Service;
+import uk.gov.hmcts.ccd.domain.model.refdata.ServiceReferenceData;
 
 import javax.inject.Inject;
 import java.time.LocalDateTime;
@@ -74,11 +74,11 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest implements ReferenceDat
     @Test
     void testShouldGetServicesSuccessfullyFromUpstream() {
         // GIVEN
-        final List<Service> expectedServices = buildServices();
+        final List<ServiceReferenceData> expectedServices = buildServices();
         stubServicesSuccess(expectedServices);
 
         // WHEN
-        final List<Service> actualServices = underTest.getServices();
+        final List<ServiceReferenceData> actualServices = underTest.getServices();
 
         // THEN
         assertThat(actualServices)
@@ -94,7 +94,7 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest implements ReferenceDat
         stubUpstreamFault(SERVICES_PATH, SERVICES_STUB_ID);
 
         // WHEN
-        final List<Service> actualServices = underTest.getServices();
+        final List<ServiceReferenceData> actualServices = underTest.getServices();
 
         // THEN
         assertThat(actualServices)
@@ -137,10 +137,10 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest implements ReferenceDat
     @Test
     void testShouldGetServicesSuccessfullyFromCache() throws Exception {
         // GIVEN
-        final List<Service> cachedServices = populateServicesCache();
+        final List<ServiceReferenceData> cachedServices = populateServicesCache();
 
         // WHEN
-        final List<Service> actualServices = underTest.getServices();
+        final List<ServiceReferenceData> actualServices = underTest.getServices();
 
         // THEN
         assertThat(actualServices)
@@ -156,7 +156,7 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest implements ReferenceDat
         attemptCachingEmptyServices();
 
         // WHEN
-        final List<Service> actualServices = underTest.getServices();
+        final List<ServiceReferenceData> actualServices = underTest.getServices();
 
         // THEN
         assertThat(actualServices)
@@ -182,9 +182,9 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest implements ReferenceDat
         SECONDS.sleep(1);
     }
 
-    private List<Service> populateServicesCache() throws Exception {
+    private List<ServiceReferenceData> populateServicesCache() throws Exception {
         stubServicesSuccess(initialServices);
-        final List<Service> cachedServices = underTest.getServices();
+        final List<ServiceReferenceData> cachedServices = underTest.getServices();
         SECONDS.sleep(1);
 
         return cachedServices;
@@ -192,7 +192,7 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest implements ReferenceDat
 
     private void attemptCachingEmptyServices() throws Exception {
         stubServicesSuccess(emptyList());
-        final List<Service> services = underTest.getServices();
+        final List<ServiceReferenceData> services = underTest.getServices();
 
         assertThat(services).isEmpty();
 
@@ -203,7 +203,7 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest implements ReferenceDat
         stubSuccess(BUILDING_LOCATIONS_PATH, objectToJsonString(buildingLocations), BUILDING_LOCATIONS_STUB_ID);
     }
 
-    private void stubServicesSuccess(final List<Service> services) {
+    private void stubServicesSuccess(final List<ServiceReferenceData> services) {
         stubSuccess(SERVICES_PATH, objectToJsonString(services), SERVICES_STUB_ID);
     }
 
@@ -245,8 +245,8 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest implements ReferenceDat
         return List.of(buildingLocation);
     }
 
-    private static List<Service> buildServices() {
-        final Service service = Service.builder()
+    private static List<ServiceReferenceData> buildServices() {
+        final ServiceReferenceData service = ServiceReferenceData.builder()
             .serviceId(11)
             .orgUnit("HMCTS")
             .businessArea("Civil, Family and Tribunals")

@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 @Jacksonized
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class Service implements Serializable {
+public class ServiceReferenceData implements Serializable {
     long serviceId;
     String orgUnit;
     String businessArea;
