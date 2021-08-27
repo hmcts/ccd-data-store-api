@@ -1,39 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static java.lang.String.format;
-import static java.util.Arrays.stream;
-import static java.util.Objects.nonNull;
-import static java.util.Spliterators.spliteratorUnknownSize;
-import static java.util.stream.Collectors.toList;
-import static org.springframework.util.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
-import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
-import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
-import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollectionOptions.ALLOW_DELETE;
-import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollectionOptions.ALLOW_INSERT;
-import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
@@ -49,6 +21,32 @@ import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static java.lang.String.format;
+import static java.util.Arrays.stream;
+import static java.util.Objects.nonNull;
+import static java.util.Spliterators.spliteratorUnknownSize;
+import static java.util.stream.Collectors.toList;
+import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
+import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
+import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollectionOptions.ALLOW_DELETE;
+import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollectionOptions.ALLOW_INSERT;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
 @Service
 public class AccessControlService {
@@ -755,9 +753,9 @@ public class AccessControlService {
             .findAny().orElse(newArrayList());
     }
 
-    static boolean hasAccessControlList(Set<String> userRoles,
-                                        Predicate<AccessControlList> criteria,
-                                        List<AccessControlList> accessControlLists) {
+    public static boolean hasAccessControlList(Set<String> userRoles,
+                                               Predicate<AccessControlList> criteria,
+                                               List<AccessControlList> accessControlLists) {
         // scoop out access control roles based on user roles
         // intersect and make sure we have access for given criteria
         return accessControlLists != null && accessControlLists
