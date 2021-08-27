@@ -29,11 +29,11 @@ public class GlobalSearchProcessorService {
         SearchCriteria searchCriteria = populateSearchCriteria(data, searchCriterias);
         List<SearchParty> searchPartyList = populateSearchParties(data, searchParties);
 
-        if (!searchPartyList.isEmpty()) {
-            searchCriteria.setSearchParties(searchPartyList);
+        if (searchCriteria.isEmpty() && !searchPartyList.isEmpty()) {
+            searchCriteria = SearchCriteria.builder().searchParties(searchPartyList).build();
         }
 
-        if (searchCriteria != null && !searchCriteria.isEmpty()) {
+        if (!searchCriteria.isEmpty()) {
             data.put("SearchCriteria", JacksonUtils.convertValueJsonNode(searchCriteria));
         }
 
@@ -43,7 +43,7 @@ public class GlobalSearchProcessorService {
     private SearchCriteria populateSearchCriteria(Map<String, JsonNode> data,
                                        List<uk.gov.hmcts.ccd.domain.model.definition.SearchCriteria> searchCriterias) {
         List<OtherCaseReference> otherCaseReferences = new ArrayList<>();
-        SearchCriteria returnValue = null;
+        SearchCriteria returnValue = new SearchCriteria();
 
         if (data != null) {
             data.forEach((key, jsonNode) -> {
