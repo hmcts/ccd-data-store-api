@@ -33,7 +33,7 @@ public class GlobalSearchProcessorService {
             searchCriteria = SearchCriteria.builder().searchParties(searchPartyList).build();
         }
 
-        if (!searchCriteria.isEmpty()) {
+        if (!searchCriteria.isEmpty() && data != null) {
             data.put("SearchCriteria", JacksonUtils.convertValueJsonNode(searchCriteria));
         }
 
@@ -46,27 +46,25 @@ public class GlobalSearchProcessorService {
         SearchCriteria returnValue = new SearchCriteria();
 
         if (data != null) {
-            data.forEach((key, jsonNode) -> {
-                searchCriterias.forEach(currentSearchCriteria -> {
+            data.forEach((key, jsonNode) -> searchCriterias.forEach(currentSearchCriteria -> {
 
-                    if (currentSearchCriteria.getOtherCaseReference().contains(".")
-                        && key.equals(currentSearchCriteria.getOtherCaseReference().split("\\.")[0])) {
-                        JsonNode nestedCaseFieldByPath =
-                            CaseFieldPathUtils.getNestedCaseFieldByPath(jsonNode,
-                                currentSearchCriteria.getOtherCaseReference().substring(
-                                    currentSearchCriteria.getOtherCaseReference().indexOf(".") + 1));
-                        otherCaseReferences.add(OtherCaseReference.builder()
-                            .id(UUID.randomUUID().toString())
-                            .value(nestedCaseFieldByPath.textValue())
-                            .build());
-                    } else if (key.equals(currentSearchCriteria.getOtherCaseReference())) {
-                        otherCaseReferences.add(OtherCaseReference.builder()
-                            .id(UUID.randomUUID().toString())
-                            .value(jsonNode.textValue())
-                            .build());
-                    }
-                });
-            });
+                if (currentSearchCriteria.getOtherCaseReference().contains(".")
+                    && key.equals(currentSearchCriteria.getOtherCaseReference().split("\\.")[0])) {
+                    JsonNode nestedCaseFieldByPath =
+                        CaseFieldPathUtils.getNestedCaseFieldByPath(jsonNode,
+                            currentSearchCriteria.getOtherCaseReference().substring(
+                                currentSearchCriteria.getOtherCaseReference().indexOf(".") + 1));
+                    otherCaseReferences.add(OtherCaseReference.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(nestedCaseFieldByPath.textValue())
+                        .build());
+                } else if (key.equals(currentSearchCriteria.getOtherCaseReference())) {
+                    otherCaseReferences.add(OtherCaseReference.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(jsonNode.textValue())
+                        .build());
+                }
+            }));
 
             returnValue = SearchCriteria.builder().otherCaseReferences(otherCaseReferences).build();
         }
