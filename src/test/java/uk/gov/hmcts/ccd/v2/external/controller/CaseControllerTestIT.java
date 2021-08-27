@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
@@ -57,6 +59,7 @@ import static uk.gov.hmcts.ccd.v2.V2.Error.NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_D
 public class CaseControllerTestIT extends WireMockBaseTest {
 
     private static final String CASE_TYPE = "TestAddressBookCase";
+    private static final String CASE_TYPE_WITH_SEARCH_PARTY = "TestAddressBookCase2";
     private static final String JURISDICTION = "PROBATE";
     private static final String TEST_EVENT_ID = "TEST_EVENT";
     private static final String UID = "123";
@@ -265,6 +268,56 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(201));
         assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
+        assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
+        assertThat(captor.getValue().getEventSelected(), is(TEST_EVENT_ID));
+        assertThat(captor.getValue().getRequestId(), is(REQUEST_ID_VALUE));
+    }
+
+    @Test
+    public void shouldPopulateSearchPartyPostCreateCase() throws Exception {
+        final String URL =  "/case-types/" + CASE_TYPE_WITH_SEARCH_PARTY + "/cases";
+        final String description = "A very long comment.......";
+        final String summary = "Short comment";
+
+        final String testFieldValue = "TestFieldValue";
+        Map<String, JsonNode> caseData = new HashMap<>();
+        caseData.put("TextField1", JacksonUtils.MAPPER.readTree("\"" + testFieldValue + "\""));
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().withData(caseData).build();
+        final Event triggeringEvent = anEvent().build();
+        triggeringEvent.setEventId(TEST_EVENT_ID);
+        triggeringEvent.setDescription(description);
+        triggeringEvent.setSummary(summary);
+        caseDetailsToSave.setEvent(triggeringEvent);
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_WITH_SEARCH_PARTY, TEST_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .header(EXPERIMENTAL_HEADER, "experimental")
+            .header(REQUEST_ID, REQUEST_ID_VALUE)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsString(caseDetailsToSave))
+        ).andReturn();
+
+        assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String content = mvcResult.getResponse().getContentAsString();
+        assertNotNull("Content Should not be null", content);
+        CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
+        assertNotNull("Saved Case Details should not be null", savedCaseResource);
+
+        assertEquals("Saved case data should contain SearchCriteria",
+            savedCaseResource.getData().get("SearchCriteria").get("OtherCaseReferences").findValue("value").asText(),
+            testFieldValue);
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CREATE_CASE.getLabel()));
+        assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
+        assertThat(captor.getValue().getIdamId(), is(UID));
+        assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
+        assertThat(captor.getValue().getHttpStatus(), is(201));
+        assertThat(captor.getValue().getCaseType(), is(CASE_TYPE_WITH_SEARCH_PARTY));
         assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
         assertThat(captor.getValue().getEventSelected(), is(TEST_EVENT_ID));
         assertThat(captor.getValue().getRequestId(), is(REQUEST_ID_VALUE));
