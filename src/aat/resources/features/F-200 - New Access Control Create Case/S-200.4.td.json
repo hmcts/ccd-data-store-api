@@ -30,7 +30,7 @@
       "data": {
         "F1": "a",
         "F2": "b",
-        "F3": "c"
+        "F3": "Fly"
       },
       "event": {
         "id": "Create",
@@ -60,8 +60,7 @@
       "state" : "Unissued1",
       "security_classification" : "PUBLIC",
       "data" : {
-        "F2": "b",
-        "F3" : "c"
+        "F3" : "Fly"
       },
       "data_classification" : {
         "F1" : "RESTRICTED",

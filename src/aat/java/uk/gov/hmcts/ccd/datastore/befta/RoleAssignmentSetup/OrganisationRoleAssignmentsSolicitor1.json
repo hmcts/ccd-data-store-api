@@ -1,13 +1,13 @@
 {
   "roleRequest" : {
-    "assignerId" : "82853c08-73dd-4bd3-a50e-7dae355da504",
+    "assignerId" : "5b9f0f4f-9d6d-4142-aabd-159dfbc61ac0",
     "process" : "ccd-fta-data-setup",
-    "reference" : "82853c08-73dd-4bd3-a50e-7dae355da504",
+    "reference" : "5b9f0f4f-9d6d-4142-aabd-159dfbc61ac0",
     "replaceExisting" : true
   },
   "requestedRoles" : [
     {
-      "actorId" : "82853c08-73dd-4bd3-a50e-7dae355da504",
+      "actorId" : "5b9f0f4f-9d6d-4142-aabd-159dfbc61ac0",
       "actorIdType" : "IDAM",
       "roleType" : "ORGANISATION",
       "roleName" : "Solicitor",
@@ -23,7 +23,7 @@
       }
     },
     {
-      "actorId" : "82853c08-73dd-4bd3-a50e-7dae355da504",
+      "actorId" : "5b9f0f4f-9d6d-4142-aabd-159dfbc61ac0",
       "actorIdType" : "IDAM",
       "roleType" : "ORGANISATION",
       "roleName" : "Solicitor",
@@ -39,30 +39,30 @@
       }
     },
     {
-      "actorId" : "82853c08-73dd-4bd3-a50e-7dae355da504",
+      "actorId" : "5b9f0f4f-9d6d-4142-aabd-159dfbc61ac0",
       "actorIdType" : "IDAM",
       "roleType" : "ORGANISATION",
       "roleName" : "Solicitor",
       "roleCategory" : "PROFESSIONAL",
       "classification" : "PUBLIC",
       "grantType" : "STANDARD",
-      "readOnly" : false,
+      "readOnly" : true,
       "beginTime" : "2021-01-01T00:00:00Z",
       "endTime" : "2023-01-01T00:00:00Z",
       "attributes" : {
-        "jurisdiction" : "J1",
+          "jurisdiction" : "J1",
         "caseType" : "CT4"
       }
     },
     {
-      "actorId" : "82853c08-73dd-4bd3-a50e-7dae355da504",
+      "actorId" : "5b9f0f4f-9d6d-4142-aabd-159dfbc61ac0",
       "actorIdType" : "IDAM",
       "roleType" : "ORGANISATION",
       "roleName" : "Solicitor",
       "roleCategory" : "PROFESSIONAL",
       "classification" : "PUBLIC",
       "grantType" : "STANDARD",
-      "readOnly" : false,
+      "readOnly" : true,
       "beginTime" : "2021-01-01T00:00:00Z",
       "endTime" : "2023-01-01T00:00:00Z",
       "attributes" : {
@@ -71,14 +71,14 @@
       }
     },
     {
-      "actorId" : "82853c08-73dd-4bd3-a50e-7dae355da504",
+      "actorId" : "5b9f0f4f-9d6d-4142-aabd-159dfbc61ac0",
       "actorIdType" : "IDAM",
       "roleType" : "ORGANISATION",
       "roleName" : "Solicitor",
       "roleCategory" : "PROFESSIONAL",
       "classification" : "PUBLIC",
       "grantType" : "STANDARD",
-      "readOnly" : false,
+      "readOnly" : true,
       "beginTime" : "2021-01-01T00:00:00Z",
       "endTime" : "2023-01-01T00:00:00Z",
       "attributes" : {

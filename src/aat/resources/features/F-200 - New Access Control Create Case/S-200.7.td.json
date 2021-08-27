@@ -1,0 +1,55 @@
+{
+  "_guid_": "S-200.7",
+
+  "productName": "CCD Data Store",
+  "operationName": "create case",
+  "method": "POST",
+  "uri": "/case-types/{ctid}/cases",
+
+  "specs": [
+    "a read only role assignment for CaseType CT6",
+    "attempts to create a case for CT6 with readOnly"
+  ],
+
+  "users" : {
+    "invokingUser": {
+      "username": "ccd.ac.solicitor1@gmail.com",
+      "password": "Pa55word11"
+    }
+  },
+
+  "request" : {
+    "pathVariables": {
+      "ctid": "CT6"
+    },
+    "_extends_": "Common_Request",
+    "headers": {
+      "experimental": true
+    },
+    "body" : {
+      "data": {
+        "F3": "Fly"
+      },
+      "event": {
+        "id": "Create",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][CT1_GetToken][testData][actualResponse][body][token]}",
+      "ignore_warning": false,
+      "draft_id": null
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message" : "No case type found",
+      "path" : "/case-types/CT6/cases",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}
