@@ -44,7 +44,6 @@ public class SecurityClassificationUtils {
         return Optional.of(securityClassification);
     }
 
-
     public static JsonNode getDataClassificationForData(JsonNode data, Iterator<JsonNode> dataIterator) {
         Boolean found = false;
         JsonNode dataClassificationValue = null;

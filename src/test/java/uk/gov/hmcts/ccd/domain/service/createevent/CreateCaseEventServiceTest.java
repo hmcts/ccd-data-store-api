@@ -34,6 +34,7 @@ import uk.gov.hmcts.ccd.domain.service.message.CaseEventMessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -106,6 +107,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private CasePostStateService casePostStateService;
     @Mock
     private CaseEventMessageService caseEventMessageService;
+    @Mock
+    private CaseDataIssueLogger caseDataIssueLogger;
 
     @Mock
     private HttpServletRequest request;

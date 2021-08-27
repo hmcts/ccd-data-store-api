@@ -34,6 +34,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
@@ -92,6 +93,8 @@ class DefaultCreateCaseOperationTest {
     @Mock
     private DraftGateway draftGateway;
     @Mock
+    private CaseDataIssueLogger caseDataIssueLogger;
+    @Mock
     private GlobalSearchProcessorService globalSearchProcessorService;
 
     @Mock
@@ -130,6 +133,7 @@ class DefaultCreateCaseOperationTest {
                                                                     validateCaseFieldsOperation,
                                                                     casePostStateService,
                                                                     draftGateway,
+                                                                    caseDataIssueLogger,
                                                                     globalSearchProcessorService);
         data = buildJsonNodeData();
         given(userRepository.getUser()).willReturn(IDAM_USER);
