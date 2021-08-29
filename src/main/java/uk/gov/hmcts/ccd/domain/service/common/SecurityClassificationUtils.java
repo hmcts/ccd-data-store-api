@@ -43,7 +43,6 @@ public class SecurityClassificationUtils {
         return Optional.of(securityClassification);
     }
 
-
     public static JsonNode getDataClassificationForData(Iterator<JsonNode> dataClassificationIterator) {
         //All the elements of a collection will have the same security classification
         //We can then just return the first element as a representative of the collection's elements security
