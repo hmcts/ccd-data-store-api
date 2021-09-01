@@ -60,7 +60,7 @@ public class AccessControlGrantTypeESQueryBuilder {
         List<TermsQueryBuilder> excludedTerms = excludedGrantTypeQueryBuilder.createQuery(roleAssignments);
         BoolQueryBuilder excludedQuery = QueryBuilders.boolQuery();
         excludedTerms.stream()
-            .forEach(query -> excludedQuery.should(query));
+            .forEach(query -> excludedQuery.must(query));
 
         BoolQueryBuilder nonOrgQuery = QueryBuilders.boolQuery();
         List<TermsQueryBuilder> basicQuery = basicGrantTypeQueryBuilder.createQuery(roleAssignments);
