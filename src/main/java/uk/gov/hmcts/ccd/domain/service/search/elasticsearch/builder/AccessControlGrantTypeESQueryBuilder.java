@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 import java.util.List;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -48,28 +47,15 @@ public class AccessControlGrantTypeESQueryBuilder {
 
     public void createQuery(String caseTypeId, BoolQueryBuilder mainQuery) {
         List<RoleAssignment> roleAssignments = getRoleAssignments(caseTypeId);
-        List<TermsQueryBuilder> standardQuery = standardGrantTypeQueryBuilder.createQuery(roleAssignments);
-        List<TermsQueryBuilder> challengedQuery = challengedGrantTypeQueryBuilder.createQuery(roleAssignments);
-        BoolQueryBuilder orgQuery = QueryBuilders.boolQuery();
+        BoolQueryBuilder standardQuery = standardGrantTypeQueryBuilder.createQuery(roleAssignments);
+        BoolQueryBuilder challengedQuery = challengedGrantTypeQueryBuilder.createQuery(roleAssignments);
+        BoolQueryBuilder orgQuery = prepareQuery(standardQuery, challengedQuery);
 
-        standardQuery.stream()
-            .forEach(query -> orgQuery.should(query));
-        challengedQuery.stream()
-            .forEach(query -> orgQuery.should(query));
+        BoolQueryBuilder basicQuery = basicGrantTypeQueryBuilder.createQuery(roleAssignments);
+        BoolQueryBuilder specificQuery = specificGrantTypeQueryBuilder.createQuery(roleAssignments);
+        BoolQueryBuilder nonOrgQuery = prepareQuery(basicQuery, specificQuery);
 
-        List<TermsQueryBuilder> excludedTerms = excludedGrantTypeQueryBuilder.createQuery(roleAssignments);
-        BoolQueryBuilder excludedQuery = QueryBuilders.boolQuery();
-        excludedTerms.stream()
-            .forEach(query -> excludedQuery.must(query));
-
-        BoolQueryBuilder nonOrgQuery = QueryBuilders.boolQuery();
-        List<TermsQueryBuilder> basicQuery = basicGrantTypeQueryBuilder.createQuery(roleAssignments);
-        basicQuery.stream()
-            .forEach(query -> nonOrgQuery.should(query));
-
-        List<TermsQueryBuilder> specificQuery = specificGrantTypeQueryBuilder.createQuery(roleAssignments);
-        specificQuery.stream()
-            .forEach(query -> nonOrgQuery.should(query));
+        BoolQueryBuilder excludedQuery = excludedGrantTypeQueryBuilder.createQuery(roleAssignments);
 
         if (!nonOrgQuery.hasClauses()
             && !orgQuery.hasClauses()
@@ -122,5 +108,18 @@ public class AccessControlGrantTypeESQueryBuilder {
     private List<RoleAssignment> getRoleAssignments(String caseTypeId) {
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         return roleAssignmentService.getRoleAssignments(userAuthorisation.getUserId(), caseTypeDefinition);
+    }
+
+    private BoolQueryBuilder prepareQuery(BoolQueryBuilder queryOne, BoolQueryBuilder queryTwo) {
+        BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
+        if (queryOne.hasClauses() && queryTwo.hasClauses()) {
+            queryBuilder.should(queryOne);
+            queryBuilder.should(queryTwo);
+        } else if (queryOne.hasClauses()) {
+            queryBuilder.should(queryOne);
+        } else if (queryTwo.hasClauses()) {
+            queryBuilder.should(queryTwo);
+        }
+        return queryBuilder;
     }
 }

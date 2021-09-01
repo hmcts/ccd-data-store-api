@@ -1,12 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
-import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.springframework.stereotype.Component;
@@ -21,43 +20,51 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REGION;
 public class StandardGrantTypeESQueryBuilder implements GrantTypeESQueryBuilder {
 
     @Override
-    public List<TermsQueryBuilder> createQuery(List<RoleAssignment> roleAssignments) {
+    public BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments) {
         Supplier<Stream<RoleAssignment>> streamSupplier = () -> roleAssignments.stream()
             .filter(roleAssignment -> GrantType.STANDARD.name().equals(roleAssignment.getGrantType()))
             .filter(roleAssignment -> roleAssignment.getAuthorisations() == null
                 || roleAssignment.getAuthorisations().size() == 0);
-        List<TermsQueryBuilder> innerQuery = Lists.newArrayList();
+
+        BoolQueryBuilder standardInnerQuery = QueryBuilders.boolQuery();
 
         streamSupplier.get()
             .filter(roleAssignment -> roleAssignment.getAttributes() != null)
-            .forEach(roleAssignment -> {
+            .map(roleAssignment -> {
+                BoolQueryBuilder innerQuery = QueryBuilders.boolQuery();
                 Optional<String> jurisdiction = roleAssignment.getAttributes().getJurisdiction();
 
                 if (jurisdiction != null
                     && StringUtils.isNotBlank(jurisdiction.orElse(""))) {
-                    innerQuery.add(QueryBuilders.termsQuery(JURISDICTION_FIELD_KEYWORD_COL, jurisdiction.get()));
+                    innerQuery.must(QueryBuilders.termsQuery(JURISDICTION_FIELD_KEYWORD_COL, jurisdiction.get()));
                 }
 
                 Optional<String> region = roleAssignment.getAttributes().getRegion();
                 if (region != null
                     && StringUtils.isNotBlank(region.orElse(""))) {
-                    innerQuery.add(QueryBuilders.termsQuery(REGION, region.get()));
+                    innerQuery.must(QueryBuilders.termsQuery(REGION, region.get()));
                 }
 
                 Optional<String> location = roleAssignment.getAttributes().getLocation();
-                if (location != null &&
-                    StringUtils.isNotBlank(location.orElse(""))) {
-                    innerQuery.add(QueryBuilders.termsQuery(LOCATION, location.get()));
+                if (location != null
+                    && StringUtils.isNotBlank(location.orElse(""))) {
+                    innerQuery.must(QueryBuilders.termsQuery(LOCATION, location.get()));
                 }
-            });
+                return innerQuery;
+            }).forEach(innerQuery -> standardInnerQuery.should(innerQuery));
 
-        List<TermsQueryBuilder> standardQueries = Lists.newArrayList(createClassification(streamSupplier.get()))
-            .stream()
-            .filter(query -> query.isPresent())
-            .map(query -> query.get())
-            .collect(Collectors.toList());
-        standardQueries.addAll(innerQuery);
+        Optional<TermsQueryBuilder> classificationTermsQuery = createClassification(streamSupplier.get());
+        BoolQueryBuilder standardQuery = QueryBuilders.boolQuery();
 
-        return standardQueries;
+        if (classificationTermsQuery.isPresent() && standardInnerQuery.hasClauses()) {
+            standardQuery.must(classificationTermsQuery.get());
+            standardQuery.must(standardInnerQuery);
+        } else if (standardInnerQuery.hasClauses()) {
+            standardQuery.must(standardInnerQuery);
+        } else if (classificationTermsQuery.isPresent()) {
+            standardQuery.must(classificationTermsQuery.get());
+        }
+
+        return standardQuery;
     }
 }

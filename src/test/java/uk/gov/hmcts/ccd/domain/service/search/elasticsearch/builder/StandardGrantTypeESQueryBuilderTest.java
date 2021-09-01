@@ -1,14 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
 import com.google.common.collect.Lists;
-import java.util.List;
-import org.elasticsearch.index.query.TermsQueryBuilder;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
@@ -25,11 +23,10 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
         RoleAssignment standardRoleAssignment = createRoleAssignment(GrantType.STANDARD,
             "CASE", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
 
-        List<TermsQueryBuilder> queryBuilder = standardGrantTypeESQueryBuilder
+        BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
             .createQuery(Lists.newArrayList(standardRoleAssignment));
 
         assertNotNull(queryBuilder);
-        assertEquals(4, queryBuilder.size());
     }
 
     @Test
@@ -37,11 +34,10 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
         RoleAssignment standardRoleAssignment = createRoleAssignment(GrantType.STANDARD,
             "CASE", "PRIVATE", "Test", "", "reg1", null, "caseId1");
 
-        List<TermsQueryBuilder> queryBuilder = standardGrantTypeESQueryBuilder
+        BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
             .createQuery(Lists.newArrayList(standardRoleAssignment));
 
         assertNotNull(queryBuilder);
-        assertEquals(3, queryBuilder.size());
     }
 
     @Test
@@ -49,11 +45,10 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
         RoleAssignment standardRoleAssignment = createRoleAssignment(GrantType.STANDARD,
             "CASE", "PRIVATE", "Test", "loc1", "", null, "caseId1");
 
-        List<TermsQueryBuilder> queryBuilder = standardGrantTypeESQueryBuilder
+        BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
             .createQuery(Lists.newArrayList(standardRoleAssignment));
 
         assertNotNull(queryBuilder);
-        assertEquals(3, queryBuilder.size());
     }
 
     @Test
@@ -61,11 +56,10 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
         RoleAssignment standardRoleAssignment = createRoleAssignment(GrantType.STANDARD,
             "CASE", "PRIVATE", "Test", "", "", null, "caseId1");
 
-        List<TermsQueryBuilder> queryBuilder = standardGrantTypeESQueryBuilder
+        BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
             .createQuery(Lists.newArrayList(standardRoleAssignment));
 
         assertNotNull(queryBuilder);
-        assertEquals(2, queryBuilder.size());
     }
 
     @Test
@@ -73,11 +67,10 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
         RoleAssignment standardRoleAssignment = createRoleAssignment(GrantType.STANDARD,
             "CASE", "PRIVATE", "", "", "", null, "caseId1");
 
-        List<TermsQueryBuilder> queryBuilder = standardGrantTypeESQueryBuilder
+        BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
             .createQuery(Lists.newArrayList(standardRoleAssignment));
 
         assertNotNull(queryBuilder);
-        assertEquals(1, queryBuilder.size());
     }
 
     @Test
@@ -85,11 +78,10 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
         RoleAssignment standardRoleAssignment = createRoleAssignment(GrantType.STANDARD,
             "CASE", "PRIVATE", "Test", null, "", null, "caseId1");
 
-        List<TermsQueryBuilder> queryBuilder = standardGrantTypeESQueryBuilder
+        BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
             .createQuery(Lists.newArrayList(standardRoleAssignment));
 
         assertNotNull(queryBuilder);
-        assertEquals(2, queryBuilder.size());
     }
 
 }

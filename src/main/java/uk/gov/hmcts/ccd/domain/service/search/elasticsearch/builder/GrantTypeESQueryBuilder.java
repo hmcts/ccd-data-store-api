@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
@@ -17,7 +18,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.SECURITY_CLASS
 
 public interface GrantTypeESQueryBuilder {
 
-    List<TermsQueryBuilder> createQuery(List<RoleAssignment> roleAssignments);
+    BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments);
 
     default Optional<TermsQueryBuilder>  createClassification(Stream<RoleAssignment> roleAssignmentStream) {
         Set<String> classifications = roleAssignmentStream
