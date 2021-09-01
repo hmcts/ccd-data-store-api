@@ -4,6 +4,28 @@ Feature: get case
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
+  @S-201.1
+  Scenario: User can not access the case when user has no case role access
+    Given a user with [restricted access to create a case J1-CT1-02]
+    And a user with [PUBLIC SC ORGANISATION role assignment to view the case and only PUBLIC field F3]
+    And a case that has just been created as in [F-201_CT1]
+    When a request is prepared with appropriate values
+    And the request [attempts to get case J1-CT1-02]
+    And it is submitted to call the [retrieve a case by id] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all other details as expected
+
+  @S-201.2
+  Scenario: User can not access the case when Case Role has insufficient SC for Case Type
+    Given a user with [restricted access to create a case J1-CT1-02]
+    And a user with [PUBLIC SC ORGANISATION role assignment to view the case and only PUBLIC field F3]
+    And a case that has just been created as in [F-201_CT1]
+    When a request is prepared with appropriate values
+    And the request [attempts to get case J1-CT1-02]
+    And it is submitted to call the [retrieve a case by id] operation of [CCD Data Store]
+    Then a negative response is received
+    And the response has all other details as expected
+
     @S-201.4
     Scenario: User can get a case only seeing fields which they have SC access to
       Given a user with [restricted access to create a case J1-CT2-01]
