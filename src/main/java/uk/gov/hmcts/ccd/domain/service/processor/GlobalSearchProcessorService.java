@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.OtherCaseReference;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchCriteria;
@@ -11,14 +12,22 @@ import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchParty;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchPartyValue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class GlobalSearchProcessorService {
 
-    public Map<String, JsonNode> populateGlobalSearchData(CaseTypeDefinition caseTypeDefinition,
+    private static final String SEARCH_CRITERIA = "SearchCriteria";
+
+    private Map<String, String> namesToValuesMap = new LinkedHashMap<>();
+
+    public void populateGlobalSearchData(CaseTypeDefinition caseTypeDefinition,
                                                           Map<String, JsonNode> data) {
         List<uk.gov.hmcts.ccd.domain.model.definition.SearchCriteria> searchCriterias =
             caseTypeDefinition.getSearchCriterias();
@@ -26,18 +35,20 @@ public class GlobalSearchProcessorService {
         List<uk.gov.hmcts.ccd.domain.model.definition.SearchParty> searchParties =
             caseTypeDefinition.getSearchParties();
 
-        SearchCriteria searchCriteria = populateSearchCriteria(data, searchCriterias);
-        List<SearchParty> searchPartyList = populateSearchParties(data, searchParties);
+        Optional<CaseFieldDefinition> searchCriteriaCaseField = caseTypeDefinition.getCaseField(SEARCH_CRITERIA);
 
-        if (searchCriteria.isEmpty() && !searchPartyList.isEmpty()) {
-            searchCriteria = SearchCriteria.builder().searchParties(searchPartyList).build();
+        if (searchCriteriaCaseField.isPresent()) {
+
+            SearchCriteria searchCriteria = populateSearchCriteria(data, searchCriterias);
+            List<SearchParty> searchPartyList = populateSearchParties(data, searchParties);
+
+            if (!searchPartyList.isEmpty()) {
+                searchCriteria.setSearchParties(searchPartyList);
+            }
+            if (!searchCriteria.isEmpty() && data != null) {
+                data.put(SEARCH_CRITERIA, JacksonUtils.convertValueJsonNode(searchCriteria));
+            }
         }
-
-        if (!searchCriteria.isEmpty() && data != null) {
-            data.put("SearchCriteria", JacksonUtils.convertValueJsonNode(searchCriteria));
-        }
-
-        return data;
     }
 
     private SearchCriteria populateSearchCriteria(Map<String, JsonNode> data,
@@ -78,7 +89,19 @@ public class GlobalSearchProcessorService {
 
         searchParties.forEach(searchParty -> {
             SearchPartyValue valueToPopulate  = new SearchPartyValue();
+
             data.forEach((key, jsonNode) -> populateSearchParty(searchParty, valueToPopulate, key, jsonNode));
+
+            String name = namesToValuesMap.keySet()
+                .stream()
+                .map(key -> namesToValuesMap.get(key))
+                .filter(value -> !value.isBlank())
+                .collect(Collectors.joining(" "));
+
+            if (name != null && !name.isBlank()) {
+                valueToPopulate.setName(name);
+                namesToValuesMap.clear();
+            }
 
             if (!valueToPopulate.isEmpty()) {
                 searchPartyList.add(SearchParty
@@ -108,13 +131,23 @@ public class GlobalSearchProcessorService {
                                             JsonNode jsonNode) {
 
         if (searchPartyDefinition.getSearchPartyName() != null) {
-            String searchPartyName = searchPartyDefinition.getSearchPartyName();
 
-            if (isComplexField(searchPartyName, key)) {
-                searchPartyValue.setName(getNestedValue(jsonNode, searchPartyName));
-            } else if (key.equals(searchPartyName)) {
-                searchPartyValue.setName(jsonNode.textValue());
-            }
+            List<String> searchPartyNames = Arrays.asList(searchPartyDefinition.getSearchPartyName().split(","));
+            searchPartyNames.forEach(x -> namesToValuesMap.putIfAbsent(x, ""));
+
+            searchPartyNames.forEach(currentSearchPartyName -> {
+                String searchPartyName = null;
+
+                if (isComplexField(currentSearchPartyName, key)) {
+                    searchPartyName = getNestedValue(jsonNode, currentSearchPartyName);
+                } else if (key.equals(currentSearchPartyName)) {
+                    searchPartyName = jsonNode.textValue();
+                }
+
+                if (searchPartyName != null) {
+                    namesToValuesMap.replace(currentSearchPartyName, searchPartyName);
+                }
+            });
         }
 
         if (searchPartyDefinition.getSearchPartyAddressLine1() != null) {
@@ -157,4 +190,5 @@ public class GlobalSearchProcessorService {
             }
         }
     }
+
 }

@@ -3,13 +3,14 @@ package uk.gov.hmcts.ccd.domain.service.processor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchParty;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,13 @@ class GlobalSearchProcessorServiceTest {
         globalSearchProcessorService = new GlobalSearchProcessorService();
         caseTypeDefinition = new CaseTypeDefinition();
 
+        CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
+        caseFieldDefinition.setId(SEARCH_CRITERIA);
+
+        List<CaseFieldDefinition> caseFieldDefinitions = List.of(caseFieldDefinition);
+
+        caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
+
         caseData = new HashMap<>();
         caseData.put("PersonFirstName", JacksonUtils.MAPPER.readTree("\"FirstNameValue\""));
 
@@ -54,10 +62,16 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
+    void checkGlobalSearchFunctionalityDisabledWithoutAppropriateCaseField() {
+        caseTypeDefinition.setCaseFieldDefinitions(new ArrayList<>());
+        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+        assertNull(caseData.get(SEARCH_CRITERIA));
+    }
+
+    @Test
     void checkNoMatchingCaseDataResultsInNoSearchCriteriaCreation() {
-        Map<String, JsonNode> globalSearchData =
-            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
-        assertNull(globalSearchData.get(SEARCH_CRITERIA));
+        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+        assertNull(caseData.get(SEARCH_CRITERIA));
     }
 
     @Test
@@ -70,10 +84,9 @@ class GlobalSearchProcessorServiceTest {
         final String lastName = "LastNameValue";
         caseData.put("TextField1", JacksonUtils.MAPPER.readTree("\""  + lastName  + "\""));
 
-        Map<String, JsonNode> globalSearchData =
-            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
 
-        JsonNode searchCriteriaNode = globalSearchData.get(SEARCH_CRITERIA);
+        JsonNode searchCriteriaNode = caseData.get(SEARCH_CRITERIA);
         assertEquals(lastName, searchCriteriaNode.get("OtherCaseReferences").findValue("value").asText());
         assertDoesNotThrow(() -> UUID.fromString(
             searchCriteriaNode.findValue("id").asText()));
@@ -94,16 +107,15 @@ class GlobalSearchProcessorServiceTest {
 
         caseData.put("PersonAddress", JacksonUtils.MAPPER.readTree("{\"AddressLine1\": \"" + addressValue  + "\"}"));
 
-        Map<String, JsonNode> globalSearchData =
-            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
-        JsonNode searchCriteriaNode = globalSearchData.get(SEARCH_CRITERIA);
+        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+        JsonNode searchCriteriaNode = caseData.get(SEARCH_CRITERIA);
 
         assertDoesNotThrow(() -> UUID.fromString(
             searchCriteriaNode.findValue("id").asText()));
         assertDoesNotThrow(() -> UUID.fromString(
             searchCriteriaNode.get("OtherCaseReferences").findValue("id").asText()));
         assertEquals(addressValue, searchCriteriaNode.get("OtherCaseReferences").findValue("value").asText());
-        assertFalse(globalSearchData.get(SEARCH_CRITERIA).has(SEARCH_PARTIES));
+        assertFalse(caseData.get(SEARCH_CRITERIA).has(SEARCH_PARTIES));
     }
 
     @Test
@@ -132,18 +144,61 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    @Disabled
     void checkCommaSeparatedValuesSearchPartyNamePopulatedInSearchCriteria() throws JsonProcessingException {
-        final String addressValue = "This is my address";
+        final String searchPartyNameFirstName = "John";
+        final String searchPartyNameMiddleName = "Johnny";
+        final String searchPartyNameLastName = "Johnson";
 
-        //caseData.put("PersonAddress.AddressLine1", JacksonUtils.MAPPER.readTree("\""  + addressValue  + "\""));
-        //TextFieldFName,TextFieldMName,TextFieldLName
-        caseData.put("PersonAddress", JacksonUtils.MAPPER.readTree("{\"AddressLine1\": \"" + addressValue  + "\"}"));
+        final String firstName = "FirstName";
+        final String middleName = "MiddleName";
+        final String lastName = "LastName";
 
-        final String lastName = "LastNameValue";
-        caseData.put("TextField1", JacksonUtils.MAPPER.readTree("\""  + lastName  + "\""));
+        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
+        caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        assertSearchCriteriaField("SearchPartyName", addressValue);
+        caseData.put(firstName, JacksonUtils.MAPPER.readTree("\""  + searchPartyNameFirstName  + "\""));
+        caseData.put(middleName, JacksonUtils.MAPPER.readTree("\""  + searchPartyNameMiddleName  + "\""));
+        caseData.put(lastName, JacksonUtils.MAPPER.readTree("\""  + searchPartyNameLastName  + "\""));
+
+        Map<String, String> expectedValues = new HashMap<>();
+
+        expectedValues.put(NAME, String.format("%s %s %s",
+            searchPartyNameFirstName,
+            searchPartyNameMiddleName,
+            searchPartyNameLastName));
+
+        assertSearchCriteriaFields(expectedValues);
+    }
+
+    @Test
+    void checkCommaSeparatedComplexValuesSearchPartyNamePopulatedInSearchCriteria() throws JsonProcessingException {
+        final String searchPartyNameFirstName = "John";
+        final String searchPartyNameMiddleName = "Johnny";
+        final String searchPartyNameLastName = "Johnson";
+
+        final String firstName = "MyPerson.Person.FirstName";
+        final String middleName = "MyPerson.Person.MiddleName";
+        final String lastName = "MyPerson.Person.LastName";
+
+        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
+        caseTypeDefinition.setSearchParties(List.of(searchParty));
+
+        caseData.put("MyPerson", JacksonUtils.MAPPER.readTree("{\n"
+            + "   \"Person\":{\n"
+            + "         \"FirstName\":\"" + searchPartyNameFirstName + "\",\n"
+            + "         \"MiddleName\":\"" + searchPartyNameMiddleName + "\",\n"
+            + "         \"LastName\":\"" + searchPartyNameLastName + "\"\n"
+            + "      }\n"
+            + "   }\n"
+            + "}"));
+
+
+        Map<String, String> expectedValues = new HashMap<>();
+
+        expectedValues.put(NAME,
+            String.format("%s %s %s", searchPartyNameFirstName, searchPartyNameMiddleName, searchPartyNameLastName));
+
+        assertSearchCriteriaFields(expectedValues);
     }
 
 
@@ -259,7 +314,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchCriteriaContainingASeachPartyContainingAllFields() throws JsonProcessingException {
+    void checkSearchCriteriaContainingASearchPartyContainingAllFields() throws JsonProcessingException {
 
         searchParty.setSearchPartyName("spName");
         searchParty.setSearchPartyDob("spDob");
@@ -346,10 +401,9 @@ class GlobalSearchProcessorServiceTest {
             + "      }\n"
             + "}"));
 
-        Map<String, JsonNode> globalSearchData =
-            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
 
-        JsonNode searchPartyNodes = globalSearchData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
+        JsonNode searchPartyNodes = caseData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
 
         assertEquals(2, searchPartyNodes.size());
     }
@@ -416,10 +470,9 @@ class GlobalSearchProcessorServiceTest {
             + "      }\n"
             + "}"));
 
-        Map<String, JsonNode> globalSearchData =
-            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
 
-        JsonNode searchPartyNodes = globalSearchData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
+        JsonNode searchPartyNodes = caseData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
 
         assertEquals(1, searchPartyNodes.size());
 
@@ -430,10 +483,9 @@ class GlobalSearchProcessorServiceTest {
     }
 
     private void assertSearchCriteriaField(String fieldName, Object expectedValue) {
-        Map<String, JsonNode> globalSearchData =
-            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
 
-        JsonNode searchPartyNode = globalSearchData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
+        JsonNode searchPartyNode = caseData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
 
         assertDoesNotThrow(() -> UUID.fromString(searchPartyNode.findValue("id").asText()));
         assertEquals(expectedValue, searchPartyNode.findValue("value").findValue(fieldName).asText());
@@ -444,10 +496,9 @@ class GlobalSearchProcessorServiceTest {
     }
 
     private void assertSearchCriteriaFields(Map<String, String> expectedValues) {
-        Map<String, JsonNode> globalSearchData =
-            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
 
-        JsonNode searchPartyNode = globalSearchData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
+        JsonNode searchPartyNode = caseData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
 
         assertDoesNotThrow(() -> UUID.fromString(searchPartyNode.findValue("id").asText()));
 
@@ -455,4 +506,5 @@ class GlobalSearchProcessorServiceTest {
             assertEquals(value, searchPartyNode.findValue("value").findValue(key).asText())
         );
     }
+
 }

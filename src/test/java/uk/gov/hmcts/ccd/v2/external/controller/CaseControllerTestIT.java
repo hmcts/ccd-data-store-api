@@ -25,6 +25,7 @@ import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchPartyValue;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
@@ -33,8 +34,11 @@ import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
@@ -45,6 +49,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -60,6 +65,8 @@ public class CaseControllerTestIT extends WireMockBaseTest {
 
     private static final String CASE_TYPE = "TestAddressBookCase";
     private static final String CASE_TYPE_WITH_SEARCH_PARTY = "TestAddressBookCase2";
+    private static final String CASE_TYPE_WITH_MULTIPLE_SEARCH_CRITERIA_AND_SEARCH_PARTY
+        = "MultipleSearchCriteriaAndSearchParties";
     private static final String JURISDICTION = "PROBATE";
     private static final String TEST_EVENT_ID = "TEST_EVENT";
     private static final String UID = "123";
@@ -274,14 +281,25 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldPopulateSearchPartyPostCreateCase() throws Exception {
+    public void shouldPopulateSearchCriteriaPostCreateCase() throws Exception {
         final String URL =  "/case-types/" + CASE_TYPE_WITH_SEARCH_PARTY + "/cases";
         final String description = "A very long comment.......";
         final String summary = "Short comment";
 
         final String testFieldValue = "TestFieldValue";
+        final String firstNameValue = "MyFirstName";
+        final String lastNameValue = "MyLastName";
+        final String addressLine1 = "My Street Address";
+        final String postCode = "SW1H 9AJ";
+
         Map<String, JsonNode> caseData = new HashMap<>();
         caseData.put("TextField1", JacksonUtils.MAPPER.readTree("\"" + testFieldValue + "\""));
+        caseData.put("PersonFirstName", JacksonUtils.MAPPER.readTree("\"" + firstNameValue + "\""));
+        caseData.put("PersonLastName", JacksonUtils.MAPPER.readTree("\"" + lastNameValue + "\""));
+        caseData.put("PersonAddress", JacksonUtils.MAPPER.readTree("{\n"
+            + "      \"PostCode\": \"" + postCode + "\",\n"
+            + "      \"AddressLine1\": \"" + addressLine1 + "\"\n"
+            + "}"));
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().withData(caseData).build();
         final Event triggeringEvent = anEvent().build();
@@ -306,9 +324,21 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseResource);
 
-        assertEquals("Saved case data should contain SearchCriteria",
-            savedCaseResource.getData().get("SearchCriteria").get("OtherCaseReferences").findValue("value").asText(),
+        JsonNode searchCriteriaJsonNode = savedCaseResource.getData().get("SearchCriteria");
+        assertEquals("Saved case data should contain SearchCriteria with OtherCaseReferences",
+            searchCriteriaJsonNode.get("OtherCaseReferences").findValue("value").asText(),
             testFieldValue);
+
+        SearchPartyValue searchPartyValue =  mapper.treeToValue(
+            searchCriteriaJsonNode.get("SearchParties").findValue("value"),
+            SearchPartyValue.class);
+        assertAll("Saved case data should contain SearchCriteria with SearchParty populated",
+            () -> assertEquals("name populated", firstNameValue + " " + lastNameValue, searchPartyValue.getName()),
+            () -> assertEquals("dateOfBirth populated", testFieldValue, searchPartyValue.getDateOfBirth()),
+            () -> assertEquals("Address Line 1 populated", addressLine1, searchPartyValue.getAddressLine1()),
+            () -> assertEquals("PostCode populated", postCode, searchPartyValue.getPostCode())
+        );
+
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
@@ -321,6 +351,119 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
         assertThat(captor.getValue().getEventSelected(), is(TEST_EVENT_ID));
         assertThat(captor.getValue().getRequestId(), is(REQUEST_ID_VALUE));
+    }
+
+    @Test
+    public void shouldPopulateMultipleSearchCriteriaAndSearchPartiesPostCreateCase() throws Exception {
+        final String URL =  "/case-types/" + CASE_TYPE_WITH_MULTIPLE_SEARCH_CRITERIA_AND_SEARCH_PARTY + "/cases";
+        final String description = "A very long comment.......";
+        final String summary = "Short comment";
+
+        final String testFieldValue = "TestFieldValue";
+        final String firstNameValue = "MyFirstName";
+        final String lastNameValue = "MyLastName";
+        final String addressLine1 = "My Street Address";
+        final String addressLine2 = "My Street Address 2";
+        final String postCode = "SW1H 9AJ";
+        final String country = "GB";
+
+        Map<String, JsonNode> caseData = new HashMap<>();
+        caseData.put("TextField1", JacksonUtils.MAPPER.readTree("\"" + testFieldValue + "\""));
+        caseData.put("PersonFirstName", JacksonUtils.MAPPER.readTree("\"" + firstNameValue + "\""));
+        caseData.put("PersonLastName", JacksonUtils.MAPPER.readTree("\"" + lastNameValue + "\""));
+        caseData.put("PersonAddress", JacksonUtils.MAPPER.readTree("{\n"
+            + "      \"PostCode\": \"" + postCode + "\",\n"
+            + "      \"AddressLine1\": \"" + addressLine1 + "\",\n"
+            + "      \"Country\": \"" + country + "\",\n"
+            + "      \"AddressLine2\": \"" + addressLine2 + "\"\n"
+            + "}"));
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().withData(caseData).build();
+        final Event triggeringEvent = anEvent().build();
+        triggeringEvent.setEventId(TEST_EVENT_ID);
+        triggeringEvent.setDescription(description);
+        triggeringEvent.setSummary(summary);
+        caseDetailsToSave.setEvent(triggeringEvent);
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_WITH_SEARCH_PARTY, TEST_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .header(EXPERIMENTAL_HEADER, "experimental")
+            .header(REQUEST_ID, REQUEST_ID_VALUE)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsString(caseDetailsToSave))
+        ).andReturn();
+
+        assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String content = mvcResult.getResponse().getContentAsString();
+        assertNotNull("Content Should not be null", content);
+        CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
+        assertNotNull("Saved Case Details should not be null", savedCaseResource);
+
+        JsonNode searchCriteriaJsonNode = savedCaseResource.getData().get("SearchCriteria");
+
+        assertEquals("Saved case data should contain two  SearchCriteria with OtherCaseReferences",
+            2, searchCriteriaJsonNode.get("OtherCaseReferences").size());
+
+        assertTrue("Saved case data should contain SearchCriteria with OtherCaseReferences",
+            searchCriteriaJsonNode.get("OtherCaseReferences").findValuesAsText("value")
+                .containsAll(List.of(testFieldValue, addressLine1)));
+
+        assertEquals(3, searchCriteriaJsonNode.get("SearchParties").size());
+
+        List<SearchPartyValue> searchPartyValues = new ArrayList<>();
+        searchPartyValues.add(
+            SearchPartyValue.builder()
+                .name(firstNameValue + " " + lastNameValue)
+                .addressLine1(addressLine1)
+                .postCode(postCode)
+                .dateOfBirth(testFieldValue)
+                .build());
+        searchPartyValues.add(
+            SearchPartyValue.builder()
+                .name(firstNameValue)
+                .emailAddress(country)
+                .addressLine1(addressLine2)
+                .postCode(testFieldValue)
+                .dateOfBirth(testFieldValue)
+                .build());
+        searchPartyValues.add(
+            SearchPartyValue.builder()
+                .name(lastNameValue)
+                .addressLine1(addressLine1)
+                .postCode(postCode)
+                .dateOfBirth(testFieldValue)
+                .build());
+
+        assertSearchPartyNodesPopulatedAsExpected(searchPartyValues, searchCriteriaJsonNode.get("SearchParties"));
+
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CREATE_CASE.getLabel()));
+        assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
+        assertThat(captor.getValue().getIdamId(), is(UID));
+        assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
+        assertThat(captor.getValue().getHttpStatus(), is(201));
+        assertThat(captor.getValue().getCaseType(), is(CASE_TYPE_WITH_MULTIPLE_SEARCH_CRITERIA_AND_SEARCH_PARTY));
+        assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
+        assertThat(captor.getValue().getEventSelected(), is(TEST_EVENT_ID));
+        assertThat(captor.getValue().getRequestId(), is(REQUEST_ID_VALUE));
+    }
+
+    private void assertSearchPartyNodesPopulatedAsExpected(List<SearchPartyValue> searchPartyValues,
+                                                           JsonNode searchParties) {
+        List<SearchPartyValue> searchPartyList = searchParties.findValues("value").stream().map(x -> {
+            try {
+                return mapper.treeToValue(x, SearchPartyValue.class);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).collect(Collectors.toList());
+
+        assertTrue(searchPartyList.containsAll(searchPartyValues));
     }
 
     @Test

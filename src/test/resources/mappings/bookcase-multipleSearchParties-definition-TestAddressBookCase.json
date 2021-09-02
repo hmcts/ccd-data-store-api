@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/api/data/case-type/TestAddressBookCase2"
+    "url": "/api/data/case-type/MultipleSearchCriteriaAndSearchParties"
   },
   "response": {
     "status": 200,
@@ -9,7 +9,7 @@
       "Content-Type": "application/json"
     },
     "jsonBody": {
-      "id": "TestAddressBookCase2",
+      "id": "MultipleSearchCriteriaAndSearchParties",
       "version": {
         "number": 1,
         "live_from": "2017-01-01"
@@ -284,15 +284,21 @@
       ],
       "searchCriterias": [
         {
-          "case_type_id": "TestAddressBookCase2",
+          "case_type_id": "MultipleSearchCriteriaAndSearchParties",
           "live_from": "2017-01-01T00:00:00.000+00:00",
           "live_to": null,
           "other_case_reference": "TextField1"
+        },
+        {
+          "case_type_id": "MultipleSearchCriteriaAndSearchParties",
+          "live_from": "2017-01-01T00:00:00.000+00:00",
+          "live_to": null,
+          "other_case_reference": "PersonAddress.AddressLine1"
         }
       ],
       "searchParties": [
         {
-          "case_type_id": "TestAddressBookCase2",
+          "case_type_id": "MultipleSearchCriteriaAndSearchParties",
           "search_party_dob": "TextField1",
           "search_party_post_code": "PersonAddress.PostCode",
           "search_party_address_line1": "PersonAddress.AddressLine1",
@@ -300,12 +306,32 @@
           "live_from": "2017-01-01T00:00:00.000+00:00",
           "live_to": null,
           "search_party_name": "PersonFirstName,PersonLastName"
+        },
+        {
+          "case_type_id": "MultipleSearchCriteriaAndSearchParties",
+          "search_party_dob": "TextField1",
+          "search_party_post_code": "TextField1",
+          "search_party_address_line1": "PersonAddress.AddressLine2",
+          "search_party_email_address": "PersonAddress.Country",
+          "live_from": "2017-01-01T00:00:00.000+00:00",
+          "live_to": null,
+          "search_party_name": "PersonFirstName"
+        },
+        {
+          "case_type_id": "MultipleSearchCriteriaAndSearchParties",
+          "search_party_dob": "TextField1",
+          "search_party_post_code": "PersonAddress.PostCode",
+          "search_party_address_line1": "PersonAddress.AddressLine1",
+          "search_party_email_address": "TextField4",
+          "live_from": "2017-01-01T00:00:00.000+00:00",
+          "live_to": null,
+          "search_party_name": "PersonLastName"
         }
       ],
       "case_fields": [
         {
           "id": "PersonFirstName",
-          "case_type_id": "TestAddressBookCase2",
+          "case_type_id": "MultipleSearchCriteriaAndSearchParties",
           "label": "First name",
           "security_classification": "PUBLIC",
           "acls": [
@@ -330,7 +356,7 @@
         },
         {
           "id": "PersonLastName",
-          "case_type_id": "TestAddressBookCase2",
+          "case_type_id": "MultipleSearchCriteriaAndSearchParties",
           "label": "Last name",
           "security_classification": "PUBLIC",
           "acls": [
@@ -355,7 +381,7 @@
         },
         {
           "id": "PersonAddress",
-          "case_type_id": "TestAddressBookCase2",
+          "case_type_id": "MultipleSearchCriteriaAndSearchParties",
           "label": "Address",
           "security_classification": "PUBLIC",
           "acls": [
@@ -427,7 +453,7 @@
         },
         {
           "id": "Aliases",
-          "case_type_id": "TestAddressBookCase2",
+          "case_type_id": "MultipleSearchCriteriaAndSearchParties",
           "label": "Aliases",
           "security_classification": "PUBLIC",
           "acls": [
@@ -456,7 +482,7 @@
         },
         {
           "id": "D8Document",
-          "case_type_id": "TestAddressBookCase2",
+          "case_type_id": "MultipleSearchCriteriaAndSearchParties",
           "label": "Document",
           "security_classification": "PUBLIC",
           "acls": [
@@ -481,7 +507,7 @@
         },
         {
           "id": "TextField1",
-          "case_type_id": "TestAddressBookCase2",
+          "case_type_id": "MultipleSearchCriteriaAndSearchParties",
           "label": "First name",
           "security_classification": "PUBLIC",
           "acls": [
@@ -507,7 +533,7 @@
         {
           "metadata": false,
           "id": "SearchCriteria",
-          "case_type_id": "TestAddressBookCase2",
+          "case_type_id": "MultipleSearchCriteriaAndSearchParties",
           "label": "SearchCriteria",
           "hint_text": null,
           "field_type": {

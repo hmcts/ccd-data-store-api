@@ -35,7 +35,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import javax.inject.Inject;
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -129,10 +128,10 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         newCaseDetails.setCaseTypeId(caseTypeId);
         newCaseDetails.setJurisdiction(caseTypeDefinition.getJurisdictionId());
         newCaseDetails.setSecurityClassification(caseTypeDefinition.getSecurityClassification());
-        Map<String, JsonNode> dataWithGlobalSearchData =
-            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseDataContent.getData());
 
-        newCaseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition, dataWithGlobalSearchData));
+        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseDataContent.getData());
+
+        newCaseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition, caseDataContent.getData()));
 
         newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(
             caseTypeDefinition,
