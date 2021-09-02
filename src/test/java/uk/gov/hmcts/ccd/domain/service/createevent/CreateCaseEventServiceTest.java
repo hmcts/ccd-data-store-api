@@ -32,6 +32,7 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.message.CaseEventMessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
+import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
@@ -115,6 +116,9 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
     @Mock
     private CaseDocumentService caseDocumentService;
+
+    @Mock
+    private GlobalSearchProcessorService globalSearchProcessorService;
 
     @InjectMocks
     private CreateCaseEventService underTest;

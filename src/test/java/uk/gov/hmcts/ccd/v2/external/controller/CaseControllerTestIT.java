@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.hmcts.ccd.GlobalSearchTestFixture;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
@@ -34,11 +35,8 @@ import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
@@ -286,7 +284,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         final String description = "A very long comment.......";
         final String summary = "Short comment";
 
-        final String testFieldValue = "TestFieldValue";
+        final String testFieldValue = "2012-04-21T00:00:00.000";
         final String firstNameValue = "MyFirstName";
         final String lastNameValue = "MyLastName";
         final String addressLine1 = "My Street Address";
@@ -359,26 +357,9 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         final String description = "A very long comment.......";
         final String summary = "Short comment";
 
-        final String testFieldValue = "TestFieldValue";
-        final String firstNameValue = "MyFirstName";
-        final String lastNameValue = "MyLastName";
-        final String addressLine1 = "My Street Address";
-        final String addressLine2 = "My Street Address 2";
-        final String postCode = "SW1H 9AJ";
-        final String country = "GB";
-
-        Map<String, JsonNode> caseData = new HashMap<>();
-        caseData.put("TextField1", JacksonUtils.MAPPER.readTree("\"" + testFieldValue + "\""));
-        caseData.put("PersonFirstName", JacksonUtils.MAPPER.readTree("\"" + firstNameValue + "\""));
-        caseData.put("PersonLastName", JacksonUtils.MAPPER.readTree("\"" + lastNameValue + "\""));
-        caseData.put("PersonAddress", JacksonUtils.MAPPER.readTree("{\n"
-            + "      \"PostCode\": \"" + postCode + "\",\n"
-            + "      \"AddressLine1\": \"" + addressLine1 + "\",\n"
-            + "      \"Country\": \"" + country + "\",\n"
-            + "      \"AddressLine2\": \"" + addressLine2 + "\"\n"
-            + "}"));
-
-        final CaseDataContent caseDetailsToSave = newCaseDataContent().withData(caseData).build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent()
+            .withData(GlobalSearchTestFixture.createCaseData())
+            .build();
         final Event triggeringEvent = anEvent().build();
         triggeringEvent.setEventId(TEST_EVENT_ID);
         triggeringEvent.setDescription(description);
@@ -401,43 +382,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseResource);
 
-        JsonNode searchCriteriaJsonNode = savedCaseResource.getData().get("SearchCriteria");
-
-        assertEquals("Saved case data should contain two  SearchCriteria with OtherCaseReferences",
-            2, searchCriteriaJsonNode.get("OtherCaseReferences").size());
-
-        assertTrue("Saved case data should contain SearchCriteria with OtherCaseReferences",
-            searchCriteriaJsonNode.get("OtherCaseReferences").findValuesAsText("value")
-                .containsAll(List.of(testFieldValue, addressLine1)));
-
-        assertEquals(3, searchCriteriaJsonNode.get("SearchParties").size());
-
-        List<SearchPartyValue> searchPartyValues = new ArrayList<>();
-        searchPartyValues.add(
-            SearchPartyValue.builder()
-                .name(firstNameValue + " " + lastNameValue)
-                .addressLine1(addressLine1)
-                .postCode(postCode)
-                .dateOfBirth(testFieldValue)
-                .build());
-        searchPartyValues.add(
-            SearchPartyValue.builder()
-                .name(firstNameValue)
-                .emailAddress(country)
-                .addressLine1(addressLine2)
-                .postCode(testFieldValue)
-                .dateOfBirth(testFieldValue)
-                .build());
-        searchPartyValues.add(
-            SearchPartyValue.builder()
-                .name(lastNameValue)
-                .addressLine1(addressLine1)
-                .postCode(postCode)
-                .dateOfBirth(testFieldValue)
-                .build());
-
-        assertSearchPartyNodesPopulatedAsExpected(searchPartyValues, searchCriteriaJsonNode.get("SearchParties"));
-
+        GlobalSearchTestFixture.assertGlobalSearchData(savedCaseResource.getData());
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
         verify(auditRepository).save(captor.capture());
 
@@ -452,18 +397,48 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         assertThat(captor.getValue().getRequestId(), is(REQUEST_ID_VALUE));
     }
 
-    private void assertSearchPartyNodesPopulatedAsExpected(List<SearchPartyValue> searchPartyValues,
-                                                           JsonNode searchParties) {
-        List<SearchPartyValue> searchPartyList = searchParties.findValues("value").stream().map(x -> {
-            try {
-                return mapper.treeToValue(x, SearchPartyValue.class);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }).collect(Collectors.toList());
 
-        assertTrue(searchPartyList.containsAll(searchPartyValues));
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_global_search.sql"})
+    public void shouldPopulateMultipleSearchCriteriaAndSearchPartiesPostCreateEvent() throws Exception {
+        String caseId = "1504259907353529";
+        final String URL =  "/cases/" + caseId + "/events";
+
+        UserInfo userInfo = UserInfo.builder()
+            .uid("TestUserId")
+            .givenName("firstname")
+            .familyName("familyname")
+            .build();
+        stubFor(WireMock.get(urlMatching("/o/userinfo"))
+            .withHeader(HttpHeaders.AUTHORIZATION, containing("Test_Token"))
+            .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent()
+            .withCaseReference(caseId)
+            .withOnBehalfOfUserToken("Test_Token")
+            .withEvent(anEvent()
+                .withEventId("HAS_PRE_STATES_EVENT")
+                .withSummary("Short comment")
+                .build())
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "HAS_PRE_STATES_EVENT"))
+            .withData(GlobalSearchTestFixture.createCaseData())
+            .build();
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .header(EXPERIMENTAL_HEADER, "experimental")
+            .header(REQUEST_ID, REQUEST_ID_VALUE)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsString(caseDetailsToSave))
+        ).andReturn();
+
+        assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String content = mvcResult.getResponse().getContentAsString();
+        CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
+        assertNotNull("Saved Case Details should not be null", savedCaseResource);
+
+        GlobalSearchTestFixture.assertGlobalSearchData(savedCaseResource.getData());
     }
 
     @Test

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.globalsearch;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -22,6 +23,7 @@ public class SearchCriteria {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<SearchParty> searchParties;
 
+    @JsonIgnore
     public boolean isEmpty() {
         return (otherCaseReferences == null || otherCaseReferences.isEmpty())
             && (searchParties == null || searchParties.isEmpty());

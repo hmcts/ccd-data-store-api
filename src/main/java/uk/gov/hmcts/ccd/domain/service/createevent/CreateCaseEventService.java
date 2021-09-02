@@ -33,6 +33,7 @@ import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
+import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
@@ -80,6 +81,7 @@ public class CreateCaseEventService {
     private final MessageService messageService;
     private final CaseDocumentService caseDocumentService;
     private final CaseDataIssueLogger caseDataIssueLogger;
+    private final GlobalSearchProcessorService globalSearchProcessorService;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -104,7 +106,8 @@ public class CreateCaseEventService {
                                   @Qualifier("utcClock") final Clock clock,
                                   @Qualifier("caseEventMessageService") final MessageService messageService,
                                   final CaseDocumentService caseDocumentService,
-                                  final CaseDataIssueLogger caseDataIssueLogger) {
+                                  final CaseDataIssueLogger caseDataIssueLogger,
+                                  final GlobalSearchProcessorService globalSearchProcessorService) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -126,6 +129,7 @@ public class CreateCaseEventService {
         this.messageService = messageService;
         this.caseDocumentService = caseDocumentService;
         this.caseDataIssueLogger = caseDataIssueLogger;
+        this.globalSearchProcessorService = globalSearchProcessorService;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -152,8 +156,9 @@ public class CreateCaseEventService {
         content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, caseEventDefinition));
         final String oldState = caseDetails.getState();
 
-        // Logic start from here to attach document with case ID
+        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, content.getData());
 
+        // Logic start from here to attach document with case ID
         final CaseDetails updatedCaseDetails = mergeUpdatedFieldsToCaseDetails(
             content.getData(),
             caseDetails,
