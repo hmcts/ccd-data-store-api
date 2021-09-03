@@ -16,25 +16,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 class GlobalSearchProcessorServiceTest {
 
     private GlobalSearchProcessorService globalSearchProcessorService;
-
-    private static CaseTypeDefinition caseTypeDefinition;
-
+    private CaseTypeDefinition caseTypeDefinition;
     private Map<String, JsonNode> caseData;
-
     private List<String> searchPartyPropertyNames;
-
     private SearchParty searchParty;
 
     private static final String SEARCH_CRITERIA = "SearchCriteria";
     private static final String SEARCH_PARTIES = "SearchParties";
+    private static final String OTHER_CASE_REFERENCES = "OtherCaseReferences";
+    private static final String ID = "id";
+    private static final String VALUE = "value";
 
     private static final String NAME = "Name";
     private static final String ADDRESS_LINE = "AddressLine1";
@@ -86,12 +85,13 @@ class GlobalSearchProcessorServiceTest {
 
         globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
 
+
         JsonNode searchCriteriaNode = caseData.get(SEARCH_CRITERIA);
-        assertEquals(lastName, searchCriteriaNode.get("OtherCaseReferences").findValue("value").asText());
+        assertEquals(lastName, searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(VALUE).asText());
         assertDoesNotThrow(() -> UUID.fromString(
-            searchCriteriaNode.findValue("id").asText()));
+            searchCriteriaNode.findValue(ID).asText()));
         assertDoesNotThrow(() -> UUID.fromString(
-            searchCriteriaNode.get("OtherCaseReferences").findValue("id").asText()));
+            searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(ID).asText()));
         assertFalse(searchCriteriaNode.has(SEARCH_PARTIES));
     }
 
@@ -111,10 +111,10 @@ class GlobalSearchProcessorServiceTest {
         JsonNode searchCriteriaNode = caseData.get(SEARCH_CRITERIA);
 
         assertDoesNotThrow(() -> UUID.fromString(
-            searchCriteriaNode.findValue("id").asText()));
+            searchCriteriaNode.findValue(ID).asText()));
         assertDoesNotThrow(() -> UUID.fromString(
-            searchCriteriaNode.get("OtherCaseReferences").findValue("id").asText()));
-        assertEquals(addressValue, searchCriteriaNode.get("OtherCaseReferences").findValue("value").asText());
+            searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(ID).asText()));
+        assertEquals(addressValue, searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(VALUE).asText());
         assertFalse(caseData.get(SEARCH_CRITERIA).has(SEARCH_PARTIES));
     }
 
@@ -479,7 +479,7 @@ class GlobalSearchProcessorServiceTest {
         JsonNode searchPartyNode = searchPartyNodes.get(0);
 
         expectedFieldValues.forEach((key, value) ->
-            assertEquals(value, searchPartyNode.findValue("value").findValue(key).asText()));
+            assertEquals(value, searchPartyNode.findValue(VALUE).findValue(key).asText()));
     }
 
     private void assertSearchCriteriaField(String fieldName, Object expectedValue) {
@@ -487,12 +487,12 @@ class GlobalSearchProcessorServiceTest {
 
         JsonNode searchPartyNode = caseData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
 
-        assertDoesNotThrow(() -> UUID.fromString(searchPartyNode.findValue("id").asText()));
-        assertEquals(expectedValue, searchPartyNode.findValue("value").findValue(fieldName).asText());
+        assertDoesNotThrow(() -> UUID.fromString(searchPartyNode.findValue(ID).asText()));
+        assertEquals(expectedValue, searchPartyNode.findValue(VALUE).findValue(fieldName).asText());
 
         searchPartyPropertyNames.stream()
             .filter(propertyName -> !propertyName.equals(fieldName))
-            .forEach(field -> assertFalse(searchPartyNode.findValue("value").has(field)));
+            .forEach(field -> assertFalse(searchPartyNode.findValue(VALUE).has(field)));
     }
 
     private void assertSearchCriteriaFields(Map<String, String> expectedValues) {
@@ -500,11 +500,12 @@ class GlobalSearchProcessorServiceTest {
 
         JsonNode searchPartyNode = caseData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
 
-        assertDoesNotThrow(() -> UUID.fromString(searchPartyNode.findValue("id").asText()));
+        assertDoesNotThrow(() -> UUID.fromString(searchPartyNode.findValue(ID).asText()));
 
         expectedValues.forEach((key, value) ->
-            assertEquals(value, searchPartyNode.findValue("value").findValue(key).asText())
+            assertEquals(value, searchPartyNode.findValue(VALUE).findValue(key).asText())
         );
+
     }
 
 }
