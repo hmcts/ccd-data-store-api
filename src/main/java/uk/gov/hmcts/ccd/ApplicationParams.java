@@ -162,6 +162,9 @@ public class ApplicationParams {
     @Value("${idam.data-store.system-user.password}")
     private String dataStoreSystemUserPassword;
 
+    @Value("#{'${case.data.issue.logging.jurisdictions}'.split(',')}")
+    private List<String> caseDataIssueLoggingJurisdictions;
+
     @Value("${reference.data.api.url}")
     private String referenceDataApiUrl;
 
@@ -205,7 +208,7 @@ public class ApplicationParams {
     }
 
     public String draftURL(String draftId) {
-        return draftHost + "/drafts/" + draftId;
+        return draftHost + "/drafts/" + encode(draftId);
     }
 
     public String getDraftEncryptionKey() {
@@ -448,6 +451,10 @@ public class ApplicationParams {
 
     public void setDataStoreSystemUserPassword(String dataStoreSystemUserPassword) {
         this.dataStoreSystemUserPassword = dataStoreSystemUserPassword;
+    }
+
+    public List<String> getCaseDataIssueLoggingJurisdictions() {
+        return caseDataIssueLoggingJurisdictions;
     }
 
     public String getReferenceDataApiUrl() {
