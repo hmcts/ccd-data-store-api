@@ -9,11 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
 @EnableCaching
-@Profile("!test")
+@EnableScheduling
 public class CachingConfiguration {
 
     @Autowired
@@ -48,6 +48,8 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithMaxIdle("jurisdictionUiConfigsCache", latestVersionTTL));
         config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", latestVersionTTL));
         config.addMapConfig(newMapConfigWithTtl("jurisdictionCache", applicationParams.getJurisdictionTTLSecs()));
+        config.addMapConfig(newMapConfigWithTtl("buildingLocations", applicationParams.getRefDataCacheTtlInSec()));
+        config.addMapConfig(newMapConfigWithTtl("orgServices", applicationParams.getRefDataCacheTtlInSec()));
     }
 
     private MapConfig newMapConfigWithMaxIdle(final String name, final Integer maxIdle) {
@@ -59,13 +61,12 @@ public class CachingConfiguration {
     }
 
     private MapConfig newMapConfig(final String name) {
-        EvictionConfig evictionConfig = new EvictionConfig()
+        final EvictionConfig evictionConfig = new EvictionConfig()
                 .setEvictionPolicy(applicationParams.getDefinitionCacheEvictionPolicy())
                 .setMaxSizePolicy(MaxSizePolicy.PER_NODE)
                 .setSize(applicationParams.getDefinitionCacheMaxSize());
-        MapConfig mapConfig = new MapConfig().setName(name)
+        return new MapConfig().setName(name)
                 .setEvictionConfig(evictionConfig);
-        return mapConfig;
     }
 
 }

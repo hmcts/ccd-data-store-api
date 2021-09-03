@@ -8,6 +8,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
 
@@ -163,6 +164,12 @@ public class ApplicationParams {
 
     @Value("#{'${case.data.issue.logging.jurisdictions}'.split(',')}")
     private List<String> caseDataIssueLoggingJurisdictions;
+
+    @Value("${reference.data.api.url}")
+    private String referenceDataApiUrl;
+
+    @Value("${reference.data.cache.ttl.in.days}")
+    private String referenceDataCacheTtlInDays;
 
     public static String encode(final String stringToEncode) {
         try {
@@ -449,4 +456,13 @@ public class ApplicationParams {
     public List<String> getCaseDataIssueLoggingJurisdictions() {
         return caseDataIssueLoggingJurisdictions;
     }
+
+    public String getReferenceDataApiUrl() {
+        return referenceDataApiUrl;
+    }
+
+    public int getRefDataCacheTtlInSec() {
+        return Math.toIntExact(Duration.ofDays(Long.parseLong(referenceDataCacheTtlInDays)).toSeconds());
+    }
+
 }
