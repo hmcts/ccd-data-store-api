@@ -74,6 +74,9 @@ public class GlobalSearchParser {
         if (request.getParties() != null) {
             fields.add(SearchCriteriaResponse.SearchCriteriaEnum.PARTIES.getCcdField());
         }
+        if (request.getOtherReferences() != null) {
+            fields.add(SearchCriteriaResponse.SearchCriteriaEnum.OTHER_CASE_REFERENCES.getCcdField());
+        }
         return fields;
     }
 }

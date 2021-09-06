@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.model.search.global;
 
 import lombok.Getter;
 import lombok.Setter;
-import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
 
 import javax.validation.constraints.Pattern;
@@ -39,7 +38,8 @@ public class SearchCriteriaResponse {
     public enum SearchCriteriaEnum {
         REGION("caseManagementRegionId", "caseManagementLocation.region"),
         BASE_LOCATION("caseManagementBaseLocationId", "caseManagementLocation.baseLocation"),
-        PARTIES("parties", CaseDetailsEntity.LAST_STATE_MODIFIED_DATE_FIELD_COL);
+        PARTIES("parties", "SearchCriteria.SearchParties"),
+        OTHER_CASE_REFERENCES("otherCaseReferences", "SearchCriteria.OtherCaseReferences");
 
         private final String searchCriteriaField;
         private final String ccdField;

@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
+import uk.gov.hmcts.ccd.domain.model.search.global.Party;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteriaResponse;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -55,6 +56,7 @@ class GlobalSearchParserTest {
 
     private JurisdictionDefinition jurisdiction;
     private List<String> validFields;
+    private List<Party> parties;
 
     private GlobalSearchParser globalSearchParser;
 
@@ -63,6 +65,9 @@ class GlobalSearchParserTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
         validFields = List.of("ValidEntry", "ValidEntryTwo");
+        Party party = new Party();
+        party.setPartyName("name");
+        parties = List.of(party);
         doReturn(USER_ROLES).when(userRepository).getUserRoles();
 
         jurisdiction = new JurisdictionDefinition();
@@ -157,11 +162,18 @@ class GlobalSearchParserTest {
                         .build())
                 .build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId(CASE_FIELD_2).withFieldType(textFieldType())
-                .withAcl(anAcl()
-                    .withRole(ROLE_IN_USER_ROLE_1)
-                    .withRead(true)
-                    .build()).build())
+            .withField(newCaseField().withId("searchCriteria")
+                .withSC(SecurityClassification.PUBLIC.name())
+                .withFieldType(
+                    aFieldType()
+                        .withId("searchCriteria")
+                        .withType(COMPLEX)
+                        .withComplexField(complexField("OtherCaseReferences", TEXT,
+                            SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true))
+                        .withComplexField(complexField("SearchParties", TEXT,
+                            SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, false))
+                        .build())
+                .build())
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .withField(newCaseField().withId(CASE_FIELD_3).withFieldType(textFieldType())
                 .withAcl(anAcl()
@@ -246,6 +258,36 @@ class GlobalSearchParserTest {
         searchCriteriaResponse2.setCcdCaseTypeId(CASE_TYPE_ID_3);
         searchCriteriaResponse2.setCaseManagementBaseLocationId(CASE_TYPE_ID_1);
         searchCriteriaResponse2.setCaseManagementRegionId(CASE_TYPE_ID_1);
+
+        List<SearchCriteriaResponse> response =
+            globalSearchParser.filterCases(new java.util.ArrayList<>(java.util.Arrays.asList(searchCriteriaResponse,
+                searchCriteriaResponse2)), searchCriteria);
+
+        assertAll(
+            () -> assertThat(response.size(), Is.is(1))
+        );
+
+    }
+
+    @Test
+    void shouldFilterResultsWhenRequestIncludesPartiesAndOtherReferences() {
+        SearchCriteria searchCriteria = new SearchCriteria();
+        searchCriteria.setParties(parties);
+        searchCriteria.setOtherReferences(validFields);
+
+        SearchCriteriaResponse searchCriteriaResponse = new SearchCriteriaResponse();
+        searchCriteriaResponse.setCaseManagementBaseLocationId("value");
+        searchCriteriaResponse.setCcdCaseTypeId(CASE_TYPE_ID_1);
+        searchCriteriaResponse.setCaseManagementBaseLocationId(CASE_TYPE_ID_1);
+        searchCriteriaResponse.setCaseManagementRegionId(CASE_TYPE_ID_1);
+
+        SearchCriteriaResponse searchCriteriaResponse2 = new SearchCriteriaResponse();
+        searchCriteriaResponse2.setCaseManagementBaseLocationId("value");
+        searchCriteriaResponse2.setCcdCaseTypeId(CASE_TYPE_ID_3);
+        searchCriteriaResponse2.setCaseManagementBaseLocationId(CASE_TYPE_ID_1);
+        searchCriteriaResponse2.setCaseManagementRegionId(CASE_TYPE_ID_1);
+        searchCriteriaResponse2.setOtherReferences(List.of(CASE_TYPE_ID_1));
+        searchCriteriaResponse2.setParties(parties);
 
         List<SearchCriteriaResponse> response =
             globalSearchParser.filterCases(new java.util.ArrayList<>(java.util.Arrays.asList(searchCriteriaResponse,
