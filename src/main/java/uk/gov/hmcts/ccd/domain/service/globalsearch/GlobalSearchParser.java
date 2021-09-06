@@ -50,14 +50,13 @@ public class GlobalSearchParser {
             Optional<CaseFieldDefinition> caseFieldDefinition =
                 (field.contains(FIELD_SEPARATOR)) ? caseTypeDefinition.getComplexSubfieldDefinitionByPath(field)
                     : caseTypeDefinition.getCaseField(field);
-            if (caseFieldDefinition.isPresent()) {
-                if (!AccessControlService.hasAccessControlList(userRepository.getUserRoles(), CAN_READ,
+            if (caseFieldDefinition.isPresent() && (!AccessControlService
+                .hasAccessControlList(userRepository.getUserRoles(), CAN_READ,
                     caseFieldDefinition.get().getAccessControlLists())
-                    || caseFieldDefinition.get()
-                    .getSecurityLabel().equalsIgnoreCase(SecurityClassification.RESTRICTED.name())) {
-                    condition = false;
-                    break;
-                }
+                || caseFieldDefinition.get()
+                .getSecurityLabel().equalsIgnoreCase(SecurityClassification.RESTRICTED.name()))) {
+                condition = false;
+                break;
             }
 
         }

@@ -22,7 +22,6 @@ import static com.google.common.collect.Sets.newHashSet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
@@ -172,9 +171,9 @@ class GlobalSearchParserTest {
             .withSecurityClassification(SecurityClassification.PUBLIC)
             .build();
 
-        when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_1))).thenReturn(caseTypeDefinition1);
-        when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_2))).thenReturn(caseTypeDefinition2);
-        when(caseTypeService.getCaseType(eq(CASE_TYPE_ID_3))).thenReturn(caseTypeDefinition3);
+        when(caseTypeService.getCaseType(CASE_TYPE_ID_1)).thenReturn(caseTypeDefinition1);
+        when(caseTypeService.getCaseType(CASE_TYPE_ID_2)).thenReturn(caseTypeDefinition2);
+        when(caseTypeService.getCaseType(CASE_TYPE_ID_3)).thenReturn(caseTypeDefinition3);
 
         globalSearchParser = new GlobalSearchParser(userRepository, caseTypeService);
     }
