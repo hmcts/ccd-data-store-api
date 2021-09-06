@@ -12,7 +12,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
-import uk.gov.hmcts.ccd.domain.model.refdata.Service;
+import uk.gov.hmcts.ccd.domain.model.refdata.ServiceReferenceData;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -54,8 +54,8 @@ public class ReferenceDataRepository {
     }
 
     @Cacheable(cacheNames = SERVICES_CACHE, key = CACHE_KEY, unless = RESULT_IS_NULL_OR_EMPTY)
-    public List<Service> getServices() {
-        return getReferenceData(SERVICES_PATH, Service[].class);
+    public List<ServiceReferenceData> getServices() {
+        return getReferenceData(SERVICES_PATH, ServiceReferenceData[].class);
     }
 
     private <T> List<T> getReferenceData(final String path, final Class<T[]> responseType) {
@@ -84,7 +84,7 @@ public class ReferenceDataRepository {
 
     @Scheduled(cron = "${reference.data.cache.refresh.rate.cron}")
     public void updateServicesCache() {
-        final List<Service> services = getServices();
+        final List<ServiceReferenceData> services = getServices();
         updateCache(SERVICES_CACHE, services);
     }
 

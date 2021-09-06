@@ -47,14 +47,6 @@
 	</suppress>
 
 	<suppress until="2021-09-25">
-		<notes>A vulnerability in all versions of Nim-lang allows unauthenticated attackers to write files to
-		arbitrary directories via a crafted zip file with dot-slash characters included in the name of the
-		crafted file
-		</notes>
-    	<cve>CVE-2020-23171</cve>
-	</suppress>
-
-	<suppress until="2021-09-25">
 		<notes>In the Jakarta Expression Language implementation 3.0.3 and earlier,
 		a bug in the ELParserTokenManager enables invalid EL expressions to be evaluated as if they were valid.
 		</notes>
@@ -67,4 +59,14 @@
 		</notes>
 		<cve>CVE-2021-22119</cve>
 	</suppress>
+
+	<suppress until="2021-09-25">
+		<notes>A vulnerability in all versions of Nim-lang allows unauthenticated attackers to write files to
+		arbitrary directories via a crafted zip file with dot-slash characters included in the name of the
+		crafted file
+		</notes>
+		<cve>CVE-2020-23171</cve>
+	</suppress>
+
+
 </suppressions>

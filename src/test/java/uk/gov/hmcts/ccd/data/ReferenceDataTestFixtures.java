@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.data;
 
 import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
-import uk.gov.hmcts.ccd.domain.model.refdata.Service;
+import uk.gov.hmcts.ccd.domain.model.refdata.ServiceReferenceData;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,7 +12,7 @@ public interface ReferenceDataTestFixtures {
     UUID SERVICES_STUB_ID = UUID.fromString("3A080490-1828-44C3-B50E-D7543CD6DFDC");
 
     List<BuildingLocation> initialBuildingLocations = buildingLocations("1");
-    List<Service> initialServices = services(11);
+    List<ServiceReferenceData> initialServices = services(11);
 
     static List<BuildingLocation> buildingLocations(final String id) {
         return List.of(BuildingLocation.builder()
@@ -20,8 +20,8 @@ public interface ReferenceDataTestFixtures {
             .build());
     }
 
-    static List<Service> services(final int id) {
-        return List.of(Service.builder()
+    static List<ServiceReferenceData> services(final int id) {
+        return List.of(ServiceReferenceData.builder()
             .serviceId(id)
             .build());
     }

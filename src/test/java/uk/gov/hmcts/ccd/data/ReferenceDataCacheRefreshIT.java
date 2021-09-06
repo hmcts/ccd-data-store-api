@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
-import uk.gov.hmcts.ccd.domain.model.refdata.Service;
+import uk.gov.hmcts.ccd.domain.model.refdata.ServiceReferenceData;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -27,7 +27,7 @@ import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_PATH;
 class ReferenceDataCacheRefreshIT extends WireMockBaseTest implements ReferenceDataTestFixtures {
 
     private final List<BuildingLocation> updatedBuildingLocations = ReferenceDataTestFixtures.buildingLocations("2");
-    private final List<Service> updatedServices = ReferenceDataTestFixtures.services(22);
+    private final List<ServiceReferenceData> updatedServices = ReferenceDataTestFixtures.services(22);
 
     @Inject
     private ReferenceDataRepository underTest;
@@ -162,7 +162,7 @@ class ReferenceDataCacheRefreshIT extends WireMockBaseTest implements ReferenceD
         stubSuccess(SERVICES_PATH, objectToJsonString(initialServices), SERVICES_STUB_ID);
 
         final List<BuildingLocation> cachedBuildingLocations = underTest.getBuildingLocations();
-        final List<Service> cachedServices = underTest.getServices();
+        final List<ServiceReferenceData> cachedServices = underTest.getServices();
 
         assertThat(cachedBuildingLocations)
             .isNotEmpty();
