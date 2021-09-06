@@ -52,14 +52,14 @@ public class GlobalSearchParser {
                     : caseTypeDefinition.getCaseField(field);
             if (caseFieldDefinition.isPresent()) {
                 if (!AccessControlService.hasAccessControlList(userRepository.getUserRoles(), CAN_READ,
-                    caseFieldDefinition.get().getAccessControlLists()) &&
-                    caseFieldDefinition.get().getSecurityLabel().equalsIgnoreCase(SecurityClassification.RESTRICTED.name())) {
+                    caseFieldDefinition.get().getAccessControlLists())
+                    || caseFieldDefinition.get().getSecurityLabel().equalsIgnoreCase(SecurityClassification.RESTRICTED.name())) {
                     condition = false;
                     break;
                 }
             }
 
-        };
+        }
         return condition;
     }
 
