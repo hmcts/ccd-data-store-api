@@ -48,7 +48,6 @@ public class DraftsEndpointIT extends WireMockBaseTest {
     private static final String ETID = "CreateCase";
     private static final String DID = "4444333322221111";
     private static final String WRONG_DID = "7578590391163133";
-    private static final String BAD_DID = "7";
     private static final String JID = "PROBATE";
     private static final String TEST_EVENT_ID = "TEST_EVENT";
     private static final String UID = "0";
@@ -129,28 +128,6 @@ public class DraftsEndpointIT extends WireMockBaseTest {
             Draft.class);
 
         assertThat(actualData, hasProperty("id", is(DID)));
-    }
-
-    @Test
-    public void shouldReturn400WhenUpdateDraftForCaseworkerWithInvalidDraftId() throws Exception {
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/event-trigger/"
-            + ETID + "/drafts/" + BAD_DID;
-        CaseDataContent caseDetailsToUpdate = newCaseDataContent()
-            .withData(getData(data))
-            .withEvent(anEvent()
-                .withEventId(TEST_EVENT_ID)
-                .build())
-            .withToken(generateEventTokenNewCase(UID, JID, CTID, TEST_EVENT_ID))
-            .build();
-
-        final MvcResult mvcResult = mockMvc.perform(put(URL)
-            .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(caseDetailsToUpdate))
-        ).andReturn();
-
-        assertEquals("Incorrect Response Status Code", 400, mvcResult.getResponse().getStatus());
-        String actualResponse = mapper.readTree(mvcResult.getResponse().getContentAsString()).toString();
-        assertThat(actualResponse, containsString("\"message\":\"Invalid Draft Id\""));
     }
 
     @Test
@@ -333,26 +310,6 @@ public class DraftsEndpointIT extends WireMockBaseTest {
         final MvcResult mvcResult = mockMvc.perform(delete(URL).contentType(JSON_CONTENT_TYPE)).andReturn();
 
         assertEquals("Incorrect Response Status Code", 200, mvcResult.getResponse().getStatus());
-    }
-
-    @Test
-    public void shouldReturn400WhenDeleteInvalidDraftIdForCaseworker() throws Exception {
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID
-            + "/drafts/" + BAD_DID;
-
-        final MvcResult mvcResult = mockMvc.perform(delete(URL).contentType(JSON_CONTENT_TYPE)).andReturn();
-
-        assertEquals("Incorrect Response Status Code", 400, mvcResult.getResponse().getStatus());
-    }
-
-    @Test
-    public void shouldReturn404WhenDeleteInvalidDraftForCaseworker() throws Exception {
-        final String URL = "/caseworkers/" + UID + "/jurisdictions/" + JID + "/case-types/" + CTID + "/drafts/"
-            + WRONG_DID;
-
-        final MvcResult mvcResult = mockMvc.perform(delete(URL).contentType(JSON_CONTENT_TYPE)).andReturn();
-
-        assertEquals("Incorrect Response Status Code", 404, mvcResult.getResponse().getStatus());
     }
 
     private Map<String, JsonNode> getData(JsonNode expectedData) {
