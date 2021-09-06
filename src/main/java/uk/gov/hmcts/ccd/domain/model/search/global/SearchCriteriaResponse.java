@@ -26,7 +26,7 @@ public class SearchCriteriaResponse {
 
     private String caseManagementBaseLocationId;
 
-    private String HMCTSServiceId;
+    private String hmctsServiceId;
 
     private String caseNameHmctsInternal;
 

@@ -7,10 +7,10 @@ import java.util.List;
 
 @Getter
 @Setter
-public class SearchCriteriaResponseTEMP{
+public class SearchCriteriaResponseTEMP {
 
-   private SearchCriteria requestValues;
+    private SearchCriteria requestValues;
 
-   private List<SearchCriteriaResponse> response;
+    private List<SearchCriteriaResponse> response;
 
 }

@@ -24,7 +24,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 @Slf4j
 public class GlobalSearchParser {
 
-    private final String FIELD_SEPARATOR = ".";
+    private static final String FIELD_SEPARATOR = ".";
     private final UserRepository userRepository;
     private final CaseTypeService caseTypeService;
 
@@ -43,17 +43,18 @@ public class GlobalSearchParser {
         return results;
     }
 
-    private boolean authorised (List<String> fields, SearchCriteriaResponse searchCriteria) {
+    private boolean authorised(List<String> fields, SearchCriteriaResponse searchCriteria) {
         CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(searchCriteria.getCcdCaseTypeId());
         boolean condition = true;
         for (String field : fields) {
             Optional<CaseFieldDefinition> caseFieldDefinition =
-                (field.contains(FIELD_SEPARATOR))? caseTypeDefinition.getComplexSubfieldDefinitionByPath(field)
+                (field.contains(FIELD_SEPARATOR)) ? caseTypeDefinition.getComplexSubfieldDefinitionByPath(field)
                     : caseTypeDefinition.getCaseField(field);
             if (caseFieldDefinition.isPresent()) {
                 if (!AccessControlService.hasAccessControlList(userRepository.getUserRoles(), CAN_READ,
                     caseFieldDefinition.get().getAccessControlLists())
-                    || caseFieldDefinition.get().getSecurityLabel().equalsIgnoreCase(SecurityClassification.RESTRICTED.name())) {
+                    || caseFieldDefinition.get()
+                    .getSecurityLabel().equalsIgnoreCase(SecurityClassification.RESTRICTED.name())) {
                     condition = false;
                     break;
                 }
@@ -65,13 +66,13 @@ public class GlobalSearchParser {
 
     private List<String> findFieldsToFilter(SearchCriteria request) {
         List<String> fields = new ArrayList<>();
-        if (request.getCaseManagementBaseLocationIds()!= null){
+        if (request.getCaseManagementBaseLocationIds() != null) {
             fields.add(SearchCriteriaResponse.SearchCriteriaEnum.BASE_LOCATION.getCcdField());
         }
-        if (request.getCaseManagementRegionIds()!= null){
+        if (request.getCaseManagementRegionIds() != null) {
             fields.add(SearchCriteriaResponse.SearchCriteriaEnum.REGION.getCcdField());
         }
-        if (request.getParties()!= null){
+        if (request.getParties() != null) {
             fields.add(SearchCriteriaResponse.SearchCriteriaEnum.PARTIES.getCcdField());
         }
         return fields;
