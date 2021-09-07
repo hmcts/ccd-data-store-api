@@ -36,6 +36,7 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchR
 class ElasticsearchCaseSearchRequestSecurityTest {
 
     private static final String CASE_TYPE_ID = "caseType";
+    private static final String CASE_TYPE_ID_2 = "caseType2";
 
     @Mock
     private CaseSearchFilter caseSearchFilter;
@@ -56,7 +57,7 @@ class ElasticsearchCaseSearchRequestSecurityTest {
     }
 
     @Test
-    @DisplayName("should parse and secure request with filters")
+    @DisplayName("should parse and secure request with filters and single case type")
     void shouldSecureRequest() {
         CaseSearchRequest caseSearchRequest = mock(CaseSearchRequest.class);
         doReturn(CASE_TYPE_ID).when(caseSearchRequest).getCaseTypeId();
@@ -79,10 +80,11 @@ class ElasticsearchCaseSearchRequestSecurityTest {
     }
 
     @Test
-    @DisplayName("should parse and secure request with filters")
+    @DisplayName("should parse and secure request with filters and multiple case types")
     void shouldSecureCrossCaseTypeRequest() {
         List<String> caseTypeIds = new ArrayList<>();
         caseTypeIds.add(CASE_TYPE_ID);
+        caseTypeIds.add(CASE_TYPE_ID_2);
 
         CrossCaseTypeSearchRequest request = mock(CrossCaseTypeSearchRequest.class);
         doReturn(caseTypeIds).when(request).getCaseTypeIds();
