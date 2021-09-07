@@ -13,6 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchPartyValue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ public class GlobalSearchProcessorService {
 
     private Map<String, String> namesToValuesMap = new LinkedHashMap<>();
 
-    public void populateGlobalSearchData(CaseTypeDefinition caseTypeDefinition,
+    public Map<String, JsonNode> populateGlobalSearchData(CaseTypeDefinition caseTypeDefinition,
                                                           Map<String, JsonNode> data) {
         List<uk.gov.hmcts.ccd.domain.model.definition.SearchCriteria> searchCriterias =
             caseTypeDefinition.getSearchCriterias();
@@ -37,18 +38,25 @@ public class GlobalSearchProcessorService {
 
         Optional<CaseFieldDefinition> searchCriteriaCaseField = caseTypeDefinition.getCaseField(SEARCH_CRITERIA);
 
+        Map<String, JsonNode> clonedData = null;
+        if (data != null) {
+            clonedData = new HashMap<>(data);
+        }
+
         if (searchCriteriaCaseField.isPresent()) {
 
-            SearchCriteria searchCriteria = populateSearchCriteria(data, searchCriterias);
-            List<SearchParty> searchPartyList = populateSearchParties(data, searchParties);
+            SearchCriteria searchCriteria = populateSearchCriteria(clonedData, searchCriterias);
+            List<SearchParty> searchPartyList = populateSearchParties(clonedData, searchParties);
 
             if (!searchPartyList.isEmpty()) {
                 searchCriteria.setSearchParties(searchPartyList);
             }
-            if (!searchCriteria.isEmpty() && data != null) {
-                data.put(SEARCH_CRITERIA, JacksonUtils.convertValueJsonNode(searchCriteria));
+            if (!searchCriteria.isEmpty()) {
+                clonedData.put(SEARCH_CRITERIA, JacksonUtils.convertValueJsonNode(searchCriteria));
             }
         }
+
+        return clonedData;
     }
 
     private SearchCriteria populateSearchCriteria(Map<String, JsonNode> data,

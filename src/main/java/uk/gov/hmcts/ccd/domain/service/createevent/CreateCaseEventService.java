@@ -156,7 +156,7 @@ public class CreateCaseEventService {
         content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, caseEventDefinition));
         final String oldState = caseDetails.getState();
 
-        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, content.getData());
+        content.setData(globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, content.getData()));
 
         // Logic start from here to attach document with case ID
         final CaseDetails updatedCaseDetails = mergeUpdatedFieldsToCaseDetails(

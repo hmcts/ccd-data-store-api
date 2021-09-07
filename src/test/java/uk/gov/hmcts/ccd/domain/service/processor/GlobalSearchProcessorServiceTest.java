@@ -63,8 +63,9 @@ class GlobalSearchProcessorServiceTest {
     @Test
     void checkGlobalSearchFunctionalityDisabledWithoutAppropriateCaseField() {
         caseTypeDefinition.setCaseFieldDefinitions(new ArrayList<>());
-        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
-        assertNull(caseData.get(SEARCH_CRITERIA));
+        Map<String, JsonNode> globalSearchData =
+            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+        assertNull(globalSearchData.get(SEARCH_CRITERIA));
     }
 
     @Test
@@ -83,10 +84,11 @@ class GlobalSearchProcessorServiceTest {
         final String lastName = "LastNameValue";
         caseData.put("TextField1", JacksonUtils.MAPPER.readTree("\""  + lastName  + "\""));
 
-        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+        Map<String, JsonNode> globalSearchData =
+            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
 
 
-        JsonNode searchCriteriaNode = caseData.get(SEARCH_CRITERIA);
+        JsonNode searchCriteriaNode = globalSearchData.get(SEARCH_CRITERIA);
         assertEquals(lastName, searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(VALUE).asText());
         assertDoesNotThrow(() -> UUID.fromString(
             searchCriteriaNode.findValue(ID).asText()));
@@ -107,15 +109,16 @@ class GlobalSearchProcessorServiceTest {
 
         caseData.put("PersonAddress", JacksonUtils.MAPPER.readTree("{\"AddressLine1\": \"" + addressValue  + "\"}"));
 
-        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
-        JsonNode searchCriteriaNode = caseData.get(SEARCH_CRITERIA);
+        Map<String, JsonNode> globalSearchData =
+            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+        JsonNode searchCriteriaNode = globalSearchData.get(SEARCH_CRITERIA);
 
         assertDoesNotThrow(() -> UUID.fromString(
             searchCriteriaNode.findValue(ID).asText()));
         assertDoesNotThrow(() -> UUID.fromString(
             searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(ID).asText()));
         assertEquals(addressValue, searchCriteriaNode.get(OTHER_CASE_REFERENCES).findValue(VALUE).asText());
-        assertFalse(caseData.get(SEARCH_CRITERIA).has(SEARCH_PARTIES));
+        assertFalse(globalSearchData.get(SEARCH_CRITERIA).has(SEARCH_PARTIES));
     }
 
     @Test
@@ -401,9 +404,10 @@ class GlobalSearchProcessorServiceTest {
             + "      }\n"
             + "}"));
 
-        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+        Map<String, JsonNode> globalSearchData =
+            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
 
-        JsonNode searchPartyNodes = caseData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
+        JsonNode searchPartyNodes = globalSearchData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
 
         assertEquals(2, searchPartyNodes.size());
     }
@@ -470,9 +474,10 @@ class GlobalSearchProcessorServiceTest {
             + "      }\n"
             + "}"));
 
-        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+        Map<String, JsonNode> globalSearchData =
+            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
 
-        JsonNode searchPartyNodes = caseData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
+        JsonNode searchPartyNodes = globalSearchData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
 
         assertEquals(1, searchPartyNodes.size());
 
@@ -483,9 +488,10 @@ class GlobalSearchProcessorServiceTest {
     }
 
     private void assertSearchCriteriaField(String fieldName, Object expectedValue) {
-        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+        Map<String, JsonNode> globalSearchData =
+            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
 
-        JsonNode searchPartyNode = caseData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
+        JsonNode searchPartyNode = globalSearchData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
 
         assertDoesNotThrow(() -> UUID.fromString(searchPartyNode.findValue(ID).asText()));
         assertEquals(expectedValue, searchPartyNode.findValue(VALUE).findValue(fieldName).asText());
@@ -496,9 +502,10 @@ class GlobalSearchProcessorServiceTest {
     }
 
     private void assertSearchCriteriaFields(Map<String, String> expectedValues) {
-        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+        Map<String, JsonNode> globalSearchData =
+            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
 
-        JsonNode searchPartyNode = caseData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
+        JsonNode searchPartyNode = globalSearchData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
 
         assertDoesNotThrow(() -> UUID.fromString(searchPartyNode.findValue(ID).asText()));
 

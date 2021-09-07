@@ -121,7 +121,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             caseTypeDefinition.getJurisdictionDefinition(),
             caseTypeDefinition);
 
-        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseDataContent.getData());
+        caseDataContent.setData(
+            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseDataContent.getData()));
 
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId, caseDataContent);
 
