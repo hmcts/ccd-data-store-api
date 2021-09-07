@@ -47,9 +47,6 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
     @MockBean
     private CaseUserAuditRepository auditRepository;
 
-//    @MockBean
-//    RoleAssignmentCategoryService roleAssignmentCategoryService;
-
     @Autowired
     private DefaultCaseUserRepository repository;
 
@@ -61,7 +58,6 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldGrantAccessAsCustomCaseRole() {
-      //  doReturn(RoleCategory.CITIZEN).when(roleAssignmentCategoryService).getRoleCategory(any());
         repository.grantAccess(CASE_ID, USER_ID, CASE_ROLE);
 
         assertThat(countAccesses(CASE_ID, USER_ID, CASE_ROLE), equalTo(1));
@@ -94,7 +90,7 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
         caseIds = repository.findCasesUserIdHasAccessTo(USER_ID_GRANTED);
 
         assertThat(caseIds.size(), equalTo(3));
-        assertThat(caseIds, containsInAnyOrder(CASE_ID_GRANTED,CASE_ID_GRANTED,CASE_ID_3));
+        assertThat(caseIds, containsInAnyOrder(CASE_ID_GRANTED, CASE_ID_GRANTED, CASE_ID_3));
     }
 
     private Integer countAccesses(Long caseId, String userId) {
@@ -128,7 +124,7 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
         caseRoles = repository.findCaseRoles(CASE_ID_GRANTED, USER_ID_GRANTED);
 
         assertThat(caseRoles.size(), equalTo(2));
-        assertThat(caseRoles, containsInAnyOrder(CASE_ROLE,CASE_ROLE_SOLICITOR));
+        assertThat(caseRoles, containsInAnyOrder(CASE_ROLE, CASE_ROLE_SOLICITOR));
     }
 
     @Test
