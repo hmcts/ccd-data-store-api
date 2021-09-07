@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -31,10 +28,12 @@ import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
-import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
+
+import javax.inject.Inject;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
-import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 @Service
 public class SubmitCaseTransaction implements AccessControl {
