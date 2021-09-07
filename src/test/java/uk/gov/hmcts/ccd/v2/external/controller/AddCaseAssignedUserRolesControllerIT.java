@@ -9,8 +9,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MvcResult;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
-import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseAssignedUserRolesRequest;
@@ -20,7 +18,6 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.core.IsNot.not;
@@ -67,14 +64,9 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
         assertEquals("Success message should be returned", ADD_SUCCESS_MESSAGE, response.getStatus());
 
         // check data has been saved
-        List<CaseUserEntity> cue = caseUserRepository
-            .findCaseUserRoles(List.of(Long.valueOf(CASE_ID_1)), List.of(userId));
-
-        assertThat(cue.size(), is(1));
-        assertEquals(CASE_ROLE_1, cue.get(0).getCasePrimaryKey().getCaseRole());
-        assertEquals(RoleCategory.CITIZEN.name(), cue.get(0).getRoleCategory());
-        assertEquals(Long.valueOf(CASE_ID_1), cue.get(0).getCasePrimaryKey().getCaseDataId());
-        assertEquals(userId, cue.get(0).getCasePrimaryKey().getUserId());
+        List<String> caseRoles = caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID_1), userId);
+        assertEquals(1, caseRoles.size());
+        assertThat(caseRoles, hasItems(CASE_ROLE_1));
 
         verifyAuditForAddCaseUserRoles(HttpStatus.CREATED, caseUserRoles);
     }
