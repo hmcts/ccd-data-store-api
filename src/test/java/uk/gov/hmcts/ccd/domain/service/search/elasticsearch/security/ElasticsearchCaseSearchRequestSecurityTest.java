@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -25,8 +27,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 
 @ExtendWith(MockitoExtension.class)
 class ElasticsearchCaseSearchRequestSecurityTest {
@@ -71,6 +75,31 @@ class ElasticsearchCaseSearchRequestSecurityTest {
             () -> verify(caseSearchRequest).toJsonString(),
             () -> verify(searchRequestJsonNode).set(anyString(), any(JsonNode.class)),
             () -> verify(objectMapperService, times(2)).convertStringToObject(anyString(), eq(ObjectNode.class))
+        );
+    }
+
+    @Test
+    @DisplayName("should parse and secure request with filters")
+    void shouldSecureCrossCaseTypeRequest() {
+        List<String> caseTypeIds = new ArrayList<>();
+        caseTypeIds.add(CASE_TYPE_ID);
+
+        CrossCaseTypeSearchRequest request = mock(CrossCaseTypeSearchRequest.class);
+        doReturn(caseTypeIds).when(request).getCaseTypeIds();
+        doReturn(new ElasticsearchRequest(searchRequestJsonNode)).when(request).getElasticSearchRequest();
+        doReturn(true).when(request).isMultiCaseTypeSearch();
+        doReturn(Optional.of(mock(QueryBuilder.class))).when(caseSearchFilter).getFilter(CASE_TYPE_ID);
+        doReturn(searchRequestJsonNode).when(objectMapperService).convertStringToObject(anyString(),
+            eq(ObjectNode.class));
+        doReturn(searchRequestJsonNode).when(searchRequestJsonNode).get(anyString());
+
+        querySecurity.createSecuredSearchRequest(request);
+
+        assertAll(
+            () -> verify(caseSearchFilter).getFilter(CASE_TYPE_ID),
+            () -> verify(request).isMultiCaseTypeSearch(),
+            () -> verify(objectMapperService, times(1)).convertStringToObject(anyString(), eq(ObjectNode.class))
+
         );
     }
 }
