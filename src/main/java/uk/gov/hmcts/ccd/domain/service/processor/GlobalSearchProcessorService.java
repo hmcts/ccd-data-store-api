@@ -51,7 +51,7 @@ public class GlobalSearchProcessorService {
             if (!searchPartyList.isEmpty()) {
                 searchCriteria.setSearchParties(searchPartyList);
             }
-            if (!searchCriteria.isEmpty()) {
+            if (!searchCriteria.isEmpty() && clonedData != null) {
                 clonedData.put(SEARCH_CRITERIA, JacksonUtils.convertValueJsonNode(searchCriteria));
             }
         }
