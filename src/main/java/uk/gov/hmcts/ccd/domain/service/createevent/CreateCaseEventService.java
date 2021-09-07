@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -31,31 +29,35 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 import javax.inject.Inject;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
 @Service
 public class CreateCaseEventService {
-
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     private final UserRepository userRepository;
     private final CaseDetailsRepository caseDetailsRepository;
@@ -76,6 +78,8 @@ public class CreateCaseEventService {
     private final Clock clock;
     private final CasePostStateService casePostStateService;
     private final MessageService messageService;
+    private final CaseDocumentService caseDocumentService;
+    private final CaseDataIssueLogger caseDataIssueLogger;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -98,7 +102,9 @@ public class CreateCaseEventService {
                                   final FieldProcessorService fieldProcessorService,
                                   final CasePostStateService casePostStateService,
                                   @Qualifier("utcClock") final Clock clock,
-                                  @Qualifier("caseEventMessageService") final MessageService messageService) {
+                                  @Qualifier("caseEventMessageService") final MessageService messageService,
+                                  final CaseDocumentService caseDocumentService,
+                                  final CaseDataIssueLogger caseDataIssueLogger) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -118,18 +124,21 @@ public class CreateCaseEventService {
         this.casePostStateService = casePostStateService;
         this.clock = clock;
         this.messageService = messageService;
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        this.caseDocumentService = caseDocumentService;
+        this.caseDataIssueLogger = caseDataIssueLogger;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public CreateCaseEventResult createCaseEvent(String caseReference, CaseDataContent content) {
+    public CreateCaseEventResult createCaseEvent(final String caseReference, final CaseDataContent content) {
 
         final CaseDetails caseDetails = getCaseDetails(caseReference);
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
-        final CaseEventDefinition caseEventDefinition =
-            findAndValidateCaseEvent(caseTypeDefinition, content.getEvent());
-        final CaseDetails caseDetailsBefore = caseService.clone(caseDetails);
-        String uid = userAuthorisation.getUserId();
+        final CaseEventDefinition caseEventDefinition = findAndValidateCaseEvent(
+            caseTypeDefinition,
+            content.getEvent()
+        );
+        final CaseDetails caseDetailsInDatabase = caseService.clone(caseDetails);
+        final String uid = userAuthorisation.getUserId();
 
         eventTokenService.validateToken(content.getToken(),
             uid,
@@ -139,37 +148,73 @@ public class CreateCaseEventService {
             caseTypeDefinition);
 
         validatePreState(caseDetails, caseEventDefinition);
+
         content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, caseEventDefinition));
-        String oldState = caseDetails.getState();
-        mergeUpdatedFieldsToCaseDetails(content.getData(), caseDetails, caseEventDefinition, caseTypeDefinition);
-        AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse =
-            callbackInvoker.invokeAboutToSubmitCallback(caseEventDefinition,
-                caseDetailsBefore,
-                caseDetails,
-                caseTypeDefinition,
-                content.getIgnoreWarning());
+        final String oldState = caseDetails.getState();
+
+        // Logic start from here to attach document with case ID
+
+        final CaseDetails updatedCaseDetails = mergeUpdatedFieldsToCaseDetails(
+            content.getData(),
+            caseDetails,
+            caseEventDefinition,
+            caseTypeDefinition
+        );
+        final CaseDetails updatedCaseDetailsWithoutHashes = caseDocumentService.stripDocumentHashes(updatedCaseDetails);
+
+        final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(
+            caseEventDefinition,
+            caseDetailsInDatabase,
+            updatedCaseDetailsWithoutHashes,
+            caseTypeDefinition,
+            content.getIgnoreWarning()
+        );
 
         final Optional<String> newState = aboutToSubmitCallbackResponse.getState();
 
-        validateCaseFieldsOperation.validateData(caseDetails.getData(), caseTypeDefinition, content);
-        LocalDateTime timeNow = now();
-        final CaseDetails savedCaseDetails =
-            saveCaseDetails(caseDetailsBefore,
-                caseDetails,
-                caseEventDefinition,
-                newState,
-                timeNow);
-        saveAuditEventForCaseDetails(aboutToSubmitCallbackResponse,
+        @SuppressWarnings("UnnecessaryLocalVariable")
+        final CaseDetails caseDetailsAfterCallback = updatedCaseDetailsWithoutHashes;
+
+        validateCaseFieldsOperation.validateData(caseDetailsAfterCallback.getData(), caseTypeDefinition, content);
+        final LocalDateTime timeNow = now();
+
+        final List<DocumentHashToken> documentHashes = caseDocumentService.extractDocumentHashToken(
+            caseDetailsInDatabase.getData(),
+            Optional.ofNullable(content.getData()).orElse(emptyMap()),
+            Optional.ofNullable(caseDetailsAfterCallback.getData()).orElse(emptyMap())
+        );
+
+        final CaseDetails caseDetailsAfterCallbackWithoutHashes = caseDocumentService.stripDocumentHashes(
+            caseDetailsAfterCallback
+        );
+
+        final CaseDetails savedCaseDetails = saveCaseDetails(
+            caseDetailsInDatabase,
+            caseDetailsAfterCallbackWithoutHashes,
+            caseEventDefinition,
+            newState,
+            timeNow
+        );
+        saveAuditEventForCaseDetails(
+            aboutToSubmitCallbackResponse,
             content.getEvent(),
             caseEventDefinition,
             savedCaseDetails,
             caseTypeDefinition,
             timeNow,
             oldState,
-            content.getOnBehalfOfUserToken());
+            content.getOnBehalfOfUserToken()
+        );
+
+        caseDocumentService.attachCaseDocuments(
+            caseDetails.getReferenceAsString(),
+            caseDetails.getCaseTypeId(),
+            caseDetails.getJurisdiction(),
+            documentHashes
+        );
 
         return CreateCaseEventResult.caseEventWith()
-            .caseDetailsBefore(caseDetailsBefore)
+            .caseDetailsBefore(caseDetailsInDatabase)
             .savedCaseDetails(savedCaseDetails)
             .eventTrigger(caseEventDefinition)
             .build();
@@ -208,50 +253,72 @@ public class CreateCaseEventService {
                 new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
     }
 
-    private CaseDetails saveCaseDetails(CaseDetails caseDetailsBefore, final CaseDetails caseDetails,
+    private CaseDetails saveCaseDetails(final CaseDetails caseDetailsBefore,
+                                        final CaseDetails caseDetails,
                                         final CaseEventDefinition caseEventDefinition,
-                                        final Optional<String> state, LocalDateTime timeNow) {
+                                        final Optional<String> state,
+                                        final LocalDateTime timeNow) {
 
-        if (!state.isPresent()) {
+        if (state.isEmpty()) {
             updateCaseState(caseDetails, caseEventDefinition);
         }
         if (!caseDetails.getState().equalsIgnoreCase(caseDetailsBefore.getState())) {
             caseDetails.setLastStateModifiedDate(timeNow);
         }
+
+        caseDataIssueLogger.logAnyDataIssuesIn(caseDetailsBefore, caseDetails);
         return caseDetailsRepository.set(caseDetails);
+    }
+
+    private void updateCaseState(CaseDetails caseDetails, CaseEventDefinition caseEventDefinition) {
+        final String postState = casePostStateService.evaluateCaseState(caseEventDefinition, caseDetails);
+        if (shouldChangeState(postState)) {
+            caseDetails.setState(postState);
+        }
     }
 
     private LocalDateTime now() {
         return LocalDateTime.now(clock);
     }
 
-    private void mergeUpdatedFieldsToCaseDetails(final Map<String, JsonNode> data,
-                                                 final CaseDetails caseDetails,
-                                                 final CaseEventDefinition caseEventDefinition,
-                                                 final CaseTypeDefinition caseTypeDefinition) {
-        if (null != data) {
-            final Map<String, JsonNode> sanitisedData = caseSanitiser.sanitise(caseTypeDefinition, data);
-            for (Map.Entry<String, JsonNode> field : sanitisedData.entrySet()) {
-                caseDetails.getData().put(field.getKey(), field.getValue());
-            }
-            caseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(
-                caseTypeDefinition,
-                caseDetails.getData(),
-                caseDetails.getDataClassification()));
-        }
-        caseDetails.setLastModified(now());
-        updateCaseState(caseDetails, caseEventDefinition);
+    CaseDetails mergeUpdatedFieldsToCaseDetails(final Map<String, JsonNode> data,
+                                                final CaseDetails caseDetails,
+                                                final CaseEventDefinition caseEventDefinition,
+                                                final CaseTypeDefinition caseTypeDefinition) {
+
+        return Optional.ofNullable(data)
+            .map(nonNullData -> {
+                CaseDetails clonedCaseDetails = caseService.clone(caseDetails);
+
+                final Map<String, JsonNode> sanitisedData = caseSanitiser.sanitise(caseTypeDefinition, nonNullData);
+                final Map<String, JsonNode> caseData = new HashMap<>(Optional.ofNullable(caseDetails.getData())
+                    .orElse(emptyMap()));
+                caseData.putAll(sanitisedData);
+                clonedCaseDetails.setData(caseData);
+
+                final Map<String, JsonNode> dataClassifications = caseDataService.getDefaultSecurityClassifications(
+                    caseTypeDefinition,
+                    clonedCaseDetails.getData(),
+                    clonedCaseDetails.getDataClassification()
+                );
+
+                clonedCaseDetails.setDataClassification(dataClassifications);
+                clonedCaseDetails.setLastModified(now());
+                updateCaseState(clonedCaseDetails, caseEventDefinition);
+
+                return clonedCaseDetails;
+            })
+            .orElseGet(() -> {
+                CaseDetails clonedCaseDetails = caseService.clone(caseDetails);
+                clonedCaseDetails.setLastModified(now());
+                updateCaseState(clonedCaseDetails, caseEventDefinition);
+
+                return clonedCaseDetails;
+            });
     }
 
-    private void updateCaseState(CaseDetails caseDetails, CaseEventDefinition caseEventDefinition) {
-        String postState = casePostStateService.evaluateCaseState(caseEventDefinition, caseDetails);
-        if (!shouldRemainOnCurrentState(postState)) {
-            caseDetails.setState(postState);
-        }
-    }
-
-    private boolean shouldRemainOnCurrentState(String postState) {
-        return equalsIgnoreCase(CaseStateDefinition.ANY, postState);
+    private boolean shouldChangeState(final String postState) {
+        return !equalsIgnoreCase(CaseStateDefinition.ANY, postState);
     }
 
     private void saveAuditEventForCaseDetails(final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse,
@@ -262,7 +329,6 @@ public class CreateCaseEventService {
                                               final LocalDateTime timeNow,
                                               final String oldState,
                                               final String onBehalfOfUserToken) {
-
         final CaseStateDefinition caseStateDefinition =
             caseTypeService.findState(caseTypeDefinition, caseDetails.getState());
         final AuditEvent auditEvent = new AuditEvent();
@@ -288,7 +354,8 @@ public class CreateCaseEventService {
             .caseDetails(caseDetails)
             .caseTypeDefinition(caseTypeDefinition)
             .caseEventDefinition(caseEventDefinition)
-            .oldState(oldState).build());
+            .oldState(oldState)
+            .build());
     }
 
     private void saveUserDetails(String onBehalfOfUserToken, AuditEvent auditEvent) {

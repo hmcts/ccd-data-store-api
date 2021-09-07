@@ -1,0 +1,30 @@
+{
+  "_guid_": "S-1035",
+  "_extends_": "F-1003-Test_Base_data",
+  "title": "must get an error response for a malformed Hashtoken",
+  "specs": [
+    "contains a malformed Hashtoken"
+  ],
+  "request": {
+    "body": {
+      "data": {
+        "DocumentField1": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary",
+          "document_hash": "bc7d8530b97077ba09d42730b114455769cc7703a2fa585b24a80131aa2a^&%$"
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_403_Response",
+    "body": {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.DocumentTokenException",
+      "message" : "The user has provided an invalid hashToken for document {\"timestamp\":\"2020-04-29T10:33:59.521+0000\",\"status\":403,\"error\":\"Forbidden\",\"message\":\"0d90e499-fd84-4589-bd78-07a6059c7ebc\",\"path\":\"/cases/documents/attachToCase\"}",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

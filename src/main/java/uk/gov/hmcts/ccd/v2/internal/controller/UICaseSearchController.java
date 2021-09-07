@@ -1,28 +1,6 @@
 package uk.gov.hmcts.ccd.v2.internal.controller;
 
-import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
-import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.google.common.base.Strings;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -33,6 +11,16 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.SwaggerDefinition;
 import io.swagger.annotations.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
@@ -46,6 +34,16 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHe
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchSortService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
+import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.MAX_CASE_IDS_LIST;
 
 @RestController
 @RequestMapping(path = "/internal/searchCases", consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -170,7 +168,7 @@ public class UICaseSearchController {
             .withSearchRequest(searchRequest)
             .build();
 
-        CaseSearchResult caseSearchResult = caseSearchOperation.execute(request);
+        CaseSearchResult caseSearchResult = caseSearchOperation.execute(request, false);
         CaseSearchResultView caseSearchResultView = caseSearchResultViewGenerator
             .execute(caseTypeId, caseSearchResult, useCaseUppercase, requestedFields);
 
