@@ -6,13 +6,6 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,6 +22,14 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchCaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -70,12 +71,12 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     }
 
     @Override
-    public CaseSearchResult execute(CrossCaseTypeSearchRequest searchRequest) {
+    public CaseSearchResult execute(CrossCaseTypeSearchRequest searchRequest, boolean dataClassification) {
         List<CaseTypeDefinition> authorisedCaseTypes = getAuthorisedCaseTypes(searchRequest);
         CrossCaseTypeSearchRequest authorisedSearchRequest =
             createAuthorisedSearchRequest(authorisedCaseTypes, searchRequest);
 
-        return searchCasesAndFilterFieldsByAccess(authorisedCaseTypes, authorisedSearchRequest);
+        return searchCasesAndFilterFieldsByAccess(authorisedCaseTypes, authorisedSearchRequest, dataClassification);
     }
 
     private List<CaseTypeDefinition> getAuthorisedCaseTypes(CrossCaseTypeSearchRequest searchRequest) {
@@ -101,20 +102,22 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     }
 
     private CaseSearchResult searchCasesAndFilterFieldsByAccess(List<CaseTypeDefinition> authorisedCaseTypes,
-                                                                CrossCaseTypeSearchRequest authorisedSearchRequest) {
+                                                                CrossCaseTypeSearchRequest authorisedSearchRequest,
+                                                                boolean dataClassification) {
         if (authorisedCaseTypes.isEmpty()) {
             return CaseSearchResult.EMPTY;
         }
 
-        CaseSearchResult result = caseSearchOperation.execute(authorisedSearchRequest);
-        filterCaseDataByCaseType(authorisedCaseTypes, result.getCases(), authorisedSearchRequest);
+        CaseSearchResult result = caseSearchOperation.execute(authorisedSearchRequest, dataClassification);
+        filterCaseDataByCaseType(authorisedCaseTypes, result.getCases(), authorisedSearchRequest, dataClassification);
 
         return result;
     }
 
     private void filterCaseDataByCaseType(List<CaseTypeDefinition> authorisedCaseTypes,
                                           List<CaseDetails> cases,
-                                          CrossCaseTypeSearchRequest authorisedSearchRequest) {
+                                          CrossCaseTypeSearchRequest authorisedSearchRequest,
+                                          boolean dataClassification) {
         Map<String, CaseTypeDefinition> caseTypeIdByCaseType = authorisedCaseTypes
             .stream()
             .collect(Collectors.toMap(CaseTypeDefinition::getId, Function.identity()));
@@ -123,14 +126,16 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
             .filter(caseDetails -> caseTypeIdByCaseType.containsKey(caseDetails.getCaseTypeId()))
             .forEach(caseDetails -> filterCaseData(caseTypeIdByCaseType.get(caseDetails.getCaseTypeId()),
                                                    caseDetails,
-                                                   authorisedSearchRequest));
+                                                   authorisedSearchRequest,
+                                                   dataClassification));
     }
 
     private void filterCaseData(CaseTypeDefinition authorisedCaseType,
                                 CaseDetails caseDetails,
-                                CrossCaseTypeSearchRequest authorisedSearchRequest) {
+                                CrossCaseTypeSearchRequest authorisedSearchRequest,
+                                boolean dataClassification) {
         filterCaseDataByAclAccess(authorisedCaseType, caseDetails);
-        filterCaseDataBySecurityClassification(caseDetails);
+        filterCaseDataBySecurityClassification(caseDetails, dataClassification);
         filterCaseDataForMultiCaseTypeSearch(authorisedSearchRequest, authorisedCaseType, caseDetails);
     }
 
@@ -143,8 +148,9 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         caseDetails.setData(jsonNodeToCaseData(accessFilteredData));
     }
 
-    private void filterCaseDataBySecurityClassification(CaseDetails caseDetails) {
-        classificationService.applyClassification(caseDetails);
+    private void filterCaseDataBySecurityClassification(CaseDetails caseDetails,
+                                                        boolean dataClassification) {
+        classificationService.applyClassification(caseDetails, dataClassification);
     }
 
     /**

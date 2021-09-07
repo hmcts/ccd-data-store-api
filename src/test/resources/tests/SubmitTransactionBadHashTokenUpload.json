@@ -1,0 +1,11 @@
+{
+  "DateField": null,
+  "TextField": "A text fields",
+  "DocumentFieldWithoutHashToken": {
+    "document_url": "http://dm-store:8080/documents/5c4b5564-a29f-47d3-8c51-50e2d4629435",
+    "document_filename": "File2.cr2",
+    "BadHashToken": "6a7e12164534a0c2252a94b308a2a185e46f89ab639c5342027b9cd393068bc"
+  },
+  "FixedListField": "VALUE2",
+  "CollectionField": []
+}

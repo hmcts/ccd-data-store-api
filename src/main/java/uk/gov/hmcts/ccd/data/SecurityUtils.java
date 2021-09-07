@@ -37,7 +37,7 @@ public class SecurityUtils {
 
     public HttpHeaders authorizationHeaders() {
         final HttpHeaders headers = new HttpHeaders();
-        headers.add(SERVICE_AUTHORIZATION, authTokenGenerator.generate());
+        headers.add(SERVICE_AUTHORIZATION, getServiceAuthorization());
         headers.add("user-id", getUserId());
         headers.add("user-roles", getUserRolesHeader());
 
@@ -80,8 +80,12 @@ public class SecurityUtils {
         return Objects.nonNull(SecurityContextHolder.getContext().getAuthentication());
     }
 
-    private String getUserBearerToken() {
+    public String getUserBearerToken() {
         return BEARER + getUserToken();
+    }
+
+    public String getServiceAuthorization() {
+        return authTokenGenerator.generate();
     }
 
     public String getUserRolesHeader() {

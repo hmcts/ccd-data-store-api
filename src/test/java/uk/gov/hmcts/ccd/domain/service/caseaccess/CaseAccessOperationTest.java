@@ -18,16 +18,24 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserEntity;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentsDeleteRequest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentCategoryService;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidCaseRoleException;
 import uk.gov.hmcts.ccd.v2.external.domain.CaseUser;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -94,6 +102,9 @@ class CaseAccessOperationTest {
     private SupplementaryDataRepository supplementaryDataRepository;
 
     @Mock
+    private RoleAssignmentCategoryService roleAssignmentCategoryService;
+
+    @Mock
     private RoleAssignmentService roleAssignmentService;
 
     @Mock
@@ -105,6 +116,9 @@ class CaseAccessOperationTest {
     @BeforeEach
     void setUp() {
         configureCaseRepository(JURISDICTION);
+        configureCaseRoleRepository();
+        configureCaseUserRepository();
+        configureCaseAccessService();
     }
 
 
@@ -209,6 +223,10 @@ class CaseAccessOperationTest {
             // ASSERT
             assertAll(
                 () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_REFERENCE),
+                () -> verify(caseUserRepository).grantAccess(
+                    CASE_ID,
+                    USER_ID,
+                    CREATOR.getRole())
                 () -> {
                     verify(roleAssignmentService)
                         .findRoleAssignmentsByCasesAndUsers(caseReferencesCaptor.capture(), userIdsCaptor.capture());
@@ -242,6 +260,10 @@ class CaseAccessOperationTest {
                 () -> assertThrows(CaseNotFoundException.class,
                     () -> caseAccessOperation.grantAccess(JURISDICTION, caseNotFound, USER_ID)),
                 () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_NOT_FOUND),
+                () -> verify(caseUserRepository, never()).grantAccess(
+                    CASE_ID,
+                    USER_ID,
+                    CREATOR.getRole())
                 () -> verifyNoInteractions(caseUserRepository),
                 () -> verifyNoInteractions(roleAssignmentService)
             );
@@ -2369,7 +2391,27 @@ class CaseAccessOperationTest {
                                   .findByReference(WRONG_JURISDICTION, CASE_REFERENCE);
     }
 
-    private CaseUserEntity createCaseUserEntity(Long caseDataId, String caseRole, String userId) {
+    private void configureCaseAccessService() {
+        doReturn(RoleCategory.PROFESSIONAL).when(roleAssignmentCategoryService).getRoleCategory(any());
+    }
+
+    private void configureCaseRoleRepository() {
+        when(caseRoleRepository.getCaseRoles(CASE_TYPE_ID)).thenReturn(Sets.newHashSet(CASE_ROLE,
+                                                                                       CASE_ROLE_CREATOR,
+                                                                                       CASE_ROLE_OTHER,
+                                                                                       CASE_ROLE_GRANTED));
+    }
+
+    private void configureCaseUserRepository() {
+        when(caseUserRepository.findCaseRoles(CASE_ID,
+                                              USER_ID)).thenReturn(Collections.singletonList(CASE_ROLE_GRANTED));
+        CaseUserEntity caseUserEntity = createCaseUserEntity(CASE_ID, CASE_ROLE, USER_ID);
+        CaseUserEntity caseUserEntity1 = createCaseUserEntity(CASE_ID, CASE_ROLE_CREATOR, USER_ID);
+        when(caseUserRepository.findCaseUserRoles(anyList(), anyList()))
+            .thenReturn(Arrays.asList(caseUserEntity, caseUserEntity1));
+    }
+
+    private CaseUserEntity createCaseUserEntity(Long caseDatatId, String caseRole, String userId) {
         CaseUserEntity.CasePrimaryKey primaryKey = new CaseUserEntity.CasePrimaryKey();
         primaryKey.setCaseDataId(caseDataId);
         primaryKey.setCaseRole(caseRole);

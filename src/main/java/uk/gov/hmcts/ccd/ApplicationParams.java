@@ -166,21 +166,15 @@ public class ApplicationParams {
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
 
-    public String getDataStoreSystemUserId() {
-        return dataStoreSystemUserId;
-    }
+    @Value("${document.hash.check.enabled}")
+    private boolean enableDocumentHashCheck;
 
-    public void setDataStoreSystemUserId(String dateStoreSystemUserId) {
-        this.dataStoreSystemUserId = dateStoreSystemUserId;
-    }
+    @Value("${ccd.case-document-am-api.attachDocumentEnabled:true}")
+    private boolean attachDocumentEnabled;
 
-    public String getDataStoreSystemUserPassword() {
-        return dataStoreSystemUserPassword;
-    }
 
-    public void setDataStoreSystemUserPassword(String dataStoreSystemUserPassword) {
-        this.dataStoreSystemUserPassword = dataStoreSystemUserPassword;
-    }
+    @Value("#{'${case.data.issue.logging.jurisdictions}'.split(',')}")
+    private List<String> caseDataIssueLoggingJurisdictions;
 
     public static String encode(final String stringToEncode) {
         try {
@@ -219,7 +213,7 @@ public class ApplicationParams {
     }
 
     public String draftURL(String draftId) {
-        return draftHost + "/drafts/" + draftId;
+        return draftHost + "/drafts/" + encode(draftId);
     }
 
     public String getDraftEncryptionKey() {
@@ -316,7 +310,7 @@ public class ApplicationParams {
     }
 
     public String userDefaultSettingsURL() {
-        return userProfileHost + "/user-profile/users?uid={uid}";
+        return userProfileHost + "/user-profile/users";
     }
 
     public String getTokenSecret() {
@@ -473,5 +467,33 @@ public class ApplicationParams {
 
     public Integer getCasesIndexNameCaseTypeIdGroupPosition() {
         return casesIndexNameCaseTypeIdGroupPosition;
+    }
+
+    public boolean isDocumentHashCheckingEnabled() {
+        return enableDocumentHashCheck;
+    }
+
+    public boolean isAttachDocumentEnabled() {
+        return attachDocumentEnabled;
+    }
+
+    public String getDataStoreSystemUserId() {
+        return dataStoreSystemUserId;
+    }
+
+    public void setDataStoreSystemUserId(String dateStoreSystemUserId) {
+        this.dataStoreSystemUserId = dateStoreSystemUserId;
+    }
+
+    public String getDataStoreSystemUserPassword() {
+        return dataStoreSystemUserPassword;
+    }
+
+    public void setDataStoreSystemUserPassword(String dataStoreSystemUserPassword) {
+        this.dataStoreSystemUserPassword = dataStoreSystemUserPassword;
+    }
+
+    public List<String> getCaseDataIssueLoggingJurisdictions() {
+        return caseDataIssueLoggingJurisdictions;
     }
 }

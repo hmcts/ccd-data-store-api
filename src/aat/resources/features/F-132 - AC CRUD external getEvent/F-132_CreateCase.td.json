@@ -1,0 +1,10 @@
+{
+  "_guid_": "F-132_CreateCase",
+  "_extends_": "F-131_CreateCase",
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][parentContext][childContexts][F-132_CreateCase_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+}

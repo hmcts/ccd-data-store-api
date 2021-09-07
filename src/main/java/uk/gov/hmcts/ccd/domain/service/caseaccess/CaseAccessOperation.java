@@ -360,10 +360,10 @@ public class CaseAccessOperation {
                 .filter(caseUserRole ->
                         StringUtils.isNoneBlank(caseUserRole.getOrganisationId())
                             && !caseUserRole.getCaseRole().equalsIgnoreCase(CREATOR.getRole()))
-                .collect(Collectors.toList())))
-            // filter cases that have no remaining roles
-            .entrySet().stream().filter(e -> !e.getValue().isEmpty())
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    .collect(Collectors.toList())))
+                // filter cases that have no remaining roles
+                .entrySet().stream().filter(e -> !e.getValue().isEmpty())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         // if empty list this processing is not required
         if (caseUserRolesWhichHaveAnOrgId.isEmpty()) {
@@ -488,7 +488,9 @@ public class CaseAccessOperation {
                                      Set<String> targetCaseRoles) {
         targetCaseRoles.stream()
             .filter(targetRole -> !currentCaseRoles.contains(targetRole))
-            .forEach(targetRole -> caseUserRepository.grantAccess(caseId, userId, targetRole));
+            .forEach(targetRole -> caseUserRepository.grantAccess(caseId,
+                userId,
+                targetRole));
     }
 
     private void revokeRemovedCaseRoles(String userId,

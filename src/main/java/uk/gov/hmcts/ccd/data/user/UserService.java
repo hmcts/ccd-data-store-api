@@ -13,7 +13,6 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.aggregated.WorkbasketDefault;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -69,15 +68,14 @@ public class UserService {
         UserProfile userProfile = new UserProfile();
         userProfile.setJurisdictions(resultJurisdictions);
         userProfile.getUser().setIdamProperties(idamProperties);
-        try {
-            UserDefault userDefault = userRepository.getUserDefaultSettings(userId);
+        UserDefault userDefault = userRepository.getUserDefaultSettings(userId);
+
+        if (userDefault != null) {
             WorkbasketDefault workbasketDefault = new WorkbasketDefault();
             workbasketDefault.setJurisdictionId(userDefault.getWorkBasketDefaultJurisdiction());
             workbasketDefault.setCaseTypeId(userDefault.getWorkBasketDefaultCaseType());
             workbasketDefault.setStateId(userDefault.getWorkBasketDefaultState());
             userProfile.getDefaultSettings().setWorkbasketDefault(workbasketDefault);
-        } catch (ResourceNotFoundException ae) {
-            LOGGER.debug("User Profile not exists for userId {}", idamProperties.getId(), ae);
         }
 
         return userProfile;

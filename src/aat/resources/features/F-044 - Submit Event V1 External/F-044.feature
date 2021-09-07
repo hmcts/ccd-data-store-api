@@ -138,6 +138,7 @@ Scenario: must update successfully all and only the respective fields with updat
       And a user with [an active Solicitor profile having full permissions on the same case type],
       And a successful call [to create a token for case creation] as in [Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation],
       And another successful call [by a privileged user with full ACL to create a case of this case type] as in [Befta_Jurisdiction2_Default_Full_Case_Creation_Data],
+      And a successful call [by a privileged user with full ACL to create a case of this case type] as in [Befta_Jurisdiction2_Document_Upload_2],
       And another successful call [to get an update event token for the case just created] as in [S-579-Prerequisite_Solicitor_2_Token_For_Update_Case],
 
      When a request is prepared with appropriate values,

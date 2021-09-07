@@ -29,8 +29,15 @@ class RoleAssignmentCategoryServiceTest {
     @Mock
     private IdamRepository idamRepository;
 
-    @InjectMocks
+
     private RoleAssignmentCategoryService roleAssignmentCategoryService;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
+
+        roleAssignmentCategoryService = new RoleAssignmentCategoryService(idamRepository);
+    }
 
     @Nested
     @DisplayName("getRoleCategory()")

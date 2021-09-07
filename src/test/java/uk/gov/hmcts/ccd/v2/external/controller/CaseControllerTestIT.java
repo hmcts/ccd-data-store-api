@@ -3,8 +3,6 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import java.util.Map;
-import javax.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.mockito.ArgumentCaptor;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -31,9 +30,12 @@ import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -69,6 +71,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     private WebApplicationContext wac;
 
     private MockMvc mockMvc;
+
     @SpyBean
     private AuditRepository auditRepository;
 
@@ -265,6 +268,42 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
         assertThat(captor.getValue().getEventSelected(), is(TEST_EVENT_ID));
         assertThat(captor.getValue().getRequestId(), is(REQUEST_ID_VALUE));
+    }
+
+    @Test
+    public void shouldReturn201WhenPostCreateCaseV3() throws Exception {
+        final String url =  "/case-types/" + CASE_TYPE + "/cases";
+        final String description = "A very long comment.......";
+        final String summary = "Short comment";
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        final Event triggeringEvent = anEvent().build();
+        triggeringEvent.setEventId(TEST_EVENT_ID);
+        triggeringEvent.setDescription(description);
+        triggeringEvent.setSummary(summary);
+        caseDetailsToSave.setEvent(triggeringEvent);
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+        final Map<String, String> parameterMap = new HashMap<>(4);
+        parameterMap.put("charset", "UTF-8");
+        MediaType jsonContentV3CreateCase = new MediaType(
+            "application",
+            "vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v3+json",
+            parameterMap);
+
+        final MvcResult mvcResult = mockMvc.perform(post(url)
+            .header(EXPERIMENTAL_HEADER, "experimental")
+            .contentType(jsonContentV3CreateCase)
+            .content(mapper.writeValueAsString(caseDetailsToSave))
+        ).andReturn();
+
+        assertEquals(mvcResult.getResponse().getContentAsString(), 201, mvcResult.getResponse().getStatus());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String content = mvcResult.getResponse().getContentAsString();
+        assertNotNull("Content Should not be null", content);
+        CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
+        assertNotNull("Saved Case Details should not be null", savedCaseResource);
     }
 
     @Test
