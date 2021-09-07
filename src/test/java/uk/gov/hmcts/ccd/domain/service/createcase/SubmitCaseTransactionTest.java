@@ -267,35 +267,6 @@ class SubmitCaseTransactionTest {
         );
     }
 
-    @Test
-    @DisplayName("when creator has access level GRANTED, then it should grant access to creator")
-    void shouldGrantAccessToAccessLevelGrantedCreator() {
-        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
-        submitCaseTransaction.submitCase(event,
-            caseTypeDefinition,
-            idamUser,
-            caseEventDefinition,
-            this.caseDetails,
-            IGNORE_WARNING);
-
-        verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID),
-            IDAM_ID, CREATOR.getRole());
-    }
-
-    @Test
-    @DisplayName("when creator has access level ALL, then it should NOT grant access to creator")
-    void shouldNotGrantAccessToAccessLevelAllCreator() {
-        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.ALL);
-
-        submitCaseTransaction.submitCase(event,
-                                         caseTypeDefinition,
-                                         idamUser,
-                                         caseEventDefinition,
-                                         this.caseDetails,
-                                         IGNORE_WARNING);
-
-        verify(caseDataAccessControl).grantAccess(CASE_ID, IDAM_ID);
-    }
 
     @Test
     @DisplayName("should invoke callback")
