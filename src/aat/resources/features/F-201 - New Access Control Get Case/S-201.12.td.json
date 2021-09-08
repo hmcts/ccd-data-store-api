@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-201.4",
+  "_guid_": "S-201.12",
 
   "productName": "CCD Data Store",
   "operationName": "retrieve a case by id",
@@ -18,12 +18,13 @@
   },
 
   "specs" : [
-    "SUPERUSER who has restricted access to create a case J1-CT2-01",
-    "restricted access to create a case J1-CT2-01",
-    "PUBLIC SC ORGANISATION role assignment to view the case and only PUBLIC field F3",
-    "attempts to get case J1-CT2-02",
+    "SUPERUSER who has restricted access to create a case J1-CT2-04",
+    "restricted access to create a case J1-CT2-04",
+    "RESTRICTED SC ORGANISATION role assignment to view the case and fields F2, F3 and F4",
+    "attempts to get case J1-CT2-04",
     "contains the PUBLIC field F3 from the ORGANISATION role assignment",
-    "contains the PRIVATE field F2 from the CASE role assignment"
+    "contains the PRIVATE field F2 from the CASE role assignment",
+    "contains the PRIVATE field F4 from the CASE role assignment"
   ],
 
   "request": {
@@ -58,12 +59,13 @@
       "security_classification" : "PUBLIC",
       "data" : {
         "F2" : "b",
-        "F3" : "c"
+        "F3" : "c",
+        "F4" : "d"
       },
       "data_classification" : {
-        "F1" : "RESTRICTED",
         "F2" : "PRIVATE",
-        "F3" : "PUBLIC"
+        "F3" : "PUBLIC",
+        "F4" : "RESTRICTED"
       },
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,

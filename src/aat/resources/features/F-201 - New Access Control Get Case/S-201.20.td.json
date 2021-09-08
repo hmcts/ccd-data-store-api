@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-201.2",
+  "_guid_": "S-201.20",
 
   "productName": "CCD Data Store",
   "operationName": "retrieve a case by id",
@@ -8,16 +8,20 @@
   "uri": "/cases/{cid}",
 
   "users": {
+    "S1": {
+      "username": "ccd.ac.solicitor1@gmail.com",
+      "password": "Pa55word11"
+    },
     "invokingUser": {
       "username": "ccd.ac.solicitor1@gmail.com",
       "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"    }
   },
 
   "specs" : [
-    "SUPERUSER who has restricted access to create a case J1-CT2-01",
-    "restricted access to create a case J1-CT1-02",
-    "PUBLIC SC ORGANISATION role assignment has insufficient SC for Case Type",
-    "attempts to get case J1-CT2-01"
+    "SUPERUSER who has restricted access to create a case J1-CT1-01",
+    "restricted access to create a case J1-CT1-01",
+    "PUBLIC SC ORGANISATION role assignment to view the case and fields",
+    "attempts to get case J1-CT1-01"
   ],
 
   "request": {

@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-201.4",
+  "_guid_": "S-201.21",
 
   "productName": "CCD Data Store",
   "operationName": "retrieve a case by id",
@@ -18,12 +18,11 @@
   },
 
   "specs" : [
-    "SUPERUSER who has restricted access to create a case J1-CT2-01",
-    "restricted access to create a case J1-CT2-01",
-    "PUBLIC SC ORGANISATION role assignment to view the case and only PUBLIC field F3",
-    "attempts to get case J1-CT2-02",
-    "contains the PUBLIC field F3 from the ORGANISATION role assignment",
-    "contains the PRIVATE field F2 from the CASE role assignment"
+    "SUPERUSER who has restricted access to create a case J1-CT1-03",
+    "restricted access to create a case J1-CT1-03",
+    "PUBLIC SC ORGANISATION role assignment to view the case and fields",
+    "attempts to get case J1-CT1-03",
+    "contains the PUBLIC field F3 from the ORGANISATION role assignment"
   ],
 
   "request": {
@@ -48,7 +47,7 @@
           "href" : "[[ANYTHING_PRESENT]]"
         }
       },
-      "id" : "${[scenarioContext][childContexts][F-201_CT2][testData][actualResponse][body][id]}",
+      "id" : "${[scenarioContext][childContexts][F-201_CT1][testData][actualResponse][body][id]}",
       "jurisdiction" : "J1",
       "case_type" : "CT2",
       "created_on" : "[[ANYTHING_PRESENT]]",
@@ -57,12 +56,9 @@
       "state" : "Unissued1",
       "security_classification" : "PUBLIC",
       "data" : {
-        "F2" : "b",
         "F3" : "c"
       },
       "data_classification" : {
-        "F1" : "RESTRICTED",
-        "F2" : "PRIVATE",
         "F3" : "PUBLIC"
       },
       "after_submit_callback_response" : null,
