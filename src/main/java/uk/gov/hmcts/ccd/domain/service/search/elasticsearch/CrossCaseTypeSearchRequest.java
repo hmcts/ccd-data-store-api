@@ -9,6 +9,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -38,15 +39,18 @@ public class CrossCaseTypeSearchRequest {
     private final ElasticsearchRequest elasticsearchRequest;
     private final boolean multiCaseTypeSearch;
     private final List<String> aliasFields = new ArrayList<>();
+    private final SearchIndex searchIndex;
 
     private CrossCaseTypeSearchRequest(List<String> caseTypeIds,
                                        ElasticsearchRequest elasticsearchRequest,
                                        boolean multiCaseTypeSearch,
-                                       List<String> aliasFields) {
+                                       List<String> aliasFields,
+                                       SearchIndex searchIndex) {
         this.caseTypeIds.addAll(caseTypeIds);
         this.elasticsearchRequest = elasticsearchRequest;
         this.multiCaseTypeSearch = multiCaseTypeSearch;
         this.aliasFields.addAll(aliasFields);
+        this.searchIndex = searchIndex;
         validateJsonSearchRequest();
     }
 
@@ -80,12 +84,17 @@ public class CrossCaseTypeSearchRequest {
         return aliasFields.stream().anyMatch(aliasField -> aliasField.equalsIgnoreCase(searchAliasField.getId()));
     }
 
+    public Optional<SearchIndex> getSearchIndex() {
+        return Optional.ofNullable(searchIndex);
+    }
+
     public static class Builder {
 
         private final List<String> caseTypeIds = new ArrayList<>();
         private ElasticsearchRequest elasticsearchRequest;
         private boolean multiCaseTypeSearch;
         private final List<String> sourceFilterAliasFields = new ArrayList<>();
+        private SearchIndex searchIndex;
 
         public Builder withCaseTypes(List<String> caseTypeIds) {
             if (caseTypeIds != null) {
@@ -109,6 +118,11 @@ public class CrossCaseTypeSearchRequest {
             if (sourceFilterAliasFields != null) {
                 this.sourceFilterAliasFields.addAll(sourceFilterAliasFields);
             }
+            return this;
+        }
+
+        public Builder withSearchIndex(final SearchIndex searchIndex) {
+            this.searchIndex = searchIndex;
             return this;
         }
 
@@ -136,8 +150,13 @@ public class CrossCaseTypeSearchRequest {
 
         public CrossCaseTypeSearchRequest build() {
             setSourceFilterAliasFields();
-            return new CrossCaseTypeSearchRequest(caseTypeIds, elasticsearchRequest, multiCaseTypeSearch,
-                                                  sourceFilterAliasFields);
+            return new CrossCaseTypeSearchRequest(
+                caseTypeIds,
+                elasticsearchRequest,
+                multiCaseTypeSearch,
+                sourceFilterAliasFields,
+                searchIndex
+            );
         }
 
     }
