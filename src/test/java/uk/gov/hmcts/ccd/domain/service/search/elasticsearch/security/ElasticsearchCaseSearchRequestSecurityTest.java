@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ElasticsearchCaseSearchRequestSecurityTest {
 
-    private final String SEARCH_REQUEST = "{\"query\" : {\"match\" : {\"reference\" : 1630596267899527}}}";
+    private static final String SEARCH_REQUEST = "{\"query\" : {\"match\" : {\"reference\" : 1630596267899527}}}";
 
     private static final String CASE_TYPE_ID = "caseType";
     private static final String CASE_TYPE_ID_2 = "caseType2";
@@ -127,7 +127,8 @@ class ElasticsearchCaseSearchRequestSecurityTest {
         CrossCaseTypeSearchRequest securedSearchRequest = querySecurity.createSecuredSearchRequest(request);
         String decodedQuery = getDecodedQuery(securedSearchRequest.getSearchRequestJsonNode());
 
-        Map<String, JsonNode> mapOfFilterValues = createMapOfFilterValues(securedSearchRequest.getSearchRequestJsonNode());
+        Map<String, JsonNode> mapOfFilterValues =
+            createMapOfFilterValues(securedSearchRequest.getSearchRequestJsonNode());
 
         assertEquals(request.getCaseTypeIds(), securedSearchRequest.getCaseTypeIds());
         assertEquals(request.getElasticSearchRequest().getQuery().toString(), decodedQuery);
@@ -163,7 +164,7 @@ class ElasticsearchCaseSearchRequestSecurityTest {
 
         for (JsonNode shouldNode : filterJsonNodes) {
             for (JsonNode mustNode : shouldNode.at("/bool/must")) {
-                if(!mustNode.at("/term/case_type_id").isEmpty()) {
+                if (!mustNode.at("/term/case_type_id").isEmpty()) {
                     values.put(
                         mustNode.at("/term/case_type_id/value").asText(),
                         shouldNode
