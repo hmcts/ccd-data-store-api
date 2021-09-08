@@ -545,7 +545,7 @@
       } ],
       "_links" : {
         "self" : {
-          "href" : "http://localhost:4452/internal/jurisdictions?access=read"
+          "href" : "[[ANYTHING_PRESENT]]"
         }
       }
     }
