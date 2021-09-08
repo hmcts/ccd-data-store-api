@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-201.1",
+  "_guid_": "S-201.2",
 
   "productName": "CCD Data Store",
   "operationName": "retrieve a case by id",
@@ -14,10 +14,13 @@
   },
 
   "specs" : [
-    "SUPERUSER who has restricted access to create a case J1-CT1-02",
+    "SUPERUSER who has restricted access to create a case J1-CT2-01",
     "restricted access to create a case J1-CT1-02",
-    "PUBLIC SC ORGANISATION role assignment without case role access",
-    "attempts to get case J1-CT1-02"
+    "PUBLIC SC ORGANISATION role assignment has insufficient SC for Case Type",
+    "Solicitor1 who has a PUBLIC SC ORGANISATION role assignment to view the case and only PUBLIC field F3",
+    "attempts to get case J1-CT2-02",
+    "contains the PUBLIC field F3 from the ORGANISATION role assignment",
+    "contains the PRIVATE field F2 from the CASE role assignment"
   ],
 
   "request": {
