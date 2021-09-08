@@ -54,40 +54,12 @@
         }
       },
       "case_id": "[[ANYTHING_PRESENT]]",
-      "case_type": {
-        "id": "[[ANYTHING_PRESENT]]",
-        "name": "[[ANYTHING_PRESENT]]",
-        "description": "[[ANYTHING_PRESENT]]",
-        "jurisdiction": {
-          "id": "[[ANYTHING_PRESENT]]",
-          "name": "[[ANYTHING_PRESENT]]",
-          "description": "[[ANYTHING_PRESENT]]"
-        },
-        "printEnabled": false
-      },
+      "case_type": "[[ANYTHING_PRESENT]]",
       "tabs": "[[ANYTHING_PRESENT]]",
       "metadataFields": "[[ANYTHING_PRESENT]]",
       "state": "[[ANYTHING_PRESENT]]",
       "triggers": "[[ANYTHING_PRESENT]]",
-      "events": [
-        {
-          "id": "[[ANYTHING_PRESENT]]",
-          "timestamp": "[[ANYTHING_PRESENT]]",
-          "summary": null,
-          "comment": null,
-          "event_id": "[[ANYTHING_PRESENT]]",
-          "event_name": "[[ANYTHING_PRESENT]]",
-          "user_id": "[[ANYTHING_PRESENT]]",
-          "user_last_name": "[[ANYTHING_PRESENT]]",
-          "user_first_name": "[[ANYTHING_PRESENT]]",
-          "state_name": "[[ANYTHING_PRESENT]]",
-          "state_id": "[[ANYTHING_PRESENT]]",
-          "significant_item": null,
-          "proxied_by" : null,
-          "proxied_by_last_name" : null,
-          "proxied_by_first_name" : null
-        }
-      ]
+      "events": "[[ANYTHING_PRESENT]]"
     }
   }
 }

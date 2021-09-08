@@ -13,15 +13,24 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_200_Response",
-    "headers": {
-      "Transfer-Encoding": "chunked",
-      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-view.v2+json;charset=UTF-8"
+    "responseCode" : 200,
+    "responseMessage" : "OK",
+    "headers" : {
+      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-view.v2+json;charset=UTF-8",
+      "Date" : "[[ANYTHING_PRESENT]]",
+      "Expires" : "0",
+      "Pragma" : "no-cache",
+      "Strict-Transport-Security" : "max-age=31536000 ; includeSubDomains",
+      "Transfer-Encoding" : "chunked",
+      "X-Content-Type-Options" : "nosniff",
+      "X-Frame-Options" : "DENY",
+      "X-Xss-Protection" : "1; mode=block"
     },
     "body": {
       "_links": {
         "self": {
-          "href": "/internal/cases/${[scenarioContext][childContexts][S-139.5_CreateCase][testData][actualResponse][body][id]}"
+          "href": "[[ANYTHING_PRESENT]]"
         }
       },
       "case_id": "${[scenarioContext][childContexts][S-139.5_CreateCase][testData][actualResponse][body][id]}",
