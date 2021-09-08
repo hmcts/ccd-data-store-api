@@ -15,14 +15,13 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Vary": "Accept-Encoding",
       "Transfer-Encoding": "chunked",
       "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-view.v2+json;charset=UTF-8"
     },
     "body": {
       "_links": {
         "self": {
-          "href": "http://localhost:4452/internal/cases/${[scenarioContext][childContexts][S-139.2_CreateCase][testData][actualResponse][body][id]}"
+          "href": "/internal/cases/${[scenarioContext][childContexts][S-139.2_CreateCase][testData][actualResponse][body][id]}"
         }
       },
       "case_id": "${[scenarioContext][childContexts][S-139.2_CreateCase][testData][actualResponse][body][id]}",

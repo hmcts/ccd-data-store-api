@@ -39,16 +39,15 @@
     "responseMessage" : "OK",
     "headers" : {
       "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
-      "Connection" : "keep-alive",
       "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-jurisdictions.v2+json;charset=UTF-8",
       "Date" : "[[ANYTHING_PRESENT]]",
       "Expires" : "0",
-      "Keep-Alive" : "timeout=60",
       "Pragma" : "no-cache",
+      "Strict-Transport-Security" : "max-age=31536000 ; includeSubDomains",
       "Transfer-Encoding" : "chunked",
       "X-Content-Type-Options" : "nosniff",
       "X-Frame-Options" : "DENY",
-      "X-XSS-Protection" : "1; mode=block"
+      "X-Xss-Protection" : "1; mode=block"
     },
     "body" : {
       "jurisdictions" : [ {
@@ -56,19 +55,6 @@
         "name" : "BEFTA Master",
         "description" : "Content for the BEFTA Master Jurisdiction.",
         "caseTypeDefinitions" : [ {
-          "id" : "FT_CRUD_1",
-          "description" : "Case Type for testing case creation without CaseType C Access",
-          "version" : null,
-          "name" : "FT- CRUD_1",
-          "events" : "[[ANYTHING_PRESENT]]",
-          "states" : "[[ANYTHING_PRESENT]]",
-          "searchAliasFields" : [ ],
-          "jurisdiction" : null,
-          "security_classification" : null,
-          "case_fields" : [ ],
-          "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]"
-        }, {
           "id" : "FT_MasterCaseType",
           "description" : "Test case containing all data types",
           "version" : null,

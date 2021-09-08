@@ -15,14 +15,13 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
-      "Vary": "Accept-Encoding",
       "Transfer-Encoding": "chunked",
       "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-view.v2+json;charset=UTF-8"
     },
     "body": {
       "_links": {
         "self": {
-          "href": "http://localhost:4452/internal/cases/${[scenarioContext][childContexts][S-139.5_CreateCase][testData][actualResponse][body][id]}"
+          "href": "/internal/cases/${[scenarioContext][childContexts][S-139.5_CreateCase][testData][actualResponse][body][id]}"
         }
       },
       "case_id": "${[scenarioContext][childContexts][S-139.5_CreateCase][testData][actualResponse][body][id]}",
@@ -50,8 +49,8 @@
     "event_id": "createCase",
     "event_name": "Create a case",
     "user_id": "[[ANYTHING_PRESENT]]",
-    "user_last_name": "befta",
-    "user_first_name": "master",
+    "user_last_name": "[[ANYTHING_PRESENT]]",
+    "user_first_name": "[[ANYTHING_PRESENT]]",
     "state_name": "Create case",
     "state_id": "CaseCreated",
     "significant_item": null,
