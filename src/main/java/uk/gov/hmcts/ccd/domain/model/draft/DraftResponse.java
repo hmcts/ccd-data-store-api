@@ -59,6 +59,13 @@ public class DraftResponse {
         this.updated = updated;
     }
 
+    public DraftResponse() {
+    }
+
+    public DraftResponse(String id) {
+        this.id = id;
+    }
+
     @JsonIgnore
     public String getCaseTypeId() {
         return getDocument() != null ? getDocument().getCaseTypeId() : null;
