@@ -1,5 +1,5 @@
 @F-139 @crud
-Feature: Get Case View Details with access Internal API CRUD Tests
+Feature: F-139: Get Case View Details with access Internal API CRUD Tests
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
@@ -62,14 +62,3 @@ Feature: Get Case View Details with access Internal API CRUD Tests
     And the response [contains HTTP 200 Ok status code],
     And the response has all other details as expected,
     And the response [does not contain the case events under triggers].
-
-#  @S-139.6
-#  Scenario: User getting a case with no CaseState U access has the update events filtered out of response
-#    Given a case that has just been created as in [S-139.5_CreateCase],
-#    And a user with [no U access to case type]
-#    When a request is prepared with appropriate values,
-#    And it is submitted to call the [Retrieve a case by ID for dynamic display] operation of [CCD Data Store],
-#    Then a positive response is received,
-#    And the response [contains HTTP 200 Ok status code],
-#    And the response has all other details as expected,
-#    And the response [does not contain the case events under triggers].

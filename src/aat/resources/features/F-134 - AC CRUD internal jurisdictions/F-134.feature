@@ -1,5 +1,5 @@
 @F-134 @crud
-Feature: Get CaseType with access Internal API CRUD Tests
+Feature: F-134: Get CaseType with access Internal API CRUD Tests
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
