@@ -50,7 +50,7 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
 
         // At least one of these clauses must match. The equivalent of OR
         crossCaseTypeSearchRequest.getCaseTypeIds()
-            .forEach(caseTypeId -> createCaseType(caseTypeId).ifPresent(boolQueryBuilder::should));
+            .forEach(caseTypeId -> createFilterQueryForCaseType(caseTypeId).ifPresent(boolQueryBuilder::should));
 
         boolQueryBuilder.minimumShouldMatch(1);
 
@@ -68,8 +68,7 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
     }
 
 
-    // return must object
-    public Optional<QueryBuilder> createCaseType(String caseTypeId) {
+    private Optional<QueryBuilder> createFilterQueryForCaseType(String caseTypeId) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
         caseSearchFilters.forEach(filter ->
@@ -110,8 +109,6 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
         return new CrossCaseTypeSearchRequest.Builder()
             .withCaseTypes(request.getCaseTypeIds())
             .withSearchRequest(new ElasticsearchRequest(queryNode))
-            .withMultiCaseTypeSearch(request.isMultiCaseTypeSearch())
-            .withSourceFilterAliasFields(request.getAliasFields())
             .build();
     }
 }
