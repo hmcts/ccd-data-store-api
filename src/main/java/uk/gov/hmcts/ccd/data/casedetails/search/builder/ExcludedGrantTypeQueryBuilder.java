@@ -25,6 +25,8 @@ public class ExcludedGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
             .filter(roleAssignment -> GrantType.EXCLUDED.name().equals(roleAssignment.getGrantType()));
 
         String tmpQuery = createClassification(params, "classifications_excluded", streamSupplier.get());
+        log.debug("[classifications_excluded] : " + params.get("classifications_excluded"));
+
 
         Set<String> caseReferences = streamSupplier.get()
             .filter(roleAssignment -> roleAssignment.getAttributes() != null)
@@ -33,6 +35,7 @@ public class ExcludedGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
             .map(caseIdOptional -> caseIdOptional.get())
             .filter(caseId -> StringUtils.isNotBlank(caseId))
             .collect(Collectors.toSet());
+        log.debug("[case_ids_excluded] : " + caseReferences);
 
         if (caseReferences.size() > 0) {
             String paramName = "case_ids_excluded";
