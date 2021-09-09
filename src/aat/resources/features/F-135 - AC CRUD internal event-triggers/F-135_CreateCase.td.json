@@ -10,8 +10,7 @@
 
   "users": {
     "invokingUser": {
-      "username": "master.caseworker@gmail.com",
-      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+      "_extends_": "BeftaMasterCaseworker"
     }
   },
 
@@ -79,15 +78,5 @@
       "delete_draft_response_status_code": null,
       "delete_draft_response_status": null
     }
-
-
-
-
-
-
-
-
-
   }
-
 }

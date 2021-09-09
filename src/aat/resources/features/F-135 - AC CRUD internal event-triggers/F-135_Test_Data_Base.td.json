@@ -8,9 +8,7 @@
 
   "users": {
     "invokingUser": {
-      "username": "master.caseworker@gmail.com",
-      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
-    }
+      "_extends_": "BeftaMasterCaseworker"
   },
 
   "request": {

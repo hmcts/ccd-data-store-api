@@ -3,7 +3,8 @@
   "_extends_" : "F-135_Test_Data_Base",
   "title": "User getting event trigger for Case with no event C access gets error",
 
-  "specs" : ["with no C access to create an event",
+  "specs" : [
+    "with no C access to create an event",
     "contains HTTP 404 status code"
   ],
 

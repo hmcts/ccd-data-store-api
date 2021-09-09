@@ -13,9 +13,8 @@ Feature: F-134: Get CaseType with access Internal API CRUD Tests
     Then a positive response is received,
     And the response [contains HTTP 200 Ok status code],
     And the response [contains the list of jurisdictions a user has access to],
-    And the response has all other details as expected.
-        #event5
-    And the response [does not contain the event with no R CRUD access]
+    And the response has all other details as expected,
+    And the response [does not contain the event5 of FT_CRUD case type with no R CRUD access].
 
   @S-134.2
   Scenario: User getting Profile with no CaseState R access has that state filtered out of the response
@@ -26,9 +25,8 @@ Feature: F-134: Get CaseType with access Internal API CRUD Tests
     Then a positive response is received,
     And the response [contains HTTP 200 Ok status code],
     And the response [contains the list of jurisdictions a user has access to],
-    And the response has all other details as expected.
-      #state3
-    And the response [does not contain the case state with no R CRUD access]
+    And the response has all other details as expected,
+    And the response [does not contain the state3 of FT_CRUD case type with no R CRUD access].
 
   @S-134.3
   Scenario: User getting Profile with no CaseType R access has that caseType filtered out of the response
@@ -39,8 +37,7 @@ Feature: F-134: Get CaseType with access Internal API CRUD Tests
     Then a positive response is received,
     And the response [contains HTTP 200 Ok status code],
     And the response [contains the list of jurisdictions a user has access to],
-    And the response has all other details as expected.
-      #FT_CRUD_2
-    And the response [does not contain the case type with no R CRUD access]
+    And the response has all other details as expected,
+    And the response [does not contain the case type FT_CRUD_2 with no R CRUD access].
 
 

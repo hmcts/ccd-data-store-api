@@ -15,7 +15,6 @@
 	},
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
-
     "body" : {
       "workbasketInputs": [
         {

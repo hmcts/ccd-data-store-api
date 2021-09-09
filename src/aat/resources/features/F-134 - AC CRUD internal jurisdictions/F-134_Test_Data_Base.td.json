@@ -11,9 +11,9 @@
     "has READ as case access parameter",
     "contains HTTP 200 Ok status code",
     "contains the list of jurisdictions a user has access to",
-    "does not contain the event with no R CRUD access",
-    "does not contain the case state with no R CRUD access",
-    "does not contain the case type with no R CRUD access"
+    "does not contain the event5 of FT_CRUD case type with no R CRUD access",
+    "does not contain the state3 of FT_CRUD case type with no R CRUD access",
+    "does not contain the case type FT_CRUD_2 with no R CRUD access"
   ],
 
   "users": {
