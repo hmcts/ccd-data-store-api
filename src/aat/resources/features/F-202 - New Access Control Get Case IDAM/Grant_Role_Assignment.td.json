@@ -1,0 +1,62 @@
+{
+  "_guid_" : "GRANT_CASE_ROLE_ASSIGNMENT",
+
+  "productName": "Role Assignment Service",
+  "operationName": "post role assignment",
+  "method": "POST",
+  "uri": "http://localhost:4096/am/role-assignments",
+
+  "specs": [
+    "a role assignment to access CaseType CT2",
+    "attempts to create a case for CT2",
+    "to create a full case",
+    "to give user Solicitor1 a PRIVATE CASE role assignment to view the previously created case"
+  ],
+
+  "users" : {
+    "S1": {
+      "username": "ccd.ac.solicitor1@gmail.com",
+      "password": "Pa55word11"
+    }
+  },
+
+  "request" : {
+    "_extends_": "Common_Request",
+    "body" : {
+      "roleRequest" : {
+        "assignerId" : "${[scenarioContext][testData][users][S1][id]}",
+        "process" : "ccd-fta-case-ra",
+        "reference" : "${[scenarioContext][testData][users][S1][id]}",
+        "replaceExisting" : false
+      },
+      "requestedRoles" : [
+        {
+          "actorId" : "${[scenarioContext][testData][users][S1][id]}",
+          "actorIdType" : "IDAM",
+          "roleType" : "CASE",
+          "roleName" : "Solicitor",
+          "roleCategory" : "PROFESSIONAL",
+          "classification" : "PRIVATE",
+          "grantType" : "SPECIFIC",
+          "readOnly" : false,
+          "beginTime" : "2021-01-01T00:00:00Z",
+          "endTime" : "2023-01-01T00:00:00Z",
+          "attributes" : {
+            "jurisdiction" : "J1",
+            "caseType" : "CT2",
+            "caseId" : "${[scenarioContext][parentContext][childContexts][F-201_CT2][testData][actualResponse][body][id]}"
+          }
+        }
+      ]
+    }
+
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_201_Response",
+    "body" : {
+      "roleAssignmentResponse" : "[[ANYTHING_PRESENT]]"
+    }
+  }
+
+}
