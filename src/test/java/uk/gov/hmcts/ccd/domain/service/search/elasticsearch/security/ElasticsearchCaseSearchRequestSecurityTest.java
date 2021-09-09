@@ -40,8 +40,6 @@ class ElasticsearchCaseSearchRequestSecurityTest {
     private static final String FILTER_VALUE_1 = "filterType1";
     private static final String FILTER_VALUE_2 = "filterType2";
 
-    private List<CaseSearchFilter> filterList = new ArrayList<>();
-
     @Mock
     private CaseSearchFilter caseSearchFilter;
 
@@ -58,7 +56,6 @@ class ElasticsearchCaseSearchRequestSecurityTest {
     @BeforeEach
     void setUp() {
         objectMapperService = new DefaultObjectMapperService(new ObjectMapper());
-        MockitoAnnotations.initMocks(this);
     }
 
     @Test
@@ -177,6 +174,8 @@ class ElasticsearchCaseSearchRequestSecurityTest {
     }
 
     private void createTestEnvironment() {
+        List<CaseSearchFilter> filterList = new ArrayList<>();
+
         when(caseSearchFilter.getFilter(CASE_TYPE_ID)).thenReturn(Optional.of(newQueryBuilder(FILTER_VALUE_1)));
 
         filterList.add(caseSearchFilter);
