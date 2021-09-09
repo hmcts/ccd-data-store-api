@@ -10,8 +10,10 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 
 import java.util.List;
+import java.util.Optional;
 
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.QUERY;
 
@@ -34,6 +36,27 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
         return createNewCaseSearchRequest(caseSearchRequest, queryClauseWithSecurityFilters);
     }
 
+    @Override
+    public CrossCaseTypeSearchRequest createSecuredSearchRequest(CrossCaseTypeSearchRequest request) {
+        String queryClauseWithSecurityFilters = addFiltersToQuery(request);
+        return createNewCrossCaseTypeSearchRequest(request, queryClauseWithSecurityFilters);
+    }
+
+    private String addFiltersToQuery(CrossCaseTypeSearchRequest crossCaseTypeSearchRequest) {
+        String query = crossCaseTypeSearchRequest.getElasticSearchRequest().getQuery().toString();
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.must(QueryBuilders.wrapperQuery(query));
+
+        // At least one of these clauses must match. The equivalent of OR
+        crossCaseTypeSearchRequest.getCaseTypeIds()
+            .forEach(caseTypeId -> createFilterQueryForCaseType(caseTypeId).ifPresent(boolQueryBuilder::should));
+
+        boolQueryBuilder.minimumShouldMatch(1);
+
+        return createQueryString(boolQueryBuilder);
+    }
+
     private String addFiltersToQuery(CaseSearchRequest caseSearchRequest) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder.must(QueryBuilders.wrapperQuery(caseSearchRequest.getQueryValue()));
@@ -42,6 +65,22 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
             filter.getFilter(caseSearchRequest.getCaseTypeId()).ifPresent(boolQueryBuilder::filter));
 
         return createQueryString(boolQueryBuilder);
+    }
+
+
+    private Optional<QueryBuilder> createFilterQueryForCaseType(String caseTypeId) {
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+        caseSearchFilters.forEach(filter ->
+            filter.getFilter(caseTypeId).ifPresent(boolQueryBuilder::must));
+
+        if (boolQueryBuilder.must().isEmpty()) {
+            return Optional.empty();
+        }
+
+        boolQueryBuilder.must(QueryBuilders.termQuery("case_type_id", caseTypeId.toLowerCase()));
+
+        return Optional.of(boolQueryBuilder);
     }
 
     private String createQueryString(QueryBuilder queryBuilder) {
@@ -61,5 +100,15 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
 
         return new CaseSearchRequest(caseSearchRequest.getCaseTypeId(),
             new ElasticsearchRequest(searchRequestJsonNode));
+    }
+
+    private CrossCaseTypeSearchRequest createNewCrossCaseTypeSearchRequest(CrossCaseTypeSearchRequest request,
+                                                                           String queryWithFilters) {
+        ObjectNode queryNode = objectMapperService.convertStringToObject(queryWithFilters, ObjectNode.class);
+
+        return new CrossCaseTypeSearchRequest.Builder()
+            .withCaseTypes(request.getCaseTypeIds())
+            .withSearchRequest(new ElasticsearchRequest(queryNode))
+            .build();
     }
 }

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchAliasField;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadSearchRequest;
@@ -31,6 +32,7 @@ import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRe
  *   }
  * }
  */
+@Slf4j
 public class CrossCaseTypeSearchRequest {
 
     private static final String SEARCH_ALIAS_FIELD_PREFIX = "alias.";
@@ -86,6 +88,12 @@ public class CrossCaseTypeSearchRequest {
 
     public Optional<SearchIndex> getSearchIndex() {
         return Optional.ofNullable(searchIndex);
+    }
+
+    public String toJsonString() {
+        String jsonString = elasticsearchRequest.toFinalRequest();
+        log.debug("json search request: {}", jsonString);
+        return jsonString;
     }
 
     public static class Builder {
