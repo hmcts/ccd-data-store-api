@@ -2,24 +2,17 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
-import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.DefaultObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -27,55 +20,54 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 class ElasticsearchCaseSearchRequestSecurityTest {
 
-    private static final String SEARCH_REQUEST = "{\"query\" : {\"match\" : {\"reference\" : 1630596267899527}}}";
+    private static final String EXPECTED_SEARCH_TERM = "{\"match\":{\"reference\":1630596267899527}}";
+    private static final String SEARCH_QUERY = "{\"query\" : {\"match\" : {\"reference\" : 1630596267899527}}}";
 
-    private static final String CASE_TYPE_ID = "caseType";
+    private static final String CASE_TYPE_ID_1 = "caseType";
     private static final String CASE_TYPE_ID_2 = "caseType2";
+    private static final List<String> CASE_TYPE_IDS = List.of(CASE_TYPE_ID_1, CASE_TYPE_ID_2);
 
     private static final String FILTER_VALUE_1 = "filterType1";
     private static final String FILTER_VALUE_2 = "filterType2";
 
-    @Mock
-    private CaseSearchFilter caseSearchFilter;
+    private final CaseSearchFilter caseSearchFilter = mock(CaseSearchFilter.class);
+    private final List<CaseSearchFilter> filterList = List.of(caseSearchFilter);
 
-    @Mock
-    private CaseAccessService caseAccessService;
 
-    private ObjectMapperService objectMapperService;
+    private final ObjectMapperService objectMapperService = new DefaultObjectMapperService(new ObjectMapper());
+    private final JsonNode searchRequestNode = objectMapperService.convertStringToObject(SEARCH_QUERY, JsonNode.class);
+    private final ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(searchRequestNode);
 
-    @Mock
-    private ObjectNode searchRequestJsonNode;
-
-    private ElasticsearchCaseSearchRequestSecurity querySecurity;
+    private final ElasticsearchCaseSearchRequestSecurity underTest =
+        new ElasticsearchCaseSearchRequestSecurity(filterList, objectMapperService);
 
     @BeforeEach
     void setUp() {
-        objectMapperService = new DefaultObjectMapperService(new ObjectMapper());
+        when(caseSearchFilter.getFilter(CASE_TYPE_ID_1)).thenReturn(Optional.of(newQueryBuilder(FILTER_VALUE_1)));
     }
 
     @Test
     @DisplayName("should parse and secure request with filters and single case type")
     void shouldSecureRequest() {
-        createTestEnvironment();
+        // GIVEN
+        CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
 
-        JsonNode searchRequestNode = objectMapperService.convertStringToObject(SEARCH_REQUEST, JsonNode.class);
+        // WHEN
+        CaseSearchRequest securedSearchRequest = underTest.createSecuredSearchRequest(request);
 
-        CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID, new ElasticsearchRequest(searchRequestNode));
-
-        CaseSearchRequest securedSearchRequest = querySecurity.createSecuredSearchRequest(request);
-
+        // THEN
         JsonNode jsonNode = objectMapperService.convertStringToObject(
             securedSearchRequest.toJsonString(),
             JsonNode.class);
         String decodedQuery = getDecodedQuery(jsonNode);
 
-        assertEquals(request.getCaseTypeId(), securedSearchRequest.getCaseTypeId());
-        assertEquals(request.getQueryValue(), decodedQuery);
+        assertEquals(CASE_TYPE_ID_1, securedSearchRequest.getCaseTypeId());
+        assertEquals(EXPECTED_SEARCH_TERM, decodedQuery);
         assertEquals(FILTER_VALUE_1, jsonNode.at("/query/bool/filter").get(0).at("/term/filterTermValue/value")
             .asText());
     }
@@ -83,57 +75,49 @@ class ElasticsearchCaseSearchRequestSecurityTest {
     @Test
     @DisplayName("should parse and secure request with NO filters and only base query and multiple case types")
     void shouldSecureCrossCaseTypeRequest() {
-        createTestEnvironment();
-
-        List<String> caseTypeIds = new ArrayList<>();
-        caseTypeIds.add(CASE_TYPE_ID);
-        caseTypeIds.add(CASE_TYPE_ID_2);
-
-        JsonNode searchRequestNode = objectMapperService.convertStringToObject(SEARCH_REQUEST, JsonNode.class);
-
+        // GIVEN
         CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
-            .withSearchRequest(new ElasticsearchRequest(searchRequestNode))
-            .withCaseTypes(caseTypeIds)
+            .withSearchRequest(elasticsearchRequest)
+            .withCaseTypes(CASE_TYPE_IDS)
             .build();
 
-        CrossCaseTypeSearchRequest securedSearchRequest = querySecurity.createSecuredSearchRequest(request);
+        // WHEN
+        CrossCaseTypeSearchRequest securedSearchRequest = underTest.createSecuredSearchRequest(request);
 
+        // THEN
         String decodedQuery = getDecodedQuery(securedSearchRequest.getSearchRequestJsonNode());
 
-        assertEquals(request.getCaseTypeIds(), securedSearchRequest.getCaseTypeIds());
-        assertEquals(request.getElasticSearchRequest().getQuery().toString(), decodedQuery);
+        assertEquals(CASE_TYPE_IDS, securedSearchRequest.getCaseTypeIds());
+        assertEquals(EXPECTED_SEARCH_TERM, decodedQuery);
     }
 
     @Test
     @DisplayName("should parse and secure request with filters and multiple case types")
     void shouldSecureCrossCaseTypeRequestWithFilters() {
-        List<String> caseTypeIds = new ArrayList<>();
-        caseTypeIds.add(CASE_TYPE_ID);
-        caseTypeIds.add(CASE_TYPE_ID_2);
-
+        // GIVEN
         when(caseSearchFilter.getFilter(CASE_TYPE_ID_2)).thenReturn(Optional.of(newQueryBuilder(FILTER_VALUE_2)));
-        createTestEnvironment();
-
-        JsonNode searchRequestNode = objectMapperService.convertStringToObject(SEARCH_REQUEST, JsonNode.class);
 
         CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
-            .withSearchRequest(new ElasticsearchRequest(searchRequestNode))
-            .withCaseTypes(caseTypeIds)
+            .withSearchRequest(elasticsearchRequest)
+            .withCaseTypes(CASE_TYPE_IDS)
             .build();
 
-        CrossCaseTypeSearchRequest securedSearchRequest = querySecurity.createSecuredSearchRequest(request);
+        // WHEN
+        CrossCaseTypeSearchRequest securedSearchRequest = underTest.createSecuredSearchRequest(request);
+
+        // THEN
         String decodedQuery = getDecodedQuery(securedSearchRequest.getSearchRequestJsonNode());
 
         Map<String, JsonNode> mapOfFilterValues =
             createMapOfFilterValues(securedSearchRequest.getSearchRequestJsonNode());
 
-        assertEquals(request.getCaseTypeIds(), securedSearchRequest.getCaseTypeIds());
-        assertEquals(request.getElasticSearchRequest().getQuery().toString(), decodedQuery);
-        assertEquals(FILTER_VALUE_1, mapOfFilterValues.get(CASE_TYPE_ID.toLowerCase()).at("/bool/must").get(0)
+        assertEquals(CASE_TYPE_IDS, securedSearchRequest.getCaseTypeIds());
+        assertEquals(EXPECTED_SEARCH_TERM, decodedQuery);
+        assertEquals(FILTER_VALUE_1, mapOfFilterValues.get(CASE_TYPE_ID_1.toLowerCase()).at("/bool/must").get(0)
             .at("/term/filterTermValue/value").asText());
         assertEquals(FILTER_VALUE_2, mapOfFilterValues.get(CASE_TYPE_ID_2.toLowerCase()).at("/bool/must").get(0)
             .at("/term/filterTermValue/value").asText());
-        assertEquals(CASE_TYPE_ID.toLowerCase(), mapOfFilterValues.get(CASE_TYPE_ID.toLowerCase()).at("/bool/must")
+        assertEquals(CASE_TYPE_ID_1.toLowerCase(), mapOfFilterValues.get(CASE_TYPE_ID_1.toLowerCase()).at("/bool/must")
             .get(1).at("/term/case_type_id/value").asText());
         assertEquals(CASE_TYPE_ID_2.toLowerCase(), mapOfFilterValues.get(CASE_TYPE_ID_2.toLowerCase()).at("/bool/must")
             .get(1).at("/term/case_type_id/value").asText());
@@ -146,7 +130,6 @@ class ElasticsearchCaseSearchRequestSecurityTest {
         return decodedQuery(queryJsonNode);
     }
 
-    // decode base 64
     private String decodedQuery(JsonNode queryJsonNode) {
         return new String(Base64.getDecoder().decode(queryJsonNode.asText()));
     }
@@ -172,15 +155,4 @@ class ElasticsearchCaseSearchRequestSecurityTest {
 
         return values;
     }
-
-    private void createTestEnvironment() {
-        List<CaseSearchFilter> filterList = new ArrayList<>();
-
-        when(caseSearchFilter.getFilter(CASE_TYPE_ID)).thenReturn(Optional.of(newQueryBuilder(FILTER_VALUE_1)));
-
-        filterList.add(caseSearchFilter);
-        querySecurity = new ElasticsearchCaseSearchRequestSecurity(filterList,
-            objectMapperService);
-    }
-
 }
