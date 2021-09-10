@@ -128,6 +128,9 @@ public abstract class BaseTest {
     private DocumentsOperation documentsOperation;
     @Inject
     protected SecurityUtils securityUtils;
+    @Inject
+    @Qualifier("DefaultObjectMapper")
+    protected ObjectMapper defaultObjectMapper;
 
     @Mock
     protected Authentication authentication;
