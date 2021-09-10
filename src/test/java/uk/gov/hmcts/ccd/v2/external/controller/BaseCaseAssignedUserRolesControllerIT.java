@@ -89,6 +89,9 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     protected static final String PARAM_CASE_IDS = "case_ids";
     protected static final String PARAM_USER_IDS = "user_ids";
 
+    protected static final String ASSIGNMENT_1 = "assignment1";
+    protected static final String ASSIGNMENT_2 = "assignment2";
+
     @Inject
     protected ApplicationParams applicationParams;
 
@@ -263,4 +266,25 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
         }
     }
 
+    protected void stubUserInfo(String userId) {
+        stubFor(WireMock.get(urlMatching("/o/userinfo"))
+            .willReturn(okJson("{"
+                + "      \"uid\": \"" + userId + "\","
+                + "      \"sub\": \"Cloud.Strife@test.com\","
+                + "      \"roles\": [ \"caseworker\", \"caseworker-test\", \"caseworker-PROBATE-public\","
+                + " \"caseworker-PROBATE\", \"caseworker-DIVORCE\", \"caseworker-SSCS\" ]"
+                + "    }").withStatus(200)));
+    }
+
+    protected void stubIdamRolesForUser(String userId) {
+        stubFor(WireMock.get(urlMatching("/api/v1/users/" + userId))
+            .willReturn(okJson("{"
+                + "      \"id\": \" " + userId + "\","
+                + "      \"email\": \"Cloud.Strife@test.com\","
+                + "      \"forename\": \"Cloud\","
+                + "      \"surname\": \"Strife\","
+                + "      \"roles\": [ \"caseworker\", \"caseworker-test\", \"caseworker-PROBATE-public\","
+                + " \"caseworker-PROBATE\", \"caseworker-DIVORCE\", \"caseworker-SSCS\" ]"
+                + "    }").withStatus(200)));
+    }
 }
