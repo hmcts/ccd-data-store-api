@@ -21,7 +21,7 @@ public class SearchCriteriaResponse {
 
     private String baseLocation;
 
-    private String HmctsServiceId;
+    private String hmctsServiceId;
 
     private String caseNameHmctsInternal;
 
