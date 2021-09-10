@@ -10,35 +10,13 @@
   "request" : {
     "pathVariables": {
       "ctid": "CT5"
-    },
-    "_extends_": "Common_Request",
-    "headers": {
-      "experimental": true
-    },
-    "body" : {
-      "data": {
-        "F3": "Fly"
-      },
-      "event": {
-        "id": "Create",
-        "summary": "",
-        "description": ""
-      },
-      "event_token": "${[scenarioContext][childContexts][CT1_GetToken][testData][actualResponse][body][token]}",
-      "ignore_warning": false,
-      "draft_id": null
     }
   },
 
   "expectedResponse": {
     "_extends_": "Common_404_Response",
     "body" : {
-      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
-      "message" : "No case type found",
-      "path" : "/case-types/CT5/cases",
-      "details" : null,
-      "callbackErrors" : null,
-      "callbackWarnings" : null
+      "path" : "/case-types/CT5/cases"
     }
   }
 }
