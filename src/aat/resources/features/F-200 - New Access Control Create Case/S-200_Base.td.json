@@ -1,10 +1,16 @@
 {
   "_guid_": "S-200_Base",
-
   "productName": "CCD Data Store",
   "operationName": "create case",
   "method": "POST",
   "uri": "/case-types/{ctid}/cases",
+
+  "users" : {
+    "invokingUser": {
+      "username": "ccd.ac.solicitor1@gmail.com",
+      "password": "Pa55word11"
+    }
+  },
 
   "request" : {
     "pathVariables": {
@@ -40,13 +46,6 @@
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null
-    }
-  },
-
-  "users" : {
-    "invokingUser": {
-      "username": "ccd.ac.solicitor1@gmail.com",
-      "password": "Pa55word11"
     }
   }
 }
