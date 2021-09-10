@@ -16,6 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteriaResponse;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -44,7 +45,6 @@ class GlobalSearchParserTest {
     private static final String CASE_TYPE_ID_2 = "CASE_TYPE_2";
     private static final String CASE_TYPE_ID_3 = "CASE_TYPE_3";
     private static final String JURISDICTION = "JURISDICTION";
-    private static final String CASE_FIELD_1 = "Case field 1";
     private static final String CASE_FIELD_2 = "Case field 2";
     private static final String CASE_FIELD_3 = "Case field 3";
     private static final String TEXT_TYPE = "Text";
@@ -197,10 +197,9 @@ class GlobalSearchParserTest {
         searchCriteria.setCaseManagementRegionIds(validFields);
 
         SearchCriteriaResponse searchCriteriaResponse = new SearchCriteriaResponse();
-        searchCriteriaResponse.setCaseManagementBaseLocationId("value");
-        searchCriteriaResponse.setCcdCaseTypeId(CASE_TYPE_ID_1);
-        searchCriteriaResponse.setCaseManagementBaseLocationId(CASE_TYPE_ID_1);
-        searchCriteriaResponse.setCaseManagementRegionId(CASE_TYPE_ID_1);
+        searchCriteriaResponse.setCaseTypeId(CASE_TYPE_ID_1);
+        searchCriteriaResponse.setBaseLocation(CASE_TYPE_ID_1);
+        searchCriteriaResponse.setRegion(CASE_TYPE_ID_1);
 
         List<SearchCriteriaResponse> response =
             globalSearchParser
@@ -220,16 +219,14 @@ class GlobalSearchParserTest {
         searchCriteria.setCaseManagementRegionIds(validFields);
 
         SearchCriteriaResponse searchCriteriaResponse = new SearchCriteriaResponse();
-        searchCriteriaResponse.setCaseManagementBaseLocationId("value");
-        searchCriteriaResponse.setCcdCaseTypeId(CASE_TYPE_ID_1);
-        searchCriteriaResponse.setCaseManagementBaseLocationId(CASE_TYPE_ID_1);
-        searchCriteriaResponse.setCaseManagementRegionId(CASE_TYPE_ID_1);
+        searchCriteriaResponse.setCaseTypeId(CASE_TYPE_ID_1);
+        searchCriteriaResponse.setBaseLocation(CASE_TYPE_ID_1);
+        searchCriteriaResponse.setRegion(CASE_TYPE_ID_1);
 
         SearchCriteriaResponse searchCriteriaResponse2 = new SearchCriteriaResponse();
-        searchCriteriaResponse2.setCaseManagementBaseLocationId("value");
-        searchCriteriaResponse2.setCcdCaseTypeId(CASE_TYPE_ID_2);
-        searchCriteriaResponse2.setCaseManagementBaseLocationId(CASE_TYPE_ID_1);
-        searchCriteriaResponse2.setCaseManagementRegionId(CASE_TYPE_ID_1);
+        searchCriteriaResponse2.setCaseTypeId(CASE_TYPE_ID_2);
+        searchCriteriaResponse2.setBaseLocation(CASE_TYPE_ID_2);
+        searchCriteriaResponse2.setRegion(CASE_TYPE_ID_2);
 
         List<SearchCriteriaResponse> response =
             globalSearchParser.filterCases(new java.util.ArrayList<>(java.util.Arrays.asList(searchCriteriaResponse,
@@ -248,16 +245,14 @@ class GlobalSearchParserTest {
         searchCriteria.setCaseManagementRegionIds(validFields);
 
         SearchCriteriaResponse searchCriteriaResponse = new SearchCriteriaResponse();
-        searchCriteriaResponse.setCaseManagementBaseLocationId("value");
-        searchCriteriaResponse.setCcdCaseTypeId(CASE_TYPE_ID_1);
-        searchCriteriaResponse.setCaseManagementBaseLocationId(CASE_TYPE_ID_1);
-        searchCriteriaResponse.setCaseManagementRegionId(CASE_TYPE_ID_1);
+        searchCriteriaResponse.setCaseTypeId(CASE_TYPE_ID_1);
+        searchCriteriaResponse.setBaseLocation(CASE_TYPE_ID_1);
+        searchCriteriaResponse.setRegion(CASE_TYPE_ID_1);
 
         SearchCriteriaResponse searchCriteriaResponse2 = new SearchCriteriaResponse();
-        searchCriteriaResponse2.setCaseManagementBaseLocationId("value");
-        searchCriteriaResponse2.setCcdCaseTypeId(CASE_TYPE_ID_3);
-        searchCriteriaResponse2.setCaseManagementBaseLocationId(CASE_TYPE_ID_1);
-        searchCriteriaResponse2.setCaseManagementRegionId(CASE_TYPE_ID_1);
+        searchCriteriaResponse2.setCaseTypeId(CASE_TYPE_ID_3);
+        searchCriteriaResponse2.setBaseLocation(CASE_TYPE_ID_3);
+        searchCriteriaResponse2.setRegion(CASE_TYPE_ID_3);
 
         List<SearchCriteriaResponse> response =
             globalSearchParser.filterCases(new java.util.ArrayList<>(java.util.Arrays.asList(searchCriteriaResponse,
@@ -276,18 +271,16 @@ class GlobalSearchParserTest {
         searchCriteria.setOtherReferences(validFields);
 
         SearchCriteriaResponse searchCriteriaResponse = new SearchCriteriaResponse();
-        searchCriteriaResponse.setCaseManagementBaseLocationId("value");
-        searchCriteriaResponse.setCcdCaseTypeId(CASE_TYPE_ID_1);
-        searchCriteriaResponse.setCaseManagementBaseLocationId(CASE_TYPE_ID_1);
-        searchCriteriaResponse.setCaseManagementRegionId(CASE_TYPE_ID_1);
+        searchCriteriaResponse.setCaseTypeId(CASE_TYPE_ID_1);
+        searchCriteriaResponse.setBaseLocation(CASE_TYPE_ID_1);
+        searchCriteriaResponse.setRegion(CASE_TYPE_ID_1);
 
         SearchCriteriaResponse searchCriteriaResponse2 = new SearchCriteriaResponse();
-        searchCriteriaResponse2.setCaseManagementBaseLocationId("value");
-        searchCriteriaResponse2.setCcdCaseTypeId(CASE_TYPE_ID_3);
-        searchCriteriaResponse2.setCaseManagementBaseLocationId(CASE_TYPE_ID_1);
-        searchCriteriaResponse2.setCaseManagementRegionId(CASE_TYPE_ID_1);
-        searchCriteriaResponse2.setOtherReferences(List.of(CASE_TYPE_ID_1));
-        searchCriteriaResponse2.setParties(parties);
+        searchCriteriaResponse2.setCaseTypeId(CASE_TYPE_ID_3);
+        searchCriteriaResponse2.setBaseLocation(CASE_TYPE_ID_3);
+        searchCriteriaResponse2.setRegion(CASE_TYPE_ID_3);
+        searchCriteriaResponse2.setOtherCaseReferences(List.of(CASE_TYPE_ID_3));
+        searchCriteriaResponse2.setSearchParties(parties);
 
         List<SearchCriteriaResponse> response =
             globalSearchParser.filterCases(new java.util.ArrayList<>(java.util.Arrays.asList(searchCriteriaResponse,
@@ -295,6 +288,21 @@ class GlobalSearchParserTest {
 
         assertAll(
             () -> assertThat(response.size(), Is.is(1))
+        );
+
+    }
+
+    @Test
+    void shouldFilterResultsWhenResponseIsEmpty() {
+        SearchCriteria searchCriteria = new SearchCriteria();
+        searchCriteria.setParties(parties);
+        searchCriteria.setOtherReferences(validFields);
+
+        List<SearchCriteriaResponse> response =
+            globalSearchParser.filterCases(new java.util.ArrayList<>(Collections.emptyList()), searchCriteria);
+
+        assertAll(
+            () -> assertThat(response.size(), Is.is(0))
         );
 
     }

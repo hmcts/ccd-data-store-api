@@ -44,7 +44,7 @@ public class GlobalSearchParser {
     }
 
     private boolean authorised(List<String> fields, SearchCriteriaResponse searchCriteria) {
-        CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(searchCriteria.getCcdCaseTypeId());
+        CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(searchCriteria.getCaseTypeId());
         boolean condition = true;
         for (String field : fields) {
             Optional<CaseFieldDefinition> caseFieldDefinition =
