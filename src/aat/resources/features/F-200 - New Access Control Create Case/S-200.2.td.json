@@ -1,22 +1,11 @@
 {
   "_guid_": "S-200.2",
-
-  "productName": "CCD Data Store",
-  "operationName": "create case",
-  "method": "POST",
-  "uri": "/case-types/{ctid}/cases",
+  "_extends_": "S-200_Base",
 
   "specs": [
     "a role assignment without definition for CaseType CT3J2 in J2 Jurisdiction",
     "attempts to create a case for CT3J2 in J2 Jurisdiction"
   ],
-
-  "users" : {
-    "invokingUser": {
-      "username": "ccd.ac.solicitor1@gmail.com",
-      "password": "Pa55word11"
-    }
-  },
 
   "request" : {
     "pathVariables": {

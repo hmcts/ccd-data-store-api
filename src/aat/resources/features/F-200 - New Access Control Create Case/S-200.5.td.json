@@ -1,22 +1,11 @@
 {
   "_guid_": "S-200.5",
-
-  "productName": "CCD Data Store",
-  "operationName": "create case",
-  "method": "POST",
-  "uri": "/case-types/{ctid}/cases",
+  "_extends_": "S-200_Base",
 
   "specs": [
     "a read only role assignment for CaseType CT4",
     "attempts to create a case for CT4 with readOnly"
   ],
-
-  "users" : {
-    "invokingUser": {
-      "username": "ccd.ac.solicitor1@gmail.com",
-      "password": "Pa55word11"
-    }
-  },
 
   "request" : {
     "pathVariables": {
