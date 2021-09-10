@@ -23,35 +23,6 @@ public class RoleAssignmentSetup{
 //    TODO CHANGE THE PATH OF THE 2 JSON FILES IN THE STATIC VARS ABOVE TO THE CORRECT PATH FOR YOUR LOCAL MACHINE
 //    TODO REPLACE THE IDAM ID IN THE 2 JSON FILES LISTED ABOVE AS FINAL VARS WITH CORRECT IDAM IDS FROM YOUR LOCAL
 
-        //NO LONGER REQUIRED AS WE CAN JUST POST ASSIGNMENTS WITH THE 'REPLACE EXISTING' FLAG
-    //    public ArrayList<RoleAssignment> getRoleAssignements(){
-    //         ArrayList<LinkedHashMap> roleAssingments = asRoleAssignemntCaseworker()
-    //            .get("/am/role-assignments/actors/82853c08-73dd-4bd3-a50e-7dae355da504")
-    //            .then()Befta_Default_Token_Creation_Data_For_Case_Creation
-    //            .extract().path("roleAssignmentResponse");
-    //
-    //         ArrayList<RoleAssignment> raList = (ArrayList<RoleAssignment>) roleAssingments.stream().map(ra ->
-    //             RoleAssignment.builder()
-    //             .roleName((String) ra.get("roleName"))
-    //             .roleType((String) ra.get("roleType"))
-    //             .grantType((String) ra.get("grantType"))
-    //             .roleCategory((String) ra.get("roleCategory"))
-    //             .classification((String) ra.get("classification"))
-    //             .readOnly((Boolean) ra.get("readOnly"))
-    //             .attributes(
-    //                 RoleAssignmentAttributes.builder()
-    //                     .jurisdiction(Optional.ofNullable((String) ra.get("attributes.jurisdiction")))
-    //                     .caseType(Optional.ofNullable((String) ra.get("attributes.caseType")))
-    //                     .build())
-    //             .build()).collect(Collectors.toList());
-    //
-    //
-    //        System.out.println(roleAssingments.get(0));
-    //        System.out.println(raList.get(0));
-    //
-    //        return raList;
-    //    }
-
 
     public void setupOrganisationRoleAssignments() {
 
