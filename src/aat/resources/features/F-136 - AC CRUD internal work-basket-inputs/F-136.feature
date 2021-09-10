@@ -23,4 +23,4 @@ Feature: F-136: Get Workbasket Input Details with access Internal API CRUD Tests
     Then a positive response is received,
     And the response [contains HTTP 200 Ok status code],
     And the response has all other details as expected,
-    And the response [does not contain the case field with no R CRUD access]
+    And the response [does not contain the case field with no R CRUD access].
