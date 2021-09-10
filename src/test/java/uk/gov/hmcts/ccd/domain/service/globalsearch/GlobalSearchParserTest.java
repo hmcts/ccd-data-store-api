@@ -81,11 +81,11 @@ class GlobalSearchParserTest {
                 .withRole(ROLE_IN_USER_ROLE_1)
                 .withRead(true)
                 .build())
-            .withField(newCaseField().withId("caseManagementLocation")
+            .withField(newCaseField().withId("CaseLocation")
                 .withSC(SecurityClassification.PUBLIC.name())
                 .withFieldType(
                     aFieldType()
-                        .withId("caseManagementLocation")
+                        .withId("CaseLocation")
                         .withType(COMPLEX)
                         .withComplexField(complexField("region", TEXT,
                             SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true))
@@ -115,11 +115,11 @@ class GlobalSearchParserTest {
                 .withRole(ROLE_IN_USER_ROLE_1)
                 .withRead(false)
                 .build())
-            .withField(newCaseField().withId("caseManagementLocation")
+            .withField(newCaseField().withId("CaseLocation")
                 .withSC(SecurityClassification.PUBLIC.name())
                 .withFieldType(
                     aFieldType()
-                        .withId("caseManagementLocation")
+                        .withId("CaseLocation")
                         .withType(COMPLEX)
                         .withComplexField(complexField("region", TEXT,
                             SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, false))
@@ -149,11 +149,11 @@ class GlobalSearchParserTest {
                 .withRole(ROLE_IN_USER_ROLE_1)
                 .withRead(false)
                 .build())
-            .withField(newCaseField().withId("caseManagementLocation")
+            .withField(newCaseField().withId("CaseLocation")
                 .withSC(SecurityClassification.PUBLIC.name())
                 .withFieldType(
                     aFieldType()
-                        .withId("caseManagementLocation")
+                        .withId("CaseLocation")
                         .withType(COMPLEX)
                         .withComplexField(complexField("region", TEXT,
                             SecurityClassification.RESTRICTED, ROLE_IN_USER_ROLE_1, true))
