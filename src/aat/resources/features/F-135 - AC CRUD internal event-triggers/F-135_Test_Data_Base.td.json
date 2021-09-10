@@ -7,19 +7,19 @@
   "users": {
     "invokingUser": {
       "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "Experimental": "true"
     },
-    "request": {
-      "headers": {
-        "_extends_": "Common_Request_Headers",
-        "Experimental": "true"
-      },
-      "pathVariables": {
-      }
-    },
-    "expectedResponse": {
-      "headers": {
-        "Content-Type": "[[ANYTHING_PRESENT]]"
-      }
+    "pathVariables": {
+    }
+  },
+  "expectedResponse": {
+    "headers": {
+      "Content-Type": "[[ANYTHING_PRESENT]]"
     }
   }
 }
