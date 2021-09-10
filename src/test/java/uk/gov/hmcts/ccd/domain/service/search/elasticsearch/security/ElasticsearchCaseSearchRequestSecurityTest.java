@@ -92,17 +92,8 @@ class ElasticsearchCaseSearchRequestSecurityTest {
     }
 
     @Test
-    @DisplayName("should parse and secure request with filters and multiple case types")
-    void shouldSecureCrossCaseTypeRequestWithFilters() {
-        String expectedFinalQueryBody = "{\"query\":{\"bool\":{\"must\":[{\"wrapper\":"
-            + "{\"query\":\"eyJtYXRjaCI6eyJyZWZlcmVuY2UiOjE2MzA1OTYyNjc4OTk1Mjd9fQ==\"}}],\"should\":["
-            + "{\"bool\":{\"must\":[{\"term\":{\"filterTermValue\":{\"value\":\"filterType1\",\"boost\":1.0}}},"
-            + "{\"term\":{\"case_type_id\":{\"value\":\"casetype\",\"boost\":1.0}}}],\"adjust_pure_negative\":true,"
-            + "\"boost\":1.0}},{\"bool\":{\"must\":[{\"term\":{\"filterTermValue\":{\"value\":\"filterType2\","
-            + "\"boost\":1.0}}},{\"term\":{\"case_type_id\":{\"value\":\"casetype2\",\"boost\":1.0}}}],"
-            + "\"adjust_pure_negative\":true,\"boost\":1.0}}],\"adjust_pure_negative\":true,"
-            + "\"minimum_should_match\":\"1\",\"boost\":1.0}}}";
-
+    @DisplayName("should parse and secure request with filters and multiple case types and verify complete query")
+    void shouldSecureCrossCaseTypeRequestWithFiltersVerifyQuery() {
         // GIVEN
         when(caseSearchFilter.getFilter(CASE_TYPE_ID_2)).thenReturn(Optional.of(newQueryBuilder(FILTER_VALUE_2)));
 
@@ -115,15 +106,40 @@ class ElasticsearchCaseSearchRequestSecurityTest {
         CrossCaseTypeSearchRequest securedSearchRequest = underTest.createSecuredSearchRequest(request);
 
         // THEN
+        String expectedFinalQueryBody = "{\"query\":{\"bool\":{\"must\":[{\"wrapper\":"
+            + "{\"query\":\"eyJtYXRjaCI6eyJyZWZlcmVuY2UiOjE2MzA1OTYyNjc4OTk1Mjd9fQ==\"}}],\"should\":["
+            + "{\"bool\":{\"must\":[{\"term\":{\"filterTermValue\":{\"value\":\"filterType1\",\"boost\":1.0}}},"
+            + "{\"term\":{\"case_type_id\":{\"value\":\"casetype\",\"boost\":1.0}}}],\"adjust_pure_negative\":true,"
+            + "\"boost\":1.0}},{\"bool\":{\"must\":[{\"term\":{\"filterTermValue\":{\"value\":\"filterType2\","
+            + "\"boost\":1.0}}},{\"term\":{\"case_type_id\":{\"value\":\"casetype2\",\"boost\":1.0}}}],"
+            + "\"adjust_pure_negative\":true,\"boost\":1.0}}],\"adjust_pure_negative\":true,"
+            + "\"minimum_should_match\":\"1\",\"boost\":1.0}}}";
+
         JsonNode returnedFinalQueryBody = securedSearchRequest.getSearchRequestJsonNode();
         String decodedQuery = getDecodedQuery(returnedFinalQueryBody);
 
+        assertEquals(CASE_TYPE_IDS, securedSearchRequest.getCaseTypeIds());
+        assertEquals(EXPECTED_SEARCH_TERM, decodedQuery);
+        assertEquals(expectedFinalQueryBody, returnedFinalQueryBody.toString());
+    }
+
+    @Test
+    @DisplayName("should parse and secure request with filters and multiple case types and verify correct filters")
+    void shouldSecureCrossCaseTypeRequestWithFiltersVerifyFilters() {
+        // GIVEN
+        when(caseSearchFilter.getFilter(CASE_TYPE_ID_2)).thenReturn(Optional.of(newQueryBuilder(FILTER_VALUE_2)));
+
+        CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
+            .withSearchRequest(elasticsearchRequest)
+            .withCaseTypes(CASE_TYPE_IDS)
+            .build();
+
+        // WHEN
+        CrossCaseTypeSearchRequest securedSearchRequest = underTest.createSecuredSearchRequest(request);
+
+        // THEN
         Map<String, JsonNode> mapOfFilterValues =
             createMapOfFilterValues(securedSearchRequest.getSearchRequestJsonNode());
-
-        assertEquals(CASE_TYPE_IDS, securedSearchRequest.getCaseTypeIds());
-        assertEquals(expectedFinalQueryBody, returnedFinalQueryBody.toString());
-        assertEquals(EXPECTED_SEARCH_TERM, decodedQuery);
         assertEquals(FILTER_VALUE_1, mapOfFilterValues.get(CASE_TYPE_ID_1.toLowerCase()).at("/bool/must").get(0)
             .at("/term/filterTermValue/value").asText());
         assertEquals(FILTER_VALUE_2, mapOfFilterValues.get(CASE_TYPE_ID_2.toLowerCase()).at("/bool/must").get(0)
