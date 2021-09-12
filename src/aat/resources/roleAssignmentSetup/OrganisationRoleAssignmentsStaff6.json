@@ -1,0 +1,30 @@
+{
+  "roleRequest" : {
+    "assignerId" : "ae6fba81-b9eb-4622-83c7-00fc43a3c1f6",
+    "process" : "ccd-fta-data-setup",
+    "reference" : "ae6fba81-b9eb-4622-83c7-00fc43a3c1f6",
+    "replaceExisting" : true
+  },
+  "requestedRoles" : [
+    {
+      "actorId" : "ae6fba81-b9eb-4622-83c7-00fc43a3c1f6",
+      "actorIdType" : "IDAM",
+      "roleType" : "ORGANISATION",
+      "roleName" : "Staff",
+      "roleCategory" : "LEGAL_OPERATIONS",
+      "classification" : "RESTRICTED",
+      "grantType" : "STANDARD",
+      "readOnly" : false,
+      "beginTime" : "2021-01-01T00:00:00Z",
+      "endTime" : "2023-01-01T00:00:00Z",
+      "attributes" : {
+        "jurisdiction" : "J1",
+        "caseType" : "CT2",
+        "region": "NorthEast",
+        "location": "Newcastle"
+      }
+    }
+
+  ]
+}
+

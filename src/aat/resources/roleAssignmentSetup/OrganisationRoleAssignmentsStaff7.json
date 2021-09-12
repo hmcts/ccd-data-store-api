@@ -1,0 +1,30 @@
+{
+  "roleRequest" : {
+    "assignerId" : "89ecd80d-5d52-4a6c-9410-4bbbbe6751e8",
+    "process" : "ccd-fta-data-setup",
+    "reference" : "89ecd80d-5d52-4a6c-9410-4bbbbe6751e8",
+    "replaceExisting" : true
+  },
+  "requestedRoles" : [
+    {
+      "actorId" : "89ecd80d-5d52-4a6c-9410-4bbbbe6751e8",
+      "actorIdType" : "IDAM",
+      "roleType" : "ORGANISATION",
+      "roleName" : "Staff",
+      "roleCategory" : "LEGAL_OPERATIONS",
+      "classification" : "RESTRICTED",
+      "grantType" : "STANDARD",
+      "readOnly" : false,
+      "beginTime" : "2021-01-01T00:00:00Z",
+      "endTime" : "2023-01-01T00:00:00Z",
+      "attributes" : {
+        "jurisdiction" : "J1",
+        "caseType" : "CT2",
+        "region": "NorthEast",
+        "location": "Gateshead"
+      }
+    }
+
+  ]
+}
+

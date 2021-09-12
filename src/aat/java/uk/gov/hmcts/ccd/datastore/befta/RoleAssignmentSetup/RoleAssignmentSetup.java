@@ -16,6 +16,15 @@ public class RoleAssignmentSetup{
     public static final String SOLICITOR_1_ORG_ROLE_ASSIGNMENTS = "roleAssignmentSetup/OrganisationRoleAssignmentsSolicitor1.json";
     public static final String SUPERUSER_ORG_ROLE_ASSIGNMENTS = "roleAssignmentSetup/OrganisationRoleAssignmentsSuperUser.json";
 
+    public static final String STAFF1_ROLE_ASSIGNMENTS = "roleAssignmentSetup/OrganisationRoleAssignmentsStaff1.json";
+    public static final String STAFF2_ROLE_ASSIGNMENTS = "roleAssignmentSetup/OrganisationRoleAssignmentsStaff2.json";
+    public static final String STAFF3_ROLE_ASSIGNMENTS = "roleAssignmentSetup/OrganisationRoleAssignmentsStaff3.json";
+    public static final String STAFF5_ROLE_ASSIGNMENTS = "roleAssignmentSetup/OrganisationRoleAssignmentsStaff5.json";
+    public static final String STAFF6_ROLE_ASSIGNMENTS = "roleAssignmentSetup/OrganisationRoleAssignmentsStaff6.json";
+    public static final String STAFF7_ROLE_ASSIGNMENTS = "roleAssignmentSetup/OrganisationRoleAssignmentsStaff7.json";
+    public static final String STAFF8_ROLE_ASSIGNMENTS = "roleAssignmentSetup/OrganisationRoleAssignmentsStaff8.json";
+    public static final String OTHER1_ROLE_ASSIGNMENTS = "roleAssignmentSetup/OrganisationRoleAssignmentsOther1.json";
+
     public static void main(String[] args) {
         new RoleAssignmentSetup().setupOrganisationRoleAssignments();
     }
@@ -26,29 +35,17 @@ public class RoleAssignmentSetup{
 
         try {
 
-            String payload = new String(Files.readAllBytes(Paths.get(getClass()
-                .getClassLoader()
-                .getResource(SOLICITOR_1_ORG_ROLE_ASSIGNMENTS).toURI())));
-            asRoleAssignemntSuperUser()
-                .contentType("application/json")
-                .body(payload)
-            .when()
-                .post("/am/role-assignments")
-                .prettyPeek()
-            .then()
-                .statusCode(201);
+            loadRoleAssignments(SOLICITOR_1_ORG_ROLE_ASSIGNMENTS);
+            loadRoleAssignments(SUPERUSER_ORG_ROLE_ASSIGNMENTS);
 
-            String payload2 = new String(Files.readAllBytes(Paths.get(getClass()
-                .getClassLoader()
-                .getResource(SUPERUSER_ORG_ROLE_ASSIGNMENTS).toURI())));
-            asRoleAssignemntSuperUser()
-                .contentType("application/json")
-                .body(payload2)
-                .when()
-                .post("/am/role-assignments")
-                .prettyPeek()
-                .then()
-                .statusCode(201);
+            loadRoleAssignments(STAFF1_ROLE_ASSIGNMENTS);
+            loadRoleAssignments(STAFF2_ROLE_ASSIGNMENTS);
+            loadRoleAssignments(STAFF3_ROLE_ASSIGNMENTS);
+            loadRoleAssignments(STAFF5_ROLE_ASSIGNMENTS);
+            loadRoleAssignments(STAFF6_ROLE_ASSIGNMENTS);
+            loadRoleAssignments(STAFF7_ROLE_ASSIGNMENTS);
+            loadRoleAssignments(STAFF8_ROLE_ASSIGNMENTS);
+            loadRoleAssignments(OTHER1_ROLE_ASSIGNMENTS);
 
 
         } catch (IOException e) {
@@ -57,6 +54,20 @@ public class RoleAssignmentSetup{
             e.printStackTrace();
         }
 
+    }
+
+    private void loadRoleAssignments(String superuserOrgRoleAssignments) throws IOException, URISyntaxException {
+        String payload2 = new String(Files.readAllBytes(Paths.get(getClass()
+            .getClassLoader()
+            .getResource(superuserOrgRoleAssignments).toURI())));
+        asRoleAssignemntSuperUser()
+            .contentType("application/json")
+            .body(payload2)
+            .when()
+            .post("/am/role-assignments")
+            .prettyPeek()
+            .then()
+            .statusCode(201);
     }
 
 

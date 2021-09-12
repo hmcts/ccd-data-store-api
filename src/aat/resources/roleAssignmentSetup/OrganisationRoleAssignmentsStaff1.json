@@ -1,0 +1,44 @@
+{
+  "roleRequest" : {
+    "assignerId" : "97e30efb-c6da-4da4-bca9-c9ef4effaf49",
+    "process" : "ccd-fta-data-setup",
+    "reference" : "97e30efb-c6da-4da4-bca9-c9ef4effaf49",
+    "replaceExisting" : true
+  },
+  "requestedRoles" : [
+    {
+      "actorId" : "97e30efb-c6da-4da4-bca9-c9ef4effaf49",
+      "actorIdType" : "IDAM",
+      "roleType" : "ORGANISATION",
+      "roleName" : "Staff",
+      "roleCategory" : "LEGAL_OPERATIONS",
+      "classification" : "PRIVATE",
+      "grantType" : "STANDARD",
+      "readOnly" : false,
+      "beginTime" : "2021-01-01T00:00:00Z",
+      "endTime" : "2023-01-01T00:00:00Z",
+      "attributes" : {
+        "jurisdiction" : "J1",
+        "caseType" : "CT1"
+      }
+    },
+    {
+      "actorId" : "97e30efb-c6da-4da4-bca9-c9ef4effaf49",
+      "actorIdType" : "IDAM",
+      "roleType" : "ORGANISATION",
+      "roleName" : "Staff",
+      "roleCategory" : "LEGAL_OPERATIONS",
+      "classification" : "PRIVATE",
+      "grantType" : "STANDARD",
+      "readOnly" : false,
+      "beginTime" : "2021-01-01T00:00:00Z",
+      "endTime" : "2023-01-01T00:00:00Z",
+      "attributes" : {
+        "jurisdiction" : "J1",
+        "caseType" : "CT2"
+      }
+    }
+
+  ]
+}
+

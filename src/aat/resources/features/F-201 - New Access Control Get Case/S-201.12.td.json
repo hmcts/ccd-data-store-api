@@ -9,11 +9,11 @@
 
   "users": {
     "S1": {
-      "username": "ccd.ac.solicitor1@gmail.com",
+      "username": "ccd.ac.staff2@gmail.com",
       "password": "Pa55word11"
     },
     "invokingUser": {
-      "username": "ccd.ac.solicitor1@gmail.com",
+      "username": "ccd.ac.staff2@gmail.com",
       "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"    }
   },
 

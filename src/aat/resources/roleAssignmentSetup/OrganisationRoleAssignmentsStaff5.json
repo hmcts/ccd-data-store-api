@@ -1,0 +1,29 @@
+{
+  "roleRequest" : {
+    "assignerId" : "8dc4fa76-e9f1-49d3-8430-aaeb68d8a083",
+    "process" : "ccd-fta-data-setup",
+    "reference" : "8dc4fa76-e9f1-49d3-8430-aaeb68d8a083",
+    "replaceExisting" : true
+  },
+  "requestedRoles" : [
+    {
+      "actorId" : "8dc4fa76-e9f1-49d3-8430-aaeb68d8a083",
+      "actorIdType" : "IDAM",
+      "roleType" : "ORGANISATION",
+      "roleName" : "Staff",
+      "roleCategory" : "LEGAL_OPERATIONS",
+      "classification" : "RESTRICTED",
+      "grantType" : "STANDARD",
+      "readOnly" : false,
+      "beginTime" : "2021-01-01T00:00:00Z",
+      "endTime" : "2023-01-01T00:00:00Z",
+      "attributes" : {
+        "jurisdiction" : "J1",
+        "caseType" : "CT2",
+        "region": "NorthEast"
+      }
+    }
+
+  ]
+}
+

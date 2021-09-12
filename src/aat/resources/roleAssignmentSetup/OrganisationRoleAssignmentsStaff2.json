@@ -1,0 +1,28 @@
+{
+  "roleRequest" : {
+    "assignerId" : "aa8167c5-8d69-44f7-9e35-22c09c6b88fd",
+    "process" : "ccd-fta-data-setup",
+    "reference" : "aa8167c5-8d69-44f7-9e35-22c09c6b88fd",
+    "replaceExisting" : true
+  },
+  "requestedRoles" : [
+    {
+      "actorId" : "aa8167c5-8d69-44f7-9e35-22c09c6b88fd",
+      "actorIdType" : "IDAM",
+      "roleType" : "ORGANISATION",
+      "roleName" : "Staff",
+      "roleCategory" : "LEGAL_OPERATIONS",
+      "classification" : "RESTRICTED",
+      "grantType" : "STANDARD",
+      "readOnly" : false,
+      "beginTime" : "2021-01-01T00:00:00Z",
+      "endTime" : "2023-01-01T00:00:00Z",
+      "attributes" : {
+        "jurisdiction" : "J1",
+        "caseType" : "CT2"
+      }
+    }
+
+  ]
+}
+
