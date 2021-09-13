@@ -2,9 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.createcase;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,6 +36,10 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -312,6 +313,7 @@ class DefaultCreateCaseOperationTest {
 
         final InOrder order = inOrder(eventTokenService,
                                       caseTypeService,
+                                      globalSearchProcessorService,
                                       validateCaseFieldsOperation,
                                       submitCaseTransaction,
                                       draftGateway);
@@ -323,6 +325,7 @@ class DefaultCreateCaseOperationTest {
             () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger,
                 CASE_TYPE.getJurisdictionDefinition(), CASE_TYPE),
             () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+            () -> order.verify(globalSearchProcessorService).populateGlobalSearchData(CASE_TYPE, eventData.getData()),
             () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                  same(CASE_TYPE),
                                                                  same(IDAM_USER),
@@ -369,6 +372,7 @@ class DefaultCreateCaseOperationTest {
         final InOrder order = inOrder(
             eventTokenService,
             caseTypeService,
+            globalSearchProcessorService,
             validateCaseFieldsOperation,
             submitCaseTransaction,
             callbackInvoker,
@@ -379,6 +383,7 @@ class DefaultCreateCaseOperationTest {
             () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger,
                 CASE_TYPE.getJurisdictionDefinition(), CASE_TYPE),
             () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+            () -> order.verify(globalSearchProcessorService).populateGlobalSearchData(CASE_TYPE, eventData.getData()),
             () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                  same(CASE_TYPE),
                                                                  same(IDAM_USER),
@@ -429,6 +434,7 @@ class DefaultCreateCaseOperationTest {
         final InOrder order = inOrder(eventTokenService,
                                       caseTypeService,
                                       validateCaseFieldsOperation,
+                                      globalSearchProcessorService,
                                       submitCaseTransaction,
                                       callbackInvoker,
                                       savedCaseType,
@@ -439,6 +445,7 @@ class DefaultCreateCaseOperationTest {
             () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger,
                 CASE_TYPE.getJurisdictionDefinition(), CASE_TYPE),
             () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+            () -> order.verify(globalSearchProcessorService).populateGlobalSearchData(CASE_TYPE, eventData.getData()),
             () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                  same(CASE_TYPE),
                                                                  same(IDAM_USER),

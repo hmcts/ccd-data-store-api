@@ -15,6 +15,7 @@ import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
+import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 
 import java.util.HashMap;
@@ -40,19 +41,21 @@ public class CallbackInvoker {
     private final CaseDataService caseDataService;
     private final CaseSanitiser caseSanitiser;
     private final SecurityValidationService securityValidationService;
-
+    private final GlobalSearchProcessorService globalSearchProcessorService;
 
     @Autowired
     public CallbackInvoker(final CallbackService callbackService,
                            final CaseTypeService caseTypeService,
                            final CaseDataService caseDataService,
                            final CaseSanitiser caseSanitiser,
-                           final SecurityValidationService securityValidationService) {
+                           final SecurityValidationService securityValidationService,
+                           final GlobalSearchProcessorService globalSearchProcessorService) {
         this.callbackService = callbackService;
         this.caseTypeService = caseTypeService;
         this.caseDataService = caseDataService;
         this.caseSanitiser = caseSanitiser;
         this.securityValidationService = securityValidationService;
+        this.globalSearchProcessorService = globalSearchProcessorService;
     }
 
     public void invokeAboutToStartCallback(final CaseEventDefinition caseEventDefinition,
@@ -219,7 +222,8 @@ public class CallbackInvoker {
                                     final CaseDetails caseDetails,
                                     final Map<String, JsonNode> responseData) {
         caseTypeService.validateData(responseData, caseTypeDefinition);
-        caseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition, responseData));
+        caseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition,
+            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, responseData)));
         deduceDataClassificationForNewFields(caseTypeDefinition, caseDetails);
     }
 

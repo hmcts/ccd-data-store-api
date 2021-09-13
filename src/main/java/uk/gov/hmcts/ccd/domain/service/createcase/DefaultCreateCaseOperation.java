@@ -121,9 +121,6 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
             caseTypeDefinition.getJurisdictionDefinition(),
             caseTypeDefinition);
 
-        caseDataContent.setData(
-            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseDataContent.getData()));
-
         validateCaseFieldsOperation.validateCaseDetails(caseTypeId, caseDataContent);
 
         final CaseDetails newCaseDetails = new CaseDetails();
@@ -133,7 +130,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         newCaseDetails.setSecurityClassification(caseTypeDefinition.getSecurityClassification());
 
 
-        newCaseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition, caseDataContent.getData()));
+        newCaseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition,
+            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseDataContent.getData())));
 
         newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(
             caseTypeDefinition,
