@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.common.FileSource;
 import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformer;
@@ -23,6 +24,9 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.inject.Inject;
 import java.io.IOException;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 
 @AutoConfigureWireMock(port = 0)
 public abstract class WireMockBaseTest extends BaseTest {
@@ -84,5 +88,27 @@ public abstract class WireMockBaseTest extends BaseTest {
                 }
             });
         }
+    }
+
+    protected void stubUserInfo(String userId) {
+        stubFor(WireMock.get(urlMatching("/o/userinfo"))
+            .willReturn(okJson("{"
+                + "      \"uid\": \"" + userId + "\","
+                + "      \"sub\": \"Cloud.Strife@test.com\","
+                + "      \"roles\": [ \"caseworker\", \"caseworker-test\", \"caseworker-PROBATE-public\","
+                + " \"caseworker-PROBATE\", \"caseworker-DIVORCE\", \"caseworker-SSCS\" ]"
+                + "    }").withStatus(200)));
+    }
+
+    protected void stubIdamRolesForUser(String userId) {
+        stubFor(WireMock.get(urlMatching("/api/v1/users/" + userId))
+            .willReturn(okJson("{"
+                + "      \"id\": \" " + userId + "\","
+                + "      \"email\": \"Cloud.Strife@test.com\","
+                + "      \"forename\": \"Cloud\","
+                + "      \"surname\": \"Strife\","
+                + "      \"roles\": [ \"caseworker\", \"caseworker-test\", \"caseworker-PROBATE-public\","
+                + " \"caseworker-PROBATE\", \"caseworker-DIVORCE\", \"caseworker-SSCS\" ]"
+                + "    }").withStatus(200)));
     }
 }
