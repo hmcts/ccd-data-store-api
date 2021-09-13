@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.OtherCaseReference;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchCriteria;
@@ -17,7 +16,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -26,24 +24,20 @@ public class GlobalSearchProcessorService {
 
     private static final String SEARCH_CRITERIA = "SearchCriteria";
 
-    private Map<String, String> namesToValuesMap = new LinkedHashMap<>();
-
     public Map<String, JsonNode> populateGlobalSearchData(CaseTypeDefinition caseTypeDefinition,
                                                           Map<String, JsonNode> data) {
-        List<uk.gov.hmcts.ccd.domain.model.definition.SearchCriteria> searchCriterias =
-            caseTypeDefinition.getSearchCriterias();
-
-        List<uk.gov.hmcts.ccd.domain.model.definition.SearchParty> searchParties =
-            caseTypeDefinition.getSearchParties();
-
-        Optional<CaseFieldDefinition> searchCriteriaCaseField = caseTypeDefinition.getCaseField(SEARCH_CRITERIA);
 
         Map<String, JsonNode> clonedData = null;
         if (data != null) {
             clonedData = new HashMap<>(data);
         }
 
-        if (searchCriteriaCaseField.isPresent()) {
+        if (caseTypeDefinition.getCaseField(SEARCH_CRITERIA).isPresent()) {
+            List<uk.gov.hmcts.ccd.domain.model.definition.SearchCriteria> searchCriterias =
+                caseTypeDefinition.getSearchCriterias();
+
+            List<uk.gov.hmcts.ccd.domain.model.definition.SearchParty> searchParties =
+                caseTypeDefinition.getSearchParties();
 
             SearchCriteria searchCriteria = populateSearchCriteria(clonedData, searchCriterias);
             List<SearchParty> searchPartyList = populateSearchParties(clonedData, searchParties);
@@ -69,13 +63,9 @@ public class GlobalSearchProcessorService {
 
                 if (currentSearchCriteria.getOtherCaseReference().contains(".")
                     && key.equals(currentSearchCriteria.getOtherCaseReference().split("\\.")[0])) {
-                    JsonNode nestedCaseFieldByPath =
-                        CaseFieldPathUtils.getNestedCaseFieldByPath(jsonNode,
-                            currentSearchCriteria.getOtherCaseReference().substring(
-                                currentSearchCriteria.getOtherCaseReference().indexOf(".") + 1));
                     otherCaseReferences.add(OtherCaseReference.builder()
                         .id(UUID.randomUUID().toString())
-                        .value(nestedCaseFieldByPath.textValue())
+                        .value(getNestedValue(jsonNode, currentSearchCriteria.getOtherCaseReference()))
                         .build());
                 } else if (key.equals(currentSearchCriteria.getOtherCaseReference())) {
                     otherCaseReferences.add(OtherCaseReference.builder()
@@ -95,21 +85,10 @@ public class GlobalSearchProcessorService {
                                              List<uk.gov.hmcts.ccd.domain.model.definition.SearchParty> searchParties) {
         List<SearchParty> searchPartyList = new ArrayList<>();
 
+        Map<String, String> namesToValuesMap = new LinkedHashMap<>();
+
         searchParties.forEach(searchParty -> {
-            SearchPartyValue valueToPopulate  = new SearchPartyValue();
-
-            data.forEach((key, jsonNode) -> populateSearchParty(searchParty, valueToPopulate, key, jsonNode));
-
-            String name = namesToValuesMap.keySet()
-                .stream()
-                .map(key -> namesToValuesMap.get(key))
-                .filter(value -> !value.isBlank())
-                .collect(Collectors.joining(" "));
-
-            if (name != null && !name.isBlank()) {
-                valueToPopulate.setName(name);
-                namesToValuesMap.clear();
-            }
+            SearchPartyValue valueToPopulate = populateSearchParty(searchParty, data, namesToValuesMap);
 
             if (!valueToPopulate.isEmpty()) {
                 searchPartyList.add(SearchParty
@@ -123,7 +102,7 @@ public class GlobalSearchProcessorService {
         return searchPartyList;
     }
 
-    private boolean isComplexField(String field, String key) {
+    private static boolean isComplexField(String field, String key) {
         return field.contains(".") && key.equals(field.split("\\.")[0]);
     }
 
@@ -133,70 +112,62 @@ public class GlobalSearchProcessorService {
         return nestedCaseFieldByPath != null ? nestedCaseFieldByPath.textValue() : null;
     }
 
-    private void populateSearchParty(uk.gov.hmcts.ccd.domain.model.definition.SearchParty searchPartyDefinition,
-                                            SearchPartyValue searchPartyValue,
-                                            String key,
-                                            JsonNode jsonNode) {
+    private SearchPartyValue populateSearchParty(
+        uk.gov.hmcts.ccd.domain.model.definition.SearchParty searchPartyDefinition,
+        Map<String, JsonNode> data,
+        Map<String, String> namesToValuesMap) {
+
+        SearchPartyValue searchPartyValue = new SearchPartyValue();
 
         if (searchPartyDefinition.getSearchPartyName() != null) {
 
             List<String> searchPartyNames = Arrays.asList(searchPartyDefinition.getSearchPartyName().split(","));
-            searchPartyNames.forEach(x -> namesToValuesMap.putIfAbsent(x, ""));
+            searchPartyNames.forEach(searchPartyName -> namesToValuesMap.putIfAbsent(searchPartyName, ""));
 
             searchPartyNames.forEach(currentSearchPartyName -> {
-                String searchPartyName = null;
-
-                if (isComplexField(currentSearchPartyName, key)) {
-                    searchPartyName = getNestedValue(jsonNode, currentSearchPartyName);
-                } else if (key.equals(currentSearchPartyName)) {
-                    searchPartyName = jsonNode.textValue();
-                }
+                String searchPartyName = findValueInMap(currentSearchPartyName, data);
 
                 if (searchPartyName != null) {
                     namesToValuesMap.replace(currentSearchPartyName, searchPartyName);
                 }
             });
-        }
 
-        if (searchPartyDefinition.getSearchPartyAddressLine1() != null) {
-            String searchPartyAddressLine = searchPartyDefinition.getSearchPartyAddressLine1();
+            String name = namesToValuesMap.keySet()
+                .stream()
+                .map(key -> namesToValuesMap.get(key))
+                .filter(value -> !value.isBlank())
+                .collect(Collectors.joining(" "));
 
-            if (isComplexField(searchPartyAddressLine, key)) {
-                searchPartyValue.setAddressLine1(getNestedValue(jsonNode, searchPartyAddressLine));
-            } else if (key.equals(searchPartyAddressLine)) {
-                searchPartyValue.setAddressLine1(jsonNode.textValue());
+            if (name != null && !name.isBlank()) {
+                searchPartyValue.setName(name);
+                namesToValuesMap.clear();
             }
         }
 
-        if (searchPartyDefinition.getSearchPartyEmailAddress() != null) {
-            String searchPartyEMailAddress = searchPartyDefinition.getSearchPartyEmailAddress();
+        searchPartyValue.setAddressLine1(findValueInMap(searchPartyDefinition.getSearchPartyAddressLine1(), data));
+        searchPartyValue.setEmailAddress(findValueInMap(searchPartyDefinition.getSearchPartyEmailAddress(), data));
+        searchPartyValue.setPostCode(findValueInMap(searchPartyDefinition.getSearchPartyPostCode(), data));
+        searchPartyValue.setDateOfBirth(findValueInMap(searchPartyDefinition.getSearchPartyDob(), data));
 
-            if (isComplexField(searchPartyEMailAddress, key)) {
-                searchPartyValue.setEmailAddress(getNestedValue(jsonNode, searchPartyEMailAddress));
-            } else if (key.equals(searchPartyEMailAddress)) {
-                searchPartyValue.setEmailAddress(jsonNode.textValue());
+        return searchPartyValue;
+    }
+
+    private String findValueInMap(String valueToFind, Map<String, JsonNode> mapToSearch) {
+        String returnValue = null;
+
+        if (valueToFind != null && mapToSearch != null) {
+            for (Map.Entry<String, JsonNode> entry : mapToSearch.entrySet()) {
+                if (isComplexField(valueToFind, entry.getKey())) {
+                    returnValue = getNestedValue(entry.getValue(), valueToFind);
+                    break;
+                } else if (entry.getKey().equals(valueToFind)) {
+                    returnValue = entry.getValue().textValue();
+                    break;
+                }
             }
         }
 
-        if (searchPartyDefinition.getSearchPartyPostCode() != null) {
-            String searchPartyPostCode = searchPartyDefinition.getSearchPartyPostCode();
-
-            if (isComplexField(searchPartyPostCode, key)) {
-                searchPartyValue.setPostCode(getNestedValue(jsonNode, searchPartyPostCode));
-            } else if (key.equals(searchPartyPostCode)) {
-                searchPartyValue.setPostCode(jsonNode.textValue());
-            }
-        }
-
-        if (searchPartyDefinition.getSearchPartyDob() != null) {
-            String searchPartyDob = searchPartyDefinition.getSearchPartyDob();
-
-            if (isComplexField(searchPartyDob, key)) {
-                searchPartyValue.setDateOfBirth(getNestedValue(jsonNode, searchPartyDob));
-            } else if (key.equals(searchPartyDob)) {
-                searchPartyValue.setDateOfBirth(jsonNode.textValue());
-            }
-        }
+        return returnValue;
     }
 
 }

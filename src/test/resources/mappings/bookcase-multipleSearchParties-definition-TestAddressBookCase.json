@@ -431,12 +431,12 @@
                 }
               },
               {
-                "id": "Postcode",
-                "label": "Postcode",
+                "id": "PostCode",
+                "label": "PostCode",
                 "security_classification": "PUBLIC",
                 "field_type": {
-                  "id": "Postcode",
-                  "type": "Postcode"
+                  "id": "PostCode",
+                  "type": "PostCode"
                 }
               },
               {

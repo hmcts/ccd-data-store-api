@@ -298,6 +298,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
             caseDetails,
             caseTypeDefinition,
             IGNORE_WARNING);
+        verify(globalSearchProcessorService).populateGlobalSearchData(any(CaseTypeDefinition.class), anyMap());
     }
 
     @Test
@@ -317,7 +318,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
         verify(userRepository).getUser(userToken);
         verify(userRepository).getUser();
-
+        verify(globalSearchProcessorService).populateGlobalSearchData(any(CaseTypeDefinition.class), anyMap());
         assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
         assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate())
             .isEqualTo(LAST_MODIFIED);
