@@ -1,0 +1,88 @@
+{
+  "_guid_": "S-139.2",
+  "_extends_": "F-139_Test_Data_Base",
+  "specs": [
+    "contains a CaseField with no R access",
+    "contains HTTP 200 Ok status code",
+    "does not contain the case field with no R CRUD access"
+  ],
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][S-139.2_CreateCase][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "responseCode" : 200,
+    "responseMessage" : "OK",
+    "headers" : {
+      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-view.v2+json;charset=UTF-8",
+      "Date" : "[[ANYTHING_PRESENT]]",
+      "Expires" : "0",
+      "Pragma" : "no-cache",
+      "Strict-Transport-Security" : "max-age=31536000 ; includeSubDomains",
+      "Transfer-Encoding" : "chunked",
+      "X-Content-Type-Options" : "nosniff",
+      "X-Frame-Options" : "DENY",
+      "X-Xss-Protection" : "1; mode=block"
+    },
+    "body": {
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "case_id": "${[scenarioContext][childContexts][S-139.2_CreateCase][testData][actualResponse][body][id]}",
+      "case_type": {
+        "id": "FT_CRUD",
+        "name": "FT- CRUD",
+        "description": "Case Type for testing CRUD",
+        "jurisdiction": {
+          "id": "BEFTA_MASTER",
+          "name": "BEFTA Master",
+          "description": "Content for the BEFTA Master Jurisdiction."
+        },
+        "printEnabled": false
+      },
+      "tabs": [
+        {
+          "id": "Data",
+          "label": "Data",
+          "order": 1,
+          "fields": [
+            {
+              "id": "TextField",
+              "label": "TextField",
+              "hidden": false,
+              "value": "value1",
+              "metadata": false,
+              "hint_text": null,
+              "field_type": "[[ANYTHING_PRESENT]]",
+              "validation_expr": null,
+              "security_label": "PUBLIC",
+              "order": 1,
+              "formatted_value": "value1",
+              "display_context": null,
+              "display_context_parameter": null,
+              "show_condition": null,
+              "show_summary_change_option": null,
+              "show_summary_content_option": null,
+              "retain_hidden_value": null,
+              "publish": null,
+              "publish_as": null,
+              "acls": "[[ANYTHING_PRESENT]]"
+            }
+          ],
+          "role": null,
+          "show_condition": null
+        }
+      ],
+      "metadataFields": "[[ANYTHING_PRESENT]]",
+      "state": "[[ANYTHING_PRESENT]]",
+      "triggers": "[[ANYTHING_PRESENT]]",
+      "events": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}
+
