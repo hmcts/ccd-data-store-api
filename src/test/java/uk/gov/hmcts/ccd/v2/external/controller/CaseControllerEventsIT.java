@@ -14,6 +14,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResource;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 
@@ -21,18 +23,28 @@ import javax.inject.Inject;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.createRoleAssignmentRecord;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.createRoleAssignmentResponse;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.emptyRoleAssignmentResponseJson;
 
 public class CaseControllerEventsIT extends WireMockBaseTest {
     private static final String GET_CASE_EVENTS = "/cases/1504259907353529/events";
     private static final String UID_NO_EVENT_ACCESS = "1234";
     private static final String UID_WITH_EVENT_ACCESS = "123";
+    private static final String UID_WITH_NO_EVENT_ACCESS = "1234";
+    private static final String ASSIGNMENT_1 = "assignment1";
+    private static final String CASE_ID_1 = "1504259907353529";
+    private static final String CASE_TYPE = "TestAddressBookNoEventAccessToCaseRole";
+    private static final String CASE_ROLE_1 = "[TEST-EVENT-ACCESS-ROLE]";
 
     private static final int NUMBER_OF_CASES = 1;
+    public static final String JURISDICTION = "PROBATE";
 
     @Inject
     private WebApplicationContext wac;
@@ -56,6 +68,9 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
     public void shouldNotReturnEventHistoryDataForCitizenWhoHasNoAccessToEvents() throws Exception {
 
         assertCaseDataResultSetSize();
+
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + UID_WITH_NO_EVENT_ACCESS))
+                .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200)));
 
         String userJson = "{\n"
             + "          \"sub\": \"Cloud.Strife@test.com\",\n"
@@ -92,6 +107,13 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_cases_event_access_case_roles.sql"})
     public void shouldReturnEventHistoryDataForCitizenWhoHasCaseRoleAccess() throws Exception {
+
+        stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + UID_WITH_EVENT_ACCESS))
+            .willReturn(okJson(defaultObjectMapper.writeValueAsString(
+                createRoleAssignmentResponse(
+                    singletonList(createRoleAssignmentRecord(ASSIGNMENT_1, CASE_ID_1, CASE_TYPE, JURISDICTION,
+                        "idam:" + CASE_ROLE_1, UID_WITH_EVENT_ACCESS, false)))))
+                .withStatus(200)));
 
         assertCaseDataResultSetSize();
 

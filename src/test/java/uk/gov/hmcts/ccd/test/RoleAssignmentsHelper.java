@@ -97,6 +97,16 @@ public class RoleAssignmentsHelper {
                                                                     String caseId,
                                                                     String roleName,
                                                                     String userId) {
+        return createRoleAssignmentRecord(id, caseId, null, null, roleName,userId, true);
+    }
+
+    public static RoleAssignmentResource createRoleAssignmentRecord(String id,
+                                                                    String caseId,
+                                                                    String caseType,
+                                                                    String jurisdiction,
+                                                                    String roleName,
+                                                                    String userId,
+                                                                    boolean localised) {
         return RoleAssignmentResource.builder()
             .id(id)
             .actorIdType(ActorIdType.IDAM.name())
@@ -111,7 +121,7 @@ public class RoleAssignmentsHelper {
             .endTime(END_TIME)
             .created(CREATED)
             .authorisations(Collections.emptyList())
-            .attributes(createRoleAssignmentRecordAttribute(caseId))
+            .attributes(createRoleAssignmentRecordAttribute(caseId, caseType, jurisdiction, localised))
             .build();
     }
 
@@ -130,7 +140,7 @@ public class RoleAssignmentsHelper {
             .endTime(END_TIME)
             .created(CREATED)
             .authorisations(Collections.emptyList())
-            .attributes(createRoleAssignmentRecordAttribute(caseId))
+            .attributes(createRoleAssignmentRecordAttribute(caseId, null, null, true))
             .build();
     }
 
@@ -141,13 +151,34 @@ public class RoleAssignmentsHelper {
             .build();
     }
 
+    private static RoleAssignmentAttributesResource createRoleAssignmentRecordAttribute(String caseId,
+                                                                                        String caseType,
+                                                                                        String jurisdiction,
+                                                                                        boolean localised) {
+        if (localised) {
+            return RoleAssignmentAttributesResource.builder()
+                .jurisdiction(Optional.of(jurisdiction == null ? "DIVORCE" : jurisdiction))
+                .caseId(Optional.of(caseId))
+                .caseType(Optional.of(caseType == null ? "FT_Tabs" : caseType))
+                .region(Optional.of("Hampshire"))
+                .location(Optional.of("Southampton"))
+                .contractType(Optional.of("SALARIED")) // SALARIED, FEEPAY
+                .build();
+        } else {
+            return RoleAssignmentAttributesResource.builder()
+                .jurisdiction(Optional.of(jurisdiction == null ? "DIVORCE" : jurisdiction))
+                .caseId(Optional.of(caseId))
+                .caseType(Optional.of(caseType == null ? "FT_Tabs" : caseType))
+                .contractType(Optional.of("SALARIED")) // SALARIED, FEEPAY
+                .build();
+        }
+    }
+
     private static RoleAssignmentAttributesResource createRoleAssignmentRecordAttribute(String caseId) {
         return RoleAssignmentAttributesResource.builder()
-            .jurisdiction(Optional.of("DIVORCE"))
+            .jurisdiction(Optional.of("PROBATE"))
             .caseId(Optional.of(caseId))
-            .caseType(Optional.of("FT_Tabs"))
-            .region(Optional.of("Hampshire"))
-            .location(Optional.of("Southampton"))
+            .caseType(Optional.of("TestAddressBookNoEventAccessToCaseRole"))
             .contractType(Optional.of("SALARIED")) // SALARIED, FEEPAY
             .build();
     }
