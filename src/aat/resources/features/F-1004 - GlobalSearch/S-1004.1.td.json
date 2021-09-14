@@ -5,8 +5,8 @@
 
 	"specs": [
 		"an active profile in CCD",
-		"uses the case-reference of the case just created",
-		"contains Last State Modified Date metadata field"
+		"contains a SearchCriteria",
+    "to create a full case"
 	],
 
 	"users": {
@@ -15,11 +15,30 @@
 		}
 	},
 
-	"request": {
-		"pathVariables": {
-			"cid": "${[scenarioContext][childContexts][S-1004.01_Case][testData][actualResponse][body][id]}"
-		}
-	},
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_GlobalSearch",
+      "cid": "${[scenarioContext][childContexts][S-1004.01_Case][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "_extends_": "Befta_Global_Search_Case_Data"
+      },
+      "event": {
+        "id": "CREATE",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][F-1004_1_Case_Data_Create_Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": false,
+      "draft_id": null
+    }
+  },
 
 	"expectedResponse": {
 		"_extends_": "Common_200_Response",
