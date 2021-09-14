@@ -1,5 +1,5 @@
 {
-  "_guid_": "CT1_GetToken",
+  "_guid_": "CT3J2_GetToken",
   "_extends_": "F-200_Base_GetToken",
 
   "request": {
@@ -8,7 +8,7 @@
       "experimental": "true"
     },
     "pathVariables": {
-      "ctid": "CT1",
+      "ctid": "CT3J2",
       "etid": "Create"
     }
   }

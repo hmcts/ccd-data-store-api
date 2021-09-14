@@ -1,0 +1,23 @@
+{
+  "_guid_": "S-200.1",
+  "_extends_": "S-200_Base",
+
+
+  "specs": [
+    "a role assignment without SC  for CaseType CT1 which is PRIVATE",
+    "attempts to create a case for CT1 with PRIVATE SC"
+  ],
+
+  "request" : {
+    "pathVariables": {
+      "ctid": "CT1"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body" : {
+      "path" : "/case-types/CT1/cases"
+    }
+  }
+}

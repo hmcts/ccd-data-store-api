@@ -1,0 +1,22 @@
+{
+  "_guid_": "S-200.6",
+  "_extends_": "S-200_Base",
+
+  "specs": [
+    "a read only role assignment for CaseType CT5",
+    "attempts to create a case for CT5 with readOnly"
+  ],
+
+  "request" : {
+    "pathVariables": {
+      "ctid": "CT5"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body" : {
+      "path" : "/case-types/CT5/cases"
+    }
+  }
+}

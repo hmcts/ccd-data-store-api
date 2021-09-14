@@ -1,26 +1,20 @@
 {
-  "_guid_": "S-200.3",
-
+  "_guid_": "S-200_Base",
   "productName": "CCD Data Store",
   "operationName": "create case",
   "method": "POST",
   "uri": "/case-types/{ctid}/cases",
 
-  "specs": [
-    "a role assignment with SC PUBLIC for CaseType CT1 which is PRIVATE",
-    "attempts to create a case for CT1"
-  ],
-
   "users" : {
     "invokingUser": {
       "username": "ccd.ac.solicitor1@gmail.com",
-      "password": "Pa55word11"
+      "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
     }
   },
 
   "request" : {
     "pathVariables": {
-      "ctid": "CT1"
+      "ctid": "[[DEFAULT_AUTO_VALUE]]"
     },
     "_extends_": "Common_Request",
     "headers": {
@@ -48,7 +42,7 @@
     "body" : {
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
       "message" : "No case type found",
-      "path" : "/case-types/CT1/cases",
+      "path" : "[[DEFAULT_AUTO_VALUE]]",
       "details" : null,
       "callbackErrors" : null,
       "callbackWarnings" : null
