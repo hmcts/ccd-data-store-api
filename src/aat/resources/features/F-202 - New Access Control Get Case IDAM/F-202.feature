@@ -1,4 +1,4 @@
-@F-202 @ra
+@F-202 @Ignore
 Feature: get case
 
   Background: Load test data for the scenario

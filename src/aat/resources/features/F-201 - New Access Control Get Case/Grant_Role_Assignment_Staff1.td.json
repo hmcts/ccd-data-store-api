@@ -1,5 +1,5 @@
 {
-  "_guid_" : "GRANT_CASE_ROLE_ASSIGNMENT_REGION",
+  "_guid_" : "GRANT_CASE_ROLE_ASSIGNMENT_STAFF1",
 
   "productName": "Role Assignment Service",
   "operationName": "post role assignment",
@@ -10,12 +10,12 @@
     "a role assignment to access CaseType CT2",
     "attempts to create a case for CT2",
     "to create a full case",
-    "to give user Solicitor1 a RESTRICTED CASE with region role assignment to view the previously created case"
+    "to give user Solicitor1 a PRIVATE CASE role assignment to view the previously created case"
   ],
 
   "users" : {
     "S1": {
-      "username": "ccd.ac.staff5@gmail.com",
+      "username": "ccd.ac.staff1@gmail.com",
       "password": "Pa55word11"
     }
   },
@@ -44,7 +44,6 @@
           "attributes" : {
             "jurisdiction" : "J1",
             "caseType" : "CT2",
-            "region": "England",
             "caseId" : "${[scenarioContext][parentContext][childContexts][F-201_CT2][testData][actualResponse][body][id]}"
           }
         }

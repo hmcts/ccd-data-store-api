@@ -59,7 +59,7 @@ Feature: get case
       Given a user with [restricted access to create a case J1-CT2-03]
       And a user with [PUBLIC SC ORGANISATION role assignment to view the case and only PUBLIC field F3]
       And a case that has just been created as in [F-201_CT2]
-      And a successful call [to give user Solicitor1 a PRIVATE CASE role assignment to view the previously created case] as in [GRANT_CASE_ROLE_ASSIGNMENT]
+      And a successful call [to give user Solicitor1 a PRIVATE CASE role assignment to view the previously created case] as in [GRANT_CASE_ROLE_ASSIGNMENT_SOLICITOR2]
       When a request is prepared with appropriate values
       And the request [attempts to get case J1-CT2-03
       And it is submitted to call the [retrieve a case by id] operation of [CCD Data Store]
@@ -73,7 +73,7 @@ Feature: get case
       Given a user with [restricted access to create a case J1-CT2-01]
       And a user with [PUBLIC SC ORGANISATION role assignment to view the case and only PUBLIC field F3]
       And a case that has just been created as in [F-201_CT2]
-      And a successful call [to give user Solicitor1 a PRIVATE CASE role assignment to view the previously created case] as in [GRANT_CASE_ROLE_ASSIGNMENT]
+      And a successful call [to give user Solicitor1 a PRIVATE CASE role assignment to view the previously created case] as in [GRANT_CASE_ROLE_ASSIGNMENT_SOLICITOR2]
       When a request is prepared with appropriate values
       And the request [attempts to get case J1-CT2-01]
       And it is submitted to call the [retrieve a case by id] operation of [CCD Data Store]
@@ -84,7 +84,7 @@ Feature: get case
     Scenario: There's a case role but it's got READONLY=N whereas  RoleToAccessProfiles has READONLY = Y
       Given a user with [restricted access to create a case J1-CT6-01]
       And a case that has just been created as in [F-201_CT2]
-      And a successful call [to give user Solicitor1 a PRIVATE CASE role assignment to view the previously created case] as in [GRANT_CASE_ROLE_ASSIGNMENT]
+      And a successful call [to give user Solicitor1 a PRIVATE CASE role assignment to view the previously created case] as in [GRANT_CASE_ROLE_ASSIGNMENT_SOLICITOR2]
       When a request is prepared with appropriate values
       And the request [attempts to get case J1-CT6-01]
       And it is submitted to call the [retrieve a case by id] operation of [CCD Data Store]
@@ -97,7 +97,7 @@ Feature: get case
       Given a user with [restricted access to create a case J1-CT2-04]
       And a user with [PRIVATE SC ORGANISATION role assignment to view the case and fields F2 and F3]
       And a case that has just been created as in [F-201_CT2]
-      And a successful call [to give user Solicitor1 a PRIVATE CASE role assignment to view the previously created case] as in [GRANT_CASE_ROLE_ASSIGNMENT]
+      And a successful call [to give user Solicitor1 a PRIVATE CASE role assignment to view the previously created case] as in [GRANT_CASE_ROLE_ASSIGNMENT_STAFF1]
       When a request is prepared with appropriate values
       And the request [attempts to get case J1-CT2-04]
       And it is submitted to call the [retrieve a case by id] operation of [CCD Data Store]
@@ -268,7 +268,7 @@ Feature: get case
       Given a user with [restricted access to create a case J1-CT2-01]
       And a user with [PUBLIC SC ORGANISATION role assignment to view the case and fields]
       And a case that has just been created as in [F-201_CT1]
-      And a successful call [to give user Solicitor1 a PUBLIC CASE role assignment to view the previously created case] as in [GRANT_CASE_ROLE_ASSIGNMENT_PUBLIC]
+      And a successful call [to give user Solicitor1 a PUBLIC CASE role assignment to view the previously created case] as in [GRANT_CASE_ROLE_ASSIGNMENT_PUBLIC_OTHER]
       When a request is prepared with appropriate values
       And the request [attempts to get case J1-CT2-01]
       And it is submitted to call the [retrieve a case by id] operation of [CCD Data Store]
