@@ -225,6 +225,11 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(fixedClock.instant()).when(clock).instant();
         doReturn(fixedClock.getZone()).when(clock).getZone();
 
+        Map<String, JsonNode> clonedData = new HashMap<>(caseDetails.getData());
+        clonedData.putAll(dataUpdate);
+        doReturn(clonedData).when(globalSearchProcessorService)
+            .populateGlobalSearchData(any(CaseTypeDefinition.class), anyMap());
+
         // WHEN
         final CaseDetails updatedCaseDetails = underTest.mergeUpdatedFieldsToCaseDetails(
             emptyMap(),

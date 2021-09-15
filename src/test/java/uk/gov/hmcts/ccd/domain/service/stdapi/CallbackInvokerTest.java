@@ -476,15 +476,14 @@ class CallbackInvokerTest {
                     null,
                     caseDetails,
                     false)).thenReturn(Optional.of(callbackResponse));
-                when(globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition,
-                    callbackResponse.getData())).thenReturn(data);
 
                 callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, TRUE);
 
                 assertAll(
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
                     () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
-                    () -> inOrder.verify(globalSearchProcessorService).populateGlobalSearchData(caseTypeDefinition,
+                    () -> inOrder.verify(globalSearchProcessorService, never())
+                        .populateGlobalSearchData(caseTypeDefinition,
                         callbackResponse.getData()),
                     () -> inOrder.verify(caseSanitiser).sanitise(caseTypeDefinition, callbackResponse.getData()),
                     () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseTypeDefinition,
@@ -787,8 +786,6 @@ class CallbackInvokerTest {
                     caseDetailsBefore,
                     caseDetails,
                     false)).thenReturn(Optional.of(callbackResponse));
-                when(globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition,
-                    callbackResponse.getData())).thenReturn(data);
 
                 callbackInvoker.invokeMidEventCallback(wizardPage,
                     caseTypeDefinition,
@@ -800,7 +797,8 @@ class CallbackInvokerTest {
                 assertAll(
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, FALSE),
                     () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
-                    () -> inOrder.verify(globalSearchProcessorService).populateGlobalSearchData(caseTypeDefinition,
+                    () -> inOrder.verify(globalSearchProcessorService, never())
+                        .populateGlobalSearchData(caseTypeDefinition,
                         callbackResponse.getData()),
                     () -> inOrder.verify(caseSanitiser).sanitise(caseTypeDefinition, callbackResponse.getData()),
                     () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseTypeDefinition,

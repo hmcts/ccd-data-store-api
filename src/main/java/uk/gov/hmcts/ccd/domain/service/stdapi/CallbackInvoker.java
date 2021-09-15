@@ -35,6 +35,8 @@ import static uk.gov.hmcts.ccd.domain.service.validate.ValidateSignificantDocume
 public class CallbackInvoker {
 
     private static final HashMap<String, JsonNode> EMPTY_DATA_CLASSIFICATION = Maps.newHashMap();
+    private static final boolean POPULATE_GLOBAL_SEARCH_DATA_ENABLED = true;
+    private static final boolean POPULATE_GLOBAL_SEARCH_DATA_DISABLED = false;
 
     private final CallbackService callbackService;
     private final CaseTypeService caseTypeService;
@@ -152,7 +154,8 @@ public class CallbackInvoker {
 
             callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
             if (callbackResponse.getData() != null) {
-                validateAndSetData(caseTypeDefinition, caseDetails, callbackResponse.getData());
+                validateAndSetData(caseTypeDefinition, caseDetails, callbackResponse.getData(),
+                    POPULATE_GLOBAL_SEARCH_DATA_DISABLED);
             }
         }
 
@@ -170,7 +173,8 @@ public class CallbackInvoker {
         callbackService.validateCallbackErrorsAndWarnings(callbackResponse, ignoreWarning);
 
         if (callbackResponse.getData() != null) {
-            validateAndSetData(caseTypeDefinition, caseDetails, callbackResponse.getData());
+            validateAndSetData(caseTypeDefinition, caseDetails, callbackResponse.getData(),
+                POPULATE_GLOBAL_SEARCH_DATA_DISABLED);
         }
     }
 
@@ -191,7 +195,8 @@ public class CallbackInvoker {
             caseDetails.setState(callbackResponse.getState());
         }
         if (callbackResponse.getData() != null) {
-            validateAndSetData(caseTypeDefinition, caseDetails, callbackResponse.getData());
+            validateAndSetData(caseTypeDefinition, caseDetails, callbackResponse.getData(),
+                POPULATE_GLOBAL_SEARCH_DATA_ENABLED);
             if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
                 securityValidationService.setClassificationFromCallbackIfValid(
                     callbackResponse,
@@ -220,10 +225,18 @@ public class CallbackInvoker {
 
     private void validateAndSetData(final CaseTypeDefinition caseTypeDefinition,
                                     final CaseDetails caseDetails,
-                                    final Map<String, JsonNode> responseData) {
+                                    final Map<String, JsonNode> responseData,
+                                    final boolean populateGlobalSearch) {
         caseTypeService.validateData(responseData, caseTypeDefinition);
-        caseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition,
-            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, responseData)));
+
+        Map<String, JsonNode> responseDataToSanitise = responseData;
+
+        if (populateGlobalSearch) {
+            responseDataToSanitise =
+                globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, responseData);
+        }
+
+        caseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition, responseDataToSanitise));
         deduceDataClassificationForNewFields(caseTypeDefinition, caseDetails);
     }
 
