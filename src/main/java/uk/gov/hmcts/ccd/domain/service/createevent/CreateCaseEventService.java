@@ -156,8 +156,6 @@ public class CreateCaseEventService {
         content.setData(fieldProcessorService.processData(content.getData(), caseTypeDefinition, caseEventDefinition));
         final String oldState = caseDetails.getState();
 
-        content.setData(globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, content.getData()));
-
         // Logic start from here to attach document with case ID
         final CaseDetails updatedCaseDetails = mergeUpdatedFieldsToCaseDetails(
             content.getData(),
@@ -299,7 +297,8 @@ public class CreateCaseEventService {
                 final Map<String, JsonNode> caseData = new HashMap<>(Optional.ofNullable(caseDetails.getData())
                     .orElse(emptyMap()));
                 caseData.putAll(sanitisedData);
-                clonedCaseDetails.setData(caseData);
+                clonedCaseDetails.setData(globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition,
+                    caseData));
 
                 final Map<String, JsonNode> dataClassifications = caseDataService.getDefaultSecurityClassifications(
                     caseTypeDefinition,
