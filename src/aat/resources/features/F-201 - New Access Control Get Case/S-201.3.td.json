@@ -10,7 +10,7 @@
   "users": {
     "S1": {
       "username": "ccd.ac.solicitor1@gmail.com",
-      "password": "Pa55word11"
+      "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
     },
     "invokingUser": {
       "username": "ccd.ac.solicitor1@gmail.com",
@@ -56,12 +56,9 @@
       "state" : "Unissued1",
       "security_classification" : "PUBLIC",
       "data" : {
-        "F2" : "b",
         "F3" : "c"
       },
       "data_classification" : {
-        "F1" : "RESTRICTED",
-        "F2" : "PRIVATE",
         "F3" : "PUBLIC"
       },
       "after_submit_callback_response" : null,

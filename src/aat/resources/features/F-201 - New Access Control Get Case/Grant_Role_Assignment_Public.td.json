@@ -7,8 +7,8 @@
   "uri": "http://localhost:4096/am/role-assignments",
 
   "specs": [
-    "a role assignment to access CaseType CT2",
-    "attempts to create a case for CT2",
+    "a role assignment to access CaseType CT1",
+    "attempts to create a case for CT1",
     "to create a full case",
     "to give user Solicitor1 a PUBLIC CASE role assignment to view the previously created case"
   ],
@@ -16,7 +16,7 @@
   "users" : {
     "S1": {
       "username": "ccd.ac.staff3@gmail.com",
-      "password": "Pa55word11"
+      "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
     }
   },
 
@@ -43,8 +43,8 @@
           "endTime" : "2023-01-01T00:00:00Z",
           "attributes" : {
             "jurisdiction" : "J1",
-            "caseType" : "CT2",
-            "caseId" : "${[scenarioContext][parentContext][childContexts][F-201_CT2][testData][actualResponse][body][id]}"
+            "caseType" : "CT1",
+            "caseId" : "${[scenarioContext][parentContext][childContexts][F-201_CT1][testData][actualResponse][body][id]}"
           }
         }
       ]

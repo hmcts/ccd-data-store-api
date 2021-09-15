@@ -16,7 +16,7 @@
   "users" : {
     "S1": {
       "username": "ccd.ac.staff8@gmail.com",
-      "password": "Pa55word11"
+      "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
     }
   },
 

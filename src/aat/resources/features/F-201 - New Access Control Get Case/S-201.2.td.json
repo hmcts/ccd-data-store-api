@@ -14,10 +14,10 @@
   },
 
   "specs" : [
-    "SUPERUSER who has restricted access to create a case J1-CT2-01",
-    "restricted access to create a case J1-CT1-02",
+    "SUPERUSER who has restricted access to create a case J1-CT1-01",
+    "restricted access to create a case J1-CT1-01",
     "PUBLIC SC ORGANISATION role assignment has insufficient SC for Case Type",
-    "attempts to get case J1-CT2-01"
+    "attempts to get case J1-CT1-01"
   ],
 
   "request": {

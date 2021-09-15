@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-201_CT2",
+  "_guid_": "F-201_CT6",
 
   "productName": "CCD Data Store",
   "operationName": "create case",
@@ -7,8 +7,8 @@
   "uri": "/case-types/{ctid}/cases",
 
   "specs": [
-    "a role assignment to access CaseType CT2",
-    "attempts to create a case for CT2",
+    "a role assignment to access CaseType CT6",
+    "attempts to create a case for CT6",
     "to create a full case"
   ],
 
@@ -21,7 +21,7 @@
 
   "request" : {
     "pathVariables": {
-      "ctid": "CT2"
+      "ctid": "CT6"
     },
     "_extends_": "Common_Request",
     "headers": {
@@ -39,7 +39,7 @@
         "summary": "",
         "description": ""
       },
-      "event_token": "${[scenarioContext][parentContext][childContexts][F-201_CT2_Token_Creation][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][parentContext][childContexts][F-201_CT6_Token_Creation][testData][actualResponse][body][token]}",
       "ignore_warning": false,
       "draft_id": null
     }
@@ -55,7 +55,7 @@
       },
       "id" : "[[ANYTHING_PRESENT]]",
       "jurisdiction" : "J1",
-      "case_type" : "CT2",
+      "case_type" : "CT6",
       "created_on" : "[[ANYTHING_PRESENT]]",
       "last_modified_on" : "[[ANYTHING_PRESENT]]",
       "last_state_modified_on" : "[[ANYTHING_PRESENT]]",

@@ -10,7 +10,7 @@
   "users": {
     "S1": {
       "username": "ccd.ac.staff8@gmail.com",
-      "password": "Pa55word11"
+      "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
     },
     "invokingUser": {
       "username": "ccd.ac.staff8@gmail.com",
@@ -18,10 +18,10 @@
   },
 
   "specs" : [
-    "SUPERUSER who has restricted access to create a case J1-CT2-08",
-    "restricted access to create a case J1-CT2-08",
+    "SUPERUSER who has restricted access to create a case J1-CT2-06",
+    "restricted access to create a case J1-CT2-06",
     "RESTRICTED SC ORGANISATION role assignment to view the case and fields F2, F3 and F4",
-    "attempts to get case J1-CT2-08"
+    "attempts to get case J1-CT2-06"
   ],
 
   "request": {

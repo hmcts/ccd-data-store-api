@@ -10,7 +10,7 @@
   "users": {
     "S1": {
       "username": "ccd.ac.staff5@gmail.com",
-      "password": "Pa55word11"
+      "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
     },
     "invokingUser": {
       "username": "ccd.ac.staff5@gmail.com",
