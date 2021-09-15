@@ -187,8 +187,9 @@ class CaseControllerTest {
             LocalDateTime stateModified = LocalDateTime.now();
             when(caseDetails.getLastStateModifiedDate()).thenReturn(stateModified);
 
-            final ResponseEntity<CaseResource> response =
-                caseController.createCase(CASE_TYPE_ID, CASE_DATA_CONTENT, IGNORE_WARNING);
+            final ResponseEntity<CaseResource> response = caseController.createCase(CASE_TYPE_ID,
+                                                                                    CASE_DATA_CONTENT,
+                                                                                    IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.CREATED)),

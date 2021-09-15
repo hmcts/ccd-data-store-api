@@ -30,6 +30,8 @@ import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentCategoryService;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -96,6 +98,9 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     @Mock
     protected Authentication authentication;
 
+    @Inject
+    protected RoleAssignmentCategoryService roleAssignmentCategoryService;
+
     @Mock
     protected SecurityContext securityContext;
 
@@ -146,6 +151,17 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             + "        }";
         stubFor(WireMock.get(urlMatching("/o/userinfo"))
             .willReturn(okJson(userJson).withStatus(200)));
+
+
+        String uidNoEventAccess = "1234";
+        UserInfo userInfo = UserInfo.builder()
+            .uid(uidNoEventAccess)
+            .roles(Lists.newArrayList(MockUtils.ROLE_CASEWORKER_PUBLIC))
+            .build();
+        stubFor(WireMock.post(urlMatching("/o/token"))
+            .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
+        stubFor(WireMock.get(urlMatching("/api/v1/users/.*"))
+            .willReturn(okJson(mapper.writeValueAsString(userInfo)).withStatus(200)));
     }
 
     protected HttpHeaders createHttpHeaders() {
