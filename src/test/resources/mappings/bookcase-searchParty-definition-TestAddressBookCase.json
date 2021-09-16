@@ -766,8 +766,8 @@
                         "label": "DateOfBirth",
                         "hint_text": null,
                         "field_type": {
-                          "id": "DateTime",
-                          "type": "DateTime",
+                          "id": "Date",
+                          "type": "Date",
                           "min": null,
                           "max": null,
                           "regular_expression": null,

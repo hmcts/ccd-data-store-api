@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class GlobalSearchTestFixture {
 
-    private static final String TEST_FIELD_VALUE = "2012-04-21T00:00:00.000";
+    private static final String TEST_FIELD_VALUE = "2012-04-21";
     private static final String FIRST_NAME_VALUE = "MyFirstName";
     private static final String LAST_NAME_VALUE = "MyLastName";
     private static final String ADDRESS_LINE_1 = "My Street Address";

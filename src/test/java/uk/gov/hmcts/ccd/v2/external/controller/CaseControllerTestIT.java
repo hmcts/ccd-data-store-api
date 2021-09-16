@@ -284,7 +284,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         final String description = "A very long comment.......";
         final String summary = "Short comment";
 
-        final String testFieldValue = "2012-04-21T00:00:00.000";
+        final String testFieldValue = "2012-04-21";
         final String firstNameValue = "MyFirstName";
         final String lastNameValue = "MyLastName";
         final String addressLine1 = "My Street Address";
@@ -365,7 +365,8 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         triggeringEvent.setDescription(description);
         triggeringEvent.setSummary(summary);
         caseDetailsToSave.setEvent(triggeringEvent);
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_WITH_SEARCH_PARTY, TEST_EVENT_ID);
+        final String token = generateEventTokenNewCase(UID, JURISDICTION,
+            CASE_TYPE_WITH_MULTIPLE_SEARCH_CRITERIA_AND_SEARCH_PARTY, TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
