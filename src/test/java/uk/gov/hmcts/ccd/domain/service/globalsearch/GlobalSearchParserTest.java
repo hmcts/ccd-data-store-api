@@ -1,23 +1,31 @@
 package uk.gov.hmcts.ccd.domain.service.globalsearch;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.global.Party;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
-import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteriaResponse;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;
@@ -28,13 +36,14 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.TEXT;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.AccessControlListBuilder.anAcl;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseTypeBuilder.newCaseType;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.FieldTypeBuilder.aFieldType;
 
 class GlobalSearchParserTest {
 
-
+    protected static final ObjectMapper mapper = JacksonUtils.MAPPER;
     private static final String ROLE_IN_USER_ROLES = "caseworker-probate-loa1";
     private static final String ROLE_IN_USER_ROLES_2 = "caseworker-divorce-loa";
     private static final String ROLE_IN_USER_ROLE_1 = "Role 1";
@@ -48,22 +57,24 @@ class GlobalSearchParserTest {
     private static final String CASE_FIELD_2 = "Case field 2";
     private static final String CASE_FIELD_3 = "Case field 3";
     private static final String TEXT_TYPE = "Text";
+    private CaseDetails caseDetails;
+    private CaseDetails caseDetails2;
+    private JurisdictionDefinition jurisdiction;
+    private List<String> validFields;
+    private List<Party> parties;
 
     @Mock
     private UserRepository userRepository;
     @Mock
     private CaseTypeService caseTypeService;
-
-    private JurisdictionDefinition jurisdiction;
-    private List<String> validFields;
-    private List<Party> parties;
+    @Mock
+    private SecurityClassificationService securityClassificationService;
 
     private GlobalSearchParser globalSearchParser;
 
-
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         validFields = List.of("ValidEntry", "ValidEntryTwo");
         Party party = new Party();
         party.setPartyName("name");
@@ -72,7 +83,6 @@ class GlobalSearchParserTest {
 
         jurisdiction = new JurisdictionDefinition();
         jurisdiction.setId(JURISDICTION);
-
 
         CaseTypeDefinition caseTypeDefinition1 = newCaseType()
             .withCaseTypeId(CASE_TYPE_ID_1)
@@ -187,24 +197,33 @@ class GlobalSearchParserTest {
         when(caseTypeService.getCaseType(CASE_TYPE_ID_2)).thenReturn(caseTypeDefinition2);
         when(caseTypeService.getCaseType(CASE_TYPE_ID_3)).thenReturn(caseTypeDefinition3);
 
-        globalSearchParser = new GlobalSearchParser(userRepository, caseTypeService);
+        globalSearchParser = new GlobalSearchParser(userRepository, caseTypeService, securityClassificationService);
     }
 
     @Test
-    void shouldNotFilterAnyResults() {
+    void shouldNotFilterAnyResults() throws JsonProcessingException {
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setCaseManagementBaseLocationIds(validFields);
         searchCriteria.setCaseManagementRegionIds(validFields);
 
-        SearchCriteriaResponse searchCriteriaResponse = new SearchCriteriaResponse();
-        searchCriteriaResponse.setCaseTypeId(CASE_TYPE_ID_1);
-        searchCriteriaResponse.setBaseLocation(CASE_TYPE_ID_1);
-        searchCriteriaResponse.setRegion(CASE_TYPE_ID_1);
+        doReturn(Optional.ofNullable(SecurityClassification.PUBLIC)).when(securityClassificationService)
+            .getUserClassification(JURISDICTION);
 
-        List<SearchCriteriaResponse> response =
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("CaseLocation", mapper.readTree("{\n"
+            + "      \"region\": \"valueOne\",\n"
+            + "       \"baseLocation\": \"valueThree\"\n"
+            + "  }"));
+        caseDetails = newCaseDetails()
+            .withCaseTypeId(CASE_TYPE_ID_1)
+            .withJurisdiction(JURISDICTION)
+            .withData(data)
+            .withSecurityClassification(SecurityClassification.PUBLIC).build();
+
+        List<CaseDetails> response =
             globalSearchParser
-                .filterCases(new java.util.ArrayList<>(java.util.Arrays.asList(searchCriteriaResponse)),
-                    searchCriteria);
+                .filterCases(new java.util.ArrayList<>(java.util.Arrays.asList(caseDetails)), searchCriteria);
 
         assertAll(
             () -> assertThat(response.size(), Is.is(1))
@@ -213,24 +232,34 @@ class GlobalSearchParserTest {
     }
 
     @Test
-    void shouldFilterResultsWhenFieldDoesNotHaveReadPermission() {
+    void shouldFilterResultsWhenFieldDoesNotHaveReadPermission() throws JsonProcessingException {
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setCaseManagementBaseLocationIds(validFields);
         searchCriteria.setCaseManagementRegionIds(validFields);
 
-        SearchCriteriaResponse searchCriteriaResponse = new SearchCriteriaResponse();
-        searchCriteriaResponse.setCaseTypeId(CASE_TYPE_ID_1);
-        searchCriteriaResponse.setBaseLocation(CASE_TYPE_ID_1);
-        searchCriteriaResponse.setRegion(CASE_TYPE_ID_1);
+        doReturn(Optional.ofNullable(SecurityClassification.PUBLIC)).when(securityClassificationService)
+            .getUserClassification(JURISDICTION);
 
-        SearchCriteriaResponse searchCriteriaResponse2 = new SearchCriteriaResponse();
-        searchCriteriaResponse2.setCaseTypeId(CASE_TYPE_ID_2);
-        searchCriteriaResponse2.setBaseLocation(CASE_TYPE_ID_2);
-        searchCriteriaResponse2.setRegion(CASE_TYPE_ID_2);
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("CaseLocation", mapper.readTree("{\n"
+            + "      \"region\": \"valueOne\",\n"
+            + "       \"baseLocation\": \"valueThree\"\n"
+            + "  }"));
+        caseDetails = newCaseDetails()
+            .withCaseTypeId(CASE_TYPE_ID_1)
+            .withJurisdiction(JURISDICTION)
+            .withData(data)
+            .withSecurityClassification(SecurityClassification.PUBLIC).build();
 
-        List<SearchCriteriaResponse> response =
-            globalSearchParser.filterCases(new java.util.ArrayList<>(java.util.Arrays.asList(searchCriteriaResponse,
-                searchCriteriaResponse2)), searchCriteria);
+        caseDetails2 = newCaseDetails()
+            .withCaseTypeId(CASE_TYPE_ID_2)
+            .withJurisdiction(JURISDICTION)
+            .withData(data)
+            .withSecurityClassification(SecurityClassification.PUBLIC).build();
+
+        List<CaseDetails> response =
+            globalSearchParser.filterCases(new java.util.ArrayList<>(java.util.Arrays.asList(caseDetails, caseDetails2)), searchCriteria);
 
         assertAll(
             () -> assertThat(response.size(), Is.is(1))
@@ -239,24 +268,34 @@ class GlobalSearchParserTest {
     }
 
     @Test
-    void shouldFilterResultsWhenFieldIsRestricted() {
+    void shouldFilterResultsWhenFieldIsRestricted() throws JsonProcessingException {
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setCaseManagementBaseLocationIds(validFields);
         searchCriteria.setCaseManagementRegionIds(validFields);
 
-        SearchCriteriaResponse searchCriteriaResponse = new SearchCriteriaResponse();
-        searchCriteriaResponse.setCaseTypeId(CASE_TYPE_ID_1);
-        searchCriteriaResponse.setBaseLocation(CASE_TYPE_ID_1);
-        searchCriteriaResponse.setRegion(CASE_TYPE_ID_1);
+        doReturn(Optional.ofNullable(SecurityClassification.PUBLIC)).when(securityClassificationService)
+            .getUserClassification(JURISDICTION);
 
-        SearchCriteriaResponse searchCriteriaResponse2 = new SearchCriteriaResponse();
-        searchCriteriaResponse2.setCaseTypeId(CASE_TYPE_ID_3);
-        searchCriteriaResponse2.setBaseLocation(CASE_TYPE_ID_3);
-        searchCriteriaResponse2.setRegion(CASE_TYPE_ID_3);
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("CaseLocation", mapper.readTree("{\n"
+            + "      \"region\": \"valueOne\",\n"
+            + "       \"baseLocation\": \"valueThree\"\n"
+            + "  }"));
+        caseDetails = newCaseDetails()
+            .withCaseTypeId(CASE_TYPE_ID_1)
+            .withJurisdiction(JURISDICTION)
+            .withData(data)
+            .withSecurityClassification(SecurityClassification.PUBLIC).build();
 
-        List<SearchCriteriaResponse> response =
-            globalSearchParser.filterCases(new java.util.ArrayList<>(java.util.Arrays.asList(searchCriteriaResponse,
-                searchCriteriaResponse2)), searchCriteria);
+        caseDetails2 = newCaseDetails()
+            .withCaseTypeId(CASE_TYPE_ID_3)
+            .withJurisdiction(JURISDICTION)
+            .withData(data)
+            .withSecurityClassification(SecurityClassification.RESTRICTED).build();
+
+        List<CaseDetails> response =
+            globalSearchParser.filterCases(new java.util.ArrayList<>(java.util.Arrays.asList(caseDetails, caseDetails2)), searchCriteria);
 
         assertAll(
             () -> assertThat(response.size(), Is.is(1))
@@ -265,26 +304,31 @@ class GlobalSearchParserTest {
     }
 
     @Test
-    void shouldFilterResultsWhenRequestIncludesPartiesAndOtherReferences() {
+    void shouldFilterResultsWhenRequestIncludesPartiesAndOtherReferences() throws JsonProcessingException {
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setParties(parties);
         searchCriteria.setOtherReferences(validFields);
 
-        SearchCriteriaResponse searchCriteriaResponse = new SearchCriteriaResponse();
-        searchCriteriaResponse.setCaseTypeId(CASE_TYPE_ID_1);
-        searchCriteriaResponse.setBaseLocation(CASE_TYPE_ID_1);
-        searchCriteriaResponse.setRegion(CASE_TYPE_ID_1);
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("searchCriteria", mapper.readTree("{\n"
+            + "      \"OtherCaseReferences\": \"valueOne\",\n"
+            + "       \"SearchParties\": \"valueThree\"\n"
+            + "  }"));
+        caseDetails = newCaseDetails()
+            .withCaseTypeId(CASE_TYPE_ID_1)
+            .withJurisdiction(JURISDICTION)
+            .withData(data)
+            .withSecurityClassification(SecurityClassification.PUBLIC).build();
 
-        SearchCriteriaResponse searchCriteriaResponse2 = new SearchCriteriaResponse();
-        searchCriteriaResponse2.setCaseTypeId(CASE_TYPE_ID_3);
-        searchCriteriaResponse2.setBaseLocation(CASE_TYPE_ID_3);
-        searchCriteriaResponse2.setRegion(CASE_TYPE_ID_3);
-        searchCriteriaResponse2.setOtherCaseReferences(List.of(CASE_TYPE_ID_3));
-        searchCriteriaResponse2.setSearchParties(parties);
+        caseDetails2 = newCaseDetails()
+            .withCaseTypeId(CASE_TYPE_ID_3)
+            .withJurisdiction(JURISDICTION)
+            .withData(data)
+            .withSecurityClassification(SecurityClassification.PUBLIC).build();
 
-        List<SearchCriteriaResponse> response =
-            globalSearchParser.filterCases(new java.util.ArrayList<>(java.util.Arrays.asList(searchCriteriaResponse,
-                searchCriteriaResponse2)), searchCriteria);
+        List<CaseDetails> response =
+            globalSearchParser.filterCases(new java.util.ArrayList<>(java.util.Arrays.asList(caseDetails, caseDetails2)), searchCriteria);
 
         assertAll(
             () -> assertThat(response.size(), Is.is(1))
@@ -298,8 +342,8 @@ class GlobalSearchParserTest {
         searchCriteria.setParties(parties);
         searchCriteria.setOtherReferences(validFields);
 
-        List<SearchCriteriaResponse> response =
-            globalSearchParser.filterCases(new java.util.ArrayList<>(Collections.emptyList()), searchCriteria);
+        List<CaseDetails> response =
+            globalSearchParser.filterCases(Collections.emptyList(), searchCriteria);
 
         assertAll(
             () -> assertThat(response.size(), Is.is(0))

@@ -35,4 +35,27 @@ public class SearchCriteria {
     @ValidPartiesItems
     @Valid
     private List<Party> parties;
+
+    public enum SearchCriteriaEnum {
+        REGION("caseManagementRegionIds", "CaseLocation.region"),
+        BASE_LOCATION("caseManagementBaseLocationIds", "CaseLocation.baseLocation"),
+        PARTIES("parties", "SearchCriteria.SearchParties"),
+        OTHER_CASE_REFERENCES("otherReferences", "SearchCriteria.OtherCaseReferences");
+
+        private final String searchCriteriaField;
+        private final String ccdField;
+
+        SearchCriteriaEnum(String searchCriteriaField, String ccdField) {
+            this.searchCriteriaField = searchCriteriaField;
+            this.ccdField = ccdField;
+        }
+
+        public String getSearchCriteriaField() {
+            return searchCriteriaField;
+        }
+
+        public String getCcdField() {
+            return ccdField;
+        }
+    }
 }

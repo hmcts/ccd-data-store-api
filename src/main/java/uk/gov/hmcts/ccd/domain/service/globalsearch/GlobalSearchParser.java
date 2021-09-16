@@ -7,12 +7,13 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
-import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteriaResponse;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,34 +28,43 @@ public class GlobalSearchParser {
     private static final String FIELD_SEPARATOR = ".";
     private final UserRepository userRepository;
     private final CaseTypeService caseTypeService;
+    private final SecurityClassificationService securityClassificationService;
 
     @Autowired
     public GlobalSearchParser(@Qualifier(CachedUserRepository.QUALIFIER)
                                   UserRepository userRepository,
-                              CaseTypeService caseTypeService) {
+                              CaseTypeService caseTypeService,
+                              SecurityClassificationService securityClassificationService) {
         this.userRepository = userRepository;
         this.caseTypeService = caseTypeService;
+        this.securityClassificationService = securityClassificationService;
     }
 
-    public List<SearchCriteriaResponse> filterCases(List<SearchCriteriaResponse> results, SearchCriteria request) {
+    public List<CaseDetails> filterCases(List<CaseDetails> results, SearchCriteria request) {
         List<String> fields = findFieldsToFilter(request);
-        results.removeIf(searchCriteria -> !authorised(fields, searchCriteria));
+        results.removeIf(caseDetails -> !authorised(fields, caseDetails));
 
         return results;
     }
 
-    private boolean authorised(List<String> fields, SearchCriteriaResponse searchCriteria) {
-        CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(searchCriteria.getCaseTypeId());
+    private boolean authorised(List<String> fields, CaseDetails caseDetails) {
+        CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseDetails.getCaseTypeId());
         boolean condition = true;
+        Optional<SecurityClassification> userClassificationOpt =
+            securityClassificationService.getUserClassification(caseDetails.getJurisdiction());
         for (String field : fields) {
             Optional<CaseFieldDefinition> caseFieldDefinition =
                 (field.contains(FIELD_SEPARATOR)) ? caseTypeDefinition.getComplexSubfieldDefinitionByPath(field)
                     : caseTypeDefinition.getCaseField(field);
             if (caseFieldDefinition.isPresent() && (!AccessControlService
                 .hasAccessControlList(userRepository.getUserRoles(), CAN_READ,
-                    caseFieldDefinition.get().getAccessControlLists())
-                || caseFieldDefinition.get()
-                .getSecurityLabel().equalsIgnoreCase(SecurityClassification.RESTRICTED.name()))) {
+                    caseFieldDefinition.get().getAccessControlLists()))){
+                condition = false;
+                break;
+            }
+            else if (!securityClassificationService
+                .userHasEnoughSecurityClassificationForField(caseTypeDefinition.getJurisdictionId(),
+                    caseTypeDefinition, caseFieldDefinition.get().getId())) {
                 condition = false;
                 break;
             }
@@ -66,16 +76,16 @@ public class GlobalSearchParser {
     private List<String> findFieldsToFilter(SearchCriteria request) {
         List<String> fields = new ArrayList<>();
         if (request.getCaseManagementBaseLocationIds() != null) {
-            fields.add(SearchCriteriaResponse.SearchCriteriaEnum.BASE_LOCATION.getCcdField());
+            fields.add(SearchCriteria.SearchCriteriaEnum.BASE_LOCATION.getCcdField());
         }
         if (request.getCaseManagementRegionIds() != null) {
-            fields.add(SearchCriteriaResponse.SearchCriteriaEnum.REGION.getCcdField());
+            fields.add(SearchCriteria.SearchCriteriaEnum.REGION.getCcdField());
         }
         if (request.getParties() != null) {
-            fields.add(SearchCriteriaResponse.SearchCriteriaEnum.PARTIES.getCcdField());
+            fields.add(SearchCriteria.SearchCriteriaEnum.PARTIES.getCcdField());
         }
         if (request.getOtherReferences() != null) {
-            fields.add(SearchCriteriaResponse.SearchCriteriaEnum.OTHER_CASE_REFERENCES.getCcdField());
+            fields.add(SearchCriteria.SearchCriteriaEnum.OTHER_CASE_REFERENCES.getCcdField());
         }
         return fields;
     }
