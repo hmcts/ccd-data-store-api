@@ -2,13 +2,16 @@
   "_guid_": "F-1004_1_Case_Data_Create_Token_Creation",
   "_extends_": "Standard_Token_Creation_Data_For_Case_Creation",
   "specs": [
-    "to create a token for case creation"
+    "to create a token for case creation",
+    "As a prerequisite"
   ],
+
   "users": {
     "invokingUser": {
       "_extends_": "BeftaMasterCaseworker"
     }
   },
+
   "request": {
     "pathVariables": {
       "uid": "[[DEFAULT_AUTO_VALUE]]",
@@ -20,24 +23,8 @@
   "expectedResponse": {
     "body": {
       "case_details" : {
-        "id" : null,
         "jurisdiction" : "BEFTA_MASTER",
-        "state" : null,
-        "version" : null,
-        "case_type_id" : "FT_GlobalSearch",
-        "created_date" : null,
-        "last_modified" : null,
-        "last_state_modified_date" : null,
-        "security_classification" : null,
-        "case_data" : null,
-        "data_classification" : null,
-        "supplementary_data" : null,
-        "after_submit_callback_response" : null,
-        "callback_response_status_code" : null,
-        "callback_response_status" : null,
-        "delete_draft_response_status_code" : null,
-        "delete_draft_response_status" : null,
-        "security_classifications" : null
+        "case_type_id" : "FT_GlobalSearch"
       },
       "event_id": "CREATE"
     }

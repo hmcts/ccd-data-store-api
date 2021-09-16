@@ -1,0 +1,75 @@
+{
+  "_guid_": "S-1004_1_UpdateCaseEvent",
+  "title": "must submit the event creation successfully for TextField and EmailField inputs",
+
+  "productName": "CCD data store",
+  "operationName": "submit V1 events endpoint",
+
+  "method": "POST",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
+
+  "specs": [
+    "submit V1 events endpoint"
+  ],
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker"
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_GlobalSearch",
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1004.01_CreateCasePreRequisite][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "Address": "updated Address"
+      },
+      "event": {
+        "id": "UPDATE",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token": "${[scenarioContext][parentContext][childContexts][S-1004_1-GetCaseworkerUpdateToken][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 201,
+    "responseMessage": "OK",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Vary": "Accept-Encoding"
+    },
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "BEFTA_MASTER",
+      "state": "CaseUpdated",
+      "version": "[[ANYTHING_PRESENT]]",
+      "case_type_id": "FT_GlobalSearch",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "security_classification": "PUBLIC",
+      "case_data": {
+        "Address": "updated Address",
+        "_extends_": "Befta_Global_Search_Updated_Expected_Search_Criteria"
+      },
+      "data_classification": "[[ANYTHING_PRESENT]]",
+      "supplementary_data": null,
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null,
+      "security_classifications": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}
