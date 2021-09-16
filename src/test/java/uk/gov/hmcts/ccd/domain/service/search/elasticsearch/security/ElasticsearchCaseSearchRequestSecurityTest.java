@@ -1,76 +1,185 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
-import java.util.Collections;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.NATIVE_ES_QUERY;
-import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.QUERY;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
+import uk.gov.hmcts.ccd.domain.service.common.DefaultObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 
-@ExtendWith(MockitoExtension.class)
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 class ElasticsearchCaseSearchRequestSecurityTest {
 
-    private static final String CASE_TYPE_ID = "caseType";
+    private static final String EXPECTED_SEARCH_TERM = "{\"match\":{\"reference\":1630596267899527}}";
+    private static final String SEARCH_QUERY = "{\"query\" : {\"match\" : {\"reference\" : 1630596267899527}}}";
 
-    @Mock
-    private CaseSearchFilter caseSearchFilter;
-    @Mock
-    private ObjectMapperService objectMapperService;
-    @Mock
-    private ObjectNode searchRequestJsonNode;
+    private static final String CASE_TYPE_ID_1 = "caseType";
+    private static final String CASE_TYPE_ID_2 = "caseType2";
+    private static final List<String> CASE_TYPE_IDS = List.of(CASE_TYPE_ID_1, CASE_TYPE_ID_2);
 
-    private ElasticsearchCaseSearchRequestSecurity querySecurity;
+    private static final String FILTER_VALUE_1 = "filterType1";
+    private static final String FILTER_VALUE_2 = "filterType2";
+
+    private final CaseSearchFilter caseSearchFilter = mock(CaseSearchFilter.class);
+    private final List<CaseSearchFilter> filterList = List.of(caseSearchFilter);
+
+
+    private final ObjectMapperService objectMapperService = new DefaultObjectMapperService(new ObjectMapper());
+    private final JsonNode searchRequestNode = objectMapperService.convertStringToObject(SEARCH_QUERY, JsonNode.class);
+    private final ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(searchRequestNode);
+
+    private final ElasticsearchCaseSearchRequestSecurity underTest =
+        new ElasticsearchCaseSearchRequestSecurity(filterList, objectMapperService);
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
-        querySecurity = new ElasticsearchCaseSearchRequestSecurity(Collections.singletonList(caseSearchFilter),
-                objectMapperService);
-        when(searchRequestJsonNode.has(QUERY)).thenReturn(true);
-        when(searchRequestJsonNode.has(NATIVE_ES_QUERY)).thenReturn(false);
+        when(caseSearchFilter.getFilter(CASE_TYPE_ID_1)).thenReturn(Optional.of(newQueryBuilder(FILTER_VALUE_1)));
     }
 
     @Test
-    @DisplayName("should parse and secure request with filters")
+    @DisplayName("should parse and secure request with filters and single case type")
     void shouldSecureRequest() {
-        CaseSearchRequest caseSearchRequest = mock(CaseSearchRequest.class);
-        doReturn(CASE_TYPE_ID).when(caseSearchRequest).getCaseTypeId();
-        doReturn("{}").when(caseSearchRequest).getQueryValue();
-        doReturn("").when(caseSearchRequest).toJsonString();
-        doReturn(Optional.of(mock(QueryBuilder.class))).when(caseSearchFilter).getFilter(CASE_TYPE_ID);
-        doReturn(searchRequestJsonNode).when(objectMapperService).convertStringToObject(anyString(),
-                eq(ObjectNode.class));
-        doReturn(searchRequestJsonNode).when(searchRequestJsonNode).get(anyString());
+        // GIVEN
+        CaseSearchRequest request = new CaseSearchRequest(CASE_TYPE_ID_1, elasticsearchRequest);
 
-        querySecurity.createSecuredSearchRequest(caseSearchRequest);
+        // WHEN
+        CaseSearchRequest securedSearchRequest = underTest.createSecuredSearchRequest(request);
 
-        assertAll(
-            () -> verify(caseSearchRequest).getQueryValue(),
-            () -> verify(caseSearchFilter).getFilter(CASE_TYPE_ID),
-            () -> verify(caseSearchRequest).toJsonString(),
-            () -> verify(searchRequestJsonNode).set(anyString(), any(JsonNode.class)),
-            () -> verify(objectMapperService, times(2)).convertStringToObject(anyString(), eq(ObjectNode.class))
-        );
+        // THEN
+        JsonNode jsonNode = objectMapperService.convertStringToObject(
+            securedSearchRequest.toJsonString(),
+            JsonNode.class);
+        String decodedQuery = getDecodedQuery(jsonNode);
+
+        assertEquals(CASE_TYPE_ID_1, securedSearchRequest.getCaseTypeId());
+        assertEquals(EXPECTED_SEARCH_TERM, decodedQuery);
+        assertEquals(FILTER_VALUE_1, jsonNode.at("/query/bool/filter").get(0).at("/term/filterTermValue/value")
+            .asText());
+    }
+
+    @Test
+    @DisplayName("should parse and secure request with NO filters and only base query and multiple case types")
+    void shouldSecureCrossCaseTypeRequest() {
+        // GIVEN
+        CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
+            .withSearchRequest(elasticsearchRequest)
+            .withCaseTypes(CASE_TYPE_IDS)
+            .build();
+
+        // WHEN
+        CrossCaseTypeSearchRequest securedSearchRequest = underTest.createSecuredSearchRequest(request);
+
+        // THEN
+        String decodedQuery = getDecodedQuery(securedSearchRequest.getSearchRequestJsonNode());
+
+        assertEquals(CASE_TYPE_IDS, securedSearchRequest.getCaseTypeIds());
+        assertEquals(EXPECTED_SEARCH_TERM, decodedQuery);
+    }
+
+    @Test
+    @DisplayName("should parse and secure request with filters and multiple case types and verify complete query")
+    void shouldSecureCrossCaseTypeRequestWithFiltersVerifyQuery() {
+        // GIVEN
+        when(caseSearchFilter.getFilter(CASE_TYPE_ID_2)).thenReturn(Optional.of(newQueryBuilder(FILTER_VALUE_2)));
+
+        CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
+            .withSearchRequest(elasticsearchRequest)
+            .withCaseTypes(CASE_TYPE_IDS)
+            .build();
+
+        // WHEN
+        CrossCaseTypeSearchRequest securedSearchRequest = underTest.createSecuredSearchRequest(request);
+
+        // THEN
+        String expectedFinalQueryBody = "{\"query\":{\"bool\":{\"must\":[{\"wrapper\":"
+            + "{\"query\":\"eyJtYXRjaCI6eyJyZWZlcmVuY2UiOjE2MzA1OTYyNjc4OTk1Mjd9fQ==\"}}],\"should\":["
+            + "{\"bool\":{\"must\":[{\"term\":{\"filterTermValue\":{\"value\":\"filterType1\",\"boost\":1.0}}},"
+            + "{\"term\":{\"case_type_id\":{\"value\":\"casetype\",\"boost\":1.0}}}],\"adjust_pure_negative\":true,"
+            + "\"boost\":1.0}},{\"bool\":{\"must\":[{\"term\":{\"filterTermValue\":{\"value\":\"filterType2\","
+            + "\"boost\":1.0}}},{\"term\":{\"case_type_id\":{\"value\":\"casetype2\",\"boost\":1.0}}}],"
+            + "\"adjust_pure_negative\":true,\"boost\":1.0}}],\"adjust_pure_negative\":true,"
+            + "\"minimum_should_match\":\"1\",\"boost\":1.0}}}";
+
+        JsonNode returnedFinalQueryBody = securedSearchRequest.getSearchRequestJsonNode();
+        String decodedQuery = getDecodedQuery(returnedFinalQueryBody);
+
+        assertEquals(CASE_TYPE_IDS, securedSearchRequest.getCaseTypeIds());
+        assertEquals(EXPECTED_SEARCH_TERM, decodedQuery);
+        assertEquals(expectedFinalQueryBody, returnedFinalQueryBody.toString());
+    }
+
+    @Test
+    @DisplayName("should parse and secure request with filters and multiple case types and verify correct filters")
+    void shouldSecureCrossCaseTypeRequestWithFiltersVerifyFilters() {
+        // GIVEN
+        when(caseSearchFilter.getFilter(CASE_TYPE_ID_2)).thenReturn(Optional.of(newQueryBuilder(FILTER_VALUE_2)));
+
+        CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
+            .withSearchRequest(elasticsearchRequest)
+            .withCaseTypes(CASE_TYPE_IDS)
+            .build();
+
+        // WHEN
+        CrossCaseTypeSearchRequest securedSearchRequest = underTest.createSecuredSearchRequest(request);
+
+        // THEN
+        Map<String, JsonNode> mapOfFilterValues =
+            createMapOfFilterValues(securedSearchRequest.getSearchRequestJsonNode());
+        assertEquals(FILTER_VALUE_1, mapOfFilterValues.get(CASE_TYPE_ID_1.toLowerCase()).at("/bool/must").get(0)
+            .at("/term/filterTermValue/value").asText());
+        assertEquals(FILTER_VALUE_2, mapOfFilterValues.get(CASE_TYPE_ID_2.toLowerCase()).at("/bool/must").get(0)
+            .at("/term/filterTermValue/value").asText());
+        assertEquals(CASE_TYPE_ID_1.toLowerCase(), mapOfFilterValues.get(CASE_TYPE_ID_1.toLowerCase()).at("/bool/must")
+            .get(1).at("/term/case_type_id/value").asText());
+        assertEquals(CASE_TYPE_ID_2.toLowerCase(), mapOfFilterValues.get(CASE_TYPE_ID_2.toLowerCase()).at("/bool/must")
+            .get(1).at("/term/case_type_id/value").asText());
+    }
+
+    private String getDecodedQuery(JsonNode node) {
+        // get wrapped query
+        JsonNode queryJsonNode = node
+            .at("/query/bool/must").get(0).at("/wrapper/query");
+        return decodedQuery(queryJsonNode);
+    }
+
+    private String decodedQuery(JsonNode queryJsonNode) {
+        return new String(Base64.getDecoder().decode(queryJsonNode.asText()));
+    }
+
+    private QueryBuilder newQueryBuilder(String value) {
+        return QueryBuilders.termQuery("filterTermValue", value);
+    }
+
+    private Map<String, JsonNode> createMapOfFilterValues(JsonNode jsonNode) {
+        Map<String, JsonNode> values = new HashMap<>();
+        JsonNode filterJsonNodes = jsonNode.at("/query/bool/should");
+
+        for (JsonNode shouldNode : filterJsonNodes) {
+            for (JsonNode mustNode : shouldNode.at("/bool/must")) {
+                if (!mustNode.at("/term/case_type_id").isEmpty()) {
+                    values.put(
+                        mustNode.at("/term/case_type_id/value").asText(),
+                        shouldNode
+                    );
+                }
+            }
+        }
+
+        return values;
     }
 }
