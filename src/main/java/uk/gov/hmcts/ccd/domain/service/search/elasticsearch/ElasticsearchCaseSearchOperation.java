@@ -16,6 +16,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.CaseTypeResults;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.dto.ElasticSearchCaseDetailsDTO;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.mapper.CaseDetailsMapper;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.CaseSearchRequestSecurity;
@@ -24,7 +25,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -80,12 +80,30 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     }
 
     private MultiSearch secureAndTransformSearchRequest(CrossCaseTypeSearchRequest request) {
-        Collection<Search> securedSearches = request.getCaseTypeIds()
+        final List<Search> securedSearches = request.getSearchIndex()
+            .map(searchIndex -> List.of(createSecuredSearch(searchIndex, request)))
+            .orElseGet(() -> buildSearchesByCaseType(request));
+
+        return new MultiSearch.Builder(securedSearches).build();
+    }
+
+    private List<Search> buildSearchesByCaseType(final CrossCaseTypeSearchRequest request) {
+        return request.getCaseTypeIds()
             .stream()
             .map(caseTypeId -> createSecuredSearch(caseTypeId, request))
             .collect(toList());
+    }
 
-        return new MultiSearch.Builder(securedSearches).build();
+    private Search createSecuredSearch(final SearchIndex searchIndex, final CrossCaseTypeSearchRequest request) {
+        final CrossCaseTypeSearchRequest securedSearchRequest =
+            caseSearchRequestSecurity.createSecuredSearchRequest(request);
+
+        final ElasticsearchRequest elasticSearchRequest = securedSearchRequest.getElasticSearchRequest();
+
+        return new Search.Builder(elasticSearchRequest.toFinalRequest())
+            .addIndex(searchIndex.getIndexName())
+            .addType(searchIndex.getIndexType())
+            .build();
     }
 
     private Search createSecuredSearch(String caseTypeId, CrossCaseTypeSearchRequest request) {
@@ -120,7 +138,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             }
         }
 
-        return new CaseSearchResult(totalHits,caseDetails,caseTypeResults);
+        return new CaseSearchResult(totalHits, caseDetails, caseTypeResults);
     }
 
     private void buildCaseTypesResults(
@@ -139,8 +157,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     private String getIndexName(MultiSearchResult.MultiSearchResponse response) {
         String quotedIndexName =  response.searchResult.getJsonObject().getAsJsonObject(HITS).get(HITS)
             .getAsJsonArray().get(0).getAsJsonObject().get("_index").toString();
-        String unquotedIndexName = quotedIndexName.replaceAll("\"", "");
-        return unquotedIndexName;
+        return quotedIndexName.replaceAll("\"", "");
     }
 
     private boolean hitsIsNotEmpty(MultiSearchResult.MultiSearchResponse response) {
