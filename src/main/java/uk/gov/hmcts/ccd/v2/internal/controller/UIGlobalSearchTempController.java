@@ -39,10 +39,11 @@ public class UIGlobalSearchTempController {
     @ApiOperation(
         value = "Search cases according to the provided ElasticSearch query. Supports searching a single case type and"
             + " a use case."
-    ) @SuppressWarnings("checkstyle:LineLength") // don't want to break message
+    )
+    @SuppressWarnings("checkstyle:LineLength") // don't want to break message
     @LogAudit(operationType = AuditOperationType.SEARCH_CASE)
     public ResponseEntity<List<CaseDetails>> searchCases(@RequestBody SearchCriteriaResponseTEMP values) {
-       List<CaseDetails> response = globalSearchParser.filterCases(values.getResponse(), values.getRequestValues());
+        List<CaseDetails> response = globalSearchParser.filterCases(values.getResponse(), values.getRequestValues());
 
         return ResponseEntity.ok(response);
     }
