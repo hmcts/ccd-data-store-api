@@ -31,7 +31,6 @@ import static com.google.common.collect.Sets.newHashSet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
@@ -105,19 +104,6 @@ class GlobalSearchParserTest {
                         .withComplexField(complexField("region", TEXT,
                             SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true))
                         .withComplexField(complexField("baseLocation", TEXT,
-                            SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true))
-                        .build())
-                .build())
-            .withSecurityClassification(SecurityClassification.PUBLIC)
-            .withField(newCaseField().withId("searchCriteria")
-                .withSC(SecurityClassification.PUBLIC.name())
-                .withFieldType(
-                    aFieldType()
-                        .withId("searchCriteria")
-                        .withType(COMPLEX)
-                        .withComplexField(complexField("OtherCaseReferences", TEXT,
-                            SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true))
-                        .withComplexField(complexField("SearchParties", TEXT,
                             SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true))
                         .build())
                 .build())
@@ -294,20 +280,16 @@ class GlobalSearchParserTest {
 
         doReturn(false)
             .when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(eq(JURISDICTION),
-                eq(caseTypeDefinition3), eq("region"));
+            .userHasEnoughSecurityClassificationForField(JURISDICTION, caseTypeDefinition3, "region");
         doReturn(true)
             .when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(eq(JURISDICTION),
-                eq(caseTypeDefinition3), eq("baseLocation"));
+            .userHasEnoughSecurityClassificationForField(JURISDICTION, caseTypeDefinition3,"baseLocation");
         doReturn(true)
             .when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(eq(JURISDICTION),
-                eq(caseTypeDefinition1), eq("region"));
+            .userHasEnoughSecurityClassificationForField(JURISDICTION, caseTypeDefinition1, "region");
         doReturn(true)
             .when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(eq(JURISDICTION),
-                eq(caseTypeDefinition1), eq("baseLocation"));
+            .userHasEnoughSecurityClassificationForField(JURISDICTION, caseTypeDefinition1,"baseLocation");
 
 
         ObjectMapper mapper = new ObjectMapper();

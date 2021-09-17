@@ -43,7 +43,6 @@ public class GlobalSearchParser {
     public List<CaseDetails> filterCases(List<CaseDetails> results, SearchCriteria request) {
         List<String> fields = findFieldsToFilter(request);
         results.removeIf(caseDetails -> !authorised(fields, caseDetails));
-
         return results;
     }
 
