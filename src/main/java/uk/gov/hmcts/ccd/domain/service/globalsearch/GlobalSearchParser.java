@@ -1,10 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.globalsearch;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -49,42 +49,36 @@ public class GlobalSearchParser {
 
     private boolean authorised(List<String> fields, CaseDetails caseDetails) {
         CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseDetails.getCaseTypeId());
-        boolean condition = true;
-        Optional<SecurityClassification> userClassificationOpt =
-            securityClassificationService.getUserClassification(caseDetails.getJurisdiction());
+        boolean isAuthorised = true;
         for (String field : fields) {
             Optional<CaseFieldDefinition> caseFieldDefinition =
                 (field.contains(FIELD_SEPARATOR)) ? caseTypeDefinition.getComplexSubfieldDefinitionByPath(field)
                     : caseTypeDefinition.getCaseField(field);
             if (caseFieldDefinition.isPresent() && (!AccessControlService
                 .hasAccessControlList(userRepository.getUserRoles(), CAN_READ,
-                    caseFieldDefinition.get().getAccessControlLists()))){
-                condition = false;
-                break;
-            }
-            else if (!securityClassificationService
+                    caseFieldDefinition.get().getAccessControlLists()))
+                || !securityClassificationService
                 .userHasEnoughSecurityClassificationForField(caseTypeDefinition.getJurisdictionId(),
                     caseTypeDefinition, caseFieldDefinition.get().getId())) {
-                condition = false;
+                isAuthorised = false;
                 break;
             }
-
         }
-        return condition;
+        return isAuthorised;
     }
 
     private List<String> findFieldsToFilter(SearchCriteria request) {
         List<String> fields = new ArrayList<>();
-        if (request.getCaseManagementBaseLocationIds() != null) {
+        if (!CollectionUtils.isEmpty(request.getCaseManagementBaseLocationIds())) {
             fields.add(SearchCriteria.SearchCriteriaEnum.BASE_LOCATION.getCcdField());
         }
-        if (request.getCaseManagementRegionIds() != null) {
+        if (!CollectionUtils.isEmpty(request.getCaseManagementRegionIds())) {
             fields.add(SearchCriteria.SearchCriteriaEnum.REGION.getCcdField());
         }
-        if (request.getParties() != null) {
+        if (!CollectionUtils.isEmpty(request.getParties())) {
             fields.add(SearchCriteria.SearchCriteriaEnum.PARTIES.getCcdField());
         }
-        if (request.getOtherReferences() != null) {
+        if (!CollectionUtils.isEmpty(request.getOtherReferences())) {
             fields.add(SearchCriteria.SearchCriteriaEnum.OTHER_CASE_REFERENCES.getCcdField());
         }
         return fields;
