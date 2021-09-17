@@ -85,10 +85,8 @@ public class GlobalSearchProcessorService {
                                              List<uk.gov.hmcts.ccd.domain.model.definition.SearchParty> searchParties) {
         List<SearchParty> searchPartyList = new ArrayList<>();
 
-        Map<String, String> namesToValuesMap = new LinkedHashMap<>();
-
         searchParties.forEach(searchParty -> {
-            SearchPartyValue valueToPopulate = populateSearchParty(searchParty, data, namesToValuesMap);
+            SearchPartyValue valueToPopulate = populateSearchParty(searchParty, data);
 
             if (!valueToPopulate.isEmpty()) {
                 searchPartyList.add(SearchParty
@@ -114,9 +112,9 @@ public class GlobalSearchProcessorService {
 
     private SearchPartyValue populateSearchParty(
         uk.gov.hmcts.ccd.domain.model.definition.SearchParty searchPartyDefinition,
-        Map<String, JsonNode> data,
-        Map<String, String> namesToValuesMap) {
+        Map<String, JsonNode> data) {
 
+        Map<String, String> namesToValuesMap = new LinkedHashMap<>();
         SearchPartyValue searchPartyValue = new SearchPartyValue();
 
         if (searchPartyDefinition.getSearchPartyName() != null) {
@@ -140,7 +138,6 @@ public class GlobalSearchProcessorService {
 
             if (name != null && !name.isBlank()) {
                 searchPartyValue.setName(name);
-                namesToValuesMap.clear();
             }
         }
 
