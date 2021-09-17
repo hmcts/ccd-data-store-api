@@ -2,7 +2,7 @@
 	"_guid_": "Case_Creation_V2_Base",
 
   "productName": "CCD Data Store",
-  "operationName": "Submit Case Creation V2",
+  "operationName": "Submit case creation as Case worker (V2)",
   "method": "POST",
   "uri": "case-types/{CaseTypeID}/cases",
 

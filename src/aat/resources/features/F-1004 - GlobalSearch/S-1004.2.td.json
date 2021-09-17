@@ -1,11 +1,11 @@
 {
   "title": "must successfully create a case as a citizen using V1: /citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases endpoint",
-  "_guid_": "S-1004_1.2",
+  "_guid_": "S-1004.2",
   "_extends_": "Citizen_Case_Creation_Base",
 
    "specs": [
     "an active profile in CCD",
-    "contains some data fields to be used to populate SearchCriteria"
+    "contains data fields that will be used to populate SearchCriteria"
   ],
 
   "request": {
@@ -18,7 +18,7 @@
       "data": {
         "_extends_": "Befta_Global_Search_Case_Data"
       },
-      "event_token": "${[scenarioContext][childContexts][F-1004_1_Case_Data_Create_Token_Creation_Citizen][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][childContexts][F-1004_Case_Data_Create_Token_Creation_Citizen][testData][actualResponse][body][token]}"
     }
   },
   "expectedResponse": {

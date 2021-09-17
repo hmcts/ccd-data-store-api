@@ -1,16 +1,12 @@
 {
-  "_guid_": "S-1004_1_UpdateCaseEvent",
-  "title": "must submit the event creation successfully for TextField and EmailField inputs",
+  "_guid_": "F-1004_CaseworkerUpdateCaseEvent",
+  "title": "must submit the event creation for a caseworker to update a case successfully",
 
-  "productName": "CCD data store",
-  "operationName": "submit V1 events endpoint",
+  "productName": "CCD Data Store",
+  "operationName": "Submit case update event creation as a Caseworker (V1)",
 
   "method": "POST",
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
-
-  "specs": [
-    "submit V1 events endpoint"
-  ],
 
   "user": {
     "_extends_": "BeftaMasterCaseworker"
@@ -24,19 +20,15 @@
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
       "ctid": "FT_GlobalSearch",
-      "cid": "${[scenarioContext][parentContext][childContexts][F-1004.01_CreateCasePreRequisite][testData][actualResponse][body][id]}"
+      "cid": "OVERRIDE"
     },
     "body": {
-      "data": {
-        "Address": "updated Address"
-      },
       "event": {
         "id": "UPDATE",
         "summary": "",
         "description": ""
       },
       "security_classification": "PUBLIC",
-      "event_token": "${[scenarioContext][parentContext][childContexts][S-1004_1-GetCaseworkerUpdateToken][testData][actualResponse][body][token]}",
       "ignore_warning": true
     }
   },
@@ -50,18 +42,11 @@
     },
     "body": {
       "id": "[[ANYTHING_PRESENT]]",
-      "jurisdiction": "BEFTA_MASTER",
-      "state": "CaseUpdated",
       "version": "[[ANYTHING_PRESENT]]",
-      "case_type_id": "FT_GlobalSearch",
       "created_date": "[[ANYTHING_PRESENT]]",
       "last_modified": "[[ANYTHING_PRESENT]]",
       "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
-      "case_data": {
-        "Address": "updated Address",
-        "_extends_": "Befta_Global_Search_Updated_Expected_Search_Criteria"
-      },
       "data_classification": "[[ANYTHING_PRESENT]]",
       "supplementary_data": null,
       "after_submit_callback_response": null,

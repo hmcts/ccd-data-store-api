@@ -1,6 +1,9 @@
 {
-  "_guid_": "F-1004_1_Case_Data_Create_Token_Creation_Citizen",
+  "_guid_": "F-1004_Case_Data_Create_Token_Creation_Citizen",
   "_extends_": "Citizen_Token_Creation_Data_For_Case_Creation",
+  "specs": [
+    "As a prerequisite"
+  ],
   "request": {
     "pathVariables": {
       "uid": "[[DEFAULT_AUTO_VALUE]]",

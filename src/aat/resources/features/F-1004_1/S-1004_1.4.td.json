@@ -1,9 +1,0 @@
-{
-  "title": "must successfully create a case as a caseworker using /case-types/{caseTypeId}/cases endpoint",
-  "_guid_": "S-1004_1.4",
-  "_extends_": "Case_Creation_V2_Base",
-
-   "specs": [
-    "an active profile in CCD"
-    ]
-}

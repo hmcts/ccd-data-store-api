@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-1004_1-GetCaseworkerUpdateToken",
+  "_guid_": "F-1004_GetCaseworkerUpdateToken",
   "title": "should create an event token for correct inputs",
 
   "productName": "CCD Data Store",
@@ -9,7 +9,7 @@
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
 
   "specs": [
-    "to get an event token for the case just created"
+    "to get a caseworker event token to update the case just created"
   ],
 
   "users": {
@@ -26,7 +26,7 @@
       "jid": "BEFTA_MASTER",
       "ctid": "FT_GlobalSearch",
       "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "cid": "${[scenarioContext][parentContext][childContexts][F-1004.01_CreateCasePreRequisite][testData][actualResponse][body][id]}",
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1004_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "etid": "UPDATE"
     }
   },

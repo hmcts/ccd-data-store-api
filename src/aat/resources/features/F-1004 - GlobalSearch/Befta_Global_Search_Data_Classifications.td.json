@@ -3,7 +3,12 @@
 
     "DateOfBirth": "PUBLIC",
     "Email": "PUBLIC",
-    "Address": "PUBLIC",
+    "Address": {
+      "classification": "PUBLIC",
+      "value": {
+        "AddressLine1": "PUBLIC"
+      }
+    },
     "FirstName": "PUBLIC",
     "LastName": "PUBLIC",
     "PostCode": "PUBLIC",

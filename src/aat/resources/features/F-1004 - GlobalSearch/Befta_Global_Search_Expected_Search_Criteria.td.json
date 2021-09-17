@@ -1,12 +1,7 @@
 {
-  "_guid_": "Befta_Global_Search_Updated_Expected_Search_Criteria",
+  "_guid_": "Befta_Global_Search_Expected_Search_Criteria",
 
-  "DateOfBirth": "2012-04-21T00:00:00.000",
-  "Email": "e@mail.com",
-  "Address": "updated Address",
-  "FirstName": "FirstNameValue",
-  "LastName": "LastNameValue",
-  "PostCode": "SE1 4EE",
+  "_extends_": "Befta_Global_Search_Case_Data",
   "SearchCriteria" : {
     "OtherCaseReferences" : [ {
       "value" : "FirstNameValue",
@@ -16,9 +11,9 @@
       "value" : {
         "Name" : "FirstNameValue LastNameValue",
         "EmailAddress" : "e@mail.com",
-        "AddressLine1" : "updated Address",
+        "AddressLine1" : "Address Value",
         "PostCode" : "SE1 4EE",
-        "DateOfBirth" : "2012-04-21T00:00:00.000"
+        "DateOfBirth" : "2012-04-21"
       },
       "id" : "[[ANYTHING_PRESENT]]"
     } ]

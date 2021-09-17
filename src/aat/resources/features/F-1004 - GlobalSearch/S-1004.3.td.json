@@ -1,18 +1,16 @@
 {
-  "title": "must successfully create a case V1: /caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases endpoint",
-  "_guid_": "S-1004.1",
-  "_extends_": "Case_Creation_Base",
+  "title": "must successfully create a case as a caseworker using  /case-types/{caseTypeId}/cases endpoint",
+  "_guid_": "S-1004.3",
+  "_extends_": "Case_Creation_V2_Base",
 
-  "specs": [
+   "specs": [
     "an active profile in CCD",
-    "contains data fields that will be used to populate SearchCriteria",
-    "to create a full case"
+    "contains data fields that will be used to populate SearchCriteria"
   ],
 
   "request": {
     "pathVariables": {
-      "jid": "BEFTA_MASTER",
-      "ctid": "FT_GlobalSearch"
+      "CaseTypeID": "FT_GlobalSearch"
     },
     "body": {
       "data": {
@@ -24,19 +22,21 @@
   "expectedResponse": {
     "_extends_": "Common_201_Response",
     "body": {
+      "_links" : {
+        "self" : {
+          "href" : "{{TEST_URL}}/case-types/FT_GlobalSearch/cases{?ignore-warning}"
+        }
+      },
       "jurisdiction": "BEFTA_MASTER",
       "state": "CaseCreated",
-      "case_type_id": "FT_GlobalSearch",
-      "supplementary_data": null,
-      "case_data": {
+      "case_type": "FT_GlobalSearch",
+      "data": {
         "_extends_": "Befta_Global_Search_Expected_Search_Criteria"
       },
       "data_classification": {
-        "_extends_": "Befta_Global_Search_Data_Classifications"
-      },
-      "security_classifications": {
         "_extends_": "Befta_Global_Search_Data_Classifications"
       }
     }
   }
 }
+
