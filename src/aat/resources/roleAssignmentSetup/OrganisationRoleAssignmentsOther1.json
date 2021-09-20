@@ -19,10 +19,9 @@
       "endTime" : "2023-01-01T00:00:00Z",
       "attributes" : {
         "jurisdiction" : "J1",
-        "caseType" : "CT2"
+        "caseType" : "CT1"
       }
     }
-
   ]
 }
 

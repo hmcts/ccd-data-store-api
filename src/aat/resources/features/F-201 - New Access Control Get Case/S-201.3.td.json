@@ -59,6 +59,8 @@
         "F3" : "c"
       },
       "data_classification" : {
+        "F1" : "RESTRICTED",
+        "F2" : "PRIVATE",
         "F3" : "PUBLIC"
       },
       "after_submit_callback_response" : null,

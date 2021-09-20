@@ -59,13 +59,12 @@
       "security_classification" : "PUBLIC",
       "data" : {
         "F2" : "b",
-        "F3" : "c",
-        "F4" : "d"
+        "F3" : "c"
       },
       "data_classification" : {
+        "F1" : "RESTRICTED",
         "F2" : "PRIVATE",
-        "F3" : "PUBLIC",
-        "F4" : "RESTRICTED"
+        "F3" : "PUBLIC"
       },
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,

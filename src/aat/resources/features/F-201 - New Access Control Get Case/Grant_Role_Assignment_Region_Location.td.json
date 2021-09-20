@@ -10,7 +10,7 @@
     "a role assignment to access CaseType CT2",
     "attempts to create a case for CT2",
     "to create a full case",
-    "to give user Solicitor1 a RESTRICTED CASE with region role assignment to view the previously created case"
+    "to give user Solicitor1 a RESTRICTED CASE with region and location role assignment to view the previously created case"
   ],
 
   "users" : {

@@ -31,7 +31,7 @@
       "experimental": true
     },
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-201_CT2][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][F-201_CT1][testData][actualResponse][body][id]}"
     }
   },
 
@@ -56,10 +56,13 @@
       "state" : "Unissued1",
       "security_classification" : "PUBLIC",
       "data" : {
+        "F2" : "b",
         "F3" : "c"
       },
       "data_classification" : {
-        "F3" : "PUBLIC"
+        "F1" : "RESTRICTED",
+        "F2" : "PRIVATE",
+        "F3" : "PRIVATE"
       },
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,

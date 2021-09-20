@@ -8,6 +8,10 @@
   "uri": "/cases/{cid}",
 
   "users": {
+    "S1": {
+      "username": "ccd.ac.solicitor1@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
+    },
     "invokingUser": {
       "username": "ccd.ac.solicitor1@gmail.com",
       "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"    }

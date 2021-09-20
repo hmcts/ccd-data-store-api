@@ -34,7 +34,7 @@
           "actorId" : "${[scenarioContext][testData][users][S1][id]}",
           "actorIdType" : "IDAM",
           "roleType" : "CASE",
-          "roleName" : "Solicitor",
+          "roleName" : "[RESPONDENT]",
           "roleCategory" : "PROFESSIONAL",
           "classification" : "PRIVATE",
           "grantType" : "SPECIFIC",

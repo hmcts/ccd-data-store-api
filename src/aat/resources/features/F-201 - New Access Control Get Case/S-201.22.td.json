@@ -55,14 +55,15 @@
       "last_modified_on" : "[[ANYTHING_PRESENT]]",
       "last_state_modified_on" : "[[ANYTHING_PRESENT]]",
       "state" : "Unissued1",
-      "security_classification" : "PUBLIC",
+      "security_classification" : "PRIVATE",
       "data" : {
         "F2" : "b",
         "F3" : "c"
       },
       "data_classification" : {
-        "F2" : "PUBLIC",
-        "F3" : "PUBLIC"
+        "F1" : "RESTRICTED",
+        "F2" : "PRIVATE",
+        "F3" : "PRIVATE"
       },
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,

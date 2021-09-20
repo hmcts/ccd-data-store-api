@@ -63,6 +63,7 @@
         "F4" : "d"
       },
       "data_classification" : {
+        "F1" : "RESTRICTED",
         "F2" : "PRIVATE",
         "F3" : "PUBLIC",
         "F4" : "RESTRICTED"

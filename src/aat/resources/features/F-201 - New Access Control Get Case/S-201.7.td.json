@@ -8,10 +8,6 @@
   "uri": "/cases/{cid}",
 
   "users": {
-    "S1": {
-      "username": "ccd.ac.solicitor1@gmail.com",
-      "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
-    },
     "invokingUser": {
       "username": "ccd.ac.solicitor2@gmail.com",
       "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"    }
@@ -20,7 +16,6 @@
   "specs" : [
     "SUPERUSER who has restricted access to create a case J1-CT2-01",
     "restricted access to create a case J1-CT2-01",
-    "PUBLIC SC ORGANISATION role assignment to view the case and only PUBLIC field F3",
     "attempts to get case J1-CT2-01"
   ],
 

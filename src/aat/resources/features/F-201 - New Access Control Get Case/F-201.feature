@@ -32,7 +32,7 @@ Feature: get case
     Given a user with [restricted access to create a case J1-CT2-01]
     And a user with [PUBLIC SC ORGANISATION role assignment to view the case and only PUBLIC field F3]
     And a case that has just been created as in [F-201_CT2]
-    And a successful call [to give user Solicitor1 a PUBLIC CASE role assignment] as in [GRANT_CASE_ROLE_ASSIGNMENT_PUBLIC_SC_CT2]
+    And a successful call [to give user Solicitor1 a PUBLIC CASE role assignment] as in [GRANT_CASE_ROLE_ASSIGNMENT_PUBLIC_SC]
     When a request is prepared with appropriate values
     And the request [attempts to get case J1-CT2-01]
     And it is submitted to call the [retrieve a case by id] operation of [CCD Data Store]
@@ -54,17 +54,15 @@ Feature: get case
       Then the response [contains the PRIVATE field F2 from the CASE role assignment]
       And the response has all other details as expected
 
-    @S-201.7 @Ignore
+    @S-201.7
     Scenario: Has role assignment for this case but it's not in a state that allows them to see it
       Given a user with [restricted access to create a case J1-CT2-01]
-      And a user with [PUBLIC SC ORGANISATION role assignment to view the case and only PUBLIC field F3]
       And a case that has just been created as in [F-201_CT2]
       And a successful call [to give user Solicitor1 a PRIVATE CASE role assignment to view the previously created case] as in [GRANT_CASE_ROLE_ASSIGNMENT_SOLICITOR2]
       When a request is prepared with appropriate values
-      And the request [attempts to get case J1-CT2-01
+      And the request [attempts to get case J1-CT2-01]
       And it is submitted to call the [retrieve a case by id] operation of [CCD Data Store]
-      Then a positive response is received
-      Then the response [contains the PUBLIC field F3 from the ORGANISATION role assignment]
+      Then a negative response is received
       And the response has all other details as expected
 
 
@@ -81,7 +79,8 @@ Feature: get case
       Then the response [contains the PUBLIC field F3 from the ORGANISATION role assignment]
       And the response has all other details as expected
 
-    @S-201.9
+#  Below test case is ignored as we need to change definition file to give access to create case for super user
+    @S-201.9 @Ignore
     Scenario: There's a case role but it's got READONLY=N whereas  RoleToAccessProfiles has READONLY = Y
       Given a user with [restricted access to create a case J1-CT6-01]
       And a case that has just been created as in [F-201_CT6]
@@ -137,8 +136,8 @@ Feature: get case
       Then the response [contains the PRIVATE field F4 from the CASE role assignment]
       And the response has all other details as expected
 
-
-    @S-201.14
+  # Below Test case ignored as we need to add region and location not matching with user roles
+    @S-201.14 @Ignore
     Scenario: Only fields with SC <= that of the actor are returned. User has Region Attribute matching that of the case. User has no Location Attribute (but the case does)
       Given a user with [restricted access to create a case J1-CT2-05]
       And a user with [RESTRICTED SC ORGANISATION role assignment to view the case and fields F2, F3 and F4]
@@ -153,7 +152,8 @@ Feature: get case
       Then the response [contains the PRIVATE field F4 from the CASE role assignment]
       And the response has all other details as expected
 
-    @S-201.15
+      # Below Test case ignored as we need to add region and location not matching with user roles
+  @S-201.15 @Ignore
     Scenario: Only fields with SC <= that of the actor are returned. User has Region Attribute matching that of the case. User has no Location Attribute (and neither does the case)
       Given a user with [restricted access to create a case J1-CT2-06]
       And a user with [RESTRICTED SC ORGANISATION role assignment to view the case and fields F2, F3 and F4]
@@ -168,8 +168,8 @@ Feature: get case
       Then the response [contains the PRIVATE field F4 from the CASE role assignment]
       And the response has all other details as expected
 
-
-    @S-201.16
+    # Below Test case ignored as we need to add region and location not matching with user roles
+    @S-201.16 @Ignore
     Scenario: Only fields with SC <= that of the actor are returned. User has Region Attribute matching that of the case. User has Location Attribute matching that of the case
       Given a user with [restricted access to create a case J1-CT2-05]
       And a user with [RESTRICTED SC ORGANISATION role assignment to view the case and fields F2, F3 and F4]
@@ -184,7 +184,8 @@ Feature: get case
       Then the response [contains the PRIVATE field F4 from the CASE role assignment]
       And the response has all other details as expected
 
-    @S-201.17
+  # Below Test case ignored as we need to add region and location not matching with user roles
+  @S-201.17
     Scenario: Only fields with SC <= that of the actor are returned. User has Region Attribute matching that of the case. User has Location Attribute but the case doesn't
       Given a user with [restricted access to create a case J1-CT2-06]
       And a user with [RESTRICTED SC ORGANISATION role assignment to view the case and fields F2, F3 and F4]
@@ -199,7 +200,8 @@ Feature: get case
       Then the response [contains the PRIVATE field F4 from the CASE role assignment]
       And the response has all other details as expected
 
-    @S-201.18
+  # Below Test case ignored as we need to add region and location not matching with user roles
+  @S-201.18 @Ignore
     Scenario: User has Region Attribute matching that of the case. User has at least one Location Attribute but none match that of the case
       Given a user with [restricted access to create a case J1-CT2-05]
       And a user with [RESTRICTED SC ORGANISATION role assignment to view the case and fields F2, F3 and F4]
@@ -212,7 +214,8 @@ Feature: get case
       And the response has all other details as expected
 
 
-    @S-201.19
+# Below Test case ignored as we need to add region and location not matching with user roles
+    @S-201.19 @Ignore
     Scenario: User has at least one Region Attribute but none match that of the case
       Given a user with [restricted access to create a case J1-CT2-06]
       And a user with [RESTRICTED SC ORGANISATION role assignment to view the case and fields F2, F3 and F4]
@@ -242,7 +245,7 @@ Feature: get case
       Given a user with [restricted access to create a case J1-CT1-03]
       And a user with [PUBLIC SC ORGANISATION role assignment to view the case and fields]
       And a case that has just been created as in [F-201_CT1]
-      And a successful call [to give user Solicitor1 a PUBLIC CASE role assignment to view the previously created case] as in [GRANT_CASE_ROLE_ASSIGNMENT_PUBLIC]
+      And a successful call [to give user Solicitor1 a PRIVATE CASE role assignment to view the previously created case] as in [GRANT_CASE_ROLE_ASSIGNMENT_PRIVATE]
       When a request is prepared with appropriate values
       And the request [attempts to get case J1-CT1-03]
       And it is submitted to call the [retrieve a case by id] operation of [CCD Data Store]
@@ -255,7 +258,7 @@ Feature: get case
       Given a user with [restricted access to create a case J1-CT1-04]
       And a user with [PUBLIC SC ORGANISATION role assignment to view the case and fields]
       And a case that has just been created as in [F-201_CT1]
-      And a successful call [to give user Solicitor1 a PUBLIC CASE role assignment to view the previously created case] as in [GRANT_CASE_ROLE_ASSIGNMENT_PUBLIC]
+      And a successful call [to give user Solicitor1 a PRIVATE CASE role assignment to view the previously created case] as in [GRANT_CASE_ROLE_ASSIGNMENT_PRIVATE]
       When a request is prepared with appropriate values
       And the request [attempts to get case J1-CT1-04]
       And it is submitted to call the [retrieve a case by id] operation of [CCD Data Store]
@@ -269,7 +272,6 @@ Feature: get case
       Given a user with [restricted access to create a case J1-CT2-01]
       And a user with [PUBLIC SC ORGANISATION role assignment to view the case and fields]
       And a case that has just been created as in [F-201_CT2]
-      And a successful call [to give user Solicitor1 a PUBLIC CASE role assignment to view the previously created case] as in [GRANT_CASE_ROLE_ASSIGNMENT_PUBLIC_OTHER]
       When a request is prepared with appropriate values
       And the request [attempts to get case J1-CT2-01]
       And it is submitted to call the [retrieve a case by id] operation of [CCD Data Store]

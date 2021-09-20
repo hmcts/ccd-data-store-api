@@ -59,7 +59,7 @@
       "last_modified_on" : "[[ANYTHING_PRESENT]]",
       "last_state_modified_on" : "[[ANYTHING_PRESENT]]",
       "state" : "Unissued1",
-      "security_classification" : "PUBLIC",
+      "security_classification" : "PRIVATE",
       "data" : {
         "F1" : "a",
         "F2" : "b",
@@ -68,7 +68,7 @@
       "data_classification" : {
         "F1" : "RESTRICTED",
         "F2" : "PRIVATE",
-        "F3" : "PUBLIC"
+        "F3" : "PRIVATE"
       },
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,
