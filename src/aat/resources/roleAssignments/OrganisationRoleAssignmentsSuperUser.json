@@ -1,0 +1,25 @@
+{
+  "roleRequest" : {
+    "assignerId" : "[[$ROLE_ASSIGNMENT_SUPER_USER]]",
+    "process" : "ccd-fta-data-setup",
+    "reference" : "[[$ROLE_ASSIGNMENT_SUPER_USER]]",
+    "replaceExisting" : true
+  },
+  "requestedRoles" : [
+    {
+      "actorId" : "[[$ROLE_ASSIGNMENT_SUPER_USER]]",
+      "actorIdType" : "IDAM",
+      "roleType" : "ORGANISATION",
+      "roleName" : "Solicitor",
+      "roleCategory" : "PROFESSIONAL",
+      "classification" : "RESTRICTED",
+      "grantType" : "STANDARD",
+      "readOnly" : false,
+      "beginTime" : "2021-01-01T00:00:00Z",
+      "attributes" : {
+        "jurisdiction" : "J1",
+        "caseType" : "CT1"
+      }
+    }
+  ]
+}
