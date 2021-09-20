@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -381,5 +382,12 @@ public abstract class BaseTest {
     public static List<CaseFieldDefinition> getCaseFieldsFromJson(String json) throws IOException {
         return mapper.readValue(json, TypeFactory.defaultInstance().constructCollectionType(List.class,
             CaseFieldDefinition.class));
+    }
+
+    public static CaseTypeDefinition loadCaseTypeDefinition(String caseTypeJsonLocation) {
+        String resourceAsString = BaseTest.getResourceAsString(caseTypeJsonLocation);
+        String jsonPathExpression = "$.response.jsonBody";
+        return JsonPath.parse(resourceAsString)
+            .read(jsonPathExpression, CaseTypeDefinition.class);
     }
 }

@@ -114,7 +114,7 @@ public class RoleAssignmentsHelper {
             .roleType(RoleType.CASE.name())
             .roleName(roleName)
             .classification(Classification.PUBLIC.name())
-            .grantType(GrantType.STANDARD.name())
+            .grantType(GrantType.SPECIFIC.name())
             .roleCategory(RoleCategory.JUDICIAL.name())
             .readOnly(false)
             .beginTime(BEGIN_TIME)
@@ -170,6 +170,8 @@ public class RoleAssignmentsHelper {
                 .caseId(Optional.of(caseId))
                 .caseType(Optional.of(caseType == null ? "FT_Tabs" : caseType))
                 .contractType(Optional.of("SALARIED")) // SALARIED, FEEPAY
+                .region(Optional.empty())
+                .location(Optional.empty())
                 .build();
         }
     }
