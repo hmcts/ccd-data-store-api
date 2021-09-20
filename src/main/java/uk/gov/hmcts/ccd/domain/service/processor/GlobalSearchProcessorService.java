@@ -26,13 +26,12 @@ public class GlobalSearchProcessorService {
 
     public Map<String, JsonNode> populateGlobalSearchData(CaseTypeDefinition caseTypeDefinition,
                                                           Map<String, JsonNode> data) {
-
-        Map<String, JsonNode> clonedData = null;
-        if (data != null) {
-            clonedData = new HashMap<>(data);
-        }
-
         if (caseTypeDefinition.getCaseField(SEARCH_CRITERIA).isPresent()) {
+            Map<String, JsonNode> clonedData = null;
+            if (data != null) {
+                clonedData = new HashMap<>(data);
+            }
+
             List<uk.gov.hmcts.ccd.domain.model.definition.SearchCriteria> searchCriterias =
                 caseTypeDefinition.getSearchCriterias();
 
@@ -48,9 +47,11 @@ public class GlobalSearchProcessorService {
             if (!searchCriteria.isEmpty() && clonedData != null) {
                 clonedData.put(SEARCH_CRITERIA, JacksonUtils.convertValueJsonNode(searchCriteria));
             }
-        }
 
-        return clonedData;
+            return clonedData;
+        } else {
+            return data;
+        }
     }
 
     private SearchCriteria populateSearchCriteria(Map<String, JsonNode> data,
@@ -59,8 +60,7 @@ public class GlobalSearchProcessorService {
         SearchCriteria returnValue = new SearchCriteria();
 
         if (data != null) {
-            data.forEach((key, jsonNode) -> searchCriterias.forEach(currentSearchCriteria -> {
-
+            searchCriterias.forEach(currentSearchCriteria -> data.forEach((key, jsonNode) -> {
                 if (currentSearchCriteria.getOtherCaseReference().contains(".")
                     && key.equals(currentSearchCriteria.getOtherCaseReference().split("\\.")[0])) {
                     otherCaseReferences.add(OtherCaseReference.builder()
@@ -74,7 +74,6 @@ public class GlobalSearchProcessorService {
                         .build());
                 }
             }));
-
             returnValue = SearchCriteria.builder().otherCaseReferences(otherCaseReferences).build();
         }
 
