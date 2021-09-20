@@ -24,16 +24,21 @@
         },
         "SearchParties" : {
           "classification" : "PUBLIC",
-          "value" : [ {
-            "value" : {
-              "Name" : "PUBLIC",
-              "EmailAddress" : "PUBLIC",
-              "AddressLine1" : "PUBLIC",
-              "PostCode" : "PUBLIC",
-              "DateOfBirth" : "PUBLIC"
+          "value" : [
+            {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
             },
-            "id" : "[[ANYTHING_PRESENT]]"
-          } ]
+            {
+              "value" : {
+                "Name" : "PUBLIC",
+                "EmailAddress" : "PUBLIC",
+                "AddressLine1" : "PUBLIC",
+                "PostCode" : "PUBLIC",
+                "DateOfBirth" : "PUBLIC"
+              },
+              "id" : "[[ANYTHING_PRESENT]]"
+            } ]
         }
       }
     }

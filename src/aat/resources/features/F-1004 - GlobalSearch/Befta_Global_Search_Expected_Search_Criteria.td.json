@@ -7,7 +7,12 @@
       "value" : "FirstNameValue",
       "id" : "[[ANYTHING_PRESENT]]"
     } ],
-    "SearchParties" : [ {
+    "SearchParties" : [
+      {
+        "__ordering__": "UNORDERED",
+        "__elementId__": "value"
+      },
+      {
       "value" : {
         "Name" : "FirstNameValue LastNameValue",
         "EmailAddress" : "e@mail.com",
