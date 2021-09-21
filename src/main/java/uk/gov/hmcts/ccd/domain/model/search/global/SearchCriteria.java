@@ -37,8 +37,8 @@ public class SearchCriteria {
     private List<Party> parties;
 
     public enum SearchCriteriaEnum {
-        REGION("caseManagementRegionIds", "CaseManagementLocation.region"),
-        BASE_LOCATION("caseManagementBaseLocationIds", "CaseManagementLocation.baseLocation"),
+        REGION("caseManagementRegionIds", "CaseManagementLocation.RegionId"),
+        BASE_LOCATION("caseManagementBaseLocationIds", "CaseManagementLocation.BaseLocationId"),
         PARTIES("parties", "SearchCriteria.SearchParties"),
         OTHER_CASE_REFERENCES("otherReferences", "SearchCriteria.OtherCaseReferences");
 

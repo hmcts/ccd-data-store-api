@@ -5,6 +5,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -58,7 +59,7 @@ public class GlobalSearchParser {
                     caseFieldDefinition.get().getAccessControlLists()))
                 || !securityClassificationService
                 .userHasEnoughSecurityClassificationForField(caseTypeDefinition.getJurisdictionId(),
-                    caseTypeDefinition, caseFieldDefinition.get().getId()))) {
+                    SecurityClassification.valueOf(caseFieldDefinition.get().getSecurityLabel())))) {
                 isAuthorised = false;
                 break;
             }

@@ -113,6 +113,14 @@ public class SecurityClassificationService {
             .orElse(false);
     }
 
+    public boolean userHasEnoughSecurityClassificationForField(String jurisdictionId,
+                                                               SecurityClassification otherClassification) {
+        final Optional<SecurityClassification> userClassification = getUserClassification(jurisdictionId);
+        return userClassification.map(securityClassification ->
+            securityClassification.higherOrEqualTo(otherClassification))
+            .orElse(false);
+    }
+
     private JsonNode filterNestedObject(JsonNode data, JsonNode dataClassification,
                                         SecurityClassification userClassification) {
         if (isAnyNull(data, dataClassification)) {
