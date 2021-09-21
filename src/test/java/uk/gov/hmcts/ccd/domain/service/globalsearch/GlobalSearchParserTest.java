@@ -101,9 +101,9 @@ class GlobalSearchParserTest {
                     aFieldType()
                         .withId("CaseManagementLocation")
                         .withType(COMPLEX)
-                        .withComplexField(complexField("region", TEXT,
+                        .withComplexField(complexField("RegionId", TEXT,
                             SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true))
-                        .withComplexField(complexField("baseLocation", TEXT,
+                        .withComplexField(complexField("BaseLocationId", TEXT,
                             SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true))
                         .build())
                 .build())
@@ -135,9 +135,9 @@ class GlobalSearchParserTest {
                     aFieldType()
                         .withId("CaseManagementLocation")
                         .withType(COMPLEX)
-                        .withComplexField(complexField("region", TEXT,
+                        .withComplexField(complexField("RegionId", TEXT,
                             SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, false))
-                        .withComplexField(complexField("baseLocation", TEXT,
+                        .withComplexField(complexField("BaseLocationId", TEXT,
                             SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true))
                         .build())
                 .build())
@@ -169,9 +169,9 @@ class GlobalSearchParserTest {
                     aFieldType()
                         .withId("CaseManagementLocation")
                         .withType(COMPLEX)
-                        .withComplexField(complexField("region", TEXT,
+                        .withComplexField(complexField("RegionId", TEXT,
                             SecurityClassification.RESTRICTED, ROLE_IN_USER_ROLE_1, true))
-                        .withComplexField(complexField("baseLocation", TEXT,
+                        .withComplexField(complexField("BaseLocationId", TEXT,
                             SecurityClassification.PUBLIC, ROLE_IN_USER_ROLE_1, true))
                         .build())
                 .build())
@@ -210,13 +210,13 @@ class GlobalSearchParserTest {
         searchCriteria.setCaseManagementBaseLocationIds(validFields);
         searchCriteria.setCaseManagementRegionIds(validFields);
         doReturn(true).when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(any(), any(), any());
+            .userHasEnoughSecurityClassificationForField(any(), any());
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, JsonNode> data = new HashMap<>();
         data.put("CaseManagementLocation", mapper.readTree("{\n"
-            + "      \"region\": \"valueOne\",\n"
-            + "       \"baseLocation\": \"valueThree\"\n"
+            + "      \"RegionId\": \"valueOne\",\n"
+            + "       \"BaseLocationId\": \"valueThree\"\n"
             + "  }"));
         caseDetails = newCaseDetails()
             .withCaseTypeId(CASE_TYPE_ID_1)
@@ -241,13 +241,13 @@ class GlobalSearchParserTest {
         searchCriteria.setCaseManagementRegionIds(validFields);
 
         doReturn(true)
-            .when(securityClassificationService).userHasEnoughSecurityClassificationForField(any(), any(), any());
+            .when(securityClassificationService).userHasEnoughSecurityClassificationForField(any(), any());
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, JsonNode> data = new HashMap<>();
         data.put("CaseManagementLocation", mapper.readTree("{\n"
-            + "      \"region\": \"valueOne\",\n"
-            + "       \"baseLocation\": \"valueThree\"\n"
+            + "      \"RegionId\": \"valueOne\",\n"
+            + "       \"BaseLocationId\": \"valueThree\"\n"
             + "  }"));
         caseDetails = newCaseDetails()
             .withCaseTypeId(CASE_TYPE_ID_1)
@@ -280,23 +280,23 @@ class GlobalSearchParserTest {
 
         doReturn(false)
             .when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(JURISDICTION, caseTypeDefinition3, "region");
+            .userHasEnoughSecurityClassificationForField(JURISDICTION, SecurityClassification.RESTRICTED);
         doReturn(true)
             .when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(JURISDICTION, caseTypeDefinition3,"baseLocation");
+            .userHasEnoughSecurityClassificationForField(JURISDICTION, SecurityClassification.PUBLIC);
         doReturn(true)
             .when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(JURISDICTION, caseTypeDefinition1, "region");
+            .userHasEnoughSecurityClassificationForField(JURISDICTION, SecurityClassification.PUBLIC);
         doReturn(true)
             .when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(JURISDICTION, caseTypeDefinition1,"baseLocation");
+            .userHasEnoughSecurityClassificationForField(JURISDICTION, SecurityClassification.PUBLIC);
 
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, JsonNode> data = new HashMap<>();
         data.put("CaseManagementLocation", mapper.readTree("{\n"
-            + "      \"region\": \"valueOne\",\n"
-            + "       \"baseLocation\": \"valueThree\"\n"
+            + "      \"RegionId\": \"valueOne\",\n"
+            + "       \"BaseLocationId\": \"valueThree\"\n"
             + "  }"));
         caseDetails = newCaseDetails()
             .withCaseTypeId(CASE_TYPE_ID_1)
@@ -328,7 +328,7 @@ class GlobalSearchParserTest {
         searchCriteria.setOtherReferences(validFields);
 
         doReturn(true).when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(any(), any(), any());
+            .userHasEnoughSecurityClassificationForField(any(), any());
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, JsonNode> data = new HashMap<>();
