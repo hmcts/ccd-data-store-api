@@ -64,12 +64,6 @@ class AddCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
             stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
                 .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200)));
 
-            // createCaseRoleAssignments will return created RAs
-            RoleAssignmentResource roleAssignment1 =
-                createRoleAssignmentRecord(ASSIGNMENT_1, CASE_ID_1, CASE_ROLE_1, userId);
-            RoleAssignmentRequestResponse roleAssignmentRequestResponse = createRoleAssignmentRequestResponse(
-                singletonList(roleAssignment1));
-
             stubIdamRolesForUser(userId);
             stubUserInfo(userId);
         }
