@@ -18,6 +18,7 @@ import java.util.Optional;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_PATH;
@@ -111,24 +112,24 @@ class ReferenceDataCacheRefreshIT extends WireMockBaseTest implements ReferenceD
 
     @Test
     void testThatExceptionShouldNotDisableCacheRefreshScheduler() {
-        // GIVEN
-        cacheContainsInitialReferenceData();
-
-        // WHEN
-        stubUpstreamFault(BUILDING_LOCATIONS_PATH, BUILDING_LOCATIONS_STUB_ID);
-
+        // GIVEN/WHEN
         await()
-            .pollDelay(1500, MICROSECONDS)
-            .atMost(Duration.FIVE_SECONDS)
-            .untilAsserted(() -> assertThat(underTest.getBuildingLocations())
-                .isNotEmpty()
-                .hasSameElementsAs(initialBuildingLocations));
+            .atMost(Duration.TEN_SECONDS)
+            .untilAsserted(() -> {
+                cacheContainsInitialReferenceData();
+
+                stubUpstreamFault(BUILDING_LOCATIONS_PATH, BUILDING_LOCATIONS_STUB_ID);
+
+                assertThat(underTest.getBuildingLocations())
+                    .isNotEmpty()
+                    .hasSameElementsAs(initialBuildingLocations);
+            });
 
         updateUpstreamReferenceData();
 
         // THEN
         await()
-            .pollDelay(1500, MICROSECONDS)
+            .pollDelay(2, SECONDS)
             .atMost(Duration.FIVE_SECONDS)
             .untilAsserted(() -> assertThat(underTest.getBuildingLocations())
                 .isNotEmpty()
