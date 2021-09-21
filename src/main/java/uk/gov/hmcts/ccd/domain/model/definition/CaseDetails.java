@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -109,6 +111,9 @@ public class CaseDetails implements Cloneable {
 
     @JsonIgnore
     private final Map<String, Object> metadata = new HashMap<>();
+
+    @JsonIgnore
+    private LocalDate resolvedTTL;
 
     public String getId() {
         return id;
@@ -370,4 +375,11 @@ public class CaseDetails implements Cloneable {
         return caseEventData;
     }
 
+    public void setResolvedTTL(LocalDate resolvedTTL) {
+        this.resolvedTTL = resolvedTTL;
+    }
+
+    public LocalDate getResolvedTTL() {
+        return resolvedTTL;
+    }
 }
