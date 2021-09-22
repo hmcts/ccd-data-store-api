@@ -23,7 +23,7 @@ def dataStoreApiDevelopPr    = "PR-1260" // This doesn't change frequently, but 
 def prsToUseAat              = ""        // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
 
 def secrets = [
-    'ccd-${env}': [
+    'ccd-demo': [
         secret('ccd-caseworker-autotest-email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
         secret('ccd-caseworker-autotest-password', 'CCD_CASEWORKER_AUTOTEST_PASSWORD'),
         secret('ccd-private-caseworker-email', 'CCD_PRIVATE_CASEWORKER_EMAIL'),
@@ -61,7 +61,7 @@ def secrets = [
         secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
         secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD')
     ],
-    's2s-${env}': [
+    's2s-demo': [
         secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
         secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT')
     ]
@@ -82,15 +82,18 @@ def vaultOverrides = [
 ]
 // vars needed for functional tests
 // Other env variables needed for BEFTA.
-env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
-env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
+env.DM_STORE_BASE_URL = "http://dm-store-demo.service.core-compute-demo.internal"
+env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-demo.service.core-compute-demo.internal"
+env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-demo.service.core-compute-demo.internal"
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 env.ELASTIC_SEARCH_FTA_ENABLED = "false"
 env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
 env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
 env.MAX_NUM_PARALLEL_THREADS=6
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
+env.S2S_URL_BASE = "http://rpe-service-auth-provider-demo.service.core-compute-demo.internal"
+env.IDAM_API_URL_BASE = "https://idam-api.demo.platform.hmcts.net"
+env.TEST_URL = "http://ccd-ac-int-data-store-api-demo.service.core-compute-demo.internal"
 
 withPipeline(type, product, component) {
     onMaster {
