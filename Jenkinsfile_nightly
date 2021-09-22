@@ -12,47 +12,48 @@ def product = "ccd"
 def component = "data-store-api"
 
 def secrets = [
-    'ccd-${env}': [
+    'ccd-demo': [
         secret('ccd-caseworker-autotest-email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
         secret('ccd-caseworker-autotest-password', 'CCD_CASEWORKER_AUTOTEST_PASSWORD'),
-        secret('ccd-importer-autotest-email', 'CCD_IMPORT_AUTOTEST_EMAIL'),
-        secret('ccd-importer-autotest-password', 'CCD_IMPORT_AUTOTEST_PASSWORD'),
-        secret('ccd-private-caseworker-email', 'CCD_PRIVATE_CASEWORKER_EMAIL'),
-        secret('ccd-private-caseworker-password', 'CCD_PRIVATE_CASEWORKER_PASSWORD'),
-        secret('ccd-restricted-caseworker-email', 'CCD_RESTRICTED_CASEWORKER_EMAIL'),
-        secret('ccd-restricted-caseworker-password', 'CCD_RESTRICTED_CASEWORKER_PASSWORD'),
-        secret('ccd-private-caseworker-solicitor-email', 'CCD_PRIVATE_CASEWORKER_SOLICITOR_EMAIL'),
-        secret('ccd-private-caseworker-solicitor-password', 'CCD_PRIVATE_CASEWORKER_SOLICITOR_PASSWORD'),
-        secret('ccd-private-cross-case-type-worker-email', 'CCD_PRIVATE_CROSS_CASE_TYPE_CASEWORKER_EMAIL'),
-        secret('ccd-private-cross-case-type-caseworker-password', 'CCD_PRIVATE_CROSS_CASE_TYPE_CASEWORKER_PASSWORD'),
-        secret('ccd-private-cross-case-type-solicitor-email', 'CCD_PRIVATE_CROSS_CASE_TYPE_SOLICITOR_EMAIL'),
-        secret('ccd-private-cross-case-type-solicitor-password', 'CCD_PRIVATE_CROSS_CASE_TYPE_SOLICITOR_PASSWORD'),
-        secret('ccd-restricted-cross-case-type-caseworker-email', 'CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_EMAIL'),
-        secret('ccd-restricted-cross-case-type-caseworker-password', 'CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_PASSWORD'),
-        secret('ccd-api-gateway-oauth2-client-secret', 'OAUTH2_CLIENT_SECRET'),
+//         secret('ccd-importer-autotest-email', 'CCD_IMPORT_AUTOTEST_EMAIL'),
+//         secret('ccd-importer-autotest-password', 'CCD_IMPORT_AUTOTEST_PASSWORD'),
+//         secret('ccd-private-caseworker-email', 'CCD_PRIVATE_CASEWORKER_EMAIL'),
+//         secret('ccd-private-caseworker-password', 'CCD_PRIVATE_CASEWORKER_PASSWORD'),
+//         secret('ccd-restricted-caseworker-email', 'CCD_RESTRICTED_CASEWORKER_EMAIL'),
+//         secret('ccd-restricted-caseworker-password', 'CCD_RESTRICTED_CASEWORKER_PASSWORD'),
+//         secret('ccd-private-caseworker-solicitor-email', 'CCD_PRIVATE_CASEWORKER_SOLICITOR_EMAIL'),
+//         secret('ccd-private-caseworker-solicitor-password', 'CCD_PRIVATE_CASEWORKER_SOLICITOR_PASSWORD'),
+//         secret('ccd-private-cross-case-type-worker-email', 'CCD_PRIVATE_CROSS_CASE_TYPE_CASEWORKER_EMAIL'),
+//         secret('ccd-private-cross-case-type-caseworker-password', 'CCD_PRIVATE_CROSS_CASE_TYPE_CASEWORKER_PASSWORD'),
+//         secret('ccd-private-cross-case-type-solicitor-email', 'CCD_PRIVATE_CROSS_CASE_TYPE_SOLICITOR_EMAIL'),
+//         secret('ccd-private-cross-case-type-solicitor-password', 'CCD_PRIVATE_CROSS_CASE_TYPE_SOLICITOR_PASSWORD'),
+//         secret('ccd-restricted-cross-case-type-caseworker-email', 'CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_EMAIL'),
+//         secret('ccd-restricted-cross-case-type-caseworker-password', 'CCD_RESTRICTED_CROSS_CASE_TYPE_CASEWORKER_PASSWORD'),
+//         secret('ccd-api-gateway-oauth2-client-secret', 'OAUTH2_CLIENT_SECRET'),
 
         //Required for FTA test RDM-6943
-        secret('ccd-befta-caseworker-2-solicitor-1-pwd', 'CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD'),
-        secret('ccd-befta-caseworker-2-solicitor-2-pwd', 'CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD'),
-        secret('ccd-befta-caseworker-2-solicitor-3-pwd', 'CCD_BEFTA_CASEWORKER_2_SOLICITOR_3_PWD'),
-        secret('ccd-befta-caseworker-1-pwd', 'CCD_BEFTA_CASEWORKER_1_PWD'),
-        secret('ccd-befta-caseworker-2-pwd', 'CCD_BEFTA_CASEWORKER_2_PWD'),
-        secret('ccd-befta-caseworker-3-pwd', 'CCD_BEFTA_CASEWORKER_3_PWD'),
-        secret('ccd-befta-citizen-2-pwd', 'CCD_BEFTA_CITIZEN_2_PWD'),
-        secret('ccd-befta-citizen-3-pwd', 'CCD_BEFTA_CITIZEN_3_PWD'),
-        secret('ccd-befta-solicitor-3-pwd', 'CCD_BEFTA_SOLICITOR_3_PWD'),
-        secret('ccd-befta-caseworker-1-no-profile-pwd', 'CCD_BEFTA_CASEWORKER_1_NO_PROFILE_PWD'),
-        secret('ccd-befta-caseworker-caa-pwd', 'CCD_BEFTA_CASEWORKER_CAA_PWD'),
-        secret('ccd-befta-master-caseworker-pwd', 'CCD_BEFTA_MASTER_CASEWORKER_PWD'),
-        secret('ccd-befta-master-solicitor1-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_1_PWD'),
-        secret('ccd-befta-master-solicitor2-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_2_PWD'),
+//         secret('ccd-befta-caseworker-2-solicitor-1-pwd', 'CCD_BEFTA_CASEWORKER_2_SOLICITOR_1_PWD'),
+//         secret('ccd-befta-caseworker-2-solicitor-2-pwd', 'CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD'),
+//         secret('ccd-befta-caseworker-2-solicitor-3-pwd', 'CCD_BEFTA_CASEWORKER_2_SOLICITOR_3_PWD'),
+//         secret('ccd-befta-caseworker-1-pwd', 'CCD_BEFTA_CASEWORKER_1_PWD'),
+//         secret('ccd-befta-caseworker-2-pwd', 'CCD_BEFTA_CASEWORKER_2_PWD'),
+//         secret('ccd-befta-caseworker-3-pwd', 'CCD_BEFTA_CASEWORKER_3_PWD'),
+//         secret('ccd-befta-citizen-2-pwd', 'CCD_BEFTA_CITIZEN_2_PWD'),
+//         secret('ccd-befta-citizen-3-pwd', 'CCD_BEFTA_CITIZEN_3_PWD'),
+//         secret('ccd-befta-solicitor-3-pwd', 'CCD_BEFTA_SOLICITOR_3_PWD'),
+//         secret('ccd-befta-caseworker-1-no-profile-pwd', 'CCD_BEFTA_CASEWORKER_1_NO_PROFILE_PWD'),
+//         secret('ccd-befta-caseworker-caa-pwd', 'CCD_BEFTA_CASEWORKER_CAA_PWD'),
+//         secret('ccd-befta-master-caseworker-pwd', 'CCD_BEFTA_MASTER_CASEWORKER_PWD'),
+//         secret('ccd-befta-master-solicitor1-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_1_PWD'),
+//         secret('ccd-befta-master-solicitor2-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_2_PWD'),
 
         secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_OAUTH2_CLIENT_SECRET'),
         secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
         secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD')
     ],
-    's2s-${env}': [
+    's2s-demo': [
         secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
+        secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_KEY'),
         secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT')
     ]
 ]
@@ -67,7 +68,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 def vaultOverrides = [
-    'preview' : 'aat',
+    'preview' : 'demo',
     'spreview': 'saat'
 ]
 // vars needed for functional tests
@@ -76,12 +77,18 @@ env.TEST_URL = "http://ccd-ac-int-data-store-api-demo.service.core-compute-demo.
 
 // Other env variables needed for BEFTA.
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
-env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
-env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
+env.DM_STORE_BASE_URL = "http://dm-store-demo.service.core-compute-demo.internal"
+env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-demo.service.core-compute-demo.internal"
+env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-demo.service.core-compute-demo.internal"
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN" // Temporary workaround for platform changes: turn BEFTA header checks to warning mode
 env.ELASTIC_SEARCH_FTA_ENABLED = "false"
 env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
+env.MAX_NUM_PARALLEL_THREADS=6
+env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
+env.S2S_URL_BASE = "http://rpe-service-auth-provider-demo.service.core-compute-demo.internal"
+env.IDAM_API_URL_BASE = "https://idam-api.demo.platform.hmcts.net"
+env.TEST_URL = "http://ccd-ac-int-data-store-api-demo.service.core-compute-demo.internal"
+env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-demo.service.core-compute-demo.internal"
 
 withNightlyPipeline(type, product, component) {
     overrideVaultEnvironments(vaultOverrides)
