@@ -91,6 +91,7 @@ withNightlyPipeline(type, product, component) {
     disableLegacyDeployment()
     enableHighLevelDataSetup()
     enableFortifyScan()
+    enableFullFunctionalTest()
 
     after('fortify-scan') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
