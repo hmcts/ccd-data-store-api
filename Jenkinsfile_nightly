@@ -97,7 +97,6 @@ withNightlyPipeline(type, product, component) {
     enableDbMigration('ccd')
     disableLegacyDeployment()
     enableHighLevelDataSetup()
-    enableFortifyScan()
     enableFullFunctionalTest()
 
     after('fortify-scan') {
