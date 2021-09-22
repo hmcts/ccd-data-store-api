@@ -72,7 +72,7 @@ def vaultOverrides = [
 ]
 // vars needed for functional tests
 // Assume a feature build branched off 'develop', with dependencies develop-to-develop.
-env.TEST_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+env.TEST_URL = "http://ccd-ac-int-data-store-api-demo.service.core-compute-demo.internal"
 
 // Other env variables needed for BEFTA.
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
