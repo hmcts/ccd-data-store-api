@@ -58,10 +58,21 @@
       "state" : "Unissued1",
       "security_classification" : "PUBLIC",
       "data" : {
+        "caseManagementLocation" : {
+          "RegionId" : "England",
+          "BaseLocationId" : "London"
+        },
         "F2" : "b",
         "F3" : "c"
       },
       "data_classification" : {
+        "caseManagementLocation" : {
+          "value" : {
+            "RegionId" : "PUBLIC",
+            "BaseLocationId" : "PUBLIC"
+          },
+          "classification" : "PUBLIC"
+        },
         "F1" : "RESTRICTED",
         "F2" : "PRIVATE",
         "F3" : "PUBLIC"

@@ -8,8 +8,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 public interface RoleAttributeMatcher {
 
     String CASE_MANAGEMENT__LOCATION = "caseManagementLocation";
-    String BASE_LOCATION = "baseLocation";
-    String REGION = "region";
+    String BASE_LOCATION = "BaseLocationId";
+    String REGION = "RegionId";
     String EMPTY_STR = "";
 
     default boolean matchAttribute(RoleAssignment roleAssignment, CaseDetails caseDetails) {

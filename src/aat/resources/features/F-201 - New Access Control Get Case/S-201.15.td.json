@@ -33,7 +33,7 @@
       "experimental": true
     },
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-201_CT2][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][F-201_CT2_NO_LOCATION][testData][actualResponse][body][id]}"
     }
   },
 
@@ -49,7 +49,7 @@
           "href" : "[[ANYTHING_PRESENT]]"
         }
       },
-      "id" : "${[scenarioContext][childContexts][F-201_CT2][testData][actualResponse][body][id]}",
+      "id" : "${[scenarioContext][childContexts][F-201_CT2_NO_LOCATION][testData][actualResponse][body][id]}",
       "jurisdiction" : "J1",
       "case_type" : "CT2",
       "created_on" : "[[ANYTHING_PRESENT]]",
@@ -58,10 +58,21 @@
       "state" : "Unissued1",
       "security_classification" : "PUBLIC",
       "data" : {
+        "caseManagementLocation" : {
+          "RegionId" : "England",
+          "BaseLocationId" : ""
+        },
         "F2" : "b",
         "F3" : "c"
       },
       "data_classification" : {
+        "caseManagementLocation" : {
+          "value" : {
+            "RegionId" : "PUBLIC",
+            "BaseLocationId" : "PUBLIC"
+          },
+          "classification" : "PUBLIC"
+        },
         "F1" : "RESTRICTED",
         "F2" : "PRIVATE",
         "F3" : "PUBLIC"
