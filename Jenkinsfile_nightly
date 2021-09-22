@@ -69,6 +69,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 
 def vaultOverrides = [
     'preview' : 'demo',
+    'aat' : 'demo',
     'spreview': 'saat'
 ]
 // vars needed for functional tests
