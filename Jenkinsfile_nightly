@@ -12,7 +12,7 @@ def product = "ccd"
 def component = "data-store-api"
 
 def secrets = [
-    'ccd-demo': [
+    'ccd-${env}': [
         secret('ccd-caseworker-autotest-email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
         secret('ccd-caseworker-autotest-password', 'CCD_CASEWORKER_AUTOTEST_PASSWORD'),
 //         secret('ccd-importer-autotest-email', 'CCD_IMPORT_AUTOTEST_EMAIL'),
@@ -51,7 +51,7 @@ def secrets = [
         secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
         secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD')
     ],
-    's2s-demo': [
+    's2s-${env}': [
         secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
         secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_KEY'),
         secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT')
