@@ -97,7 +97,7 @@ withNightlyPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     enableDbMigration('ccd')
     disableLegacyDeployment()
-//     enableHighLevelDataSetup()
+    enableHighLevelDataSetup()
     enableFullFunctionalTest()
 
     after('fortify-scan') {
