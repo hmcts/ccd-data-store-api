@@ -770,7 +770,7 @@ task smoke() {
         javaexec {
             main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath
-            args = ['--plugin', "json:${rootDir}/target/cucumber.json", '--tags', '@Smoke and not @Ignore', '--glue',
+            args = ['--plugin', "json:${rootDir}/target/cucumber.json", '--tags', '@Smoke2 and not @Ignore', '--glue',
                     'uk.gov.hmcts.befta.player', '--glue', "uk.gov.hmcts.ccd.datastore.befta", 'src/aat/resources/features']
             jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
         }
