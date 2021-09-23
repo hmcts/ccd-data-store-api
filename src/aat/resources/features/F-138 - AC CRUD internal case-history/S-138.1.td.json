@@ -1,0 +1,37 @@
+{
+	"_guid_": "S-138.1",
+	"_extends_": "F-138_Test_Data_Base",
+	"specs": [
+		"contains a CaseType with no R access",
+		"contains a HTTP 404 Not Found"
+	],
+
+	"request": {
+		"_extends_": "Common_Request",
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_CRUD_2",
+      "cid": "${[scenarioContext][childContexts][F-138_CreateCase][testData][actualResponse][body][id]}",
+      "eventId": "${[scenarioContext][childContexts][F-138_GetEventId][testData][actualResponse][body][events][0][id]}"
+    }
+	},
+	"expectedResponse": {
+		"_extends_": "Common_404_Response",
+    "headers" : {
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANY_NULLABLE]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANY_NULLABLE]]"
+    },
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message": "No case type found",
+      "details": "Unable to find the case type, please try a search or return to the case list overview page.",
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+	}
+}
+

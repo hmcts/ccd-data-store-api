@@ -1,0 +1,28 @@
+{
+  "_guid_": "F-139_Test_Data_Base",
+  "productName": "CCD Data Store",
+  "operationName": "Retrieve a case by ID for dynamic display",
+  "method": "GET",
+  "uri": "/internal/cases/{cid}",
+
+  "specs": [
+    "an active profile in CCD"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "experimental": true,
+      "_extends_": "Common_Request_Headers"
+    }
+  },
+
+  "expectedResponse": {
+  }
+}

@@ -188,7 +188,6 @@ class SubmitCaseTransactionTest {
 
         assertAll(
             () -> assertThat(actualCaseDetails, sameInstance(savedCaseDetails)),
-            () -> verify(caseDocumentService, times(2)).stripDocumentHashes(caseDetails),
             () -> order.verify(caseDetails).setCreatedDate(notNull(LocalDateTime.class)),
             () -> order.verify(caseDetails).setLastStateModifiedDate(notNull(LocalDateTime.class)),
             () -> order.verify(caseDetails).setReference(Long.valueOf(CASE_UID)),
