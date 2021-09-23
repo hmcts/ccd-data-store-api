@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 
 import java.util.List;
 
@@ -22,6 +23,8 @@ class DefaultJurisdictionsResolverTest {
     private JurisdictionsResolver idamJurisdictionsResolver;
     @Mock
     private JurisdictionsResolver attributeBasedJurisdictionsResolver;
+    @Mock
+    private CaseDefinitionRepository caseDefinitionRepository;
 
     private JurisdictionsResolver jurisdictionsResolver;
 
@@ -53,6 +56,6 @@ class DefaultJurisdictionsResolverTest {
         assertEquals(jurisdictions, jurisdictionsResolver.getJurisdictions());
 
         verify(attributeBasedJurisdictionsResolver).getJurisdictions();
-        verifyZeroInteractions(idamJurisdictionsResolver);
+        verify(idamJurisdictionsResolver).getJurisdictions();
     }
 }

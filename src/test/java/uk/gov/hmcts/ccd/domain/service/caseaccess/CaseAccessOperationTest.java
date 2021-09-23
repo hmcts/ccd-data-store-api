@@ -24,6 +24,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentsDelete
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRoleWithOrganisation;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentCategoryService;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.InvalidCaseRoleException;
@@ -98,6 +99,9 @@ class CaseAccessOperationTest {
 
     @Mock
     private ApplicationParams applicationParams;
+
+    @Mock
+    private RoleAssignmentCategoryService roleAssignmentCategoryService;
 
     @InjectMocks
     private uk.gov.hmcts.ccd.domain.service.caseaccess.CaseAccessOperation caseAccessOperation;

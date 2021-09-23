@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/o/.well-known/123openid-configuration2"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "issuer": "http://localhost:{{request.requestLine.port}}/o",
+      "jwks_uri": "http://localhost:{{request.requestLine.port}}/jwks"
+    },
+    "transformers": ["response-template"]
+  }
+}
+
