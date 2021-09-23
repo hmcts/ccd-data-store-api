@@ -15,6 +15,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @SuppressWarnings("checkstyle:OperatorWrap")
@@ -77,6 +78,7 @@ public class CaseDetailsEntity {
     public static final String DATA_COL = "data";
     public static final String DATA_CLASSIFICATION_COL = "data_classification";
     public static final String SUPPLEMENTARY_DATA_COL = "supplementary_data";
+    public static final String RESOLVED_TTL_COL = "resolved_ttl";
 
 
 
@@ -111,6 +113,8 @@ public class CaseDetailsEntity {
     @Column(name = SUPPLEMENTARY_DATA_COL)
     @Convert(converter = JsonDataConverter.class)
     private JsonNode supplementaryData;
+    @Column(name = RESOLVED_TTL_COL)
+    private LocalDate resolvedTTL;
 
     @Version
     private Integer version;
@@ -171,6 +175,10 @@ public class CaseDetailsEntity {
         this.state = state;
     }
 
+    public void setResolvedTTL(LocalDate resolvedTTL) {
+        this.resolvedTTL = resolvedTTL;
+    }
+
     public SecurityClassification getSecurityClassification() {
         return securityClassification;
     }
@@ -217,5 +225,9 @@ public class CaseDetailsEntity {
 
     public void setLastStateModifiedDate(LocalDateTime lastStateModifiedDate) {
         this.lastStateModifiedDate = lastStateModifiedDate;
+    }
+
+    public LocalDate getResolvedTTL() {
+        return resolvedTTL;
     }
 }

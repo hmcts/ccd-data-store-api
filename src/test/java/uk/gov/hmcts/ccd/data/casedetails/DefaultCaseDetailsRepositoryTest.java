@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
 import com.google.common.collect.Maps;
-import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,6 +23,7 @@ import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
@@ -40,7 +41,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -56,6 +56,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     private static final String WRONG_JURISDICTION = "DIVORCE";
     private static final Long REFERENCE = 1504259907353529L;
     private static final Long WRONG_REFERENCE = 9999999999999999L;
+    private static final LocalDate RESOLVED_TTL = LocalDate.now();
 
     private JdbcTemplate template;
 
@@ -88,6 +89,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         caseDetails.setCreatedDate(LocalDateTime.now(ZoneOffset.UTC));
         caseDetails.setState("CaseCreated");
         caseDetails.setSecurityClassification(SecurityClassification.PUBLIC);
+        caseDetails.setResolvedTTL(RESOLVED_TTL);
         try {
             caseDetails.setData(JacksonUtils.convertValue(
                 mapper.readTree("{\"Alliases\": [], \"HasOtherInfo\": \"Yes\"}")));
@@ -99,6 +101,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         assertThat(caseDetailsPersisted.getReference(), is(caseDetails.getReference()));
         assertThat(caseDetailsPersisted.getJurisdiction(), is(caseDetails.getJurisdiction()));
         assertThat(caseDetailsPersisted.getCaseTypeId(), is(caseDetails.getCaseTypeId()));
+        assertThat(caseDetailsPersisted.getResolvedTTL(), is(caseDetails.getResolvedTTL()));
     }
 
     @Test
@@ -470,7 +473,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     public void findByReference_withJurisdiction_jurisdictionNotFound() {
         final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(WRONG_JURISDICTION, REFERENCE);
 
-        MatcherAssert.assertThat(maybeCase.isPresent(), is(false));
+        assertThat(maybeCase.isPresent(), is(false));
     }
 
     @Test
@@ -478,7 +481,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     public void findByReference_withJurisdiction_referenceNotFound() {
         final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(JURISDICTION, WRONG_REFERENCE);
 
-        MatcherAssert.assertThat(maybeCase.isPresent(), is(false));
+        assertThat(maybeCase.isPresent(), is(false));
     }
 
     @Test
@@ -503,9 +506,9 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     }
 
     private void assertCaseDetails(CaseDetails caseDetails, String id, String jurisdictionId, Long caseReference) {
-        MatcherAssert.assertThat(caseDetails.getId(), equalTo(id));
-        MatcherAssert.assertThat(caseDetails.getJurisdiction(), equalTo(jurisdictionId));
-        MatcherAssert.assertThat(caseDetails.getReference(), equalTo(caseReference));
+        assertThat(caseDetails.getId(), equalTo(id));
+        assertThat(caseDetails.getJurisdiction(), equalTo(jurisdictionId));
+        assertThat(caseDetails.getReference(), equalTo(caseReference));
     }
 
 }
