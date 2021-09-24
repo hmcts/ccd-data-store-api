@@ -234,7 +234,7 @@ public class CaseFieldDefinition implements Serializable, CommonField {
                 .orElseThrow(() -> new RuntimeException(
                     format("CaseField %s has no nested elements with code %s.",
                     this.getId(), complexACL.getListElementCode())));
-            nestedField.getAccessControlListByRole(complexACL.getRole())
+            nestedField.getAccessControlListByRole(complexACL.getAccessProfile())
                 .ifPresent(accessControlList -> nestedField.accessControlLists.remove(accessControlList));
             nestedField.getAccessControlLists().add(complexACL);
 
@@ -254,7 +254,7 @@ public class CaseFieldDefinition implements Serializable, CommonField {
                 } else {
                     siblings = filterSiblings("", complexACL.getListElementCode(), allPaths);
                 }
-                removeACLS(findSiblingsWithNoComplexACLs(siblings), complexACL.getRole());
+                removeACLS(findSiblingsWithNoComplexACLs(siblings), complexACL.getAccessProfile());
             });
         }
     }
@@ -307,7 +307,8 @@ public class CaseFieldDefinition implements Serializable, CommonField {
 
     @JsonIgnore
     public Optional<AccessControlList> getAccessControlListByRole(String role) {
-        return this.accessControlLists.stream().filter(acl -> acl.getRole().equalsIgnoreCase(role)).findFirst();
+        return this.accessControlLists.stream().filter(acl -> acl.getAccessProfile().equalsIgnoreCase(role))
+            .findFirst();
     }
 
     private List<String> buildAllDottedComplexFieldPossibilities(List<CaseFieldDefinition> caseFieldEntities) {

@@ -15,7 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 @Service
@@ -23,13 +23,13 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 public class ClassifiedStartEventOperation implements StartEventOperation {
     private static final HashMap<String, JsonNode> EMPTY_DATA_CLASSIFICATION = Maps.newHashMap();
     private final StartEventOperation startEventOperation;
-    private final SecurityClassificationService classificationService;
+    private final SecurityClassificationServiceImpl classificationService;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseDataService caseDataService;
     private final DraftGateway draftGateway;
 
     public ClassifiedStartEventOperation(@Qualifier("default") StartEventOperation startEventOperation,
-                                         SecurityClassificationService classificationService,
+                                         SecurityClassificationServiceImpl classificationService,
                                          @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                          final CaseDefinitionRepository caseDefinitionRepository,
                                          final CaseDataService caseDataService,
