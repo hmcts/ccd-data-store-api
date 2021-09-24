@@ -10,12 +10,12 @@
   ],
   "users": {
     "invokingUser": {
-      "username": "master.caseworker@gmail.com",
+      "username": "master.caseworker2@gmail.com",
       "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
     }
   },
 	"user": {
-		"username": "master.caseworker@gmail.com",
+		"username": "master.caseworker2@gmail.com",
 		"password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
 	},
 

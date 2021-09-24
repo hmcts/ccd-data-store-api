@@ -1,0 +1,36 @@
+{
+  "_guid_": "F-200_GetToken_Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation as Case worker",
+
+  "method": "GET",
+  "uri": "/case-types/{ctid}/event-triggers/{etid}?ignore-warning=false",
+
+  "specs": [
+    "to create a token for case creation"
+  ],
+
+  "users": {
+    "invokingUser": {
+
+      "username": "ccd.ac.solicitor1@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
+    }
+  },
+
+  "request": {
+    "headers":{
+      "_extends_": "Common_Request_Headers",
+      "experimental": "true"
+    },
+    "pathVariables": {
+
+    }
+  },
+
+  "expectedResponse": {
+
+  }
+
+}
