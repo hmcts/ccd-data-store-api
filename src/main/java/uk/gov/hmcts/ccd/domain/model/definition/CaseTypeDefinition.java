@@ -38,6 +38,8 @@ public class CaseTypeDefinition implements Serializable {
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
     private final List<SearchAliasField> searchAliasFields = new ArrayList<>();
+    private final List<SearchParty> searchParties = new ArrayList<>();
+    private final List<SearchCriteria> searchCriterias = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -191,5 +193,25 @@ public class CaseTypeDefinition implements Serializable {
             .filter(caseField -> LABEL.equals(caseField.getFieldTypeDefinition().getType()))
             .collect(Collectors.toMap(CaseFieldDefinition::getId, caseField ->
                 JsonNodeFactory.instance.textNode(caseField.getLabel())));
+    }
+
+    public List<SearchParty> getSearchParties() {
+        return searchParties;
+    }
+
+    public void setSearchParties(List<SearchParty> searchParties) {
+        if (searchParties != null) {
+            this.searchParties.addAll(searchParties);
+        }
+    }
+
+    public List<SearchCriteria> getSearchCriterias() {
+        return searchCriterias;
+    }
+
+    public void setSearchCriterias(List<SearchCriteria> searchCriterias) {
+        if (searchCriterias != null) {
+            this.searchCriterias.addAll(searchCriterias);
+        }
     }
 }
