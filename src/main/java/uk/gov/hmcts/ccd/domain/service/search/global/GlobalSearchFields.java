@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.globalsearch;
+package uk.gov.hmcts.ccd.domain.service.search.global;
 
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.domain.types.DynamicListValidator;

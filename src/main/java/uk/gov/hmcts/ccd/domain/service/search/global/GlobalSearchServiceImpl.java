@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.globalsearch;
+package uk.gov.hmcts.ccd.domain.service.search.global;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -25,7 +25,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toUnmodifiableMap;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.LocationCollector.toLocationLookup;
+import static uk.gov.hmcts.ccd.domain.service.search.global.LocationCollector.toLocationLookup;
 
 @Service
 public class GlobalSearchServiceImpl implements GlobalSearchService {
@@ -33,7 +33,7 @@ public class GlobalSearchServiceImpl implements GlobalSearchService {
     private final ApplicationParams applicationParams;
     private final ObjectMapperService objectMapperService;
     private final ReferenceDataRepository referenceDataRepository;
-    private final SearchResponseTransformer searchResponseTransformer;
+    private final GlobalSearchResponseTransformer globalSearchResponseTransformer;
     private final ElasticsearchQueryHelper elasticsearchQueryHelper;
     private final GlobalSearchQueryBuilder globalSearchQueryBuilder;
 
@@ -52,13 +52,13 @@ public class GlobalSearchServiceImpl implements GlobalSearchService {
     public GlobalSearchServiceImpl(final ApplicationParams applicationParams,
                                    final ObjectMapperService objectMapperService,
                                    final ReferenceDataRepository referenceDataRepository,
-                                   final SearchResponseTransformer searchResponseTransformer,
+                                   final GlobalSearchResponseTransformer globalSearchResponseTransformer,
                                    final ElasticsearchQueryHelper elasticsearchQueryHelper,
                                    final GlobalSearchQueryBuilder globalSearchQueryBuilder) {
         this.applicationParams = applicationParams;
         this.objectMapperService = objectMapperService;
         this.referenceDataRepository = referenceDataRepository;
-        this.searchResponseTransformer = searchResponseTransformer;
+        this.globalSearchResponseTransformer = globalSearchResponseTransformer;
         this.elasticsearchQueryHelper = elasticsearchQueryHelper;
         this.globalSearchQueryBuilder = globalSearchQueryBuilder;
     }
@@ -124,10 +124,11 @@ public class GlobalSearchServiceImpl implements GlobalSearchService {
         final LocationLookup locationLookup = LOCATION_LOOKUP_FUNCTION.apply(buildingLocations);
 
         final List<GlobalSearchResponsePayload.Result> results = caseSearchResult.getCases().stream()
-            .map(caseDetails -> searchResponseTransformer.transformResult(caseDetails, serviceLookup, locationLookup))
+            .map(caseDetails ->
+                globalSearchResponseTransformer.transformResult(caseDetails, serviceLookup, locationLookup))
             .collect(Collectors.toUnmodifiableList());
 
-        final GlobalSearchResponsePayload.ResultInfo resultInfo = searchResponseTransformer.transformResultInfo(
+        final GlobalSearchResponsePayload.ResultInfo resultInfo = globalSearchResponseTransformer.transformResultInfo(
             requestPayload.getMaxReturnRecordCount(),
             requestPayload.getStartRecordNumber(),
             caseSearchResult.getTotal(),

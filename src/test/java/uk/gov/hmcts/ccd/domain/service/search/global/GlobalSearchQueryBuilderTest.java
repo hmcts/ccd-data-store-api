@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.globalsearch;
+package uk.gov.hmcts.ccd.domain.service.search.global;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +26,7 @@ import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.search.global.SortCriteria;
 import uk.gov.hmcts.ccd.domain.service.common.DefaultObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
-import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataPaths;
+import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths;
 
 import java.util.ArrayList;
 import java.util.HashMap;

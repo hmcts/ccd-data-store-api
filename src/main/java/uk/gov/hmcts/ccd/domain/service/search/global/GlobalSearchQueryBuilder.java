@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.globalsearch;
+package uk.gov.hmcts.ccd.domain.service.search.global;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.Lists;
@@ -24,24 +24,24 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CASE_TYPE;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataPaths.BASE_LOCATION;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataPaths.CASE_MANAGEMENT_CATEGORY_ID;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataPaths.CASE_MANAGEMENT_CATEGORY_NAME;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataPaths.CASE_MANAGEMENT_LOCATION;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataPaths.CASE_NAME_HMCTS_INTERNAL;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataPaths.OTHER_REFERENCE;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataPaths.REGION;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataPaths.SEARCH_PARTIES;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataPaths.SEARCH_PARTY_ADDRESS_LINE_1;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataPaths.SEARCH_PARTY_DATE_OF_BIRTH;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataPaths.SEARCH_PARTY_EMAIL_ADDRESS;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataPaths.SEARCH_PARTY_NAME;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataPaths.SEARCH_PARTY_POSTCODE;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.JURISDICTION;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.REFERENCE;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.STATE;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.SupplementaryDataFields.SERVICE_ID;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CASE_TYPE;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.BASE_LOCATION;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.CASE_MANAGEMENT_CATEGORY_ID;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.CASE_MANAGEMENT_CATEGORY_NAME;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.CASE_MANAGEMENT_LOCATION;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.CASE_NAME_HMCTS_INTERNAL;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.OTHER_REFERENCE;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.REGION;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.SEARCH_PARTIES;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.SEARCH_PARTY_ADDRESS_LINE_1;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.SEARCH_PARTY_DATE_OF_BIRTH;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.SEARCH_PARTY_EMAIL_ADDRESS;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.SEARCH_PARTY_NAME;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.SEARCH_PARTY_POSTCODE;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.JURISDICTION;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.REFERENCE;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.STATE;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.SupplementaryDataFields.SERVICE_ID;
 
 @Named
 public class GlobalSearchQueryBuilder {

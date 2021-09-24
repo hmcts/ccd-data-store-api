@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.globalsearch;
+package uk.gov.hmcts.ccd.domain.service.search.global;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.NonNull;
@@ -11,9 +11,9 @@ import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.refdata.LocationLookup;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceLookup;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
-import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseManagementLocationFields;
-import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.SearchCriteriaFields;
-import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.SupplementaryDataFields;
+import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseManagementLocationFields;
+import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.SearchCriteriaFields;
+import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.SupplementaryDataFields;
 import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
 import uk.gov.hmcts.ccd.domain.types.DynamicListValidator;
 
@@ -27,14 +27,14 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static java.util.Collections.emptyList;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataFields.CASE_MANAGEMENT_CATEGORY;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataFields.CASE_MANAGEMENT_LOCATION;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataFields.CASE_NAME_HMCTS_INTERNAL;
-import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataFields.SEARCH_CRITERIA;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataFields.CASE_MANAGEMENT_CATEGORY;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataFields.CASE_MANAGEMENT_LOCATION;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataFields.CASE_NAME_HMCTS_INTERNAL;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataFields.SEARCH_CRITERIA;
 
 @SuppressWarnings("squid:S1075") // paths below are not URI path literals
 @Named
-public class SearchResponseTransformer {
+public class GlobalSearchResponseTransformer {
 
     private static final String CATEGORY_VALUE_PATH = "/" + DynamicListValidator.VALUE;
     private static final String CATEGORY_ID_PATH = CATEGORY_VALUE_PATH + "/" + DynamicListValidator.CODE;
@@ -45,8 +45,8 @@ public class SearchResponseTransformer {
     private final CaseDefinitionRepository caseDefinitionRepository;
 
     @Inject
-    public SearchResponseTransformer(@Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                         final CaseDefinitionRepository caseDefinitionRepository) {
+    public GlobalSearchResponseTransformer(@Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                               final CaseDefinitionRepository caseDefinitionRepository) {
         this.caseDefinitionRepository = caseDefinitionRepository;
     }
 

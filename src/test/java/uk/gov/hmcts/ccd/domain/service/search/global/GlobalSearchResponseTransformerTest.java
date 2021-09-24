@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.globalsearch;
+package uk.gov.hmcts.ccd.domain.service.search.global;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,13 +28,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
-class SearchResponseTransformerTest extends TestFixtures {
+class GlobalSearchResponseTransformerTest extends TestFixtures {
 
     @Mock
     private CachedCaseDefinitionRepository caseDefinitionRepository;
 
     @InjectMocks
-    private SearchResponseTransformer underTest;
+    private GlobalSearchResponseTransformer underTest;
 
     private static Map<String, JsonNode> CASE_DATA;
     private static Map<String, JsonNode> SUPPLEMENTARY_DATA;

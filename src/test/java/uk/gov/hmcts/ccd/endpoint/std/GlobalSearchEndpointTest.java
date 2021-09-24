@@ -16,10 +16,10 @@ import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
-import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
+import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchService;
 
 import java.util.List;
 

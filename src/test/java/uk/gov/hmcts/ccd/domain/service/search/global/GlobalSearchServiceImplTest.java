@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.globalsearch;
+package uk.gov.hmcts.ccd.domain.service.search.global;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -67,7 +67,7 @@ class GlobalSearchServiceImplTest extends TestFixtures {
     private ReferenceDataRepository referenceDataRepository;
 
     @Mock
-    private SearchResponseTransformer searchResponseTransformer;
+    private GlobalSearchResponseTransformer globalSearchResponseTransformer;
 
     @Mock
     private ElasticsearchQueryHelper elasticsearchQueryHelper;
@@ -121,14 +121,14 @@ class GlobalSearchServiceImplTest extends TestFixtures {
         doReturn(servicesRefData).when(referenceDataRepository).getServices();
         doReturn(locationsRefData).when(referenceDataRepository).getBuildingLocations();
         doReturn(GlobalSearchResponsePayload.ResultInfo.builder().build())
-            .when(searchResponseTransformer).transformResultInfo(
+            .when(globalSearchResponseTransformer).transformResultInfo(
                 requestPayload.getMaxReturnRecordCount(),
                 requestPayload.getStartRecordNumber(),
                 caseSearchResult.getTotal(),
                 caseSearchResult.getCases().size()
             );
         doReturn(GlobalSearchResponsePayload.Result.builder().build())
-            .when(searchResponseTransformer).transformResult(
+            .when(globalSearchResponseTransformer).transformResult(
                 any(CaseDetails.class),
                 any(ServiceLookup.class),
                 any(LocationLookup.class)
@@ -140,13 +140,13 @@ class GlobalSearchServiceImplTest extends TestFixtures {
         // THEN
         assertThat(response).isNotNull();
 
-        verify(searchResponseTransformer).transformResultInfo(
+        verify(globalSearchResponseTransformer).transformResultInfo(
             requestPayload.getMaxReturnRecordCount(),
             requestPayload.getStartRecordNumber(),
             caseSearchResult.getTotal(),
             caseSearchResult.getCases().size()
         );
-        verify(searchResponseTransformer).transformResult(
+        verify(globalSearchResponseTransformer).transformResult(
             any(CaseDetails.class),
             any(ServiceLookup.class),
             any(LocationLookup.class)

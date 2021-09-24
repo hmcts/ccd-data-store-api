@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.search.global;
 
-import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields;
+import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields;
 
 import static uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchSortService.KEYWORD_SUFFIX;
 

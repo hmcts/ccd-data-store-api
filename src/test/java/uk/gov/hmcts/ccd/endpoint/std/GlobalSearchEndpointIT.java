@@ -23,7 +23,7 @@ import uk.gov.hmcts.ccd.domain.model.search.global.Party;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.search.global.SortCriteria;
 import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
-import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields;
+import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields;
 
 import javax.inject.Inject;
 import java.io.IOException;
