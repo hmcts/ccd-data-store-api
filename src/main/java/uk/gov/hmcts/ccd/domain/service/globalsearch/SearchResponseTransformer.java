@@ -11,9 +11,15 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.refdata.LocationLookup;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceLookup;
+import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseManagementLocationFields;
+import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.SearchCriteriaFields;
+import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.SupplementaryDataFields;
+import uk.gov.hmcts.ccd.domain.types.CollectionValidator;
+import uk.gov.hmcts.ccd.domain.types.DynamicListValidator;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,21 +27,20 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static java.util.Collections.emptyList;
+import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataFields.CASE_MANAGEMENT_CATEGORY;
+import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataFields.CASE_MANAGEMENT_LOCATION;
+import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataFields.CASE_NAME_HMCTS_INTERNAL;
+import static uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseDataFields.SEARCH_CRITERIA;
 
+@SuppressWarnings("squid:S1075") // paths below are not URI path literals
 @Named
 public class SearchResponseTransformer {
 
-    private static final String SERVICE_ID_FIELD = "HMCTSServiceId";
-    private static final String CASE_MANAGEMENT_LOCATION_FIELD = "caseManagementLocation";
-    private static final String CASE_MANAGEMENT_CATEGORY_FIELD = "caseManagementCategory";
-    private static final String CATEGORY_ID_PATH = "/value/code";
-    private static final String CATEGORY_NAME_PATH = "/value/label";
-    private static final String BASE_LOCATION_ID_PATH = "/baseLocation";
-    private static final String REGION_ID_PATH = "/region";
-    private static final String CASE_NAME_HMCTS_INTERNAL_FIELD = "caseNameHmctsInternal";
-    private static final String SEARCH_CRITERIA_FIELD = "SearchCriteria";
-    private static final String OTHER_CASE_REFERENCES_FIELD = "OtherCaseReferences";
-    private static final String OTHER_CASE_REFERENCES_VALUE_FIELD = "value";
+    private static final String CATEGORY_VALUE_PATH = "/" + DynamicListValidator.VALUE;
+    private static final String CATEGORY_ID_PATH = CATEGORY_VALUE_PATH + "/" + DynamicListValidator.CODE;
+    private static final String CATEGORY_NAME_PATH = CATEGORY_VALUE_PATH + "/" + DynamicListValidator.LABEL;
+    private static final String BASE_LOCATION_ID_PATH = "/" + CaseManagementLocationFields.BASE_LOCATION;
+    private static final String REGION_ID_PATH = "/" + CaseManagementLocationFields.REGION;
 
     private final CaseDefinitionRepository caseDefinitionRepository;
 
@@ -68,12 +73,15 @@ public class SearchResponseTransformer {
         final String caseTypeName = Optional.ofNullable(caseDefinitionRepository.getCaseType(caseTypeId))
             .map(CaseTypeDefinition::getName)
             .orElse(null);
-        final Map<String, JsonNode> caseData = caseDetails.getData();
+        // NB: if no relevant case data has been index for record then use empty map rather than null
+        final Map<String, JsonNode> caseData = Optional.ofNullable(caseDetails.getData()).orElse(new HashMap<>());
 
-        final String serviceId = findValue(caseDetails.getSupplementaryData(), SERVICE_ID_FIELD);
+        final String serviceId = Optional.ofNullable(caseDetails.getSupplementaryData())
+            .map(supplementaryData -> findValue(supplementaryData, SupplementaryDataFields.SERVICE_ID))
+            .orElse(null);
 
-        final String baseLocationId = findValue(caseData, CASE_MANAGEMENT_LOCATION_FIELD, BASE_LOCATION_ID_PATH);
-        final String regionId = findValue(caseData, CASE_MANAGEMENT_LOCATION_FIELD, REGION_ID_PATH);
+        final String baseLocationId = findValue(caseData, CASE_MANAGEMENT_LOCATION, BASE_LOCATION_ID_PATH);
+        final String regionId = findValue(caseData, CASE_MANAGEMENT_LOCATION, REGION_ID_PATH);
 
         return GlobalSearchResponse.Result.builder()
             .stateId(caseDetails.getState())
@@ -83,15 +91,15 @@ public class SearchResponseTransformer {
             .ccdJurisdictionName(optionalJurisdiction.map(JurisdictionDefinition::getName).orElse(null))
             .ccdCaseTypeId(caseTypeId)
             .ccdCaseTypeName(caseTypeName)
-            .caseNameHmctsInternal(findValue(caseData, CASE_NAME_HMCTS_INTERNAL_FIELD))
+            .caseNameHmctsInternal(findValue(caseData, CASE_NAME_HMCTS_INTERNAL))
             .hmctsServiceId(serviceId)
             .hmctsServiceShortDescription(serviceLookup.getServiceShortDescription(serviceId))
             .baseLocationId(baseLocationId)
             .baseLocationName(locationLookup.getLocationName(baseLocationId))
             .regionId(regionId)
             .regionName(locationLookup.getRegionName(regionId))
-            .caseManagementCategoryId(findValue(caseData, CASE_MANAGEMENT_CATEGORY_FIELD, CATEGORY_ID_PATH))
-            .caseManagementCategoryName(findValue(caseData, CASE_MANAGEMENT_CATEGORY_FIELD, CATEGORY_NAME_PATH))
+            .caseManagementCategoryId(findValue(caseData, CASE_MANAGEMENT_CATEGORY, CATEGORY_ID_PATH))
+            .caseManagementCategoryName(findValue(caseData, CASE_MANAGEMENT_CATEGORY, CATEGORY_NAME_PATH))
             .build();
     }
 
@@ -113,11 +121,12 @@ public class SearchResponseTransformer {
     }
 
     private List<String> getOtherReferences(@NonNull final Map<String, JsonNode> data) {
-        final Optional<JsonNode> optionalJsonNode = Optional.ofNullable(data.get(SEARCH_CRITERIA_FIELD))
-            .map(node -> node.get(OTHER_CASE_REFERENCES_FIELD));
+        final Optional<JsonNode> optionalJsonNode = Optional.ofNullable(data.get(SEARCH_CRITERIA))
+            .map(node -> node.get(SearchCriteriaFields.OTHER_CASE_REFERENCES));
 
+        // get values from collection list
         return optionalJsonNode.map(node -> StreamSupport.stream(node.spliterator(), false)
-            .map(x -> x.get(OTHER_CASE_REFERENCES_VALUE_FIELD).asText())
+            .map(x -> x.get(CollectionValidator.VALUE).asText())
             .collect(Collectors.toUnmodifiableList()))
             .orElse(emptyList());
     }

@@ -242,6 +242,44 @@ class SearchResponseTransformerTest extends TestFixtures {
             .satisfies(result -> assertThat(result.getOtherReferences()).containsExactlyInAnyOrder("Ref1", "Ref2"));
     }
 
+    @Test
+    void testShouldHandleNullCaseDataGracefully() {
+        // GIVEN
+        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withData(null) // i.e. when no GlobalSearch fields present in case data
+            .withReference(REFERENCE)
+            .withSupplementaryData(emptyMap())
+            .build();
+
+        // WHEN
+        final GlobalSearchResponse.Result actualResult =
+            underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+
+        // THEN
+        assertThat(actualResult)
+            .isNotNull()
+            .satisfies(result -> assertThat(result.getCaseReference()).isEqualTo(REFERENCE.toString()));
+    }
+
+    @Test
+    void testShouldHandleNullSupplementaryDataGracefully() {
+        // GIVEN
+        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withData(CASE_DATA)
+            .withReference(REFERENCE)
+            .withSupplementaryData(emptyMap()) // i.e. when no GlobalSearch fields present in SupplementaryData
+            .build();
+
+        // WHEN
+        final GlobalSearchResponse.Result actualResult =
+            underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+
+        // THEN
+        assertThat(actualResult)
+            .isNotNull()
+            .satisfies(result -> assertThat(result.getCaseReference()).isEqualTo(REFERENCE.toString()));
+    }
+
     @ParameterizedTest
     @MethodSource("providePaginationParameters")
     void testShouldEvaluatePaginationInformation(final Integer maxReturnRecordCount,
