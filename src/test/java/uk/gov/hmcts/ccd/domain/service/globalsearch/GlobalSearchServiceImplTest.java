@@ -23,13 +23,13 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.ReferenceDataRepository;
-import uk.gov.hmcts.ccd.domain.dto.globalsearch.GlobalSearchResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.refdata.LocationLookup;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceLookup;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
+import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.service.aggregated.CaseDetailsUtil;
 import uk.gov.hmcts.ccd.domain.service.common.DefaultObjectMapperService;
@@ -120,20 +120,22 @@ class GlobalSearchServiceImplTest extends TestFixtures {
         final CaseSearchResult caseSearchResult = buildCaseSearchResult();
         doReturn(servicesRefData).when(referenceDataRepository).getServices();
         doReturn(locationsRefData).when(referenceDataRepository).getBuildingLocations();
-        doReturn(GlobalSearchResponse.ResultInfo.builder().build()).when(searchResponseTransformer).transformResultInfo(
-            requestPayload.getMaxReturnRecordCount(),
-            requestPayload.getStartRecordNumber(),
-            caseSearchResult.getTotal(),
-            caseSearchResult.getCases().size()
-        );
-        doReturn(GlobalSearchResponse.Result.builder().build()).when(searchResponseTransformer).transformResult(
-            any(CaseDetails.class),
-            any(ServiceLookup.class),
-            any(LocationLookup.class)
-        );
+        doReturn(GlobalSearchResponsePayload.ResultInfo.builder().build())
+            .when(searchResponseTransformer).transformResultInfo(
+                requestPayload.getMaxReturnRecordCount(),
+                requestPayload.getStartRecordNumber(),
+                caseSearchResult.getTotal(),
+                caseSearchResult.getCases().size()
+            );
+        doReturn(GlobalSearchResponsePayload.Result.builder().build())
+            .when(searchResponseTransformer).transformResult(
+                any(CaseDetails.class),
+                any(ServiceLookup.class),
+                any(LocationLookup.class)
+            );
 
         // WHEN
-        final GlobalSearchResponse response = underTest.transformResponse(requestPayload, caseSearchResult);
+        final GlobalSearchResponsePayload response = underTest.transformResponse(requestPayload, caseSearchResult);
 
         // THEN
         assertThat(response).isNotNull();

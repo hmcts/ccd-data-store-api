@@ -5,12 +5,12 @@ import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.dto.globalsearch.GlobalSearchResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.refdata.LocationLookup;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceLookup;
+import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
 import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.CaseManagementLocationFields;
 import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.SearchCriteriaFields;
 import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchFields.SupplementaryDataFields;
@@ -50,22 +50,22 @@ public class SearchResponseTransformer {
         this.caseDefinitionRepository = caseDefinitionRepository;
     }
 
-    public GlobalSearchResponse.ResultInfo transformResultInfo(final Integer maxReturnRecordCount,
-                                                               final Integer startRecordNumber,
-                                                               final Long totalSearchHits,
-                                                               final Integer recordsReturnedCount) {
+    public GlobalSearchResponsePayload.ResultInfo transformResultInfo(final Integer maxReturnRecordCount,
+                                                                      final Integer startRecordNumber,
+                                                                      final Long totalSearchHits,
+                                                                      final Integer recordsReturnedCount) {
         final boolean moreToGo = totalSearchHits > (maxReturnRecordCount + startRecordNumber - 1);
 
-        return GlobalSearchResponse.ResultInfo.builder()
+        return GlobalSearchResponsePayload.ResultInfo.builder()
             .casesReturned(recordsReturnedCount)
             .caseStartRecord(startRecordNumber)
             .moreResultsToGo(moreToGo)
             .build();
     }
 
-    public GlobalSearchResponse.Result transformResult(final CaseDetails caseDetails,
-                                                       final ServiceLookup serviceLookup,
-                                                       final LocationLookup locationLookup) {
+    public GlobalSearchResponsePayload.Result transformResult(final CaseDetails caseDetails,
+                                                              final ServiceLookup serviceLookup,
+                                                              final LocationLookup locationLookup) {
         final String jurisdictionId = caseDetails.getJurisdiction();
         final String caseTypeId = caseDetails.getCaseTypeId();
         final Optional<JurisdictionDefinition> optionalJurisdiction =
@@ -83,7 +83,7 @@ public class SearchResponseTransformer {
         final String baseLocationId = findValue(caseData, CASE_MANAGEMENT_LOCATION, BASE_LOCATION_ID_PATH);
         final String regionId = findValue(caseData, CASE_MANAGEMENT_LOCATION, REGION_ID_PATH);
 
-        return GlobalSearchResponse.Result.builder()
+        return GlobalSearchResponsePayload.Result.builder()
             .stateId(caseDetails.getState())
             .caseReference(caseDetails.getReferenceAsString())
             .otherReferences(getOtherReferences(caseData))

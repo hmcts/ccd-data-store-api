@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.dto.globalsearch;
+package uk.gov.hmcts.ccd.domain.model.search.global;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -10,7 +10,7 @@ import java.util.List;
 @Value
 @Builder
 @Jacksonized
-public class GlobalSearchResponse {
+public class GlobalSearchResponsePayload {
     ResultInfo resultInfo;
     List<Result> results;
 

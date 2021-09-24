@@ -12,12 +12,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.dto.globalsearch.GlobalSearchResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.refdata.LocationLookup;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceLookup;
+import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
 import uk.gov.hmcts.ccd.domain.service.aggregated.CaseDetailsUtil;
 
 import java.util.Map;
@@ -65,7 +65,7 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
@@ -84,7 +84,7 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
@@ -105,7 +105,7 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
@@ -129,7 +129,7 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
@@ -150,7 +150,7 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
@@ -171,7 +171,7 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
@@ -194,7 +194,7 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
@@ -215,7 +215,7 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
@@ -233,7 +233,7 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
@@ -252,7 +252,7 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
@@ -271,7 +271,7 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
@@ -287,7 +287,7 @@ class SearchResponseTransformerTest extends TestFixtures {
                                                  final Long totalSearchHits,
                                                  final Integer recordsReturnedCount,
                                                  final Boolean moreToGo) {
-        final GlobalSearchResponse.ResultInfo actualResultInfo = underTest.transformResultInfo(
+        final GlobalSearchResponsePayload.ResultInfo actualResultInfo = underTest.transformResultInfo(
             maxReturnRecordCount,
             startRecordNumber,
             totalSearchHits,

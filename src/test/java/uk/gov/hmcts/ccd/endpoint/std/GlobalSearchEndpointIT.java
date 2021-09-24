@@ -15,8 +15,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.domain.dto.globalsearch.GlobalSearchResponse;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
+import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortByCategory;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortDirection;
 import uk.gov.hmcts.ccd.domain.model.search.global.Party;
@@ -134,19 +134,19 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
 
         // ASSERT extra
         String responseAsString = result.getResponse().getContentAsString();
-        GlobalSearchResponse globalSearchResponse = mapper.readValue(responseAsString,
-            GlobalSearchResponse.class);
+        GlobalSearchResponsePayload globalSearchResponsePayload = mapper.readValue(responseAsString,
+            GlobalSearchResponsePayload.class);
 
-        assertThat(globalSearchResponse.getResultInfo().getCasesReturned(), is(1));
-        assertThat(globalSearchResponse.getResultInfo().getCaseStartRecord(), is(startRecord));
-        assertThat(globalSearchResponse.getResultInfo().isMoreResultsToGo(), is(true));
+        assertThat(globalSearchResponsePayload.getResultInfo().getCasesReturned(), is(1));
+        assertThat(globalSearchResponsePayload.getResultInfo().getCaseStartRecord(), is(startRecord));
+        assertThat(globalSearchResponsePayload.getResultInfo().isMoreResultsToGo(), is(true));
 
-        assertThat(globalSearchResponse.getResults().get(0).getCaseReference(), is(REFERENCE));
-        assertThat(globalSearchResponse.getResults().get(0).getCcdJurisdictionId(), is(JURISDICTION));
-        assertThat(globalSearchResponse.getResults().get(0).getStateId(), is(STATE));
-        assertThat(globalSearchResponse.getResults().get(0).getCcdCaseTypeId(), is(CASE_TYPE));
-        assertThat(globalSearchResponse.getResults().get(0).getHmctsServiceId(), is(SERVICE_ID));
-        assertThat(globalSearchResponse.getResults().get(0).getHmctsServiceShortDescription(), is(SERVICE_NAME));
+        assertThat(globalSearchResponsePayload.getResults().get(0).getCaseReference(), is(REFERENCE));
+        assertThat(globalSearchResponsePayload.getResults().get(0).getCcdJurisdictionId(), is(JURISDICTION));
+        assertThat(globalSearchResponsePayload.getResults().get(0).getStateId(), is(STATE));
+        assertThat(globalSearchResponsePayload.getResults().get(0).getCcdCaseTypeId(), is(CASE_TYPE));
+        assertThat(globalSearchResponsePayload.getResults().get(0).getHmctsServiceId(), is(SERVICE_ID));
+        assertThat(globalSearchResponsePayload.getResults().get(0).getHmctsServiceShortDescription(), is(SERVICE_NAME));
     }
 
     @Test

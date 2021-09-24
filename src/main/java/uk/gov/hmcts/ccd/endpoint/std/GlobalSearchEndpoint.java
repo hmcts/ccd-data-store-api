@@ -13,9 +13,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ccd.domain.dto.globalsearch.GlobalSearchResponse;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
+import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
 import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
 import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
@@ -86,7 +86,7 @@ public class GlobalSearchEndpoint {
             })
         )
     })
-    public GlobalSearchResponse searchForCases(@RequestBody @Valid GlobalSearchRequestPayload requestPayload) {
+    public GlobalSearchResponsePayload searchForCases(@RequestBody @Valid GlobalSearchRequestPayload requestPayload) {
 
         Instant start = Instant.now();
 
@@ -103,7 +103,7 @@ public class GlobalSearchEndpoint {
 
         CaseSearchResult caseSearchResult = caseSearchOperation.execute(searchRequest, true);
 
-        GlobalSearchResponse result = globalSearchService.transformResponse(requestPayload, caseSearchResult);
+        GlobalSearchResponsePayload result = globalSearchService.transformResponse(requestPayload, caseSearchResult);
 
         Duration between = Duration.between(start, Instant.now());
         log.debug("GlobalSearchEndpoint.searchForCases execution completed in {} milliseconds...", between.toMillis());

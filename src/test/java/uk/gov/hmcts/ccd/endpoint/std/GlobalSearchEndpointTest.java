@@ -12,9 +12,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.ccd.domain.dto.globalsearch.GlobalSearchResponse;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
+import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
@@ -56,14 +56,14 @@ class GlobalSearchEndpointTest {
         private GlobalSearchRequestPayload globalSearchRequestPayload;
         private CrossCaseTypeSearchRequest assembledSearchRequest;
         private CaseSearchResult searchResults;
-        private GlobalSearchResponse transformedResult;
+        private GlobalSearchResponsePayload transformedResult;
 
         @BeforeEach
         void setUp() {
             globalSearchRequestPayload = Mockito.spy(GlobalSearchRequestPayload.class);
             assembledSearchRequest = Mockito.mock(CrossCaseTypeSearchRequest.class);
             searchResults = Mockito.mock(CaseSearchResult.class);
-            transformedResult = GlobalSearchResponse.builder().build();
+            transformedResult = GlobalSearchResponsePayload.builder().build();
 
             doReturn(assembledSearchRequest).when(globalSearchService).assembleSearchQuery(any());
             doReturn(searchResults).when(caseSearchOperation).execute(any(), anyBoolean());
@@ -82,7 +82,7 @@ class GlobalSearchEndpointTest {
             doReturn(searchCriteria).when(globalSearchRequestPayload).getSearchCriteria();
 
             // ACT
-            GlobalSearchResponse output = classUnderTest.searchForCases(globalSearchRequestPayload);
+            GlobalSearchResponsePayload output = classUnderTest.searchForCases(globalSearchRequestPayload);
 
             // ASSERT
             assertEquals(transformedResult, output);
@@ -111,7 +111,7 @@ class GlobalSearchEndpointTest {
             doReturn(searchCriteria).when(globalSearchRequestPayload).getSearchCriteria();
 
             // ACT
-            GlobalSearchResponse output = classUnderTest.searchForCases(globalSearchRequestPayload);
+            GlobalSearchResponsePayload output = classUnderTest.searchForCases(globalSearchRequestPayload);
 
             // ASSERT
             assertEquals(transformedResult, output);
