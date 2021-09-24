@@ -1,4 +1,5 @@
 {
+  "id" : "2D4CF82C-57E8-4D5D-B07D-74507EC00675",
   "request": {
     "method": "GET",
     "urlPath": "/refdata/location/building-locations"
