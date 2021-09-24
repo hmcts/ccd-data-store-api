@@ -11,7 +11,8 @@ import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRe
  **/
 public final class GlobalSearchFields {
 
-    private static final String LIST_VALUE_SUFFIX = "." + DynamicListValidator.VALUE;
+    private static final String FIELD_SEPARATOR = ".";
+    private static final String LIST_VALUE_SUFFIX = FIELD_SEPARATOR + DynamicListValidator.VALUE;
 
     // metadata
     public static final String REFERENCE = CaseDetailsEntity.REFERENCE_FIELD_COL;
@@ -117,7 +118,8 @@ public final class GlobalSearchFields {
 
 
         // CaseManagementCategory fields
-        private static final String CASE_MANAGEMENT_CATEGORY_PREFIX = CASE_MANAGEMENT_CATEGORY + LIST_VALUE_SUFFIX;
+        private static final String CASE_MANAGEMENT_CATEGORY_PREFIX
+            = CASE_MANAGEMENT_CATEGORY + LIST_VALUE_SUFFIX + FIELD_SEPARATOR;
 
         public static final String CASE_MANAGEMENT_CATEGORY_ID
             = CASE_MANAGEMENT_CATEGORY_PREFIX + DynamicListValidator.CODE;
@@ -126,7 +128,7 @@ public final class GlobalSearchFields {
 
 
         // CaseManagementLocation fields
-        private static final String CASE_MANAGEMENT_LOCATION_PREFIX = CASE_MANAGEMENT_LOCATION + ".";
+        private static final String CASE_MANAGEMENT_LOCATION_PREFIX = CASE_MANAGEMENT_LOCATION + FIELD_SEPARATOR;
 
         public static final String BASE_LOCATION
             = CASE_MANAGEMENT_LOCATION_PREFIX + CaseManagementLocationFields.BASE_LOCATION;
@@ -134,7 +136,7 @@ public final class GlobalSearchFields {
 
 
         // SearchCriteria fields
-        private static final String SEARCH_CRITERIA_PREFIX = SEARCH_CRITERIA + ".";
+        private static final String SEARCH_CRITERIA_PREFIX = SEARCH_CRITERIA + FIELD_SEPARATOR;
 
         public static final String OTHER_REFERENCE
             = SEARCH_CRITERIA_PREFIX + SearchCriteriaFields.OTHER_CASE_REFERENCES + COLLECTION_VALUE_SUFFIX;
@@ -143,7 +145,7 @@ public final class GlobalSearchFields {
 
 
         // :: SearchParty fields
-        private static final String SEARCH_PARTIES_PREFIX = SEARCH_PARTIES + ".";
+        private static final String SEARCH_PARTIES_PREFIX = SEARCH_PARTIES + FIELD_SEPARATOR;
 
         public static final String SEARCH_PARTY_NAME = SEARCH_PARTIES_PREFIX + SearchPartyFields.NAME;
         public static final String SEARCH_PARTY_EMAIL_ADDRESS = SEARCH_PARTIES_PREFIX + SearchPartyFields.EMAIL_ADDRESS;
