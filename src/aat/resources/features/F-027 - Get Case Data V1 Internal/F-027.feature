@@ -81,7 +81,6 @@ Scenario: must return appropriate negative response for a user not having a prof
 Scenario: must return status 200 along with the case-view object successfully
 
     Given a user with [an active profile in CCD],
-      And a successful call [to create a token for case creation] as in [S-027.01_GetToken],
       And a case that has just been created as in [S-027.01_Case],
 
      When a request is prepared with appropriate values,
