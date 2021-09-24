@@ -1,7 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.globalsearch;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.ReferenceDataRepository;
 import uk.gov.hmcts.ccd.domain.dto.globalsearch.GlobalSearchResponse;
 import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
@@ -9,7 +12,12 @@ import uk.gov.hmcts.ccd.domain.model.refdata.LocationLookup;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceLookup;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceReferenceData;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
+import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchIndex;
 
 import java.util.List;
 import java.util.Map;
@@ -21,13 +29,18 @@ import static uk.gov.hmcts.ccd.domain.service.globalsearch.LocationCollector.toL
 
 @Service
 public class GlobalSearchServiceImpl implements GlobalSearchService {
+
+    private final ApplicationParams applicationParams;
+    private final ObjectMapperService objectMapperService;
     private final ReferenceDataRepository referenceDataRepository;
     private final SearchResponseTransformer searchResponseTransformer;
+    private final ElasticsearchQueryHelper elasticsearchQueryHelper;
+    private final GlobalSearchQueryBuilder globalSearchQueryBuilder;
 
-    static Function<List<BuildingLocation>, LocationLookup> LOCATION_LOOKUP_FUNCTION =
+    static final Function<List<BuildingLocation>, LocationLookup> LOCATION_LOOKUP_FUNCTION =
         locations -> locations.stream().collect(toLocationLookup());
 
-    static Function<List<ServiceReferenceData>, ServiceLookup> SERVICE_LOOKUP_FUNCTION =
+    static final Function<List<ServiceReferenceData>, ServiceLookup> SERVICE_LOOKUP_FUNCTION =
         services -> {
             final Map<String, String> servicesMap = services.stream()
                 .collect(toUnmodifiableMap(ServiceReferenceData::getServiceCode,
@@ -36,14 +49,71 @@ public class GlobalSearchServiceImpl implements GlobalSearchService {
         };
 
     @Autowired
-    public GlobalSearchServiceImpl(final ReferenceDataRepository referenceDataRepository,
-                                   final SearchResponseTransformer searchResponseTransformer) {
+    public GlobalSearchServiceImpl(final ApplicationParams applicationParams,
+                                   final ObjectMapperService objectMapperService,
+                                   final ReferenceDataRepository referenceDataRepository,
+                                   final SearchResponseTransformer searchResponseTransformer,
+                                   final ElasticsearchQueryHelper elasticsearchQueryHelper,
+                                   final GlobalSearchQueryBuilder globalSearchQueryBuilder) {
+        this.applicationParams = applicationParams;
+        this.objectMapperService = objectMapperService;
         this.referenceDataRepository = referenceDataRepository;
         this.searchResponseTransformer = searchResponseTransformer;
+        this.elasticsearchQueryHelper = elasticsearchQueryHelper;
+        this.globalSearchQueryBuilder = globalSearchQueryBuilder;
     }
 
     @Override
-    public void assembleSearchQuery(GlobalSearchRequestPayload payload) {
+    public CrossCaseTypeSearchRequest assembleSearchQuery(GlobalSearchRequestPayload request) {
+
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+
+        if (request == null || request.getSearchCriteria() == null) {
+            return null;
+        }
+
+        // generate ES query builder
+        searchSourceBuilder.query(globalSearchQueryBuilder.globalSearchQuery(request));
+
+        // add sort(s)
+        globalSearchQueryBuilder.globalSearchSort(request).forEach(searchSourceBuilder::sort);
+
+        // add pagination
+        if (request.getMaxReturnRecordCount() != null && request.getMaxReturnRecordCount() > 0) {
+            searchSourceBuilder.size(request.getMaxReturnRecordCount());
+        }
+        if (request.getStartRecordNumber() != null && request.getStartRecordNumber() > 0) {
+            // NB: `GS.StartRecordNumber` is not zero indexed but `ES.from` is
+            searchSourceBuilder.from(request.getStartRecordNumber() - 1);
+        }
+
+        // construct search JSON
+        ObjectNode jsonSearchRequest =
+            objectMapperService.convertStringToObject(searchSourceBuilder.toString(), ObjectNode.class);
+
+        // :: configure data fields to return
+        jsonSearchRequest.set(ElasticsearchRequest.SOURCE, globalSearchQueryBuilder.globalSearchSourceFields());
+
+        // convert to CCD ES request
+        ElasticsearchRequest elasticsearchRequest =
+            elasticsearchQueryHelper.validateAndConvertRequest(jsonSearchRequest.toString());
+
+        // :: configure SupplementaryData fields to return
+        elasticsearchRequest.setRequestedSupplementaryData(
+            globalSearchQueryBuilder.globalSearchSupplementaryDataFields()
+        );
+
+        // point to global search index
+        SearchIndex searchIndex = new SearchIndex(
+            applicationParams.getGlobalSearchIndexName(),
+            applicationParams.getGlobalSearchIndexType()
+        );
+
+        return new CrossCaseTypeSearchRequest.Builder()
+            .withCaseTypes(request.getSearchCriteria().getCcdCaseTypeIds())
+            .withSearchRequest(elasticsearchRequest)
+            .withSearchIndex(searchIndex)
+            .build();
     }
 
     public GlobalSearchResponse transformResponse(final GlobalSearchRequestPayload requestPayload,
@@ -69,4 +139,5 @@ public class GlobalSearchServiceImpl implements GlobalSearchService {
             .results(results)
             .build();
     }
+
 }

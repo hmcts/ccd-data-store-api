@@ -1,33 +1,53 @@
 package uk.gov.hmcts.ccd.endpoint.std;
 
 import io.swagger.annotations.ApiOperation;
-
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ccd.domain.dto.globalsearch.GlobalSearchResponse;
+import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
 import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
 import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchService;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security.AuthorisedCaseSearchOperation;
 
 import javax.validation.Valid;
+import java.time.Duration;
+import java.time.Instant;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+@Slf4j
 @RestController
 @Validated
 public class GlobalSearchEndpoint {
 
+    private final CaseSearchOperation caseSearchOperation;
+    private final ElasticsearchQueryHelper elasticsearchQueryHelper;
     private final GlobalSearchService globalSearchService;
+
+    @SuppressWarnings({"squid:S1075"})
     public static final String GLOBAL_SEARCH_PATH = "/globalSearch";
 
     @Autowired
-    public GlobalSearchEndpoint(GlobalSearchService globalSearchService) {
+    public GlobalSearchEndpoint(@Qualifier(AuthorisedCaseSearchOperation.QUALIFIER)
+                                CaseSearchOperation caseSearchOperation,
+                                ElasticsearchQueryHelper elasticsearchQueryHelper,
+                                GlobalSearchService globalSearchService) {
+        this.caseSearchOperation = caseSearchOperation;
+        this.elasticsearchQueryHelper = elasticsearchQueryHelper;
         this.globalSearchService = globalSearchService;
     }
 
@@ -66,8 +86,30 @@ public class GlobalSearchEndpoint {
             })
         )
     })
-    public void searchForCases(@RequestBody @Valid GlobalSearchRequestPayload requestPayload) {
+    public GlobalSearchResponse searchForCases(@RequestBody @Valid GlobalSearchRequestPayload requestPayload) {
+
+        Instant start = Instant.now();
+
         requestPayload.setDefaults();
-        globalSearchService.assembleSearchQuery(requestPayload);
+
+        // if no CaseType filter applied :: load all case types available for user
+        if (CollectionUtils.isEmpty(requestPayload.getSearchCriteria().getCcdCaseTypeIds())) {
+            requestPayload.getSearchCriteria().setCcdCaseTypeIds(
+                elasticsearchQueryHelper.getCaseTypesAvailableToUser()
+            );
+        }
+
+        CrossCaseTypeSearchRequest searchRequest = globalSearchService.assembleSearchQuery(requestPayload);
+
+        CaseSearchResult caseSearchResult = caseSearchOperation.execute(searchRequest, true);
+
+        GlobalSearchResponse result = globalSearchService.transformResponse(requestPayload, caseSearchResult);
+
+        Duration between = Duration.between(start, Instant.now());
+        log.debug("GlobalSearchEndpoint.searchForCases execution completed in {} milliseconds...", between.toMillis());
+
+        return result;
+
     }
+
 }
