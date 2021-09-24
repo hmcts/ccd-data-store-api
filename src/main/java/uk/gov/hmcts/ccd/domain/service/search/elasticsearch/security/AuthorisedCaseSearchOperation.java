@@ -93,11 +93,11 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         List<String> authorisedCaseTypeIds =
             authorisedCaseTypes.stream().map(CaseTypeDefinition::getId).collect(Collectors.toList());
 
-        return new CrossCaseTypeSearchRequest.Builder()
+        // clone CCT search request object :: then replace case type list
+        return new CrossCaseTypeSearchRequest.Builder(originalSearchRequest)
             .withCaseTypes(authorisedCaseTypeIds)
-            .withSearchRequest(originalSearchRequest.getElasticSearchRequest())
+            // NB: preserve original MultiCaseType processing instruction
             .withMultiCaseTypeSearch(originalSearchRequest.isMultiCaseTypeSearch())
-            .withSourceFilterAliasFields(originalSearchRequest.getAliasFields())
             .build();
     }
 

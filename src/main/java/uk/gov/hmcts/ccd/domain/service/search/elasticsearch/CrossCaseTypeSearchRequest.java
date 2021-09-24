@@ -90,12 +90,6 @@ public class CrossCaseTypeSearchRequest {
         return Optional.ofNullable(searchIndex);
     }
 
-    public String toJsonString() {
-        String jsonString = elasticsearchRequest.toFinalRequest();
-        log.debug("json search request: {}", jsonString);
-        return jsonString;
-    }
-
     public static class Builder {
 
         private final List<String> caseTypeIds = new ArrayList<>();
@@ -104,7 +98,23 @@ public class CrossCaseTypeSearchRequest {
         private final List<String> sourceFilterAliasFields = new ArrayList<>();
         private SearchIndex searchIndex;
 
+        // empty builder
+        public Builder() {
+        }
+
+        // clone builder
+        public Builder(CrossCaseTypeSearchRequest originalSearchRequest) {
+            withCaseTypes(originalSearchRequest.getCaseTypeIds());
+            withSearchRequest(originalSearchRequest.getElasticSearchRequest());
+            withMultiCaseTypeSearch(originalSearchRequest.isMultiCaseTypeSearch());
+            withSourceFilterAliasFields(originalSearchRequest.getAliasFields());
+            withSearchIndex(originalSearchRequest.getSearchIndex().orElse(null));
+        }
+
         public Builder withCaseTypes(List<String> caseTypeIds) {
+            this.caseTypeIds.clear(); // i.e. if pre-populated from clone builder
+            multiCaseTypeSearch = false;
+
             if (caseTypeIds != null) {
                 this.caseTypeIds.addAll(caseTypeIds);
                 multiCaseTypeSearch = this.caseTypeIds.size() > 1;
@@ -123,6 +133,8 @@ public class CrossCaseTypeSearchRequest {
         }
 
         public Builder withSourceFilterAliasFields(List<String> sourceFilterAliasFields) {
+            this.sourceFilterAliasFields.clear(); // i.e. if pre-populated from clone builder
+
             if (sourceFilterAliasFields != null) {
                 this.sourceFilterAliasFields.addAll(sourceFilterAliasFields);
             }
@@ -157,7 +169,10 @@ public class CrossCaseTypeSearchRequest {
         }
 
         public CrossCaseTypeSearchRequest build() {
-            setSourceFilterAliasFields();
+            // NB: bypass 'source filter -> alias' conversion if using a single search index (required for GlobalSearch)
+            if (searchIndex == null) {
+                setSourceFilterAliasFields();
+            }
             return new CrossCaseTypeSearchRequest(
                 caseTypeIds,
                 elasticsearchRequest,

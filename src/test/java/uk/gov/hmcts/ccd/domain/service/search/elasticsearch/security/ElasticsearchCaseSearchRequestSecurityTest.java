@@ -2,16 +2,23 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.common.DefaultObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchIndex;
 
 import java.util.Base64;
 import java.util.HashMap;
@@ -20,10 +27,17 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.NATIVE_ES_QUERY;
+import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SOURCE;
+import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SUPPLEMENTARY_DATA;
 
 class ElasticsearchCaseSearchRequestSecurityTest {
+
+    public static final String FROM = "from";
+    public static final String SIZE = "size";
 
     private static final String EXPECTED_SEARCH_TERM = "{\"match\":{\"reference\":1630596267899527}}";
     private static final String SEARCH_QUERY = "{\"query\" : {\"match\" : {\"reference\" : 1630596267899527}}}";
@@ -40,14 +54,17 @@ class ElasticsearchCaseSearchRequestSecurityTest {
 
 
     private final ObjectMapperService objectMapperService = new DefaultObjectMapperService(new ObjectMapper());
-    private final JsonNode searchRequestNode = objectMapperService.convertStringToObject(SEARCH_QUERY, JsonNode.class);
-    private final ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(searchRequestNode);
+    private JsonNode searchRequestNode;
+    private ElasticsearchRequest elasticsearchRequest;
 
     private final ElasticsearchCaseSearchRequestSecurity underTest =
         new ElasticsearchCaseSearchRequestSecurity(filterList, objectMapperService);
 
     @BeforeEach
     void setUp() {
+        searchRequestNode = objectMapperService.convertStringToObject(SEARCH_QUERY, JsonNode.class);
+        elasticsearchRequest = new ElasticsearchRequest(searchRequestNode);
+
         when(caseSearchFilter.getFilter(CASE_TYPE_ID_1)).thenReturn(Optional.of(newQueryBuilder(FILTER_VALUE_1)));
     }
 
@@ -148,6 +165,120 @@ class ElasticsearchCaseSearchRequestSecurityTest {
             .get(1).at("/term/case_type_id/value").asText());
         assertEquals(CASE_TYPE_ID_2.toLowerCase(), mapOfFilterValues.get(CASE_TYPE_ID_2.toLowerCase()).at("/bool/must")
             .get(1).at("/term/case_type_id/value").asText());
+    }
+
+    @Test
+    @DisplayName("should preserve SearchIndex, pagination, source fields and SupplementaryData fields if supplied")
+    void shouldPreserveSearchIndexPaginationSourceAndSupplementaryDataValues() throws JSONException {
+        // GIVEN
+        when(caseSearchFilter.getFilter(CASE_TYPE_ID_2)).thenReturn(Optional.of(newQueryBuilder(FILTER_VALUE_2)));
+
+        int from = 100;
+        int size = 999;
+
+        String sourceField1 = "my.source.field.one";
+        String sourceField2 = "my.source.field.two";
+        ArrayNode sourceFields = JacksonUtils.MAPPER.createArrayNode()
+            .add(sourceField1)
+            .add(sourceField2);
+
+        ObjectNode searchRequestObjectNode = (ObjectNode)searchRequestNode;
+        searchRequestObjectNode.put(FROM, from);
+        searchRequestObjectNode.put(SIZE, size);
+        searchRequestObjectNode.set(SOURCE, sourceFields);
+
+        String supplementaryDataField1 = "my.supplementary-data.field.one";
+        String supplementaryDataField2 = "my.supplementary-data.field.two";
+        ArrayNode supplementaryDataFields = JacksonUtils.MAPPER.createArrayNode()
+            .add(supplementaryDataField1)
+            .add(supplementaryDataField2);
+
+        ObjectNode combinedSearchRequest = (ObjectNode)objectMapperService.createEmptyJsonNode();
+        combinedSearchRequest.set(NATIVE_ES_QUERY, searchRequestObjectNode);
+        combinedSearchRequest.set(SUPPLEMENTARY_DATA, supplementaryDataFields);
+
+        SearchIndex searchIndex = new SearchIndex(
+            "my_index_name",
+            "my_index_type"
+        );
+
+        CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
+            .withSearchRequest(new ElasticsearchRequest(combinedSearchRequest))
+            .withCaseTypes(CASE_TYPE_IDS)
+            .withSearchIndex(searchIndex)
+            .build();
+
+        // WHEN
+        CrossCaseTypeSearchRequest securedSearchRequest = underTest.createSecuredSearchRequest(request);
+
+        // THEN
+        // :: SearchIndex
+        assertTrue(securedSearchRequest.getSearchIndex().isPresent());
+        assertEquals(searchIndex, securedSearchRequest.getSearchIndex().get());
+        // :: pagination
+        assertEquals(from, securedSearchRequest.getSearchRequestJsonNode().get(FROM).asInt());
+        assertEquals(size, securedSearchRequest.getSearchRequestJsonNode().get(SIZE).asInt());
+        // :: source fields
+        JSONAssert.assertEquals(
+            "[\"" + sourceField1 + "\",\"" + sourceField2 + "\"]",
+            securedSearchRequest.getSearchRequestJsonNode().get(SOURCE).toString(),
+            JSONCompareMode.LENIENT
+        );
+        // :: SupplementaryData fields
+        JSONAssert.assertEquals(
+            "[\"" + supplementaryDataField1 + "\",\"" + supplementaryDataField2 + "\"]",
+            securedSearchRequest.getElasticSearchRequest().getRequestedSupplementaryData().toString(),
+            JSONCompareMode.LENIENT
+        );
+    }
+
+    @Test
+    @DisplayName("should preserve SearchIndex, pagination and source fields when SupplementaryData fields not supplied")
+    void shouldPreserveSearchIndexPaginationAndSourceWithoutSupplementaryDataValues() throws JSONException {
+        // GIVEN
+        when(caseSearchFilter.getFilter(CASE_TYPE_ID_2)).thenReturn(Optional.of(newQueryBuilder(FILTER_VALUE_2)));
+
+        int from = 100;
+        int size = 999;
+
+        String sourceField1 = "my.source.field.one";
+        String sourceField2 = "my.source.field.two";
+        ArrayNode sourceFields = JacksonUtils.MAPPER.createArrayNode()
+            .add(sourceField1)
+            .add(sourceField2);
+
+        ObjectNode searchRequestObjectNode = (ObjectNode)searchRequestNode;
+        searchRequestObjectNode.put(FROM, from);
+        searchRequestObjectNode.put(SIZE, size);
+        searchRequestObjectNode.set(SOURCE, sourceFields);
+
+        SearchIndex searchIndex = new SearchIndex(
+            "my_index_name",
+            "my_index_type"
+        );
+
+        CrossCaseTypeSearchRequest request = new CrossCaseTypeSearchRequest.Builder()
+            .withSearchRequest(new ElasticsearchRequest(searchRequestObjectNode))
+            .withCaseTypes(CASE_TYPE_IDS)
+            .withSearchIndex(searchIndex)
+            .build();
+
+        // WHEN
+        CrossCaseTypeSearchRequest securedSearchRequest = underTest.createSecuredSearchRequest(request);
+
+        // THEN
+        // :: SearchIndex
+        assertTrue(securedSearchRequest.getSearchIndex().isPresent());
+        assertEquals(searchIndex, securedSearchRequest.getSearchIndex().get());
+        // :: pagination
+        assertEquals(from, securedSearchRequest.getSearchRequestJsonNode().get(FROM).asInt());
+        assertEquals(size, securedSearchRequest.getSearchRequestJsonNode().get(SIZE).asInt());
+        // :: source fields
+        JSONAssert.assertEquals(
+            "[\"" + sourceField1 + "\",\"" + sourceField2 + "\"]",
+            securedSearchRequest.getSearchRequestJsonNode().get(SOURCE).toString(),
+            JSONCompareMode.LENIENT
+        );
     }
 
     private String getDecodedQuery(JsonNode node) {
