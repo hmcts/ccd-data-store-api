@@ -1,0 +1,52 @@
+{
+  "_guid_": "Get_Document_Metadata",
+  "productName": "CCD Data Store",
+  "operationName": "Get a case document",
+  "method": "GET",
+  "uri": "{{CASE_DOCUMENT_AM_URL}}/cases/documents/{docId}",
+  "users": {
+    "invokingUser": {
+      "username": "befta.caseworker.2.solicitor.2@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_2_SOLICITOR_2_PWD]]"
+    }
+  },
+  "request": {
+    "headers": {
+      "Authorization": "[[DEFAULT_AUTO_VALUE]]",
+      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]"
+    },
+    "pathVariables": {
+      "docId": "OVERRIDE"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 200,
+    "responseMessage": "OK",
+    "headers": {
+      "_extends_": "Common_Response_Header_Base"
+    },
+    "body": {
+      "classification": "PUBLIC",
+      "size": "[[ANYTHING_PRESENT]]",
+      "mimeType": "[[ANYTHING_PRESENT]]",
+      "originalDocumentName": "[[ANYTHING_PRESENT]]",
+      "createdOn": "[[ANYTHING_PRESENT]]",
+      "createdBy": "[[ANYTHING_PRESENT]]",
+      "lastModifiedBy": "[[ANYTHING_PRESENT]]",
+      "modifiedOn": "[[ANYTHING_PRESENT]]",
+      "metadata": {
+        "jurisdiction": "[[ANYTHING_PRESENT]]",
+        "case_id": "[[ANYTHING_PRESENT]]",
+        "case_type_id": "[[ANYTHING_PRESENT]]"
+      },
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        },
+        "binary": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      }
+    }
+  }
+}

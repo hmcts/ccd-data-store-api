@@ -51,6 +51,7 @@ class DocumentSanitiserTest {
     private static final String DOCUMENT_URL_VALUE = "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0";
     private static final String BINARY_URL = "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary";
     private static final String FILENAME = "Seagulls_Sqaure.jpg";
+    private static final String DOCUMENT_HASH = "document_hash";
 
     static {
         DOCUMENT_FIELD_TYPE.setId(TYPE_DOCUMENT);
@@ -73,9 +74,11 @@ class DocumentSanitiserTest {
 
         documentSanitiser = new DocumentSanitiser(documentManagementRestClient);
         DOCUMENT_VALUE_INITIAL.put("document_url", DOCUMENT_URL_VALUE);
+        DOCUMENT_VALUE_INITIAL.put("document_hash", DOCUMENT_HASH);
         DOCUMENT_VALUE_SANITISED.put("document_url", DOCUMENT_URL_VALUE);
         DOCUMENT_VALUE_SANITISED.put("document_binary_url",BINARY_URL);
         DOCUMENT_VALUE_SANITISED.put("document_filename", FILENAME);
+        DOCUMENT_VALUE_SANITISED.put("document_hash", DOCUMENT_HASH);
     }
 
     @Test
@@ -97,6 +100,7 @@ class DocumentSanitiserTest {
         ((ObjectNode)documentValue).set(DOCUMENT_URL, JSON_FACTORY.textNode("testUrl"));
         ((ObjectNode)documentValue).set(DOCUMENT_BINARY_URL, JSON_FACTORY.textNode("testBinaryUrl"));
         ((ObjectNode)documentValue).set(DOCUMENT_FILENAME, JSON_FACTORY.textNode("testFilename"));
+        ((ObjectNode)documentValue).set(DOCUMENT_HASH, JSON_FACTORY.textNode("testHash"));
 
         JsonNode sanitisedDocument = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValue);
 
