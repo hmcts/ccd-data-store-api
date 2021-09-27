@@ -54,4 +54,9 @@
 		<cve>CVE-2020-23171</cve>
 	</suppress>
 
+	<!-- Suppress temporarily -->
+	<suppress>
+		<cve>CVE-2021-22147</cve>
+	</suppress>
+
 </suppressions>
