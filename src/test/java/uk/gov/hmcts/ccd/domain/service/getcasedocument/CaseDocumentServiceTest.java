@@ -86,18 +86,18 @@ class CaseDocumentServiceTest extends TestFixtures {
     }
 
     @Test
-    void testShouldReturnOriginalCaseDetailsWhenNoDocumentsPresent() throws Exception {
+    void testShouldReturnClonedCaseDetailsWhenNoDocumentsPresent() throws Exception {
         // Given
         final Map<String, JsonNode> data = fromFileAsMap("text-type-case-field.json");
         final CaseDetails caseDetails = buildCaseDetails(data);
 
         doCallRealMethod().when(documentUtils).findDocumentNodes(anyMap());
+        doReturn(caseDetails).when(caseService).clone(caseDetails);
 
         // When
         final CaseDetails actualClonedCaseDetails = underTest.stripDocumentHashes(caseDetails);
 
         // Then
-        verifyZeroInteractions(caseService);
         verify(documentUtils).findDocumentNodes(anyMap());
 
         assertThat(actualClonedCaseDetails)
