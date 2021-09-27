@@ -41,6 +41,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -631,7 +632,7 @@ class RoleAssignmentServiceTest {
             given(filteredRoleAssignments.getFilteredMatchingRoleAssignments())
                 .willReturn(roleAssignments.getRoleAssignments());
             given(roleAssignmentFilteringService.filter(roleAssignments, caseTypeDefinition,
-                Lists.newArrayList(MatcherType.GRANTTYPE)))
+                singletonList(MatcherType.GRANTTYPE)))
                 .willReturn(filteredRoleAssignments);
 
             List<RoleAssignment> resultCases =
