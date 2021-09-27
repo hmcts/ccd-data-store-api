@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
+import uk.gov.hmcts.ccd.domain.model.std.validator.ValidSearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Getter
@@ -24,7 +24,7 @@ public class GlobalSearchRequestPayload {
     @Valid
     private List<SortCriteria> sortCriteria;
 
-    @NotNull(message = ValidationError.SEARCH_CRITERIA_MISSING)
+    @ValidSearchCriteria
     @Valid
     private SearchCriteria searchCriteria;
 
