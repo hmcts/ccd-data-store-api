@@ -22,7 +22,6 @@ import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -60,6 +59,7 @@ import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.GET_ROLE_ASSIGNMENTS_P
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.createRoleAssignmentRecord;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.createRoleAssignmentResponse;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.emptyRoleAssignmentResponseJson;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleToAccessProfileDefinition;
 
 @Transactional
 public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
@@ -456,8 +456,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         when(userAuthorisation.getUserId()).thenReturn(userId);
 
         CaseTypeDefinition caseTypeDefinition = loadCaseTypeDefinition("/mappings/bookcase-definition.json");
-        caseTypeDefinition.setRoleToAccessProfiles(
-            asList(RoleToAccessProfileDefinition.builder().roleName("[CREATOR]").build()));
+        caseTypeDefinition.setRoleToAccessProfiles(asList(roleToAccessProfileDefinition("[CREATOR]")));
 
         stubFor(WireMock.get(urlMatching("/api/data/case-type/TestAddressBookCase"))
             .willReturn(okJson(defaultObjectMapper.writeValueAsString(caseTypeDefinition))

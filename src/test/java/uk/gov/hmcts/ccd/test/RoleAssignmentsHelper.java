@@ -10,11 +10,16 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import static uk.gov.hmcts.ccd.BaseTest.loadCaseTypeDefinition;
 
 public class RoleAssignmentsHelper {
     public static final String GET_ROLE_ASSIGNMENTS_PREFIX = "/am/role-assignments/actors/";
@@ -149,6 +154,21 @@ public class RoleAssignmentsHelper {
         return RoleAssignmentResponse.builder()
             .roleAssignments(roleAssignments)
             .build();
+    }
+
+    public static RoleToAccessProfileDefinition roleToAccessProfileDefinition(String caseRole) {
+        return RoleToAccessProfileDefinition.builder()
+            .disabled(false)
+            .readOnly(false)
+            .accessProfiles(caseRole)
+            .roleName(caseRole).build();
+    }
+
+    public static CaseTypeDefinition enhanceGetCaseTypeStubWithAccessProfiles(
+        String caseTypeJsonFile, RoleToAccessProfileDefinition... accessProfiles) {
+        CaseTypeDefinition caseTypeDefinition = loadCaseTypeDefinition("/mappings/" + caseTypeJsonFile);
+        caseTypeDefinition.setRoleToAccessProfiles(Arrays.asList(accessProfiles.clone()));
+        return caseTypeDefinition;
     }
 
     private static RoleAssignmentAttributesResource createRoleAssignmentRecordAttribute(String caseId,
