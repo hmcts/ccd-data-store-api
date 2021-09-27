@@ -44,6 +44,7 @@
 		Suppressed until fix in place
 		</notes>
 		<cve>CVE-2021-22144</cve>
+		<cve>CVE-2021-22147</cve>
 	</suppress>
 
 	<suppress until="2021-10-25">
