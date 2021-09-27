@@ -91,6 +91,7 @@ env.IDAM_API_URL_BASE = "https://idam-api.demo.platform.hmcts.net"
 env.TEST_URL = "http://ccd-ac-int-data-store-api-demo.service.core-compute-demo.internal"
 env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-demo.service.core-compute-demo.internal"
 env.BEFTA_USER_AUTHENTICATION_RETRY_MAX_ATTEMPTS=1
+env.ELASTIC_SEARCH_FTA_ENABLED=true
 
 withNightlyPipeline(type, product, component) {
     overrideVaultEnvironments(vaultOverrides)
