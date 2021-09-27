@@ -329,6 +329,8 @@
 								}
 							],
 							"searchAliasFields": [],
+              "searchParties" : [],
+              "searchCriterias" : [],
 							"security_classification": null,
 							"case_fields": [],
 							"printable_document_url": null,
@@ -606,6 +608,8 @@
 								}
 							],
 							"searchAliasFields": [],
+              "searchParties" : [],
+              "searchCriterias" : [],
 							"security_classification": null,
 							"case_fields": [],
 							"printable_document_url": null,

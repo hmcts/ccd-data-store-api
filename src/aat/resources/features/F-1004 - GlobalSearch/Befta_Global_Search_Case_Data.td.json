@@ -1,0 +1,12 @@
+{
+  "_guid_": "Befta_Global_Search_Case_Data",
+
+  "DateOfBirth": "2012-04-21",
+  "Email": "e@mail.com",
+  "Address": {
+    "AddressLine1": "Address Value"
+  },
+  "FirstName": "FirstNameValue",
+  "LastName": "LastNameValue",
+  "PostCode": "SE1 4EE"
+}

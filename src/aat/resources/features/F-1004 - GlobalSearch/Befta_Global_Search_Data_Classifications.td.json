@@ -1,0 +1,45 @@
+{
+  "_guid_": "Befta_Global_Search_Data_Classifications",
+
+    "DateOfBirth": "PUBLIC",
+    "Email": "PUBLIC",
+    "Address": {
+      "classification": "PUBLIC",
+      "value": {
+        "AddressLine1": "PUBLIC"
+      }
+    },
+    "FirstName": "PUBLIC",
+    "LastName": "PUBLIC",
+    "PostCode": "PUBLIC",
+    "SearchCriteria" : {
+      "classification" : "PUBLIC",
+      "value" : {
+        "OtherCaseReferences" : {
+          "classification" : "PUBLIC",
+          "value" : [ {
+            "id" : "[[ANYTHING_PRESENT]]",
+            "classification" : "PUBLIC"
+          } ]
+        },
+        "SearchParties" : {
+          "classification" : "PUBLIC",
+          "value" : [
+            {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },
+            {
+              "value" : {
+                "Name" : "PUBLIC",
+                "EmailAddress" : "PUBLIC",
+                "AddressLine1" : "PUBLIC",
+                "PostCode" : "PUBLIC",
+                "DateOfBirth" : "PUBLIC"
+              },
+              "id" : "[[ANYTHING_PRESENT]]"
+            } ]
+        }
+      }
+    }
+}
