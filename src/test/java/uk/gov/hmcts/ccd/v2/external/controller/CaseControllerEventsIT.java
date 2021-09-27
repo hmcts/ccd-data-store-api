@@ -20,7 +20,6 @@ import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
 import javax.inject.Inject;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -44,6 +43,7 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
 
     @Before
     public void setUp() {
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         MockUtils.setSecurityAuthorities(RandomStringUtils.randomAlphanumeric(10), authentication,
             MockUtils.ROLE_CASEWORKER_PUBLIC);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
@@ -52,7 +52,7 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-        scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
+        scripts = {"classpath:sql/insert_cases_event_access_case_roles.sql"})
     public void shouldNotReturnEventHistoryDataForCitizenWhoHasNoAccessToEvents() throws Exception {
 
         assertCaseDataResultSetSize();
@@ -80,7 +80,6 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
             .andReturn();
 
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = result.getResponse().getContentAsString();
         assertNotNull("Content Should not be null", content);
         CaseEventsResource saveCaseEventsResource = mapper.readValue(content, CaseEventsResource.class);
@@ -91,7 +90,7 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-        scripts = { "classpath:sql/insert_cases_event_access_case_roles.sql" })
+        scripts = {"classpath:sql/insert_cases_event_access_case_roles.sql"})
     public void shouldReturnEventHistoryDataForCitizenWhoHasCaseRoleAccess() throws Exception {
 
         assertCaseDataResultSetSize();
@@ -107,7 +106,6 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
             .andReturn();
 
         assertEquals(result.getResponse().getContentAsString(), 200, result.getResponse().getStatus());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String content = result.getResponse().getContentAsString();
         assertNotNull("Content Should not be null", content);
         CaseEventsResource savedCaseEventsResource = mapper.readValue(content, CaseEventsResource.class);
@@ -118,7 +116,7 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
     }
 
     private void assertCaseDataResultSetSize() {
-        final int count = template.queryForObject("SELECT count(1) as n FROM case_data",Integer.class);
+        final int count = template.queryForObject("SELECT count(1) as n FROM case_data", Integer.class);
         assertEquals("Incorrect case data size", NUMBER_OF_CASES, count);
     }
 }

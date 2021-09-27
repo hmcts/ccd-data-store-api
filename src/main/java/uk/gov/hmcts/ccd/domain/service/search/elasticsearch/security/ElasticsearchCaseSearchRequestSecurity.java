@@ -59,9 +59,11 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
         return queryString;
     }
 
-    private CaseSearchRequest createNewCaseSearchRequest(CaseSearchRequest caseSearchRequest, String queryWithFilters) {
+    private CaseSearchRequest createNewCaseSearchRequest(CaseSearchRequest caseSearchRequest,
+                                                         String queryWithFilters) {
         ObjectNode searchRequestJsonNode =
-            objectMapperService.convertStringToObject(caseSearchRequest.toJsonString(), ObjectNode.class);
+            objectMapperService.convertStringToObject(caseSearchRequest.toJsonString(),
+                ObjectNode.class);
         ObjectNode queryNode = objectMapperService.convertStringToObject(queryWithFilters, ObjectNode.class);
         searchRequestJsonNode.set(QUERY, queryNode.get(QUERY));
 

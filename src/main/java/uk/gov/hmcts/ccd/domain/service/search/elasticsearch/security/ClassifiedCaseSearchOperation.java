@@ -29,8 +29,8 @@ public class ClassifiedCaseSearchOperation implements CaseSearchOperation {
     }
 
     @Override
-    public CaseSearchResult execute(CrossCaseTypeSearchRequest request) {
-        final CaseSearchResult results = caseSearchOperation.execute(request);
+    public CaseSearchResult execute(CrossCaseTypeSearchRequest request, boolean dataClassification) {
+        final CaseSearchResult results = caseSearchOperation.execute(request, dataClassification);
 
         if (results == null) {
             return new CaseSearchResult();

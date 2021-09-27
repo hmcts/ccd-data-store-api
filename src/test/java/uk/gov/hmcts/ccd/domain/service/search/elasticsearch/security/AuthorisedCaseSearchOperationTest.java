@@ -30,6 +30,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchAliasField;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
+import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
@@ -44,6 +45,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Mockito.mock;
@@ -106,7 +108,8 @@ class AuthorisedCaseSearchOperationTest {
             caseDetails.setReference(CASE_REFERENCE);
             caseDetails.setCaseTypeId(CASE_TYPE_ID_1);
             CaseSearchResult searchResult = new CaseSearchResult(1L, singletonList(caseDetails));
-            when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class))).thenReturn(searchResult);
+            when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class),
+                anyBoolean())).thenReturn(searchResult);
 
             Map<String, JsonNode> unFilteredData = new HashMap<>();
             caseDetails.setData(unFilteredData);
@@ -130,14 +133,14 @@ class AuthorisedCaseSearchOperationTest {
                 .withSearchRequest(elasticsearchRequest)
                 .build();
 
-            CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(searchRequest);
+            CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(searchRequest, true);
 
             assertAll(
                 () -> assertThat(result, is(searchResult)),
                 () -> assertThat(caseDetails.getData(), Matchers.is(filteredData)),
                 () -> assertThat(result.getTotal(), is(1L)),
                 () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ),
-                () -> verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class)),
+                () -> verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class), anyBoolean()),
                 () -> verify(caseDataAccessControl).generateAccessProfilesByCaseTypeId(CASE_TYPE_ID_1),
                 () -> verify(objectMapperService).convertObjectToJsonNode(unFilteredData),
                 () -> verify(accessControlService).filterCaseFieldsByAccess(jsonNode,
@@ -156,7 +159,7 @@ class AuthorisedCaseSearchOperationTest {
             when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ))
                 .thenReturn(Optional.empty());
 
-            CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(searchRequest);
+            CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(searchRequest, true);
 
             assertAll(
                 () -> assertThat(result.getCases(), hasSize(0)),
@@ -184,7 +187,8 @@ class AuthorisedCaseSearchOperationTest {
             caseDetails.setReference(CASE_REFERENCE);
             caseTypeDefinition.setSearchAliasFields(getSearchAliasFields());
             searchResult = new CaseSearchResult(1L, singletonList(caseDetails));
-            when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class))).thenReturn(searchResult);
+            when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class),
+                anyBoolean())).thenReturn(searchResult);
             when(objectMapperService.createEmptyJsonNode()).thenReturn(JsonNodeFactory.instance.objectNode());
             when(objectMapperService.convertJsonNodeToMap(any(JsonNode.class))).thenReturn(transformedData);
         }
@@ -192,7 +196,8 @@ class AuthorisedCaseSearchOperationTest {
         @Test
         @DisplayName("should transform search results to alias names defined in source filter")
         void shouldTransformMultiCaseTypeSearchResults() {
-            when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class))).thenReturn(searchResult);
+            when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class),
+                anyBoolean())).thenReturn(searchResult);
 
             ObjectNode dataNode = JsonNodeFactory.instance.objectNode();
             dataNode.set("firstName", JsonNodeFactory.instance.textNode("Baker"));
@@ -209,7 +214,7 @@ class AuthorisedCaseSearchOperationTest {
                 .withSourceFilterAliasFields(asList("name", "postcode"))
                 .build();
 
-            CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(searchRequest);
+            CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(searchRequest, true);
             verifyResult(result);
         }
 
@@ -240,7 +245,7 @@ class AuthorisedCaseSearchOperationTest {
                 .withSourceFilterAliasFields(asList("collection", "postcode"))
                 .build();
 
-            CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(searchRequest);
+            CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(searchRequest, true);
             verifyResult(result);
         }
 
@@ -251,7 +256,8 @@ class AuthorisedCaseSearchOperationTest {
                 () -> assertThat(result.getTotal(), is(1L)),
                 () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ),
                 () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_2, CAN_READ),
-                () -> verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class)),
+                () -> verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class), anyBoolean()),
+                () -> verify(caseDataAccessControl).generateAccessProfilesByCaseTypeId(CASE_TYPE_ID_1),
                 () -> verify(caseDataAccessControl).generateAccessProfilesByCaseTypeId(CASE_TYPE_ID_1)
             );
         }

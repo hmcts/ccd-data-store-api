@@ -59,18 +59,18 @@ class ClassifiedCaseSearchOperationTest {
     @DisplayName("should call decorated implementation")
     void shouldCallDecoratedImplementation() {
         CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = mock(CrossCaseTypeSearchRequest.class);
-        classifiedSearchOperation.execute(crossCaseTypeSearchRequest);
+        classifiedSearchOperation.execute(crossCaseTypeSearchRequest, false);
 
-        verify(searchOperation).execute(crossCaseTypeSearchRequest);
+        verify(searchOperation).execute(crossCaseTypeSearchRequest, false);
     }
 
     @Test
     @DisplayName("should return empty list when decorated returns null")
     void shouldReturnEmptyListWhenNullResult() {
         CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = mock(CrossCaseTypeSearchRequest.class);
-        doReturn(null).when(searchOperation).execute(crossCaseTypeSearchRequest);
+        doReturn(null).when(searchOperation).execute(crossCaseTypeSearchRequest, false);
 
-        CaseSearchResult output = classifiedSearchOperation.execute(crossCaseTypeSearchRequest);
+        CaseSearchResult output = classifiedSearchOperation.execute(crossCaseTypeSearchRequest, false);
 
         assertAll(
             () -> assertThat(output, is(notNullValue())),
@@ -84,9 +84,9 @@ class ClassifiedCaseSearchOperationTest {
         CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = mock(CrossCaseTypeSearchRequest.class);
         List<CaseDetails> cases = Arrays.asList(case1, case2);
         CaseSearchResult caseSearchResult = new CaseSearchResult(Long.valueOf(cases.size()), cases);
-        doReturn(caseSearchResult).when(searchOperation).execute(crossCaseTypeSearchRequest);
+        doReturn(caseSearchResult).when(searchOperation).execute(crossCaseTypeSearchRequest, false);
 
-        final CaseSearchResult output = classifiedSearchOperation.execute(crossCaseTypeSearchRequest);
+        final CaseSearchResult output = classifiedSearchOperation.execute(crossCaseTypeSearchRequest, false);
 
         assertAll(
             () -> assertThat(output.getCases(), hasSize(2)),
@@ -102,11 +102,11 @@ class ClassifiedCaseSearchOperationTest {
         CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = mock(CrossCaseTypeSearchRequest.class);
         List<CaseDetails> cases = Arrays.asList(case1, case2);
         CaseSearchResult caseSearchResult = new CaseSearchResult(Long.valueOf(cases.size()), cases);
-        doReturn(caseSearchResult).when(searchOperation).execute(crossCaseTypeSearchRequest);
+        doReturn(caseSearchResult).when(searchOperation).execute(crossCaseTypeSearchRequest, false);
 
         doReturn(Optional.empty()).when(classificationService).applyClassification(case2);
 
-        final CaseSearchResult output = classifiedSearchOperation.execute(crossCaseTypeSearchRequest);
+        final CaseSearchResult output = classifiedSearchOperation.execute(crossCaseTypeSearchRequest, false);
 
         assertAll(
             () -> assertThat(output.getCases(), hasSize(1)),

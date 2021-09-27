@@ -33,6 +33,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
@@ -90,6 +91,8 @@ class DefaultCreateCaseOperationTest {
     private AfterSubmitCallbackResponse responseBody;
     @Mock
     private DraftGateway draftGateway;
+    @Mock
+    private CaseDataIssueLogger caseDataIssueLogger;
 
     @Mock
     private CasePostStateService casePostStateService;
@@ -125,8 +128,9 @@ class DefaultCreateCaseOperationTest {
                                                                     caseTypeService,
                                                                     callbackInvoker,
                                                                     validateCaseFieldsOperation,
-                casePostStateService,
-                                                                    draftGateway);
+                                                                    casePostStateService,
+                                                                    draftGateway,
+                                                                    caseDataIssueLogger);
         data = buildJsonNodeData();
         given(userRepository.getUser()).willReturn(IDAM_USER);
         given(userRepository.getUserId()).willReturn(UID);

@@ -4,9 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -18,13 +16,14 @@ import static java.util.function.Predicate.not;
 import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.elasticsearch.rest.RestRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
@@ -41,10 +40,12 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
+import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefaultCollection;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Repository
 @Qualifier(DefaultUserRepository.QUALIFIER)
@@ -55,6 +56,7 @@ public class DefaultUserRepository implements UserRepository {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultUserRepository.class);
     private static final String RELEVANT_ROLES = "caseworker-%s";
     private static final int JURISDICTION_INDEX = 1;
+    private static final String EMAIL_HEADER = "email-ids-users-to-find";
 
     private final ApplicationParams applicationParams;
     private final CaseDefinitionRepository caseDefinitionRepository;
@@ -128,24 +130,29 @@ public class DefaultUserRepository implements UserRepository {
     @Override
     public UserDefault getUserDefaultSettings(final String userId) {
         try {
-            final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
-            final Map<String, String> queryParams = new HashMap<>();
-            queryParams.put("uid", ApplicationParams.encode(userId.toLowerCase()));
+            final HttpHeaders requestHeaders = securityUtils.authorizationHeaders();
+            requestHeaders.add(EMAIL_HEADER, userId.toLowerCase());
+            final HttpEntity<RestRequest> requestEntity = new HttpEntity<>(requestHeaders);
             final String encodedUrl = UriComponentsBuilder.fromHttpUrl(applicationParams.userDefaultSettingsURL())
-                .buildAndExpand(queryParams).toUriString();
-            return restTemplate.exchange(new URI(encodedUrl), HttpMethod.GET, requestEntity, UserDefault.class)
+                .toUriString();
+
+            UserDefaultCollection userDefaultCollection = restTemplate
+                .exchange(new URI(encodedUrl), HttpMethod.GET, requestEntity, UserDefaultCollection.class)
                 .getBody();
+
+            if (userDefaultCollection == null || isEmpty(userDefaultCollection.getUserDefaults())) {
+                LOG.error("User Profile not exists for userId '{}'", userId);
+                return null;
+            }
+
+            return userDefaultCollection.getUserDefaults().get(0);
         } catch (RestClientResponseException e) {
             LOG.error("Failed to retrieve user profile", e);
             final List<String> headerMessages = Optional.ofNullable(e.getResponseHeaders())
                 .map(headers -> headers.get("Message")).orElse(null);
             final String message = headerMessages != null ? headerMessages.get(0) : e.getMessage();
             if (message != null) {
-                if (HttpStatus.NOT_FOUND.value() == e.getRawStatusCode()) {
-                    throw new ResourceNotFoundException(message);
-                } else {
-                    throw new BadRequestException(message);
-                }
+                throw new BadRequestException(message);
             }
             throw new ServiceException("Problem getting user default settings for " + userId);
         } catch (ResourceAccessException e) {
