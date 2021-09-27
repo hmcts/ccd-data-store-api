@@ -15,6 +15,7 @@ import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
+import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 
 import java.util.HashMap;
@@ -40,19 +41,21 @@ public class CallbackInvoker {
     private final CaseDataService caseDataService;
     private final CaseSanitiser caseSanitiser;
     private final SecurityValidationService securityValidationService;
-
+    private final GlobalSearchProcessorService globalSearchProcessorService;
 
     @Autowired
     public CallbackInvoker(final CallbackService callbackService,
                            final CaseTypeService caseTypeService,
                            final CaseDataService caseDataService,
                            final CaseSanitiser caseSanitiser,
-                           final SecurityValidationService securityValidationService) {
+                           final SecurityValidationService securityValidationService,
+                           final GlobalSearchProcessorService globalSearchProcessorService) {
         this.callbackService = callbackService;
         this.caseTypeService = caseTypeService;
         this.caseDataService = caseDataService;
         this.caseSanitiser = caseSanitiser;
         this.securityValidationService = securityValidationService;
+        this.globalSearchProcessorService = globalSearchProcessorService;
     }
 
     public void invokeAboutToStartCallback(final CaseEventDefinition caseEventDefinition,
@@ -188,7 +191,7 @@ public class CallbackInvoker {
             caseDetails.setState(callbackResponse.getState());
         }
         if (callbackResponse.getData() != null) {
-            validateAndSetData(caseTypeDefinition, caseDetails, callbackResponse.getData());
+            validateAndSetDataForGlobalSearch(caseTypeDefinition, caseDetails, callbackResponse.getData());
             if (callbackResponseHasCaseAndDataClassification(callbackResponse)) {
                 securityValidationService.setClassificationFromCallbackIfValid(
                     callbackResponse,
@@ -217,10 +220,32 @@ public class CallbackInvoker {
 
     private void validateAndSetData(final CaseTypeDefinition caseTypeDefinition,
                                     final CaseDetails caseDetails,
-                                    final Map<String, JsonNode> responseData) {
+                                    final Map<String, JsonNode> responseData,
+                                    final boolean populateGlobalSearch) {
         caseTypeService.validateData(responseData, caseTypeDefinition);
-        caseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition, responseData));
+
+        Map<String, JsonNode> responseDataToSanitise = responseData;
+
+        if (populateGlobalSearch) {
+            responseDataToSanitise =
+                globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, responseData);
+        }
+
+        caseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition, responseDataToSanitise));
         deduceDataClassificationForNewFields(caseTypeDefinition, caseDetails);
+    }
+
+    private void validateAndSetData(final CaseTypeDefinition caseTypeDefinition,
+                                    final CaseDetails caseDetails,
+                                    final Map<String, JsonNode> responseData) {
+        validateAndSetData(caseTypeDefinition, caseDetails, responseData, false);
+    }
+
+    private void validateAndSetDataForGlobalSearch(final CaseTypeDefinition caseTypeDefinition,
+                                    final CaseDetails caseDetails,
+                                    final Map<String, JsonNode> responseData) {
+
+        validateAndSetData(caseTypeDefinition, caseDetails, responseData, true);
     }
 
     private void deduceDataClassificationForNewFields(CaseTypeDefinition caseTypeDefinition, CaseDetails caseDetails) {
