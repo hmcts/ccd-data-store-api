@@ -76,7 +76,8 @@
 		<cve>CVE-2021-28170</cve>
 		<cve>CVE-2021-22119</cve>
 		<cve>CVE-2021-22144</cve>
-
+		<cve>CVE-2021-22147</cve>
+		<cve>CVE-2020-23171</cve>
 	</suppress>
 
 </suppressions>
