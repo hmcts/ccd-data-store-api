@@ -7,14 +7,19 @@ import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.SearchResult;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.powermock.reflect.Whitebox;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
+import uk.gov.hmcts.ccd.auditlog.AuditEntry;
+import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
+import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortByCategory;
@@ -37,6 +42,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -44,6 +50,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint.GLOBAL_SEARCH_PATH;
 
 public class GlobalSearchEndpointIT extends WireMockBaseTest {
+
+    private static final String GET_GLOBAL_SEARCH = "/globalSearch";
 
     private static final String REFERENCE = "4444333322221111";
     private static final String JURISDICTION = "AUTOTEST1";
@@ -58,6 +66,9 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
     private MockMvc mockMvc;
     @MockBean
     private JestClient jestClient;
+
+    @SpyBean
+    private AuditRepository auditRepository;
 
     private List<String> validFields;
     private List<String> invalidFields;
@@ -96,34 +107,7 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
         stubElasticSearchSearchRequestWillReturn();
 
         int startRecord = 2;
-
-        GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
-        payload.setMaxReturnRecordCount(10);
-        payload.setStartRecordNumber(startRecord);
-        payload.setSortCriteria(validSortCriteria);
-        SearchCriteria searchCriteria = new SearchCriteria();
-        searchCriteria.setCaseManagementBaseLocationIds(validFields);
-        searchCriteria.setCaseManagementRegionIds(validFields);
-        searchCriteria.setCcdCaseTypeIds(List.of(CASE_TYPE));
-        searchCriteria.setCcdJurisdictionIds(validFields);
-        searchCriteria.setOtherReferences(validFields);
-        searchCriteria.setStateIds(validFields);
-        searchCriteria.setCaseReferences(validCaseReferences);
-        Party party = new Party();
-        party.setAddressLine1("address");
-        party.setPartyName("name");
-        party.setDateOfBirth("1999-01-01");
-        party.setPostCode("EC3M 8AF");
-        party.setEmailAddress("someone@cgi.com");
-        Party partyTwo = new Party();
-        partyTwo.setAddressLine1("address");
-        partyTwo.setPartyName("name");
-        partyTwo.setDateOfBirth("1999-01-01");
-        partyTwo.setPostCode("EC3M 8AF");
-        partyTwo.setEmailAddress("someone@cgi.com");
-        List<Party> list = List.of(party, partyTwo);
-        searchCriteria.setParties(list);
-        payload.setSearchCriteria(searchCriteria);
+        GlobalSearchRequestPayload payload = createRequestPayload(startRecord);
 
         // ACT / ASSERT
         MvcResult result = mockMvc.perform(post(GLOBAL_SEARCH_PATH)
@@ -205,6 +189,44 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
             .andReturn();
     }
 
+
+    @Test
+    public void shouldAuditLogSearchCases() throws Exception {
+
+        // ARRANGE
+        stubElasticSearchSearchRequestWillReturn();
+        GlobalSearchRequestPayload payload = createRequestPayload(2);
+
+        // ACT / ASSERT
+        MvcResult result = mockMvc.perform(post(GLOBAL_SEARCH_PATH)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(payload)))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        // ASSERT extra
+        String responseAsString = result.getResponse().getContentAsString();
+        GlobalSearchResponsePayload globalSearchResponsePayload = mapper.readValue(responseAsString,
+            GlobalSearchResponsePayload.class);
+
+        assertThat(globalSearchResponsePayload.getResults().get(0).getCaseReference(), is(REFERENCE));
+        assertThat(globalSearchResponsePayload.getResults().get(0).getCcdJurisdictionId(), is(JURISDICTION));
+        assertThat(globalSearchResponsePayload.getResults().get(0).getStateId(), is(STATE));
+        assertThat(globalSearchResponsePayload.getResults().get(0).getCcdCaseTypeId(), is(CASE_TYPE));
+        assertThat(globalSearchResponsePayload.getResults().get(0).getHmctsServiceId(), is(SERVICE_ID));
+        assertThat(globalSearchResponsePayload.getResults().get(0).getHmctsServiceShortDescription(), is(SERVICE_NAME));
+
+        // check auditing
+        ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        assertThat(captor.getValue().getOperationType(), is(AuditOperationType.GLOBAL_SEARCH.getLabel()));
+        assertThat(captor.getValue().getCaseId(), is(REFERENCE));
+        assertThat(captor.getValue().getIdamId(), is("123"));
+        assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
+        assertThat(captor.getValue().getHttpStatus(), is(200));
+    }
+
     @Test
     public void shouldReturn200WhenEmptyFieldsHaveDefaultValues() throws Exception {
 
@@ -271,6 +293,38 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
         Whitebox.setInternalState(response, "searchResult", searchResult);
 
         given(jestClient.execute(any())).willReturn(multiSearchResult);
+    }
+
+
+    private GlobalSearchRequestPayload createRequestPayload(int startRecord) {
+        GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
+        payload.setMaxReturnRecordCount(10);
+        payload.setStartRecordNumber(startRecord);
+        payload.setSortCriteria(validSortCriteria);
+        SearchCriteria searchCriteria = new SearchCriteria();
+        searchCriteria.setCaseManagementBaseLocationIds(validFields);
+        searchCriteria.setCaseManagementRegionIds(validFields);
+        searchCriteria.setCcdCaseTypeIds(List.of(CASE_TYPE));
+        searchCriteria.setCcdJurisdictionIds(validFields);
+        searchCriteria.setOtherReferences(validFields);
+        searchCriteria.setStateIds(validFields);
+        searchCriteria.setCaseReferences(validCaseReferences);
+        Party party = new Party();
+        party.setAddressLine1("address");
+        party.setPartyName("name");
+        party.setDateOfBirth("1999-01-01");
+        party.setPostCode("EC3M 8AF");
+        party.setEmailAddress("someone@cgi.com");
+        Party partyTwo = new Party();
+        partyTwo.setAddressLine1("address");
+        partyTwo.setPartyName("name");
+        partyTwo.setDateOfBirth("1999-01-01");
+        partyTwo.setPostCode("EC3M 8AF");
+        partyTwo.setEmailAddress("someone@cgi.com");
+        List<Party> list = List.of(party, partyTwo);
+        searchCriteria.setParties(list);
+        payload.setSearchCriteria(searchCriteria);
+        return payload;
     }
 
 }
