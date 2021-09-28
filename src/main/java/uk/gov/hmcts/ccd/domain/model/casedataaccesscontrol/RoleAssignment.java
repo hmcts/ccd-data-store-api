@@ -35,4 +35,8 @@ public class RoleAssignment {
         return (beginTime == null || machineTimestamp.isAfter(beginTime))
             && (endTime == null || machineTimestamp.isBefore(endTime));
     }
+
+    public RoleAssignmentAttributes getAttributes() {
+        return attributes == null ? new RoleAssignmentAttributes() : attributes;
+    }
 }

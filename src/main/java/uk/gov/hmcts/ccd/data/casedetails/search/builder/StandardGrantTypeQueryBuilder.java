@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 
@@ -25,6 +26,7 @@ public class StandardGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
 
         String regionAndLocationQuery = streamSupplier.get()
             .filter(roleAssignment -> roleAssignment.getAttributes() != null)
+            .filter(roleAssignment -> isValidRoleAssignment(roleAssignment.getAttributes()))
             .map(roleAssignment -> {
                 Optional<String> jurisdiction = roleAssignment.getAttributes().getJurisdiction();
                 String innerQuery = "";
@@ -54,5 +56,14 @@ public class StandardGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
         }
 
         return StringUtils.isNotBlank(tmpQuery) ? String.format(QUERY_WRAPPER, tmpQuery) : tmpQuery;
+    }
+
+    private boolean isValidRoleAssignment(RoleAssignmentAttributes attributes) {
+        Optional<String> jurisdiction = attributes.getJurisdiction();
+        boolean isValid = jurisdiction != null && jurisdiction.isPresent();
+        Optional<String> location = attributes.getLocation();
+        isValid = isValid || (location != null && location.isPresent());
+        Optional<String> region = attributes.getLocation();
+        return isValid || (region != null && region.isPresent());
     }
 }
