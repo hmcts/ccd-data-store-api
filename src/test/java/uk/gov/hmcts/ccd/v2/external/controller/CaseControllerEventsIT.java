@@ -69,8 +69,8 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         template = new JdbcTemplate(db);
 
-        if (applicationParams.getEnableAttributeBasedAccessControl() &&
-            !applicationParams.getEnablePseudoAccessProfilesGeneration()) {
+        if (applicationParams.getEnableAttributeBasedAccessControl()
+            && !applicationParams.getEnablePseudoAccessProfilesGeneration()) {
             CaseTypeDefinition caseTypeDefinition = enhanceGetCaseTypeStubWithAccessProfiles(
                 "bookcase-no-event-access-to-caserole-definition.json",
                 roleToAccessProfileDefinition(CASE_ROLE_1),
@@ -102,19 +102,7 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
                 )))
                 .withStatus(200)));
 
-//        stubUserInfo("1234");
-//        stubCitizenUserInfo("1234");
-        String userJson = "{\n"
-            + "          \"sub\": \"Cloud.Strife@test.com\",\n"
-            + "          \"uid\": \"1234\",\n"
-            + "          \"roles\": [\n"
-            + "            \"caseworker\",\n"
-            + "            \"caseworker-test\"\n"
-            + "          ],\n"
-            + "          \"name\": \"Cloud Strife\"\n"
-            + "        }";
-        stubFor(WireMock.get(urlMatching("/o/userinfo"))
-            .willReturn(okJson(userJson).withStatus(200)));
+        stubUserInfo("1234");
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTHORIZATION, "Bearer " + UID_WITH_NO_EVENT_ACCESS);
@@ -160,7 +148,6 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
 
         assertCaseDataResultSetSize();
 
-//        stubCitizenUserInfo(UID_WITH_EVENT_ACCESS);
         stubUserInfo(UID_WITH_EVENT_ACCESS);
 
         HttpHeaders headers = new HttpHeaders();

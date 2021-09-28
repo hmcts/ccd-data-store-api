@@ -11,6 +11,12 @@
     "jsonBody": {
       "id": "GrantOfRepresentation",
       "description": "Probate - Grant of Representation",
+      "jurisdiction": {
+        "id": "PROBATE",
+        "name": "Test",
+        "description": "Test Jurisdiction"
+      },
+      "security_classification": "PUBLIC",
       "name": "Grant of Representation",
       "states": [
         {
