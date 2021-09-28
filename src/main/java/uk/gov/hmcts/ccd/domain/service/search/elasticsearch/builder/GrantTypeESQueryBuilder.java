@@ -32,6 +32,7 @@ public interface GrantTypeESQueryBuilder {
         return Optional.empty();
     }
 
+    @SuppressWarnings("java:S2789")
     default Optional<TermsQueryBuilder> getJurisdictions(Supplier<Stream<RoleAssignment>> streamSupplier) {
         Set<String> jurisdictions = streamSupplier.get()
             .filter(roleAssignment -> roleAssignment.getAttributes() != null)
@@ -47,6 +48,7 @@ public interface GrantTypeESQueryBuilder {
         return Optional.empty();
     }
 
+    @SuppressWarnings("java:S2789")
     default Optional<TermsQueryBuilder> getCaseReferences(Supplier<Stream<RoleAssignment>> streamSupplier) {
         Set<String> caseReferences = streamSupplier.get()
             .filter(roleAssignment -> roleAssignment.getAttributes() != null)

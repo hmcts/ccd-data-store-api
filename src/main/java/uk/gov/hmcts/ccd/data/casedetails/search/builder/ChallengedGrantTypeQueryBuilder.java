@@ -20,6 +20,7 @@ public class ChallengedGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
     private static final String QUERY = "%s in (:%s)";
 
     @Override
+    @SuppressWarnings("java:S2789")
     public String createQuery(List<RoleAssignment> roleAssignments, Map<String, Object> params) {
         Supplier<Stream<RoleAssignment>> streamSupplier = () -> roleAssignments.stream()
             .filter(roleAssignment -> GrantType.CHALLENGED.name().equals(roleAssignment.getGrantType()));

@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 public class StandardGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
 
     @Override
+    @SuppressWarnings("java:S2789")
     public String createQuery(List<RoleAssignment> roleAssignments, Map<String, Object> params) {
         Supplier<Stream<RoleAssignment>> streamSupplier = () -> roleAssignments.stream()
             .filter(roleAssignment -> GrantType.STANDARD.name().equals(roleAssignment.getGrantType()))
@@ -58,6 +59,7 @@ public class StandardGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
         return StringUtils.isNotBlank(tmpQuery) ? String.format(QUERY_WRAPPER, tmpQuery) : tmpQuery;
     }
 
+    @SuppressWarnings("java:S2789")
     private boolean isValidRoleAssignment(RoleAssignmentAttributes attributes) {
         Optional<String> jurisdiction = attributes.getJurisdiction();
         boolean isValid = jurisdiction != null && jurisdiction.isPresent();

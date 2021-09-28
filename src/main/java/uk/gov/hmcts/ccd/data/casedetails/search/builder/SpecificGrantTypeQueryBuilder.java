@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 public class SpecificGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
 
     @Override
+    @SuppressWarnings("java:S2789")
     public String createQuery(List<RoleAssignment> roleAssignments, Map<String, Object> params) {
         Supplier<Stream<RoleAssignment>> streamSupplier = () -> roleAssignments.stream()
             .filter(roleAssignment -> GrantType.SPECIFIC.name().equals(roleAssignment.getGrantType()))
