@@ -51,8 +51,6 @@ import static uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint.GLOBAL_SEARCH_P
 
 public class GlobalSearchEndpointIT extends WireMockBaseTest {
 
-    private static final String GET_GLOBAL_SEARCH = "/globalSearch";
-
     private static final String REFERENCE = "4444333322221111";
     private static final String JURISDICTION = "AUTOTEST1";
     private static final String CASE_TYPE = "TestAddressBookCase";

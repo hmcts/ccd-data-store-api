@@ -98,6 +98,8 @@ public class GlobalSearchEndpoint {
 
         Instant start = Instant.now();
 
+        requestPayload.setDefaults();
+
         // if no CaseType filter applied :: load all case types available for user
         if (CollectionUtils.isEmpty(requestPayload.getSearchCriteria().getCcdCaseTypeIds())) {
             requestPayload.getSearchCriteria().setCcdCaseTypeIds(
