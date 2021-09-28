@@ -20,6 +20,7 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REGION;
 public class StandardGrantTypeESQueryBuilder implements GrantTypeESQueryBuilder {
 
     @Override
+    @SuppressWarnings("java:S2789")
     public BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments) {
         Supplier<Stream<RoleAssignment>> streamSupplier = () -> roleAssignments.stream()
             .filter(roleAssignment -> GrantType.STANDARD.name().equals(roleAssignment.getGrantType()))

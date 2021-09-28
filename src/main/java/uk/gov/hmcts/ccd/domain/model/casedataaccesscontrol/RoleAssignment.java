@@ -24,6 +24,7 @@ public class RoleAssignment {
     private List<String> authorisations;
     private RoleAssignmentAttributes attributes;
 
+    @SuppressWarnings("java:S2789")
     public boolean isCaseRoleAssignment() {
         return this.getAttributes() != null
             && this.getAttributes().getCaseId() != null
