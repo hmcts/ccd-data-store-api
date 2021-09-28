@@ -31,6 +31,7 @@ import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.C
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.CASE_MANAGEMENT_LOCATION;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.CASE_NAME_HMCTS_INTERNAL;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.OTHER_REFERENCE;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.OTHER_REFERENCE_VALUE;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.REGION;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.SEARCH_PARTIES;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.SEARCH_PARTY_ADDRESS_LINE_1;
@@ -61,7 +62,7 @@ public class GlobalSearchQueryBuilder {
                 addTermsQuery(boolQueryBuilder, STATE, searchCriteria.getStateIds());
                 addTermsQuery(boolQueryBuilder, REGION, searchCriteria.getCaseManagementRegionIds());
                 addTermsQuery(boolQueryBuilder, BASE_LOCATION, searchCriteria.getCaseManagementBaseLocationIds());
-                addTermsQuery(boolQueryBuilder, OTHER_REFERENCE, searchCriteria.getOtherReferences());
+                addTermsQuery(boolQueryBuilder, OTHER_REFERENCE_VALUE, searchCriteria.getOtherReferences());
                 // add parties query for all party values
                 addPartiesQuery(boolQueryBuilder, searchCriteria.getParties());
             }

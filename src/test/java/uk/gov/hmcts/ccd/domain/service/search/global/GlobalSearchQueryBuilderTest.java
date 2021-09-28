@@ -118,9 +118,9 @@ class GlobalSearchQueryBuilderTest {
                 () -> assertTermsQuery(output, GlobalSearchFields.JURISDICTION, JURISDICTION_TERMS),
                 () -> assertTermsQuery(output, GlobalSearchFields.CASE_TYPE, CASE_TYPE_TERMS),
                 () -> assertTermsQuery(output, GlobalSearchFields.STATE, STATE_TERMS),
-                () -> assertTermsQuery(output, GlobalSearchFields.CaseDataPaths.REGION, REGION_TERMS),
-                () -> assertTermsQuery(output, GlobalSearchFields.CaseDataPaths.BASE_LOCATION, BASE_LOCATION_TERMS),
-                () -> assertTermsQuery(output, GlobalSearchFields.CaseDataPaths.OTHER_REFERENCE, OTHER_REFERENCE_TERMS)
+                () -> assertTermsQuery(output, CaseDataPaths.REGION, REGION_TERMS),
+                () -> assertTermsQuery(output, CaseDataPaths.BASE_LOCATION, BASE_LOCATION_TERMS),
+                () -> assertTermsQuery(output, CaseDataPaths.OTHER_REFERENCE_VALUE, OTHER_REFERENCE_TERMS)
             );
 
         }
@@ -309,9 +309,9 @@ class GlobalSearchQueryBuilderTest {
                 () -> assertNull(getTermsQueryBuilder(output, GlobalSearchFields.JURISDICTION)),
                 () -> assertNull(getTermsQueryBuilder(output, GlobalSearchFields.CASE_TYPE)),
                 () -> assertNull(getTermsQueryBuilder(output, GlobalSearchFields.STATE)),
-                () -> assertNull(getTermsQueryBuilder(output, GlobalSearchFields.CaseDataPaths.REGION)),
-                () -> assertNull(getTermsQueryBuilder(output, GlobalSearchFields.CaseDataPaths.BASE_LOCATION)),
-                () -> assertNull(getTermsQueryBuilder(output, GlobalSearchFields.CaseDataPaths.OTHER_REFERENCE))
+                () -> assertNull(getTermsQueryBuilder(output, CaseDataPaths.REGION)),
+                () -> assertNull(getTermsQueryBuilder(output, CaseDataPaths.BASE_LOCATION)),
+                () -> assertNull(getTermsQueryBuilder(output, CaseDataPaths.OTHER_REFERENCE_VALUE))
             );
         }
 

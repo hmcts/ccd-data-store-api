@@ -139,7 +139,8 @@ public final class GlobalSearchFields {
         private static final String SEARCH_CRITERIA_PREFIX = SEARCH_CRITERIA + FIELD_SEPARATOR;
 
         public static final String OTHER_REFERENCE
-            = SEARCH_CRITERIA_PREFIX + SearchCriteriaFields.OTHER_CASE_REFERENCES + COLLECTION_VALUE_SUFFIX;
+            = SEARCH_CRITERIA_PREFIX + SearchCriteriaFields.OTHER_CASE_REFERENCES;
+        public static final String OTHER_REFERENCE_VALUE = OTHER_REFERENCE + COLLECTION_VALUE_SUFFIX;
         public static final String SEARCH_PARTIES
             = SEARCH_CRITERIA_PREFIX + SearchCriteriaFields.SEARCH_PARTIES + COLLECTION_VALUE_SUFFIX;
 
