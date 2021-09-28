@@ -51,6 +51,12 @@ import static uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint.GLOBAL_SEARCH_P
 
 public class GlobalSearchEndpointIT extends WireMockBaseTest {
 
+    private static final String ADDRESS_LINE_1 = "address";
+    private static final String NAME = "name";
+    private static final String DOB  = "1999-01-01";
+    private static final String POSTCODE = "EC3M 8AF";
+    private static final String EMAIL_ADDRESS = "someone@cgi.com";
+
     private static final String REFERENCE = "4444333322221111";
     private static final String JURISDICTION = "AUTOTEST1";
     private static final String CASE_TYPE = "TestAddressBookCase";
@@ -223,6 +229,7 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
         assertThat(captor.getValue().getIdamId(), is("123"));
         assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(200));
+        assertThat(captor.getValue().getListOfCaseTypes(), is("TestAddressBookCase"));
     }
 
     @Test
@@ -308,17 +315,17 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
         searchCriteria.setStateIds(validFields);
         searchCriteria.setCaseReferences(validCaseReferences);
         Party party = new Party();
-        party.setAddressLine1("address");
-        party.setPartyName("name");
-        party.setDateOfBirth("1999-01-01");
-        party.setPostCode("EC3M 8AF");
-        party.setEmailAddress("someone@cgi.com");
+        party.setAddressLine1(ADDRESS_LINE_1);
+        party.setPartyName(NAME);
+        party.setDateOfBirth(DOB);
+        party.setPostCode(POSTCODE);
+        party.setEmailAddress(EMAIL_ADDRESS);
         Party partyTwo = new Party();
-        partyTwo.setAddressLine1("address");
-        partyTwo.setPartyName("name");
-        partyTwo.setDateOfBirth("1999-01-01");
-        partyTwo.setPostCode("EC3M 8AF");
-        partyTwo.setEmailAddress("someone@cgi.com");
+        partyTwo.setAddressLine1(ADDRESS_LINE_1);
+        partyTwo.setPartyName(NAME);
+        partyTwo.setDateOfBirth(DOB);
+        partyTwo.setPostCode(POSTCODE);
+        partyTwo.setEmailAddress(EMAIL_ADDRESS);
         List<Party> list = List.of(party, partyTwo);
         searchCriteria.setParties(list);
         payload.setSearchCriteria(searchCriteria);

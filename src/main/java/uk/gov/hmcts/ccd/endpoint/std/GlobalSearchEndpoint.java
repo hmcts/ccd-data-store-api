@@ -28,7 +28,6 @@ import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchService;
 import javax.validation.Valid;
 import java.time.Duration;
 import java.time.Instant;
-
 import java.util.stream.Collectors;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -92,8 +91,11 @@ public class GlobalSearchEndpoint {
             })
         )
     })
-    @LogAudit(operationType = AuditOperationType.GLOBAL_SEARCH, caseTypeIds = "#caseTypeIds",
-        caseId = "T(uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint).buildCaseIds(#result)")
+    @LogAudit(
+        operationType = AuditOperationType.GLOBAL_SEARCH,
+        caseTypeIds = "T(uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint).buildCaseTypeIds(#result)",
+        caseId = "T(uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint).buildCaseIds(#result)"
+    )
     public GlobalSearchResponsePayload searchForCases(@RequestBody @Valid GlobalSearchRequestPayload requestPayload) {
 
         Instant start = Instant.now();
@@ -119,9 +121,15 @@ public class GlobalSearchEndpoint {
         return result;
     }
 
-    public static String buildCaseIds(GlobalSearchResponsePayload caseSearchResult) {
-        return caseSearchResult.getResults().stream().limit(MAX_CASE_IDS_LIST)
+    public static String buildCaseIds(GlobalSearchResponsePayload globalSearchResult) {
+        return globalSearchResult.getResults().stream().limit(MAX_CASE_IDS_LIST)
             .map(c -> String.valueOf(c.getCaseReference()))
+            .collect(Collectors.joining(CASE_ID_SEPARATOR));
+    }
+
+    public static String buildCaseTypeIds(GlobalSearchResponsePayload globalSearchResult) {
+        return globalSearchResult.getResults().stream().limit(MAX_CASE_IDS_LIST)
+            .map(c -> String.valueOf(c.getCcdCaseTypeId()))
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 
