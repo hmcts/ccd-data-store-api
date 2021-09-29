@@ -177,7 +177,7 @@ public class AccessControlService {
             fieldName -> findCaseFieldAndVerifyHasAccess(fieldName, caseFieldDefinitions, userRoles, access)
                 .ifPresent(caseField -> {
                     if (isEmpty(caseField.getComplexACLs())) {
-                        filteredCaseFields.set(fieldName, caseFields.get(fieldName));
+                            filteredCaseFields.set(fieldName, caseFields.get(fieldName));
                     } else if (!isClassification) {
                         filteredCaseFields.set(
                             fieldName,
@@ -245,8 +245,6 @@ public class AccessControlService {
                                                     final Predicate<AccessControlList> access,
                                                     final boolean isClassification,
                                                     final CaseFieldDefinition childField) {
-        LOG.info("Child Field "+ childField);
-
         if (caseField.isCollectionFieldType() && jsonNode.isArray()) {
             jsonNode.forEach(caseFieldValueJsonNode -> {
                 if (caseFieldValueJsonNode.get(VALUE).get(childField.getId()) != null) {
@@ -255,13 +253,15 @@ public class AccessControlService {
                 }
             });
         } else {
+            // We are getting class com.fasterxml.jackson.databind.node.MissingNode cannot be cast to class
+            // com.fasterxml.jackson.databind.node.ObjectNode exception when childField.getId() is null, so this
+            // is added to check if the value exists.
             if (jsonNode.path(childField.getId()) != null) {
                 filterChildrenUsingJsonNode(childField, jsonNode.path(childField.getId()), userRoles, access,
                     isClassification);
-            }
-            else {
-                LOG.info(
-                    "Can not found Id value for  childField {} with path {} with user roles={}", childField, jsonNode.path(childField.getId()), userRoles);
+            } else {
+                LOG.info("Can not found Id value for  childField {} with path {} with user roles={}",
+                    childField, jsonNode.path(childField.getId()), userRoles);
             }
         }
     }
