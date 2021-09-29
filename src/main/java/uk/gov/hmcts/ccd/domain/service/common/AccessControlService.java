@@ -14,6 +14,7 @@ import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollec
 import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollectionOptions.ALLOW_INSERT;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
+import com.fasterxml.jackson.databind.node.MissingNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -221,7 +222,15 @@ public class AccessControlService {
                                                  final Set<String> userRoles,
                                                  final Predicate<AccessControlList> access,
                                                  boolean isClassification) {
-        if (caseField.isCompoundFieldType()) {
+        // We are getting class com.fasterxml.jackson.databind.node.MissingNode cannot be cast to class
+        // com.fasterxml.jackson.databind.node.ObjectNode exception when childField.getId() is null, so this
+        // is added to check if the value exists.
+        if (jsonNode instanceof MissingNode){
+            LOG.info("Can not found value for  jsonNode={}, jsonNodeParent={}, user roles={}, caseType={}, " +
+                    "accessControlList={}",
+                 jsonNode, jsonNode.findParent("id"), userRoles, caseField.getCaseTypeId(),
+                caseField.getAccessControlLists());
+        } else if (caseField.isCompoundFieldType()) {
             caseField.getFieldTypeDefinition().getChildren().stream().forEach(childField -> {
                 if (!hasAccessControlList(userRoles, access, childField.getAccessControlLists())) {
                     locateAndRemoveChildNode(caseField, jsonNode, childField);
@@ -249,20 +258,12 @@ public class AccessControlService {
             jsonNode.forEach(caseFieldValueJsonNode -> {
                 if (caseFieldValueJsonNode.get(VALUE).get(childField.getId()) != null) {
                     filterChildrenUsingJsonNode(childField, caseFieldValueJsonNode.get(VALUE).get(childField.getId()),
-                        userRoles, access, isClassification);
+                                                userRoles, access, isClassification);
                 }
             });
         } else {
-            // We are getting class com.fasterxml.jackson.databind.node.MissingNode cannot be cast to class
-            // com.fasterxml.jackson.databind.node.ObjectNode exception when childField.getId() is null, so this
-            // is added to check if the value exists.
-            if (jsonNode.path(childField.getId()) != null) {
-                filterChildrenUsingJsonNode(childField, jsonNode.path(childField.getId()), userRoles, access,
-                    isClassification);
-            } else {
-                LOG.info("Can not found Id value for  childField {} with path {} with user roles={}",
-                    childField, jsonNode.path(childField.getId()), userRoles);
-            }
+            filterChildrenUsingJsonNode(childField, jsonNode.path(childField.getId()), userRoles, access,
+                                        isClassification);
         }
     }
 
