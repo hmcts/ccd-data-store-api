@@ -28,4 +28,9 @@ public class CachedCaseRoleRepository implements CaseRoleRepository {
     public Set<String> getCaseRoles(String caseTypeId) {
         return caseRoles.computeIfAbsent(caseTypeId, caseRoleRepository::getCaseRoles);
     }
+
+    @Override
+    public Set<String> getCaseRoles(String userId, String jurisdictionId, String caseTypeId) {
+        return getCaseRoles(caseTypeId);
+    }
 }
