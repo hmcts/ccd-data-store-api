@@ -32,6 +32,11 @@ public class AuthorisationsMatcher implements RoleAttributeMatcher {
     }
 
     @Override
+    public MatcherType getType() {
+        return MatcherType.AUTHORISATION;
+    }
+
+    @Override
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseDetails caseDetails) {
         return matchAuthorisations(roleAssignment, caseTypeService.getCaseType(caseDetails.getCaseTypeId()));
     }

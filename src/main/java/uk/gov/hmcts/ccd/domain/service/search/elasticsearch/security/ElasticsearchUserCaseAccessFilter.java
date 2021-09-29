@@ -6,6 +6,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -24,17 +25,23 @@ public class ElasticsearchUserCaseAccessFilter implements CaseSearchFilter {
 
     private final CaseAccessService caseAccessService;
     private final CaseDefinitionRepository caseDefinitionRepository;
+    private final ApplicationParams applicationParams;
 
     @Autowired
     public ElasticsearchUserCaseAccessFilter(CaseAccessService caseAccessService,
                                              @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                             final CaseDefinitionRepository caseDefinitionRepository) {
+                                             final CaseDefinitionRepository caseDefinitionRepository,
+                                             ApplicationParams applicationParams) {
         this.caseAccessService = caseAccessService;
         this.caseDefinitionRepository = caseDefinitionRepository;
+        this.applicationParams = applicationParams;
     }
 
     @Override
     public Optional<QueryBuilder> getFilter(String caseTypeId) {
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            return Optional.empty();
+        }
         Instant start = Instant.now();
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         if (caseTypeDefinition == null) {

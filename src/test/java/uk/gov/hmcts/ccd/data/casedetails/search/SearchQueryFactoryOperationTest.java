@@ -9,11 +9,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.casedetails.search.builder.AccessControlGrantTypeQueryBuilder;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -46,6 +49,12 @@ class SearchQueryFactoryOperationTest {
     @Mock
     private EntityManager entityManager;
 
+    @Mock
+    private CaseDefinitionRepository caseDefinitionRepository;
+
+    @Mock
+    private AccessControlGrantTypeQueryBuilder accessControlGrantTypeQueryBuilder;
+
     private SearchQueryFactoryOperation classUnderTest;
 
     @BeforeEach
@@ -57,7 +66,9 @@ class SearchQueryFactoryOperationTest {
             userAuthorisation,
             sortOrderQueryBuilder,
             authorisedCaseDefinitionDataService,
-            roleAssignmentService);
+            roleAssignmentService,
+            caseDefinitionRepository,
+            accessControlGrantTypeQueryBuilder);
     }
 
     @Test
@@ -98,7 +109,7 @@ class SearchQueryFactoryOperationTest {
 
         verify(sortOrderQueryBuilder).buildSortOrderClause(metadata);
         verify(userAuthorisation, times(1)).getUserId();
-        verify(roleAssignmentService).getCaseReferencesForAGivenUser(anyString());
+        verify(roleAssignmentService).getRoleAssignments(anyString(), anyObject());
         verify(entityManager).createNativeQuery(anyString(), any(Class.class));
     }
 
