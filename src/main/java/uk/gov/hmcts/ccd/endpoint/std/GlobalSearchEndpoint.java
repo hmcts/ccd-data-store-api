@@ -28,7 +28,10 @@ import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchService;
 import javax.validation.Valid;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ccd.auditlog.aop.AuditContext.CASE_ID_SEPARATOR;
@@ -93,7 +96,7 @@ public class GlobalSearchEndpoint {
     })
     @LogAudit(
         operationType = AuditOperationType.GLOBAL_SEARCH,
-        caseTypeIds = "T(uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint).buildCaseTypeIds(#result)",
+        caseTypeIds = "T(uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint).buildCaseTypeIds(#requestPayload)",
         caseId = "T(uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint).buildCaseIds(#result)"
     )
     public GlobalSearchResponsePayload searchForCases(@RequestBody @Valid GlobalSearchRequestPayload requestPayload) {
@@ -127,10 +130,18 @@ public class GlobalSearchEndpoint {
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 
-    public static String buildCaseTypeIds(GlobalSearchResponsePayload globalSearchResult) {
-        return globalSearchResult.getResults().stream().limit(MAX_CASE_IDS_LIST)
-            .map(c -> String.valueOf(c.getCcdCaseTypeId()))
+    public static String buildCaseTypeIds(GlobalSearchRequestPayload globalSearchRequest) {
+        // NB: match Case ID list size and separator configuration
+        return getCaseTypeIds(globalSearchRequest).limit(MAX_CASE_IDS_LIST)
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 
+    private static Stream<String> getCaseTypeIds(
+        GlobalSearchRequestPayload globalSearchRequest) {
+        return globalSearchRequest != null
+            ? Optional.ofNullable(globalSearchRequest.getSearchCriteria().getCcdCaseTypeIds())
+            .map(Collection::stream)
+            .orElseGet(Stream::empty)
+            : Stream.empty();
+    }
 }
