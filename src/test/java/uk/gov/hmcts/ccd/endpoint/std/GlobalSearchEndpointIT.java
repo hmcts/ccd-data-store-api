@@ -57,7 +57,8 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
     private static final String POSTCODE = "EC3M 8AF";
     private static final String EMAIL_ADDRESS = "someone@cgi.com";
 
-    private static final String REFERENCE = "4444333322221111";
+    private static final String REFERENCE_1 = "4444333322221111";
+    private static final String REFERENCE_2 = "1111222233334444";
     private static final String JURISDICTION = "AUTOTEST1";
     private static final String CASE_TYPE = "TestAddressBookCase";
     private static final String STATE = "TODO";
@@ -101,7 +102,7 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
         invalidSortCriteriaOne.setSortBy("invalid");
         invalidSortCriteriaOne.setSortDirection("invalid");
         invalidSortCriteria = List.of(invalidSortCriteriaOne);
-        validCaseReferences = List.of(REFERENCE, "1234-1234-1234-1234", "234-1234*", "1234-1234-1234-123?");
+        validCaseReferences = List.of(REFERENCE_1, "1234-1234-1234-1234", "234-1234*", "1234-1234-1234-123?");
     }
 
     @Test
@@ -125,11 +126,11 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
         GlobalSearchResponsePayload globalSearchResponsePayload = mapper.readValue(responseAsString,
             GlobalSearchResponsePayload.class);
 
-        assertThat(globalSearchResponsePayload.getResultInfo().getCasesReturned(), is(1));
+        assertThat(globalSearchResponsePayload.getResultInfo().getCasesReturned(), is(2));
         assertThat(globalSearchResponsePayload.getResultInfo().getCaseStartRecord(), is(startRecord));
         assertThat(globalSearchResponsePayload.getResultInfo().isMoreResultsToGo(), is(true));
 
-        assertThat(globalSearchResponsePayload.getResults().get(0).getCaseReference(), is(REFERENCE));
+        assertThat(globalSearchResponsePayload.getResults().get(0).getCaseReference(), is(REFERENCE_1));
         assertThat(globalSearchResponsePayload.getResults().get(0).getCcdJurisdictionId(), is(JURISDICTION));
         assertThat(globalSearchResponsePayload.getResults().get(0).getStateId(), is(STATE));
         assertThat(globalSearchResponsePayload.getResults().get(0).getCcdCaseTypeId(), is(CASE_TYPE));
@@ -213,7 +214,7 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
         GlobalSearchResponsePayload globalSearchResponsePayload = mapper.readValue(responseAsString,
             GlobalSearchResponsePayload.class);
 
-        assertThat(globalSearchResponsePayload.getResults().get(0).getCaseReference(), is(REFERENCE));
+        assertThat(globalSearchResponsePayload.getResults().get(0).getCaseReference(), is(REFERENCE_1));
         assertThat(globalSearchResponsePayload.getResults().get(0).getCcdJurisdictionId(), is(JURISDICTION));
         assertThat(globalSearchResponsePayload.getResults().get(0).getStateId(), is(STATE));
         assertThat(globalSearchResponsePayload.getResults().get(0).getCcdCaseTypeId(), is(CASE_TYPE));
@@ -225,7 +226,7 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
         verify(auditRepository).save(captor.capture());
 
         assertThat(captor.getValue().getOperationType(), is(AuditOperationType.GLOBAL_SEARCH.getLabel()));
-        assertThat(captor.getValue().getCaseId(), is(REFERENCE));
+        assertThat(captor.getValue().getCaseId(), is(REFERENCE_1 + "," + REFERENCE_2));
         assertThat(captor.getValue().getIdamId(), is("123"));
         assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
         assertThat(captor.getValue().getHttpStatus(), is(200));
@@ -248,25 +249,28 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
             .andReturn();
     }
 
-
-    private String createCaseDetailsElastic(String caseDetails) {
+    private String create2CaseDetailsElastic(String caseDetails1, String caseDetails2) {
         return "{\n"
             + "   \"took\":177,\n"
             + "   \"hits\":{\n"
             + "      \"hits\":[\n"
             + "         {\n"
             + "            \"_index\":\"TestAddressBookCase_cases-000001\",\n"
-            + "            \"_source\":" + caseDetails
+            + "            \"_source\":" + caseDetails1
+            + "         },\n"
+            + "         {\n"
+            + "            \"_index\":\"TestAddressBookCase_cases-000001\",\n"
+            + "            \"_source\":" + caseDetails2
             + "         }\n"
             + "      ]\n"
             + "   }\n"
             + "}";
     }
 
-    private String createCaseDetails() {
+    private String createCaseDetails(String reference) {
         return "{\n"
             + "\"id\": 18,\n"
-            + "\"" + GlobalSearchFields.REFERENCE + "\": \"" + REFERENCE + "\",\n"
+            + "\"" + GlobalSearchFields.REFERENCE + "\": \"" + reference + "\",\n"
             + "\"" + GlobalSearchFields.JURISDICTION + "\": \"" + JURISDICTION + "\",\n"
             + "\"" + GlobalSearchFields.CASE_TYPE + "\": \"" + CASE_TYPE + "\",\n"
             + "\"" + GlobalSearchFields.STATE + "\": \"" + STATE + "\",\n"
@@ -281,8 +285,9 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
     }
 
     private void stubElasticSearchSearchRequestWillReturn() throws java.io.IOException {
-        String caseDetails = createCaseDetails();
-        String caseDetailElastic = createCaseDetailsElastic(caseDetails);
+        String caseDetails1 = createCaseDetails(REFERENCE_1);
+        String caseDetails2 = createCaseDetails(REFERENCE_2);
+        String caseDetailElastic = create2CaseDetailsElastic(REFERENCE_1, REFERENCE_2);
 
         JsonObject convertedObject = new Gson().fromJson(caseDetailElastic, JsonObject.class);
         MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
@@ -290,7 +295,7 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
 
         SearchResult searchResult = mock(SearchResult.class);
         when(searchResult.getTotal()).thenReturn(30L);
-        when(searchResult.getSourceAsStringList()).thenReturn(newArrayList(caseDetails));
+        when(searchResult.getSourceAsStringList()).thenReturn(newArrayList(caseDetails1, caseDetails2));
 
         MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
         when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
