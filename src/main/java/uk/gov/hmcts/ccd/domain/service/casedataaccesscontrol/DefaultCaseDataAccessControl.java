@@ -93,7 +93,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         List<RoleAssignment> filteredRoleAssignments = roleAssignmentsFilteringService
             .filter(roleAssignments, caseTypeDefinition).getFilteredMatchingRoleAssignments();
 
-        return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments, caseTypeDefinition));
+        return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments, caseTypeDefinition, isCreationProfile));
     }
 
 
@@ -117,14 +117,15 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.get().getCaseTypeId());
 
         return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments.getFilteredMatchingRoleAssignments(),
-            caseTypeDefinition));
+            caseTypeDefinition, false));
     }
 
     private List<AccessProfile> filteredAccessProfiles(List<RoleAssignment> filteredRoleAssignments,
-                                                       CaseTypeDefinition caseTypeDefinition) {
+                                                       CaseTypeDefinition caseTypeDefinition,
+                                                       boolean isCreationProfile) {
         if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
             List<RoleAssignment> pseudoRoleAssignments = pseudoRoleAssignmentsGenerator
-                .createPseudoRoleAssignments(filteredRoleAssignments);
+                .createPseudoRoleAssignments(filteredRoleAssignments, isCreationProfile);
             filteredRoleAssignments = augment(filteredRoleAssignments, pseudoRoleAssignments);
         }
 
@@ -218,7 +219,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     private List<RoleAssignment> appendGeneratedPseudoRoleAssignments(List<RoleAssignment> filteringResults) {
         if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
             List<RoleAssignment> pseudoRoleAssignments = pseudoRoleAssignmentsGenerator
-                .createPseudoRoleAssignments(filteringResults);
+                .createPseudoRoleAssignments(filteringResults, false);
             filteringResults = augment(filteringResults, pseudoRoleAssignments);
         }
         return filteringResults;

@@ -38,12 +38,13 @@ public class PseudoRoleAssignmentsGenerator {
         this.caseAccessService = caseAccessService;
     }
 
-    public List<RoleAssignment> createPseudoRoleAssignments(List<RoleAssignment> filteredRoleAssignments) {
+    public List<RoleAssignment> createPseudoRoleAssignments(List<RoleAssignment> filteredRoleAssignments,
+                                                            boolean isCreationProfile) {
 
         List<String> idamUserRoles = new ArrayList<>(userRepository.getUserRoles());
         List<RoleAssignment> pseudoRoleAssignments = new ArrayList<>();
 
-        if (caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()) {
+        if (!isCreationProfile && caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()) {
             if (atLeastOneCaseRoleExists(filteredRoleAssignments)) {
                 pseudoRoleAssignments.addAll(createPseudoRoleAssignmentsForGrantedOnlyAccess(idamUserRoles));
             }

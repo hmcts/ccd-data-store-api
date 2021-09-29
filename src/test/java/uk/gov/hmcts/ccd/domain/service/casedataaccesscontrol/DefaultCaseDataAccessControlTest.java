@@ -44,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -400,7 +401,7 @@ class DefaultCaseDataAccessControlTest {
         roleAssignments.add(roleAssignment2);
 
         doReturn(roleAssignments)
-            .when(pseudoRoleAssignmentsGenerator).createPseudoRoleAssignments(anyList());
+            .when(pseudoRoleAssignmentsGenerator).createPseudoRoleAssignments(anyList(), eq(false));
 
         CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, true);
 
@@ -482,7 +483,7 @@ class DefaultCaseDataAccessControlTest {
         pseudoRoleAssignments.add(roleAssignment1);
 
         doReturn(pseudoRoleAssignments)
-            .when(pseudoRoleAssignmentsGenerator).createPseudoRoleAssignments(anyList());
+            .when(pseudoRoleAssignmentsGenerator).createPseudoRoleAssignments(anyList(), eq(false));
 
         boolean anyRoleEquals = defaultCaseDataAccessControl.anyAccessProfileEqualsTo(CASE_TYPE_1, ROLE_NAME_1);
         assertEquals(true, anyRoleEquals);
