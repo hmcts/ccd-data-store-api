@@ -60,7 +60,7 @@ public class DocumentSanitiser implements Sanitiser {
             sanitisedData.put(DOCUMENT_BINARY_URL, binary.getHref());
 
             final JsonNode documentHashNode = fieldData.get(DOCUMENT_HASH);
-            if (documentHashNode != null) {
+            if (documentHashNode != null && !documentHashNode.textValue().isBlank()) {
                 sanitisedData.put(DOCUMENT_HASH, documentHashNode.textValue());
             }
 

@@ -21,9 +21,9 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.Collections;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.any;
@@ -74,11 +74,9 @@ class DocumentSanitiserTest {
 
         documentSanitiser = new DocumentSanitiser(documentManagementRestClient);
         DOCUMENT_VALUE_INITIAL.put("document_url", DOCUMENT_URL_VALUE);
-        DOCUMENT_VALUE_INITIAL.put("document_hash", DOCUMENT_HASH);
         DOCUMENT_VALUE_SANITISED.put("document_url", DOCUMENT_URL_VALUE);
         DOCUMENT_VALUE_SANITISED.put("document_binary_url",BINARY_URL);
         DOCUMENT_VALUE_SANITISED.put("document_filename", FILENAME);
-        DOCUMENT_VALUE_SANITISED.put("document_hash", DOCUMENT_HASH);
     }
 
     @Test
@@ -88,6 +86,33 @@ class DocumentSanitiserTest {
         document.setOriginalDocumentName(FILENAME);
         when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
+        DOCUMENT_VALUE_INITIAL.put("document_hash", DOCUMENT_HASH);
+        JsonNode sanitisedDocument = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, DOCUMENT_VALUE_INITIAL);
+
+        DOCUMENT_VALUE_SANITISED.put("document_hash", DOCUMENT_HASH);
+        assertThat(sanitisedDocument, is(DOCUMENT_VALUE_SANITISED));
+    }
+
+    @Test
+    @DisplayName("should sanitise when hashToken null")
+    void shouldSanitizeIfDocumentRetrievedButNullHashToken() {
+        final Document document = buildDocument(BINARY_URL);
+        document.setOriginalDocumentName(FILENAME);
+        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
+
+        JsonNode sanitisedDocument = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, DOCUMENT_VALUE_INITIAL);
+
+        assertThat(sanitisedDocument, is(DOCUMENT_VALUE_SANITISED));
+    }
+
+    @Test
+    @DisplayName("should sanitise when hashToken is empty")
+    void shouldSanitizeIfDocumentRetrievedButEmptyHashToken() {
+        final Document document = buildDocument(BINARY_URL);
+        document.setOriginalDocumentName(FILENAME);
+        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
+
+        DOCUMENT_VALUE_INITIAL.put("document_hash", "");
         JsonNode sanitisedDocument = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, DOCUMENT_VALUE_INITIAL);
 
         assertThat(sanitisedDocument, is(DOCUMENT_VALUE_SANITISED));
