@@ -270,8 +270,9 @@ public class ApplicationParams {
         return caseDefinitionHost + "/api/base-types";
     }
 
-    public String caseRolesURL() {
-        return caseDefinitionHost + "/api/data/caseworkers/uid/jurisdictions/jid/case-types";
+    public String caseRolesURL(final String userId, final String jurisdictionId, final String caseTypeId) {
+        return caseDefinitionHost + "/api/data/caseworkers/" + encode(userId)
+            + "/jurisdictions/" + encode(jurisdictionId) + "/case-types/" + encode(caseTypeId) + "/roles";
     }
 
     public String userDefaultSettingsURL() {
