@@ -245,19 +245,26 @@ public class AccessControlService {
                                                     final Predicate<AccessControlList> access,
                                                     final boolean isClassification,
                                                     final CaseFieldDefinition childField) {
+        LOG.info("Child Field "+ childField);
+
         if (caseField.isCollectionFieldType() && jsonNode.isArray()) {
             jsonNode.forEach(caseFieldValueJsonNode -> {
                 if (caseFieldValueJsonNode.get(VALUE).get(childField.getId()) != null) {
                     filterChildrenUsingJsonNode(childField, caseFieldValueJsonNode.get(VALUE).get(childField.getId()),
-                                                userRoles, access, isClassification);
+                        userRoles, access, isClassification);
                 }
             });
         } else {
-            filterChildrenUsingJsonNode(childField, jsonNode.path(childField.getId()), userRoles, access,
-                                        isClassification);
+            if (jsonNode.path(childField.getId()) != null) {
+                filterChildrenUsingJsonNode(childField, jsonNode.path(childField.getId()), userRoles, access,
+                    isClassification);
+            }
+            else {
+                LOG.info(
+                    "Can not found Id value for  childField {} with path {} with user roles={}", childField, jsonNode.path(childField.getId()), userRoles);
+            }
         }
     }
-
     private void traverseAndFilterCollectionChildField(final CaseFieldDefinition caseField,
                                                        final JsonNode jsonNode,
                                                        final Set<String> userRoles,
