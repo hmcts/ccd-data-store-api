@@ -177,7 +177,7 @@ public class AccessControlService {
             fieldName -> findCaseFieldAndVerifyHasAccess(fieldName, caseFieldDefinitions, userRoles, access)
                 .ifPresent(caseField -> {
                     if (isEmpty(caseField.getComplexACLs())) {
-                            filteredCaseFields.set(fieldName, caseFields.get(fieldName));
+                        filteredCaseFields.set(fieldName, caseFields.get(fieldName));
                     } else if (!isClassification) {
                         filteredCaseFields.set(
                             fieldName,
@@ -265,6 +265,7 @@ public class AccessControlService {
             }
         }
     }
+
     private void traverseAndFilterCollectionChildField(final CaseFieldDefinition caseField,
                                                        final JsonNode jsonNode,
                                                        final Set<String> userRoles,
