@@ -140,6 +140,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     }
 
     private void filterCaseDataByAclAccess(CaseTypeDefinition authorisedCaseType, CaseDetails caseDetails) {
+
         JsonNode caseData = caseDataToJsonNode(caseDetails);
         JsonNode accessFilteredData =
             accessControlService.filterCaseFieldsByAccess(caseData, authorisedCaseType.getCaseFieldDefinitions(),

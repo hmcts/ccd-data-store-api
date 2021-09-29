@@ -225,9 +225,9 @@ public class AccessControlService {
         // We are getting class com.fasterxml.jackson.databind.node.MissingNode cannot be cast to class
         // com.fasterxml.jackson.databind.node.ObjectNode exception when childField.getId() is null, so this
         // is added to check if the value exists.
-        if (jsonNode instanceof MissingNode){
-            LOG.info("Can not found value for  jsonNode={}, jsonNodeParent={}, user roles={}, caseType={}, " +
-                    "accessControlList={}",
+        if (jsonNode instanceof MissingNode) {
+            LOG.info("Can not found value for  jsonNode={}, jsonNodeParent={}, user roles={}, caseType={}, "
+                    + "accessControlList={}",
                  jsonNode, jsonNode.findParent("id"), userRoles, caseField.getCaseTypeId(),
                 caseField.getAccessControlLists());
         } else if (caseField.isCompoundFieldType()) {
