@@ -24,6 +24,7 @@ public class RoleAssignment {
     private List<String> authorisations;
     private RoleAssignmentAttributes attributes;
 
+    @SuppressWarnings("java:S2789")
     public boolean isCaseRoleAssignment() {
         return this.getAttributes() != null
             && this.getAttributes().getCaseId() != null
@@ -34,5 +35,9 @@ public class RoleAssignment {
         final var machineTimestamp = Instant.now();
         return (beginTime == null || machineTimestamp.isAfter(beginTime))
             && (endTime == null || machineTimestamp.isBefore(endTime));
+    }
+
+    public RoleAssignmentAttributes getAttributes() {
+        return attributes == null ? new RoleAssignmentAttributes() : attributes;
     }
 }

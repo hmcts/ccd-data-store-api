@@ -14,8 +14,6 @@ import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder.AccessControlGrantTypeESQueryBuilder;
 
-import java.util.List;
-
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.QUERY;
 
 @Component
@@ -44,9 +42,7 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
     private String addFiltersToQuery(CaseSearchRequest caseSearchRequest) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder.must(QueryBuilders.wrapperQuery(caseSearchRequest.getQueryValue()));
-        BoolQueryBuilder grantTypeQueryBuilder = grantTypeESQueryBuilder
-            .createQuery(caseSearchRequest.getCaseTypeId());
-        boolQueryBuilder.must(grantTypeQueryBuilder);
+        grantTypeESQueryBuilder.createQuery(caseSearchRequest.getCaseTypeId(), boolQueryBuilder);
 
         caseSearchFilters.forEach(filter ->
             filter.getFilter(caseSearchRequest.getCaseTypeId()).ifPresent(boolQueryBuilder::filter));

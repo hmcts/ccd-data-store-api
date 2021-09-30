@@ -2,13 +2,14 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
 import com.google.common.collect.Lists;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -56,7 +57,8 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
     @Test
     void shouldReturnEmptyQueryWhenNoRoleAssignmentsExists() {
         when(roleAssignmentService.getRoleAssignments(anyString(), any())).thenReturn(Lists.newArrayList());
-        BoolQueryBuilder query = accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID);
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
         assertNotNull(query);
         assertFalse(query.hasClauses());
     }
@@ -66,9 +68,11 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC, "CASE", "PRIVATE", "", "", null);
         when(roleAssignmentService.getRoleAssignments(anyString(), any()))
             .thenReturn(Lists.newArrayList(roleAssignment));
-        BoolQueryBuilder query = accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID);
+
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
         assertNotNull(query);
-        assertEquals(1, query.should().size());
+        assertEquals(1, query.must().size());
     }
 
 
@@ -82,12 +86,10 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
         when(roleAssignmentService.getRoleAssignments(anyString(), any()))
             .thenReturn(Lists.newArrayList(roleAssignment, specificRoleAssignment));
 
-        BoolQueryBuilder query = accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID);
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
         assertNotNull(query);
-        assertEquals(1, query.should().size());
-        BoolQueryBuilder nonOrgQuery = (BoolQueryBuilder) query.should().get(0);
-        assertNotNull(nonOrgQuery);
-        assertEquals(2, nonOrgQuery.should().size());
+        assertEquals(1, query.must().size());
     }
 
     @Test
@@ -108,18 +110,11 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
             challengedRoleAssignment, standardRoleAssignment));
 
 
-        BoolQueryBuilder query = accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID);
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
 
         assertNotNull(query);
-        assertEquals(2, query.should().size());
-        BoolQueryBuilder nonOrgQuery = (BoolQueryBuilder) query.should().get(0);
-        assertNotNull(nonOrgQuery);
-        assertEquals(2, nonOrgQuery.should().size());
-
-        BoolQueryBuilder orgQuery = (BoolQueryBuilder) query.should().get(1);
-        assertNotNull(orgQuery);
-        assertEquals(1, orgQuery.should().size());
-        assertEquals(0, orgQuery.mustNot().size());
+        assertEquals(1, query.must().size());
     }
 
     @Test
@@ -144,17 +139,10 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
             challengedRoleAssignment, standardRoleAssignment, excludedRoleAssignment));
 
 
-        BoolQueryBuilder query = accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID);
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
 
         assertNotNull(query);
-        assertEquals(2, query.should().size());
-        BoolQueryBuilder nonOrgQuery = (BoolQueryBuilder) query.should().get(0);
-        assertNotNull(nonOrgQuery);
-        assertEquals(2, nonOrgQuery.should().size());
-
-        BoolQueryBuilder orgQuery = (BoolQueryBuilder) query.should().get(1);
-        assertNotNull(orgQuery);
-        assertEquals(1, orgQuery.should().size());
-        assertEquals(1, orgQuery.mustNot().size());
+        assertEquals(1, query.must().size());
     }
 }

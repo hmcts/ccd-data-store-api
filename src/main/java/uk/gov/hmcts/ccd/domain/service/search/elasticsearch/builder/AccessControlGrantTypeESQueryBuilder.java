@@ -45,57 +45,81 @@ public class AccessControlGrantTypeESQueryBuilder {
         this.userAuthorisation = userAuthorisation;
     }
 
-    public BoolQueryBuilder createQuery(String caseTypeId) {
+    public void createQuery(String caseTypeId, BoolQueryBuilder mainQuery) {
         List<RoleAssignment> roleAssignments = getRoleAssignments(caseTypeId);
-
         BoolQueryBuilder standardQuery = standardGrantTypeQueryBuilder.createQuery(roleAssignments);
         BoolQueryBuilder challengedQuery = challengedGrantTypeQueryBuilder.createQuery(roleAssignments);
-        BoolQueryBuilder orgQuery = QueryBuilders.boolQuery();
-
-        if (standardQuery.hasClauses()) {
-            orgQuery.should(standardQuery);
-        }
-        if (challengedQuery.hasClauses()) {
-            orgQuery.should(challengedQuery);
-        }
-
-        BoolQueryBuilder orgQueryWithExcluded = QueryBuilders.boolQuery();
-
-        BoolQueryBuilder excludedQuery = excludedGrantTypeQueryBuilder.createQuery(roleAssignments);
-        if (excludedQuery.hasClauses()) {
-            orgQueryWithExcluded.mustNot(excludedQuery);
-        }
-
-        if (orgQuery.hasClauses()) {
-            orgQueryWithExcluded.should(orgQuery);
-        }
+        BoolQueryBuilder orgQuery = prepareQuery(standardQuery, challengedQuery);
 
         BoolQueryBuilder basicQuery = basicGrantTypeQueryBuilder.createQuery(roleAssignments);
         BoolQueryBuilder specificQuery = specificGrantTypeQueryBuilder.createQuery(roleAssignments);
+        BoolQueryBuilder nonOrgQuery = prepareQuery(basicQuery, specificQuery);
 
-        BoolQueryBuilder nonOrgQuery = QueryBuilders.boolQuery();
-        if (basicQuery.hasClauses()) {
-            nonOrgQuery.should(basicQuery);
+        BoolQueryBuilder excludedQuery = excludedGrantTypeQueryBuilder.createQuery(roleAssignments);
+
+        if (!nonOrgQuery.hasClauses()
+            && !orgQuery.hasClauses()
+            && excludedQuery.hasClauses()) {
+            mainQuery.mustNot(excludedQuery);
         }
 
-        if (specificQuery.hasClauses()) {
-            nonOrgQuery.should(specificQuery);
+        if (!nonOrgQuery.hasClauses()
+            && orgQuery.hasClauses()
+            && !excludedQuery.hasClauses()) {
+            mainQuery.must(orgQuery);
         }
 
-        BoolQueryBuilder grantTypeQuery = QueryBuilders.boolQuery();
-        if (nonOrgQuery.hasClauses()) {
-            grantTypeQuery.should(nonOrgQuery);
+        if (nonOrgQuery.hasClauses()
+            && !orgQuery.hasClauses()
+            && !excludedQuery.hasClauses()) {
+            mainQuery.must(nonOrgQuery);
         }
 
-        if (orgQueryWithExcluded.hasClauses()) {
-            grantTypeQuery.should(orgQueryWithExcluded);
+        if (!nonOrgQuery.hasClauses()
+            && orgQuery.hasClauses()
+            && excludedQuery.hasClauses()) {
+            orgQuery.mustNot(excludedQuery);
+            mainQuery.must(orgQuery);
         }
 
-        return grantTypeQuery;
+        if (nonOrgQuery.hasClauses()
+            && !orgQuery.hasClauses()
+            && excludedQuery.hasClauses()) {
+            nonOrgQuery.mustNot(excludedQuery);
+            mainQuery.must(nonOrgQuery);
+        }
+
+        if (nonOrgQuery.hasClauses()
+            && orgQuery.hasClauses()
+            && !excludedQuery.hasClauses()) {
+            nonOrgQuery.should(orgQuery);
+            mainQuery.must(nonOrgQuery);
+        }
+
+        if (nonOrgQuery.hasClauses()
+            && orgQuery.hasClauses()
+            && excludedQuery.hasClauses()) {
+            orgQuery.mustNot(excludedQuery);
+            nonOrgQuery.should(orgQuery);
+            mainQuery.must(nonOrgQuery);
+        }
     }
 
     private List<RoleAssignment> getRoleAssignments(String caseTypeId) {
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         return roleAssignmentService.getRoleAssignments(userAuthorisation.getUserId(), caseTypeDefinition);
+    }
+
+    private BoolQueryBuilder prepareQuery(BoolQueryBuilder queryOne, BoolQueryBuilder queryTwo) {
+        BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
+        if (queryOne.hasClauses() && queryTwo.hasClauses()) {
+            queryBuilder.should(queryOne);
+            queryBuilder.should(queryTwo);
+        } else if (queryOne.hasClauses()) {
+            queryBuilder.should(queryOne);
+        } else if (queryTwo.hasClauses()) {
+            queryBuilder.should(queryTwo);
+        }
+        return queryBuilder;
     }
 }

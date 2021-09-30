@@ -4,12 +4,10 @@ import com.google.common.collect.Lists;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BasicGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
 
@@ -25,7 +23,6 @@ class BasicGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC, "CASE", "PRIVATE", "", "", null);
         BoolQueryBuilder query = basicGrantTypeESQueryBuilder.createQuery(Lists.newArrayList(roleAssignment));
         assertNotNull(query);
-        assertFalse(query.must().isEmpty());
     }
 
 
@@ -34,6 +31,5 @@ class BasicGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC, "CASE", "", "", "", null);
         BoolQueryBuilder query = basicGrantTypeESQueryBuilder.createQuery(Lists.newArrayList(roleAssignment));
         assertNotNull(query);
-        assertTrue(query.must().isEmpty());
     }
 }

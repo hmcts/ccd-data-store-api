@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 
 import static uk.gov.hmcts.ccd.data.casedetails.search.builder.GrantTypeQueryBuilder.AND_NOT;
+import static uk.gov.hmcts.ccd.data.casedetails.search.builder.GrantTypeQueryBuilder.EMPTY;
 import static uk.gov.hmcts.ccd.data.casedetails.search.builder.GrantTypeQueryBuilder.OR;
 
 @Component
@@ -43,15 +44,7 @@ public class AccessControlGrantTypeQueryBuilder {
         String challengedQuery = challengedGrantTypeQueryBuilder.createQuery(roleAssignments, params);
 
         String orgQuery = mergeQuery(standardQuery, challengedQuery, OR);
-        String tmpQuery = orgQuery;
         String excludedQuery = excludedGrantTypeQueryBuilder.createQuery(roleAssignments, params);
-        if (StringUtils.isNotBlank(excludedQuery)) {
-            tmpQuery = tmpQuery
-                + getOperator(tmpQuery, AND_NOT)
-                + excludedQuery;
-            tmpQuery = String.format(QUERY, tmpQuery);
-        }
-
         String nonOrgQuery = mergeQuery(basicQuery, specificQuery, OR);
 
         if (StringUtils.isBlank(nonOrgQuery)
@@ -60,13 +53,51 @@ public class AccessControlGrantTypeQueryBuilder {
             return AND_NOT + excludedQuery;
         }
 
-        if (StringUtils.isNotBlank(nonOrgQuery)) {
-            tmpQuery = nonOrgQuery
-                + getOperator(tmpQuery, OR)
-                + tmpQuery;
+        if (StringUtils.isBlank(nonOrgQuery)
+            && StringUtils.isNotBlank(orgQuery)
+            && StringUtils.isBlank(excludedQuery)) {
+            return String.format(FINAL_QUERY, orgQuery);
         }
 
-        return StringUtils.isNotBlank(tmpQuery) ? String.format(FINAL_QUERY, tmpQuery) : tmpQuery;
+        if (StringUtils.isNotBlank(nonOrgQuery)
+            && StringUtils.isBlank(orgQuery)
+            && StringUtils.isBlank(excludedQuery)) {
+            return String.format(FINAL_QUERY, nonOrgQuery);
+        }
+
+        if (StringUtils.isBlank(nonOrgQuery)
+            && StringUtils.isNotBlank(orgQuery)
+            && StringUtils.isNotBlank(excludedQuery)) {
+            return String.format(FINAL_QUERY, orgQuery
+                + getOperator(orgQuery, AND_NOT)
+                + excludedQuery);
+        }
+
+        if (StringUtils.isNotBlank(nonOrgQuery)
+            && StringUtils.isBlank(orgQuery)
+            && StringUtils.isNotBlank(excludedQuery)) {
+            return String.format(FINAL_QUERY, nonOrgQuery
+                + getOperator(nonOrgQuery, AND_NOT)
+                + excludedQuery);
+        }
+
+
+        if (StringUtils.isNotBlank(nonOrgQuery)
+            && StringUtils.isNotBlank(orgQuery)
+            && StringUtils.isBlank(excludedQuery)) {
+            return String.format(FINAL_QUERY, nonOrgQuery
+                + getOperator(nonOrgQuery, OR)
+                + orgQuery);
+        }
+
+        if (StringUtils.isNotBlank(nonOrgQuery)
+            && StringUtils.isNotBlank(orgQuery)
+            && StringUtils.isNotBlank(excludedQuery)) {
+            return String.format(FINAL_QUERY, nonOrgQuery
+                + OR + String.format(QUERY, orgQuery + AND_NOT + excludedQuery));
+        }
+
+        return EMPTY;
     }
 
     private String mergeQuery(String queryOne,
@@ -77,7 +108,7 @@ public class AccessControlGrantTypeQueryBuilder {
         if (StringUtils.isNotBlank(queryTwo)) {
             return String.format(QUERY, tmpQuery + getOperator(tmpQuery, operator) + queryTwo);
         }
-        return StringUtils.isNotBlank(tmpQuery) ? String.format(QUERY, tmpQuery) : tmpQuery;
+        return tmpQuery;
     }
 
     private String getOperator(String query, String operator) {

@@ -4,13 +4,10 @@ import com.google.common.collect.Lists;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ExcludedGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
 
@@ -25,11 +22,10 @@ class ExcludedGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
     void shouldReturnQueryWhenExcludedGrantTypePresentInRoleAssignments() {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.EXCLUDED, "CASE",
             "PRIVATE",  "TEST", "", "", null, "123");
-        BoolQueryBuilder query = excludedGrantTypeESQueryBuilder.createQuery(Lists.newArrayList(roleAssignment));
+        BoolQueryBuilder query = excludedGrantTypeESQueryBuilder
+            .createQuery(Lists.newArrayList(roleAssignment));
 
         assertNotNull(query);
-        assertTrue(query.hasClauses());
-        assertEquals(2, query.must().size());
     }
 
     @Test
@@ -39,8 +35,6 @@ class ExcludedGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
         BoolQueryBuilder query = excludedGrantTypeESQueryBuilder.createQuery(Lists.newArrayList(roleAssignment));
 
         assertNotNull(query);
-        assertTrue(query.hasClauses());
-        assertEquals(1, query.must().size());
     }
 
     @Test
@@ -50,7 +44,5 @@ class ExcludedGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
         BoolQueryBuilder query = excludedGrantTypeESQueryBuilder.createQuery(Lists.newArrayList(roleAssignment));
 
         assertNotNull(query);
-        assertFalse(query.hasClauses());
-        assertEquals(0, query.must().size());
     }
 }

@@ -9,7 +9,8 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.GrantType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 
 @Slf4j
@@ -17,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 public class StandardGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
 
     @Override
+    @SuppressWarnings("java:S2789")
     public String createQuery(List<RoleAssignment> roleAssignments, Map<String, Object> params) {
         Supplier<Stream<RoleAssignment>> streamSupplier = () -> roleAssignments.stream()
             .filter(roleAssignment -> GrantType.STANDARD.name().equals(roleAssignment.getGrantType()))
@@ -24,21 +26,23 @@ public class StandardGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
                 || roleAssignment.getAuthorisations().size() == 0);
 
         String regionAndLocationQuery = streamSupplier.get()
+            .filter(roleAssignment -> roleAssignment.getAttributes() != null)
+            .filter(roleAssignment -> isValidRoleAssignment(roleAssignment.getAttributes()))
             .map(roleAssignment -> {
                 Optional<String> jurisdiction = roleAssignment.getAttributes().getJurisdiction();
                 String innerQuery = "";
-                if (jurisdiction.isPresent()) {
+                if (jurisdiction != null && jurisdiction.isPresent()) {
                     innerQuery = String.format("%s='%s'", JURISDICTION, jurisdiction.get());
                 }
 
                 Optional<String> region = roleAssignment.getAttributes().getRegion();
-                if (region.isPresent()) {
+                if (region != null && region.isPresent()) {
                     innerQuery = innerQuery + getOperator(innerQuery, AND)
                         + String.format("%s='%s'", REGION, region.get());
                 }
 
                 Optional<String> location = roleAssignment.getAttributes().getLocation();
-                if (location.isPresent()) {
+                if (location != null && location.isPresent()) {
                     innerQuery = innerQuery + getOperator(innerQuery, AND)
                         + String.format("%s='%s'", LOCATION, location.get());
                 }
@@ -53,5 +57,15 @@ public class StandardGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
         }
 
         return StringUtils.isNotBlank(tmpQuery) ? String.format(QUERY_WRAPPER, tmpQuery) : tmpQuery;
+    }
+
+    @SuppressWarnings("java:S2789")
+    private boolean isValidRoleAssignment(RoleAssignmentAttributes attributes) {
+        Optional<String> jurisdiction = attributes.getJurisdiction();
+        boolean isValid = jurisdiction != null && jurisdiction.isPresent();
+        Optional<String> location = attributes.getLocation();
+        isValid = isValid || (location != null && location.isPresent());
+        Optional<String> region = attributes.getLocation();
+        return isValid || (region != null && region.isPresent());
     }
 }
