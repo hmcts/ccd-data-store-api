@@ -23,22 +23,24 @@ public class AttributeBasedSecurityClassificationService
     implements AccessControl {
 
 
-    private CaseDataAccessControl caseDataAccessControl;
+    private CaseAccessService caseAccessService;
 
     @Autowired
     public AttributeBasedSecurityClassificationService(@Qualifier(CachedUserRepository.QUALIFIER)
                                                                UserRepository userRepository,
-                                                       CaseDataAccessControl caseDataAccessControl) {
+                                                       CaseAccessService caseAccessService) {
         super(userRepository);
-        this.caseDataAccessControl = caseDataAccessControl;
+        this.caseAccessService = caseAccessService;
     }
-
-
+    
     @Override
     public Optional<SecurityClassification> getUserClassification(CaseDetails caseDetails, boolean create) {
-        Set<AccessProfile> accessProfiles = caseDataAccessControl
-            .generateAccessProfilesByCaseReference(caseDetails.getReferenceAsString());
-        
+        Set<AccessProfile> accessProfiles;
+        if (create) {
+            accessProfiles = caseAccessService.getCreationAccessProfiles(caseDetails.getCaseTypeId());
+        } else {
+            accessProfiles = caseAccessService.getAccessProfilesByCaseReference(caseDetails.getReferenceAsString());
+        }
         return getMaxSecurityClassification(accessProfiles);
     }
 
