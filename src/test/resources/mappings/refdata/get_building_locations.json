@@ -10,6 +10,19 @@
       "Content-Type": "application/json"
     },
     "jsonBody": [
+      {
+        "building_location_id": "123",
+        "building_location_name": "54 TEST ROAD",
+        "building_location_status": "LIVE",
+        "area": "North",
+        "region": "Midlands",
+        "region_id": "1",
+        "cluster_name": "NBC",
+        "cluster_id": "1",
+        "court_finder_url": "",
+        "postcode": "T33ST",
+        "address": "TEST ROAD"
+      }
     ]
   }
 }
