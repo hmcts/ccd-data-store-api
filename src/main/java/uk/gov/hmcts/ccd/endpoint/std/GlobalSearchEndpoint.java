@@ -136,9 +136,8 @@ public class GlobalSearchEndpoint {
             .collect(Collectors.joining(CASE_ID_SEPARATOR));
     }
 
-    private static Stream<String> getCaseTypeIds(
-        GlobalSearchRequestPayload globalSearchRequest) {
-        return globalSearchRequest != null
+    private static Stream<String> getCaseTypeIds(GlobalSearchRequestPayload globalSearchRequest) {
+        return globalSearchRequest != null && globalSearchRequest.getSearchCriteria() != null
             ? Optional.ofNullable(globalSearchRequest.getSearchCriteria().getCcdCaseTypeIds())
             .map(Collection::stream)
             .orElseGet(Stream::empty)
