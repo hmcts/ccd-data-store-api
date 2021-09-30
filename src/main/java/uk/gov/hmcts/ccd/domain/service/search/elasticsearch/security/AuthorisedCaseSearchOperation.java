@@ -176,7 +176,10 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     private void filterCaseDataForMultiCaseTypeSearch(CrossCaseTypeSearchRequest searchRequest,
                                                       CaseTypeDefinition authorisedCaseType,
                                                       CaseDetails caseDetails) {
-        if (searchRequest.isMultiCaseTypeSearch() && caseDetails.getData() != null) {
+        if (searchRequest.isMultiCaseTypeSearch() && caseDetails.getData() != null
+            // NB: bypass MultiCaseType CaseData filters if using a single search index (required for GlobalSearch)
+            && searchRequest.getSearchIndex().isEmpty()) {
+
             JsonNode caseData = caseDataToJsonNode(caseDetails);
             String caseDataJson = caseData.toString();
             JsonNode filteredMultiCaseTypeSearchData = objectMapperService.createEmptyJsonNode();
