@@ -24,6 +24,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 @Component
 @ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "true")
@@ -46,6 +49,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     private final PseudoRoleToAccessProfileGenerator pseudoRoleToAccessProfileGenerator;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseDetailsRepository caseDetailsRepository;
+    private final UserAuthorisation userAuthorisation;
 
     @Autowired
     public DefaultCaseDataAccessControl(RoleAssignmentService roleAssignmentService,
@@ -58,7 +62,8 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
                                         @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                             final CaseDefinitionRepository caseDefinitionRepository,
                                         @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
-                                                CaseDetailsRepository caseDetailsRepository) {
+                                                CaseDetailsRepository caseDetailsRepository,
+                                        UserAuthorisation userAuthorisation) {
         this.roleAssignmentService = roleAssignmentService;
         this.securityUtils = securityUtils;
         this.roleAssignmentsFilteringService = roleAssignmentsFilteringService;
@@ -68,6 +73,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         this.pseudoRoleToAccessProfileGenerator = pseudoRoleToAccessProfileGenerator;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseDetailsRepository = caseDetailsRepository;
+        this.userAuthorisation = userAuthorisation;
     }
 
     // Returns List<AccessProfile>. Returns list of access profiles
@@ -118,6 +124,13 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
 
         return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments.getFilteredMatchingRoleAssignments(),
             caseTypeDefinition, false));
+    }
+
+    @Override
+    public void grantAccess(CaseDetails caseDetails, String idamUserId) {
+        if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
+            roleAssignmentService.createCaseRoleAssignments(caseDetails, idamUserId, Set.of(CREATOR.getRole()), false);
+        }
     }
 
     private List<AccessProfile> filteredAccessProfiles(List<RoleAssignment> filteredRoleAssignments,

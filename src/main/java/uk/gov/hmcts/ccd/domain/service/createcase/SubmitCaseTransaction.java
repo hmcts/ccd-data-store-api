@@ -128,7 +128,7 @@ public class SubmitCaseTransaction implements AccessControl {
             caseDetailsAfterCallbackWithoutHashes
         );
 
-        caseDataAccessControl.grantAccess(savedCaseDetails.getId(), idamUser.getId());
+        caseDataAccessControl.grantAccess(savedCaseDetails, idamUser.getId());
 
         caseDocumentService.attachCaseDocuments(
             caseDetails.getReferenceAsString(),
