@@ -302,6 +302,8 @@
             "PhoneUKField": "07123456789",
             "NumberField": "164528",
             "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_F-109-Befta_Jurisdiction1_Case_Creation]}",
+            "[ACCESS_GRANTED]" : "STANDARD",
+            "[ACCESS_PROCESS]" : "NONE",
             "YesOrNoField": "Yes",
             "EmailField": "ccd@hmcts.net",
             "TextField": "Some Text"
@@ -312,6 +314,8 @@
             "PhoneUKField": "07123456789",
             "NumberField": "164528",
             "[CASE_REFERENCE]": "${[scenarioContext][customValues][caseIdAsStringFrom_F-109-Befta_Jurisdiction1_Case_Creation]}",
+            "[ACCESS_GRANTED]" : "STANDARD",
+            "[ACCESS_PROCESS]" : "NONE",
             "YesOrNoField": "Yes",
             "EmailField": "ccd@hmcts.net",
             "TextField": "Some Text"
