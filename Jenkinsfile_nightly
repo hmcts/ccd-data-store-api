@@ -46,7 +46,7 @@ def secrets = [
         secret('ccd-befta-master-caseworker-pwd', 'CCD_BEFTA_MASTER_CASEWORKER_PWD'),
         secret('ccd-befta-master-solicitor1-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_1_PWD'),
         secret('ccd-befta-master-solicitor2-pwd', 'CCD_BEFTA_MASTER_SOLICITOR_2_PWD'),
-
+        secret('auto-test-cnp-private-pwd', 'CCD_PRIVATE_CASEWORKER_AUTOTEST_1AND2_PASSWORD'),
         secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_OAUTH2_CLIENT_SECRET'),
         secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
         secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD')

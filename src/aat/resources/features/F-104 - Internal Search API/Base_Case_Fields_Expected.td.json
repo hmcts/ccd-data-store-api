@@ -8,6 +8,8 @@
     "[STATE]": "TODO",
     "[SECURITY_CLASSIFICATION]": "PRIVATE",
     "[CASE_TYPE]": "AAT_PRIVATE",
+    "[ACCESS_GRANTED]" : "STANDARD",
+    "[ACCESS_PROCESS]" : "NONE",
     "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
   },
   "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data]}",
@@ -19,7 +21,9 @@
     "[STATE]": "TODO",
     "[SECURITY_CLASSIFICATION]": "PRIVATE",
     "[CASE_TYPE]": "AAT_PRIVATE",
-    "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
+    "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
+    "[ACCESS_GRANTED]" : "STANDARD",
+    "[ACCESS_PROCESS]" : "NONE"
   },
   "supplementary_data" : null
 }
