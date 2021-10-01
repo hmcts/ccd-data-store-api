@@ -65,13 +65,18 @@ public class RoleAssignmentsHelper {
     }
 
     public static String userRoleAssignmentJson(String actorId, String roleName, String caseId) {
+        return userRoleAssignmentJson(actorId, roleName, caseId, Classification.PUBLIC);
+    }
+
+    public static String userRoleAssignmentJson(String actorId, String roleName, String caseId,
+                                                Classification classification) {
         return "        {"
                + "          \"id\": \"e6fc5ebb-63e3-4613-9cfc-b3f9b1559571\","
                + "          \"actorIdType\": \"IDAM\","
                + "          \"actorId\": \"" + actorId + "\","
                + "          \"roleType\": \"CASE\","
                + "          \"roleName\": \"" + roleName + "\","
-               + "          \"classification\": \"PUBLIC\","
+               + "          \"classification\": \"" + classification.name() + "\","
                + "          \"grantType\": \"STANDARD\","
                + "          \"roleCategory\": \"SPECIFIC\","
                + "          \"readOnly\": false,"
