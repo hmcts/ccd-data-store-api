@@ -2011,16 +2011,23 @@ public class AccessControlServiceTest {
             JsonNode dataNode = generatePeopleData();
 
             ((ObjectNode) dataNode.get("People").get(0).get(VALUE)).replace("BirthInfo", MissingNode.getInstance());
+
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_READ,
                 false);
-            assertTrue(jsonNode.get("People").get(0).get(VALUE).get("BirthInfo").isEmpty());
+
+            assertAll(() -> assertTrue(jsonNode.get("People").get(0).get(VALUE).get("BirthInfo").isEmpty()),
+                () -> assertThat(jsonNode.get("People").get(0).get(VALUE).get("FirstName").textValue(), is("Fatih")),
+                () -> assertThat(jsonNode.get("People").get(1).get(VALUE).get("FirstName").textValue(), is("Andrew")));
+
             List<ILoggingEvent> logsList = listAppender.list;
-            assertEquals("Can not find value for caseFieldId={}, accessControlList={}", logsList.get(0)
-                .getMessage());
+            assertEquals("Can not find field with caseFieldId=BirthInfo, "
+                + "accessControlList=[ACL{role='caseworker-probate-loa1', crud=R}]",
+                logsList.get(0).getFormattedMessage());
+
             logger.detachAndStopAllAppenders();
         }
 
