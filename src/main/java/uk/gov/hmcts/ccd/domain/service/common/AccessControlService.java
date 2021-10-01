@@ -291,7 +291,7 @@ public class AccessControlService {
             } else {
                 LOG.debug("Logging below details as we are getting com.fasterxml.jackson.databind.node.MissingNode "
                     + " cannot be cast to class com.fasterxml.jackson.databind.node.ObjectNode");
-                LOG.info("Can not find value for caseFieldId={}, accessControlList={}",
+                LOG.info("Can not find field with caseFieldId={}, accessControlList={}",
                     caseField.getId(), caseField.getAccessControlLists());
             }
         }
