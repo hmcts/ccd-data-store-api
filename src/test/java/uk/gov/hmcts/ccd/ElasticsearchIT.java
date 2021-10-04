@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.experimental.runners.Enclosed;
@@ -49,6 +50,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
@@ -144,6 +147,9 @@ import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.alias;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.caseData;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.caseTypesParam;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.createPostRequest;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.GET_ROLE_ASSIGNMENTS_PREFIX;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleAssignmentJson;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleAssignmentResponseJson;
 
 @RunWith(Enclosed.class)
 public class ElasticsearchIT extends ElasticsearchBaseTest {
@@ -217,6 +223,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
         void shouldReturnAllCaseDetailsForDefaultUseCase() throws Exception {
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                 .query(boolQuery()
@@ -243,6 +251,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
         void shouldReturnAllCaseDetailsForPhoneValueWithSpace() throws Exception {
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                 .query(boolQuery()
@@ -289,6 +299,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
         void shouldReturnAllCaseDetailsForDefaultUseCaseWithRoleCaseworkerCaa() throws Exception {
             MockUtils.setSecurityAuthorities(authentication, CASEWORKER_CAA);
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
@@ -316,6 +328,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
         void shouldReturnAllHeaderInfoForDefaultUseCase() throws Exception {
             ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
@@ -329,6 +343,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
         void shouldReturnAllHeaderInfoForDefaultUseCaseWhenUserRoleColumnIsPopulated() throws Exception {
             ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
@@ -344,6 +360,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
         void shouldReturnAllHeaderInfoForDefaultUseCaseWhenUserHasSomeAuthorisationOnCaseFields() throws Exception {
             ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
@@ -373,6 +391,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
 
         @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
         void shouldReturnAllHeaderInfoForDefaultUseCaseWhenUseHaveNoAuthorisationOnCaseField() throws Exception {
             ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
@@ -396,6 +416,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
         void shouldReturnAllHeaderInfoForSpecifiedUseCase() throws Exception {
             ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
@@ -409,6 +431,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
         void shouldReturnAllFormattedCaseDetails() throws Exception {
             ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
@@ -427,6 +451,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
         void shouldOnlyReturnSpecifiedFieldsInResponse() throws Exception {
             String nestedFieldId = COMPLEX_FIELD + "." + COMPLEX_NESTED_FIELD + "." + NESTED_NUMBER_FIELD;
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
@@ -464,6 +490,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
         void shouldTreatUseCaseRequestWithSourceAsStandardRequest() throws Exception {
             String nestedFieldId = COMPLEX_FIELD + "." + COMPLEX_NESTED_FIELD + "." + NESTED_NUMBER_FIELD;
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
@@ -501,6 +529,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
         void shouldReturnRequestedSupplementaryDataForUseCaseRequest() throws Exception {
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                 .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
@@ -524,6 +554,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
         void shouldReturnAllSupplementaryDataWhenWildcardIsUsed() throws Exception {
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                 .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
@@ -547,6 +579,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
         void shouldReturnNoSupplementaryDataWhenNotRequestedForUseCaseRequest() throws Exception {
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                 .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
@@ -562,6 +596,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         }
 
         @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
         void shouldReturnAllSupplementaryDataByDefaultForStandardRequest() throws Exception {
             ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                 .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
@@ -813,6 +849,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             // AuthorisationCaseField
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnCaseFieldsWithCrud() throws Exception {
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
@@ -825,6 +863,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnCaseFieldsWithCrudWithoutRead() throws Exception {
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
@@ -837,6 +877,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldNotReturnCaseFieldsWithoutCrud() throws Exception {
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
@@ -852,6 +894,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             // AuthorisationCaseState
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnCasesWithStateCrud() throws Exception {
                 ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                     .query(matchQuery(STATE, IN_PROGRESS_STATE))
@@ -894,6 +938,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             // AuthorisationCaseType
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnCaseTypesWithCrud() throws Exception {
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
 
@@ -933,6 +979,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             // AuthorisationComplexType
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnComplexNestedFieldsWithCrud() throws Exception {
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
@@ -945,6 +993,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldNotReturnComplexNestedFieldsWithCrudWithoutRead() throws Exception {
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
@@ -957,6 +1007,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnComplexNestedFieldsWithoutCrud() throws Exception {
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
@@ -975,6 +1027,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             // Case
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnCasesWithLowerCaseSC() throws Exception {
                 ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                     .query(matchQuery(STATE, STATE_VALUE))
@@ -993,6 +1047,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldNotReturnCasesWithHigherCaseSC() throws Exception {
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
 
@@ -1008,6 +1064,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             // CaseField
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnCaseFieldsWithLowerSC() throws Exception {
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
@@ -1022,6 +1080,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldNotReturnCaseFieldsWithHigherSC() throws Exception {
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
@@ -1038,6 +1098,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             // CaseType
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnCasesWithLowerCaseTypeSC() throws Exception {
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
 
@@ -1051,6 +1113,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldNotReturnCasesWithHigherCaseTypeSC() throws Exception {
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
 
@@ -1066,6 +1130,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             // ComplexTypes
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnComplexNestedFieldsWithLowerSC() throws Exception {
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
@@ -1081,6 +1147,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldNotReturnComplexNestedFieldsWithHigherSC() throws Exception {
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
@@ -1100,6 +1168,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         class GeneralAccessTest {
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldOnlyReturnCasesFromCaseTypesWithJurisdictionRole() throws Exception {
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
 
@@ -1114,6 +1184,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldMergePermissionsOfMultipleRolesForCaseData() throws Exception {
                 ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                     .query(matchAllQuery())
@@ -1146,6 +1218,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldMergePermissionsOfMultipleRolesForCases() throws Exception {
                 ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                     .query(matchAllQuery())
@@ -1176,6 +1250,16 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
             scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
         void shouldOnlyReturnCasesSolicitorHasBeenGrantedAccessTo() throws Exception {
+            if (applicationParams.getEnableAttributeBasedAccessControl()) {
+                String roleAssignmentResponseJson = roleAssignmentResponseJson(
+                    roleAssignmentJson("idam:caseworker-autotest1-solicitor", "AUTOTEST1", "SECURITY",
+                        "1589460125872336"),
+                    roleAssignmentJson("[DEFENDANT]", "AUTOTEST1", "SECURITY", "1589460099608691")
+                );
+
+                stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "123"))
+                    .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
+            }
             ElasticsearchTestRequest searchRequest = matchAllRequest();
 
             CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_SOLICITOR);
@@ -1237,6 +1321,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             // Note that cross case type searches do NOT return case data
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnAllCasesForAllSpecifiedCaseTypes() throws Exception {
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
 
@@ -1254,6 +1340,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnRequestedAliasSource() throws Exception {
                 ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                     .query(matchAllQuery())
@@ -1279,6 +1367,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test // Note that the size and sort is applied to each separate case type then results combined
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnPaginatedResults() throws Exception {
                 ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                     .query(matchAllQuery())
@@ -1296,6 +1386,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldQueryOnAliasField() throws Exception {
                 ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                     .query(matchQuery(alias(FIXED_LIST_ALIAS), FIXED_LIST_VALUE))
@@ -1316,7 +1408,10 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         class SingleCaseTypeSearch {
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnAllCaseDetails() throws Exception {
+
                 ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                     .query(boolQuery()
                         .must(matchQuery(caseData(NUMBER_FIELD), NUMBER_VALUE)) // ES Double
@@ -1347,6 +1442,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnRequestedSupplementaryData() throws Exception {
                 ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                     .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
@@ -1369,6 +1466,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
 
             @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnAllSupplementaryDataWhenWildcardIsUsed() throws Exception {
                 ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                     .query(matchQuery(MetaData.CaseField.CASE_REFERENCE.getDbColumnName(), DEFAULT_CASE_REFERENCE))
