@@ -5,6 +5,7 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.AuthorisationMapper;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,11 +46,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment.builder;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.BASIC;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.CHALLENGED;
@@ -68,6 +73,7 @@ class DefaultCaseDataAccessControlTest {
     private static final String ROLE_NAME_5 = "TEST_ROLE_5";
     private static final String ACTOR_ID_1 = "ACTOR_ID_1";
     private static final String USER_ID = "USER_ID";
+    private static final String CASE_ID = "45677";
 
     private static final String AUTHORISATION_1 = "TEST_AUTH_1";
     private static final String AUTHORISATION_2 = "TEST_AUTH_2";
@@ -102,6 +108,9 @@ class DefaultCaseDataAccessControlTest {
 
     @Mock(lenient = true)
     private FilteredRoleAssignments filteredRoleAssignments;
+
+    @Mock
+    private UserAuthorisation userAuthorisation;
 
     @InjectMocks
     private DefaultCaseDataAccessControl defaultCaseDataAccessControl;
@@ -328,8 +337,30 @@ class DefaultCaseDataAccessControlTest {
     }
 
     @Test
-    void testGrantAccess() {
-        defaultCaseDataAccessControl.grantAccess(null, USER_ID);
+    void shouldGrantAccessToAccessLevelGrantedCreator() {
+        when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.GRANTED);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setId(CASE_ID);
+
+        defaultCaseDataAccessControl.grantAccess(caseDetails, USER_ID);
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Set<String>> captor = ArgumentCaptor.forClass(Set.class);
+        verify(roleAssignmentService).createCaseRoleAssignments(
+            eq(caseDetails), eq(USER_ID), captor.capture(), eq(false));
+        assertEquals(1, captor.getValue().size());
+        assertEquals(CREATOR.getRole(), captor.getValue().iterator().next());
+    }
+
+    @Test
+    void shouldNotGrantAccessToAccessLevelAllCreator() {
+        when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setId(CASE_ID);
+
+        defaultCaseDataAccessControl.grantAccess(caseDetails, USER_ID);
+
+        verifyNoInteractions(roleAssignmentService);
     }
 
     private List<AccessControlList> createAccessControlList() {
@@ -400,7 +431,7 @@ class DefaultCaseDataAccessControlTest {
         roleAssignments.add(roleAssignment2);
 
         doReturn(roleAssignments)
-            .when(pseudoRoleAssignmentsGenerator).createPseudoRoleAssignments(anyList());
+            .when(pseudoRoleAssignmentsGenerator).createPseudoRoleAssignments(anyList(), eq(false));
 
         CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, true);
 
@@ -482,7 +513,7 @@ class DefaultCaseDataAccessControlTest {
         pseudoRoleAssignments.add(roleAssignment1);
 
         doReturn(pseudoRoleAssignments)
-            .when(pseudoRoleAssignmentsGenerator).createPseudoRoleAssignments(anyList());
+            .when(pseudoRoleAssignmentsGenerator).createPseudoRoleAssignments(anyList(), eq(false));
 
         boolean anyRoleEquals = defaultCaseDataAccessControl.anyAccessProfileEqualsTo(CASE_TYPE_1, ROLE_NAME_1);
         assertEquals(true, anyRoleEquals);
