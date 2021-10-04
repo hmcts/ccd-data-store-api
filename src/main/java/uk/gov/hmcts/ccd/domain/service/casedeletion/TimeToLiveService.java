@@ -27,11 +27,12 @@ public class TimeToLiveService {
             Integer ttlIncrement = caseEventDefinition.getTtlIncrement();
 
             if (data.get(TTL_CASE_FIELD_ID) != null && (ttlIncrement != null)) {
-                TTL timeToLive = null;
                 try {
-                    timeToLive = getTTLFromJson(data.get(TTL_CASE_FIELD_ID));
-                    timeToLive.setSystemTTL(LocalDate.now().plusDays(ttlIncrement));
-                    clonedData.put(TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(timeToLive));
+                    TTL timeToLive = getTTLFromJson(data.get(TTL_CASE_FIELD_ID));
+                    if (timeToLive != null) {
+                        timeToLive.setSystemTTL(LocalDate.now().plusDays(ttlIncrement));
+                        clonedData.put(TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(timeToLive));
+                    }
                 } catch (JsonProcessingException e) {
                     //TODO - What to do here ?
                     e.printStackTrace();
