@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.casedeletion;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
@@ -14,7 +15,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.TTL_CASE_FIELD_ID;
 
-
+@Slf4j
 @Service
 public class TimeToLiveService {
 
@@ -34,8 +35,7 @@ public class TimeToLiveService {
                         clonedData.put(TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(timeToLive));
                     }
                 } catch (JsonProcessingException e) {
-                    //TODO - What to do here ?
-                    e.printStackTrace();
+                    log.error("Failed to read TTL from case data");
                 }
             }
         }
@@ -54,7 +54,7 @@ public class TimeToLiveService {
                     throw new BadRequestException("Time to live content has been modified");
                 }
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
+                log.error("Failed to read TTL from case data");
             }
         }
     }
