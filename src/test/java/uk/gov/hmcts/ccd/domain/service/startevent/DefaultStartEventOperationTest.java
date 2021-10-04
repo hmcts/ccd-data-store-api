@@ -24,6 +24,7 @@ import uk.gov.hmcts.ccd.domain.model.draft.CaseDraft;
 import uk.gov.hmcts.ccd.domain.model.draft.DraftResponse;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
@@ -35,6 +36,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +49,7 @@ import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -76,6 +79,7 @@ public class DefaultStartEventOperationTest {
     private static final Map<String, JsonNode> DATA_CLASSIFICATION = Maps.newHashMap();
     private static final Map<String, JsonNode> DEFAULT_VALUE_DATA = expectedDefaultValue();
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
+    private static final int TTL_INCREMENT = 20;
 
     private static Map<String, JsonNode> NEW_FIELDS_CLASSIFICATION =
         ImmutableMap.of("key", JSON_NODE_FACTORY.textNode("value"));
@@ -134,6 +138,24 @@ public class DefaultStartEventOperationTest {
         return data;
     }
 
+    static Map<String, JsonNode> ttlCaseData(String systemTtl) {
+        Map<String, JsonNode> data = new HashMap<>();
+
+        try {
+            JsonNode ttl = MAPPER.readTree("{"
+                + "  \"SystemTTL\": \"" + systemTtl + "\","
+                + "  \"OverrideTTL\": \"2017-02-13\","
+                + "  \"Suspended\": \"No\""
+                + "}");
+
+            data.put("TTL", ttl);
+        } catch (JsonProcessingException ex) {
+            ex.printStackTrace();
+        }
+
+        return data;
+    }
+
     static Map<String, JsonNode> expectedAfterMergeWithDefaultValue() {
         Map<String, JsonNode> data = new HashMap<>();
         try {
@@ -155,7 +177,6 @@ public class DefaultStartEventOperationTest {
                                                      + "  \"OrgPolicyCaseAssignedRole\": \"[Claimant]\""
                                                      + "}");
             data.put("OrganisationPolicyField", orgPolicy);
-
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -190,15 +211,17 @@ public class DefaultStartEventOperationTest {
     private UIDService uidService;
     @Mock
     private CaseDataService caseDataService;
-
+    @Mock
+    private TimeToLiveService timeToLiveService;
 
     private DefaultStartEventOperation defaultStartEventOperation;
 
     private final CaseDetails caseDetails = newCaseDetails().withData(null).build();
     private final CaseTypeDefinition caseTypeDefinition = newCaseType().withCaseTypeId(TEST_CASE_TYPE_ID)
         .withJurisdiction(newJurisdiction().withJurisdictionId(TEST_JURISDICTION_ID).build()).build();
-    private final CaseEventDefinition caseEventDefinition = newCaseEvent().withCaseFields(
-        Arrays.asList(newCaseEventField()
+    private final CaseEventDefinition caseEventDefinition = newCaseEvent().withTTLIncrement(TTL_INCREMENT)
+        .withCaseFields(
+            Arrays.asList(newCaseEventField()
                           .withCaseFieldId("ChangeOrganisationRequestField")
                           .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
                                                                    .reference("Reason")
@@ -227,7 +250,21 @@ public class DefaultStartEventOperationTest {
                                                                    .reference("OrgPolicyCaseAssignedRole")
                                                                    .defaultValue("[Claimant]")
                                                                    .build())
+                          .build(),
+                      newCaseEventField()
+                          .withCaseFieldId("TTL")
+                          .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                                                                   .reference("SystemTTL")
+                                                                   .build())
+                          .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                                                                    .reference("OverrideTTL")
+                                                                    .build())
+                          .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
+                                                                    .reference("Suspended")
+                                                                    .build())
                           .build()
+
+
         )
     ).build();
     private final CaseDataContent caseDataContent = newCaseDataContent()
@@ -261,7 +298,8 @@ public class DefaultStartEventOperationTest {
                                                                     userAuthorisation,
                                                                     callbackInvoker,
                                                                     uidService,
-                                                                    caseDataService);
+                                                                    caseDataService,
+                                                                    timeToLiveService);
     }
 
     @Nested
@@ -374,6 +412,7 @@ public class DefaultStartEventOperationTest {
         @DisplayName("Should successfully trigger start")
         void shouldSuccessfullyTriggerStart() {
 
+            caseDetails.setData(existingCaseData());
             StartEventResult actual = defaultStartEventOperation.triggerStartForDraft(TEST_DRAFT_ID,
                                                                                        IGNORE_WARNING);
             assertAll(
@@ -442,8 +481,27 @@ public class DefaultStartEventOperationTest {
     @DisplayName("case tests")
     class StartEventResultForCase {
 
+        private Map<String, JsonNode> expectedData;
+
         @BeforeEach
         void setUp() {
+
+            Map<String, JsonNode> ttlData = new HashMap<>(existingCaseData());
+            ttlData.putAll(ttlCaseData("2021-03-04"));
+            caseDetails.setData(ttlData);
+
+            expectedData = new HashMap<>(expectedAfterMergeWithDefaultValue());
+            LocalDate twentyDaysFromNow = LocalDate.now().plusDays(TTL_INCREMENT);
+            expectedData.putAll(ttlCaseData(twentyDaysFromNow.toString()));
+
+            doReturn(expectedData)
+                .when(timeToLiveService).updateCaseDetailsWithTTL(anyMap(), any(CaseEventDefinition.class));
+
+            doReturn(NEW_FIELDS_CLASSIFICATION).when(caseDataService)
+                .getDefaultSecurityClassifications(eq(caseTypeDefinition),
+                    eq(caseDetails.getData()), eq(caseDetails.getDataClassification()));
+
+
             caseDetails.setData(existingCaseData());
             caseDetails.setState(TEST_CASE_STATE);
             caseDetails.setCaseTypeId(TEST_CASE_TYPE_ID);
@@ -481,7 +539,7 @@ public class DefaultStartEventOperationTest {
                 () -> verify(callbackInvoker).invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition,
                                                                          actual.getCaseDetails(), IGNORE_WARNING),
                 () -> assertThat(actual.getCaseDetails(), is(equalTo(caseDetails))),
-                () -> assertThat(actual.getCaseDetails().getData(), is(equalTo(expectedAfterMergeWithDefaultValue()))),
+                () -> assertThat(actual.getCaseDetails().getData(), is(equalTo(expectedData))),
                 () -> assertThat(actual.getCaseDetails().getDataClassification(),
                     is(equalTo(NEW_FIELDS_CLASSIFICATION))),
                 () -> assertThat(actual.getToken(), is(equalTo(TEST_EVENT_TOKEN))),

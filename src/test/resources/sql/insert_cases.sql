@@ -633,6 +633,49 @@ VALUES (16, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '2019-08-24 20:44:53.824'
 );
 
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
+VALUES (20, 'TestAddressBookCaseTTL', 'PROBATE', 'CaseCreated', 'PUBLIC',
+        '{
+          "PersonFirstName": "Peter",
+          "PersonLastName": "Pullen",
+          "PersonAddress": {
+            "AddressLine1": "Governer House",
+            "AddressLine2": "1 Puddle Lane",
+            "AddressLine3": "London",
+            "Country": "England",
+            "Postcode": "SE1 4EE"
+          },
+          "TTL": {
+            "SystemTTL": "2021-09-30",
+            "OverrideTTL": "2021-08-30",
+            "Suspended": "No"
+          }
+        }',
+        '{
+          "PersonFirstName": "PRIVATE",
+          "PersonLastName": "PUBLIC",
+          "PersonAddress": {
+            "classification" : "PUBLIC",
+            "value" : {
+                "AddressLine1": "PUBLIC",
+                "AddressLine2": "PUBLIC",
+                "AddressLine3": "PUBLIC",
+                "Country": "PUBLIC",
+                "Postcode": "PUBLIC"
+            }
+          },
+          "TTL": {
+            "classification" : "PUBLIC",
+            "value" : {
+                "SystemTTL": "PUBLIC",
+                "OverrideTTL": "PUBLIC",
+                "Suspended": "PUBLIC"
+            }
+          }
+        }',
+        '9816494993793181'
+       );
+
 INSERT INTO case_event (
         case_data_id,
         case_type_id,
@@ -666,6 +709,8 @@ INSERT INTO case_event (
         '2017-05-09 14:31:43.000000',
         '{}'
     );
+
+
 
 INSERT INTO case_event (
         case_data_id,

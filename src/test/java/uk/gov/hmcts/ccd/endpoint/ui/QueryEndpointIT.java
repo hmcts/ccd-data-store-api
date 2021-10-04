@@ -152,6 +152,8 @@ public class QueryEndpointIT extends WireMockBaseTest {
         + "/0/jurisdictions/PROBATE/case-types/"
         + "TestAddressBookCaseEventEnablingCondition/cases/1504259907353529";
 
+    private static final int NUMBER_OF_CASES_EVENT_ENABLING = 19;
+
     @Inject
     private WebApplicationContext wac;
 
@@ -1027,7 +1029,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         // Check that we have the expected test data set size
         final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
+        assertEquals("Incorrect data initiation", NUMBER_OF_CASES_EVENT_ENABLING, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_CASE_EVENT_ENABLING_CONDITION)
             .contentType(JSON_CONTENT_TYPE)
@@ -1050,7 +1052,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         // Check that we have the expected test data set size
         final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
+        assertEquals("Incorrect data initiation", NUMBER_OF_CASES_EVENT_ENABLING, resultList.size());
 
         final MvcResult result = mockMvc.perform(get(GET_CASE_EVENT_ENABLING_CONDITION)
             .contentType(JSON_CONTENT_TYPE)

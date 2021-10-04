@@ -30,6 +30,8 @@ import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
+import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageCollection;
@@ -39,14 +41,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 
 import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -103,6 +98,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String CASE_TYPE_NO_UPDATE_FIELD_ACCESS = "TestAddressBookCaseNoUpdateFieldAccess";
     private static final String CASE_TYPE_NO_READ_FIELD_ACCESS = "TestAddressBookCaseNoReadFieldAccess";
     private static final String CASE_TYPE_NO_READ_CASE_TYPE_ACCESS = "TestAddressBookCaseNoReadCaseTypeAccess";
+    private static final String CASE_TYPE_TTL = "TestAddressBookCaseTTL";
     private static final String JURISDICTION = "PROBATE";
     private static final String TEST_EVENT_ID = "TEST_EVENT";
     private static final String CREATE_EVENT_ID = "Create2";
@@ -3146,6 +3142,20 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         shouldReturn200WithFieldRemovedWhenGetTokenForStartEventWithNoCaseTypeReadAccess("citizens");
     }
 
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn200WithCaseDataWithTTLWhenGetTokenForStartEventForCaseworker()
+        throws Exception {
+        shouldReturn200WithCaseDataWithTLLWhenGetTokenForStartEvent("caseworkers");
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn200WithCaseDataWithTTLWhenGetTokenForStartEventForCitizen()
+        throws Exception {
+        shouldReturn200WithCaseDataWithTLLWhenGetTokenForStartEvent("citizens");
+    }
+
     private void shouldReturn200WithNoCaseDataWhenGetTokenForStartCaseWithNoCaseTypeReadAccess(String userRole)
         throws Exception {
         final String url = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" +
@@ -3529,6 +3539,27 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             () -> assertThat("Created_date is not present", MAPPER.readTree(actual).get("case_details")
                 .has("created_date"), is(true))
         );
+    }
+
+    private void shouldReturn200WithCaseDataWithTLLWhenGetTokenForStartEvent(String userRole)
+        throws Exception {
+        final String reference = "9816494993793181";
+        final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" +
+            CASE_TYPE_TTL + "/cases/" + reference + "/event-triggers/" + TEST_EVENT_ID + "/token";
+
+        final MvcResult mvcResult = mockMvc.perform(get(URL).contentType(JSON_CONTENT_TYPE))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        StartEventResult actualStartEventResult = MAPPER.readValue(mvcResult.getResponse().getContentAsString(),
+            StartEventResult.class);
+        CaseDetails caseDetails = actualStartEventResult.getCaseDetails();
+        String expectedSystemTTL = LocalDate.now().plusDays(20).toString();
+        assertAll(
+            () -> assertThat(caseDetails.getData().get(TTL.TTL_CASE_FIELD_ID).get("SystemTTL").textValue(),
+                is(expectedSystemTTL))
+        );
+
     }
 
     private void shouldReturn200WithFieldRemovedWhenGetTokenForStartEventWithNoCaseTypeReadAccess(String userRole)
