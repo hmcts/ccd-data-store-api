@@ -50,7 +50,7 @@ public class RoleAssignmentsHelper {
                + "          \"roleName\": \"" + roleName + "\","
                + "          \"classification\": \"PUBLIC\","
                + "          \"grantType\": \"STANDARD\","
-               + "          \"roleCategory\": \"SPECIFIC\","
+               + "          \"roleCategory\": \"JUDICIAL\","
                + "          \"readOnly\": false,"
                + "          \"beginTime\": \"2021-02-01T00:00:00Z\","
                + "          \"endTime\": \"2122-01-01T00:00:00Z\","
@@ -78,7 +78,7 @@ public class RoleAssignmentsHelper {
                + "          \"roleName\": \"" + roleName + "\","
                + "          \"classification\": \"" + classification.name() + "\","
                + "          \"grantType\": \"STANDARD\","
-               + "          \"roleCategory\": \"SPECIFIC\","
+               + "          \"roleCategory\": \"JUDICIAL\","
                + "          \"readOnly\": false,"
                + "          \"beginTime\": \"2021-02-01T00:00:00Z\","
                + "          \"endTime\": \"2122-01-01T00:00:00Z\","
@@ -90,6 +90,49 @@ public class RoleAssignmentsHelper {
                + "          },"
                + "          \"authorisations\": []"
                + "        }";
+    }
+
+    public static String securityCTUserRoleAssignmentJson(String actorId, String roleName, String caseId,
+                                                          Classification classification, GrantType grantType) {
+        return "        {"
+               + "          \"id\": \"e6fc5ebb-63e3-4613-9cfc-b3f9b1559571\","
+               + "          \"actorIdType\": \"IDAM\","
+               + "          \"actorId\": \"" + actorId + "\","
+               + "          \"roleType\": \"CASE\","
+               + "          \"roleName\": \"" + roleName + "\","
+               + "          \"classification\": \"" + classification.name() + "\","
+               + "          \"grantType\": \"" + grantType.name() + "\","
+               + "          \"roleCategory\": \"JUDICIAL\","
+               + "          \"readOnly\": false,"
+               + "          \"beginTime\": \"2021-02-01T00:00:00Z\","
+               + "          \"endTime\": \"2122-01-01T00:00:00Z\","
+               + "          \"created\": \"2020-12-23T06:37:58.096065Z\","
+               + "          \"attributes\": {"
+               + "            \"jurisdiction\": \"AUTOTEST1\","
+               + "            \"caseType\": \"SECURITY\","
+               + "            \"caseId\": \"" + caseId + "\""
+               + "          },"
+               + "          \"authorisations\": []"
+               + "        }";
+    }
+
+    public static String securityCTSpecificPublicUserRoleAssignmentJson(String actorId,
+                                                                        String roleName,
+                                                                        String caseId) {
+        return securityCTUserRoleAssignmentJson(actorId, roleName, caseId, Classification.PUBLIC, GrantType.SPECIFIC);
+    }
+
+    public static String securityCTSpecificRestrictedUserRoleAssignmentJson(String actorId,
+                                                                            String roleName,
+                                                                            String caseId) {
+        return securityCTUserRoleAssignmentJson(actorId, roleName, caseId, Classification.RESTRICTED,
+            GrantType.SPECIFIC);
+    }
+
+    public static String securityCTSpecificPrivateUserRoleAssignmentJson(String actorId,
+                                                                         String roleName,
+                                                                         String caseId) {
+        return securityCTUserRoleAssignmentJson(actorId, roleName, caseId, Classification.PRIVATE, GrantType.SPECIFIC);
     }
 
     public static RoleAssignmentRequestResponse createRoleAssignmentRequestResponse(

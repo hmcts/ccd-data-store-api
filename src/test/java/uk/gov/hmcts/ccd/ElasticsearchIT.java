@@ -150,6 +150,9 @@ import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.createPostRequest;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.GET_ROLE_ASSIGNMENTS_PREFIX;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleAssignmentJson;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleAssignmentResponseJson;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.securityCTSpecificPrivateUserRoleAssignmentJson;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.securityCTSpecificPublicUserRoleAssignmentJson;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.securityCTSpecificRestrictedUserRoleAssignmentJson;
 
 @RunWith(Enclosed.class)
 public class ElasticsearchIT extends ElasticsearchBaseTest {
@@ -346,6 +349,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
             scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
         void shouldReturnAllHeaderInfoForDefaultUseCaseWhenUserRoleColumnIsPopulated() throws Exception {
+            stubSecurityCaseTypeRoleAssignments();
             ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
@@ -852,6 +856,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
                 scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnCaseFieldsWithCrud() throws Exception {
+                stubSecurityCaseTypeRoleAssignments();
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC);
@@ -866,6 +871,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
                 scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnCaseFieldsWithCrudWithoutRead() throws Exception {
+                stubSecurityCaseTypeRoleAssignments();
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC);
@@ -880,6 +886,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
                 scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldNotReturnCaseFieldsWithoutCrud() throws Exception {
+                stubSecurityCaseTypeRoleAssignments();
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PRIVATE);
@@ -897,6 +904,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
                 scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnCasesWithStateCrud() throws Exception {
+                stubSecurityCaseTypeRoleAssignments();
                 ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                     .query(matchQuery(STATE, IN_PROGRESS_STATE))
                     .build();
@@ -911,6 +919,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             @Test
             void shouldNotReturnCasesWithStateCrudWithoutRead() throws Exception {
+                stubSecurityCaseTypeRoleAssignments();
                 ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                     .query(matchQuery(STATE, IN_PROGRESS_STATE))
                     .build();
@@ -924,6 +933,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             @Test
             void shouldNotReturnCasesWithoutStateCrud() throws Exception {
+                stubSecurityCaseTypeRoleAssignments();
                 ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                     .query(matchQuery(STATE, IN_PROGRESS_STATE))
                     .build();
@@ -941,6 +951,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
                 scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnCaseTypesWithCrud() throws Exception {
+                stubSecurityCaseTypeRoleAssignments();
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC);
@@ -982,6 +993,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
                 scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnComplexNestedFieldsWithCrud() throws Exception {
+                stubSecurityCaseTypeRoleAssignments();
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC);
@@ -996,6 +1008,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
                 scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldNotReturnComplexNestedFieldsWithCrudWithoutRead() throws Exception {
+                stubSecurityCaseTypeRoleAssignments();
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_RESTRICTED);
@@ -1010,6 +1023,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
                 scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnComplexNestedFieldsWithoutCrud() throws Exception {
+                stubSecurityCaseTypeRoleAssignments();
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PRIVATE);
@@ -1030,6 +1044,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
                 scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnCasesWithLowerCaseSC() throws Exception {
+                stubSecurityCaseTypeRoleAssignments();
                 ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                     .query(matchQuery(STATE, STATE_VALUE))
                     .sort(CREATED_DATE)
@@ -1067,6 +1082,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
                 scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnCaseFieldsWithLowerSC() throws Exception {
+                stubSecurityCaseTypeRoleAssignments();
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_RESTRICTED);
@@ -1133,6 +1149,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
                 scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldReturnComplexNestedFieldsWithLowerSC() throws Exception {
+                stubSecurityCaseTypeRoleAssignments();
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_RESTRICTED);
@@ -1171,6 +1188,23 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
                 scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
             void shouldOnlyReturnCasesFromCaseTypesWithJurisdictionRole() throws Exception {
+                if (applicationParams.getEnableAttributeBasedAccessControl()) {
+                    String roleAssignmentResponseJson = roleAssignmentResponseJson(
+                        roleAssignmentJson("idam:caseworker-autotest2", "AUTOTEST1", "AAT",
+                            "1588866820969121"),
+                        roleAssignmentJson("idam:caseworker-autotest2", "AUTOTEST1", "AAT",
+                            "1589460056217857"),
+                        roleAssignmentJson("idam:caseworker-autotest2", "AUTOTEST2", "MAPPER",
+                            "1588870615652827"),
+                        roleAssignmentJson("idam:caseworker-autotest1-solicitor", "AUTOTEST1", "SECURITY",
+                            "1589460125872336")
+                    );
+
+                    stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "123"))
+                        .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
+
+                    stubUserInfo("123", AUTOTEST2_PUBLIC);
+                }
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
 
                 CaseSearchResult caseSearchResult =
@@ -1240,48 +1274,48 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
         }
 
-        /*
-        The following tests require the Spring @SQL annotation, which does not work in @Nested classes (see SPR-15366)
-         To use @SQL annotation in @Nested classes is to copy the annotations from the enclosing test class to the
-         nested test class. reason you have to duplicate the configuration is that annotations in Spring are not
-         inherited from enclosing classes. This is a known limitation of the Spring TestContext Framework
-        */
-        @Test
-        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-            scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
-        void shouldOnlyReturnCasesSolicitorHasBeenGrantedAccessTo() throws Exception {
-            if (applicationParams.getEnableAttributeBasedAccessControl()) {
-                String roleAssignmentResponseJson = roleAssignmentResponseJson(
-                    roleAssignmentJson("idam:caseworker-autotest1-solicitor", "AUTOTEST1", "SECURITY",
-                        "1589460125872336"),
-                    roleAssignmentJson("[DEFENDANT]", "AUTOTEST1", "SECURITY", "1589460099608691")
+        @Nested
+        class GrantedAccessTest {
+
+            @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
+            void shouldOnlyReturnCasesSolicitorHasBeenGrantedAccessTo() throws Exception {
+                if (applicationParams.getEnableAttributeBasedAccessControl()) {
+                    String roleAssignmentResponseJson = roleAssignmentResponseJson(
+                        roleAssignmentJson("idam:caseworker-autotest1-solicitor", "AUTOTEST1", "SECURITY",
+                            "1589460125872336"),
+                        roleAssignmentJson("[DEFENDANT]", "AUTOTEST1", "SECURITY", "1589460099608691")
+                    );
+
+                    stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "123"))
+                        .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
+                }
+                ElasticsearchTestRequest searchRequest = matchAllRequest();
+
+                CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_SOLICITOR);
+
+                assertAll(
+                    () -> assertThat(caseSearchResult.getTotal(), is(2L)),
+                    () -> Assertions.assertThat(caseSearchResult.getCases()).extracting("reference")
+                        .contains(1589460125872336L, 1589460099608691L)
                 );
-
-                stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "123"))
-                    .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
             }
-            ElasticsearchTestRequest searchRequest = matchAllRequest();
 
-            CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_SOLICITOR);
+            @Test
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
+            void shouldReturnAllCasesForCaseworker() throws Exception {
+                stubSecurityCaseTypeRoleAssignments();
 
-            assertAll(
-                () -> assertThat(caseSearchResult.getTotal(), is(2L)),
-                () -> Assertions.assertThat(caseSearchResult.getCases()).extracting("reference")
-                    .contains(1589460125872336L, 1589460099608691L)
-            );
-        }
+                ElasticsearchTestRequest searchRequest = matchAllRequest();
 
-        @Test
-        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-            scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
-        void shouldReturnAllCasesForCaseworker() throws Exception {
-            ElasticsearchTestRequest searchRequest = matchAllRequest();
+                CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_RESTRICTED);
 
-            CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_RESTRICTED);
-
-            assertAll(
-                () -> assertThat(caseSearchResult.getTotal(), is(4L))
-            );
+                assertAll(
+                    () -> assertThat(caseSearchResult.getTotal(), is(4L))
+                );
+            }
         }
 
         private CaseSearchResult executeRequest(ElasticsearchTestRequest searchRequest,
@@ -1574,6 +1608,23 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             return ElasticsearchTestHelper.executeRequest(postRequest, expectedErrorCode, mapper, mockMvc,
                 JsonNode.class);
+        }
+    }
+
+    private void stubSecurityCaseTypeRoleAssignments() {
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            String userId = "123";
+            String roleAssignmentResponseJson = roleAssignmentResponseJson(
+                securityCTSpecificPublicUserRoleAssignmentJson(userId, "caseworker-autotest1", "1589460099608690"),
+                securityCTSpecificPrivateUserRoleAssignmentJson(userId, "idam:" + "caseworker-autotest1-private",
+                    "1588870649839697"),
+                securityCTSpecificRestrictedUserRoleAssignmentJson(userId, "idam:" + "caseworker-autotest1-restricted",
+                    "1589460125872336"),
+                securityCTSpecificPrivateUserRoleAssignmentJson(userId, "[DEFENDANT]", "1589460099608691")
+            );
+
+            stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + userId))
+                .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
         }
     }
 }

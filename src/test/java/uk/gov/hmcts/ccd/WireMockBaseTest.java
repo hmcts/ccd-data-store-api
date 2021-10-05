@@ -24,6 +24,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
@@ -91,12 +93,19 @@ public abstract class WireMockBaseTest extends BaseTest {
     }
 
     protected void stubUserInfo(String userId) {
+        stubUserInfo(userId, "caseworker", "caseworker-test", "caseworker-PROBATE-public", "caseworker-PROBATE",
+            "caseworker-DIVORCE", "caseworker-SSCS");
+    }
+
+    protected void stubUserInfo(String userId, String... roles) {
+        String rolesList = Stream.of(roles)
+            .map(e -> "\"" + e + "\"")
+            .collect(Collectors.joining(","));
         stubFor(WireMock.get(urlMatching("/o/userinfo"))
             .willReturn(okJson("{"
                 + "      \"uid\": \"" + userId + "\","
                 + "      \"sub\": \"Cloud.Strife@test.com\","
-                + "      \"roles\": [ \"caseworker\", \"caseworker-test\", \"caseworker-PROBATE-public\","
-                + " \"caseworker-PROBATE\", \"caseworker-DIVORCE\", \"caseworker-SSCS\" ]"
+                + "      \"roles\": [ " + rolesList + " ]"
                 + "    }").withStatus(200)));
     }
 

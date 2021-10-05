@@ -26,7 +26,7 @@ INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classific
 VALUES (6, 'AAT', 'AUTOTEST1', 'IN_PROGRESS', 'PUBLIC', '{}', '{}', '1589460056217857');
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
-VALUES (7, 'AAT', 'AUTOTEST1', 'TODO', 'PUBLIC', '{}', '{}', '1588870615652827');
+VALUES (7, 'MAPPER', 'AUTOTEST1', 'TODO', 'PUBLIC', '{}', '{}', '1588870615652827');
 
 insert into case_users (case_data_id, user_id, case_role)
 values (2, 123, '[CREATOR]');
