@@ -91,6 +91,7 @@
               "update": false,
               "delete": false
             }],
+          "callback_url_about_to_start_event": "http://localhost:{{request.requestLine.port}}/callback_about_to_start_ttl",
           "ttl_increment": "20"
         }
       ],
@@ -276,6 +277,7 @@
           }
         }
       ]
-    }
+    },
+    "transformers": ["response-template"]
   }
 }

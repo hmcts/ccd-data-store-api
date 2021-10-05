@@ -94,7 +94,7 @@ class TimeToLiveServiceTest {
             timeToLiveService.verifyTTLContentNotChanged(expectedCaseData, caseData);
         });
 
-        assertEquals("Time to live content has been modified", exception.getMessage());
+        assertEquals(TimeToLiveService.TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE, exception.getMessage());
     }
 
     private Map<String, JsonNode> addDaysToSystemTTL(Map<String, JsonNode> data, Integer numOfDays) {

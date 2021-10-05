@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
@@ -78,6 +79,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
+import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.TTL_CASE_FIELD_ID;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseViewFieldBuilder.aViewField;
@@ -147,6 +149,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         template = new JdbcTemplate(db);
+        wireMockServer.resetAll();
     }
 
     @Test
@@ -3547,6 +3550,9 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String URL = "/" + userRole + "/0/jurisdictions/" + JURISDICTION + "/case-types/" +
             CASE_TYPE_TTL + "/cases/" + reference + "/event-triggers/" + TEST_EVENT_ID + "/token";
 
+        stubFor(WireMock.post(urlMatching("/callback_about_to_start_ttl"))
+            .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
         final MvcResult mvcResult = mockMvc.perform(get(URL).contentType(JSON_CONTENT_TYPE))
             .andExpect(status().is(200))
             .andReturn();
@@ -3556,9 +3562,68 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         CaseDetails caseDetails = actualStartEventResult.getCaseDetails();
         String expectedSystemTTL = LocalDate.now().plusDays(20).toString();
         assertAll(
-            () -> assertThat(caseDetails.getData().get(TTL.TTL_CASE_FIELD_ID).get("SystemTTL").textValue(),
+            () -> assertThat(caseDetails.getData().get(TTL_CASE_FIELD_ID).get("SystemTTL").textValue(),
                 is(expectedSystemTTL))
         );
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldErrorIfTriggerStartForCaseDetectsAboutToCallStartCallbackHasModifiedTTL() throws Exception {
+        final String reference = "9816494993793181";
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" +
+            CASE_TYPE_TTL + "/cases/" + reference + "/event-triggers/" + TEST_EVENT_ID + "/token";
+
+        TTL timeToLive = TTL.builder()
+            .systemTTL(LocalDate.now())
+            .build();
+
+        Map<String, JsonNode> ttl = new HashMap<>();
+        ttl.put(TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(timeToLive));
+
+        Map<String, JsonNode> caseData = new HashMap<>();
+        caseData.put("data", MAPPER.valueToTree(ttl));
+
+        stubFor(WireMock.post(urlMatching("/callback_about_to_start_ttl"))
+            .willReturn(okJson(MAPPER.writeValueAsString(caseData))
+                .withStatus(200)));
+
+        mockMvc.perform(get(URL).contentType(JSON_CONTENT_TYPE))
+            .andExpect(status().is(400))
+            .andReturn();
+
+        verifyWireMock(1, postRequestedFor(urlMatching("/callback_about_to_start_ttl")));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn200WhenTriggerStartForCaseDetectsAboutToCallStartCallbackHasNotModifiedTTL()
+        throws Exception {
+
+        final String reference = "9816494993793181";
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" +
+            CASE_TYPE_TTL + "/cases/" + reference + "/event-triggers/" + TEST_EVENT_ID + "/token";
+
+        TTL timeToLive = TTL.builder()
+            .systemTTL(LocalDate.now().plusDays(20))
+            .overrideTTL(LocalDate.of(2021,8,30))
+            .suspended("No").build();
+
+        Map<String, JsonNode> ttl = new HashMap<>();
+        ttl.put(TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(timeToLive));
+
+        Map<String, JsonNode> caseData = new HashMap<>();
+        caseData.put("data", MAPPER.valueToTree(ttl));
+
+        stubFor(WireMock.post(urlMatching("/callback_about_to_start_ttl"))
+            .willReturn(okJson(MAPPER.writeValueAsString(caseData))
+                .withStatus(200)));
+
+        mockMvc.perform(get(URL).contentType(JSON_CONTENT_TYPE))
+            .andExpect(status().is(200))
+            .andReturn();
+
+        verifyWireMock(1, postRequestedFor(urlMatching("/callback_about_to_start_ttl")));
 
     }
 

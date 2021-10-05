@@ -19,6 +19,9 @@ import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.TTL_CASE_FIELD_ID;
 @Service
 public class TimeToLiveService {
 
+    protected static final String TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE =
+        "Time to live content has been modified by aboutToStart callback";
+
     public Map<String, JsonNode> updateCaseDetailsWithTTL(Map<String, JsonNode> data,
                                                           CaseEventDefinition caseEventDefinition) {
         Map<String, JsonNode> clonedData = data;
@@ -51,7 +54,7 @@ public class TimeToLiveService {
 
                 if (expectedTtl != null && !expectedTtl.equals(actualTtl)) {
                     // TODO - not sure what exception to throw here
-                    throw new BadRequestException("Time to live content has been modified");
+                    throw new BadRequestException(TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE);
                 }
             } catch (JsonProcessingException e) {
                 log.error("Failed to read TTL from case data");
