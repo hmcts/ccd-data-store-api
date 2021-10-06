@@ -1,5 +1,4 @@
 DELETE FROM case_data;
-DELETE from case_users;
 
 -- The data for ElasticsearchIT - loaded in here, but indexed by ElasticsearchIT.initData(embeddedElastic) method from:
 -- elasticsearch/data/aat_cases
@@ -28,8 +27,3 @@ VALUES (6, 'AAT', 'AUTOTEST1', 'IN_PROGRESS', 'PUBLIC', '{}', '{}', '15894600562
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
 VALUES (7, 'MAPPER', 'AUTOTEST1', 'TODO', 'PUBLIC', '{}', '{}', '1588870615652827');
 
-insert into case_users (case_data_id, user_id, case_role)
-values (2, 123, '[CREATOR]');
-
-insert into case_users (case_data_id, user_id, case_role)
-values (4, 123, '[DEFENDANT]');
