@@ -63,7 +63,9 @@ def secrets = [
     ],
     's2s-${env}': [
         secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
-        secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT')
+        secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT'),
+        secret('microservicekey-ccd-data', 'ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_KEY'),
+
     ]
 ]
 
@@ -89,6 +91,14 @@ env.ELASTIC_SEARCH_FTA_ENABLED = "false"
 env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
 env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
+
+//RA Data Setup
+env.ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_ID = "ccd_data"
+ENV.ROLE_ASSIGNMENT_HOST="http://am-role-assignment-service-demo.service.core-compute-demo.internal"
+env.ROLE_ASSIGNMENT_USER_EMAIL="ccd.ac.solicitor1@gmail.com"
+env.ROLE_ASSIGNMENT_USER_PASSWORD="Pa55word11"
+env.ROLE_ASSIGNMENT_SOLICITOR_USER="ccd.ac.solicitor1@gmail.com"
+env.ROLE_ASSIGNMENT_SOLICITOR_USER_PWD="Pa55word11"
 
 withPipeline(type, product, component) {
     onMaster {

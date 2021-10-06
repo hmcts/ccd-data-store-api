@@ -53,7 +53,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     @Override
     protected BeftaTestDataLoader buildTestDataLoader() {
-        new RoleAssignmentSetup().setupOrganisationRoleAssignments();
+//        new RoleAssignmentSetup().setupOrganisationRoleAssignments();
         return new DataLoaderToDefinitionStore(this,
             DataLoaderToDefinitionStore.VALID_CCD_TEST_DEFINITIONS_PATH);
     }

@@ -20,8 +20,8 @@ public class RoleAssignmentSetup{
         new RoleAssignmentSetup().setupOrganisationRoleAssignments();
     }
 
-//    TODO CHANGE THE PATH OF THE 2 JSON FILES IN THE STATIC VARS ABOVE TO THE CORRECT PATH FOR YOUR LOCAL MACHINE
-//    TODO REPLACE THE IDAM ID IN THE 2 JSON FILES LISTED ABOVE AS FINAL VARS WITH CORRECT IDAM IDS FROM YOUR LOCAL
+    //    TODO CHANGE THE PATH OF THE 2 JSON FILES IN THE STATIC VARS ABOVE TO THE CORRECT PATH FOR YOUR LOCAL MACHINE
+    //    TODO REPLACE THE IDAM ID IN THE 2 JSON FILES LISTED ABOVE AS FINAL VARS WITH CORRECT IDAM IDS FROM YOUR LOCAL
 
 
     public void setupOrganisationRoleAssignments() {
@@ -57,12 +57,12 @@ public class RoleAssignmentSetup{
 
 
     protected RequestSpecification asRoleAssignemntCaseworker() {
-//          AuthenticatedUser caseworker = aat.getIdamHelper().authenticate("ccd.ac.solicitor1@gmail.com",
-//              "Pa55word");
-//          caseworker.getId();
-//          caseworker.getAccessToken();
-//
-//          String s2sToken = aat.getS2SHelper().getToken();
+    //          AuthenticatedUser caseworker = aat.getIdamHelper().authenticate("ccd.ac.solicitor1@gmail.com",
+    //              "Pa55word");
+    //          caseworker.getId();
+    //          caseworker.getAccessToken();
+    //
+    //          String s2sToken = aat.getS2SHelper().getToken();
 
         //ccd.ac.solicitor1@gmail.com
         //TODO YOU NEED TO HARDCODE THE AUTH AND S2S TOKEN BELOW IN ORDER TO SUCCESSFULLY UPLOAD THE ROLEASSIGNMENTS
