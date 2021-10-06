@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.datastore.befta;
 
-import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import org.junit.AssumptionViolatedException;
@@ -12,7 +11,6 @@ import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
 import uk.gov.hmcts.befta.util.BeftaUtils;
 import uk.gov.hmcts.befta.util.EnvironmentVariableUtils;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
-import uk.gov.hmcts.ccd.datastore.befta.RoleAssignmentSetup.RoleAssignmentSetup;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -55,7 +53,7 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
 
     @Override
     protected BeftaTestDataLoader buildTestDataLoader() {
-//        new RoleAssignmentSetup().setupOrganisationRoleAssignments();
+    //        new RoleAssignmentSetup().setupOrganisationRoleAssignments();
         return new DataLoaderToDefinitionStore(this,
             DataLoaderToDefinitionStore.VALID_CCD_TEST_DEFINITIONS_PATH);
     }
