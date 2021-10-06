@@ -1,5 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import com.google.common.collect.Lists;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,18 +35,10 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.Classification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.MatcherType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseAssignedUserRole;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -422,6 +423,27 @@ class RoleAssignmentServiceTest {
 
     }
 
+    private RoleAssignments getRoleAssignments() {
+
+        final Instant currentTIme = Instant.now();
+        final long oneHour = 3600000;
+
+        final RoleAssignmentAttributes roleAssignmentAttributes =
+            RoleAssignmentAttributes.builder().caseId(Optional.of(CASE_ID)).build();
+
+        final List<RoleAssignment> roleAssignments = Arrays.asList(
+
+            RoleAssignment.builder().actorId("actorId").roleType(RoleType.CASE.name())
+                .attributes(roleAssignmentAttributes)
+                .beginTime(currentTIme.minusMillis(oneHour)).endTime(currentTIme.plusMillis(oneHour)).build(),
+
+            RoleAssignment.builder().actorId("actorId1").roleType(RoleType.CASE.name())
+                .attributes(roleAssignmentAttributes)
+                .beginTime(currentTIme.minusMillis(oneHour)).endTime(currentTIme.plusMillis(oneHour)).build()
+        );
+        return RoleAssignments.builder().roleAssignments(roleAssignments).build();
+    }
+
 
     @Nested
     @DisplayName("getRoleAssignments()")
@@ -594,6 +616,29 @@ class RoleAssignmentServiceTest {
             // THEN
             assertEquals(2, resultCases.size()); // multiple cases
             verify(roleAssignmentFilteringService).filter(roleAssignments, caseTypeDefinition);
+        }
+
+        @Test
+        public void shouldGetRoleAssignmentsBasedOnExcluded() {
+
+            given(roleAssignmentRepository.getRoleAssignments(USER_ID))
+                .willReturn(mockedRoleAssignmentResponse);
+
+            RoleAssignments roleAssignments = getRoleAssignments();
+            given(roleAssignmentsMapper.toRoleAssignments(mockedRoleAssignmentResponse))
+                .willReturn(roleAssignments);
+
+            given(filteredRoleAssignments.getFilteredMatchingRoleAssignments())
+                .willReturn(roleAssignments.getRoleAssignments());
+            given(roleAssignmentFilteringService.filter(roleAssignments, caseTypeDefinition,
+                Lists.newArrayList(MatcherType.GRANTTYPE)))
+                .willReturn(filteredRoleAssignments);
+
+            List<RoleAssignment> resultCases =
+                roleAssignmentService.getRoleAssignments(USER_ID, caseTypeDefinition);
+
+            assertTrue(resultCases.size() == 2);
+            roleAssignmentFilteringService.filter(roleAssignments, caseTypeDefinition);
         }
 
     }

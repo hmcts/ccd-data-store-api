@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,9 +20,7 @@ public interface CaseDataAccessControl {
         return new HashSet<>();
     }
 
-    default void grantAccess(String caseId, String idamUserId) {
-
-    }
+    void grantAccess(CaseDetails caseDetails, String idamUserId);
 
     CaseAccessMetadata generateAccessMetadataWithNoCaseId();
 

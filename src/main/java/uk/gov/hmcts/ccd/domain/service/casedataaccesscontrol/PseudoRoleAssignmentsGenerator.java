@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -37,12 +38,13 @@ public class PseudoRoleAssignmentsGenerator {
         this.caseAccessService = caseAccessService;
     }
 
-    public List<RoleAssignment> createPseudoRoleAssignments(List<RoleAssignment> filteredRoleAssignments) {
+    public List<RoleAssignment> createPseudoRoleAssignments(List<RoleAssignment> filteredRoleAssignments,
+                                                            boolean isCreationProfile) {
 
         List<String> idamUserRoles = new ArrayList<>(userRepository.getUserRoles());
         List<RoleAssignment> pseudoRoleAssignments = new ArrayList<>();
 
-        if (caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()) {
+        if (!isCreationProfile && caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()) {
             if (atLeastOneCaseRoleExists(filteredRoleAssignments)) {
                 pseudoRoleAssignments.addAll(createPseudoRoleAssignmentsForGrantedOnlyAccess(idamUserRoles));
             }
@@ -59,6 +61,7 @@ public class PseudoRoleAssignmentsGenerator {
             .getClassificationsForUserRoleList(idamRoles);
 
         Map<String, String> roleToClassification = classifications.stream()
+            .filter(Objects::nonNull)
             .collect(Collectors.toMap(UserRole::getRole, UserRole::getSecurityClassification));
 
         return idamRoles.stream()

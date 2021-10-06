@@ -166,5 +166,4 @@ public class CaseAccessService {
     public Boolean userCanOnlyAccessExplicitlyGrantedCases() {
         return userRepository.anyRoleMatches(RESTRICT_GRANTED_ROLES_PATTERN);
     }
-
 }

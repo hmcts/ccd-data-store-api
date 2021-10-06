@@ -38,7 +38,8 @@ public class AttributeBasedSecurityClassificationService
     public Optional<SecurityClassification> getUserClassification(CaseDetails caseDetails, boolean create) {
         Set<AccessProfile> accessProfiles;
         if (create) {
-            accessProfiles = caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseDetails.getCaseTypeId());
+            accessProfiles = caseDataAccessControl
+                .generateCreationAccessProfilesByCaseTypeId(caseDetails.getCaseTypeId());
         } else {
             accessProfiles = caseDataAccessControl
                 .generateAccessProfilesByCaseReference(caseDetails.getReferenceAsString());

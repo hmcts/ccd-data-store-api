@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import static org.mockito.Mockito.verify;
@@ -41,8 +42,10 @@ class RoleBasedCaseDataAccessControlTest {
     @DisplayName("when creator has access level GRANTED, then it should grant access to creator")
     void shouldGrantAccessToAccessLevelGrantedCreator() {
         when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.GRANTED);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setId(CASE_ID);
 
-        instance.grantAccess(CASE_ID, IDAM_ID);
+        instance.grantAccess(caseDetails, IDAM_ID);
 
         verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID), IDAM_ID, CREATOR.getRole());
     }
@@ -51,8 +54,10 @@ class RoleBasedCaseDataAccessControlTest {
     @DisplayName("when creator has access level ALL, then it should NOT grant access to creator")
     void shouldNotGrantAccessToAccessLevelAllCreator() {
         when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.ALL);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setId(CASE_ID);
 
-        instance.grantAccess(CASE_ID, IDAM_ID);
+        instance.grantAccess(caseDetails, IDAM_ID);
 
         verifyZeroInteractions(caseUserRepository);
     }

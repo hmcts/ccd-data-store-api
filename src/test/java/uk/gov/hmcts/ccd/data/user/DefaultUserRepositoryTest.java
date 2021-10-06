@@ -28,10 +28,10 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefault;
+import uk.gov.hmcts.ccd.domain.model.aggregated.UserDefaultCollection;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -48,10 +48,11 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.util.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -66,6 +67,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static java.util.Objects.requireNonNull;
 
 class DefaultUserRepositoryTest {
 
@@ -77,6 +79,10 @@ class DefaultUserRepositoryTest {
     private static final String CITIZEN = "citizen";
     private static final String PROBATE_PRIVATE_BETA = "probate-private-beta";
     private static final String LETTER_HOLDER = "letter-holder";
+
+    private static final String EMAIL_HEADER = "email-ids-users-to-find";
+    private static final String FIND_USER_PROFILE_URL = "http://test.hmcts.net/users";
+    private static final String EMAIL_ID = "ccd+test@hmcts.net";
 
     @Mock
     private ApplicationParams applicationParams;
@@ -226,23 +232,12 @@ class DefaultUserRepositoryTest {
     @Test
     void getUserDefaultSettingsShouldReturnServiceExceptionWhenMessageIsNull() {
         assertThrows(ServiceException.class, () -> {
-            when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
+            when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
+            when(applicationParams.userDefaultSettingsURL()).thenReturn(FIND_USER_PROFILE_URL);
             HttpClientErrorException response = createErrorResponse(HttpStatus.BAD_GATEWAY, null);
             when(restTemplate.exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class),
-                eq(UserDefault.class))).thenThrow(response);
+                eq(UserDefaultCollection.class))).thenThrow(response);
             doThrow(response).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class), anyMap());
-
-            userRepository.getUserDefaultSettings("222");
-        });
-    }
-
-    @Test
-    void getUserDefaultSettingsShouldReturnResourceNotFoundExceptionWhen404() {
-        assertThrows(ResourceNotFoundException.class, () -> {
-            when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
-            HttpClientErrorException response = createErrorResponse(HttpStatus.NOT_FOUND, "some message");
-            when(restTemplate.exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class),
-                eq(UserDefault.class))).thenThrow(response);
 
             userRepository.getUserDefaultSettings("222");
         });
@@ -251,10 +246,11 @@ class DefaultUserRepositoryTest {
     @Test
     void getUserDefaultSettingsShouldReturnBadRequestWhenNot404() {
         assertThrows(BadRequestException.class, () -> {
-            when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
+            when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
+            when(applicationParams.userDefaultSettingsURL()).thenReturn(FIND_USER_PROFILE_URL);
             HttpClientErrorException response = createErrorResponse(HttpStatus.BAD_GATEWAY, "some message");
             when(restTemplate.exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class),
-                eq(UserDefault.class))).thenThrow(response);
+                eq(UserDefaultCollection.class))).thenThrow(response);
 
             doThrow(response).when(restTemplate).exchange(anyString(), any(), any(), any(Class.class), anyMap());
 
@@ -278,39 +274,46 @@ class DefaultUserRepositoryTest {
         @Test
         @DisplayName("should return the User Profile defaults for the user")
         void shouldReturnUserProfileDefaultsForUser() {
-            when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
+            when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
+            when(applicationParams.userDefaultSettingsURL()).thenReturn(FIND_USER_PROFILE_URL);
+
             final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
             jurisdictionDefinition.setId("TEST");
             jurisdictionDefinition.setName("Test");
             jurisdictionDefinition.setDescription("Test Jurisdiction");
+
             final UserDefault userDefault = new UserDefault();
             userDefault.setJurisdictionDefinitions(singletonList(jurisdictionDefinition));
-            final ResponseEntity<UserDefault> responseEntity = new ResponseEntity<>(userDefault, HttpStatus.OK);
+            UserDefaultCollection userDefaultCollection = new UserDefaultCollection(singletonList(userDefault));
+
+            final ResponseEntity<UserDefaultCollection> responseEntity = new ResponseEntity<>(
+                userDefaultCollection, HttpStatus.OK);
             when(restTemplate
-                .exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class)))
+                .exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefaultCollection.class)))
                 .thenReturn(responseEntity);
 
-            final UserDefault result = userRepository.getUserDefaultSettings("ccd+test@hmcts.net");
+            final UserDefault result = userRepository.getUserDefaultSettings(EMAIL_ID);
             assertThat(result, is(userDefault));
             verify(restTemplate).exchange(
-                isA(URI.class), same(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class));
+                isA(URI.class), same(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefaultCollection.class));
         }
 
         @Test
         @DisplayName("should throw a BadRequestException if the User Profile defaults cannot be retrieved")
         void shouldThrowExceptionIfUserProfileCannotBeRetrieved() {
-            when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
+            when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
+            when(applicationParams.userDefaultSettingsURL()).thenReturn(FIND_USER_PROFILE_URL);
             final HttpHeaders headers = new HttpHeaders();
             headers.add("Message", "User Profile data could not be retrieved");
             final RestClientResponseException exception =
                 new RestClientResponseException("Error on GET", 400, "Bad Request", headers, null, null);
             when(restTemplate
-                .exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class)))
+                .exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefaultCollection.class)))
                 .thenThrow(exception);
 
             final BadRequestException badRequestException =
                 assertThrows(BadRequestException.class,
-                    () -> userRepository.getUserDefaultSettings("ccd+test@hmcts.net"),
+                    () -> userRepository.getUserDefaultSettings(EMAIL_ID),
                     "Expected getUserDefaultSettings() to throw, but it didn't");
             assertThat(badRequestException.getMessage(), is(headers.getFirst("Message")));
         }
@@ -318,55 +321,88 @@ class DefaultUserRepositoryTest {
         @Test
         @DisplayName("should throw a ServiceException if an error occurs retrieving the User Profile defaults")
         void shouldThrowExceptionIfErrorOnRetrievingUserProfile() {
-            when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
+            when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
+            when(applicationParams.userDefaultSettingsURL()).thenReturn(FIND_USER_PROFILE_URL);
             final RestClientResponseException exception =
                 new RestClientResponseException(null, 500, "Internal Server Error", null, null, null);
             when(restTemplate
-                .exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class)))
+                .exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefaultCollection.class)))
                 .thenThrow(exception);
 
-            final String userId = "ccd+test@hmcts.net";
             final ServiceException serviceException =
                 assertThrows(ServiceException.class,
-                    () -> userRepository.getUserDefaultSettings(userId),
+                    () -> userRepository.getUserDefaultSettings(EMAIL_ID),
                     "Expected getUserDefaultSettings() to throw, but it didn't");
-            assertThat(serviceException.getMessage(), is("Problem getting user default settings for " + userId));
+            assertThat(serviceException.getMessage(), is("Problem getting user default settings for " + EMAIL_ID));
         }
 
         @Test
         @DisplayName("should throw a ServiceException if an IO error occurs retrieving the User Profile defaults")
         void shouldThrowExceptionIfIOErrorOnRetrievingUserProfile() {
-            when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
+            when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
+            when(applicationParams.userDefaultSettingsURL()).thenReturn(FIND_USER_PROFILE_URL);
             final ResourceAccessException exception =
                 new ResourceAccessException("I/O Error");
             when(restTemplate
-                .exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefault.class)))
+                .exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefaultCollection.class)))
                 .thenThrow(exception);
 
-            final String userId = "ccd+test@hmcts.net";
             final ServiceException serviceException =
                 assertThrows(ServiceException.class,
-                    () -> userRepository.getUserDefaultSettings(userId),
+                    () -> userRepository.getUserDefaultSettings(EMAIL_ID),
                     "Expected getUserDefaultSettings() to throw, but it didn't");
-            assertThat(serviceException.getMessage(), is("Problem getting user default settings for " + userId));
+            assertThat(serviceException.getMessage(), is("Problem getting user default settings for " + EMAIL_ID));
         }
 
         @Test
         @DisplayName("should make the User Profile API call with the userId converted to lowercase, prior to encoding")
         void shouldCallUserProfileWithLowercaseEncodedUserId() {
-            when(applicationParams.userDefaultSettingsURL()).thenReturn("http://test.hmcts.net/users?uid={uid}");
-            ArgumentCaptor<URI> uriCaptor = ArgumentCaptor.forClass(URI.class);
-            final ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
+            when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
+            when(applicationParams.userDefaultSettingsURL()).thenReturn(FIND_USER_PROFILE_URL);
+
+            final JurisdictionDefinition jurisdictionDefinition = new JurisdictionDefinition();
+            jurisdictionDefinition.setId("TEST");
+            jurisdictionDefinition.setName("Test");
+            jurisdictionDefinition.setDescription("Test Jurisdiction");
+
+            final UserDefault userDefault = new UserDefault();
+            userDefault.setJurisdictionDefinitions(singletonList(jurisdictionDefinition));
+            UserDefaultCollection userDefaultCollection = new UserDefaultCollection(singletonList(userDefault));
+
+            final ResponseEntity<UserDefaultCollection> responseEntity = new ResponseEntity<>(
+                userDefaultCollection, HttpStatus.OK);
             doReturn(responseEntity)
                 .when(restTemplate)
                 .exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), (Class<?>)any(Class.class));
 
-            final String userId = "CCD+Test@HMCTS.net";
-            userRepository.getUserDefaultSettings(userId);
+            ArgumentCaptor<URI> uriCaptor = ArgumentCaptor.forClass(URI.class);
+            ArgumentCaptor<HttpEntity> entityCaptor = ArgumentCaptor.forClass(HttpEntity.class);
+
+            userRepository.getUserDefaultSettings(EMAIL_ID.toUpperCase());
             verify(restTemplate).exchange(
-                uriCaptor.capture(), same(HttpMethod.GET), isA(HttpEntity.class), (Class<?>)any(Class.class));
-            final String lowercaseEncodedUserId = "ccd%2Btest%40hmcts.net";
-            assertThat(uriCaptor.getValue().getRawQuery(), containsString(lowercaseEncodedUserId));
+                uriCaptor.capture(), same(HttpMethod.GET), entityCaptor.capture(), (Class<?>)any(Class.class));
+
+            assertEquals(FIND_USER_PROFILE_URL, uriCaptor.getValue().toString());
+            assertEquals(EMAIL_ID,
+                requireNonNull(requireNonNull(entityCaptor.getValue().getHeaders().get(EMAIL_HEADER)).get(0)));
+        }
+
+        @Test
+        @DisplayName("should return empty user default settings when the user is not found")
+        void shouldReturnEmptyUserProfileDefaultsForUnknownUser() {
+            when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
+            when(applicationParams.userDefaultSettingsURL()).thenReturn(FIND_USER_PROFILE_URL);
+
+            UserDefaultCollection userDefaultCollection = new UserDefaultCollection();
+            final ResponseEntity<UserDefaultCollection> responseEntity = new ResponseEntity<>(
+                userDefaultCollection, HttpStatus.OK);
+
+            when(restTemplate
+                .exchange(isA(URI.class), eq(HttpMethod.GET), isA(HttpEntity.class), eq(UserDefaultCollection.class)))
+                .thenReturn(responseEntity);
+
+            UserDefault userDefault = userRepository.getUserDefaultSettings("test222@hmcts.net");
+            assertNull(userDefault);
         }
     }
 

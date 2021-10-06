@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.MatcherType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.RoleAttributeMatcher;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -42,6 +43,19 @@ public class RoleAssignmentsFilteringServiceImpl implements RoleAssignmentsFilte
 
         return filterMatchingRoleAssignments(roleAssignments,
             (matcher, roleAssignment) -> matcher.matchAttribute(roleAssignment, caseTypeDefinition));
+    }
+
+    @Override
+    public FilteredRoleAssignments filter(RoleAssignments roleAssignments,
+                                          CaseTypeDefinition caseTypeDefinition,
+                                          List<MatcherType> excludeMatchers) {
+        return filterMatchingRoleAssignments(roleAssignments,
+            (matcher, roleAssignment) -> {
+                if (!excludeMatchers.contains(matcher.getType())) {
+                    return matcher.matchAttribute(roleAssignment, caseTypeDefinition);
+                }
+                return true;
+            });
     }
 
     private FilteredRoleAssignments filterMatchingRoleAssignments(

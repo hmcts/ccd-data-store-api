@@ -1,0 +1,35 @@
+{
+  "title": "must receive an error response for a non existing case id",
+
+  "_guid_": "S-1054",
+  "_extends_": "F-1001_Test_Data_Base",
+
+  "specs": [
+    "an active Solicitor profile in CCD with a specific variation of ACLs on a case type",
+    "contains a non existing case id"
+  ],
+
+  "productName": "CCD Data Store",
+  "operationName": "Get Document AM Data",
+  "method": "GET",
+  "uri": "/cases/{caseId}/documents/{documentId}",
+
+  "request": {
+    "pathVariables": {
+      "caseId": "0000000000000000"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+
+    "body": {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException",
+      "message" : "No case found",
+      "path" : "/cases/${[scenarioContext][testData][request][pathVariables][caseId]}/documents/${[scenarioContext][testData][request][pathVariables][documentId]}",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}
