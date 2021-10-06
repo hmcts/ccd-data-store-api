@@ -1291,51 +1291,54 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             }
         }
 
-        @Nested
-        class GrantedAccessTest {
-
-            @Test
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-                scripts = {"classpath:sql/insert_elasticsearch_cases.sql",
-                    "classpath:sql/insert_elasticsearch_case_users.sql"})
-            void shouldOnlyReturnCasesSolicitorHasBeenGrantedAccessTo() throws Exception {
-                if (applicationParams.getEnableAttributeBasedAccessControl()) {
-                    String roleAssignmentResponseJson = roleAssignmentResponseJson(
-                        roleAssignmentJson("idam:caseworker-autotest1-solicitor", "AUTOTEST1", "SECURITY",
-                            "1589460125872336"),
-                        roleAssignmentJson("[DEFENDANT]", "AUTOTEST1", "SECURITY", "1589460099608691")
-                    );
-
-                    stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "123"))
-                        .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
-                }
-                ElasticsearchTestRequest searchRequest = matchAllRequest();
-
-                CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_SOLICITOR);
-
-                assertAll(
-                    () -> assertThat(caseSearchResult.getTotal(), is(2L)),
-                    () -> Assertions.assertThat(caseSearchResult.getCases()).extracting("reference")
-                        .contains(1589460125872336L, 1589460099608691L)
+        /*
+        The following tests require the Spring @SQL annotation, which does not work in @Nested classes (see SPR-15366)
+         To use @SQL annotation in @Nested classes is to copy the annotations from the enclosing test class to the
+         nested test class. reason you have to duplicate the configuration is that annotations in Spring are not
+         inherited from enclosing classes. This is a known limitation of the Spring TestContext Framework
+        */
+        @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_elasticsearch_cases.sql",
+                "classpath:sql/insert_elasticsearch_case_users.sql"})
+        void shouldOnlyReturnCasesSolicitorHasBeenGrantedAccessTo() throws Exception {
+            if (applicationParams.getEnableAttributeBasedAccessControl()) {
+                String roleAssignmentResponseJson = roleAssignmentResponseJson(
+                    roleAssignmentJson("idam:caseworker-autotest1-solicitor", "AUTOTEST1", "SECURITY",
+                        "1589460125872336"),
+                    roleAssignmentJson("[DEFENDANT]", "AUTOTEST1", "SECURITY", "1589460099608691")
                 );
+
+                stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "123"))
+                    .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
             }
+            ElasticsearchTestRequest searchRequest = matchAllRequest();
 
-            @Test
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-                scripts = {"classpath:sql/insert_elasticsearch_cases.sql",
-                    "classpath:sql/insert_elasticsearch_case_users.sql"})
-            void shouldReturnAllCasesForCaseworker() throws Exception {
-                stubSecurityCaseTypeRoleAssignments();
+            CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_SOLICITOR);
 
-                ElasticsearchTestRequest searchRequest = matchAllRequest();
-
-                CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_RESTRICTED);
-
-                assertAll(
-                    () -> assertThat(caseSearchResult.getTotal(), is(4L))
-                );
-            }
+            assertAll(
+                () -> assertThat(caseSearchResult.getTotal(), is(2L)),
+                () -> Assertions.assertThat(caseSearchResult.getCases()).extracting("reference")
+                    .contains(1589460125872336L, 1589460099608691L)
+            );
         }
+
+        @Test
+        @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = {"classpath:sql/insert_elasticsearch_cases.sql",
+                "classpath:sql/insert_elasticsearch_case_users.sql"})
+        void shouldReturnAllCasesForCaseworker() throws Exception {
+            stubSecurityCaseTypeRoleAssignments();
+
+            ElasticsearchTestRequest searchRequest = matchAllRequest();
+
+            CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_RESTRICTED);
+
+            assertAll(
+                () -> assertThat(caseSearchResult.getTotal(), is(4L))
+            );
+        }
+
 
         private CaseSearchResult executeRequest(ElasticsearchTestRequest searchRequest,
                                                 String caseTypeParam, String... roles) throws Exception {
