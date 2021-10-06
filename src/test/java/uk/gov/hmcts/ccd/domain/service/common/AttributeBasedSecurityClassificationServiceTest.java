@@ -84,7 +84,7 @@ class AttributeBasedSecurityClassificationServiceTest {
         when(caseDetails.getReferenceAsString()).thenReturn(CASE_REFERENCE);
         when(caseDetails.getCaseTypeId()).thenReturn(CASE_TYPE_ID);
 
-        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(CASE_REFERENCE)).thenReturn(null);
+        when(caseDataAccessControl.generateCreationAccessProfilesByCaseTypeId(CASE_TYPE_ID)).thenReturn(null);
         Optional<SecurityClassification> classification =  classUnderTest.getUserClassification(caseDetails, true);
         assertTrue(classification.isEmpty());
     }
@@ -99,7 +99,7 @@ class AttributeBasedSecurityClassificationServiceTest {
         AccessProfile accessProfile = mock(AccessProfile.class);
         when(accessProfile.getSecurityClassification()).thenReturn("PUBLIC");
 
-        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(CASE_TYPE_ID))
+        when(caseDataAccessControl.generateCreationAccessProfilesByCaseTypeId(CASE_TYPE_ID))
             .thenReturn(Sets.newHashSet(accessProfile));
         Optional<SecurityClassification> classification =  classUnderTest.getUserClassification(caseDetails, true);
         assertEquals(classification.get(), SecurityClassification.PUBLIC);
@@ -117,7 +117,7 @@ class AttributeBasedSecurityClassificationServiceTest {
         AccessProfile privateAccessProfile = mock(AccessProfile.class);
         when(privateAccessProfile.getSecurityClassification()).thenReturn("PRIVATE");
 
-        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(CASE_TYPE_ID))
+        when(caseDataAccessControl.generateCreationAccessProfilesByCaseTypeId(CASE_TYPE_ID))
             .thenReturn(Sets.newHashSet(accessProfile, privateAccessProfile));
         Optional<SecurityClassification> classification =  classUnderTest.getUserClassification(caseDetails, true);
         assertEquals(classification.get(), SecurityClassification.PRIVATE);

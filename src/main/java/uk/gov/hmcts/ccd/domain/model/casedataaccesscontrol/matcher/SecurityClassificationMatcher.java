@@ -17,6 +17,11 @@ import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils
 public class SecurityClassificationMatcher implements RoleAttributeMatcher {
 
     @Override
+    public MatcherType getType() {
+        return MatcherType.SECURITYCLASSIFICATION;
+    }
+
+    @Override
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseDetails caseDetails) {
         SecurityClassification caseDetailsSecurityClassification = caseDetails.getSecurityClassification();
         log.debug("Match role assignment security classification {} with case details security classification "

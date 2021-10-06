@@ -77,6 +77,7 @@ env.TEST_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
 // Other env variables needed for BEFTA.
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
+env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
 env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN" // Temporary workaround for platform changes: turn BEFTA header checks to warning mode
 env.ELASTIC_SEARCH_FTA_ENABLED = "false"
@@ -89,7 +90,11 @@ withNightlyPipeline(type, product, component) {
     enableDbMigration('ccd')
     disableLegacyDeployment()
     enableHighLevelDataSetup()
+    enableFortifyScan()
 
+    after('fortify-scan') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+    }
     after('test') {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'

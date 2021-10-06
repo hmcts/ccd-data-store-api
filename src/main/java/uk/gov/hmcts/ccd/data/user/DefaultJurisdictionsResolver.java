@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Qualifier(DefaultJurisdictionsResolver.QUALIFIER)
@@ -28,9 +30,16 @@ public class DefaultJurisdictionsResolver implements JurisdictionsResolver {
     @Override
     public List<String> getJurisdictions() {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
-            return attributeBasedJurisdictionsResolver.getJurisdictions();
+            List<String> jurisdictions = attributeBasedJurisdictionsResolver.getJurisdictions();
+            List<String> roleJurisdictions = idamJurisdictionsResolver.getJurisdictions();
+
+            return Stream.concat(jurisdictions.stream(), roleJurisdictions.stream())
+                .map(String::toLowerCase)
+                .distinct()
+                .collect(Collectors.toList());
         } else {
             return idamJurisdictionsResolver.getJurisdictions();
         }
     }
+
 }

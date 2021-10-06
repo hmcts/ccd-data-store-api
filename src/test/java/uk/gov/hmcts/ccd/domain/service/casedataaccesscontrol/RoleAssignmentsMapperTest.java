@@ -32,6 +32,7 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 @DisplayName("RoleAssignmentMapperTest")
@@ -186,7 +187,7 @@ class RoleAssignmentsMapperTest {
             assertAll(
                 () -> assertThat(roleAssignments.size(), is(1)),
                 () -> assertThat(roleAssignments.get(0).getId(), is(ASSIGNMENT_1)),
-                () -> assertNull(roleAssignments.get(0).getAttributes())
+                () -> assertNotNull(roleAssignments.get(0).getAttributes())
             );
         }
     }

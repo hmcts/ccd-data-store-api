@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.data.casedetails.query;
 
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,10 +14,6 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Matchers.anyString;
@@ -75,21 +73,6 @@ class UserAuthorisationSecurityTest {
 
             assertAll(
                 () -> verify(builder).whereGrantedAccessOnly(USER_ID)
-            );
-        }
-
-        @Test
-        @DisplayName("should secure for user ID when user access level is GRANTED")
-        void accessLevelGrantedForRA() {
-            doReturn(true).when(applicationParams).getEnableAttributeBasedAccessControl();
-            when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
-            when(roleAssignmentService.getCaseReferencesForAGivenUser(USER_ID)).thenReturn(caseReferences);
-            security.secure(builder, null);
-
-            assertAll(
-                () -> verify(builder).whereGrantedAccessOnlyForRA(
-                    caseReferences.stream().map(Long::parseLong).collect(Collectors.toList())
-                )
             );
         }
     }

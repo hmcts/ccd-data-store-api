@@ -1,0 +1,13 @@
+{
+  "_guid_": "S-139.4_Event_Creation",
+  "_extends_": "S-132.2_Event5_Creation",
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][parentContext][childContexts][S-139.2_CreateCase][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "event_token": "${[scenarioContext][parentContext][childContexts][S-139.4_Event_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+}

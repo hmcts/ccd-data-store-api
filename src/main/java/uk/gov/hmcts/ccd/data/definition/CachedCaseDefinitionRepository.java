@@ -99,6 +99,11 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
+    public List<JurisdictionDefinition> getAllJurisdictionsFromDefinitionStore() {
+        return caseDefinitionRepository.getAllJurisdictionsFromDefinitionStore();
+    }
+
+    @Override
     public List<String> getAllCaseTypesIDs() {
         return caseDefinitionRepository.getAllCaseTypesIDs();
     }
