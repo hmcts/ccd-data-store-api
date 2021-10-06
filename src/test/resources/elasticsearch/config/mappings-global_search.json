@@ -1,6 +1,38 @@
 {
   "_doc": {
     "properties": {
+      "created_date": {
+        "type": "date",
+        "ignore_malformed": true
+      },
+      "last_modified": {
+        "type": "date",
+        "ignore_malformed": true
+      },
+      "reference": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256,
+            "normalizer": "lowercase_normalizer"
+          }
+        },
+        "analyzer": "standard",
+        "search_analyzer": "alphanumeric_string_analyzer"
+      },
+      "jurisdiction": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256,
+            "normalizer": "lowercase_normalizer"
+          }
+        },
+        "analyzer": "standard",
+        "search_analyzer": "alphanumeric_string_analyzer"
+      },
       "case_type_id": {
         "type": "text",
         "fields": {
@@ -13,18 +45,31 @@
         "analyzer": "standard",
         "search_analyzer": "alphanumeric_string_analyzer"
       },
-      "created_date": {
-        "type": "date",
-        "ignore_malformed": true
+      "state": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256,
+            "normalizer": "lowercase_normalizer"
+          }
+        },
+        "analyzer": "standard",
+        "search_analyzer": "alphanumeric_string_analyzer"
+      },
+      "security_classification": {
+        "type": "keyword",
+        "normalizer": "lowercase_normalizer"
       },
       "data": {
+        "type": "object",
         "properties": {
           "SearchCriteria": {
+            "type": "object",
             "properties": {
               "OtherCaseReferences": {
                 "properties": {
                   "id": {
-                    "type": "object",
                     "enabled": false
                   },
                   "value": {
@@ -44,13 +89,12 @@
               "SearchParties": {
                 "properties": {
                   "id": {
-                    "type": "object",
                     "enabled": false
                   },
                   "value": {
                     "type": "nested",
                     "properties": {
-                      "AddressLine1": {
+                      "Name": {
                         "type": "text",
                         "fields": {
                           "keyword": {
@@ -61,14 +105,6 @@
                         },
                         "analyzer": "standard",
                         "search_analyzer": "alphanumeric_string_analyzer"
-                      },
-                      "DateOfBirth": {
-                        "type": "date",
-                        "ignore_malformed": true
-                      },
-                      "DateOfDeath": {
-                        "type": "date",
-                        "ignore_malformed": true
                       },
                       "EmailAddress": {
                         "type": "text",
@@ -82,7 +118,7 @@
                         "analyzer": "standard",
                         "search_analyzer": "alphanumeric_string_analyzer"
                       },
-                      "Name": {
+                      "AddressLine1": {
                         "type": "text",
                         "fields": {
                           "keyword": {
@@ -105,6 +141,14 @@
                         },
                         "analyzer": "standard",
                         "search_analyzer": "alphanumeric_string_analyzer"
+                      },
+                      "DateOfBirth": {
+                        "type": "date",
+                        "ignore_malformed": true
+                      },
+                      "DateOfDeath": {
+                        "type": "date",
+                        "ignore_malformed": true
                       }
                     }
                   }
@@ -112,9 +156,56 @@
               }
             }
           },
-          "caseManagementCategory": {
+          "caseManagementLocation": {
+            "type": "object",
             "properties": {
+              "region": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256,
+                    "normalizer": "lowercase_normalizer"
+                  }
+                },
+                "analyzer": "standard",
+                "search_analyzer": "alphanumeric_string_analyzer"
+              },
+              "baseLocation": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256,
+                    "normalizer": "lowercase_normalizer"
+                  }
+                },
+                "analyzer": "standard",
+                "search_analyzer": "alphanumeric_string_analyzer"
+              }
+            }
+          },
+          "caseNameHmctsInternal": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256,
+                "normalizer": "lowercase_normalizer"
+              }
+            },
+            "analyzer": "standard",
+            "search_analyzer": "alphanumeric_string_analyzer"
+          },
+          "caseManagementCategory": {
+            "type": "object",
+            "properties": {
+              "list_items": {
+                "type": "object",
+                "enabled": false
+              },
               "value": {
+                "type": "object",
                 "properties": {
                   "code": {
                     "type": "text",
@@ -143,94 +234,15 @@
                 }
               }
             }
-          },
-          "caseManagementLocation": {
-            "properties": {
-              "baseLocation": {
-                "type": "text",
-                "fields": {
-                  "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256,
-                    "normalizer": "lowercase_normalizer"
-                  }
-                },
-                "analyzer": "standard",
-                "search_analyzer": "alphanumeric_string_analyzer"
-              },
-              "region": {
-                "type": "text",
-                "fields": {
-                  "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256,
-                    "normalizer": "lowercase_normalizer"
-                  }
-                },
-                "analyzer": "standard",
-                "search_analyzer": "alphanumeric_string_analyzer"
-              }
-            }
-          },
-          "caseNameHmctsInternal": {
-            "type": "text",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256,
-                "normalizer": "lowercase_normalizer"
-              }
-            },
-            "analyzer": "standard",
-            "search_analyzer": "alphanumeric_string_analyzer"
           }
         }
       },
-      "jurisdiction": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "ignore_above": 256,
-            "normalizer": "lowercase_normalizer"
-          }
-        },
-        "analyzer": "standard",
-        "search_analyzer": "alphanumeric_string_analyzer"
-      },
-      "last_modified": {
-        "type": "date",
-        "ignore_malformed": true
-      },
-      "reference": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "ignore_above": 256,
-            "normalizer": "lowercase_normalizer"
-          }
-        },
-        "analyzer": "standard",
-        "search_analyzer": "alphanumeric_string_analyzer"
-      },
-      "security_classification": {
-        "type": "keyword",
-        "normalizer": "lowercase_normalizer"
-      },
-      "state": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "ignore_above": 256,
-            "normalizer": "lowercase_normalizer"
-          }
-        },
-        "analyzer": "standard",
-        "search_analyzer": "alphanumeric_string_analyzer"
+      "data_classification": {
+        "type": "object",
+        "enabled": false
       },
       "supplementary_data": {
+        "type": "object",
         "properties": {
           "HMCTSServiceId": {
             "type": "text",
