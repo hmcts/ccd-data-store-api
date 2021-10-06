@@ -11,6 +11,7 @@ def type = "java"
 def product = "ccd"
 def component = "data-store-api"
 
+
 def secrets = [
     'ccd-${env}': [
         secret('ccd-caseworker-autotest-email', 'CCD_CASEWORKER_AUTOTEST_EMAIL'),
