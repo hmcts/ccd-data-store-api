@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.datastore.befta.roleAssignmentSetup;
+package uk.gov.hmcts.ccd.datastore.befta.roleassignmentsetup;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -8,23 +8,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class RoleAssignmentSetup{
+public class RoleAssignmentSetup {
 
     public static final String CCD_CASEWORKER_AUTOTEST_PASSWORD = "CCD_CASEWORKER_AUTOTEST_PASSWORD";
-    public static final String SOLICITOR_1_ORG_ROLE_ASSIGNMENTS = "/Users/skynet/Desktop/mis_cosas/work/MoJ/repositories" +
-        "/ccd-data-store-api/src/aat/java/uk/gov/hmcts/ccd/datastore/befta/RoleAssignmentSetup" +
-        "/OrganisationRoleAssignmentsSolicitor1.json";
-    public static final String SUPERUSER_ORG_ROLE_ASSIGNMENTS = "/Users/skynet/Desktop/mis_cosas/work/MoJ/repositories" +
-        "/ccd-data-store-api/src/aat/java/uk/gov/hmcts/ccd/datastore/befta/RoleAssignmentSetup/" +
-        "OrganisationRoleAssignmentsSuperUser.json";
+    public static final String SOLICITOR_1_ORG_ROLE_ASSIGNMENTS = "";
+    public static final String SUPERUSER_ORG_ROLE_ASSIGNMENTS = "";
 
     public static void main(String[] args) {
         new RoleAssignmentSetup().setupOrganisationRoleAssignments();
     }
-
-    //    TODO CHANGE THE PATH OF THE 2 JSON FILES IN THE STATIC VARS ABOVE TO THE CORRECT PATH FOR YOUR LOCAL MACHINE
-    //    TODO REPLACE THE IDAM ID IN THE 2 JSON FILES LISTED ABOVE AS FINAL VARS WITH CORRECT IDAM IDS FROM YOUR LOCAL
-
 
     public void setupOrganisationRoleAssignments() {
 
@@ -59,8 +51,6 @@ public class RoleAssignmentSetup{
 
 
     protected RequestSpecification asRoleAssignemntCaseworker() {
-        // ccd.ac.solicitor1@gmail.com
-        // TODO YOU NEED TO HARDCODE THE AUTH AND S2S TOKEN BELOW IN ORDER TO SUCCESSFULLY UPLOAD THE ROLEASSIGNMENTS
         String bearerToken = "";
         String s2sToken = "";
         return RestAssured.given(new RequestSpecBuilder()
