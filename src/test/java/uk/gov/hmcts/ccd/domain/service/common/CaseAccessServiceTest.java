@@ -685,7 +685,7 @@ class CaseAccessServiceTest {
         @Test
         @DisplayName("should throw exception when no user role found")
         void getCreateCaseRolesThrows() {
-            when(caseDataAccessControl.generateCreationAccessProfilesByCaseTypeId(anyString())).thenReturn(null);
+            when(caseDataAccessControl.generateOrganisationalAccessProfilesByCaseTypeId(anyString())).thenReturn(null);
             assertThrows(ValidationException.class, () -> caseAccessService.getCaseCreationRoles("CASE_TYPE_ID"));
         }
     }
