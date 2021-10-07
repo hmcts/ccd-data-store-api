@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 public interface CaseDataAccessControl {
     Set<AccessProfile> generateAccessProfilesByCaseTypeId(String caseTypeId);
 
-    Set<AccessProfile> generateCreationAccessProfilesByCaseTypeId(String caseTypeId);
+    Set<AccessProfile> generateOrganisationalAccessProfilesByCaseTypeId(String caseTypeId);
 
     Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference);
 

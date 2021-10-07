@@ -84,7 +84,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     }
 
     @Override
-    public Set<AccessProfile> generateCreationAccessProfilesByCaseTypeId(String caseTypeId) {
+    public Set<AccessProfile> generateOrganisationalAccessProfilesByCaseTypeId(String caseTypeId) {
         return generateAllTypesOfProfilesByCaseTypeId(caseTypeId, true);
     }
 
@@ -270,7 +270,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
                                               Predicate<AccessControlList> access,
                                               String caseTypeId) {
         // In R.A if the access is create the RoleType has to be organisation.
-        final var accessProfile = generateCreationAccessProfilesByCaseTypeId(caseTypeId);
+        final var accessProfile = generateOrganisationalAccessProfilesByCaseTypeId(caseTypeId);
         return access.test(getCreateAccessControlList()) && accessProfile.isEmpty();
     }
 

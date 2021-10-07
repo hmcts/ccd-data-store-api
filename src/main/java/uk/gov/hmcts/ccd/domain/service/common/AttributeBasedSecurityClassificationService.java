@@ -39,7 +39,7 @@ public class AttributeBasedSecurityClassificationService
         Set<AccessProfile> accessProfiles;
         if (create) {
             accessProfiles = caseDataAccessControl
-                .generateCreationAccessProfilesByCaseTypeId(caseDetails.getCaseTypeId());
+                .generateOrganisationalAccessProfilesByCaseTypeId(caseDetails.getCaseTypeId());
         } else {
             accessProfiles = caseDataAccessControl
                 .generateAccessProfilesByCaseReference(caseDetails.getReferenceAsString());

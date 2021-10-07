@@ -87,7 +87,7 @@ class AuthorisedGetUserProfileOperationTest {
         test1JurisdictionDisplayProperties.setCaseTypeDefinitions(caseTypes1Definition);
         test2JurisdictionDisplayProperties.setCaseTypeDefinitions(caseTypes2Definition);
 
-        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(any()))
+        when(caseDataAccessControl.generateOrganisationalAccessProfilesByCaseTypeId(any()))
             .thenReturn(accessProfiles);
         doReturn(userProfile).when(getUserProfileOperation).execute(CAN_READ);
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(any(), any(), any());
