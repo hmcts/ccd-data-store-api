@@ -1290,7 +1290,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     executeRequest(searchRequest, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B));
 
                 assertAll(
-                    () -> assertThat(caseSearchResult.getTotal(), is(2L)),
+                    () -> assertThat(caseSearchResult.getTotal(), is(3L)),
                     () -> assertThat(caseSearchResult.getCases().size(), is(2)) // = Size * Number of case types
                 );
             }
