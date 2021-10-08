@@ -11,6 +11,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
@@ -41,6 +44,7 @@ import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollec
 import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollectionOptions.ALLOW_UPDATE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
+
 public interface AccessControlService {
     Predicate<AccessControlList> CAN_CREATE = AccessControlList::isCreate;
     Predicate<AccessControlList> CAN_UPDATE = AccessControlList::isUpdate;
@@ -53,6 +57,10 @@ public interface AccessControlService {
     String NO_EVENT_FOUND = "No event found";
     String NO_FIELD_FOUND = "No field found";
     String VALUE = "value";
+
+    Logger LOG = LoggerFactory.getLogger(AccessControlService.class);
+
+
 
     boolean canAccessCaseTypeWithCriteria(CaseTypeDefinition caseType,
                                           Set<AccessProfile> accessProfiles,
