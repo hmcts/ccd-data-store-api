@@ -544,10 +544,10 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
     @Nested
     @DisplayName("GET /cases/{caseId}/supplementary-data")
-    private class UserRoleValidation {
+    class UserRoleValidation {
 
         @BeforeEach
-        public void setup() {
+        void setup() {
             String userJson = "{\n"
                 + "          \"sub\": \"Cloud.Strife@test.com\",\n"
                 + "          \"uid\": \"1234\",\n"
@@ -564,7 +564,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
         @Test
         @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
             scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
-        public void shouldThrowExceptionWhenSolicitorRoleWithNoCasesAssignedToTheUser() throws Exception {
+        void shouldThrowExceptionWhenSolicitorRoleWithNoCasesAssignedToTheUser() throws Exception {
 
             MockUtils.setSecurityAuthorities(authentication, ROLE_PROBATE_SOLICITOR);
             String caseId = "1504259907353545";
