@@ -43,7 +43,7 @@ public class ClassifiedCaseSearchOperation implements CaseSearchOperation {
             .map(Optional::get)
             .collect(Collectors.toList());
 
-        return new CaseSearchResult(Long.valueOf(classifiedCases.size()),
+        return new CaseSearchResult(results.getTotal(),
             classifiedCases, results.getCaseTypesResults());
     }
 }

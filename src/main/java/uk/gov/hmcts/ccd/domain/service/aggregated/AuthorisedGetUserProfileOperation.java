@@ -55,7 +55,7 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
     }
 
     private Set<AccessProfile> getAccessProfiles(String caseTypeId) {
-        return caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
+        return caseDataAccessControl.generateOrganisationalAccessProfilesByCaseTypeId(caseTypeId);
     }
 
     private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition,
