@@ -44,12 +44,14 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
     }
 
     private UserProfile filterCaseTypes(UserProfile userProfile, Predicate<AccessControlList> access) {
-        if (userProfile.getUser() != null && userProfile.getUser().getIdamProperties() != null) {
-            log.info("Filtering case types for user '{}' with roles '{}' from original jurisdictions '{}'",
+        boolean shouldLog = userProfile.getUser() != null && userProfile.getUser().getIdamProperties() != null;
+        if (shouldLog) {
+            log.info("Filtering case types for user '{}' with roles '{}' from original jurisdictions '{}' ({})",
                 userProfile.getUser().getIdamProperties().getEmail(),
                 userProfile.getUser().getIdamProperties().getRoles(),
                 Arrays.stream(userProfile.getJurisdictions()).map(JurisdictionDisplayProperties::getId)
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toList()),
+                userProfile.getJurisdictions().length);
         }
 
         Arrays.stream(userProfile.getJurisdictions()).forEach(
@@ -62,6 +64,14 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
                     .collect(Collectors.toList())
             )
         );
+        if (shouldLog) {
+            log.info("Remaining jurisdictions for user '{}' with roles '{}':: '{}' ({})",
+                userProfile.getUser().getIdamProperties().getEmail(),
+                userProfile.getUser().getIdamProperties().getRoles(),
+                Arrays.stream(userProfile.getJurisdictions()).map(JurisdictionDisplayProperties::getId)
+                    .collect(Collectors.toList()),
+                userProfile.getJurisdictions().length);
+        }
         return userProfile;
     }
 
