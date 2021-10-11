@@ -51,7 +51,7 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
     }
 
     @Override
-    public Set<AccessProfile> generateCreationAccessProfilesByCaseTypeId(String caseTypeId) {
+    public Set<AccessProfile> generateOrganisationalAccessProfilesByCaseTypeId(String caseTypeId) {
         return userRoleToAccessProfiles(userRepository.getUserRoles());
     }
 

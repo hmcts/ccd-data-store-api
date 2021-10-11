@@ -78,7 +78,6 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
     @SuppressWarnings("checkstyle:LineLength") // don't want to break error messages and add unwanted +
     private static final String HTTP_500_ERROR_MESSAGE = "Problem getting Role Assignments from Role Assignment Service because of ";
 
-
     @Nested
     @DisplayName("createRoleAssignment()")
     class CreateRoleAssignment {
