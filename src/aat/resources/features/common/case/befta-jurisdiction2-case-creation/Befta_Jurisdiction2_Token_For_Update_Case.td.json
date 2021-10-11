@@ -3,7 +3,7 @@
 	"title": "should create an event token for correct inputs",
 
 	"productName": "CCD Data Store",
-	"operationName": "Retrieve a create token",
+	"operationName": "Start event creation process to update a case",
 
 	"method": "GET",
 	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
