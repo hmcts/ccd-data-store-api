@@ -59,13 +59,14 @@ def secrets = [
 
         secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_OAUTH2_CLIENT_SECRET'),
         secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
-        secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD'),
+        secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD')
 
-	secret('microservicekey-ccd-data', 'ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_KEY'),
+	
     ],
     's2s-${env}': [
         secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
-        secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT')
+        secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT'),
+        secret('microservicekey-ccd-data', 'ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_KEY')
     ]
 ]
 
