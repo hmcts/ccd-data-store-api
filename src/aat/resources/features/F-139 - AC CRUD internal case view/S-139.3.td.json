@@ -1,0 +1,35 @@
+{
+  "_guid_": "S-139.3",
+  "_extends_": "F-139_Test_Data_Base",
+  "specs": [
+    "no R access to case state",
+    "contains a HTTP 404 Not Found"
+  ],
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][S-139.2_CreateCase][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "headers" : {
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Content-Encoding": "[[ANY_NULLABLE]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security": "[[ANY_NULLABLE]]"
+    },
+    "body" : {
+      "exception": "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
+      "message": "No case found for reference: ${[scenarioContext][childContexts][S-139.2_CreateCase][testData][actualResponse][body][id]}",
+      "path": "/internal/cases/${[scenarioContext][childContexts][S-139.2_CreateCase][testData][actualResponse][body][id]}",
+      "details": null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}
+

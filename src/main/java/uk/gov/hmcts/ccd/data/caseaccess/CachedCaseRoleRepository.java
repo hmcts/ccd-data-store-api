@@ -1,13 +1,13 @@
 package uk.gov.hmcts.ccd.data.caseaccess;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.web.context.annotation.RequestScope;
+
 import java.util.Map;
 import java.util.Set;
 
 import static com.google.common.collect.Maps.newHashMap;
-
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import org.springframework.web.context.annotation.RequestScope;
 
 @Service
 @Qualifier(CachedCaseRoleRepository.QUALIFIER)
@@ -18,6 +18,7 @@ public class CachedCaseRoleRepository implements CaseRoleRepository {
 
     private final CaseRoleRepository caseRoleRepository;
     private final Map<String, Set<String>> caseRoles = newHashMap();
+    private final Map<String, Set<String>> roles = newHashMap();
 
     public CachedCaseRoleRepository(@Qualifier(DefaultCaseRoleRepository.QUALIFIER)
                                     final CaseRoleRepository caseRoleRepository) {
@@ -27,5 +28,10 @@ public class CachedCaseRoleRepository implements CaseRoleRepository {
     @Override
     public Set<String> getCaseRoles(String caseTypeId) {
         return caseRoles.computeIfAbsent(caseTypeId, caseRoleRepository::getCaseRoles);
+    }
+
+    @Override
+    public Set<String> getRoles(String caseTypeId) {
+        return roles.computeIfAbsent(caseTypeId, caseRoleRepository::getRoles);
     }
 }
