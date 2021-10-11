@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import com.google.common.collect.Maps;
 import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -145,7 +146,7 @@ class DefaultCaseDataAccessControlTest {
         var result = defaultCaseDataAccessControl
             .shouldRemoveCaseDefinition(accessProfiles, accessMap.get("create"), CASE_TYPE_1);
 
-        verifyRemoveDefintion(caseDefinitionRepository, securityUtils, roleAssignmentService,
+        verifyRemoveDefiniton(caseDefinitionRepository, securityUtils, roleAssignmentService,
             roleAssignmentsFilteringService, applicationParams, accessProfileService);
         assertFalse(result);
     }
@@ -172,9 +173,107 @@ class DefaultCaseDataAccessControlTest {
         var result = defaultCaseDataAccessControl
             .shouldRemoveCaseDefinition(accessProfiles, accessMap.get("read"), CASE_TYPE_1);
 
-        verifyRemoveDefintion(caseDefinitionRepository, securityUtils, roleAssignmentService,
+        verifyRemoveDefiniton(caseDefinitionRepository, securityUtils, roleAssignmentService,
             roleAssignmentsFilteringService, applicationParams, accessProfileService);
         assertFalse(result);
+    }
+
+    @Test
+    void shouldGenerateAccessProfilesByCaseDetails() {
+        doReturn(USER_ID).when(securityUtils).getUserId();
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(CASE_TYPE_1);
+
+        RoleAssignments roleAssignments = new RoleAssignments();
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
+
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+
+        CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+
+        Map<String, String> roleAndGrantType = Maps.newHashMap();
+        roleAndGrantType.put(ROLE_NAME_1, GrantType.EXCLUDED.name());
+        List<RoleAssignment> roleAssignments1 = createFilteringResults(roleAndGrantType);
+
+        doReturn(roleAssignments1).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+
+        doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+        doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
+
+        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
+            .generateAccessProfilesByCaseDetails(caseDetails);
+
+        assertNotNull(accessProfiles);
+        assertEquals(0, accessProfiles.size());
+        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(securityUtils).getUserId();
+        verify(roleAssignmentService).getRoleAssignments(anyString());
+        verify(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+        verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+        verify(applicationParams).getEnablePseudoAccessProfilesGeneration();
+        verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
+    }
+
+    @Test
+    void shouldGenerateAccessProfilesByCaseReference() {
+
+        doReturn(USER_ID).when(securityUtils).getUserId();
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(CASE_TYPE_1);
+        Optional<CaseDetails> optionalCaseDetails = Optional.of(caseDetails);
+        doReturn(optionalCaseDetails).when(caseDetailsRepository).findByReference(CASE_ID);
+
+        RoleAssignments roleAssignments = new RoleAssignments();
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
+
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+
+        CaseTypeDefinition caseTypeDefinition = createCaseTypeDefinition(ROLE_NAME_1);
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+
+        Map<String, String> roleAndGrantType = Maps.newHashMap();
+        roleAndGrantType.put(ROLE_NAME_1, GrantType.EXCLUDED.name());
+        List<RoleAssignment> roleAssignments1 = createFilteringResults(roleAndGrantType);
+
+        doReturn(roleAssignments1).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+
+        doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+        doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
+
+        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl.generateAccessProfilesByCaseReference(CASE_ID);
+
+        assertNotNull(accessProfiles);
+        assertEquals(0, accessProfiles.size());
+        verify(caseDetailsRepository).findByReference(CASE_ID);
+        verify(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        verify(securityUtils).getUserId();
+        verify(roleAssignmentService).getRoleAssignments(anyString());
+        verify(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseDetails.class));
+        verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+        verify(applicationParams).getEnablePseudoAccessProfilesGeneration();
+        verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
+    }
+
+    @Test
+    void shouldGenerateAccessProfilesByNonExistingCaseId() {
+
+        Optional<CaseDetails> optionalCaseDetails = Optional.empty();
+        doReturn(optionalCaseDetails).when(caseDetailsRepository).findByReference(CASE_ID);
+
+        Optional<CaseDetails> optionalCaseDetails1 = Optional.empty();
+        doReturn(optionalCaseDetails1).when(caseDetailsRepository).findById(null, Long.parseLong(CASE_ID));
+
+        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl.generateAccessProfilesByCaseReference(CASE_ID);
+        Assertions.assertTrue(accessProfiles.isEmpty());
+        verify(caseDetailsRepository).findByReference(CASE_ID);
+        verify(caseDetailsRepository).findById(null, Long.parseLong(CASE_ID));
     }
 
     @Test
@@ -201,12 +300,12 @@ class DefaultCaseDataAccessControlTest {
         var result = defaultCaseDataAccessControl
             .shouldRemoveCaseDefinition(accessProfiles, accessMap.get("create"), CASE_TYPE_1);
 
-        verifyRemoveDefintion(caseDefinitionRepository, securityUtils, roleAssignmentService,
+        verifyRemoveDefiniton(caseDefinitionRepository, securityUtils, roleAssignmentService,
             roleAssignmentsFilteringService, applicationParams, accessProfileService);
         assertTrue(result);
     }
 
-    private static void verifyRemoveDefintion(CaseDefinitionRepository caseDefinitionRepository,
+    private static void verifyRemoveDefiniton(CaseDefinitionRepository caseDefinitionRepository,
                                               SecurityUtils securityUtils, RoleAssignmentService roleAssignmentService,
                                               RoleAssignmentsFilteringService roleAssignmentsFilteringService,
                                               ApplicationParams applicationParams,
@@ -395,52 +494,6 @@ class DefaultCaseDataAccessControlTest {
     }
 
     @Test
-    void testGenerateAccessMetadataReturnsAccessProcessValueOfNone() {
-        Map<String, String> roleAndGrantType = Maps.newHashMap();
-        roleAndGrantType.put(ROLE_NAME_1, GrantType.STANDARD.name());
-        roleAndGrantType.put(ROLE_NAME_2, BASIC.name());
-
-        CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, false);
-
-        assertEquals(AccessProcess.NONE.name(), caseAccessMetadata.getAccessProcessString());
-        assertEquals(String.join(",", BASIC.name(), GrantType.STANDARD.name()),
-            caseAccessMetadata.getAccessGrantsString());
-    }
-
-    @Test
-    void testGenerateAccessMetadataReturnsAccessProcessValueOfSpecific() {
-        Map<String, String> roleAndGrantType = Maps.newHashMap();
-        roleAndGrantType.put(ROLE_NAME_2, BASIC.name());
-
-        CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, false);
-
-        assertEquals(AccessProcess.SPECIFIC.name(), caseAccessMetadata.getAccessProcessString());
-        assertEquals(BASIC.name(), caseAccessMetadata.getAccessGrantsString());
-    }
-
-    @Test
-    void testGenerateAccessMetadataWithPseudoRoleAssignmentsGeneration() {
-        Map<String, String> roleAndGrantType = Maps.newHashMap();
-        roleAndGrantType.put(ROLE_NAME_2, BASIC.name());
-
-        RoleAssignment roleAssignment1 = builder().grantType(CHALLENGED.name()).build();
-        RoleAssignment roleAssignment2 = builder().grantType(GrantType.STANDARD.name()).build();
-
-        List<RoleAssignment> roleAssignments = new ArrayList<>();
-        roleAssignments.add(roleAssignment1);
-        roleAssignments.add(roleAssignment2);
-
-        doReturn(roleAssignments)
-            .when(pseudoRoleAssignmentsGenerator).createPseudoRoleAssignments(anyList(), eq(false));
-
-        CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, true);
-
-        assertEquals(AccessProcess.NONE.name(), caseAccessMetadata.getAccessProcessString());
-        assertEquals(String.join(",", BASIC.name(), CHALLENGED.name(), STANDARD.name()),
-            caseAccessMetadata.getAccessGrantsString());
-    }
-
-    @Test
     void testAnyRoleEqualsToWhenPassedUserRoleNotExistsInRoleAssignments() {
         CaseTypeDefinition caseTypeDefinition =  createCaseTypeDefinition(ROLE_NAME_1);
 
@@ -521,6 +574,60 @@ class DefaultCaseDataAccessControlTest {
         anyRoleEquals = defaultCaseDataAccessControl.anyAccessProfileEqualsTo(CASE_TYPE_1,
             AccessControl.IDAM_PREFIX + ROLE_NAME_2);
         assertEquals(true, anyRoleEquals);
+    }
+
+    @Test
+    void testGenerateAccessMetadataWithNoCaseId() {
+        CaseAccessMetadata caseAccessMetadata = defaultCaseDataAccessControl.generateAccessMetadataWithNoCaseId();
+
+        assertEquals(AccessProcess.NONE.name(), caseAccessMetadata.getAccessProcessString());
+        assertEquals(STANDARD.name(), caseAccessMetadata.getAccessGrantsString());
+    }
+
+    @Test
+    void testGenerateAccessMetadataReturnsAccessProcessValueOfNone() {
+        Map<String, String> roleAndGrantType = Maps.newHashMap();
+        roleAndGrantType.put(ROLE_NAME_1, GrantType.STANDARD.name());
+        roleAndGrantType.put(ROLE_NAME_2, BASIC.name());
+
+        CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, false);
+
+        assertEquals(AccessProcess.NONE.name(), caseAccessMetadata.getAccessProcessString());
+        assertEquals(String.join(",", BASIC.name(), GrantType.STANDARD.name()),
+            caseAccessMetadata.getAccessGrantsString());
+    }
+
+    @Test
+    void testGenerateAccessMetadataReturnsAccessProcessValueOfSpecific() {
+        Map<String, String> roleAndGrantType = Maps.newHashMap();
+        roleAndGrantType.put(ROLE_NAME_2, BASIC.name());
+
+        CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, false);
+
+        assertEquals(AccessProcess.SPECIFIC.name(), caseAccessMetadata.getAccessProcessString());
+        assertEquals(BASIC.name(), caseAccessMetadata.getAccessGrantsString());
+    }
+
+    @Test
+    void testGenerateAccessMetadataWithPseudoRoleAssignmentsGeneration() {
+        Map<String, String> roleAndGrantType = Maps.newHashMap();
+        roleAndGrantType.put(ROLE_NAME_2, BASIC.name());
+
+        RoleAssignment roleAssignment1 = builder().grantType(CHALLENGED.name()).build();
+        RoleAssignment roleAssignment2 = builder().grantType(GrantType.STANDARD.name()).build();
+
+        List<RoleAssignment> roleAssignments = new ArrayList<>();
+        roleAssignments.add(roleAssignment1);
+        roleAssignments.add(roleAssignment2);
+
+        doReturn(roleAssignments)
+            .when(pseudoRoleAssignmentsGenerator).createPseudoRoleAssignments(anyList(), eq(false));
+
+        CaseAccessMetadata caseAccessMetadata = getCaseAccessMetadata(roleAndGrantType, true);
+
+        assertEquals(AccessProcess.NONE.name(), caseAccessMetadata.getAccessProcessString());
+        assertEquals(String.join(",", BASIC.name(), CHALLENGED.name(), STANDARD.name()),
+            caseAccessMetadata.getAccessGrantsString());
     }
 
     @Test

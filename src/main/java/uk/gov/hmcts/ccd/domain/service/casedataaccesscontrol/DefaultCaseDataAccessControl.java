@@ -122,7 +122,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         // R.A uses external micro-services which referer cases by caseReference
         // Non R.A uses internal case id. Both cases should be contemplated in the code.
         if (caseDetails.isEmpty()) {
-            caseDetails = caseDetailsRepository.findById(null,Long.parseLong(caseReference));
+            caseDetails = caseDetailsRepository.findById(null, Long.parseLong(caseReference));
             if (caseDetails.isEmpty()) {
                 return Sets.newHashSet();
             }
