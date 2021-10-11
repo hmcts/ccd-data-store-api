@@ -1,9 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -11,6 +7,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -38,7 +40,7 @@ class AttributeBasedAccessControlServiceTest {
     }
 
     @Test
-    void shouldReturnFalseWhenHAccessProfilesAreReadOnlyAndPredicateIsDelete() {
+    void shouldReturnFalseWhenAccessProfilesAreReadOnlyAndPredicateIsDelete() {
         Set<AccessProfile> accessProfiles = createAccessProfiles(true, ACCESS_PROFILE_1);
         List<AccessControlList> accessControlLists = createAccessControlList(ACCESS_PROFILE_1);
         boolean hasAccess = attributeBasedAccessControlService
@@ -48,7 +50,16 @@ class AttributeBasedAccessControlServiceTest {
     }
 
     @Test
-    void shouldReturnTrueeWhenHAccessProfilesAreReadOnlyAndPredicateIsRead() {
+    void shouldReturnFalseWhenAccessProfilesAreReadOnlyAndPredicateIsDeleteAndAclsEmpty() {
+        Set<AccessProfile> accessProfiles = createAccessProfiles(true, ACCESS_PROFILE_1);
+        boolean hasAccess = attributeBasedAccessControlService
+            .hasAccessControlList(accessProfiles, CAN_DELETE, Collections.emptyList());
+
+        assertFalse(hasAccess);
+    }
+
+    @Test
+    void shouldReturnTrueeWhenAccessProfilesAreReadOnlyAndPredicateIsRead() {
         Set<AccessProfile> accessProfiles = createAccessProfiles(true, ACCESS_PROFILE_1);
         List<AccessControlList> accessControlLists = createAccessControlList(ACCESS_PROFILE_1);
         boolean hasAccess = attributeBasedAccessControlService
@@ -58,7 +69,7 @@ class AttributeBasedAccessControlServiceTest {
     }
 
     @Test
-    void shouldReturnFalseWhenHAccessProfilesAreReadOnlyAndPredicateIsUpdate() {
+    void shouldReturnFalseWhenAccessProfilesAreReadOnlyAndPredicateIsUpdate() {
         Set<AccessProfile> accessProfiles = createAccessProfiles(true, ACCESS_PROFILE_1);
         List<AccessControlList> accessControlLists = createAccessControlList(ACCESS_PROFILE_1);
         boolean hasAccess = attributeBasedAccessControlService
@@ -68,7 +79,7 @@ class AttributeBasedAccessControlServiceTest {
     }
 
     @Test
-    void shouldReturnFalseWhenHAccessProfilesAreReadOnlyAndPredicateIsCreate() {
+    void shouldReturnFalseWhenAccessProfilesAreReadOnlyAndPredicateIsCreate() {
         Set<AccessProfile> accessProfiles = createAccessProfiles(true, ACCESS_PROFILE_1);
         List<AccessControlList> accessControlLists = createAccessControlList(ACCESS_PROFILE_1);
         boolean hasAccess = attributeBasedAccessControlService
@@ -78,7 +89,7 @@ class AttributeBasedAccessControlServiceTest {
     }
 
     @Test
-    void shouldReturnTrueWhenHAccessProfilesAreNotReadOnlyAndPredicateIsCreate() {
+    void shouldReturnTrueWhenAccessProfilesAreNotReadOnlyAndPredicateIsCreate() {
         Set<AccessProfile> accessProfiles = createAccessProfiles(false,
             ACCESS_PROFILE_1,
             ACCESS_PROFILE_2,
