@@ -29,12 +29,11 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.GET_ROLE_ASSIGNMENTS_PREFIX;
-import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleAssignmentJson;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.organisationalRoleAssignmentJson;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleAssignmentResponseJson;
 
 public class UIUserProfileControllerIT extends WireMockBaseTest {
 
-    private static final String ASSIGNMENT_1 = "assignment1";
     private static final String CASE_ID_1 = "1504259907353552";
     private static final String CASE_TYPE = "GrantOfRepresentation";
     private static final String JURISDICTION = "PROBATE";
@@ -61,8 +60,9 @@ public class UIUserProfileControllerIT extends WireMockBaseTest {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
             String userId = "123";
             String roleAssignmentResponseJson = roleAssignmentResponseJson(
-                roleAssignmentJson("idam:" + CASE_ROLE_1, JURISDICTION, CASE_TYPE, CASE_ID_1),
-                roleAssignmentJson("idam:" + "caseworker-probate-solicitor", JURISDICTION, CASE_TYPE, CASE_ID_1)
+                organisationalRoleAssignmentJson(CASE_ROLE_1, JURISDICTION, CASE_TYPE, CASE_ID_1),
+                organisationalRoleAssignmentJson("idam:" + "caseworker-probate-solicitor", JURISDICTION,
+                    CASE_TYPE, CASE_ID_1)
             );
 
             stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + userId))
@@ -87,9 +87,8 @@ public class UIUserProfileControllerIT extends WireMockBaseTest {
             () -> assertThat(response.getUserProfile().getUser().getIdamProperties().getEmail(),
                 is("Cloud.Strife@test.com")),
             () -> assertThat(jurisdictions.length, is(4)),
-            () -> assertThat(jurisdiction.get().getCaseTypeDefinitions().size(),
-                is(1)),
-            () -> assertThat(jurisdiction.get().getCaseTypeDefinitions()
+            () -> assertThat(jurisdiction.get().getCaseTypeDefinitions().size(), is(1)),
+            () -> assertThat("Should have 3 states", jurisdiction.get().getCaseTypeDefinitions()
                 .get(0).getStates().size(), is(3)),
             () -> assertThat(response.getUserProfile().getDefaultSettings().getWorkbasketDefault().getStateId(),
                 is("CaseCreated")),

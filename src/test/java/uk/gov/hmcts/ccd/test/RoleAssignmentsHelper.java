@@ -64,6 +64,30 @@ public class RoleAssignmentsHelper {
                + "        }";
     }
 
+    public static String organisationalRoleAssignmentJson(String roleName, String jurisdiction, String caseType,
+                                                          String caseId) {
+        return "        {"
+               + "          \"id\": \"e6fc5ebb-63e3-4613-9cfc-b3f9b1559571\","
+               + "          \"actorIdType\": \"IDAM\","
+               + "          \"actorId\": \"123\","
+               + "          \"roleType\": \"ORGANISATION\","
+               + "          \"roleName\": \"" + roleName + "\","
+               + "          \"classification\": \"PUBLIC\","
+               + "          \"grantType\": \"STANDARD\","
+               + "          \"roleCategory\": \"JUDICIAL\","
+               + "          \"readOnly\": false,"
+               + "          \"beginTime\": \"2021-02-01T00:00:00Z\","
+               + "          \"endTime\": \"2122-01-01T00:00:00Z\","
+               + "          \"created\": \"2020-12-23T06:37:58.096065Z\","
+               + "          \"attributes\": {"
+               + "            \"jurisdiction\": \"" + jurisdiction + "\","
+               + "            \"caseType\": \"" + caseType + "\","
+               + "            \"caseId\": \"" + caseId + "\""
+               + "          },"
+               + "          \"authorisations\": []"
+               + "        }";
+    }
+
     public static String userRoleAssignmentJson(String actorId, String roleName, String caseId) {
         return userRoleAssignmentJson(actorId, roleName, caseId, Classification.PUBLIC);
     }
@@ -92,7 +116,7 @@ public class RoleAssignmentsHelper {
                + "        }";
     }
 
-    public static String caseTypaRoleAssignmentJson(String actorId, String roleName, String caseId, String jurisdiction,
+    public static String caseTypeRoleAssignmentJson(String actorId, String roleName, String caseId, String jurisdiction,
                                                     String caseType, Classification classification,
                                                     GrantType grantType) {
         return "        {"
@@ -119,38 +143,38 @@ public class RoleAssignmentsHelper {
 
     public static String restrictedSecurityCTSpecificPublicUserRoleAssignmentJson(String actorId, String roleName,
                                                                                   String caseId) {
-        return caseTypaRoleAssignmentJson(actorId, roleName, caseId, "AUTOTEST1", "RESTRICTED_SECURITY",
+        return caseTypeRoleAssignmentJson(actorId, roleName, caseId, "AUTOTEST1", "RESTRICTED_SECURITY",
             Classification.PUBLIC, GrantType.SPECIFIC);
     }
 
     public static String mapperCTSpecificPublicUserRoleAssignmentJson(String actorId, String roleName, String caseId) {
-        return caseTypaRoleAssignmentJson(actorId, roleName, caseId, "AUTOTEST2", "MAPPER",
+        return caseTypeRoleAssignmentJson(actorId, roleName, caseId, "AUTOTEST2", "MAPPER",
             Classification.PUBLIC, GrantType.SPECIFIC);
     }
 
     public static String aatCTSpecificPublicUserRoleAssignmentJson(String actorId, String roleName, String caseId) {
-        return caseTypaRoleAssignmentJson(actorId, roleName, caseId, "AUTOTEST1", "AAT",
+        return caseTypeRoleAssignmentJson(actorId, roleName, caseId, "AUTOTEST1", "AAT",
             Classification.PUBLIC, GrantType.SPECIFIC);
     }
 
     public static String securityCTSpecificPublicUserRoleAssignmentJson(String actorId,
                                                                         String roleName,
                                                                         String caseId) {
-        return caseTypaRoleAssignmentJson(actorId, roleName, caseId, "AUTOTEST1", "SECURITY",
+        return caseTypeRoleAssignmentJson(actorId, roleName, caseId, "AUTOTEST1", "SECURITY",
             Classification.PUBLIC, GrantType.SPECIFIC);
     }
 
     public static String securityCTSpecificRestrictedUserRoleAssignmentJson(String actorId,
                                                                             String roleName,
                                                                             String caseId) {
-        return caseTypaRoleAssignmentJson(actorId, roleName, caseId, "AUTOTEST1", "SECURITY",
+        return caseTypeRoleAssignmentJson(actorId, roleName, caseId, "AUTOTEST1", "SECURITY",
             Classification.RESTRICTED, GrantType.SPECIFIC);
     }
 
     public static String securityCTSpecificPrivateUserRoleAssignmentJson(String actorId,
                                                                          String roleName,
                                                                          String caseId) {
-        return caseTypaRoleAssignmentJson(actorId, roleName, caseId, "AUTOTEST1", "SECURITY",
+        return caseTypeRoleAssignmentJson(actorId, roleName, caseId, "AUTOTEST1", "SECURITY",
             Classification.PRIVATE, GrantType.SPECIFIC);
     }
 
