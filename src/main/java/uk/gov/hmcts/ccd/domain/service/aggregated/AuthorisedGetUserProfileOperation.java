@@ -44,11 +44,14 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
     }
 
     private UserProfile filterCaseTypes(UserProfile userProfile, Predicate<AccessControlList> access) {
-        log.info("Filtering case types for user '{}' with roles '{}' from original jurisdictions '{}'",
-            userProfile.getUser().getIdamProperties().getEmail(),
-            userProfile.getUser().getIdamProperties().getRoles(),
-            Arrays.stream(userProfile.getJurisdictions()).map(JurisdictionDisplayProperties::getId)
-                .collect(Collectors.toList()));
+        if (userProfile.getUser() != null && userProfile.getUser().getIdamProperties() != null) {
+            log.info("Filtering case types for user '{}' with roles '{}' from original jurisdictions '{}'",
+                userProfile.getUser().getIdamProperties().getEmail(),
+                userProfile.getUser().getIdamProperties().getRoles(),
+                Arrays.stream(userProfile.getJurisdictions()).map(JurisdictionDisplayProperties::getId)
+                    .collect(Collectors.toList()));
+        }
+
         Arrays.stream(userProfile.getJurisdictions()).forEach(
             jurisdiction -> jurisdiction.setCaseTypeDefinitions(
                 jurisdiction.getCaseTypeDefinitions()
