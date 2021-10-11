@@ -25,12 +25,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.lessThan;
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CallbackResponseBuilder.aCallbackResponse;
@@ -91,8 +88,8 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
         verify(exactly(3), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
     }
 
-        @Test
-        public void shouldNotRetryWhenCallbackRetriesDisabled() throws Exception {
+    @Test
+    public void shouldNotRetryWhenCallbackRetriesDisabled() throws Exception {
 
         stubFor(post(urlMatching("/test-callbackGrrrr.*"))
             .inScenario("CallbackRetry")
