@@ -102,6 +102,19 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments, caseTypeDefinition, isCreationProfile));
     }
 
+    // use for ES searchCases - we don't want to fetch the case, because it should be taken from the ES
+    @Override
+    public Set<AccessProfile> generateAccessProfilesByCaseDetails(CaseDetails caseDetails) {
+        RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
+
+        FilteredRoleAssignments filteredRoleAssignments =
+            roleAssignmentsFilteringService.filter(roleAssignments, caseDetails);
+
+        CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
+
+        return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments.getFilteredMatchingRoleAssignments(),
+            caseTypeDefinition, false));
+    }
 
     @Override
     public Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference) {

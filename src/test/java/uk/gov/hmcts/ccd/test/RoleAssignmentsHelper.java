@@ -92,8 +92,9 @@ public class RoleAssignmentsHelper {
                + "        }";
     }
 
-    public static String securityCTUserRoleAssignmentJson(String actorId, String roleName, String caseId,
-                                                          Classification classification, GrantType grantType) {
+    public static String caseTypaRoleAssignmentJson(String actorId, String roleName, String caseId, String jurisdiction,
+                                                    String caseType, Classification classification,
+                                                    GrantType grantType) {
         return "        {"
                + "          \"id\": \"e6fc5ebb-63e3-4613-9cfc-b3f9b1559571\","
                + "          \"actorIdType\": \"IDAM\","
@@ -108,31 +109,49 @@ public class RoleAssignmentsHelper {
                + "          \"endTime\": \"2122-01-01T00:00:00Z\","
                + "          \"created\": \"2020-12-23T06:37:58.096065Z\","
                + "          \"attributes\": {"
-               + "            \"jurisdiction\": \"AUTOTEST1\","
-               + "            \"caseType\": \"SECURITY\","
+               + "            \"jurisdiction\": \"" + jurisdiction + "\","
+               + "            \"caseType\": \"" + caseType + "\","
                + "            \"caseId\": \"" + caseId + "\""
                + "          },"
                + "          \"authorisations\": []"
                + "        }";
     }
 
+    public static String restrictedSecurityCTSpecificPublicUserRoleAssignmentJson(String actorId, String roleName,
+                                                                                  String caseId) {
+        return caseTypaRoleAssignmentJson(actorId, roleName, caseId, "AUTOTEST1", "RESTRICTED_SECURITY",
+            Classification.PUBLIC, GrantType.SPECIFIC);
+    }
+
+    public static String mapperCTSpecificPublicUserRoleAssignmentJson(String actorId, String roleName, String caseId) {
+        return caseTypaRoleAssignmentJson(actorId, roleName, caseId, "AUTOTEST2", "MAPPER",
+            Classification.PUBLIC, GrantType.SPECIFIC);
+    }
+
+    public static String aatCTSpecificPublicUserRoleAssignmentJson(String actorId, String roleName, String caseId) {
+        return caseTypaRoleAssignmentJson(actorId, roleName, caseId, "AUTOTEST1", "AAT",
+            Classification.PUBLIC, GrantType.SPECIFIC);
+    }
+
     public static String securityCTSpecificPublicUserRoleAssignmentJson(String actorId,
                                                                         String roleName,
                                                                         String caseId) {
-        return securityCTUserRoleAssignmentJson(actorId, roleName, caseId, Classification.PUBLIC, GrantType.SPECIFIC);
+        return caseTypaRoleAssignmentJson(actorId, roleName, caseId, "AUTOTEST1", "SECURITY",
+            Classification.PUBLIC, GrantType.SPECIFIC);
     }
 
     public static String securityCTSpecificRestrictedUserRoleAssignmentJson(String actorId,
                                                                             String roleName,
                                                                             String caseId) {
-        return securityCTUserRoleAssignmentJson(actorId, roleName, caseId, Classification.RESTRICTED,
-            GrantType.SPECIFIC);
+        return caseTypaRoleAssignmentJson(actorId, roleName, caseId, "AUTOTEST1", "SECURITY",
+            Classification.RESTRICTED, GrantType.SPECIFIC);
     }
 
     public static String securityCTSpecificPrivateUserRoleAssignmentJson(String actorId,
                                                                          String roleName,
                                                                          String caseId) {
-        return securityCTUserRoleAssignmentJson(actorId, roleName, caseId, Classification.PRIVATE, GrantType.SPECIFIC);
+        return caseTypaRoleAssignmentJson(actorId, roleName, caseId, "AUTOTEST1", "SECURITY",
+            Classification.PRIVATE, GrantType.SPECIFIC);
     }
 
     public static RoleAssignmentRequestResponse createRoleAssignmentRequestResponse(
