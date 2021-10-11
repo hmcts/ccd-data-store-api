@@ -179,8 +179,9 @@ public class DefaultUserRepository implements UserRepository {
     @Override
     public List<String> getCaseworkerUserRolesJurisdictions() {
         String[] roles = this.getUserDetails().getRoles();
+        LOG.info("User '{}' has IDAM roles '{}'", getUser().getEmail(), Arrays.toString(roles));
 
-        return Arrays.stream(roles)
+        List<String> result = Arrays.stream(roles)
             .filter(this::isCaseworkerRole)
             .filter(not(this::isCrossJurisdictionRole))
             .map(this::extractJurisdiction)
@@ -188,6 +189,9 @@ public class DefaultUserRepository implements UserRepository {
             .map(Optional::get)
             .distinct()
             .collect(Collectors.toList());
+
+        LOG.info("Result of getCaseworkerUserRolesJurisdictions():: '{}'", result);
+        return result;
     }
 
     @Override

@@ -1,9 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.google.common.collect.Sets;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
 import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Qualifier(AuthorisedGetUserProfileOperation.QUALIFIER)
+@Slf4j
 public class AuthorisedGetUserProfileOperation implements GetUserProfileOperation {
     public static final String QUALIFIER = "authorised";
 
@@ -41,6 +44,11 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
     }
 
     private UserProfile filterCaseTypes(UserProfile userProfile, Predicate<AccessControlList> access) {
+        log.info("Filtering case types for user '{}' with roles '{}' from original jurisdictions '{}'",
+            userProfile.getUser().getIdamProperties().getEmail(),
+            userProfile.getUser().getIdamProperties().getRoles(),
+            Arrays.stream(userProfile.getJurisdictions()).map(JurisdictionDisplayProperties::getId)
+                .collect(Collectors.toList()));
         Arrays.stream(userProfile.getJurisdictions()).forEach(
             jurisdiction -> jurisdiction.setCaseTypeDefinitions(
                 jurisdiction.getCaseTypeDefinitions()
@@ -61,6 +69,7 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
     private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition,
                                                       Set<AccessProfile> accessProfiles,
                                                       Predicate<AccessControlList> access) {
+
         if (caseTypeDefinition == null || CollectionUtils.isEmpty(accessProfiles)
             || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, access)) {
             return Optional.empty();
