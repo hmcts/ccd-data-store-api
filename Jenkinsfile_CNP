@@ -59,7 +59,9 @@ def secrets = [
 
         secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_OAUTH2_CLIENT_SECRET'),
         secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
-        secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD')
+        secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD'),
+
+	secret('microservicekey-ccd-data', 'ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_KEY'),
     ],
     's2s-${env}': [
         secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
@@ -91,6 +93,15 @@ env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
 env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
 env.MAX_NUM_PARALLEL_THREADS=6
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
+
+
+//RA Data Setup
+env.ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_ID = "ccd_data"
+env.ROLE_ASSIGNMENT_HOST="http://am-role-assignment-service-demo.service.core-compute-demo.internal"
+env.ROLE_ASSIGNMENT_USER_EMAIL="ccd.ac.solicitor1@gmail.com"
+env.ROLE_ASSIGNMENT_USER_PASSWORD="Pa55word11"
+env.ROLE_ASSIGNMENT_SOLICITOR_USER="ccd.ac.solicitor1@gmail.com"
+env.ROLE_ASSIGNMENT_SOLICITOR_USER_PWD="Pa55word11"
 
 withPipeline(type, product, component) {
     onMaster {
