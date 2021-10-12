@@ -1,12 +1,12 @@
 {
-  "_guid_": "F-1005-CreateEventTokenErrorResponse",
+  "_guid_": "F-1005-RetrieveTriggerErrorResponse",
   "title": "should return bad request error when about to start callback has modified TTL",
 
   "productName": "CCD Data Store",
-  "operationName": "Start event creation process to update a case",
+  "operationName": "Retrieve an update event trigger for case",
 
   "method": "GET",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+  "uri": "/cases/{caseId}/event-triggers/{triggerId}",
 
   "specs": [
     "to get an update event token for the case just created"
@@ -19,12 +19,13 @@
   },
 
   "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "experimental": "true"
+    },
     "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_MASTER",
-      "ctid": "FT_MasterCaseType",
-      "cid": "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
-      "etid": "OVERRIDE"
+      "caseId": "OVERRIDE",
+      "triggerId": "OVERRIDE"
     }
   },
   "expectedResponse": {
