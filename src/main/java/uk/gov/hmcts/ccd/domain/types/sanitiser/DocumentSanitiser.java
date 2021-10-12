@@ -44,6 +44,11 @@ public class DocumentSanitiser implements Sanitiser {
     public JsonNode sanitise(FieldTypeDefinition fieldTypeDefinition, JsonNode fieldData) {
         final ObjectNode sanitisedData = JSON_NODE_FACTORY.objectNode();
 
+        // TODO: remove this log later
+        if (fieldData.has(DOCUMENT_BINARY_URL)
+            && fieldData.has(DOCUMENT_FILENAME) && !fieldData.has(DOCUMENT_URL)) {
+            LOG.info("Document submitted without document_url");
+        }
         if ((fieldData.has(DOCUMENT_BINARY_URL)
             && fieldData.has(DOCUMENT_FILENAME))
             || fieldData.isNull()) {
