@@ -13,6 +13,7 @@ public class SearchParty implements Serializable {
 
     private String caseTypeId;
     private String searchPartyDob;
+    private String searchPartyDod;
     private String searchPartyPostCode;
     private String searchPartyAddressLine1;
     private String searchPartyEmailAddress;

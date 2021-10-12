@@ -28,12 +28,15 @@ public class SearchPartyValue {
 
     private String dateOfBirth;
 
+    private String dateOfDeath;
+
     @JsonIgnore
     public boolean isEmpty() {
         return StringUtils.isEmpty(name)
                 && StringUtils.isEmpty(emailAddress)
                 && StringUtils.isEmpty(addressLine1)
                 && StringUtils.isEmpty(postCode)
-                && StringUtils.isEmpty(dateOfBirth);
+                && StringUtils.isEmpty(dateOfBirth)
+                && StringUtils.isEmpty(dateOfDeath);
     }
 }

@@ -32,6 +32,7 @@ import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -139,6 +140,22 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    public void shouldReturn200WhenEmptyFieldsHaveDefaultValues() throws Exception {
+
+        GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
+        SearchCriteria searchCriteria = new SearchCriteria();
+        searchCriteria.setCaseManagementBaseLocationIds(validFields);
+        searchCriteria.setCaseManagementRegionIds(validFields);
+        payload.setSearchCriteria(searchCriteria);
+
+        mockMvc.perform(post(GLOBAL_SEARCH_PATH)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(payload)))
+            .andExpect(status().is(200))
+            .andReturn();
+    }
+
+    @Test
     public void shouldThrowValidationErrorsWhenDataInvalid() throws Exception {
 
         GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
@@ -152,10 +169,9 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
         searchCriteria.setStateIds(invalidFields);
         Party party = new Party();
         party.setAddressLine1("address");
-        Party secondParty = new Party();
-        secondParty.setAddressLine1("address");
-        secondParty.setDateOfBirth("1999-13-01");
-        List<Party> list = List.of(party, secondParty);
+        party.setDateOfBirth("1999-13-01");
+        party.setDateOfDeath("2026-12-32");
+        List<Party> list = List.of(party);
         searchCriteria.setParties(list);
         payload.setSearchCriteria(searchCriteria);
 
@@ -164,7 +180,7 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
             .content(mapper.writeValueAsBytes(payload)))
             .andExpect(status().is(400))
             .andExpect(jsonPath(MESSAGE_FIELD, is(ValidationError.ARGUMENT_INVALID)))
-            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.PARTIES_INVALID)))
+            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.DATE_OF_DEATH_INVALID)))
             .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.SORT_BY_INVALID)))
             .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.SORT_DIRECTION_INVALID)))
             .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.MAX_RECORD_COUNT_INVALID)))
@@ -178,7 +194,7 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldThrowValidationErrorsWhenDataNull() throws Exception {
+    public void shouldThrowValidationErrorsWhenSearchCriteriaNull() throws Exception {
 
         GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
         payload.setMaxReturnRecordCount(10);
@@ -234,13 +250,57 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    public void shouldReturn200WhenEmptyFieldsHaveDefaultValues() throws Exception {
+    public void shouldThrowValidationErrorsWhenSearchCriteriaEmpty() throws Exception {
 
         GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
-        SearchCriteria searchCriteria = new SearchCriteria();
-        searchCriteria.setCaseManagementBaseLocationIds(validFields);
-        searchCriteria.setCaseManagementRegionIds(validFields);
-        payload.setSearchCriteria(searchCriteria);
+        payload.setMaxReturnRecordCount(10);
+        payload.setStartRecordNumber(2);
+        payload.setSortCriteria(validSortCriteria);
+        payload.setSearchCriteria(new SearchCriteria());
+
+        mockMvc.perform(post(GLOBAL_SEARCH_PATH)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(payload)))
+            .andExpect(status().is(400))
+            .andExpect(jsonPath(MESSAGE_FIELD, is(ValidationError.ARGUMENT_INVALID)))
+            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.SEARCH_CRITERIA_MISSING)))
+            .andReturn();
+    }
+
+    @Test
+    public void shouldThrowValidationErrorsWhenSearchCriteriaPartiesIsEmpty() throws Exception {
+
+        GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
+        SearchCriteria criteria = new SearchCriteria();
+        List<Party> partyList = new ArrayList<>();
+        partyList.add(new Party());
+        criteria.setParties(partyList);
+        payload.setSearchCriteria(new SearchCriteria());
+
+        mockMvc.perform(post(GLOBAL_SEARCH_PATH)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(payload)))
+            .andExpect(status().is(400))
+            .andExpect(jsonPath(MESSAGE_FIELD, is(ValidationError.ARGUMENT_INVALID)))
+            .andExpect(jsonPath(DETAILS_FIELD, hasItem(ValidationError.SEARCH_CRITERIA_MISSING)))
+            .andReturn();
+    }
+
+    @Test
+    public void shouldReturn200WhenOneValidFieldInSearchCriteria() throws Exception {
+
+        SearchCriteria criteria = new SearchCriteria();
+        criteria.setCcdCaseTypeIds(null);
+        List<String> emptyList = new ArrayList<>();
+        criteria.setCcdJurisdictionIds(emptyList);
+        List<Party> partyList = new ArrayList<>();
+        partyList.add(new Party());
+        Party validParty = new Party();
+        validParty.setPartyName("name");
+        partyList.add(validParty);
+        criteria.setParties(partyList);
+        GlobalSearchRequestPayload payload = new GlobalSearchRequestPayload();
+        payload.setSearchCriteria(criteria);
 
         mockMvc.perform(post(GLOBAL_SEARCH_PATH)
             .contentType(JSON_CONTENT_TYPE)

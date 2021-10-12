@@ -69,7 +69,7 @@ public class GlobalSearchEndpoint {
         @ApiResponse(
             code = 400,
             message = "One or more of the following reasons:"
-                + "\n1) " + ValidationError.PARTIES_INVALID
+                + "\n1) " + ValidationError.DATE_OF_DEATH_INVALID
                 + "\n2) " + ValidationError.SORT_BY_INVALID
                 + "\n3) " + ValidationError.SORT_DIRECTION_INVALID
                 + "\n4) " + ValidationError.MAX_RECORD_COUNT_INVALID

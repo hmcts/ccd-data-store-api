@@ -144,6 +144,7 @@ public class GlobalSearchProcessorService {
         searchPartyValue.setEmailAddress(findValueInMap(searchPartyDefinition.getSearchPartyEmailAddress(), data));
         searchPartyValue.setPostCode(findValueInMap(searchPartyDefinition.getSearchPartyPostCode(), data));
         searchPartyValue.setDateOfBirth(findValueInMap(searchPartyDefinition.getSearchPartyDob(), data));
+        searchPartyValue.setDateOfDeath(findValueInMap(searchPartyDefinition.getSearchPartyDod(), data));
 
         return searchPartyValue;
     }
