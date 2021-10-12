@@ -135,6 +135,12 @@ public class ApplicationParams {
     @Value("${search.elastic.nodes.discovery.filter}")
     private String elasticsearchNodeDiscoveryFilter;
 
+    @Value("${search.global.index.name}")
+    private String globalSearchIndexName;
+
+    @Value("${search.global.index.type}")
+    private String globalSearchIndexType;
+
     @Value("#{'${audit.log.ignore.statues}'.split(',')}")
     private List<Integer> auditLogIgnoreStatuses;
 
@@ -371,6 +377,14 @@ public class ApplicationParams {
 
     public String getElasticsearchNodeDiscoveryFilter() {
         return elasticsearchNodeDiscoveryFilter;
+    }
+
+    public String getGlobalSearchIndexName() {
+        return globalSearchIndexName;
+    }
+
+    public String getGlobalSearchIndexType() {
+        return globalSearchIndexType;
     }
 
     public List<String> getWriteToCCDCaseTypesOnly() {

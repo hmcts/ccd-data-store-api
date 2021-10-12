@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.service.globalsearch;
+package uk.gov.hmcts.ccd.domain.service.search.global;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeAll;
@@ -12,12 +12,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.dto.globalsearch.GlobalSearchResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.refdata.LocationLookup;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceLookup;
+import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
 import uk.gov.hmcts.ccd.domain.service.aggregated.CaseDetailsUtil;
 
 import java.util.Map;
@@ -28,13 +28,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
-class SearchResponseTransformerTest extends TestFixtures {
+class GlobalSearchResponseTransformerTest extends TestFixtures {
 
     @Mock
     private CachedCaseDefinitionRepository caseDefinitionRepository;
 
     @InjectMocks
-    private SearchResponseTransformer underTest;
+    private GlobalSearchResponseTransformer underTest;
 
     private static Map<String, JsonNode> CASE_DATA;
     private static Map<String, JsonNode> SUPPLEMENTARY_DATA;
@@ -65,7 +65,7 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
@@ -84,7 +84,7 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
@@ -105,7 +105,7 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
@@ -129,7 +129,7 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
@@ -150,7 +150,7 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
@@ -171,7 +171,7 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
@@ -194,7 +194,7 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
@@ -215,7 +215,7 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
@@ -233,13 +233,51 @@ class SearchResponseTransformerTest extends TestFixtures {
             .build();
 
         // WHEN
-        final GlobalSearchResponse.Result actualResult =
+        final GlobalSearchResponsePayload.Result actualResult =
             underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
 
         // THEN
         assertThat(actualResult)
             .isNotNull()
             .satisfies(result -> assertThat(result.getOtherReferences()).containsExactlyInAnyOrder("Ref1", "Ref2"));
+    }
+
+    @Test
+    void testShouldHandleNullCaseDataGracefully() {
+        // GIVEN
+        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withData(null) // i.e. when no GlobalSearch fields present in case data
+            .withReference(REFERENCE)
+            .withSupplementaryData(emptyMap())
+            .build();
+
+        // WHEN
+        final GlobalSearchResponsePayload.Result actualResult =
+            underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+
+        // THEN
+        assertThat(actualResult)
+            .isNotNull()
+            .satisfies(result -> assertThat(result.getCaseReference()).isEqualTo(REFERENCE.toString()));
+    }
+
+    @Test
+    void testShouldHandleNullSupplementaryDataGracefully() {
+        // GIVEN
+        final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
+            .withData(CASE_DATA)
+            .withReference(REFERENCE)
+            .withSupplementaryData(emptyMap()) // i.e. when no GlobalSearch fields present in SupplementaryData
+            .build();
+
+        // WHEN
+        final GlobalSearchResponsePayload.Result actualResult =
+            underTest.transformResult(caseDetails, SERVICE_LOOKUP, LOCATION_LOOKUP);
+
+        // THEN
+        assertThat(actualResult)
+            .isNotNull()
+            .satisfies(result -> assertThat(result.getCaseReference()).isEqualTo(REFERENCE.toString()));
     }
 
     @ParameterizedTest
@@ -249,7 +287,7 @@ class SearchResponseTransformerTest extends TestFixtures {
                                                  final Long totalSearchHits,
                                                  final Integer recordsReturnedCount,
                                                  final Boolean moreToGo) {
-        final GlobalSearchResponse.ResultInfo actualResultInfo = underTest.transformResultInfo(
+        final GlobalSearchResponsePayload.ResultInfo actualResultInfo = underTest.transformResultInfo(
             maxReturnRecordCount,
             startRecordNumber,
             totalSearchHits,
