@@ -12,6 +12,7 @@ import javax.validation.constraints.Size;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -52,7 +53,7 @@ public class SearchCriteria {
                             return true;
                         }
                     }
-                } else if (!fieldListObjects.isEmpty()) {
+                } else if (fieldListObjects.stream().anyMatch(Objects::nonNull)) {
                     nonNullFields.add(field);
                 }
             }
