@@ -233,6 +233,52 @@
           "publish": null,
           "publish_as": null,
           "acls": []
+        },
+        {
+          "_extends_": "CaseViewFieldMetadataTrue",
+          "id" : "[ACCESS_GRANTED]",
+          "label" : "Access Granted",
+          "hidden" : null,
+          "value" : "STANDARD",
+          "hint_text" : null,
+          "field_type": {
+            "_extends_": "BaseTextFieldType"
+          },
+          "validation_expr" : null,
+          "security_label" : "PUBLIC",
+          "order" : null,
+          "formatted_value" : null,
+          "display_context" : null,
+          "display_context_parameter" : null,
+          "show_condition" : null,
+          "show_summary_change_option" : null,
+          "show_summary_content_option" : null,
+          "retain_hidden_value" : null,
+          "publish" : null,
+          "publish_as" : null,
+          "acls" : null
+        }, {
+          "id" : "[ACCESS_PROCESS]",
+          "label" : "Access Process",
+          "hidden" : null,
+          "value" : "NONE",
+          "hint_text" : null,
+          "field_type": {
+            "_extends_": "BaseTextFieldType"
+          },
+          "validation_expr" : null,
+          "security_label" : "PUBLIC",
+          "order" : null,
+          "formatted_value" : null,
+          "display_context" : null,
+          "display_context_parameter" : null,
+          "show_condition" : null,
+          "show_summary_change_option" : null,
+          "show_summary_content_option" : null,
+          "retain_hidden_value" : null,
+          "publish" : null,
+          "publish_as" : null,
+          "acls" : null
         }
       ],
       "state": {
