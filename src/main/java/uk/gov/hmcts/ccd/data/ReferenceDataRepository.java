@@ -23,6 +23,7 @@ import java.util.Optional;
 
 @Named
 @Slf4j
+@SuppressWarnings("squid:S1075") // paths below are not URI path literals
 public class ReferenceDataRepository {
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
