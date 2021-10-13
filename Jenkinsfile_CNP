@@ -61,7 +61,7 @@ def secrets = [
         secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
         secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD')
 
-	
+
     ],
     's2s-${env}': [
         secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
@@ -103,6 +103,13 @@ env.ROLE_ASSIGNMENT_USER_EMAIL="ccd.ac.solicitor1@gmail.com"
 env.ROLE_ASSIGNMENT_USER_PASSWORD="Pa55word11"
 env.ROLE_ASSIGNMENT_SOLICITOR_USER="ccd.ac.solicitor1@gmail.com"
 env.ROLE_ASSIGNMENT_SOLICITOR_USER_PWD="Pa55word11"
+
+env.ROLE_ASSIGNMENT_STAFF1_USER="ccd.ac.staff+1@gmail.com"
+env.ROLE_ASSIGNMENT_STAFF1_USER_PWD="Pa55word11"
+env.ROLE_ASSIGNMENT_STAFF2_USER="ccd.ac.staff+2@gmail.com"
+env.ROLE_ASSIGNMENT_STAFF2_USER_PWD="Pa55word11"
+env.ROLE_ASSIGNMENT_SUPER_USER="ccd.ac.superuser@gmail.com"
+env.ROLE_ASSIGNMENT_SUPER_USER_PWD="Pa55word11"
 
 withPipeline(type, product, component) {
     onMaster {
