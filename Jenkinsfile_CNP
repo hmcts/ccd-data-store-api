@@ -98,7 +98,7 @@ env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 
 //RA Data Setup
 env.ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_ID = "ccd_data"
-env.ROLE_ASSIGNMENT_HOST="https://am-role-assignment-service-pr-1002.service.core-compute-preview.internal"
+env.ROLE_ASSIGNMENT_HOST="https://am-role-assignment-service-pr-929.service.core-compute-preview.internal"
 env.ROLE_ASSIGNMENT_USER_EMAIL="ccd.ac.solicitor1@gmail.com"
 env.ROLE_ASSIGNMENT_USER_PASSWORD="Pa55word11"
 env.ROLE_ASSIGNMENT_SOLICITOR_USER="ccd.ac.solicitor1@gmail.com"
