@@ -2,9 +2,10 @@ package uk.gov.hmcts.ccd.domain.service.casedeletion;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.config.JacksonObjectMapperConfig;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -23,11 +24,12 @@ class TimeToLiveServiceTest {
     private CaseEventDefinition caseEventDefinition;
     private static final Integer TTL_INCREMENT = 10;
     private Map<String, JsonNode> caseData = new HashMap<>();
+    private static final ObjectMapper OBJECT_MAPPER = new JacksonObjectMapperConfig().defaultObjectMapper();
 
     @BeforeEach
     void setUp() throws JsonProcessingException {
-        caseData.put("key", JacksonUtils.MAPPER.readTree("{\"Value\": \"value\"}"));
-        timeToLiveService = new TimeToLiveService();
+        caseData.put("key", OBJECT_MAPPER.readTree("{\"Value\": \"value\"}"));
+        timeToLiveService = new TimeToLiveService(OBJECT_MAPPER);
         caseEventDefinition = new CaseEventDefinition();
     }
 
@@ -44,14 +46,14 @@ class TimeToLiveServiceTest {
     @Test
     void updateCaseDetailsTTLCaseFieldPresentNoTTLIncrementSet() {
         TTL ttl = TTL.builder().systemTTL(LocalDate.now()).build();
-        caseData.put(TTL.TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(ttl));
+        caseData.put(TTL.TTL_CASE_FIELD_ID, OBJECT_MAPPER.valueToTree(ttl));
         assertEquals(caseData, timeToLiveService.updateCaseDetailsWithTTL(caseData, caseEventDefinition));
     }
 
     @Test
     void updateCaseDetailsTTLCaseFieldPresentTTLIncrementSet() {
         TTL ttl = TTL.builder().systemTTL(LocalDate.now()).build();
-        caseData.put(TTL.TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(ttl));
+        caseData.put(TTL.TTL_CASE_FIELD_ID, OBJECT_MAPPER.valueToTree(ttl));
 
         Map<String, JsonNode> expectedCaseData = addDaysToSystemTTL(caseData, TTL_INCREMENT);
 
@@ -75,10 +77,10 @@ class TimeToLiveServiceTest {
     @Test
     void verifyTTLContentNotChangedTTLValuesUnchanged() {
         TTL ttl = TTL.builder().systemTTL(LocalDate.now()).build();
-        caseData.put(TTL.TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(ttl));
+        caseData.put(TTL.TTL_CASE_FIELD_ID, OBJECT_MAPPER.valueToTree(ttl));
 
         Map<String, JsonNode> expectedCaseData = new HashMap<>(caseData);
-        expectedCaseData.put(TTL.TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(ttl));
+        expectedCaseData.put(TTL.TTL_CASE_FIELD_ID, OBJECT_MAPPER.valueToTree(ttl));
 
         timeToLiveService.verifyTTLContentNotChanged(expectedCaseData, caseData);
     }
@@ -86,7 +88,7 @@ class TimeToLiveServiceTest {
     @Test
     void verifyTTLContentNotChangedTTLValuesChanged() {
         TTL ttl = TTL.builder().systemTTL(LocalDate.now()).build();
-        caseData.put(TTL.TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(ttl));
+        caseData.put(TTL.TTL_CASE_FIELD_ID, OBJECT_MAPPER.valueToTree(ttl));
 
         Map<String, JsonNode> expectedCaseData = addDaysToSystemTTL(caseData, TTL_INCREMENT);
 
@@ -102,7 +104,7 @@ class TimeToLiveServiceTest {
         TTL expectedTtl = TTL.builder()
             .systemTTL(LocalDate.now().plusDays(numOfDays))
             .build();
-        clonedData.put(TTL.TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(expectedTtl));
+        clonedData.put(TTL.TTL_CASE_FIELD_ID, OBJECT_MAPPER.valueToTree(expectedTtl));
         return clonedData;
     }
 }

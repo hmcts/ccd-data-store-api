@@ -27,6 +27,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.config.JacksonObjectMapperConfig;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
@@ -3557,8 +3558,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andExpect(status().is(200))
             .andReturn();
 
-        StartEventResult actualStartEventResult = MAPPER.readValue(mvcResult.getResponse().getContentAsString(),
-            StartEventResult.class);
+        StartEventResult actualStartEventResult = new JacksonObjectMapperConfig().defaultObjectMapper()
+            .readValue(mvcResult.getResponse().getContentAsString(), StartEventResult.class);
         CaseDetails caseDetails = actualStartEventResult.getCaseDetails();
         String expectedSystemTTL = LocalDate.now().plusDays(20).toString();
         assertAll(
@@ -3574,18 +3575,20 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" +
             CASE_TYPE_TTL + "/cases/" + reference + "/event-triggers/" + TEST_EVENT_ID + "/token";
 
+        final ObjectMapper objectMapper = new JacksonObjectMapperConfig().defaultObjectMapper();
+
         TTL timeToLive = TTL.builder()
             .systemTTL(LocalDate.now())
             .build();
 
         Map<String, JsonNode> ttl = new HashMap<>();
-        ttl.put(TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(timeToLive));
+        ttl.put(TTL_CASE_FIELD_ID, objectMapper.valueToTree(timeToLive));
 
         Map<String, JsonNode> caseData = new HashMap<>();
-        caseData.put("data", MAPPER.valueToTree(ttl));
+        caseData.put("data", objectMapper.valueToTree(ttl));
 
         stubFor(WireMock.post(urlMatching("/callback_about_to_start_ttl"))
-            .willReturn(okJson(MAPPER.writeValueAsString(caseData))
+            .willReturn(okJson(objectMapper.writeValueAsString(caseData))
                 .withStatus(200)));
 
         mockMvc.perform(get(URL).contentType(JSON_CONTENT_TYPE))
@@ -3600,6 +3603,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     public void shouldReturn200WhenTriggerStartForCaseDetectsAboutToCallStartCallbackHasNotModifiedTTL()
         throws Exception {
 
+        final ObjectMapper objectMapper = new JacksonObjectMapperConfig().defaultObjectMapper();
         final String reference = "9816494993793181";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" +
             CASE_TYPE_TTL + "/cases/" + reference + "/event-triggers/" + TEST_EVENT_ID + "/token";
@@ -3610,13 +3614,13 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .suspended("No").build();
 
         Map<String, JsonNode> ttl = new HashMap<>();
-        ttl.put(TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(timeToLive));
+        ttl.put(TTL_CASE_FIELD_ID, objectMapper.valueToTree(timeToLive));
 
         Map<String, JsonNode> caseData = new HashMap<>();
-        caseData.put("data", MAPPER.valueToTree(ttl));
+        caseData.put("data", objectMapper.valueToTree(ttl));
 
         stubFor(WireMock.post(urlMatching("/callback_about_to_start_ttl"))
-            .willReturn(okJson(MAPPER.writeValueAsString(caseData))
+            .willReturn(okJson(objectMapper.writeValueAsString(caseData))
                 .withStatus(200)));
 
         mockMvc.perform(get(URL).contentType(JSON_CONTENT_TYPE))

@@ -2,9 +2,11 @@ package uk.gov.hmcts.ccd.domain.service.casedeletion;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -22,20 +24,26 @@ public class TimeToLiveService {
     protected static final String TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE =
         "Time to live content has been modified by aboutToStart callback";
 
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    public TimeToLiveService(@Qualifier("DefaultObjectMapper") ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
     public Map<String, JsonNode> updateCaseDetailsWithTTL(Map<String, JsonNode> data,
                                                           CaseEventDefinition caseEventDefinition) {
         Map<String, JsonNode> clonedData = data;
 
         if (clonedData != null) {
-            clonedData = new HashMap<>(data);
             Integer ttlIncrement = caseEventDefinition.getTtlIncrement();
-
-            if (data.get(TTL_CASE_FIELD_ID) != null && (ttlIncrement != null)) {
+            clonedData = new HashMap<>(data);
+            if (clonedData.get(TTL_CASE_FIELD_ID) != null && (ttlIncrement != null)) {
                 try {
-                    TTL timeToLive = getTTLFromJson(data.get(TTL_CASE_FIELD_ID));
+                    TTL timeToLive = getTTLFromJson(clonedData.get(TTL_CASE_FIELD_ID));
                     if (timeToLive != null) {
                         timeToLive.setSystemTTL(LocalDate.now().plusDays(ttlIncrement));
-                        clonedData.put(TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(timeToLive));
+                        clonedData.put(TTL_CASE_FIELD_ID, objectMapper.valueToTree(timeToLive));
                     }
                 } catch (JsonProcessingException e) {
                     log.error("Failed to read TTL from case data");
@@ -53,7 +61,6 @@ public class TimeToLiveService {
                 TTL actualTtl = getTTLFromJson(actual.get(TTL_CASE_FIELD_ID));
 
                 if (expectedTtl != null && !expectedTtl.equals(actualTtl)) {
-                    // TODO - not sure what exception to throw here
                     throw new BadRequestException(TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE);
                 }
             } catch (JsonProcessingException e) {
@@ -64,7 +71,7 @@ public class TimeToLiveService {
 
     private TTL getTTLFromJson(JsonNode ttlJsonNode) throws JsonProcessingException {
         if (ttlJsonNode != null) {
-            return JacksonUtils.MAPPER.readValue(ttlJsonNode.toString(), TTL.class);
+            return objectMapper.readValue(ttlJsonNode.toString(), TTL.class);
         }
         return null;
     }
