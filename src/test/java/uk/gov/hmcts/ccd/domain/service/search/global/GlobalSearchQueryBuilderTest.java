@@ -185,6 +185,7 @@ class GlobalSearchQueryBuilderTest {
             party1.setAddressLine1("addressLine1_1");
             party1.setPostCode("postCode_1");
             party1.setDateOfBirth("2021-02-01");
+            party1.setDateOfDeath("2021-05-06");
 
             Party party2 = new Party();
             party2.setPartyName("partyName_2");
@@ -192,6 +193,7 @@ class GlobalSearchQueryBuilderTest {
             party2.setAddressLine1("addressLine1_2");
             party2.setPostCode("postCode_2");
             party2.setDateOfBirth("2021-03-02");
+            party2.setDateOfDeath("2021-07-08");
 
             SearchCriteria searchCriteria = new SearchCriteria();
             searchCriteria.setParties(List.of(party1, party2));
@@ -275,6 +277,7 @@ class GlobalSearchQueryBuilderTest {
             partyEmptyProperties.setAddressLine1("");
             partyEmptyProperties.setPostCode("");
             partyEmptyProperties.setDateOfBirth("");
+            partyEmptyProperties.setDateOfDeath("");
 
             Party partyNullProperties = new Party();
             partyNullProperties.setPartyName(null);
@@ -282,6 +285,7 @@ class GlobalSearchQueryBuilderTest {
             partyNullProperties.setAddressLine1(null);
             partyNullProperties.setPostCode(null);
             partyNullProperties.setDateOfBirth(null);
+            partyNullProperties.setDateOfDeath(null);
 
             List<Party> partyList = new ArrayList<>();
             partyList.add(partyEmptyProperties);
@@ -356,6 +360,11 @@ class GlobalSearchQueryBuilderTest {
                     actualPartyQuery,
                     CaseDataPaths.SEARCH_PARTY_DATE_OF_BIRTH,
                     expectedParty.getDateOfBirth()
+                ),
+                () -> assertNestedRangeQueryForDate(
+                    actualPartyQuery,
+                    CaseDataPaths.SEARCH_PARTY_DATE_OF_DEATH,
+                    expectedParty.getDateOfDeath()
                 )
             );
         }
@@ -369,7 +378,6 @@ class GlobalSearchQueryBuilderTest {
             );
         }
 
-        @SuppressWarnings("SameParameterValue")
         private void assertNestedRangeQueryForDate(NestedQueryBuilder nestedQueryBuilder,
                                                    String path,
                                                    String expectedDate) {
@@ -435,7 +443,6 @@ class GlobalSearchQueryBuilderTest {
             return jsonNode != null ? jsonNode.at("/nested/path").asText() : null;
         }
 
-        @SuppressWarnings("SameParameterValue")
         private RangeQueryBuilder getRangeQueryBuilder(QueryBuilder queryBuilder, String fieldName) {
             BoolQueryBuilder boolQueryBuilder = toBoolQueryBuilder(queryBuilder);
 

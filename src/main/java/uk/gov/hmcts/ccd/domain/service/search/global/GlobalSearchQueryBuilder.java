@@ -36,6 +36,7 @@ import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.C
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.SEARCH_PARTIES;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.SEARCH_PARTY_ADDRESS_LINE_1;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.SEARCH_PARTY_DATE_OF_BIRTH;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.SEARCH_PARTY_DATE_OF_DEATH;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.SEARCH_PARTY_EMAIL_ADDRESS;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.SEARCH_PARTY_NAME;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.SEARCH_PARTY_POSTCODE;
@@ -162,6 +163,12 @@ public class GlobalSearchQueryBuilder {
                 boolQueryBuilder.must(QueryBuilders.rangeQuery(SEARCH_PARTY_DATE_OF_BIRTH)
                     .gte(party.getDateOfBirth())
                     .lte(party.getDateOfBirth())
+                );
+            }
+            if (StringUtils.isNotBlank(party.getDateOfDeath())) {
+                boolQueryBuilder.must(QueryBuilders.rangeQuery(SEARCH_PARTY_DATE_OF_DEATH)
+                    .gte(party.getDateOfDeath())
+                    .lte(party.getDateOfDeath())
                 );
             }
         }
