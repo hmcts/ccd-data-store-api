@@ -45,7 +45,7 @@ public class IdamRepository {
         return idamClient.getUserByUserId(bearerToken, userId);
     }
 
-    private String getDataStoreSystemUserAccessToken() {
+    public String getDataStoreSystemUserAccessToken() {
         return idamClient.getAccessToken(applicationParams.getDataStoreSystemUserId(),
             applicationParams.getDataStoreSystemUserPassword());
     }

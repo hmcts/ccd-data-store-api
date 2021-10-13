@@ -5,7 +5,6 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import com.github.tomakehurst.wiremock.verification.VerificationResult;
 import org.awaitility.Duration;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
@@ -25,7 +24,6 @@ import static org.awaitility.Awaitility.await;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_PATH;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_PATH;
 
-@Disabled
 @TestPropertySource(locations = "classpath:cache-refresh-schedule.properties")
 class ReferenceDataCacheRefreshIT extends WireMockBaseTest implements ReferenceDataTestFixtures {
 
