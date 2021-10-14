@@ -1,5 +1,5 @@
 {
-  "_guid_" : "GRANT_CASE_ROLE_ASSIGNMENT",
+  "_guid_" : "GRANT_CASE_ROLE_ASSIGNMENT_READ_ONLY_TRUE",
 
   "productName": "Role Assignment Service",
   "operationName": "post role assignment",
@@ -7,10 +7,10 @@
   "uri": "http://localhost:4096/am/role-assignments",
 
   "specs": [
-    "a role assignment to access CaseType CT2",
-    "attempts to create a case for CT2",
+    "a role assignment to access CaseType CT1",
+    "attempts to create a case for CT1",
     "to create a full case",
-    "to give user Solicitor1 a PRIVATE CASE role assignment to view the previously created case"
+    "to give user Solicitor1 a role assignment with readonly status set to true"
   ],
 
   "users" : {
@@ -38,7 +38,7 @@
           "roleCategory" : "PROFESSIONAL",
           "classification" : "PRIVATE",
           "grantType" : "SPECIFIC",
-          "readOnly" : false,
+          "readOnly" : true,
           "beginTime" : "2021-01-01T00:00:00Z",
           "endTime" : "2023-01-01T00:00:00Z",
           "attributes" : {

@@ -1,0 +1,47 @@
+{
+  "_guid_": "S-201.23",
+
+  "productName": "CCD Data Store",
+  "operationName": "retrieve a case by id",
+
+  "method": "GET",
+  "uri": "/cases/{cid}",
+
+  "users": {
+    "S1": {
+      "username": "ccd.ac.solicitor1@gmail.com",
+      "password": "Pa55word11"
+    },
+    "invokingUser": {
+      "username": "ccd.ac.solicitor1@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"    }
+  },
+
+  "specs" : [
+    "SUPERUSER who has restricted access to create a case J1-CT2-07",
+    "restricted access to create a case J1-CT2-07",
+    "RESTRICTED SC ORGANISATION role assignment to view the case and fields F2, F3 and F4",
+    "attempts to get case J1-CT2-07"
+  ],
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "experimental": true
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-201_CT2][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
+      "message": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}
