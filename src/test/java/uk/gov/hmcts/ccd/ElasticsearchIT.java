@@ -1585,6 +1585,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             // NB: should only return test case 2 as case 1 has matching criteria but across different parties
             Party party = new Party();
             party.setDateOfBirth("2000-01-01");
+            party.setDateOfDeath("2000-02-02");
             party.setAddressLine1("AddressLine1");
             party.setPostCode("PostCode");
             party.setEmailAddress("test@example.com");

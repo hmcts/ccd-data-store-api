@@ -80,6 +80,7 @@ public final class GlobalSearchFields {
         public static final String ADDRESS_LINE_1 = "AddressLine1";
         public static final String POSTCODE = "PostCode";
         public static final String DATE_OF_BIRTH = "DateOfBirth";
+        public static final String DATE_OF_DEATH = "DateOfDeath";
 
         // Hide Utility Class Constructor : Utility class should not have a public or default constructor (squid:S1118)
         private SearchPartyFields() {
@@ -154,6 +155,7 @@ public final class GlobalSearchFields {
             = SEARCH_PARTIES_PREFIX + SearchPartyFields.ADDRESS_LINE_1;
         public static final String SEARCH_PARTY_POSTCODE = SEARCH_PARTIES_PREFIX + SearchPartyFields.POSTCODE;
         public static final String SEARCH_PARTY_DATE_OF_BIRTH = SEARCH_PARTIES_PREFIX + SearchPartyFields.DATE_OF_BIRTH;
+        public static final String SEARCH_PARTY_DATE_OF_DEATH = SEARCH_PARTIES_PREFIX + SearchPartyFields.DATE_OF_DEATH;
 
 
         // Hide Utility Class Constructor : Utility class should not have a public or default constructor (squid:S1118)

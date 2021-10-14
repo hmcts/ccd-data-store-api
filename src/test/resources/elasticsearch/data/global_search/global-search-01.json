@@ -24,6 +24,7 @@
                     "id": "a12cf1f0-c4e6-4f6d-baf2-447e876fd9f7",
                     "value": {
                         "DateOfBirth": "2000-01-01",
+                        "DateOfDeath": "2000-02-02",
                         "AddressLine1": "AddressLine1",
                         "PostCode": "no-match",
                         "EmailAddress": "test@example.com",
@@ -34,6 +35,7 @@
                     "id": "18e62954-9b84-4840-9048-f88293d9c5c5",
                     "value": {
                         "DateOfBirth": "2000-01-01",
+                        "DateOfDeath": "2000-02-02",
                         "AddressLine1": "no-match",
                         "PostCode": "PostCode",
                         "EmailAddress": "test@example.com",
@@ -44,15 +46,7 @@
         }
     },
     "data_classification": {
-        "DateOfBirth": "PUBLIC",
         "caseManagementCategory": "PUBLIC",
-        "Email": "PUBLIC",
-        "Address": {
-            "classification": "PUBLIC",
-            "value": {
-                "AddressLine1": "PUBLIC"
-            }
-        },
         "caseManagementLocation": {
             "classification": "PUBLIC",
             "value": {
@@ -60,9 +54,6 @@
                 "region": "PUBLIC"
             }
         },
-        "FirstName": "PUBLIC",
-        "LastName": "PUBLIC",
-        "PostCode": "PUBLIC",
         "caseNameHmctsInternal": "PUBLIC",
         "SearchCriteria": {
             "classification": "PUBLIC",
@@ -83,6 +74,7 @@
                             "id": "a12cf1f0-c4e6-4f6d-baf2-447e876fd9f7",
                             "value": {
                                 "DateOfBirth": "PUBLIC",
+                                "DateOfDeath": "PUBLIC",
                                 "AddressLine1": "PUBLIC",
                                 "PostCode": "PUBLIC",
                                 "EmailAddress": "PUBLIC",
@@ -93,6 +85,7 @@
                             "id": "18e62954-9b84-4840-9048-f88293d9c5c5",
                             "value": {
                                 "DateOfBirth": "PUBLIC",
+                                "DateOfDeath": "PUBLIC",
                                 "AddressLine1": "PUBLIC",
                                 "PostCode": "PUBLIC",
                                 "EmailAddress": "PUBLIC",
