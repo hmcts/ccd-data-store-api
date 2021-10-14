@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.verification.VerificationResult;
 import org.awaitility.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
@@ -26,6 +27,7 @@ import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_P
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_CACHE;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_PATH;
 
+@Isolated("Isolate from other integration tests that may utilise the same ReferenceData cache.")
 @TestPropertySource(locations = "classpath:cache-refresh-schedule.properties")
 class ReferenceDataCacheRefreshIT extends WireMockBaseTest implements ReferenceDataTestFixtures {
 
