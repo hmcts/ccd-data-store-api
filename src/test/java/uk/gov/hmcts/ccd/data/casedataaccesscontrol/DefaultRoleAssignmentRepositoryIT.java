@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.data.casedataaccesscontrol;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -80,11 +82,19 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
     @DisplayName("createRoleAssignment()")
     class CreateRoleAssignment {
 
+        private StubMapping badRasStub;
         private static final String CREATE_URL = "/am/role-assignments";
 
         @BeforeEach
         void setUp() {
-            WireMock.reset();
+            badRasStub = null;
+        }
+
+        @AfterEach
+        void tearDown() {
+            if (badRasStub != null) {
+                WireMock.removeStub(badRasStub);
+            }
         }
 
         @DisplayName("should return roleAssignments after successful Create call")
@@ -138,7 +148,7 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
 
             // GIVEN
             RoleAssignmentRequestResource assignmentRequest = createAssignmentRequest(Set.of("[ROLE1]"));
-            WireMock.stubFor(WireMock.post(urlMatching(CREATE_URL)).willReturn(badRequest()));
+            badRasStub = WireMock.stubFor(WireMock.post(urlMatching(CREATE_URL)).willReturn(badRequest()));
 
             // WHEN / THEN
             final BadRequestException exception = assertThrows(BadRequestException.class,
@@ -157,7 +167,7 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
 
             // GIVEN
             RoleAssignmentRequestResource assignmentRequest = createAssignmentRequest(Set.of("[ROLE1]"));
-            WireMock.stubFor(WireMock.post(urlMatching(CREATE_URL)).willReturn(serverError()));
+            badRasStub = WireMock.stubFor(WireMock.post(urlMatching(CREATE_URL)).willReturn(serverError()));
 
             // WHEN / THEN
             final ServiceException exception = assertThrows(ServiceException.class,
@@ -236,6 +246,8 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
     @DisplayName("deleteRoleAssignmentsByQuery()")
     class DeleteRoleAssignmentsByQuery {
 
+        private StubMapping badRasStub;
+
         private static final String DELETE_URL = "/am/role-assignments/query/delete";
 
         private static final String CASE_ID_1 = "11111";
@@ -249,7 +261,15 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
 
         @BeforeEach
         void setUp() {
-            WireMock.reset();
+            badRasStub = null;
+            WireMock.resetAllRequests();
+        }
+
+        @AfterEach
+        void tearDown() {
+            if (badRasStub != null) {
+                WireMock.removeStub(badRasStub);
+            }
         }
 
         @DisplayName("should make a call to the delete role assignment by query end point for single case role")
@@ -308,7 +328,7 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
                 new RoleAssignmentQuery(CASE_ID_1, USER_ID_1, List.of(ROLE_1))
             );
 
-            WireMock.stubFor(WireMock.post(urlMatching(DELETE_URL)).willReturn(badRequest()));
+            badRasStub = WireMock.stubFor(WireMock.post(urlMatching(DELETE_URL)).willReturn(badRequest()));
 
             // WHEN / THEN
             final BadRequestException exception = assertThrows(BadRequestException.class,
@@ -330,7 +350,7 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
                 new RoleAssignmentQuery(CASE_ID_2, USER_ID_2, List.of(ROLE_2))
             );
 
-            WireMock.stubFor(WireMock.post(urlMatching(DELETE_URL)).willReturn(serverError()));
+            badRasStub = WireMock.stubFor(WireMock.post(urlMatching(DELETE_URL)).willReturn(serverError()));
 
             // WHEN / THEN
             final ServiceException exception = assertThrows(ServiceException.class,
@@ -348,11 +368,6 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
     @Nested
     @DisplayName("getRoleAssignments()")
     class GetRoleAssignments {
-
-        @BeforeEach
-        void setUp() {
-            WireMock.reset();
-        }
 
         @DisplayName("should return roleAssignments")
         @Test
@@ -523,11 +538,6 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
 
         private final List<String> caseIds = Arrays.asList("111", "222");
         private final List<String> userIds = Arrays.asList("111", "222");
-
-        @BeforeEach
-        void setUp() {
-            WireMock.reset();
-        }
 
         @DisplayName("should return roleAssignments by user and roles")
         @Test
