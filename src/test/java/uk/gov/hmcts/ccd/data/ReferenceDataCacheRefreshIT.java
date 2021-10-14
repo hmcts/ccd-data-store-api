@@ -21,7 +21,9 @@ import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_CACHE;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_PATH;
+import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_CACHE;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_PATH;
 
 @TestPropertySource(locations = "classpath:cache-refresh-schedule.properties")
@@ -35,7 +37,7 @@ class ReferenceDataCacheRefreshIT extends WireMockBaseTest implements ReferenceD
 
     @BeforeEach
     void prepare() {
-        List.of("buildingLocations", "orgServices")
+        List.of(BUILDING_LOCATIONS_CACHE, SERVICES_CACHE)
             .parallelStream()
             .forEach(cacheName -> underTest.invalidateCache(cacheName));
 
