@@ -20,7 +20,7 @@ public final class GlobalSearchFields {
     public static final String CASE_TYPE = CaseDetailsEntity.CASE_TYPE_ID_FIELD_COL;
     public static final String STATE = CaseDetailsEntity.STATE_FIELD_COL;
     public static final String CREATED_DATE = CaseDetailsEntity.CREATED_DATE_FIELD_COL;
-
+    public static final String SECURITY_CLASSIFICATION = CaseDetailsEntity.SECURITY_CLASSIFICATION_FIELD_COL;
 
     /**
      * Case Data fields used in Global Search.

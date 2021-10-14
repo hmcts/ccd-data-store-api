@@ -200,17 +200,7 @@ public interface AccessControlService {
         if (caseField.isCollectionFieldType() && jsonNode.isArray()) {
             jsonNode.forEach(jsonNode1 -> ((ObjectNode) jsonNode1.get(VALUE)).remove(childField.getId()));
         } else {
-            // We are getting class com.fasterxml.jackson.databind.node.MissingNode cannot be cast to class
-            // com.fasterxml.jackson.databind.node.ObjectNode exception when childField.getId() is null, so this
-            // is added to check if the value exists.
-            if (jsonNode instanceof ObjectNode) {
-                ((ObjectNode) jsonNode).remove(childField.getId());
-            } else {
-                LOG.debug("Logging below details as we are getting com.fasterxml.jackson.databind.node.MissingNode "
-                    + " cannot be cast to class com.fasterxml.jackson.databind.node.ObjectNode");
-                LOG.info("Can not find field with caseFieldId={}, accessControlList={}",
-                    caseField.getId(), caseField.getAccessControlLists());
-            }
+            ((ObjectNode) jsonNode).remove(childField.getId());
         }
     }
 

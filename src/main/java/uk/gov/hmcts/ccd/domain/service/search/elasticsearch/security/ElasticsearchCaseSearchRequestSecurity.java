@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder.AccessControlGrantTypeESQueryBuilder;
 
 import java.util.Optional;
 
