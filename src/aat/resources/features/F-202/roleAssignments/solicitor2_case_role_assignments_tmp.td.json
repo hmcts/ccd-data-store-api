@@ -1,5 +1,5 @@
 {
-  "_guid_" : "solicitor2_case_role_assignments",
+  "_guid_" : "solicitor2_case_role_assignments_tmp",
 
   "productName": "Role Assignment Service",
   "operationName": "post role assignment",
@@ -62,40 +62,6 @@
             "jurisdiction" : "J1",
             "caseType" : "CT2",
             "caseId" : "${[scenarioContext][parentContext][childContexts][J1-CT2-03][testData][actualResponse][body][id]}"
-          }
-        },
-        {
-          "actorId" : "${[scenarioContext][testData][users][S1][id]}",
-          "actorIdType" : "IDAM",
-          "roleType" : "CASE",
-          "roleName" : "[RESPONDENT]",
-          "roleCategory" : "PROFESSIONAL",
-          "classification" : "PUBLIC",
-          "grantType" : "SPECIFIC",
-          "readOnly" : true,
-          "beginTime" : "2021-01-01T00:00:00Z",
-          "endTime" : "2023-01-01T00:00:00Z",
-          "attributes" : {
-            "jurisdiction" : "J1",
-            "caseType" : "CT2",
-            "caseId" : "${[scenarioContext][parentContext][childContexts][J1-CT7-03][testData][actualResponse][body][id]}"
-          }
-        },
-        {
-          "actorId" : "${[scenarioContext][testData][users][S1][id]}",
-          "actorIdType" : "IDAM",
-          "roleType" : "CASE",
-          "roleName" : "[RESPONDENT]",
-          "roleCategory" : "PROFESSIONAL",
-          "classification" : "PUBLIC",
-          "grantType" : "SPECIFIC",
-          "readOnly" : false,
-          "beginTime" : "2021-01-01T00:00:00Z",
-          "endTime" : "2023-01-01T00:00:00Z",
-          "attributes" : {
-            "jurisdiction" : "J1",
-            "caseType" : "CT2",
-            "caseId" : "${[scenarioContext][parentContext][childContexts][J1-CT6-01][testData][actualResponse][body][id]}"
           }
         }
       ]

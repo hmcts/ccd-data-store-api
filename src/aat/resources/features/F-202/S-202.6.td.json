@@ -1,10 +1,6 @@
 {
-  "_guid_": "S-202.1",
-
-  "productName": "CCD Data Store",
-  "operationName": "ES Search",
-  "method": "POST",
-  "uri": "/searchCases",
+  "_guid_": "S-202.6",
+  "_extends_": "F-202_Test_Data_Base",
 
   "specs": [
     "restricted access to create a case J1-CT2-01",
@@ -21,12 +17,8 @@
   },
 
   "request" : {
-    "_extends_": "Common_Request",
     "queryParams": {
-      "ctid": "CT1"
-    },
-    "headers": {
-      "experimental": true
+      "ctid": "CT2,CT7"
     },
     "body": {
       "query": {

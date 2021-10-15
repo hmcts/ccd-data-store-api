@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-202.1",
+  "_guid_": "F-202_Test_Data_Base",
 
   "productName": "CCD Data Store",
   "operationName": "ES Search",
@@ -13,36 +13,19 @@
     "contains no cases"
   ],
 
-  "users" : {
-    "invokingUser": {
-      "username": "ccd.ac.solicitor1@gmail.com",
-      "password": "Pa55word11"
-    }
-  },
 
   "request" : {
     "_extends_": "Common_Request",
-    "queryParams": {
-      "ctid": "CT1"
-    },
+
     "headers": {
       "experimental": true
-    },
-    "body": {
-      "query": {
-        "match_all": {
-        }
-      }
     }
+
   },
 
   "expectedResponse": {
-    "_extends_": "Common_200_Response",
-    "body" : {
-      "total" : 0,
-      "cases" : [ ],
-      "case_types_results" : [ ]
-      }
-    }
+    "_extends_": "Common_200_Response"
+
+  }
 
 }

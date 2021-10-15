@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-202.8",
+  "_guid_": "S-202.3",
 
   "productName": "CCD Data Store",
   "operationName": "ES Search",
@@ -8,14 +8,16 @@
 
   "specs": [
     "to create a token for event creation",
-    "restricted access to create CT6 cases",
-    "attempts to search for case J1-CT6-01",
-    "contains no cases"
+    "restricted access to create CT2 cases",
+    "attempts to search for case J1-CT2-01",
+    "contains no cases",
+    "to give user Solicitor2 their role case role assignments"
   ],
 
   "users" : {
     "invokingUser": {
-      "username": "ccd.ac.solicitor2@gmail.com",
+
+      "username": "ccd.ac.solicitor1@gmail.com",
       "password": "Pa55word11"
     }
   },
@@ -23,7 +25,7 @@
   "request" : {
     "_extends_": "Common_Request",
     "queryParams": {
-      "ctid": "CT6,CT7"
+      "ctid": "CT2"
     },
     "headers": {
       "experimental": true
@@ -31,7 +33,9 @@
     "body": {
       "query": {
         "match": {
-          "match_all": {
+          "match":{
+            "data.F2.keyword": "b"
+          }
         }
       }
     }

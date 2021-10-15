@@ -17,35 +17,91 @@ Feature: Access Control Search Tests
       Then the response [contains no cases]
       And the response has all other details as expected
 
-  @S-202.3
-  Scenario: todo (3rd row on worked examples table)
+
+
+    @S-202.3
+    Scenario: User can Search for case with field that user doesn't have SC access to view
+      Given a user with [restricted access to create CT2 cases]
+      And a user [Solicitor2]
+      And a case that has just been created as in [J1-CT2-01]
+      And a case that has just been created as in [J1-CT2-02]
+      And a case that has just been created as in [J1-CT2-03]
+      And a successful call [to create a token for event creation] as in [J1-CT2-03_Update_Token_Creation]
+      And a successful call [to update the case] as in [J1-CT2-03_Issued]
+      And a case that has just been created as in [J1-CT2-04]
+      And a case that has just been created as in [J1-CT2-05]
+      And a case that has just been created as in [J1-CT2-06]
+
+      And a successful call [to give user Solicitor2 their role case role assignments] as in [solicitor2_case_role_assignments_tmp]
+      When a request is prepared with appropriate values
+      And the request [attempts to search for case type CT2 by field F2=b]
+      And it is submitted to call the [ES Search] operation of [CCD Data Store]
+      Then a positive response is received
+      Then the response [contains case J1-CT2-03]
+      And the response has all other details as expected
+
+
+#    @S-202.8
+#  Scenario: todo ( 6th and 8th row on worked examples table)
+#       Given a user with [restricted access to create CT6 cases]
+#       And a case that has just been created as in [J1-CT6-01]
+#
+#      And a case that has just been created as in [J1-CT7-01]
+#      And a case that has just been created as in [J1-CT7-02]
+#      And a case that has just been created as in [J1-CT7-03]
+#      # When a request is prepared with appropriate values
+#      # And the request [attempts to search for case J1-CT6-01]
+#      # And it is submitted to call the [ES Search] operation of [CCD Data Store]
+#      # Then a positive response is received
+#      # Then the response [contains no cases]
+#      # And the response has all other details as expected
+
+
+
+  @S-202.5
+  Scenario: User can Search for case that they have SC access to
     Given a user with [restricted access to create CT2 cases]
+    And a user [Solicitor1]
 
     And a case that has just been created as in [J1-CT2-01]
     And a case that has just been created as in [J1-CT2-02]
-
     And a case that has just been created as in [J1-CT2-03]
     And a successful call [to create a token for event creation] as in [J1-CT2-03_Update_Token_Creation]
     And a successful call [to update the case] as in [J1-CT2-03_Issued]
-
     And a case that has just been created as in [J1-CT2-04]
     And a case that has just been created as in [J1-CT2-05]
     And a case that has just been created as in [J1-CT2-06]
 
-    @S-202.8
-  Scenario: todo ( 6th and 8th row on worked examples table)
-       Given a user with [restricted access to create CT6 cases]
-       And a case that has just been created as in [J1-CT6-01]
+    And a successful call [to give user Solicitor2 their role case role assignments] as in [solicitor2_case_role_assignments_tmp]
+    When a request is prepared with appropriate values
+    And the request [attempts to search for case type CT2 by field F2=b]
+    And it is submitted to call the [ES Search] operation of [CCD Data Store]
+    Then a positive response is received
+    Then the response [contains case J1-CT2-01]
+    Then the response [contains case J1-CT2-02]
+    And the response has all other details as expected
 
-      And a case that has just been created as in [J1-CT7-01]
-      And a case that has just been created as in [J1-CT7-02]
-      And a case that has just been created as in [J1-CT7-03]
-      # When a request is prepared with appropriate values
-      # And the request [attempts to search for case J1-CT6-01]
-      # And it is submitted to call the [ES Search] operation of [CCD Data Store]
-      # Then a positive response is received
-      # Then the response [contains no cases]
-      # And the response has all other details as expected
+    @S-202.7
+    Scenario: User cant see cases in a state it does not have access to see
+      Given a user with [restricted access to create CT2 cases]
+      And a user [Solicitor2]
+      And a case that has just been created as in [J1-CT2-01]
+      And a case that has just been created as in [J1-CT2-02]
+      And a case that has just been created as in [J1-CT2-03]
+      And a successful call [to create a token for event creation] as in [J1-CT2-03_Update_Token_Creation]
+      And a successful call [to update the case] as in [J1-CT2-03_Issued]
+      And a case that has just been created as in [J1-CT2-04]
+      And a case that has just been created as in [J1-CT2-05]
+      And a case that has just been created as in [J1-CT2-06]
+
+      And a successful call [to give user Solicitor2 their role case role assignments] as in [solicitor2_case_role_assignments_tmp]
+      When a request is prepared with appropriate values
+      And the request [attempts to search for case type CT2 by field F3=c]
+      And it is submitted to call the [ES Search] operation of [CCD Data Store]
+      Then a positive response is received
+      Then the response [contains case J1-CT2-03]
+      And the response has all other details as expected
+
 
 
 

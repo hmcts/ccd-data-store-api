@@ -1,15 +1,11 @@
 {
-  "_guid_": "S-202.8",
-
-  "productName": "CCD Data Store",
-  "operationName": "ES Search",
-  "method": "POST",
-  "uri": "/searchCases",
+  "_guid_": "S-202.1",
+  "_extends_": "F-202_Test_Data_Base",
 
   "specs": [
-    "to create a token for event creation",
-    "restricted access to create CT6 cases",
-    "attempts to search for case J1-CT6-01",
+    "restricted access to create a case J1-CT2-01",
+    "PUBLIC SC ORGANISATION role assignment access",
+    "attempts to search for case J1-CT2-01",
     "contains no cases"
   ],
 
@@ -21,17 +17,13 @@
   },
 
   "request" : {
-    "_extends_": "Common_Request",
     "queryParams": {
-      "ctid": "CT6,CT7"
-    },
-    "headers": {
-      "experimental": true
+      "ctid": "CT2"
     },
     "body": {
       "query": {
         "match": {
-          "match_all": {
+          "data.F3.keyword": "c"
         }
       }
     }
@@ -43,7 +35,7 @@
       "total" : 0,
       "cases" : [ ],
       "case_types_results" : [ ]
+      }
     }
-  }
 
 }

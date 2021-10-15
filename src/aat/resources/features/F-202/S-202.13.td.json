@@ -1,10 +1,6 @@
 {
-  "_guid_": "S-202.1",
-
-  "productName": "CCD Data Store",
-  "operationName": "ES Search",
-  "method": "POST",
-  "uri": "/searchCases",
+  "_guid_": "S-202.13",
+  "_extends_": "F-202_Test_Data_Base",
 
   "specs": [
     "restricted access to create a case J1-CT2-01",
@@ -15,22 +11,19 @@
 
   "users" : {
     "invokingUser": {
-      "username": "ccd.ac.solicitor1@gmail.com",
+      "username": "ccd.ac.staff6@gmail.com",
       "password": "Pa55word11"
     }
   },
 
   "request" : {
-    "_extends_": "Common_Request",
     "queryParams": {
-      "ctid": "CT1"
-    },
-    "headers": {
-      "experimental": true
+      "ctid": "CT2"
     },
     "body": {
       "query": {
-        "match_all": {
+        "match": {
+          "data.F4.keyword": "d"
         }
       }
     }
