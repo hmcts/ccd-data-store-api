@@ -1,0 +1,81 @@
+{
+  "_guid_": "S-1006.6",
+  "_extends_": "F-1006_Test_Data_Base_V2",
+
+  "title": "TTL.Suspended changed to \"N/No/F/False\" or NULL, SystemTTL and Override TTL greater than Guard value",
+
+  "prerequisites" : [ {
+    "Token_Creation": "S-1006_GetUpdateSuspendedCaseToken"
+  }
+  ],
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a case Id that has just been created as in F-1006_CreateSuspendedCasePreRequisiteCaseworker",
+    "contains an event token for the case just created above",
+    "has TTL.Suspension value changed to No from Yes",
+    "has TTL.SystemTTL set to greater than today + guard value",
+    "has TTL.OverrideTTL set to greater than today + guard value"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1006_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    },
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "body": {
+      "data": {
+        "TTL": {
+          "Suspended": "No",
+          "OverrideTTL": null,
+          "SystemTTL": "2023-04-30"
+        }
+      },
+      "event": {
+        "id": "updateCaseSubmitTTL",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "vary" : "accept-encoding"
+    },
+    "responseCode" : 201,
+    "responseMessage" : "Created",
+    "body" : {
+      "_links" : "[[ANYTHING_PRESENT]]",
+      "id" : "[[ANYTHING_PRESENT]]",
+      "jurisdiction" : "BEFTA_MASTER",
+      "state" : "CaseUpdated",
+      "case_type" : "FT_MasterCaseType",
+      "created_on" : "[[ANYTHING_PRESENT]]",
+      "last_modified_on" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on" : "[[ANYTHING_PRESENT]]",
+      "security_classification" : "PUBLIC",
+      "data" : {
+        "TTL" : {
+          "Suspended" : "No",
+          "OverrideTTL" : null,
+          "SystemTTL" : "2023-04-30"
+        }
+      },
+      "data_classification" : {
+        "_extends_": "TTL_Classifications"
+      },
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
+    }
+  }
+}
