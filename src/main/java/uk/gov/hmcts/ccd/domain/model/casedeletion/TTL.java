@@ -25,14 +25,8 @@ public class TTL {
     public static final String YES = "Yes";
     public static final String NO = "No";
 
-    @JsonDeserialize(using = LocalDateDeserializer.class)
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate systemTTL;
 
-    @JsonDeserialize(using = LocalDateDeserializer.class)
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate overrideTTL;
 
     private String suspended;
