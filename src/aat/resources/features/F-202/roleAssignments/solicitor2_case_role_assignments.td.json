@@ -1,0 +1,113 @@
+{
+  "_guid_" : "solicitor2_case_role_assignments",
+
+  "productName": "Role Assignment Service",
+  "operationName": "post role assignment",
+  "method": "POST",
+  "uri": "http://localhost:4096/am/role-assignments",
+
+  "specs": [
+    "a role assignment to access CaseType CT2",
+    "attempts to create a case for CT2",
+    "to create a full case",
+    "to give user Solicitor1 a PRIVATE CASE role assignment to view the previously created case"
+  ],
+
+  "users" : {
+    "S1": {
+      "username": "ccd.ac.solicitor2@gmail.com",
+      "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
+    }
+  },
+
+  "request" : {
+    "_extends_": "Common_Request",
+    "body" : {
+      "roleRequest" : {
+        "assignerId" : "${[scenarioContext][testData][users][S1][id]}",
+        "process" : "ccd-fta-case-ra",
+        "reference" : "${[scenarioContext][testData][users][S1][id]}",
+        "replaceExisting" : false
+      },
+      "requestedRoles" : [
+        {
+          "actorId" : "${[scenarioContext][testData][users][S1][id]}",
+          "actorIdType" : "IDAM",
+          "roleType" : "CASE",
+          "roleName" : "[RESPONDENT]",
+          "roleCategory" : "PROFESSIONAL",
+          "classification" : "PUBLIC",
+          "grantType" : "SPECIFIC",
+          "readOnly" : false,
+          "beginTime" : "2021-01-01T00:00:00Z",
+          "endTime" : "2023-01-01T00:00:00Z",
+          "attributes" : {
+            "jurisdiction" : "J1",
+            "caseType" : "CT2",
+            "caseId" : "${[scenarioContext][parentContext][childContexts][J1-CT2-01][testData][actualResponse][body][id]}"
+          }
+        },
+        {
+          "actorId" : "${[scenarioContext][testData][users][S1][id]}",
+          "actorIdType" : "IDAM",
+          "roleType" : "CASE",
+          "roleName" : "[RESPONDENT]",
+          "roleCategory" : "PROFESSIONAL",
+          "classification" : "PUBLIC",
+          "grantType" : "SPECIFIC",
+          "readOnly" : false,
+          "beginTime" : "2021-01-01T00:00:00Z",
+          "endTime" : "2023-01-01T00:00:00Z",
+          "attributes" : {
+            "jurisdiction" : "J1",
+            "caseType" : "CT2",
+            "caseId" : "${[scenarioContext][parentContext][childContexts][J1-CT2-03][testData][actualResponse][body][id]}"
+          }
+        },
+        {
+          "actorId" : "${[scenarioContext][testData][users][S1][id]}",
+          "actorIdType" : "IDAM",
+          "roleType" : "CASE",
+          "roleName" : "[RESPONDENT]",
+          "roleCategory" : "PROFESSIONAL",
+          "classification" : "PUBLIC",
+          "grantType" : "SPECIFIC",
+          "readOnly" : true,
+          "beginTime" : "2021-01-01T00:00:00Z",
+          "endTime" : "2023-01-01T00:00:00Z",
+          "attributes" : {
+            "jurisdiction" : "J1",
+            "caseType" : "CT2",
+            "caseId" : "${[scenarioContext][parentContext][childContexts][J1-CT7-03][testData][actualResponse][body][id]}"
+          }
+        },
+        {
+          "actorId" : "${[scenarioContext][testData][users][S1][id]}",
+          "actorIdType" : "IDAM",
+          "roleType" : "CASE",
+          "roleName" : "[RESPONDENT]",
+          "roleCategory" : "PROFESSIONAL",
+          "classification" : "PUBLIC",
+          "grantType" : "SPECIFIC",
+          "readOnly" : false,
+          "beginTime" : "2021-01-01T00:00:00Z",
+          "endTime" : "2023-01-01T00:00:00Z",
+          "attributes" : {
+            "jurisdiction" : "J1",
+            "caseType" : "CT2",
+            "caseId" : "${[scenarioContext][parentContext][childContexts][J1-CT6-01][testData][actualResponse][body][id]}"
+          }
+        }
+      ]
+    }
+
+  },
+
+  "expectedResponse" : {
+    "_extends_" : "Common_201_Response",
+    "body" : {
+      "roleAssignmentResponse" : "[[ANYTHING_PRESENT]]"
+    }
+  }
+
+}

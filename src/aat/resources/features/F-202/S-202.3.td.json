@@ -1,0 +1,49 @@
+{
+  "_guid_": "S-202.3",
+
+  "productName": "CCD Data Store",
+  "operationName": "ES Search",
+  "method": "POST",
+  "uri": "/searchCases",
+
+  "specs": [
+    "to create a token for event creation",
+    "restricted access to create CT2 cases",
+    "attempts to search for case J1-CT2-01",
+    "contains no cases"
+  ],
+
+  "users" : {
+    "invokingUser": {
+      "username": "ccd.ac.solicitor1@gmail.com",
+      "password": "Pa55word11"
+    }
+  },
+
+  "request" : {
+    "_extends_": "Common_Request",
+    "queryParams": {
+      "ctid": "CT2"
+    },
+    "headers": {
+      "experimental": true
+    },
+    "body": {
+      "query": {
+        "match": {
+          "reference": "${[scenarioContext][childContexts][F202_Create_Case_CT1][testData][actualResponse][body][id]}"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body" : {
+      "total" : 0,
+      "cases" : [ ],
+      "case_types_results" : [ ]
+    }
+  }
+
+}
