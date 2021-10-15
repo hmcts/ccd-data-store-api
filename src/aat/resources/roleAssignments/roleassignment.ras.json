@@ -67,21 +67,22 @@
       }
     },
     {
-      "actorId" : "[[$ROLE_ASSIGNMENT_SOLICITOR_USER]]",
-      "actorIdType" : "IDAM",
-      "roleType" : "ORGANISATION",
-      "roleName" : "Solicitor",
-      "roleCategory" : "PROFESSIONAL",
-      "classification" : "PUBLIC",
-      "grantType" : "STANDARD",
-      "readOnly" : false,
-      "beginTime" : "2021-01-01T00:00:00Z",
-      "attributes" : {
-        "jurisdiction" : "J1",
-        "caseType" : "CT6"
+      "actorId": "[[$ROLE_ASSIGNMENT_SOLICITOR_USER]]",
+      "actorIdType": "IDAM",
+      "roleType": "ORGANISATION",
+      "roleName": "Solicitor",
+      "roleCategory": "PROFESSIONAL",
+      "classification": "PUBLIC",
+      "grantType": "STANDARD",
+      "readOnly": false,
+      "beginTime": "2021-01-01T00:00:00Z",
+      "attributes": {
+        "jurisdiction": "J1",
+        "caseType": "CT6"
       }
     }
 
   ]
 }
+
 
