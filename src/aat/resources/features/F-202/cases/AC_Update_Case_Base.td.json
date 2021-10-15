@@ -41,47 +41,35 @@
 
   "expectedResponse": {
     "_extends_": "Common_201_Response",
-    "body" :  {
-      "token" : "[[ANYTHING_PRESENT]]",
+    "body":{
       "_links" : {
         "self" : {
           "href" : "[[ANYTHING_PRESENT]]"
         }
       },
-      "case_details" : {
-        "id" : "[[ANYTHING_PRESENT]]",
-        "jurisdiction" : "[[ANYTHING_PRESENT]]",
-        "state" : "[[ANYTHING_PRESENT]]",
-        "version" : 0,
-        "case_type_id" : "[[ANYTHING_PRESENT]]",
-        "created_date" : "[[ANYTHING_PRESENT]]",
-        "last_modified" : "2021-10-14T18:30:56.118553",
-        "last_state_modified_date" : "2021-10-14T18:30:56.100397",
-        "security_classification" : "PUBLIC",
-        "case_data" : {
-          "F1" : "a",
-          "F2" : "b",
-          "F3" : "c"
-        },
-        "data_classification" : {
-          "F1" : "RESTRICTED",
-          "F2" : "PRIVATE",
-          "F3" : "PUBLIC"
-        },
-        "supplementary_data" : null,
-        "after_submit_callback_response" : null,
-        "callback_response_status_code" : null,
-        "callback_response_status" : null,
-        "delete_draft_response_status_code" : null,
-        "delete_draft_response_status" : null,
-        "security_classifications" : {
-          "F1" : "RESTRICTED",
-          "F2" : "PRIVATE",
-          "F3" : "PUBLIC"
-        }
+      "id" : "[[ANYTHING_PRESENT]]",
+      "jurisdiction" : "[[ANYTHING_PRESENT]]",
+      "case_type" : "[[ANYTHING_PRESENT]]",
+      "created_on" : "[[ANYTHING_PRESENT]]",
+      "last_modified_on" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on" : "[[ANYTHING_PRESENT]]",
+      "state" : "[[ANYTHING_PRESENT]]",
+      "security_classification" : "[[ANYTHING_PRESENT]]",
+      "data" : {
+        "F1" : "a",
+        "F2" : "b",
+        "F3" : "c"
       },
-      "event_id" : "Issue"
+      "data_classification" : {
+        "F1" : "RESTRICTED",
+        "F2" : "PRIVATE",
+        "F3" : "PUBLIC"
+      },
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
     }
-
   }
 }
