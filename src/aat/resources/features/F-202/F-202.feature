@@ -16,3 +16,18 @@ Feature: Access Control Search Tests
       Then a positive response is received
       Then the response [contains no cases]
       And the response has all other details as expected
+
+    @S-202.3
+    Scenario: todo (3rd row on worked examples table)
+      Given a user with [restricted access to create CT2 cases]
+
+      And a case that has just been created as in [J1-CT2-01]
+      And a case that has just been created as in [J1-CT2-02]
+
+      And a case that has just been created as in [J1-CT2-03]
+      And a successful call [to create a token for event creation] as in [J1-CT2-03_Update_Token_Creation]
+      And a successful call [to update the case] as in [J1-CT2-03_Issued]
+
+      And a case that has just been created as in [J1-CT2-04]
+      And a case that has just been created as in [J1-CT2-05]
+      And a case that has just been created as in [J1-CT2-06]
