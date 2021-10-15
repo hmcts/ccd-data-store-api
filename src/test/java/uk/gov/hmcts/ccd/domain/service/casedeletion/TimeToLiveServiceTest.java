@@ -104,10 +104,19 @@ class TimeToLiveServiceTest {
 
     @Test
     void verifyTTLSuspensionNotChanged() {
-        TTL ttl = TTL.builder().systemTTL(LocalDate.now()).suspended(TTL.NO).overrideTTL(LocalDate.now()).build();
+        TTL ttl = TTL
+            .builder()
+            .systemTTL(LocalDate.now())
+            .suspended(TTL.NO)
+            .overrideTTL(LocalDate.now())
+            .build();
         caseData.put(TTL.TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(ttl));
 
-        TTL updatedTtl = TTL.builder().systemTTL(LocalDate.now()).suspended(TTL.NO).overrideTTL(LocalDate.now()).build();
+        TTL updatedTtl = TTL.builder()
+            .systemTTL(LocalDate.now())
+            .suspended(TTL.NO)
+            .overrideTTL(LocalDate.now())
+            .build();
         Map<String, JsonNode> updatedCaseData = new HashMap<>();
         updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(updatedTtl));
 
@@ -116,10 +125,20 @@ class TimeToLiveServiceTest {
 
     @Test
     void verifyTTLSuspensionChanged() {
-        TTL ttl = TTL.builder().systemTTL(LocalDate.now()).suspended(TTL.YES).overrideTTL(LocalDate.now()).build();
+        TTL ttl = TTL
+            .builder()
+            .systemTTL(LocalDate.now())
+            .suspended(TTL.YES)
+            .overrideTTL(LocalDate.now())
+            .build();
         caseData.put(TTL.TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(ttl));
 
-        TTL updatedTtl = TTL.builder().systemTTL(LocalDate.now()).suspended(TTL.NO).overrideTTL(LocalDate.now()).build();
+        TTL updatedTtl = TTL
+            .builder()
+            .systemTTL(LocalDate.now())
+            .suspended(TTL.NO)
+            .overrideTTL(LocalDate.now())
+            .build();
         Map<String, JsonNode> updatedCaseData = new HashMap<>();
         updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(updatedTtl));
 
@@ -131,7 +150,7 @@ class TimeToLiveServiceTest {
     }
 
     @Test
-    void verifyResolvedTTLSetToNULLWhenTTLSuspended() {
+    void verifyResolvedTtlSetToNullWhenTtlSuspended() {
         TTL ttl = TTL.builder().systemTTL(LocalDate.now()).overrideTTL(LocalDate.now()).suspended(TTL.YES).build();
         caseData.put(TTL.TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(ttl));
 
@@ -141,7 +160,7 @@ class TimeToLiveServiceTest {
     }
 
     @Test
-    void verifyResolvedTTLSetToNULLWhenTTLNotSuspended() {
+    void verifyResolvedTtlSetToNullWhenTtlNotSuspended() {
         TTL ttl = TTL.builder().systemTTL(null).overrideTTL(null).suspended(TTL.NO).build();
         caseData.put(TTL.TTL_CASE_FIELD_ID, JacksonUtils.MAPPER.valueToTree(ttl));
 

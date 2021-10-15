@@ -87,8 +87,7 @@ public class TimeToLiveService {
             && (beforeCallbackTTL.getSystemTTL() != null
             && beforeCallbackTTL.getSystemTTL().isBefore(localDate)))
             && beforeCallbackTTL.getOverrideTTL() != null
-            && beforeCallbackTTL.getOverrideTTL().isBefore(localDate))
-        {
+            && beforeCallbackTTL.getOverrideTTL().isBefore(localDate)) {
             throw new ValidationException("Unsetting a suspension can only be allowed if"
                 + " the deletion will occur beyond the guard period.");
         }
@@ -104,7 +103,7 @@ public class TimeToLiveService {
         }
 
         if (afterCallbackTTL != null) {
-            if(afterCallbackTTL.isSuspended()) {
+            if (afterCallbackTTL.isSuspended()) {
                 resolveTTL = null;
             } else {
                 resolveTTL = afterCallbackTTL.getOverrideTTL() != null

@@ -38,9 +38,6 @@ public class TTL {
     private String suspended;
 
     public boolean isSuspended() {
-        if(suspended == null || suspended.equals(NO)) {
-            return false;
-        }
-        return true;
+        return suspended != null && !suspended.equals(NO);
     }
 }

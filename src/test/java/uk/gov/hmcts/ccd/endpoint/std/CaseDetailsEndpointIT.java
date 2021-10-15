@@ -234,8 +234,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .findFirst()
             .orElse(null);
         assertNotNull(savedCaseDetails);
-        assertEquals("Incorrect Case Type", CASE_TYPE_TTL
-            , savedCaseDetails.getCaseTypeId());
+        assertEquals("Incorrect Case Type", CASE_TYPE_TTL, savedCaseDetails.getCaseTypeId());
         assertEquals(
             "Incorrect Data content: Data should have changed",
             caseDetailsToSave.getData(),
