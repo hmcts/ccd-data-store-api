@@ -22,6 +22,7 @@ import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
@@ -78,6 +79,7 @@ public class CreateCaseEventService {
     private final CasePostStateService casePostStateService;
     private final MessageService messageService;
     private final CaseDocumentService caseDocumentService;
+    private final TimeToLiveService timeToLiveService;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -101,7 +103,8 @@ public class CreateCaseEventService {
                                   final CasePostStateService casePostStateService,
                                   @Qualifier("utcClock") final Clock clock,
                                   @Qualifier("caseEventMessageService") final MessageService messageService,
-                                  final CaseDocumentService caseDocumentService) {
+                                  final CaseDocumentService caseDocumentService,
+                                  final TimeToLiveService timeToLiveService) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -122,6 +125,7 @@ public class CreateCaseEventService {
         this.clock = clock;
         this.messageService = messageService;
         this.caseDocumentService = caseDocumentService;
+        this.timeToLiveService = timeToLiveService;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -149,7 +153,6 @@ public class CreateCaseEventService {
         final String oldState = caseDetails.getState();
 
         // Logic start from here to attach document with case ID
-
         final CaseDetails updatedCaseDetails = mergeUpdatedFieldsToCaseDetails(
             content.getData(),
             caseDetails,
@@ -157,6 +160,8 @@ public class CreateCaseEventService {
             caseTypeDefinition
         );
         final CaseDetails updatedCaseDetailsWithoutHashes = caseDocumentService.stripDocumentHashes(updatedCaseDetails);
+
+        timeToLiveService.validateSuspensionChange(updatedCaseDetails.getData(), caseDetailsInDatabase.getData());
 
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(
             caseEventDefinition,
@@ -183,6 +188,10 @@ public class CreateCaseEventService {
         final CaseDetails caseDetailsAfterCallbackWithoutHashes = caseDocumentService.stripDocumentHashes(
             caseDetailsAfterCallback
         );
+
+        timeToLiveService.verifyTTLContentNotChanged(updatedCaseDetails.getData(), caseDetailsAfterCallback.getData());
+        caseDetailsAfterCallbackWithoutHashes
+            .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
 
         final CaseDetails savedCaseDetails = saveCaseDetails(
             caseDetailsInDatabase,

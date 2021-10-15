@@ -41,7 +41,7 @@ public class CaseDocumentService {
     public CaseDetails stripDocumentHashes(final CaseDetails caseDetails) {
         final List<JsonNode> documentNodes = caseDocumentUtils.findDocumentNodes(caseDetails.getData());
 
-        return documentNodes.isEmpty() ? caseDetails : removeHashes(caseDetails);
+        return documentNodes.isEmpty() ? caseService.clone(caseDetails) : removeHashes(caseDetails);
     }
 
     public List<DocumentHashToken> extractDocumentHashToken(final Map<String, JsonNode> databaseCaseData,
