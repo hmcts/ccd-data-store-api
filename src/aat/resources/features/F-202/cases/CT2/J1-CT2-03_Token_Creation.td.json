@@ -1,0 +1,15 @@
+{
+  "_guid_": "J1-CT2-03_Token_Creation",
+  "_extends_" : "AC_Token_Creation_Base",
+
+
+
+  "request": {
+
+    "pathVariables": {
+      "ctid": "CT2",
+      "etid": "Create"
+    }
+  }
+
+}

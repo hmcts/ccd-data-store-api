@@ -1,0 +1,87 @@
+{
+  "_guid_": "AC_Update_Case_Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "Submit update case event",
+
+  "method": "POST",
+  "uri": "/cases/{cid}/events",
+
+  "specs" : [
+    "to update the case"
+  ],
+
+  "users" : {
+    "invokingUser": {
+      "username": "ccd.ac.superuser@gmail.com",
+      "password": "Pa55word11"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "experimental" : "true"
+    },
+    "pathVariables": {
+    },
+    "body": {
+      "data": {
+        "F1": "a",
+        "F2": "b",
+        "F3": "c"
+      },
+      "event": {
+        "summary": "",
+        "description": ""
+      },
+      "ignore_warning": false
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body" :  {
+      "token" : "[[ANYTHING_PRESENT]]",
+      "_links" : {
+        "self" : {
+          "href" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "case_details" : {
+        "id" : "[[ANYTHING_PRESENT]]",
+        "jurisdiction" : "[[ANYTHING_PRESENT]]",
+        "state" : "[[ANYTHING_PRESENT]]",
+        "version" : 0,
+        "case_type_id" : "[[ANYTHING_PRESENT]]",
+        "created_date" : "[[ANYTHING_PRESENT]]",
+        "last_modified" : "2021-10-14T18:30:56.118553",
+        "last_state_modified_date" : "2021-10-14T18:30:56.100397",
+        "security_classification" : "PUBLIC",
+        "case_data" : {
+          "F1" : "a",
+          "F2" : "b",
+          "F3" : "c"
+        },
+        "data_classification" : {
+          "F1" : "RESTRICTED",
+          "F2" : "PRIVATE",
+          "F3" : "PUBLIC"
+        },
+        "supplementary_data" : null,
+        "after_submit_callback_response" : null,
+        "callback_response_status_code" : null,
+        "callback_response_status" : null,
+        "delete_draft_response_status_code" : null,
+        "delete_draft_response_status" : null,
+        "security_classifications" : {
+          "F1" : "RESTRICTED",
+          "F2" : "PRIVATE",
+          "F3" : "PUBLIC"
+        }
+      },
+      "event_id" : "Issue"
+    }
+
+  }
+}

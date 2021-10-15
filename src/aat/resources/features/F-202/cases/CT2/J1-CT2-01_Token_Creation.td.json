@@ -1,0 +1,19 @@
+{
+  "_guid_": "J1-CT2-01_Token_Creation",
+  "_extends_" : "AC_Token_Creation_Base",
+
+
+  "specs": [
+    "to create a token for case creation",
+    "to create a full case"
+  ],
+
+
+  "request": {
+    "pathVariables": {
+      "ctid": "CT2",
+      "etid": "Create"
+    }
+  }
+
+}

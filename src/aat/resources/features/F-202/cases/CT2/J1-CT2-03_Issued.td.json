@@ -1,0 +1,28 @@
+{
+  "_guid_": "J1-CT2-03_Issued",
+  "_extends_" : "AC_Update_Case_Base",
+
+
+  "specs": [
+  ],
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][J1-CT2-03][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "F1": "a",
+        "F2": "b",
+        "F3": "c"
+      },
+      "event": {
+        "id": "Issue"
+      },
+      "event_token": "${[scenarioContext][parentContext][childContexts][J1-CT2-03_Update_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+}
