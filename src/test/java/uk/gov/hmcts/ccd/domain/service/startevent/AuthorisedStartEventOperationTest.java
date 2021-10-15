@@ -62,6 +62,11 @@ class AuthorisedStartEventOperationTest {
     private static final String CASEWORKER_PROBATE_LOA1 = "caseworker-probate-loa1";
     private static final String CASEWORKER_PROBATE_LOA3 = "caseworker-probate-loa3";
     private static final String CASEWORKER_DIVORCE = "caseworker-divorce-loa3";
+
+    private static final String CREATE_CASEWORKER_PROBATE_LOA2 = "caseworker-probate-loa2";
+    private static final String CREATE_CASEWORKER_PROBATE_LOA3 = "caseworker-probate-loa3";
+    private static final String CREATE_CASEWORKER_DIVORCE_LOA1 = "caseworker-divorce-loa1";
+
     private static final Map<String, JsonNode> EMPTY_MAP = Maps.newHashMap();
 
 
@@ -96,6 +101,10 @@ class AuthorisedStartEventOperationTest {
     private final Set<AccessProfile> accessProfiles = createAccessProfiles(Sets.newHashSet(CASEWORKER_DIVORCE,
         CASEWORKER_PROBATE_LOA1,
         CASEWORKER_PROBATE_LOA3,
+        GlobalCaseRole.CREATOR.getRole()));
+    private final Set<AccessProfile> creationAccessProfiles = createAccessProfiles(Sets.newHashSet(CREATE_CASEWORKER_DIVORCE_LOA1,
+        CREATE_CASEWORKER_PROBATE_LOA2,
+        CREATE_CASEWORKER_PROBATE_LOA3,
         GlobalCaseRole.CREATOR.getRole()));
 
     @BeforeEach
@@ -140,7 +149,10 @@ class AuthorisedStartEventOperationTest {
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
         when(caseAccessService.getAccessProfiles(anyString())).thenReturn(accessProfiles);
         when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(accessProfiles);
+        when(caseAccessService.getCreationAccessProfiles(anyString())).thenReturn(creationAccessProfiles);
         when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ))
+            .thenReturn(true);
+        when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, creationAccessProfiles, CAN_READ))
             .thenReturn(true);
         when(accessControlService.filterCaseFieldsByAccess(eq(classifiedCaseDetailsNode),
             eq(caseFieldDefinitions),
