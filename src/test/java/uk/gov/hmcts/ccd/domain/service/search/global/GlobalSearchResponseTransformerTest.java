@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.search.global;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
@@ -19,12 +22,14 @@ import uk.gov.hmcts.ccd.domain.model.refdata.LocationLookup;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceLookup;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
 import uk.gov.hmcts.ccd.domain.service.aggregated.CaseDetailsUtil;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,6 +37,9 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
 
     @Mock
     private CachedCaseDefinitionRepository caseDefinitionRepository;
+
+    @Mock
+    private CaseDataAccessControl caseDataAccessControl;
 
     @InjectMocks
     private GlobalSearchResponseTransformer underTest;
@@ -58,6 +66,7 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
     @Test
     void testShouldMapState() {
         // GIVEN
+        stubAccessMetadata();
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withState("CaseCreated")
             .withData(emptyMap())
@@ -77,6 +86,7 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
     @Test
     void testShouldMapCaseReference() {
         // GIVEN
+        stubAccessMetadata();
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withReference(1629297445116784L)
             .withData(emptyMap())
@@ -96,6 +106,7 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
     @Test
     void testShouldMapJurisdiction() {
         // GIVEN
+        stubAccessMetadata();
         final JurisdictionDefinition jurisdictionDefinition = buildJurisdictionDefinition();
         doReturn(jurisdictionDefinition).when(caseDefinitionRepository).getJurisdiction(JURISDICTION_ID);
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
@@ -120,6 +131,7 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
     @Test
     void testShouldMapCaseType() {
         // GIVEN
+        stubAccessMetadata();
         final CaseTypeDefinition caseTypeDefinition = buildCaseTypeDefinition();
         doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
@@ -144,6 +156,7 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
     @Test
     void testShouldMapService() {
         // GIVEN
+        stubAccessMetadata();
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withSupplementaryData(SUPPLEMENTARY_DATA)
             .withData(emptyMap())
@@ -165,6 +178,7 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
     @Test
     void testShouldMapLocationAndRegion() {
         // GIVEN
+        stubAccessMetadata();
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withData(CASE_DATA)
             .withSupplementaryData(emptyMap())
@@ -188,6 +202,7 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
     @Test
     void testShouldMapCaseManagementCategory() {
         // GIVEN
+        stubAccessMetadata();
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withData(CASE_DATA)
             .withSupplementaryData(emptyMap())
@@ -209,6 +224,7 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
     @Test
     void testShouldMapCaseNameHmctsInternal() {
         // GIVEN
+        stubAccessMetadata();
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withData(CASE_DATA)
             .withSupplementaryData(emptyMap())
@@ -224,9 +240,16 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
             .satisfies(result -> assertThat(result.getCaseNameHmctsInternal()).isEqualTo("Internal case name"));
     }
 
+    private void stubAccessMetadata() {
+        val caseAccessMetadata = new CaseAccessMetadata();
+        caseAccessMetadata.setAccessProcess(AccessProcess.CHALLENGED);
+        doReturn(caseAccessMetadata).when(caseDataAccessControl).generateAccessMetadata(any());
+    }
+
     @Test
     void testShouldMapOtherCaseReferences() {
         // GIVEN
+        stubAccessMetadata();
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withData(CASE_DATA)
             .withSupplementaryData(emptyMap())
@@ -245,6 +268,7 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
     @Test
     void testShouldHandleNullCaseDataGracefully() {
         // GIVEN
+        stubAccessMetadata();
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withData(null) // i.e. when no GlobalSearch fields present in case data
             .withReference(REFERENCE)
@@ -264,6 +288,7 @@ class GlobalSearchResponseTransformerTest extends TestFixtures {
     @Test
     void testShouldHandleNullSupplementaryDataGracefully() {
         // GIVEN
+        stubAccessMetadata();
         final CaseDetails caseDetails = CaseDetailsUtil.CaseDetailsBuilder.caseDetails()
             .withData(CASE_DATA)
             .withReference(REFERENCE)
