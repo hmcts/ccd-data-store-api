@@ -148,7 +148,8 @@ class TimeToLiveServiceTest {
         final ValidationException exception = assertThrows(ValidationException.class,
             () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
         Assert.assertThat(exception.getMessage(),
-            startsWith("Cannot proceed"));
+            startsWith("Unsetting a suspension can only be allowed "
+                + "if the deletion will occur beyond the guard period."));
     }
 
     @Test
