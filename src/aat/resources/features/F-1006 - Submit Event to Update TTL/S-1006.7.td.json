@@ -47,14 +47,9 @@
 
   "expectedResponse": {
     "_extends_": "Common_400_Response",
-    "headers": {
-      "vary" : "accept-encoding"
-    },
     "body" : {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
       "timestamp": "[[ANYTHING_PRESENT]]",
-      "status": 400,
-      "error": "Bad Request",
       "message": "Time to live content has been modified by aboutToStart callback",
       "path": "[[ANYTHING_PRESENT]]",
       "details": null,

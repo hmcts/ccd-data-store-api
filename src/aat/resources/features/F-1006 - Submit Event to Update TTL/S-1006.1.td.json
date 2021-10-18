@@ -46,19 +46,12 @@
 
   "expectedResponse": {
     "_extends_": "Common_422_Response",
-    "headers": {
-      "vary" : "accept-encoding"
-    },
     "body" : {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
       "timestamp": "[[ANYTHING_PRESENT]]",
-      "status": 422,
-      "error": "Unprocessable Entity",
       "message": "Unsetting a suspension can only be allowed if the deletion will occur beyond the guard period.",
       "path": "[[ANYTHING_PRESENT]]",
-      "details": null,
-      "callbackErrors": null,
-      "callbackWarnings": null
+      "details": null
     }
   }
 }

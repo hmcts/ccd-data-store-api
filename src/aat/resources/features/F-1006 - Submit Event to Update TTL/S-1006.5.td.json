@@ -46,11 +46,6 @@
 
   "expectedResponse": {
     "_extends_": "Common_201_Response",
-    "headers": {
-      "vary" : "accept-encoding"
-    },
-    "responseCode" : 201,
-    "responseMessage" : "Created",
     "body" : {
       "_links" : "[[ANYTHING_PRESENT]]",
       "id" : "[[ANYTHING_PRESENT]]",
