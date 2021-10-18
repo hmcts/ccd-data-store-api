@@ -32,6 +32,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
@@ -168,9 +169,17 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         List<RoleToAccessProfileDefinition> pseudoAccessProfilesMappings = new ArrayList<>();
         pseudoAccessProfilesMappings.addAll(caseTypeDefinition.getRoleToAccessProfiles());
         if (applicationParams.getEnablePseudoAccessProfilesGeneration()) {
-            pseudoAccessProfilesMappings.addAll(pseudoRoleToAccessProfileGenerator.generate(caseTypeDefinition));
+            List<RoleToAccessProfileDefinition> generated =
+                pseudoRoleToAccessProfileGenerator.generate(caseTypeDefinition);
+            pseudoAccessProfilesMappings.addAll(generated.stream()
+                .filter(e -> getRoleNamesAsStream(caseTypeDefinition).noneMatch(p -> p.equals(e.getRoleName())))
+                .collect(Collectors.toList()));
         }
         return accessProfileService.generateAccessProfiles(filteredRoleAssignments, pseudoAccessProfilesMappings);
+    }
+
+    private Stream<String> getRoleNamesAsStream(CaseTypeDefinition caseTypeDefinition) {
+        return caseTypeDefinition.getRoleToAccessProfiles().stream().map(RoleToAccessProfileDefinition::getRoleName);
     }
 
     private List<RoleAssignment> augment(List<RoleAssignment> filteredRoleAssignments,

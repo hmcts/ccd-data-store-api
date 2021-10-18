@@ -99,6 +99,9 @@ class DefaultCaseDataAccessControlTest {
     private PseudoRoleAssignmentsGenerator pseudoRoleAssignmentsGenerator;
 
     @Mock
+    private PseudoRoleToAccessProfileGenerator pseudoRoleToAccessProfileGenerator;
+
+    @Mock
     private ApplicationParams applicationParams;
 
     @Mock
@@ -404,6 +407,42 @@ class DefaultCaseDataAccessControlTest {
         verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
         verify(applicationParams).getEnablePseudoAccessProfilesGeneration();
         verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
+    }
+
+    @Test
+    void shouldReturnAccessProfilesWhenDefinitionHasDuplicateWithPseudoGeneratedRoleName() {
+        CaseTypeDefinition caseTypeDefinition =  createCaseTypeDefinition(ROLE_NAME_1, CREATOR.name());
+
+        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_1);
+        doReturn(USER_ID).when(securityUtils).getUserId();
+        RoleAssignments roleAssignments = mock(RoleAssignments.class);
+        doReturn(roleAssignments).when(roleAssignmentService).getRoleAssignments(anyString());
+
+        Map<String, String> roleAndGrantType = Maps.newHashMap();
+        roleAndGrantType.put(ROLE_NAME_1, BASIC.name());
+        roleAndGrantType.put(CREATOR.name(), BASIC.name());
+        roleAndGrantType.put(ROLE_NAME_2, BASIC.name());
+        List<RoleAssignment> roleAssignments1 = createFilteringResults(roleAndGrantType);
+
+        doReturn(roleAssignments1).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
+        doReturn(filteredRoleAssignments).when(roleAssignmentsFilteringService)
+            .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
+
+        doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
+        doReturn(true).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
+        List<RoleToAccessProfileDefinition> generatedPseudoAP = List.of(
+            RoleToAccessProfileDefinition.builder()
+                .accessProfiles(CREATOR.name())
+                .roleName(CREATOR.name())
+                .build()
+        );
+        doReturn(generatedPseudoAP).when(pseudoRoleToAccessProfileGenerator).generate(any(CaseTypeDefinition.class));
+
+        Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
+            .generateAccessProfilesByCaseTypeId(CASE_TYPE_1);
+
+        assertNotNull(accessProfiles);
+        assertEquals(2, accessProfiles.size());
     }
 
     private CaseTypeDefinition createCaseTypeDefinition(String... roleNames) {
