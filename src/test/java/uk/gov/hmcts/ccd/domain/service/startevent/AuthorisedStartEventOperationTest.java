@@ -102,7 +102,8 @@ class AuthorisedStartEventOperationTest {
         CASEWORKER_PROBATE_LOA1,
         CASEWORKER_PROBATE_LOA3,
         GlobalCaseRole.CREATOR.getRole()));
-    private final Set<AccessProfile> creationAccessProfiles = createAccessProfiles(Sets.newHashSet(CREATE_CASEWORKER_DIVORCE_LOA1,
+    private final Set<AccessProfile> creationAccessProfiles =
+        createAccessProfiles(Sets.newHashSet(CREATE_CASEWORKER_DIVORCE_LOA1,
         CREATE_CASEWORKER_PROBATE_LOA2,
         CREATE_CASEWORKER_PROBATE_LOA3,
         GlobalCaseRole.CREATOR.getRole()));
