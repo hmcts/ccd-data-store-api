@@ -62,6 +62,8 @@
           "events" : "[[ANYTHING_PRESENT]]",
           "states" : "[[ANYTHING_PRESENT]]",
           "searchAliasFields" : [ ],
+          "searchParties" : [ ],
+          "searchCriterias" : [ ],
           "jurisdiction" : null,
           "security_classification" : null,
           "case_fields" : [ ],
