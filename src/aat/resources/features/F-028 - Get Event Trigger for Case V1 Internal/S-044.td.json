@@ -1599,7 +1599,7 @@
       "end_button_label": null,
       "can_save_draft": null,
       "access_granted" : "STANDARD",
-      "access_process" : "NONE",
+      "access_process" : "Rafal breaking test",
       "title_display": "CUSTOM  TITLE DISPLAY"
     }
   }
