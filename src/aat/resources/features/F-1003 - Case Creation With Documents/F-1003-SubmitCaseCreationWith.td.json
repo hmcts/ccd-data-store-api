@@ -1,7 +1,7 @@
 {
   "_guid_": "F-1003-SubmitCaseCreation",
   "productName": "CCD Data Store",
-  "operationName": "Submit Case Creation",
+  "operationName": "Submit Case Creation With Doc Fields",
   "users": {
     "invokingUser": {
       "username": "befta.caseworker.2.solicitor.2@gmail.com",
