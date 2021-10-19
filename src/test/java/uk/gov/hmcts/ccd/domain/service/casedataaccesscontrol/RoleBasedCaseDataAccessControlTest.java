@@ -1,12 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
-import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -16,15 +14,17 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 class RoleBasedCaseDataAccessControlTest {
@@ -86,10 +86,10 @@ class RoleBasedCaseDataAccessControlTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setReference(CASE_REFERENCE);
         caseDetails.setId(CASE_ID);
-        Mockito.when(caseDetailsRepository.findByReference(CASE_REFERENCE.toString()))
+        when(caseDetailsRepository.findByReference(CASE_REFERENCE.toString()))
             .thenReturn(Optional.of(caseDetails));
-        Mockito.when(userRepository.getUserId()).thenReturn(IDAM_ID);
-        Mockito.when(caseUserRepository.findCaseRoles( Long.valueOf(CASE_ID), IDAM_ID)).thenReturn(caseRoles);
+        when(userRepository.getUserId()).thenReturn(IDAM_ID);
+        when(caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID), IDAM_ID)).thenReturn(caseRoles);
         Set<AccessProfile> accessProfileList =
             instance.generateAccessProfilesByCaseReference(CASE_REFERENCE.toString());
         assertEquals(2, accessProfileList.size());
@@ -101,11 +101,11 @@ class RoleBasedCaseDataAccessControlTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setReference(CASE_REFERENCE);
         caseDetails.setId(CASE_ID);
-        Mockito.when(caseDetailsRepository.findByReference(CASE_REFERENCE.toString())).thenReturn(Optional.empty());
-        Mockito.when(caseDetailsRepository.findById(null, Long.parseLong(CASE_ID)))
+        when(caseDetailsRepository.findByReference(CASE_REFERENCE.toString())).thenReturn(Optional.empty());
+        when(caseDetailsRepository.findById(null, Long.parseLong(CASE_ID)))
             .thenReturn(Optional.of(caseDetails));
-        Mockito.when(userRepository.getUserId()).thenReturn(IDAM_ID);
-        Mockito.when(caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID), IDAM_ID)).thenReturn(caseRoles);
+        when(userRepository.getUserId()).thenReturn(IDAM_ID);
+        when(caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID), IDAM_ID)).thenReturn(caseRoles);
         Set<AccessProfile> accessProfileList = instance.generateAccessProfilesByCaseReference(CASE_ID);
         assertEquals(2, accessProfileList.size());
     }
@@ -113,11 +113,11 @@ class RoleBasedCaseDataAccessControlTest {
     @Test
     @DisplayName("should throw exception when case reference or case id is invalid")
     void shouldThrowException() {
-        Mockito.when(caseDetailsRepository.findByReference(CASE_REFERENCE.toString())).thenReturn(Optional.empty());
-        Mockito.when(caseDetailsRepository.findById(null, Long.parseLong(CASE_ID)))
+        when(caseDetailsRepository.findByReference(CASE_REFERENCE.toString())).thenReturn(Optional.empty());
+        when(caseDetailsRepository.findById(null, Long.parseLong(CASE_ID)))
             .thenReturn(Optional.empty());
-        Mockito.when(userRepository.getUserId()).thenReturn(IDAM_ID);
-        Mockito.when(caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID), IDAM_ID)).thenReturn(caseRoles);
+        when(userRepository.getUserId()).thenReturn(IDAM_ID);
+        when(caseUserRepository.findCaseRoles(Long.valueOf(CASE_ID), IDAM_ID)).thenReturn(caseRoles);
         assertThrows(CaseNotFoundException.class, () -> instance.generateAccessProfilesByCaseReference(CASE_ID));
     }
 }

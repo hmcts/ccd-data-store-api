@@ -116,8 +116,7 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
             .collect(Collectors.toSet());
     }
 
-    private String getCaseId(String caseReference)
-    {
+    private String getCaseId(String caseReference) {
         Optional<CaseDetails> caseDetails =  caseDetailsRepository.findByReference(caseReference);
         // R.A uses external micro-services which referer cases by caseReference
         // Non R.A uses internal case id. Both cases should be contemplated in the code.
