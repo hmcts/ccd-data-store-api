@@ -581,6 +581,22 @@
           "printable_document_url" : null,
           "acls" : "[[ANYTHING_PRESENT]]",
           "roleToAccessProfiles" : [ ]
+        },{
+          "id": "FT_GlobalSearch",
+          "description": "Case Type for testing GlobalSearch",
+          "version": null,
+          "name": "FT_GlobalSearch",
+          "events": "[[ANYTHING_PRESENT]]",
+          "states": "[[ANYTHING_PRESENT]]",
+          "searchAliasFields": [],
+          "searchParties": [],
+          "searchCriterias": [],
+          "jurisdiction": null,
+          "security_classification": null,
+          "case_fields": [],
+          "printable_document_url": null,
+          "acls": "[[ANYTHING_PRESENT]]",
+          "roleToAccessProfiles": []
         }, {
           "id" : "FT_CRUD_4",
           "description" : "Case Type with no C CRUD access",
