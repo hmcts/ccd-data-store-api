@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -22,16 +23,17 @@ import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.TTL_CASE_FIELD_ID;
 @Service
 public class TimeToLiveService {
 
-    public static final Integer TTL_GUARD = 365;
-
     protected static final String TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE =
         "Time to live content has been modified by aboutToStart callback";
 
     private ObjectMapper objectMapper;
+    private ApplicationParams applicationParams;
 
     @Autowired
-    public TimeToLiveService(@Qualifier("DefaultObjectMapper") ObjectMapper objectMapper) {
+    public TimeToLiveService(@Qualifier("DefaultObjectMapper") ObjectMapper objectMapper,
+                             ApplicationParams applicationParams) {
         this.objectMapper = objectMapper;
+        this.applicationParams = applicationParams;
     }
 
     public Map<String, JsonNode> updateCaseDetailsWithTTL(Map<String, JsonNode> data,
@@ -88,7 +90,7 @@ public class TimeToLiveService {
         }
         // check caseDetailsInDatabase (which is the current state of the fields) against the updatedCaseDetails when
         // checking if TTL.suspended has changed value
-        LocalDate localDate = LocalDate.now().plusDays(TTL_GUARD);
+        LocalDate localDate = LocalDate.now().plusDays(applicationParams.getTtlGuard());
         if (!beforeCallbackTTL.getSuspended().equalsIgnoreCase(currentTTLInDatabase.getSuspended())
             && (!beforeCallbackTTL.isSuspended()
             && (beforeCallbackTTL.getSystemTTL() != null
