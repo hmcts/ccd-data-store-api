@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -15,7 +16,9 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchR
 import java.util.List;
 import java.util.Optional;
 
+import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.NATIVE_ES_QUERY;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.QUERY;
+import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SUPPLEMENTARY_DATA;
 
 @Component
 public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequestSecurity {
@@ -92,11 +95,9 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
 
     private CaseSearchRequest createNewCaseSearchRequest(CaseSearchRequest caseSearchRequest,
                                                          String queryWithFilters) {
+
         ObjectNode searchRequestJsonNode =
-            objectMapperService.convertStringToObject(caseSearchRequest.toJsonString(),
-                ObjectNode.class);
-        ObjectNode queryNode = objectMapperService.convertStringToObject(queryWithFilters, ObjectNode.class);
-        searchRequestJsonNode.set(QUERY, queryNode.get(QUERY));
+            updateSearchRequestQueryInJson(caseSearchRequest.toJsonString(), queryWithFilters);
 
         return new CaseSearchRequest(caseSearchRequest.getCaseTypeId(),
             new ElasticsearchRequest(searchRequestJsonNode));
@@ -104,11 +105,45 @@ public class ElasticsearchCaseSearchRequestSecurity implements CaseSearchRequest
 
     private CrossCaseTypeSearchRequest createNewCrossCaseTypeSearchRequest(CrossCaseTypeSearchRequest request,
                                                                            String queryWithFilters) {
-        ObjectNode queryNode = objectMapperService.convertStringToObject(queryWithFilters, ObjectNode.class);
 
-        return new CrossCaseTypeSearchRequest.Builder()
-            .withCaseTypes(request.getCaseTypeIds())
-            .withSearchRequest(new ElasticsearchRequest(queryNode))
+        ObjectNode searchRequestJsonNode =
+            updateSearchRequestQueryInJson(request.getSearchRequestJsonNode().toString(), queryWithFilters);
+
+        ElasticsearchRequest newElasticsearchRequest =
+            createNewElasticsearchRequest(request.getElasticSearchRequest(), searchRequestJsonNode);
+
+        // clone CCT search request object :: then replace ES search request
+        return new CrossCaseTypeSearchRequest
+            .Builder(request)
+            .withSearchRequest(newElasticsearchRequest)
             .build();
     }
+
+    private ElasticsearchRequest createNewElasticsearchRequest(ElasticsearchRequest request,
+                                                               JsonNode updatedSearchRequestQuery) {
+
+        ObjectNode searchRequestObjectNode;
+
+        if (request.hasRequestedSupplementaryData()) {
+            searchRequestObjectNode = (ObjectNode)objectMapperService.createEmptyJsonNode();
+            searchRequestObjectNode.set(NATIVE_ES_QUERY, updatedSearchRequestQuery.deepCopy());
+            searchRequestObjectNode.set(SUPPLEMENTARY_DATA, request.getRequestedSupplementaryData());
+        } else {
+            searchRequestObjectNode = updatedSearchRequestQuery.deepCopy();
+        }
+
+        return new ElasticsearchRequest(searchRequestObjectNode);
+    }
+
+    private ObjectNode updateSearchRequestQueryInJson(String searchRequest, String queryWithFilters) {
+
+        ObjectNode searchRequestJsonNode = objectMapperService.convertStringToObject(searchRequest, ObjectNode.class);
+        ObjectNode queryNode = objectMapperService.convertStringToObject(queryWithFilters, ObjectNode.class);
+
+        // update query value with replacement
+        searchRequestJsonNode.set(QUERY, queryNode.get(QUERY));
+
+        return searchRequestJsonNode;
+    }
+
 }
