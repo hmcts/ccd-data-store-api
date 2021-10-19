@@ -1,12 +1,7 @@
 {
-  "_guid_": "F-1003-SubmitCaseCreationWithNoFilename",
+  "_guid_": "F-1003-SubmitCaseCreation",
   "productName": "CCD Data Store",
-  "operationName": "Submit Case Creation With No Document Filename",
-  "specs": [
-    "an active caseworker profile in CCD with full permissions on a document field",
-    "is to attach the document uploaded above to a new case without specifying filename",
-    "contains necessary details about the document attached to the case"
-  ],
+  "operationName": "Submit Case Creation",
   "users": {
     "invokingUser": {
       "username": "befta.caseworker.2.solicitor.2@gmail.com",
@@ -29,9 +24,7 @@
     "body": {
       "data": {
         "DocumentField1": {
-          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
-          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary",
-          "document_hash": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][hashToken]}"
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}"
         }
       },
       "event": {

@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-1003-SubmitCaseCreationNoFilenameResponse",
+  "_guid_": "F-1003-SubmitCaseCreationResponse",
   "_extends_": "Common_201_Response",
   "headers": {
     "Content-Type" : "application/json;charset=UTF-8",
