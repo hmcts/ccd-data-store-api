@@ -1,0 +1,8 @@
+{
+  "_guid_": "S-1041",
+  "_extends_": "F-1003-SubmitCaseCreationWithNoFilename",
+  "title": "must successfully create a case with new document uploaded",
+  "expectedResponse": {
+    "_extends_": "F-1003-SubmitCaseCreationNoFilenameResponse"
+  }
+}
