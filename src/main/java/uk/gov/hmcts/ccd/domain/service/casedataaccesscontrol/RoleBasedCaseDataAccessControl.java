@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
@@ -45,7 +46,8 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
                                           final @Qualifier(CachedCaseUserRepository.QUALIFIER)
                                               CaseUserRepository caseUserRepository,
                                           @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
-                                          final CaseDetailsRepository caseDetailsRepository
+                                          final @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                              CaseDetailsRepository caseDetailsRepository
                                           ) {
         this.userAuthorisation = userAuthorisation;
         this.caseUserRepository = caseUserRepository;
@@ -65,11 +67,10 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
 
     @Override
     public Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference) {
-        final Optional<CaseDetails> maybeCase = caseDetailsRepository.findByReference(caseReference);
-        final var caseDetails = maybeCase.orElseThrow(() -> new CaseNotFoundException(caseReference));
+
         Set<String> roles = Sets.union(userRepository.getUserRoles(),
             Sets.newHashSet(caseUserRepository
-                .findCaseRoles(Long.valueOf(caseDetails.getId()), userRepository.getUserId())));
+                .findCaseRoles(Long.valueOf(getCaseId(caseReference)), userRepository.getUserId())));
         return userRoleToAccessProfiles(roles);
     }
 
@@ -113,6 +114,19 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
             .stream()
             .map(AccessProfile::new)
             .collect(Collectors.toSet());
+    }
+
+    private String getCaseId(String caseReference)
+    {
+        Optional<CaseDetails> caseDetails =  caseDetailsRepository.findByReference(caseReference);
+        // R.A uses external micro-services which referer cases by caseReference
+        // Non R.A uses internal case id. Both cases should be contemplated in the code.
+        if (caseDetails.isEmpty()) {
+            caseDetails = caseDetailsRepository.findById(null,Long.parseLong(caseReference));
+        }
+
+        caseDetails.orElseThrow(() -> new CaseNotFoundException(caseReference));
+        return caseDetails.get().getId();
     }
 
 
