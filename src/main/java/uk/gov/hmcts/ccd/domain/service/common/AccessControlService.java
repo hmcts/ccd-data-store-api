@@ -11,6 +11,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
@@ -42,6 +45,9 @@ import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollec
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
 public interface AccessControlService {
+
+    Logger LOG = LoggerFactory.getLogger(AccessControlService.class);
+
     Predicate<AccessControlList> CAN_CREATE = AccessControlList::isCreate;
     Predicate<AccessControlList> CAN_UPDATE = AccessControlList::isUpdate;
     Predicate<AccessControlList> CAN_READ = AccessControlList::isRead;

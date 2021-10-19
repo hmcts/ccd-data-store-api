@@ -2028,7 +2028,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -2038,7 +2038,7 @@ public class AccessControlServiceTest {
 
             List<ILoggingEvent> logsList = listAppender.list;
             assertEquals("Can not find field with caseFieldId=BirthInfo, "
-                + "accessControlList=[ACL{role='caseworker-probate-loa1', crud=R}]",
+                + "accessControlList=[ACL{accessProfile='caseworker-probate-loa1', crud=R}]",
                 logsList.get(0).getFormattedMessage());
 
             logger.detachAndStopAllAppenders();
