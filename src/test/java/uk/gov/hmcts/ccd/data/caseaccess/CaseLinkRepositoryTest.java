@@ -8,6 +8,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 
 import javax.inject.Inject;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,7 +29,16 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void testSaveCaseLinkEntity() {
-        assertNotNull(caseLinkRepository.save(caseLinkEntity));
+
+        CaseLinkEntity savedEntity = caseLinkRepository.save(caseLinkEntity);
+        assertNotNull(savedEntity);
+        assertNotNull(savedEntity.getCaseLinkPrimaryKey());
+        assertEquals(caseLinkEntity.getCaseLinkPrimaryKey().getCaseId(),
+            savedEntity.getCaseLinkPrimaryKey().getCaseId());
+        assertEquals(caseLinkEntity.getCaseLinkPrimaryKey().getLinkedCaseId(),
+            savedEntity.getCaseLinkPrimaryKey().getLinkedCaseId());
+        assertEquals(caseLinkEntity.getCaseTypeId(),
+            savedEntity.getCaseTypeId());
     }
 
     @Test

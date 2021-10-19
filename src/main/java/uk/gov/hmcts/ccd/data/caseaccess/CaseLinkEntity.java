@@ -5,7 +5,6 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.io.Serializable;
-import java.util.Objects;
 
 @Entity
 @Table(name = "case_link")
@@ -31,24 +30,6 @@ public class CaseLinkEntity {
 
         public void setLinkedCaseId(long linkedCaseId) {
             this.linkedCaseId = linkedCaseId;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            CaseLinkPrimaryKey that = (CaseLinkPrimaryKey) o;
-            return caseId.equals(that.caseId)
-                && linkedCaseId.equals(that.linkedCaseId);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(caseId, linkedCaseId);
         }
     }
 
