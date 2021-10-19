@@ -117,15 +117,15 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
     }
 
     private String getCaseId(String caseReference) {
-        Optional<CaseDetails> caseDetails =  caseDetailsRepository.findByReference(caseReference);
+        Optional<CaseDetails> optionalCaseDetails =  caseDetailsRepository.findByReference(caseReference);
         // R.A uses external micro-services which referer cases by caseReference
         // Non R.A uses internal case id. Both cases should be contemplated in the code.
-        if (caseDetails.isEmpty()) {
-            caseDetails = caseDetailsRepository.findById(null,Long.parseLong(caseReference));
+        if (optionalCaseDetails.isEmpty()) {
+            optionalCaseDetails = caseDetailsRepository.findById(null,Long.parseLong(caseReference));
         }
 
-        caseDetails.orElseThrow(() -> new CaseNotFoundException(caseReference));
-        return caseDetails.get().getId();
+        CaseDetails caseDetails = optionalCaseDetails.orElseThrow(() -> new CaseNotFoundException(caseReference));
+        return caseDetails.getId();
     }
 
 
