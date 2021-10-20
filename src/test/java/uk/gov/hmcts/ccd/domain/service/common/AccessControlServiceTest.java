@@ -1,9 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.MissingNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.util.Collections;
@@ -17,6 +22,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
@@ -44,6 +50,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
@@ -69,6 +77,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPage
 
 @SuppressWarnings("checkstyle:TypeName") // too many legacy TypeName occurrences on '@Nested' classes
 public class AccessControlServiceTest {
+    private Logger logger;
+    private ListAppender<ILoggingEvent> listAppender;
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
     private static final String EVENT_ID_WITH_ACCESS = "EVENT_ID_WITH_ACCESS";
@@ -1935,6 +1945,102 @@ public class AccessControlServiceTest {
                     .get("Txt").textValue(), is("someNote11")),
                 () -> assertThat(jsonNode.get("People").get(0).get("value").size(), is(4))
             );
+        }
+
+        @Test
+        @DisplayName("Should filter data for missing node and return remaining data")
+        void shouldFilterDataForMissingNodeAndReturnRemainingData() throws IOException {
+            logger = (Logger) LoggerFactory.getLogger(AccessControlService.class);
+            listAppender = new ListAppender<>();
+            listAppender.start();
+            logger.addAppender(listAppender);
+            final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
+            people.setAccessControlLists(asList(anAcl()
+                .withRole(ROLE_IN_USER_ROLES)
+                .withRead(true)
+                .build()));
+            people.setComplexACLs(asList(
+                aComplexACL()
+                    .withListElementCode("FirstName")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("LastName")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(false)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("BirthInfo")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("BirthInfo.BornCity")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("BirthInfo.BornAddress")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("BirthInfo.BornAddress.Address")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses.Name")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Addresses.Address")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(false)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Notes")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build(),
+                aComplexACL()
+                    .withListElementCode("Notes.Txt")
+                    .withRole(ROLE_IN_USER_ROLES)
+                    .withRead(true)
+                    .build()
+            ));
+
+            final CaseTypeDefinition caseType = newCaseType().withField(people).build();
+            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+
+            JsonNode dataNode = generatePeopleData();
+
+            ((  ObjectNode) dataNode.get("People").get(0).get(VALUE)).replace("BirthInfo", MissingNode.getInstance());
+
+            JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
+                dataNode,
+                caseType.getCaseFieldDefinitions(),
+                ACCESS_PROFILES,
+                CAN_READ,
+                false);
+
+            assertAll(() -> assertTrue(jsonNode.get("People").get(0).get(VALUE).get("BirthInfo").isEmpty()),
+                () -> assertThat(jsonNode.get("People").get(0).get(VALUE).get("FirstName").textValue(), is("Fatih")),
+                () -> assertThat(jsonNode.get("People").get(1).get(VALUE).get("FirstName").textValue(), is("Andrew")));
+
+            List<ILoggingEvent> logsList = listAppender.list;
+            assertEquals("Can not find field with caseFieldId=BirthInfo, "
+                + "accessControlList=[ACL{accessProfile='caseworker-probate-loa1', crud=R}]",
+                logsList.get(0).getFormattedMessage());
+
+            logger.detachAndStopAllAppenders();
         }
 
         @Test
