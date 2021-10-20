@@ -58,9 +58,9 @@
       "security_classification" : "PUBLIC",
       "data" : {
         "DocumentField" : {
-          "document_url" : "[[ANYTHING_PRESENT]]",
-          "document_filename" : "[[ANYTHING_PRESENT]]",
-          "document_binary_url" : "[[ANYTHING_PRESENT]]"
+          "document_url" : "${[scenarioContext][childContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_filename" : "${[scenarioContext][childContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url" : "${[scenarioContext][childContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][_links][binary][href]}"
         },
         "TextField" : "Test1"
       },
