@@ -352,6 +352,24 @@ class DefaultCaseDataAccessControlTest {
         ArgumentCaptor<Set<String>> captor = ArgumentCaptor.forClass(Set.class);
         verify(roleAssignmentService).createCaseRoleAssignments(
             eq(caseDetails), eq(USER_ID), captor.capture(), eq(false));
+        verifyNoInteractions(caseUserRepository);
+        assertEquals(1, captor.getValue().size());
+        assertEquals(CREATOR.getRole(), captor.getValue().iterator().next());
+    }
+
+    @Test
+    void shouldGrantAccessToAccessLevelGrantedCreatorAndSyncCaseUsers() {
+        when(userAuthorisation.getAccessLevel()).thenReturn(UserAuthorisation.AccessLevel.GRANTED);
+        when(applicationParams.getEnableCaseUsersDbSync()).thenReturn(true);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setId(CASE_ID);
+
+        defaultCaseDataAccessControl.grantAccess(caseDetails, USER_ID);
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Set<String>> captor = ArgumentCaptor.forClass(Set.class);
+        verify(roleAssignmentService).createCaseRoleAssignments(
+            eq(caseDetails), eq(USER_ID), captor.capture(), eq(false));
         verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID), USER_ID, CREATOR.getRole());
         assertEquals(1, captor.getValue().size());
         assertEquals(CREATOR.getRole(), captor.getValue().iterator().next());

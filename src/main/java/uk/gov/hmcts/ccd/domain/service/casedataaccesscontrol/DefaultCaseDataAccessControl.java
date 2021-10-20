@@ -136,7 +136,9 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     public void grantAccess(CaseDetails caseDetails, String idamUserId) {
         if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             roleAssignmentService.createCaseRoleAssignments(caseDetails, idamUserId, Set.of(CREATOR.getRole()), false);
-            caseUserRepository.grantAccess(Long.valueOf(caseDetails.getId()), idamUserId, CREATOR.getRole());
+            if (applicationParams.getEnableCaseUsersDbSync()) {
+                caseUserRepository.grantAccess(Long.valueOf(caseDetails.getId()), idamUserId, CREATOR.getRole());
+            }
         }
     }
 
