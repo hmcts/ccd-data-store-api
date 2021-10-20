@@ -1,0 +1,39 @@
+{
+  "_guid_": "F-1003-SubmitCaseCreationNoFilenameResponse",
+  "_extends_": "Common_201_Response",
+  "headers": {
+    "Content-Type" : "application/json;charset=UTF-8",
+    "Transfer-Encoding" : "chunked"
+  },
+  "body": {
+    "_links" : {
+      "self" : {
+        "href" : "{{TEST_URL}}/case-types/BEFTA_CASETYPE_2_1/cases{?ignore-warning}"
+      }
+    },
+    "id" : "[[ANYTHING_PRESENT]]",
+    "jurisdiction" : "BEFTA_JURISDICTION_2",
+    "case_type" : "BEFTA_CASETYPE_2_1",
+    "created_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+    "last_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+    "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+    "state" : "TODO",
+    "security_classification" : "PUBLIC",
+    "data" : {
+      "DocumentField1" : {
+        "document_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+        "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary",
+        "document_filename" : "[[ANYTHING_PRESENT]]"
+      }
+    },
+    "data_classification" : {
+      "DocumentField1" : "PUBLIC"
+    },
+    "after_submit_callback_response" : null,
+    "callback_response_status_code" : null,
+    "callback_response_status" : null,
+    "delete_draft_response_status_code" : null,
+    "delete_draft_response_status" : null
+  }
+
+}
