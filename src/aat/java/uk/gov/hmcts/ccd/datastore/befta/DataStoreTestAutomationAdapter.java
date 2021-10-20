@@ -51,11 +51,11 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             .orElse("error cant find tag");
     }
 
-    @Override
-    protected BeftaTestDataLoader buildTestDataLoader() {
-        return new DataLoaderToDefinitionStore(this,
-            DataLoaderToDefinitionStore.VALID_CCD_TEST_DEFINITIONS_PATH);
-    }
+//    @Override
+//    protected BeftaTestDataLoader buildTestDataLoader() {
+//        return new DataLoaderToDefinitionStore(this,
+//            DataLoaderToDefinitionStore.VALID_CCD_TEST_DEFINITIONS_PATH);
+//    }
 
     @Override
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {

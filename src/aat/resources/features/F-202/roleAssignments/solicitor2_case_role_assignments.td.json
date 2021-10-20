@@ -34,7 +34,7 @@
           "actorId" : "${[scenarioContext][testData][users][S1][id]}",
           "actorIdType" : "IDAM",
           "roleType" : "CASE",
-          "roleName" : "[RESPONDENT]",
+          "roleName" : "Respondent",
           "roleCategory" : "PROFESSIONAL",
           "classification" : "PUBLIC",
           "grantType" : "SPECIFIC",
@@ -51,7 +51,7 @@
           "actorId" : "${[scenarioContext][testData][users][S1][id]}",
           "actorIdType" : "IDAM",
           "roleType" : "CASE",
-          "roleName" : "[RESPONDENT]",
+          "roleName" : "Respondent",
           "roleCategory" : "PROFESSIONAL",
           "classification" : "PUBLIC",
           "grantType" : "SPECIFIC",
@@ -68,7 +68,7 @@
           "actorId" : "${[scenarioContext][testData][users][S1][id]}",
           "actorIdType" : "IDAM",
           "roleType" : "CASE",
-          "roleName" : "[RESPONDENT]",
+          "roleName" : "Respondent",
           "roleCategory" : "PROFESSIONAL",
           "classification" : "PUBLIC",
           "grantType" : "SPECIFIC",
@@ -85,7 +85,7 @@
           "actorId" : "${[scenarioContext][testData][users][S1][id]}",
           "actorIdType" : "IDAM",
           "roleType" : "CASE",
-          "roleName" : "[RESPONDENT]",
+          "roleName" : "Respondent",
           "roleCategory" : "PROFESSIONAL",
           "classification" : "PUBLIC",
           "grantType" : "SPECIFIC",
@@ -168,7 +168,6 @@
         }
       ]
     }
-
   },
 
   "expectedResponse" : {

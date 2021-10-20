@@ -1,5 +1,5 @@
 {
-  "_guid_" : "solicitor2_case_role_assignments_tmp",
+  "_guid_" : "solicitor1_case_role_assignments_tmp",
 
   "productName": "Role Assignment Service",
   "operationName": "post role assignment",
@@ -10,12 +10,14 @@
     "a role assignment to access CaseType CT2",
     "attempts to create a case for CT2",
     "to create a full case",
-    "to give user Solicitor2 their role case role assignments"
+    "to give user Solicitor1 a PRIVATE CASE role assignment to view the previously created case",
+    "to give user Solicitor1 their role case role assignments"
+
   ],
 
   "users" : {
     "S1": {
-      "username": "ccd.ac.solicitor2@gmail.com",
+      "username": "ccd.ac.solicitor1@gmail.com",
       "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
     }
   },
@@ -34,7 +36,7 @@
           "actorId" : "${[scenarioContext][testData][users][S1][id]}",
           "actorIdType" : "IDAM",
           "roleType" : "CASE",
-          "roleName" : "Respondent",
+          "roleName" : "[APPELLANT]",
           "roleCategory" : "PROFESSIONAL",
           "classification" : "PUBLIC",
           "grantType" : "SPECIFIC",
@@ -51,9 +53,9 @@
           "actorId" : "${[scenarioContext][testData][users][S1][id]}",
           "actorIdType" : "IDAM",
           "roleType" : "CASE",
-          "roleName" : "Respondent",
+          "roleName" : "[APPELLANT]",
           "roleCategory" : "PROFESSIONAL",
-          "classification" : "PUBLIC",
+          "classification" : "PRIVATE",
           "grantType" : "SPECIFIC",
           "readOnly" : false,
           "beginTime" : "2021-01-01T00:00:00Z",
@@ -61,9 +63,10 @@
           "attributes" : {
             "jurisdiction" : "J1",
             "caseType" : "CT2",
-            "caseId" : "${[scenarioContext][parentContext][childContexts][J1-CT2-03][testData][actualResponse][body][id]}"
+            "caseId" : "${[scenarioContext][parentContext][childContexts][J1-CT2-02][testData][actualResponse][body][id]}"
           }
         }
+
       ]
     }
 

@@ -71,7 +71,7 @@ public class RoleAssignmentsFilteringServiceImpl implements RoleAssignmentsFilte
                 boolean attributeMatched = hasMatch.test(roleAttributeMatcher, roleAssignment);
                 roleAttributeMatchersResults.put(roleAttributeMatcher.getClass().getName(), attributeMatched);
             }
-
+  //add the role assignment along with the attribute matcher ?
             returnValue.addFilterMatchingResult(new RoleAssignmentFilteringResult(roleAssignment,
                                                                                     roleAttributeMatchersResults));
         }

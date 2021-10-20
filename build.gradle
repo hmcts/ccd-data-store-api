@@ -820,7 +820,7 @@ task functional() {
             args = [
                     '--threads', '10',
                     '--plugin', "json:${rootDir}/target/cucumber.json",
-                    '--tags', '@ash',
+                    '--tags', '@S-202.3',
                     '--glue', 'uk.gov.hmcts.befta.player',
                     '--glue', 'uk.gov.hmcts.ccd.datastore.befta', 'src/aat/resources/features'
             ]

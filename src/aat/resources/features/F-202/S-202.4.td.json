@@ -10,6 +10,7 @@
     "to create a token for event creation",
     "restricted access to create CT2 cases",
     "attempts to search for case J1-CT2-01",
+    "to give user Solicitor1 their role case role assignments",
     "contains no cases",
     "to give user Solicitor2 their role case role assignments"
   ],
@@ -33,9 +34,7 @@
     "body": {
       "query": {
         "match": {
-          "match":{
-            "data.F2.keyword": "b"
-          }
+          "data.F2.keyword": "b${[scenarioContext][customValues][UniqueString]}"
         }
       }
     }

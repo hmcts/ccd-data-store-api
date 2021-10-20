@@ -9,8 +9,14 @@
   "specs": [
     "to create a token for event creation",
     "restricted access to create CT2 cases",
+    "attempts to search for case type CT2 by field F2=b",
     "attempts to search for case J1-CT2-01",
     "contains no cases",
+    "contains case J1-CT2-03",
+    "attempts to search for case type CT2 by field F2",
+    "contains case field F3 only as the user only has SC access to this field",
+    "contains case J1-CT2-03 which the user has state access to",
+    "does not contain case J1-CT2-01 as the user does not have access to the state",
     "to give user Solicitor2 their role case role assignments"
   ],
 
@@ -33,9 +39,7 @@
     "body": {
       "query": {
         "match": {
-          "match":{
-            "data.F2.keyword": "b"
-          }
+            "data.F2.keyword": "b${[scenarioContext][customValues][UniqueString]}"
         }
       }
     }
@@ -43,10 +47,42 @@
 
   "expectedResponse": {
     "_extends_": "Common_200_Response",
-    "body" : {
-      "total" : 0,
-      "cases" : [ ],
-      "case_types_results" : [ ]
+    "body" :  {
+      "total" : 1,
+      "cases" : [ {
+        "id" : "[[ANYTHING_PRESENT]]",
+        "jurisdiction" : "J1",
+        "state" : "Issued1",
+        "version" : null,
+        "case_type_id" : "CT2",
+        "created_date" : "[[ANYTHING_PRESENT]]",
+        "last_modified" : "[[ANYTHING_PRESENT]]",
+        "last_state_modified_date" : "[[ANYTHING_PRESENT]]",
+        "security_classification" : "PUBLIC",
+        "case_data" : {
+          "F3" : "C${[scenarioContext][customValues][UniqueString]}"
+        },
+        "data_classification" : {
+          "F1" : "RESTRICTED",
+          "F2" : "PRIVATE",
+          "F3" : "PUBLIC"
+        },
+        "supplementary_data" : null,
+        "after_submit_callback_response" : null,
+        "callback_response_status_code" : null,
+        "callback_response_status" : null,
+        "delete_draft_response_status_code" : null,
+        "delete_draft_response_status" : null,
+        "security_classifications" : {
+          "F1" : "RESTRICTED",
+          "F2" : "PRIVATE",
+          "F3" : "PUBLIC"
+        }
+      } ],
+      "case_types_results" : [ {
+        "total" : 1,
+        "case_type_id" : "CT2"
+      } ]
     }
   }
 

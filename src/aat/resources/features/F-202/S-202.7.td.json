@@ -23,7 +23,7 @@
     "body": {
       "query": {
         "match": {
-          "data.F3.keyword": "c"
+          "data.F3.keyword": "c${[scenarioContext][customValues][UniqueString]}"
         }
       }
     }
