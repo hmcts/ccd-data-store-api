@@ -158,6 +158,9 @@ public class ApplicationParams {
     @Value("${enable-pseudo-access-profiles-generation}")
     private boolean enablePseudoAccessProfilesGeneration;
 
+    @Value("${enable-case-users-db-sync}")
+    private boolean enableCaseUsersDbSync;
+
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
 
@@ -455,6 +458,10 @@ public class ApplicationParams {
 
     public boolean getEnablePseudoAccessProfilesGeneration() {
         return enablePseudoAccessProfilesGeneration;
+    }
+
+    public boolean getEnableCaseUsersDbSync() {
+        return enableCaseUsersDbSync;
     }
 
     public List<String> getCcdAccessControlCitizenRoles() {

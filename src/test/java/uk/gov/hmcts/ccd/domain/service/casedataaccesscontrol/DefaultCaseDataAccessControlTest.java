@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
@@ -111,6 +112,9 @@ class DefaultCaseDataAccessControlTest {
 
     @Mock
     private UserAuthorisation userAuthorisation;
+
+    @Mock
+    private CaseUserRepository caseUserRepository;
 
     @InjectMocks
     private DefaultCaseDataAccessControl defaultCaseDataAccessControl;
@@ -348,6 +352,7 @@ class DefaultCaseDataAccessControlTest {
         ArgumentCaptor<Set<String>> captor = ArgumentCaptor.forClass(Set.class);
         verify(roleAssignmentService).createCaseRoleAssignments(
             eq(caseDetails), eq(USER_ID), captor.capture(), eq(false));
+        verify(caseUserRepository).grantAccess(Long.valueOf(CASE_ID), USER_ID, CREATOR.getRole());
         assertEquals(1, captor.getValue().size());
         assertEquals(CREATOR.getRole(), captor.getValue().iterator().next());
     }
@@ -361,6 +366,7 @@ class DefaultCaseDataAccessControlTest {
         defaultCaseDataAccessControl.grantAccess(caseDetails, USER_ID);
 
         verifyNoInteractions(roleAssignmentService);
+        verifyNoInteractions(caseUserRepository);
     }
 
     private List<AccessControlList> createAccessControlList() {
