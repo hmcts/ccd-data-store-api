@@ -164,6 +164,9 @@ public class ApplicationParams {
     @Value("${idam.data-store.system-user.password}")
     private String dataStoreSystemUserPassword;
 
+    @Value("#{'${case.data.issue.logging.jurisdictions}'.split(',')}")
+    private List<String> caseDataIssueLoggingJurisdictions;
+
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -201,7 +204,7 @@ public class ApplicationParams {
     }
 
     public String draftURL(String draftId) {
-        return draftHost + "/drafts/" + draftId;
+        return draftHost + "/drafts/" + encode(draftId);
     }
 
     public String getDraftEncryptionKey() {
@@ -275,7 +278,7 @@ public class ApplicationParams {
     }
 
     public String userDefaultSettingsURL() {
-        return userProfileHost + "/user-profile/users?uid={uid}";
+        return userProfileHost + "/user-profile/users";
     }
 
     public String getTokenSecret() {
@@ -448,5 +451,9 @@ public class ApplicationParams {
 
     public void setDataStoreSystemUserPassword(String dataStoreSystemUserPassword) {
         this.dataStoreSystemUserPassword = dataStoreSystemUserPassword;
+    }
+
+    public List<String> getCaseDataIssueLoggingJurisdictions() {
+        return caseDataIssueLoggingJurisdictions;
     }
 }
