@@ -30,15 +30,5 @@
         }
       ]
     }
-  },
-
-  "expectedResponse": {
-    "body" : {
-      "metadata": {
-        "case_type_id": "FT_MasterCaseType",
-        "jurisdiction": "BEFTA_MASTER"
-      }
-    }
   }
-
 }
