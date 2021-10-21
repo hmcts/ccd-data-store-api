@@ -1,7 +1,8 @@
 CREATE TABLE public.case_link (
     case_id bigint NOT NULL,
     linked_case_id bigint NOT NULL,
-    case_type_id character varying(255) NOT NULL
+    case_type_id character varying(255) NOT NULL,
+    PRIMARY KEY(case_id, linked_case_id)
 );
 
 ALTER TABLE public.case_link
