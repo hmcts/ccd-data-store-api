@@ -23,26 +23,9 @@
 
   "expectedResponse": {
     "body": {
-      "token" : "[[ANYTHING_PRESENT]]",
       "case_details" : {
-        "id" : null,
         "jurisdiction" : "BEFTA_MASTER",
-        "state" : null,
-        "version" : null,
-        "case_type_id" : "FT_MasterCaseType",
-        "created_date" : null,
-        "last_modified" : null,
-        "last_state_modified_date" : null,
-        "security_classification" : null,
-        "case_data" : { },
-        "data_classification" : { },
-        "supplementary_data" : null,
-        "after_submit_callback_response" : null,
-        "callback_response_status_code" : null,
-        "callback_response_status" : null,
-        "delete_draft_response_status_code" : null,
-        "delete_draft_response_status" : null,
-        "security_classifications" : { }
+        "case_type_id" : "FT_MasterCaseType"
       },
       "event_id": "documentHashCallback"
     }
