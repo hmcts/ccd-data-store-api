@@ -159,9 +159,10 @@ public class CreateCaseEventService {
             caseEventDefinition,
             caseTypeDefinition
         );
-        final CaseDetails updatedCaseDetailsWithoutHashes = caseDocumentService.stripDocumentHashes(updatedCaseDetails);
 
-        timeToLiveService.validateSuspensionChange(updatedCaseDetails.getData(), caseDetailsInDatabase.getData());
+        timeToLiveService.validateSuspensionChange(content.getData(), caseDetailsInDatabase.getData());
+
+        final CaseDetails updatedCaseDetailsWithoutHashes = caseDocumentService.stripDocumentHashes(updatedCaseDetails);
 
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(
             caseEventDefinition,
@@ -189,7 +190,6 @@ public class CreateCaseEventService {
             caseDetailsAfterCallback
         );
 
-        timeToLiveService.verifyTTLContentNotChanged(updatedCaseDetails.getData(), caseDetailsAfterCallback.getData());
         caseDetailsAfterCallbackWithoutHashes
             .setResolvedTTL(timeToLiveService.getUpdatedResolvedTTL(caseDetailsAfterCallback.getData()));
 

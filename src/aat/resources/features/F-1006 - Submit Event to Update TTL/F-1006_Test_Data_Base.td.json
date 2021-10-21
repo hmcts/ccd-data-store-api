@@ -20,12 +20,5 @@
       "ctid": "FT_MasterCaseType",
       "cid": "${[scenarioContext][childContexts][F-1006_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
 		}
-	},
-
-	"expectedResponse": {
-		"headers": {
-			"Content-Length": "[[ANYTHING_PRESENT]]",
-			"Content-Encoding": "gzip"
-		}
 	}
 }

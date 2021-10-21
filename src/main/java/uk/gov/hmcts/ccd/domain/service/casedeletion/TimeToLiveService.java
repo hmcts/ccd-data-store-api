@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.time.LocalDate;
@@ -44,14 +45,10 @@ public class TimeToLiveService {
             Integer ttlIncrement = caseEventDefinition.getTtlIncrement();
             clonedData = new HashMap<>(data);
             if (clonedData.get(TTL_CASE_FIELD_ID) != null && (ttlIncrement != null)) {
-                try {
-                    TTL timeToLive = getTTLFromJson(clonedData.get(TTL_CASE_FIELD_ID));
-                    if (timeToLive != null) {
-                        timeToLive.setSystemTTL(LocalDate.now().plusDays(ttlIncrement));
-                        clonedData.put(TTL_CASE_FIELD_ID, objectMapper.valueToTree(timeToLive));
-                    }
-                } catch (JsonProcessingException e) {
-                    log.error("Failed to read TTL from case data");
+                TTL timeToLive = getTTLFromJson(clonedData.get(TTL_CASE_FIELD_ID));
+                if (timeToLive != null) {
+                    timeToLive.setSystemTTL(LocalDate.now().plusDays(ttlIncrement));
+                    clonedData.put(TTL_CASE_FIELD_ID, objectMapper.valueToTree(timeToLive));
                 }
             }
         }
@@ -61,29 +58,19 @@ public class TimeToLiveService {
 
     public void verifyTTLContentNotChanged(Map<String, JsonNode> expected, Map<String, JsonNode> actual) {
         if (expected != null && actual != null) {
-            try {
-                TTL expectedTtl = getTTLFromJson(expected.get(TTL_CASE_FIELD_ID));
-                TTL actualTtl = getTTLFromJson(actual.get(TTL_CASE_FIELD_ID));
+            TTL expectedTtl = getTTLFromJson(expected.get(TTL_CASE_FIELD_ID));
+            TTL actualTtl = getTTLFromJson(actual.get(TTL_CASE_FIELD_ID));
 
-                if (expectedTtl != null && !expectedTtl.equals(actualTtl)) {
-                    throw new BadRequestException(TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE);
-                }
-            } catch (JsonProcessingException e) {
-                log.error("Failed to read TTL from case data");
+            if (expectedTtl != null && !expectedTtl.equals(actualTtl)) {
+                throw new BadRequestException(TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE);
             }
         }
     }
 
     public void validateSuspensionChange(Map<String, JsonNode> beforeCallbackData,
                                           Map<String, JsonNode> currentDataInDatabase) {
-        TTL beforeCallbackTTL = null;
-        TTL currentTTLInDatabase = null;
-        try {
-            beforeCallbackTTL = getTTLFromJson(beforeCallbackData.get(TTL_CASE_FIELD_ID));
-            currentTTLInDatabase = getTTLFromJson(currentDataInDatabase.get(TTL_CASE_FIELD_ID));
-        } catch (JsonProcessingException e) {
-            log.error("Failed to read TTL from case data");
-        }
+        TTL beforeCallbackTTL = getTTLFromJson(beforeCallbackData.get(TTL_CASE_FIELD_ID));
+        TTL currentTTLInDatabase = getTTLFromJson(currentDataInDatabase.get(TTL_CASE_FIELD_ID));
 
         if (beforeCallbackTTL == null || currentTTLInDatabase == null) {
             return;
@@ -102,14 +89,9 @@ public class TimeToLiveService {
         }
     }
 
-    public LocalDate getUpdatedResolvedTTL(Map<String, JsonNode> afterCallbackData) {
-        TTL afterCallbackTTL = null;
+    public LocalDate getUpdatedResolvedTTL(Map<String, JsonNode> caseData) {
         LocalDate resolveTTL = null;
-        try {
-            afterCallbackTTL = getTTLFromJson(afterCallbackData.get(TTL_CASE_FIELD_ID));
-        } catch (JsonProcessingException e) {
-            log.error("Failed to read TTL from case data");
-        }
+        TTL afterCallbackTTL = getTTLFromJson(caseData.get(TTL_CASE_FIELD_ID));
 
         if (afterCallbackTTL != null) {
             if (afterCallbackTTL.isSuspended()) {
@@ -123,10 +105,11 @@ public class TimeToLiveService {
         return resolveTTL;
     }
 
-    private TTL getTTLFromJson(JsonNode ttlJsonNode) throws JsonProcessingException {
-        if (ttlJsonNode != null) {
+    private TTL getTTLFromJson(JsonNode ttlJsonNode) {
+        try {
             return objectMapper.readValue(ttlJsonNode.toString(), TTL.class);
+        } catch (NullPointerException | JsonProcessingException e) {
+            throw new ServiceException("Unable to read TTL from case data", e);
         }
-        return null;
     }
 }

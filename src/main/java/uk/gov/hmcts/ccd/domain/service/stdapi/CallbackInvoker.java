@@ -12,6 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
@@ -39,6 +40,7 @@ public class CallbackInvoker {
     private final CaseTypeService caseTypeService;
     private final CaseDataService caseDataService;
     private final CaseSanitiser caseSanitiser;
+    private final TimeToLiveService timeToLiveService;
     private final SecurityValidationService securityValidationService;
 
 
@@ -47,11 +49,13 @@ public class CallbackInvoker {
                            final CaseTypeService caseTypeService,
                            final CaseDataService caseDataService,
                            final CaseSanitiser caseSanitiser,
+                           final TimeToLiveService timeToLiveService,
                            final SecurityValidationService securityValidationService) {
         this.callbackService = callbackService;
         this.caseTypeService = caseTypeService;
         this.caseDataService = caseDataService;
         this.caseSanitiser = caseSanitiser;
+        this.timeToLiveService = timeToLiveService;
         this.securityValidationService = securityValidationService;
     }
 
@@ -91,6 +95,7 @@ public class CallbackInvoker {
         }
 
         if (callbackResponse.isPresent()) {
+            timeToLiveService.verifyTTLContentNotChanged(caseDetailsBefore.getData(), caseDetails.getData());
             return validateAndSetFromAboutToSubmitCallback(caseTypeDefinition,
                 caseDetails,
                 ignoreWarning,

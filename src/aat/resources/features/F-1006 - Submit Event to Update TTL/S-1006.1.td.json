@@ -48,9 +48,7 @@
     "_extends_": "Common_422_Response",
     "body" : {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
-      "timestamp": "[[ANYTHING_PRESENT]]",
       "message": "Unsetting a suspension can only be allowed if the deletion will occur beyond the guard period.",
-      "path": "[[ANYTHING_PRESENT]]",
       "details": null
     }
   }

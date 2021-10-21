@@ -24,10 +24,6 @@
 
   "expectedResponse": {
     "body": {
-      "case_details": {
-        "jurisdiction": "[[ANYTHING_PRESENT]]",
-        "case_type_id": "[[ANYTHING_PRESENT]]"
-      },
       "event_id": "createCaseSubmitTTL"
     }
   }

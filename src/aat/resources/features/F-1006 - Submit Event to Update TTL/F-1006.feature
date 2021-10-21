@@ -61,7 +61,7 @@ Feature: F-1006: Submit Event to Update TTL
      Then a negative response is received
       And the response has all other details as expected
 
-    @S-1006.5 @AC-2
+    @S-1006.5 @AC-11
     Scenario: TTL.Suspended changed to "N/No/F/False" or NULL, SystemTTL and Override TTL are NULL and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
     Given a user with [an active profile in CCD]
       And a successful call [to create a case] as in [F-1006_CreateSuspendedCasePreRequisiteCaseworker]
@@ -75,7 +75,7 @@ Feature: F-1006: Submit Event to Update TTL
      Then a positive response is received
       And the response has all other details as expected
 
-    @S-1006.6 @AC-3
+    @S-1006.6 @AC-12
     Scenario: TTL.Suspended changed to "N/No/F/False" or NULL, SystemTTL greater than TTLGuard, OverRide TTL is NULL and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
     Given a user with [an active profile in CCD]
       And a successful call [to create a case] as in [F-1006_CreateSuspendedCasePreRequisiteCaseworker]
@@ -89,7 +89,7 @@ Feature: F-1006: Submit Event to Update TTL
      Then a positive response is received
       And the response has all other details as expected
 
-    @S-1006.7 @AC-7
+    @S-1006.7 @AC-13
     Scenario: TTL.Suspended changed to "N/No/F/False" or NULL, SystemTTL greater than TTLGuard, OverRide TTL is NULL and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
     Given a user with [an active profile in CCD]
       And a successful call [to create a case] as in [F-1006_CreateSuspendedCasePreRequisiteCaseworker]

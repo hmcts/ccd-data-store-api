@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.config.JacksonObjectMapperConfig;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.time.LocalDate;
@@ -85,7 +86,12 @@ class TimeToLiveServiceTest {
     void verifyTTLContentNotChangedNoTTLInCaseData() {
         Map<String, JsonNode> expectedCaseData = new HashMap<>(caseData);
 
-        timeToLiveService.verifyTTLContentNotChanged(expectedCaseData, caseData);
+
+
+        final ServiceException exception = assertThrows(ServiceException.class,
+            () -> timeToLiveService.verifyTTLContentNotChanged(expectedCaseData, caseData));
+        Assert.assertThat(exception.getMessage(),
+            startsWith("Unable to read TTL from case data"));
     }
 
     @Test
