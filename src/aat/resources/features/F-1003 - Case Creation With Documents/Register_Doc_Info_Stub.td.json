@@ -5,6 +5,10 @@
     "to register a document info callback stub with the ccd-test-stubs service"
   ],
 
+  "prerequisites": [
+    "UnRegister_All_Doc_Info_Stubs_By_Metadata"
+  ],
+
   "request": {
     "body": {
       "request": {
@@ -30,6 +34,9 @@
         "transformers": [
           "dynamic-case-data-response-transformer"
         ]
+      },
+      "metadata": {
+        "testId": "S-1041"
       }
     }
   },
@@ -61,7 +68,10 @@
           "dynamic-case-data-response-transformer"
         ]
       },
-      "uuid": "[[ANY_STRING_NOT_NULLABLE]]"
+      "uuid": "[[ANY_STRING_NOT_NULLABLE]]",
+      "metadata": {
+        "testId": "S-1041"
+      }
     }
   }
 }
