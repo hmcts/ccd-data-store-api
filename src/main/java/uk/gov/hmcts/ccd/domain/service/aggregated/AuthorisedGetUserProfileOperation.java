@@ -48,11 +48,14 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
 
     private UserProfile filterCaseTypes(UserProfile userProfile, Predicate<AccessControlList> access) {
         final Set<String> userRoles = getUserRoles();
+        Set<String> caseAndUserRoles = Sets.union(userRoles,
+            caseUserRepository.getCaseUserRolesByUserId(userRepository.getUserId()));
+
         Arrays.stream(userProfile.getJurisdictions()).forEach(
             jurisdiction -> jurisdiction.setCaseTypeDefinitions(
                 jurisdiction.getCaseTypeDefinitions()
                     .stream()
-                    .map(caseType -> verifyAccess(caseType, userRoles, access))
+                    .map(caseType -> verifyAccess(caseType, userRoles, caseAndUserRoles, access))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(Collectors.toList())
@@ -65,14 +68,14 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
         return userRepository.getUserRoles();
     }
 
-    private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles,
+    private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition,
+                                                      Set<String> userRoles,
+                                                      Set<String> caseAndUserRoles,
                                                       Predicate<AccessControlList> access) {
         if (caseTypeDefinition == null || CollectionUtils.isEmpty(userRoles)
             || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, access)) {
             return Optional.empty();
         }
-        Set<String> caseAndUserRoles = Sets.union(userRoles,
-            caseUserRepository.getCaseUserRolesByUserId(userRepository.getUserId()));
 
         caseTypeDefinition.setStates(accessControlService.filterCaseStatesByAccess(caseTypeDefinition.getStates(),
             caseAndUserRoles, access));
