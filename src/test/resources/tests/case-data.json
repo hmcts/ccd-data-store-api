@@ -156,5 +156,10 @@
         "document_binary_url": "http://dm-store:8080/documents/f6d623f2-db67-4a01-ae6e-3b6ee14a8b20/binary"
       }
     }
-  ]
+  ],
+  "hearingDoc": {
+    "document_url": "http://em-hrs-api-aat.service.core-compute-aat.internal/hearing-recordings/39a196bf-f105-4e47-840a-90f661b54ed0/segments/1",
+    "document_filename": "Hearing_Document.docx",
+    "document_binary_url": "http://em-hrs-api-aat.service.core-compute-aat.internal/hearing-recordings/39a196bf-f105-4e47-840a-90f661b54ed0/segments/1"
+  }
 }
