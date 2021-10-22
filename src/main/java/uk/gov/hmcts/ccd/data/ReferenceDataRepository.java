@@ -23,16 +23,20 @@ import java.util.Optional;
 
 @Named
 @Slf4j
+@SuppressWarnings("squid:S1075") // paths below are not URI path literals
 public class ReferenceDataRepository {
+
     private final SecurityUtils securityUtils;
     private final RestTemplate restTemplate;
     private final ApplicationParams applicationParams;
     private final CacheManager cacheManager;
 
-    private static final String BUILDING_LOCATIONS_CACHE = "buildingLocations";
-    private static final String SERVICES_CACHE = "orgServices";
-    private static final String CACHE_KEY = "#root.method.name";
     private static final String RESULT_IS_NULL_OR_EMPTY = "#result==null or #result.isEmpty()";
+
+    public static final String BUILDING_LOCATIONS_CACHE = "buildingLocations";
+    public static final String BUILDING_LOCATIONS_CACHE_KEY = "getBuildingLocations";
+    public static final String SERVICES_CACHE = "orgServices";
+    public static final String SERVICES_CACHE_KEY = "getServices";
 
     static final String BUILDING_LOCATIONS_PATH = "/refdata/location/building-locations";
     static final String SERVICES_PATH = "/refdata/location/orgServices";
@@ -48,22 +52,33 @@ public class ReferenceDataRepository {
         this.cacheManager = cacheManager;
     }
 
-    @Cacheable(cacheNames = BUILDING_LOCATIONS_CACHE, key = CACHE_KEY, unless = RESULT_IS_NULL_OR_EMPTY)
+    @Cacheable(
+        cacheNames = BUILDING_LOCATIONS_CACHE,
+        key = "T(uk.gov.hmcts.ccd.data.ReferenceDataRepository).BUILDING_LOCATIONS_CACHE_KEY",
+        unless = RESULT_IS_NULL_OR_EMPTY
+    )
     public List<BuildingLocation> getBuildingLocations() {
         return getReferenceData(BUILDING_LOCATIONS_PATH, BuildingLocation[].class);
     }
 
-    @Cacheable(cacheNames = SERVICES_CACHE, key = CACHE_KEY, unless = RESULT_IS_NULL_OR_EMPTY)
+    @Cacheable(
+        cacheNames = SERVICES_CACHE,
+        key = "T(uk.gov.hmcts.ccd.data.ReferenceDataRepository).SERVICES_CACHE_KEY",
+        unless = RESULT_IS_NULL_OR_EMPTY
+    )
     public List<ServiceReferenceData> getServices() {
         return getReferenceData(SERVICES_PATH, ServiceReferenceData[].class);
     }
 
     private <T> List<T> getReferenceData(final String path, final Class<T[]> responseType) {
         try {
+
+            log.debug("getReferenceData: " + path);
+
             final T[] result = restTemplate.exchange(
                     applicationParams.getReferenceDataApiUrl() + path,
                     HttpMethod.GET,
-                    new HttpEntity<>(securityUtils.authorizationHeaders()),
+                    new HttpEntity<>(securityUtils.authorizationHeadersForDataStoreSystemUser()),
                     responseType)
                 .getBody();
 
@@ -79,19 +94,20 @@ public class ReferenceDataRepository {
     @Scheduled(cron = "${reference.data.cache.refresh.rate.cron}")
     public void updateBuildingLocationCache() {
         final List<BuildingLocation> buildingLocations = getBuildingLocations();
-        updateCache(BUILDING_LOCATIONS_CACHE, buildingLocations);
+        updateCache(BUILDING_LOCATIONS_CACHE, BUILDING_LOCATIONS_CACHE_KEY, buildingLocations);
     }
 
     @Scheduled(cron = "${reference.data.cache.refresh.rate.cron}")
     public void updateServicesCache() {
         final List<ServiceReferenceData> services = getServices();
-        updateCache(SERVICES_CACHE, services);
+        updateCache(SERVICES_CACHE, SERVICES_CACHE_KEY, services);
     }
 
-    private <T> void updateCache(final String cacheName, final List<T> newValue) {
+    private <T> void updateCache(final String cacheName, final String cacheKey, final List<T> newValue) {
         if (!newValue.isEmpty()) {
             invalidateCache(cacheName);
-            putCache(cacheName, newValue);
+            putCache(cacheName, cacheKey, newValue);
+            log.debug("Update " + cacheName + " cache with " + newValue.size() + " records.");
         }
     }
 
@@ -99,8 +115,8 @@ public class ReferenceDataRepository {
         Optional.ofNullable(cacheManager.getCache(cacheName)).ifPresent(Cache::invalidate);
     }
 
-    private <T> void putCache(final String cacheName, final List<T> newValue) {
+    private <T> void putCache(final String cacheName, final String cacheKey, final List<T> newValue) {
         Optional.ofNullable(cacheManager.getCache(cacheName))
-            .ifPresent(cache -> cache.putIfAbsent(CACHE_KEY, newValue));
+            .ifPresent(cache -> cache.putIfAbsent(cacheKey, newValue));
     }
 }

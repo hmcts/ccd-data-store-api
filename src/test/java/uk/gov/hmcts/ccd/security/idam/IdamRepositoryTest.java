@@ -55,6 +55,21 @@ class IdamRepositoryTest {
         assertThat(idamUserRoles).isSameAs(ROLES);
     }
 
+    @Test
+    @DisplayName("Get DataStore's SystemUser access token")
+    void shouldGetDataStoreSystemUserAccessToken() {
+
+        // GIVEN
+        mockGetDataStoreSystemUserAccessToken();
+
+        // WHEN
+        String token = idamRepository.getDataStoreSystemUserAccessToken();
+
+        // THEN
+        assertThat(token).isSameAs(TEST_USER_TOKEN);
+
+    }
+
     private void mockGetUserByUserId() {
         UserDetails userDetails = UserDetails.builder()
             .id(USER_ID)

@@ -11,6 +11,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_CACHE;
+import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_CACHE;
+
 @Configuration
 @EnableCaching
 @EnableScheduling
@@ -48,8 +51,8 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithMaxIdle("jurisdictionUiConfigsCache", latestVersionTTL));
         config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", latestVersionTTL));
         config.addMapConfig(newMapConfigWithTtl("jurisdictionCache", applicationParams.getJurisdictionTTLSecs()));
-        config.addMapConfig(newMapConfigWithTtl("buildingLocations", applicationParams.getRefDataCacheTtlInSec()));
-        config.addMapConfig(newMapConfigWithTtl("orgServices", applicationParams.getRefDataCacheTtlInSec()));
+        config.addMapConfig(newMapConfigWithTtl(BUILDING_LOCATIONS_CACHE, applicationParams.getRefDataCacheTtlInSec()));
+        config.addMapConfig(newMapConfigWithTtl(SERVICES_CACHE, applicationParams.getRefDataCacheTtlInSec()));
     }
 
     private MapConfig newMapConfigWithMaxIdle(final String name, final Integer maxIdle) {

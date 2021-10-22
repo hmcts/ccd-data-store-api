@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.data;
 import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
 import uk.gov.hmcts.ccd.domain.model.refdata.CourtVenue;
@@ -18,9 +19,12 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_CACHE;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_PATH;
+import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_CACHE;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_PATH;
 
+@Isolated("Isolate from other integration tests that may utilise the same ReferenceData cache.")
 class ReferenceDataRepositoryIT extends WireMockBaseTest implements ReferenceDataTestFixtures {
 
     @Inject
@@ -28,7 +32,7 @@ class ReferenceDataRepositoryIT extends WireMockBaseTest implements ReferenceDat
 
     @BeforeEach
     void prepare() {
-        List.of("buildingLocations", "orgServices")
+        List.of(BUILDING_LOCATIONS_CACHE, SERVICES_CACHE)
             .parallelStream()
             .forEach(cacheName -> underTest.invalidateCache(cacheName));
 

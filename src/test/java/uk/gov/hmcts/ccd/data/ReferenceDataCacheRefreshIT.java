@@ -5,8 +5,8 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import com.github.tomakehurst.wiremock.verification.VerificationResult;
 import org.awaitility.Duration;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
@@ -22,10 +22,12 @@ import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_CACHE;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_PATH;
+import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_CACHE;
 import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_PATH;
 
-@Disabled
+@Isolated("Isolate from other integration tests that may utilise the same ReferenceData cache.")
 @TestPropertySource(locations = "classpath:cache-refresh-schedule.properties")
 class ReferenceDataCacheRefreshIT extends WireMockBaseTest implements ReferenceDataTestFixtures {
 
@@ -37,7 +39,7 @@ class ReferenceDataCacheRefreshIT extends WireMockBaseTest implements ReferenceD
 
     @BeforeEach
     void prepare() {
-        List.of("buildingLocations", "orgServices")
+        List.of(BUILDING_LOCATIONS_CACHE, SERVICES_CACHE)
             .parallelStream()
             .forEach(cacheName -> underTest.invalidateCache(cacheName));
 
