@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -50,6 +52,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseDetailsRepository caseDetailsRepository;
     private final UserAuthorisation userAuthorisation;
+    private final CaseUserRepository caseUserRepository;
 
     @Autowired
     public DefaultCaseDataAccessControl(RoleAssignmentService roleAssignmentService,
@@ -63,7 +66,9 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
                                             final CaseDefinitionRepository caseDefinitionRepository,
                                         @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                                 CaseDetailsRepository caseDetailsRepository,
-                                        UserAuthorisation userAuthorisation) {
+                                        UserAuthorisation userAuthorisation,
+                                        @Qualifier(CachedCaseUserRepository.QUALIFIER)
+                                                CaseUserRepository caseUserRepository) {
         this.roleAssignmentService = roleAssignmentService;
         this.securityUtils = securityUtils;
         this.roleAssignmentsFilteringService = roleAssignmentsFilteringService;
@@ -74,6 +79,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.userAuthorisation = userAuthorisation;
+        this.caseUserRepository = caseUserRepository;
     }
 
     // Returns List<AccessProfile>. Returns list of access profiles
@@ -130,6 +136,9 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     public void grantAccess(CaseDetails caseDetails, String idamUserId) {
         if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             roleAssignmentService.createCaseRoleAssignments(caseDetails, idamUserId, Set.of(CREATOR.getRole()), false);
+            if (applicationParams.getEnableCaseUsersDbSync()) {
+                caseUserRepository.grantAccess(Long.valueOf(caseDetails.getId()), idamUserId, CREATOR.getRole());
+            }
         }
     }
 
