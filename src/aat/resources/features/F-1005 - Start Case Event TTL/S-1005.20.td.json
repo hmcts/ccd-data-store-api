@@ -1,0 +1,26 @@
+{
+  "_guid_": "S-1005.20",
+  "_extends_": "F-1005-CreateEventTokenErrorResponseCitizen",
+  "title": "must error when updating a case where about to start callback has modified TTL.OverrideTTL",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details",
+    "has a TTLIncrement of 20 days configured",
+    "is configured to trigger an About to Start callback that changes TTL.OverrideTTL",
+    "contains the error message indicating unauthorised change to the TTL values"
+  ],
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "cid": "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}",
+      "etid": "updateModifiedOverrideTTL"
+    }
+  }
+}
