@@ -80,7 +80,8 @@ public class CaseAccessOperation {
             if (currentRoles.stream().noneMatch(cauRole -> cauRole.getCaseRole().equals(CREATOR.getRole()))) {
                 roleAssignmentService.createCaseRoleAssignments(caseDetails, userId, Set.of(CREATOR.getRole()), false);
             }
-        } else {
+        }
+        if (applicationParams.getEnableCaseUsersDbSync()) {
             caseUserRepository.grantAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
         }
     }
@@ -98,7 +99,8 @@ public class CaseAccessOperation {
                     .roleNames(List.of(CREATOR.getRole()))
                     .build();
             roleAssignmentService.deleteRoleAssignments(List.of(deleteRequest));
-        } else {
+        }
+        if (applicationParams.getEnableCaseUsersDbSync()) {
             caseUserRepository.revokeAccess(Long.valueOf(caseDetails.getId()), userId, CREATOR.getRole());
         }
     }
@@ -135,7 +137,8 @@ public class CaseAccessOperation {
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
             // NB: `replaceExisting = true` uses RAS which does not need us to revokeRemoved or ignoreGranted.
             roleAssignmentService.createCaseRoleAssignments(caseDetails, userId, targetCaseRoles, true);
-        } else {
+        }
+        if (applicationParams.getEnableCaseUsersDbSync()) {
             final var caseId = Long.valueOf(caseDetails.getId());
             final List<String> currentCaseRoles = caseUserRepository.findCaseRoles(caseId, userId);
 
@@ -180,7 +183,8 @@ public class CaseAccessOperation {
                         //      to prevent duplicates being generated.  see filter above.
                         roleAssignmentService.createCaseRoleAssignments(caseDetails, userId, caseRoles, false)
                     );
-                } else {
+                }
+                if (applicationParams.getEnableCaseUsersDbSync()) {
                     Long caseId = Long.parseLong(caseDetails.getId());
                     caseRolesByUserIdAndCase.forEach((userId, caseRoles) ->
                         caseRoles.forEach(caseRole ->
@@ -236,7 +240,8 @@ public class CaseAccessOperation {
 
             // submit list of all delete requests from all cases
             roleAssignmentService.deleteRoleAssignments(deleteRequests);
-        } else {
+        }
+        if (applicationParams.getEnableCaseUsersDbSync()) {
             filteredCauRolesByCaseDetails.forEach((caseDetails, requestedAssignments) -> {
                     Long caseId = Long.parseLong(caseDetails.getId());
                     requestedAssignments.forEach(requestedAssignment ->
