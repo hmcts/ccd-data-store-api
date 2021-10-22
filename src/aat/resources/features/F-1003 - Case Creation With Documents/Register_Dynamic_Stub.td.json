@@ -1,0 +1,10 @@
+{
+  "_guid_": "Register_Dynamic_Stub",
+  "productName": "CCD Test Stub Service",
+  "operationName": "Register stub dynamically",
+  "specs": [
+    "register a stub with the Wiremock server running within ccd-test-stubs service"
+  ],
+  "method": "POST",
+  "uri": "{{BEFTA_TEST_STUB_SERVICE_BASE_URL}}/__admin/mappings"
+ }
