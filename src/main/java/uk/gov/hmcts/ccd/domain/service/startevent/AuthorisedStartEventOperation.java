@@ -96,7 +96,7 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
 
     private Set<AccessProfile> getCaseRoles(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition) {
         if (caseDetails == null || caseDetails.getId() == null || Draft.isDraft(caseDetails.getId())) {
-            return Sets.union(caseAccessService.getAccessProfiles(caseTypeDefinition.getId()),
+            return Sets.union(caseAccessService.getCreationAccessProfiles(caseTypeDefinition.getId()),
                 caseAccessService.getCaseCreationCaseRoles());
         } else {
             return caseAccessService.getAccessProfilesByCaseReference(caseDetails.getReferenceAsString());
