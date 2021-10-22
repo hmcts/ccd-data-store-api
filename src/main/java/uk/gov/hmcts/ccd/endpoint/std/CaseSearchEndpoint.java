@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
@@ -60,7 +59,7 @@ public class CaseSearchEndpoint {
 
     @Autowired
     public CaseSearchEndpoint(@Qualifier(AuthorisedCaseSearchOperation.QUALIFIER)
-                                      CaseSearchOperation caseSearchOperation,
+                                  CaseSearchOperation caseSearchOperation,
                               @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                   CaseDefinitionRepository caseDefinitionRepository,
                               @Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository,
@@ -93,7 +92,8 @@ public class CaseSearchEndpoint {
             + "search results, please state the alias fields to be returned in the _source property for e.g."
             + " \"_source\":[\"alias.customer\",\"alias.postcode\"]",
             required = true)
-        @RequestBody String jsonSearchRequest) {
+        @RequestBody String jsonSearchRequest,
+        @RequestParam(value = "data_classification", defaultValue = "true") boolean dataClassification) {
 
         Instant start = Instant.now();
         validateCtid(caseTypeIds);
@@ -110,7 +110,7 @@ public class CaseSearchEndpoint {
             .withSearchRequest(elasticsearchRequest)
             .build();
 
-        CaseSearchResult result = caseSearchOperation.execute(request);
+        CaseSearchResult result = caseSearchOperation.execute(request, dataClassification);
 
         Duration between = Duration.between(start, Instant.now());
         log.debug("searchCases execution completed in {} millisecs...", between.toMillis());
