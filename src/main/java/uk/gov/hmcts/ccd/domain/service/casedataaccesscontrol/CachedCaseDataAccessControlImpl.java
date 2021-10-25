@@ -24,6 +24,8 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
 
     private final Map<String, Set<AccessProfile>> caseTypeAccessProfiles = newConcurrentMap();
 
+    private final Map<String, Set<AccessProfile>> caseTypeOrganisationalAccessProfiles = newConcurrentMap();
+
     private final Map<String, Set<AccessProfile>> caseReferenceAccessProfiles = newConcurrentMap();
 
 
@@ -40,7 +42,7 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
 
     @Override
     public Set<AccessProfile> generateOrganisationalAccessProfilesByCaseTypeId(String caseTypeId) {
-        return caseTypeAccessProfiles.computeIfAbsent(caseTypeId,
+        return caseTypeOrganisationalAccessProfiles.computeIfAbsent(caseTypeId,
             e -> noCacheCaseDataAccessControl.generateOrganisationalAccessProfilesByCaseTypeId(caseTypeId));
     }
 
