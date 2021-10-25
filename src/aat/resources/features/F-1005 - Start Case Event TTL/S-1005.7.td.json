@@ -1,14 +1,14 @@
 {
-  "_guid_": "S-1005.2",
+  "_guid_": "S-1005.7",
   "_extends_": "F-1005_CitizenCreateUpdateEvent",
-  "title": "must successfully update a cases TTL.SystemTTL value",
+  "title": "must successfully update a case without modifying the TTL.SystemTTL value when no TTLIncrement is specified",
 
   "specs": [
     "an active profile in CCD",
     "contains correctly configured event details",
-    "has a TTLIncrement of 20 days configured",
-    "contains the TTL.SystemTTL for the case, that has been set to 20 days from today",
-    "is configured to trigger an About To Start callback that does not change of the TTL.suspended or TTL.OverrideTTL or TTL.SystemTTL"
+    "has a null TTLIncrement configured",
+    "is configured to trigger an About to Start callback",
+    "contains the TTL.SystemTTL for the case, that has not been modified"
   ],
 
   "users": {
@@ -19,11 +19,8 @@
 
   "request": {
     "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_MASTER",
-      "ctid": "FT_MasterCaseType",
       "cid": "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}",
-      "etid": "updateCaseTTLInc"
+      "etid": "updateCaseNoTTLInc"
     }
   },
 
@@ -35,11 +32,7 @@
         "state": "CaseCreated",
         "case_type_id": "FT_MasterCaseType",
         "case_data": {
-          "TTL" : {
-            "SystemTTL" : "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
-            "OverrideTTL" : "2021-03-05",
-            "Suspended" : "No"
-          }
+          "_extends_": "TTL_Case_Data"
         },
         "data_classification": {
           "_extends_": "TTL_Case_Data_Classifications"
@@ -49,7 +42,7 @@
           "_extends_": "TTL_Case_Data_Classifications"
         }
       },
-      "event_id": "updateCaseTTLInc"
+      "event_id": "updateCaseNoTTLInc"
     }
   }
 }
