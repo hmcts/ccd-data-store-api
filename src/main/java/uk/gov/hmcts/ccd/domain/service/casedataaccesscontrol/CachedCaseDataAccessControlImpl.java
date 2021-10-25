@@ -64,7 +64,7 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
 
     @Override
     public CaseAccessMetadata generateAccessMetadataWithNoCaseId() {
-       return noCacheCaseDataAccessControl.generateAccessMetadataWithNoCaseId();
+        return noCacheCaseDataAccessControl.generateAccessMetadataWithNoCaseId();
     }
 
     @Override
