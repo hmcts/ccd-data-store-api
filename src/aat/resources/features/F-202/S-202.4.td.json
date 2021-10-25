@@ -43,9 +43,41 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body" : {
-      "total" : 0,
-      "cases" : [ ],
-      "case_types_results" : [ ]
+      "total" : 1,
+      "cases" : [ {
+        "id" : "[[ANYTHING_PRESENT]]",
+        "jurisdiction" : "J1",
+        "state" : "Issued1",
+        "version" : null,
+        "case_type_id" : "CT2",
+        "created_date" : "[[ANYTHING_PRESENT]]",
+        "last_modified" : "[[ANYTHING_PRESENT]]",
+        "last_state_modified_date" : "[[ANYTHING_PRESENT]]",
+        "security_classification" : "PUBLIC",
+        "case_data" : {
+          "F3" : "c${[scenarioContext][customValues][UniqueString]}"
+        },
+        "data_classification" : {
+          "F1" : "RESTRICTED",
+          "F2" : "PRIVATE",
+          "F3" : "PUBLIC"
+        },
+        "supplementary_data" : null,
+        "after_submit_callback_response" : null,
+        "callback_response_status_code" : null,
+        "callback_response_status" : null,
+        "delete_draft_response_status_code" : null,
+        "delete_draft_response_status" : null,
+        "security_classifications" : {
+          "F1" : "RESTRICTED",
+          "F2" : "PRIVATE",
+          "F3" : "PUBLIC"
+        }
+      } ],
+      "case_types_results" : [ {
+        "total" : 1,
+        "case_type_id" : "CT2"
+      } ]
     }
   }
 

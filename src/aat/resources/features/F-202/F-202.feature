@@ -43,9 +43,6 @@ Feature: Access Control Search Tests
     @S-202.3
     Scenario: USer Searching can only return cases that have access to the state for
       Given a user with [restricted access to create CT2 cases]
-#      And a user [Solicitor2]
-
-#      And a case that has just been created as in [J1-CT7-01]
 
       And a case that has just been created as in [J1-CT2-01]
       And a case that has just been created as in [J1-CT2-02]
@@ -88,6 +85,7 @@ Feature: Access Control Search Tests
     And the response has all other details as expected
 
 
+    #todo needs closer look at why the expected behaviour is what it is before finishing this test
   @S-202.5
   Scenario: USer Searching can only return cases that have access to the state for
     Given a user with [restricted access to create CT2 cases]
@@ -100,6 +98,31 @@ Feature: Access Control Search Tests
     And a case that has just been created as in [J1-CT2-04]
     And a case that has just been created as in [J1-CT2-05]
     And a case that has just been created as in [J1-CT2-06]
+
+    And a successful call [to give user Solicitor1 their role case role assignments] as in [solicitor1_case_role_assignments_tmp]
+    When a request is prepared with appropriate values
+    And it is submitted to call the [ES Search] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response has all other details as expected
+
+  @S-202.6
+  Scenario: S-202.6
+    Given a user with [restricted access to create CT2 cases]
+
+    And a case that has just been created as in [J1-CT2-01]
+    And a case that has just been created as in [J1-CT2-02]
+    And a case that has just been created as in [J1-CT2-03]
+    And a successful call [to create a token for event creation] as in [J1-CT2-03_Update_Token_Creation]
+    And a successful call [to update the case] as in [J1-CT2-03_Issued]
+    And a case that has just been created as in [J1-CT2-04]
+    And a case that has just been created as in [J1-CT2-05]
+    And a case that has just been created as in [J1-CT2-06]
+
+    And a case that has just been created as in [J1-CT7-01]
+    And a case that has just been created as in [J1-CT7-02]
+    And a successful call [to create a token for event creation] as in [J1-CT7-02_Token_Creation]
+    And a successful call [to update the case] as in [J1-CT7-02_Issued]
+    And a case that has just been created as in [J1-CT7-03]
 
     And a successful call [to give user Solicitor1 their role case role assignments] as in [solicitor1_case_role_assignments_tmp]
     When a request is prepared with appropriate values
