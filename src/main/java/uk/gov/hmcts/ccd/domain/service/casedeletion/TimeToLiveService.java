@@ -58,8 +58,14 @@ public class TimeToLiveService {
 
     public void verifyTTLContentNotChanged(Map<String, JsonNode> expected, Map<String, JsonNode> actual) {
         if (expected != null && actual != null) {
-            TTL expectedTtl = getTTLFromJson(expected.get(TTL_CASE_FIELD_ID));
-            TTL actualTtl = getTTLFromJson(actual.get(TTL_CASE_FIELD_ID));
+            TTL expectedTtl = null;
+            TTL actualTtl = null;
+
+            if (expected.get(TTL_CASE_FIELD_ID) != null
+                && actual.get(TTL_CASE_FIELD_ID) != null) {
+                expectedTtl = getTTLFromJson(expected.get(TTL_CASE_FIELD_ID));
+                actualTtl = getTTLFromJson(actual.get(TTL_CASE_FIELD_ID));
+            }
 
             if (expectedTtl != null && !expectedTtl.equals(actualTtl)) {
                 throw new BadRequestException(TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE);
@@ -69,8 +75,14 @@ public class TimeToLiveService {
 
     public void validateSuspensionChange(Map<String, JsonNode> beforeCallbackData,
                                           Map<String, JsonNode> currentDataInDatabase) {
-        TTL beforeCallbackTTL = getTTLFromJson(beforeCallbackData.get(TTL_CASE_FIELD_ID));
-        TTL currentTTLInDatabase = getTTLFromJson(currentDataInDatabase.get(TTL_CASE_FIELD_ID));
+        TTL beforeCallbackTTL = null;
+        TTL currentTTLInDatabase = null;
+        if (beforeCallbackData != null
+            && beforeCallbackData.get(TTL_CASE_FIELD_ID) != null
+            && currentDataInDatabase.get(TTL_CASE_FIELD_ID) != null) {
+            beforeCallbackTTL = getTTLFromJson(beforeCallbackData.get(TTL_CASE_FIELD_ID));
+            currentTTLInDatabase = getTTLFromJson(currentDataInDatabase.get(TTL_CASE_FIELD_ID));
+        }
 
         if (beforeCallbackTTL == null || currentTTLInDatabase == null) {
             return;
@@ -91,7 +103,10 @@ public class TimeToLiveService {
 
     public LocalDate getUpdatedResolvedTTL(Map<String, JsonNode> caseData) {
         LocalDate resolveTTL = null;
-        TTL afterCallbackTTL = getTTLFromJson(caseData.get(TTL_CASE_FIELD_ID));
+        TTL afterCallbackTTL = null;
+        if (caseData.get(TTL_CASE_FIELD_ID) != null) {
+            afterCallbackTTL = getTTLFromJson(caseData.get(TTL_CASE_FIELD_ID));
+        }
 
         if (afterCallbackTTL != null) {
             if (afterCallbackTTL.isSuspended()) {

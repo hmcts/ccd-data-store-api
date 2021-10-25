@@ -95,7 +95,6 @@ public class CallbackInvoker {
         }
 
         if (callbackResponse.isPresent()) {
-            timeToLiveService.verifyTTLContentNotChanged(caseDetailsBefore.getData(), caseDetails.getData());
             return validateAndSetFromAboutToSubmitCallback(caseTypeDefinition,
                 caseDetails,
                 ignoreWarning,
@@ -223,6 +222,7 @@ public class CallbackInvoker {
     private void validateAndSetData(final CaseTypeDefinition caseTypeDefinition,
                                     final CaseDetails caseDetails,
                                     final Map<String, JsonNode> responseData) {
+        timeToLiveService.verifyTTLContentNotChanged(caseDetails.getData(), responseData);
         caseTypeService.validateData(responseData, caseTypeDefinition);
         caseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition, responseData));
         deduceDataClassificationForNewFields(caseTypeDefinition, caseDetails);
