@@ -22,7 +22,8 @@
     },
     "body": {
       "query": {
-        "match_all": {
+        "match": {
+          "data.F3.keyword": "c${[scenarioContext][customValues][UniqueString]}"
         }
       }
     }

@@ -50,11 +50,7 @@
       "created_on" : "[[ANYTHING_PRESENT]]",
       "last_modified_on" : "[[ANYTHING_PRESENT]]",
       "last_state_modified_on" : "[[ANYTHING_PRESENT]]",
-      "data" : {
-        "F1": "a${[scenarioContext][customValues][UniqueString]}",
-        "F2": "b${[scenarioContext][customValues][UniqueString]}",
-        "F3": "c${[scenarioContext][customValues][UniqueString]}"
-      },
+      "data" : "[[ANYTHING_PRESENT]]",
       "data_classification" : {
         "F1" : "RESTRICTED",
         "F2" : "PRIVATE",

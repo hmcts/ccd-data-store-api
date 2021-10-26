@@ -15,9 +15,8 @@
     },
     "body": {
       "data": {
-        "F1": "a",
-        "F2": "b",
-        "F3": "c"
+        "_extends_" : "F-202_Case_Data_Base"
+
       },
       "event": {
         "id": "Issue"
