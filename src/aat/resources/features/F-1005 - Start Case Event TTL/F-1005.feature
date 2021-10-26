@@ -187,7 +187,7 @@ Feature: F-1005: Update Case - Start Case Event - Update Code for TTL
     And   the response has all other details as expected
     And   the response [contains the error message indicating unauthorised change to the TTL values]
 
-  @S-1005.14 @AC11
+  @S-1005.14 @AC14
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL.OverrideTTL has changed after About to Start Callback.
   Start Event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
     Given a user with [an active profile in CCD],
@@ -201,7 +201,7 @@ Feature: F-1005: Update Case - Start Case Event - Update Code for TTL
     And   the response has all other details as expected,
     And   the response [contains the error message indicating unauthorised change to the TTL values].
 
-  @S-1005.15 @AC12
+  @S-1005.15 @AC15
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL.SystemTTL has changed after About to Start Callback.
   Start Event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
     Given a user with [an active profile in CCD],
@@ -215,7 +215,7 @@ Feature: F-1005: Update Case - Start Case Event - Update Code for TTL
     And   the response has all other details as expected
     And   the response [contains the error message indicating unauthorised change to the TTL values].
 
-  @S-1005.16 @AC13
+  @S-1005.16 @AC16
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL.suspended has changed after About to Start Callback.
   Start Event is invoked on v2_internal#/ui-start-trigger-controller/getCaseUpdateViewEventUsingGET
 
