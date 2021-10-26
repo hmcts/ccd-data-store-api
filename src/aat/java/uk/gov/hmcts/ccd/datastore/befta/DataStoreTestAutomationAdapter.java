@@ -12,6 +12,7 @@ import uk.gov.hmcts.befta.util.BeftaUtils;
 import uk.gov.hmcts.befta.util.EnvironmentVariableUtils;
 import uk.gov.hmcts.befta.util.ReflectionUtils;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -171,6 +172,8 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             } catch (Exception e) {
                 throw new FunctionalTestException("Couldn't get binary link from response field", e);
             }
+        } else if (key.toString().equalsIgnoreCase("dateTwentyDaysFromToday")) {
+            return LocalDate.now().plusDays(20).toString();
         }
         return super.calculateCustomValue(scenarioContext, key);
     }

@@ -46,7 +46,6 @@
 		<cve>CVE-2021-22144</cve>
 	</suppress>
 
-
 	<suppress until="2021-11-25">
 		<notes>In the Jakarta Expression Language implementation 3.0.3 and earlier,
 			a bug in the ELParserTokenManager enables invalid EL expressions to be evaluated as if they were valid.
@@ -67,5 +66,11 @@
 		crafted file
 		</notes>
 		<cve>CVE-2020-23171</cve>
+	</suppress>
+
+	<!-- Suppress temporarily -->
+	<suppress>
+		<cve>CVE-2021-22147</cve>
+		<cve>CVE-2021-42340</cve>
 	</suppress>
 </suppressions>
