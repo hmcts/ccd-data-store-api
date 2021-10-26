@@ -5,7 +5,6 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 

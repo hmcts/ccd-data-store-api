@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
