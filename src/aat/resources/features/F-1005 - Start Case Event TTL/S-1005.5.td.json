@@ -23,7 +23,7 @@
       "id" : "updateCaseTTLInc",
       "name" : "Update with TTL Increment",
       "description" : "Update a case with a TTL increment value present",
-      "case_id" : "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "case_id": "${}${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "case_fields" : [ {
         "id" : "TTL",
         "label" : "TTL Fields",

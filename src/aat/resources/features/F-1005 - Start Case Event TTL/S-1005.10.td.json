@@ -29,7 +29,7 @@
       "id" : "updateCaseNoTTLInc",
       "name" : "Update with no TTL Increment",
       "description" : "Update a case with no TTL increment value present",
-      "case_id" : "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "case_id": "${}${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "case_fields" : [ {
         "id" : "TTL",
         "label" : "TTL Fields",
