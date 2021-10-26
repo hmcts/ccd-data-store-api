@@ -40,7 +40,7 @@ import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 @Component
 @ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "true")
 @Lazy
-public class DefaultCaseDataAccessControl implements CaseDataAccessControl, AccessControl {
+public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessControl, AccessControl {
 
     private final RoleAssignmentService roleAssignmentService;
     private final SecurityUtils securityUtils;
@@ -56,17 +56,17 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
 
     @Autowired
     public DefaultCaseDataAccessControl(RoleAssignmentService roleAssignmentService,
-                                        SecurityUtils securityUtils,
-                                        RoleAssignmentsFilteringService roleAssignmentsFilteringService,
-                                        PseudoRoleAssignmentsGenerator pseudoRoleAssignmentsGenerator,
-                                        ApplicationParams applicationParams,
-                                        AccessProfileService accessProfileService,
-                                        PseudoRoleToAccessProfileGenerator pseudoRoleToAccessProfileGenerator,
-                                        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                                SecurityUtils securityUtils,
+                                                RoleAssignmentsFilteringService roleAssignmentsFilteringService,
+                                                PseudoRoleAssignmentsGenerator pseudoRoleAssignmentsGenerator,
+                                                ApplicationParams applicationParams,
+                                                AccessProfileService accessProfileService,
+                                                PseudoRoleToAccessProfileGenerator pseudoRoleToAccessProfileGenerator,
+                                                @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                             final CaseDefinitionRepository caseDefinitionRepository,
-                                        @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                                @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
                                                 CaseDetailsRepository caseDetailsRepository,
-                                        UserAuthorisation userAuthorisation,
+                                                UserAuthorisation userAuthorisation,
                                         @Qualifier(CachedCaseUserRepository.QUALIFIER)
                                                 CaseUserRepository caseUserRepository) {
         this.roleAssignmentService = roleAssignmentService;
