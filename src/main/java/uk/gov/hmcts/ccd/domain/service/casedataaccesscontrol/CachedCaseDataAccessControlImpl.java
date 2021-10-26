@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -50,6 +51,11 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
     public Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference) {
         return caseReferenceAccessProfiles.computeIfAbsent(caseReference,
             e -> noCacheCaseDataAccessControl.generateAccessProfilesByCaseReference(caseReference));
+    }
+
+
+    public Set<AccessProfile> getCaseUserAccessProfilesByUserId() {
+        return noCacheCaseDataAccessControl.getCaseUserAccessProfilesByUserId();
     }
 
     @Override

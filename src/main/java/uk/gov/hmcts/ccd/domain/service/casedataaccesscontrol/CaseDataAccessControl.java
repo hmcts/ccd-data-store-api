@@ -16,9 +16,7 @@ public interface CaseDataAccessControl {
 
     Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference);
 
-    default Set<AccessProfile> getCaseUserAccessProfilesByUserId() {
-        return new HashSet<>();
-    }
+    Set<AccessProfile> getCaseUserAccessProfilesByUserId();
 
     void grantAccess(CaseDetails caseDetails, String idamUserId);
 
