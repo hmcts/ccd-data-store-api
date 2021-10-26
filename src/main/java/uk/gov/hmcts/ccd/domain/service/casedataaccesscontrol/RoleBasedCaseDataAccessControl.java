@@ -34,7 +34,7 @@ import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 @Component
 @Lazy
 @ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "false", matchIfMissing = true)
-public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, AccessControl {
+public class RoleBasedCaseDataAccessControl implements NoCacheCaseDataAccessControl, AccessControl {
     private final UserAuthorisation userAuthorisation;
     private final CaseUserRepository caseUserRepository;
     private final UserRepository userRepository;
