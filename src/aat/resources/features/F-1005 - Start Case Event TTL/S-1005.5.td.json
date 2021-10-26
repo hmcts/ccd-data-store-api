@@ -44,7 +44,7 @@
           "fixed_list_items" : [ ],
           "complex_fields" : [ {
             "id" : "SystemTTL",
-            "label" : "TTL complex",
+            "label" : "System TTL",
             "hidden" : null,
             "order" : null,
             "metadata" : false,
@@ -72,7 +72,7 @@
             "formatted_value" : null
           }, {
             "id" : "OverrideTTL",
-            "label" : "TTL complex",
+            "label" : "Override TTL",
             "hidden" : null,
             "order" : null,
             "metadata" : false,
@@ -100,7 +100,7 @@
             "formatted_value" : null
           }, {
             "id" : "Suspended",
-            "label" : "TTL complex",
+            "label" : "Suspended",
             "hidden" : null,
             "order" : null,
             "metadata" : false,
