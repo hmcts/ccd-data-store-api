@@ -34,7 +34,7 @@
         }
       },
       "event": {
-        "id": "updateCaseSubmitTTL",
+        "id": "updateCase",
         "summary": "",
         "description": ""
       },

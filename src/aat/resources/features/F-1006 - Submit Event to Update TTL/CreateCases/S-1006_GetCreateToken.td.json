@@ -17,14 +17,14 @@
 		"pathVariables": {
       "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType",
-      "etid": "createCaseSubmitTTL"
+      "etid": "createCaseTTL"
 		}
 	},
 
 
   "expectedResponse": {
     "body": {
-      "event_id": "createCaseSubmitTTL"
+      "event_id": "createCaseTTL"
     }
   }
 }

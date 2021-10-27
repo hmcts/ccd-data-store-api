@@ -27,7 +27,7 @@
       "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType",
       "cid": "${[scenarioContext][parentContext][childContexts][F-1006_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
-      "etid": "updateCaseSubmitTTL"
+      "etid": "updateCase"
     }
   },
 
@@ -60,7 +60,7 @@
         "delete_draft_response_status": null,
         "security_classifications": "[[ANYTHING_PRESENT]]"
       },
-      "event_id": "updateCaseSubmitTTL"
+      "event_id": "updateCase"
     }
   }
 }
