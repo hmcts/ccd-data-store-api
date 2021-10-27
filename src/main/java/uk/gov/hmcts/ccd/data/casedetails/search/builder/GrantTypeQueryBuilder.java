@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 
+import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 
 public interface GrantTypeQueryBuilder {
@@ -43,12 +45,28 @@ public interface GrantTypeQueryBuilder {
             .filter(classification -> StringUtils.isNotBlank(classification))
             .collect(Collectors.toSet());
 
-        if (classifications.size() > 0) {
-            params.put(paramName, classifications);
+        Set<String> classificationParams = getClassificationParams(classifications);
+
+        if (classificationParams.size() > 0) {
+            params.put(paramName, classificationParams);
             return String.format(QUERY, SECURITY_CLASSIFICATION, paramName);
         }
 
         return EMPTY;
+    }
+
+    private Set<String> getClassificationParams(Set<String> classifications) {
+        if (classifications.contains(SecurityClassification.RESTRICTED.name())) {
+            return Sets.newHashSet(SecurityClassification.PUBLIC.name(),
+                SecurityClassification.PRIVATE.name(),
+                SecurityClassification.RESTRICTED.name());
+        } else if (classifications.contains(SecurityClassification.PRIVATE.name())) {
+            return Sets.newHashSet(SecurityClassification.PUBLIC.name(),
+                SecurityClassification.PRIVATE.name());
+        } else if (classifications.contains(SecurityClassification.PUBLIC.name())) {
+            return Sets.newHashSet(SecurityClassification.PUBLIC.name());
+        }
+        return classifications;
     }
 
     default String getOperator(String query, String operator) {

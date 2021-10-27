@@ -16,9 +16,7 @@ public class BasicGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
     @Override
     public String createQuery(List<RoleAssignment> roleAssignments, Map<String, Object> params) {
         Stream<RoleAssignment> roleAssignmentStream = roleAssignments.stream()
-            .filter(roleAssignment -> GrantType.BASIC.name().equals(roleAssignment.getGrantType()))
-            .filter(roleAssignment -> roleAssignment.getAuthorisations() == null
-                || roleAssignment.getAuthorisations().size() == 0);
+            .filter(roleAssignment -> GrantType.BASIC.name().equals(roleAssignment.getGrantType()));
         String query = createClassification(params, "classifications", roleAssignmentStream);
         if (StringUtils.isNotBlank(query)) {
             return String.format(QUERY_WRAPPER, query);

@@ -15,9 +15,7 @@ public class BasicGrantTypeESQueryBuilder implements GrantTypeESQueryBuilder {
     @Override
     public BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments) {
         Stream<RoleAssignment> roleAssignmentStream = roleAssignments.stream()
-            .filter(roleAssignment -> GrantType.BASIC.name().equals(roleAssignment.getGrantType()))
-            .filter(roleAssignment -> roleAssignment.getAuthorisations() == null
-                || roleAssignment.getAuthorisations().size() == 0);
+            .filter(roleAssignment -> GrantType.BASIC.name().equals(roleAssignment.getGrantType()));
 
         BoolQueryBuilder basicQuery =  QueryBuilders.boolQuery();
         Lists.newArrayList(createClassification(roleAssignmentStream))

@@ -21,9 +21,7 @@ public class StandardGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
     @SuppressWarnings("java:S2789")
     public String createQuery(List<RoleAssignment> roleAssignments, Map<String, Object> params) {
         Supplier<Stream<RoleAssignment>> streamSupplier = () -> roleAssignments.stream()
-            .filter(roleAssignment -> GrantType.STANDARD.name().equals(roleAssignment.getGrantType()))
-            .filter(roleAssignment -> roleAssignment.getAuthorisations() == null
-                || roleAssignment.getAuthorisations().size() == 0);
+            .filter(roleAssignment -> GrantType.STANDARD.name().equals(roleAssignment.getGrantType()));
 
         String regionAndLocationQuery = streamSupplier.get()
             .filter(roleAssignment -> roleAssignment.getAttributes() != null)

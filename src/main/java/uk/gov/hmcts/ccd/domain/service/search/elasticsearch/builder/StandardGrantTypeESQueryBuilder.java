@@ -23,9 +23,7 @@ public class StandardGrantTypeESQueryBuilder implements GrantTypeESQueryBuilder 
     @SuppressWarnings("java:S2789")
     public BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments) {
         Supplier<Stream<RoleAssignment>> streamSupplier = () -> roleAssignments.stream()
-            .filter(roleAssignment -> GrantType.STANDARD.name().equals(roleAssignment.getGrantType()))
-            .filter(roleAssignment -> roleAssignment.getAuthorisations() == null
-                || roleAssignment.getAuthorisations().size() == 0);
+            .filter(roleAssignment -> GrantType.STANDARD.name().equals(roleAssignment.getGrantType()));
 
         BoolQueryBuilder standardInnerQuery = QueryBuilders.boolQuery();
 

@@ -20,9 +20,7 @@ public class SpecificGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
     @SuppressWarnings("java:S2789")
     public String createQuery(List<RoleAssignment> roleAssignments, Map<String, Object> params) {
         Supplier<Stream<RoleAssignment>> streamSupplier = () -> roleAssignments.stream()
-            .filter(roleAssignment -> GrantType.SPECIFIC.name().equals(roleAssignment.getGrantType()))
-            .filter(roleAssignment -> roleAssignment.getAuthorisations() == null
-                || roleAssignment.getAuthorisations().size() == 0);
+            .filter(roleAssignment -> GrantType.SPECIFIC.name().equals(roleAssignment.getGrantType()));
 
         String tmpQuery = createClassification(params, "classifications_specific", streamSupplier.get());
 

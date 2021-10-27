@@ -40,7 +40,7 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap());
 
         assertNotNull(query);
-        assertEquals("", query);
+        assertEquals("( security_classification in (:classifications) )", query);
     }
 
     @Test

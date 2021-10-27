@@ -16,9 +16,7 @@ public class SpecificGrantTypeESQueryBuilder implements GrantTypeESQueryBuilder 
     @Override
     public BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments) {
         Supplier<Stream<RoleAssignment>> streamSupplier = () -> roleAssignments.stream()
-            .filter(roleAssignment -> GrantType.SPECIFIC.name().equals(roleAssignment.getGrantType()))
-            .filter(roleAssignment -> roleAssignment.getAuthorisations() == null
-                || roleAssignment.getAuthorisations().size() == 0);
+            .filter(roleAssignment -> GrantType.SPECIFIC.name().equals(roleAssignment.getGrantType()));
 
         BoolQueryBuilder specificQuery =  QueryBuilders.boolQuery();
         Lists.newArrayList(createClassification(streamSupplier.get()),
