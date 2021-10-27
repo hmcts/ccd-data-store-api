@@ -63,7 +63,8 @@ def secrets = [
     ],
     's2s-${env}': [
         secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
-        secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT')
+        secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT'),
+        secret('microservicekey-xui-webapp', 'BEFTA_S2S_CLIENT_SECRET_OF_XUI_WEBAPP')
     ]
 ]
 
@@ -91,6 +92,8 @@ env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
 env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
 env.MAX_NUM_PARALLEL_THREADS=6
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
+env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal"
+env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
 
 withPipeline(type, product, component) {
     onMaster {
