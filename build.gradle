@@ -256,13 +256,13 @@ dependencies {
     compile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
     }
-    compile(group: 'org.elasticsearch', name: 'elasticsearch', version: '6.8.15') {
+    compile(group: 'org.elasticsearch', name: 'elasticsearch', version: '6.8.17') {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
     }
     compile 'org.jooq:jool-java-8:0.9.14'
     compile 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
-    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.2.0'
+    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.7.0'
     testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.2.0'
 
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
