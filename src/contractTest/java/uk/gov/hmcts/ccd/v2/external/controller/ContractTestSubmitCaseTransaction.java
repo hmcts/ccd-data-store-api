@@ -1,11 +1,12 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import javax.inject.Inject;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -13,9 +14,6 @@ import uk.gov.hmcts.ccd.domain.service.createcase.SubmitCaseTransaction;
 import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
-import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
-
-import javax.inject.Inject;
 
 @Service
 @Primary
@@ -29,13 +27,11 @@ public class ContractTestSubmitCaseTransaction extends SubmitCaseTransaction {
                                              CallbackInvoker callbackInvoker,
                                              UIDService uidService,
                                              SecurityClassificationService securityClassificationService,
-                                             DefaultCaseUserRepository caseUserRepository,
-                                             UserAuthorisation userAuthorisation,
+                                             CaseDataAccessControl caseDataAccessControl,
                                              MessageService messageService,
                                              CaseDocumentService caseDocumentService) {
         super(caseDetailsRepository, caseAuditEventRepository, caseTypeService,
             callbackInvoker, uidService, securityClassificationService,
-            caseUserRepository, userAuthorisation, messageService,
-            caseDocumentService);
+            caseDataAccessControl, messageService, caseDocumentService);
     }
 }

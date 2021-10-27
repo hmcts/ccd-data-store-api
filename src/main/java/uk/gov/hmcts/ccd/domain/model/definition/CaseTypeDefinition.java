@@ -40,6 +40,8 @@ public class CaseTypeDefinition implements Serializable {
     private final List<SearchAliasField> searchAliasFields = new ArrayList<>();
     private final List<SearchParty> searchParties = new ArrayList<>();
     private final List<SearchCriteria> searchCriterias = new ArrayList<>();
+    @JsonProperty("roleToAccessProfiles")
+    private List<RoleToAccessProfileDefinition> roleToAccessProfiles = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -193,6 +195,15 @@ public class CaseTypeDefinition implements Serializable {
             .filter(caseField -> LABEL.equals(caseField.getFieldTypeDefinition().getType()))
             .collect(Collectors.toMap(CaseFieldDefinition::getId, caseField ->
                 JsonNodeFactory.instance.textNode(caseField.getLabel())));
+    }
+
+
+    public List<RoleToAccessProfileDefinition> getRoleToAccessProfiles() {
+        return roleToAccessProfiles;
+    }
+
+    public void setRoleToAccessProfiles(List<RoleToAccessProfileDefinition> roleToAccessProfiles) {
+        this.roleToAccessProfiles = roleToAccessProfiles;
     }
 
     public List<SearchParty> getSearchParties() {

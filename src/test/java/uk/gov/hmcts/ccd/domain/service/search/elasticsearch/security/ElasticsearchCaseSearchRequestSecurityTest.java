@@ -10,6 +10,10 @@ import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
@@ -19,6 +23,7 @@ import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchIndex;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder.AccessControlGrantTypeESQueryBuilder;
 
 import java.util.Base64;
 import java.util.HashMap;
@@ -34,6 +39,7 @@ import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRe
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SOURCE;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.SUPPLEMENTARY_DATA;
 
+@ExtendWith(MockitoExtension.class)
 class ElasticsearchCaseSearchRequestSecurityTest {
 
     public static final String FROM = "from";
@@ -52,19 +58,23 @@ class ElasticsearchCaseSearchRequestSecurityTest {
     private final CaseSearchFilter caseSearchFilter = mock(CaseSearchFilter.class);
     private final List<CaseSearchFilter> filterList = List.of(caseSearchFilter);
 
+    @Mock
+    private AccessControlGrantTypeESQueryBuilder grantTypeESQueryBuilder;
 
     private final ObjectMapperService objectMapperService = new DefaultObjectMapperService(new ObjectMapper());
     private JsonNode searchRequestNode;
     private ElasticsearchRequest elasticsearchRequest;
 
-    private final ElasticsearchCaseSearchRequestSecurity underTest =
-        new ElasticsearchCaseSearchRequestSecurity(filterList, objectMapperService);
+    private ElasticsearchCaseSearchRequestSecurity underTest = null;
+
 
     @BeforeEach
     void setUp() {
+        MockitoAnnotations.initMocks(this);
         searchRequestNode = objectMapperService.convertStringToObject(SEARCH_QUERY, JsonNode.class);
         elasticsearchRequest = new ElasticsearchRequest(searchRequestNode);
-
+        underTest =
+            new ElasticsearchCaseSearchRequestSecurity(filterList, objectMapperService,grantTypeESQueryBuilder);
         when(caseSearchFilter.getFilter(CASE_TYPE_ID_1)).thenReturn(Optional.of(newQueryBuilder(FILTER_VALUE_1)));
     }
 

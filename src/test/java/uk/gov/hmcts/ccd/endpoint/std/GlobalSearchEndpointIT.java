@@ -60,9 +60,10 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
 
     private static final String REFERENCE_1 = "4444333322221111";
     private static final String REFERENCE_2 = "1111222233334444";
-    private static final String JURISDICTION = "AUTOTEST1";
+    private static final String JURISDICTION = "PROBATE";
     private static final String CASE_TYPE = "TestAddressBookCase";
     private static final String STATE = "TODO";
+    private static final String SECURITY_CLASSIFICATION = "PUBLIC";
 
     private static final String SERVICE_ID = "AAA1";
     private static final String SERVICE_NAME = "test_service_short_description"; // see wiremock RefData mappings
@@ -221,7 +222,7 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
         // ACT / ASSERT
         MvcResult result = mockMvc.perform(post(GLOBAL_SEARCH_PATH)
             .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsBytes(payload)))
+                .content(mapper.writeValueAsBytes(payload)))
             .andExpect(status().is(200))
             .andReturn();
 
@@ -334,6 +335,7 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
             + "\"" + GlobalSearchFields.JURISDICTION + "\": \"" + JURISDICTION + "\",\n"
             + "\"" + GlobalSearchFields.CASE_TYPE + "\": \"" + CASE_TYPE + "\",\n"
             + "\"" + GlobalSearchFields.STATE + "\": \"" + STATE + "\",\n"
+            + "\"" + GlobalSearchFields.SECURITY_CLASSIFICATION + "\": \"" + SECURITY_CLASSIFICATION + "\",\n"
             + "\"" + GlobalSearchFields.CREATED_DATE + "\": \"2021-09-07T13:38:00.050Z\",\n"
             + "\"last_state_modified_date\": \"2021-09-07T13:38:00.050Z\",\n"
             + "\"last_modified\": \"2021-09-07T13:38:00.062Z\","

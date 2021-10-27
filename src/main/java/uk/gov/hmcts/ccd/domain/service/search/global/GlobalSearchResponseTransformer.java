@@ -5,12 +5,14 @@ import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.refdata.LocationLookup;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceLookup;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseManagementLocationFields;
 import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.SearchCriteriaFields;
 import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.SupplementaryDataFields;
@@ -43,11 +45,15 @@ public class GlobalSearchResponseTransformer {
     private static final String REGION_ID_PATH = "/" + CaseManagementLocationFields.REGION;
 
     private final CaseDefinitionRepository caseDefinitionRepository;
+    private final CaseDataAccessControl caseDataAccessControl;
 
     @Inject
     public GlobalSearchResponseTransformer(@Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                               final CaseDefinitionRepository caseDefinitionRepository) {
+                                               final CaseDefinitionRepository caseDefinitionRepository,
+                                           CaseDataAccessControl caseDataAccessControl) {
+
         this.caseDefinitionRepository = caseDefinitionRepository;
+        this.caseDataAccessControl = caseDataAccessControl;
     }
 
     public GlobalSearchResponsePayload.ResultInfo transformResultInfo(final Integer maxReturnRecordCount,
@@ -100,6 +106,7 @@ public class GlobalSearchResponseTransformer {
             .regionName(locationLookup.getRegionName(regionId))
             .caseManagementCategoryId(findValue(caseData, CASE_MANAGEMENT_CATEGORY, CATEGORY_ID_PATH))
             .caseManagementCategoryName(findValue(caseData, CASE_MANAGEMENT_CATEGORY, CATEGORY_NAME_PATH))
+            .processForAccess(getCaseAccessMetaData(caseDetails.getReferenceAsString()).getAccessProcessString())
             .build();
     }
 
@@ -129,6 +136,10 @@ public class GlobalSearchResponseTransformer {
             .map(x -> x.get(CollectionValidator.VALUE).asText())
             .collect(Collectors.toUnmodifiableList()))
             .orElse(emptyList());
+    }
+
+    private CaseAccessMetadata getCaseAccessMetaData(String caseReference) {
+        return caseDataAccessControl.generateAccessMetadata(caseReference);
     }
 
 }
