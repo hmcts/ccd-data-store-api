@@ -141,6 +141,24 @@
           }
         },
         {
+          "id": "PersonFirstName",
+          "case_type_id": "TestAddressBookCaseNoReadFieldAccess",
+          "label": "First name",
+          "security_classification": "PUBLIC",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": false,
+              "update": true,
+              "delete": false
+            }],
+          "field_type": {
+            "type": "Text",
+            "id": "Text"
+          }
+        },
+        {
           "id": "PersonLastName",
           "case_type_id": "TestAddressBookCaseNoReadFieldAccess",
           "label": "Last name",

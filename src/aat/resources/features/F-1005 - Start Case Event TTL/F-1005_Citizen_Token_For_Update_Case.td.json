@@ -1,12 +1,7 @@
 {
-	"_guid_": "Befta_Jurisdiction2_Token_For_Update_Case",
+	"_guid_": "F-1005_Citizen_Token_For_Update_Case.td.json",
+  "_extends_": "Citizen_Token_Creation_Data_For_Case_Creation",
 	"title": "should create an event token for correct inputs",
-
-	"productName": "CCD Data Store",
-	"operationName": "Start event creation process to update a case",
-
-	"method": "GET",
-	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
 
 	"specs": [
 		"to get an update event token for the case just created"
@@ -14,7 +9,7 @@
 
 	"users": {
 		"invokingUser": {
-      "_extends_": "BeftaCaseworker2Solicitor1"
+      "_extends_": "BeftaCitizen2"
 		}
 	},
 
@@ -24,10 +19,10 @@
 		},
 		"pathVariables": {
 			"uid": "[[DEFAULT_AUTO_VALUE]]",
-			"jid": "BEFTA_JURISDICTION_2",
-			"ctid": "BEFTA_CASETYPE_2_1",
-			"cid": "${[scenarioContext][parentContext][childContexts][Befta_Jurisdiction2_Default_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
-			"etid": "UPDATE"
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+			"cid": "${[scenarioContext][parentContext][childContexts][Befta_Jurisdiction2_Default_Citizen_Case_Creation_Data][testData][actualResponse][body][id]}",
+			"etid": "createCaseTTL"
 		}
 	},
 

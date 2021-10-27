@@ -1,0 +1,40 @@
+{
+  "_guid_": "F-1005_RetrieveTriggerInternalErrorResponse",
+
+  "productName": "CCD Data Store",
+  "operationName": "Retrieve an start event trigger for case",
+
+  "method": "GET",
+  "uri": "internal/cases/{caseId}/event-triggers/{triggerId}",
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker"
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "experimental": "true"
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 400,
+    "responseMessage": "Bad Request",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Vary": "Accept-Encoding"
+    },
+    "body": {
+      "timestamp" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "path" : "[[ANY_STRING_NOT_NULLABLE]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null,
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "status" : 400,
+      "error" : "Bad Request",
+      "message" : "Time to live content has been modified by aboutToStart callback"
+    }
+  }
+}

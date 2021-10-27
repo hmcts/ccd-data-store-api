@@ -11,7 +11,6 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
-import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.time.LocalDate;
@@ -26,6 +25,7 @@ public class TimeToLiveService {
 
     protected static final String TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE =
         "Time to live content has been modified by aboutToStart callback";
+    protected static final String FAILED_TO_READ_TTL_FROM_CASE_DATA = "Failed to read TTL from case data";
 
     private ObjectMapper objectMapper;
     private ApplicationParams applicationParams;
@@ -58,14 +58,8 @@ public class TimeToLiveService {
 
     public void verifyTTLContentNotChanged(Map<String, JsonNode> expected, Map<String, JsonNode> actual) {
         if (expected != null && actual != null) {
-            TTL expectedTtl = null;
-            TTL actualTtl = null;
-
-            if (expected.get(TTL_CASE_FIELD_ID) != null
-                && actual.get(TTL_CASE_FIELD_ID) != null) {
-                expectedTtl = getTTLFromJson(expected.get(TTL_CASE_FIELD_ID));
-                actualTtl = getTTLFromJson(actual.get(TTL_CASE_FIELD_ID));
-            }
+            TTL expectedTtl = getTTLFromJson(expected.get(TTL_CASE_FIELD_ID));
+            TTL actualTtl = getTTLFromJson(actual.get(TTL_CASE_FIELD_ID));
 
             if (expectedTtl != null && !expectedTtl.equals(actualTtl)) {
                 throw new BadRequestException(TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE);
@@ -121,10 +115,13 @@ public class TimeToLiveService {
     }
 
     private TTL getTTLFromJson(JsonNode ttlJsonNode) {
-        try {
-            return objectMapper.readValue(ttlJsonNode.toString(), TTL.class);
-        } catch (NullPointerException | JsonProcessingException e) {
-            throw new ServiceException("Unable to read TTL from case data", e);
+        if (ttlJsonNode != null) {
+            try {
+                return objectMapper.readValue(ttlJsonNode.toString(), TTL.class);
+            } catch (JsonProcessingException e) {
+                throw new ValidationException(FAILED_TO_READ_TTL_FROM_CASE_DATA);
+            }
         }
+        return null;
     }
 }

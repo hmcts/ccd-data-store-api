@@ -67,10 +67,10 @@
 		</notes>
 		<cve>CVE-2020-23171</cve>
 	</suppress>
-	<suppress until="2021-11-25">
-		<notes>The fix for bug 63362 present in Apache Tomcat 10.1.0-M1 to 10.1.0-M5, 10.0.0-M1 to 10.0.11,
-			9.0.40 to 9.0.53 and 8.5.60 to 8.5.71 introduced a memory leak.
-		</notes>
+
+	<!-- Suppress temporarily -->
+	<suppress>
+		<cve>CVE-2021-22147</cve>
 		<cve>CVE-2021-42340</cve>
 	</suppress>
 </suppressions>
