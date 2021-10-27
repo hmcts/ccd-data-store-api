@@ -72,6 +72,8 @@ public class CaseUserControllerIT extends WireMockBaseTest {
         CaseUser caseUser = new CaseUser();
         caseUser.setCaseRoles(Sets.newHashSet(role1, role2));
 
+        stubIdamRolesForUser(userId);
+
         final MvcResult mvcResult = mockMvc.perform(put(requestUrl)
             .contentType(JSON_CONTENT_TYPE)
             .accept(JSON_CONTENT_TYPE)

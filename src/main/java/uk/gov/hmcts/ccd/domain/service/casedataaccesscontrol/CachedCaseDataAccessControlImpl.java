@@ -52,6 +52,11 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
             e -> noCacheCaseDataAccessControl.generateAccessProfilesByCaseReference(caseReference));
     }
 
+    @Override
+    public Set<AccessProfile> generateAccessProfilesByCaseDetails(CaseDetails caseDetails) {
+        return caseReferenceAccessProfiles.computeIfAbsent(caseDetails.getReferenceAsString(),
+            e -> noCacheCaseDataAccessControl.generateAccessProfilesByCaseDetails(caseDetails));
+    }
 
     public Set<AccessProfile> getCaseUserAccessProfilesByUserId() {
         return noCacheCaseDataAccessControl.getCaseUserAccessProfilesByUserId();

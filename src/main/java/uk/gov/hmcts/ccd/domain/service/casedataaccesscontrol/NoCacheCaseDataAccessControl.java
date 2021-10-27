@@ -16,6 +16,8 @@ public interface NoCacheCaseDataAccessControl {
 
     Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference);
 
+    Set<AccessProfile> generateAccessProfilesByCaseDetails(CaseDetails caseDetails);
+
     default Set<AccessProfile> getCaseUserAccessProfilesByUserId() {
         return new HashSet<>();
     }

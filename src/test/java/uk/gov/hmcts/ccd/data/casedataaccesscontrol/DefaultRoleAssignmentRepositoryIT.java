@@ -30,6 +30,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.badRequest;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static com.github.tomakehurst.wiremock.client.WireMock.notFound;
+import static com.github.tomakehurst.wiremock.client.WireMock.ok;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.serverError;
@@ -246,8 +247,6 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
     @DisplayName("deleteRoleAssignmentsByQuery()")
     class DeleteRoleAssignmentsByQuery {
 
-        private StubMapping badRasStub;
-
         private static final String DELETE_URL = "/am/role-assignments/query/delete";
 
         private static final String CASE_ID_1 = "11111";
@@ -261,20 +260,13 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
 
         @BeforeEach
         void setUp() {
-            badRasStub = null;
             WireMock.resetAllRequests();
-        }
-
-        @AfterEach
-        void tearDown() {
-            if (badRasStub != null) {
-                WireMock.removeStub(badRasStub);
-            }
         }
 
         @DisplayName("should make a call to the delete role assignment by query end point for single case role")
         @Test
         void shouldMakeCallToDeleteByQueryApiForSingleCaseRole() {
+            WireMock.stubFor(WireMock.post(urlMatching(DELETE_URL)).willReturn(ok()));
 
             // GIVEN
             List<RoleAssignmentQuery> queryRequests = List.of(
@@ -295,6 +287,7 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
         @DisplayName("should make a call to the delete role assignment by query end point for multiple case roles")
         @Test
         void shouldMakeCallToDeleteByQueryApiForMultipleCaseRoles() {
+            WireMock.stubFor(WireMock.post(urlMatching(DELETE_URL)).willReturn(ok()));
 
             // GIVEN
             List<RoleAssignmentQuery> queryRequests = List.of(
@@ -328,7 +321,7 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
                 new RoleAssignmentQuery(CASE_ID_1, USER_ID_1, List.of(ROLE_1))
             );
 
-            badRasStub = WireMock.stubFor(WireMock.post(urlMatching(DELETE_URL)).willReturn(badRequest()));
+            WireMock.stubFor(WireMock.post(urlMatching(DELETE_URL)).willReturn(badRequest()));
 
             // WHEN / THEN
             final BadRequestException exception = assertThrows(BadRequestException.class,
@@ -350,7 +343,7 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
                 new RoleAssignmentQuery(CASE_ID_2, USER_ID_2, List.of(ROLE_2))
             );
 
-            badRasStub = WireMock.stubFor(WireMock.post(urlMatching(DELETE_URL)).willReturn(serverError()));
+            WireMock.stubFor(WireMock.post(urlMatching(DELETE_URL)).willReturn(serverError()));
 
             // WHEN / THEN
             final ServiceException exception = assertThrows(ServiceException.class,

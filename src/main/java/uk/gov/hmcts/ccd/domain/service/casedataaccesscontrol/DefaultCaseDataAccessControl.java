@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
@@ -108,6 +109,19 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments, caseTypeDefinition, isCreationProfile));
     }
 
+    // use for ES searchCases - we don't want to fetch the case, because it should be taken from the ES
+    @Override
+    public Set<AccessProfile> generateAccessProfilesByCaseDetails(CaseDetails caseDetails) {
+        RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
+
+        FilteredRoleAssignments filteredRoleAssignments =
+            roleAssignmentsFilteringService.filter(roleAssignments, caseDetails);
+
+        CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
+
+        return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments.getFilteredMatchingRoleAssignments(),
+            caseTypeDefinition, false));
+    }
 
     @Override
     public Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference) {
@@ -115,7 +129,7 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         // R.A uses external micro-services which referer cases by caseReference
         // Non R.A uses internal case id. Both cases should be contemplated in the code.
         if (caseDetails.isEmpty()) {
-            caseDetails = caseDetailsRepository.findById(null,Long.parseLong(caseReference));
+            caseDetails = caseDetailsRepository.findById(null, Long.parseLong(caseReference));
             if (caseDetails.isEmpty()) {
                 return Sets.newHashSet();
             }
@@ -164,9 +178,17 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         List<RoleToAccessProfileDefinition> pseudoAccessProfilesMappings = new ArrayList<>();
         pseudoAccessProfilesMappings.addAll(caseTypeDefinition.getRoleToAccessProfiles());
         if (applicationParams.getEnablePseudoAccessProfilesGeneration()) {
-            pseudoAccessProfilesMappings.addAll(pseudoRoleToAccessProfileGenerator.generate(caseTypeDefinition));
+            List<RoleToAccessProfileDefinition> generated =
+                pseudoRoleToAccessProfileGenerator.generate(caseTypeDefinition);
+            pseudoAccessProfilesMappings.addAll(generated.stream()
+                .filter(e -> getRoleNamesAsStream(caseTypeDefinition).noneMatch(p -> p.equals(e.getRoleName())))
+                .collect(Collectors.toList()));
         }
         return accessProfileService.generateAccessProfiles(filteredRoleAssignments, pseudoAccessProfilesMappings);
+    }
+
+    private Stream<String> getRoleNamesAsStream(CaseTypeDefinition caseTypeDefinition) {
+        return caseTypeDefinition.getRoleToAccessProfiles().stream().map(RoleToAccessProfileDefinition::getRoleName);
     }
 
     private List<RoleAssignment> augment(List<RoleAssignment> filteredRoleAssignments,
