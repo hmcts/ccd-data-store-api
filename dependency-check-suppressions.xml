@@ -75,4 +75,9 @@
 		<cve>CVE-2021-22147</cve>
 	</suppress>
 
+
+	<suppress until="2021-11-27">
+		<cve>CVE-2021-42340</cve>
+	</suppress>
+
 </suppressions>
