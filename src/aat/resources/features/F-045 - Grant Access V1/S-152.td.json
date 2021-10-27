@@ -5,6 +5,7 @@
 
 	"specs": [
 		"an active profile in CCD",
+		"testUser - with an active profile in CCD",
 		"contains in input parameters a structurally valid but non-existing case-reference",
 		"has the 404 return code"
 	],
