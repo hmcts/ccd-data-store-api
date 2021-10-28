@@ -41,6 +41,10 @@ public class CaseDocumentService {
     public CaseDetails stripDocumentHashes(final CaseDetails caseDetails) {
         final List<JsonNode> documentNodes = caseDocumentUtils.findDocumentNodes(caseDetails.getData());
 
+        // TODO: remove this flag permanently and make this behaviour default.
+        if (applicationParams.isDocumentHashCloneEnabled()) {
+            return documentNodes.isEmpty() ? caseService.clone(caseDetails) : removeHashes(caseDetails);
+        }
         return documentNodes.isEmpty() ? caseDetails : removeHashes(caseDetails);
     }
 

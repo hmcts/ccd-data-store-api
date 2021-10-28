@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/callback/document"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "data" : {
+        "D8Document": {
+          "document_url": "http://localhost:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976",
+          "document_filename": "Screenshot 2020-02-24 at 13.32.03.Jpeg",
+          "document_binary_url": "http://localhost:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976/binary",
+          "document_hash": "36fc7aa586a54bffc2982ed490c4503f4aca875b7160c9d24b6690276886tytu"
+        }
+      }
+    }
+  }
+}

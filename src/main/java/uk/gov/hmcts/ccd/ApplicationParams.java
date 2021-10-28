@@ -155,6 +155,9 @@ public class ApplicationParams {
     @Value("${ccd.case-document-am-api.attachDocumentEnabled:true}")
     private boolean attachDocumentEnabled;
 
+    @Value("${ccd.documentHashCloneEnabled:true}")
+    private boolean documentHashCloneEnabled;
+
     @Value("${idam.data-store.system-user.username}")
     private String dataStoreSystemUserId;
 
@@ -448,5 +451,9 @@ public class ApplicationParams {
 
     public List<String> getCaseDataIssueLoggingJurisdictions() {
         return caseDataIssueLoggingJurisdictions;
+    }
+
+    public boolean isDocumentHashCloneEnabled() {
+        return this.documentHashCloneEnabled;
     }
 }
