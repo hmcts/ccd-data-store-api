@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
+import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -10,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermsQueryBuilder;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.JURISDICTION_FIELD_KEYWORD_COL;
@@ -26,10 +28,26 @@ public interface GrantTypeESQueryBuilder {
             .filter(classification -> StringUtils.isNotBlank(classification))
             .collect(Collectors.toSet());
 
-        if (classifications.size() > 0) {
-            return Optional.of(QueryBuilders.termsQuery(SECURITY_CLASSIFICATION_FIELD_COL, classifications));
+        Set<String> classificationParams = getClassificationParams(classifications);
+
+        if (classificationParams.size() > 0) {
+            return Optional.of(QueryBuilders.termsQuery(SECURITY_CLASSIFICATION_FIELD_COL, classificationParams));
         }
         return Optional.empty();
+    }
+
+    private Set<String> getClassificationParams(Set<String> classifications) {
+        if (classifications.contains(SecurityClassification.RESTRICTED.name())) {
+            return Sets.newHashSet(SecurityClassification.PUBLIC.name(),
+                SecurityClassification.PRIVATE.name(),
+                SecurityClassification.RESTRICTED.name());
+        } else if (classifications.contains(SecurityClassification.PRIVATE.name())) {
+            return Sets.newHashSet(SecurityClassification.PUBLIC.name(),
+                SecurityClassification.PRIVATE.name());
+        } else if (classifications.contains(SecurityClassification.PUBLIC.name())) {
+            return Sets.newHashSet(SecurityClassification.PUBLIC.name());
+        }
+        return classifications;
     }
 
     @SuppressWarnings("java:S2789")
