@@ -93,8 +93,8 @@ public abstract class WireMockBaseTest extends BaseTest {
     }
 
     protected void stubUserInfo(String userId) {
-        stubUserInfo(userId, "caseworker", "caseworker-test", "caseworker-PROBATE-public", "caseworker-PROBATE",
-            "caseworker-DIVORCE", "caseworker-SSCS");
+        stubUserInfo(userId, "caseworker", "caseworker-test", "caseworker-probate-public", "caseworker-probate",
+            "caseworker-divorce", "caseworker-sscs");
     }
 
     protected void stubUserInfo(String userId, String... roles) {
@@ -116,8 +116,8 @@ public abstract class WireMockBaseTest extends BaseTest {
                 + "      \"email\": \"Cloud.Strife@test.com\","
                 + "      \"forename\": \"Cloud\","
                 + "      \"surname\": \"Strife\","
-                + "      \"roles\": [ \"caseworker\", \"caseworker-test\", \"caseworker-PROBATE-public\","
-                + " \"caseworker-PROBATE\", \"caseworker-DIVORCE\", \"caseworker-SSCS\" ]"
+                + "      \"roles\": [ \"caseworker\", \"caseworker-test\", \"caseworker-probate-public\","
+                + " \"caseworker-probate\", \"caseworker-divorce\", \"caseworker-sscs\" ]"
                 + "    }").withStatus(200)));
     }
 }
