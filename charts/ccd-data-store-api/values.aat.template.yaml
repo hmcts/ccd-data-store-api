@@ -4,3 +4,4 @@ java:
   ingressHost: ${SERVICE_FQDN}
   environment:
     DATA_STORE_DB_HOST: ccd-data-store-api-postgres-db-v11-aat.postgres.database.azure.com
+    LOG_AND_AUDIT_CASE_ENABLED: true
