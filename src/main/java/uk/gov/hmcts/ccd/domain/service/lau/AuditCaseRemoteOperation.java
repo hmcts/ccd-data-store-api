@@ -25,8 +25,6 @@ import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import static java.time.format.DateTimeFormatter.ISO_INSTANT;
-
 @Service
 @Slf4j
 @Qualifier("AuditCaseRemoteOperation")

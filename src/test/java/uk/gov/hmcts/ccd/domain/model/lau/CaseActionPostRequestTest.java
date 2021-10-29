@@ -13,8 +13,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,7 +28,8 @@ class CaseActionPostRequestTest {
     private static final String ACTION_LOG_CASE_TYPE_ID = "Caveat";
 
     private static final Clock fixedClock = Clock.fixed(Instant.parse(ACTION_LOG_TIMESTAMP_AS_TEXT), ZoneOffset.UTC);
-    private static final ZonedDateTime ACTION_LOG_TIMESTAMP = ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
+    private static final ZonedDateTime ACTION_LOG_TIMESTAMP =
+        ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
 
     private CaseActionPostRequest caseActionPostRequest;
 

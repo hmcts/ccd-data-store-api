@@ -26,7 +26,8 @@ class CaseSearchPostRequestTest {
     private static final String SEARCH_LOG_USER_ID = "1234";
     private static final List<String> SEARCH_LOG_CASE_REFS = Arrays.asList("100001", "100002");
     private static final Clock fixedClock = Clock.fixed(Instant.parse(SEARCH_LOG_TIMESTAMP_AS_TEXT), ZoneOffset.UTC);
-    private static final ZonedDateTime SEARCH_LOG_TIMESTAMP = ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
+    private static final ZonedDateTime SEARCH_LOG_TIMESTAMP =
+        ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
 
     private CaseSearchPostRequest caseSearchPostRequest;
 
@@ -34,7 +35,8 @@ class CaseSearchPostRequestTest {
 
     @Test
     void jsonContructionTestWithMultipleCaseRefs() throws JsonProcessingException {
-        caseSearchPostRequest = new CaseSearchPostRequest(new SearchLog(SEARCH_LOG_USER_ID, SEARCH_LOG_CASE_REFS, SEARCH_LOG_TIMESTAMP));
+        caseSearchPostRequest = new CaseSearchPostRequest(
+            new SearchLog(SEARCH_LOG_USER_ID, SEARCH_LOG_CASE_REFS, SEARCH_LOG_TIMESTAMP));
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
@@ -53,7 +55,8 @@ class CaseSearchPostRequestTest {
 
     @Test
     void jsonContructionTestWithEmptyCaseRefs() throws JsonProcessingException {
-        caseSearchPostRequest = new CaseSearchPostRequest(new SearchLog(SEARCH_LOG_USER_ID, null, SEARCH_LOG_TIMESTAMP));
+        caseSearchPostRequest = new CaseSearchPostRequest(
+            new SearchLog(SEARCH_LOG_USER_ID, null, SEARCH_LOG_TIMESTAMP));
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
