@@ -44,8 +44,8 @@ public class AuditService {
     public void audit(AuditContext auditContext) {
         AuditEntry entry = new AuditEntry();
 
-        ZonedDateTime currentDateTime = ZonedDateTime.of(LocalDateTime.now(clock), ZoneOffset.UTC);
-        String formattedDate = currentDateTime.format(ISO_LOCAL_DATE_TIME);
+        ZonedDateTime currentZonedDateTime = ZonedDateTime.of(LocalDateTime.now(clock), ZoneOffset.UTC);
+        String formattedDate = currentZonedDateTime.format(ISO_LOCAL_DATE_TIME);
         entry.setDateTime(formattedDate);
 
         entry.setHttpStatus(auditContext.getHttpStatus());
@@ -70,13 +70,13 @@ public class AuditService {
         // Log and Audit Call...
         if (auditCaseRemoteConfiguration.isEnabled() && Objects.nonNull(auditContext.getAuditOperationType())) {
             switch (auditContext.getAuditOperationType()) {
-                case CASE_ACCESSED: auditCaseRemoteOperation.postCaseAction(entry, currentDateTime);
+                case CASE_ACCESSED: auditCaseRemoteOperation.postCaseAction(entry, currentZonedDateTime);
                 break;
-                case CREATE_CASE: auditCaseRemoteOperation.postCaseAction(entry, currentDateTime);
+                case CREATE_CASE: auditCaseRemoteOperation.postCaseAction(entry, currentZonedDateTime);
                 break;
-                case UPDATE_CASE: auditCaseRemoteOperation.postCaseAction(entry, currentDateTime);
+                case UPDATE_CASE: auditCaseRemoteOperation.postCaseAction(entry, currentZonedDateTime);
                 break;
-                case SEARCH_CASE: auditCaseRemoteOperation.postCaseSearch(entry, currentDateTime);
+                case SEARCH_CASE: auditCaseRemoteOperation.postCaseSearch(entry, currentZonedDateTime);
                 break;
             }
         }

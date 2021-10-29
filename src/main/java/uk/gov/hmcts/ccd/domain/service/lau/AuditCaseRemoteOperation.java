@@ -142,22 +142,22 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
         return null;
     }
 
-    private ActionLog createActionLogFromAuditEntry(AuditEntry entry, ZonedDateTime currentDateTime) {
+    private ActionLog createActionLogFromAuditEntry(AuditEntry entry, ZonedDateTime zonedDateTime) {
         ActionLog actionLog = new ActionLog();
         actionLog.setUserId(entry.getIdamId());
         actionLog.setCaseAction(caseActionMap.get(entry.getOperationType()));
         actionLog.setCaseJurisdictionId(entry.getJurisdiction());
         actionLog.setCaseRef(entry.getCaseId());
         actionLog.setCaseTypeId(entry.getCaseType());
-        actionLog.setTimestamp(currentDateTime.format(ISO_INSTANT));
+        actionLog.setTimestamp(zonedDateTime);
         return actionLog;
     }
 
-    private SearchLog createSearchLogFromAuditEntry(AuditEntry entry, ZonedDateTime currentDateTime) {
+    private SearchLog createSearchLogFromAuditEntry(AuditEntry entry, ZonedDateTime zonedDateTime) {
         SearchLog searchLog = new SearchLog();
         searchLog.setUserId(entry.getIdamId());
         searchLog.setCaseRefs(entry.getCaseId());
-        searchLog.setTimestamp(currentDateTime.format(ISO_INSTANT));
+        searchLog.setTimestamp(zonedDateTime);
         return searchLog;
     }
 

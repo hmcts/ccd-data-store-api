@@ -4,6 +4,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
+
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 
 @NoArgsConstructor
 @Setter
@@ -16,20 +19,24 @@ public class ActionLog implements Serializable {
     private String caseRef;
     private String caseJurisdictionId;
     private String caseTypeId;
-    private String timestamp;
+    private ZonedDateTime timestamp;
 
     public ActionLog(final String userId,
         final String caseAction,
         final String caseRef,
         final String caseJurisdictionId,
         final String caseTypeId,
-        final String timestamp) {
+        final ZonedDateTime timestamp) {
         this.userId = userId;
         this.caseAction = caseAction;
         this.caseRef = caseRef;
         this.caseJurisdictionId = caseJurisdictionId;
         this.caseTypeId = caseTypeId;
         this.timestamp = timestamp;
+    }
+
+    public String getTimestamp() {
+        return timestamp.format(ISO_INSTANT);
     }
 
 }

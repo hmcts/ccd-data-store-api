@@ -5,8 +5,11 @@ import lombok.Setter;
 import uk.gov.hmcts.ccd.auditlog.aop.AuditContext;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
+
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 
 @NoArgsConstructor
 @Setter
@@ -18,14 +21,18 @@ public class SearchLog implements Serializable {
 
     private String userId;
     private List<String> caseRefs;
-    private String timestamp;
+    private ZonedDateTime timestamp;
 
     public SearchLog(final String userId,
         final List<String> caseRefs,
-        final String timestamp) {
+        final ZonedDateTime timestamp) {
         this.userId = userId;
         this.caseRefs = caseRefs;
         this.timestamp = timestamp;
+    }
+
+    public String getTimestamp() {
+        return timestamp.format(ISO_INSTANT);
     }
 
     public void setCaseRefs(String caseRefs) {
