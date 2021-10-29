@@ -1,0 +1,25 @@
+{
+  "_guid_": "S-1043",
+  "_extends_": "F-1003-SubmitCaseCreation",
+  "title": "must successfully create a case with new document uploaded where filename is not specified",
+  "specs": [
+    "an active caseworker profile in CCD with full permissions on a document field",
+    "is to attach the document uploaded above to a new case without specifying filename",
+    "contains necessary details about the document attached to the case"
+  ],
+
+  "request": {
+    "body": {
+      "data": {
+        "DocumentField1": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary",
+          "document_hash": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][hashToken]}"
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "F-1003-SubmitCaseCreationResponse"
+  }
+}
