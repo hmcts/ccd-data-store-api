@@ -114,16 +114,17 @@ public class SearchQueryFactoryOperation {
     }
 
     private String addUserCaseStateAccessClause(MetaData metadata, Map<String, Object> params) {
-        // restrict cases to the case states the user has access to
-        List<String> caseStateIds =
-            authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(metadata.getJurisdiction(),
-                                                                              metadata.getCaseTypeId(),
-                                                                              CAN_READ);
-        if (!caseStateIds.isEmpty()) {
-            params.put("states", caseStateIds);
-            return " AND state IN (:states)";
+        if (!applicationParam.getEnableAttributeBasedAccessControl()) {
+            // restrict cases to the case states the user has access to
+            List<String> caseStateIds =
+                authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(metadata.getJurisdiction(),
+                    metadata.getCaseTypeId(),
+                    CAN_READ);
+            if (!caseStateIds.isEmpty()) {
+                params.put("states", caseStateIds);
+                return " AND state IN (:states)";
+            }
         }
-
         return "";
     }
 
