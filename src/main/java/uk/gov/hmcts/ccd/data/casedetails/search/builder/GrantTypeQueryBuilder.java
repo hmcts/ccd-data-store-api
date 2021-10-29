@@ -46,12 +46,14 @@ public interface GrantTypeQueryBuilder {
 
     String createQuery(List<RoleAssignment> roleAssignments,
                        Map<String, Object> params,
-                       List<CaseStateDefinition> caseStates);
+                       List<CaseStateDefinition> caseStates,
+                       Set<AccessProfile> accessProfiles);
 
     default String createClassification(Map<String, Object> params, String paramName,
                                         Supplier<Stream<RoleAssignment>> streamSupplier,
                                         AccessControlService accessControlService,
-                                        List<CaseStateDefinition> caseStates) {
+                                        List<CaseStateDefinition> caseStates,
+                                        Set<AccessProfile> accessProfiles) {
         Set<String> classifications = streamSupplier
             .get()
             .map(roleAssignment -> roleAssignment.getClassification())
@@ -69,7 +71,7 @@ public interface GrantTypeQueryBuilder {
         }
 
         List<CaseStateDefinition> raCaseStates = accessControlService
-            .filterCaseStatesByAccess(caseStates, generateAccessProfiles(streamSupplier), CAN_READ);
+            .filterCaseStatesByAccess(caseStates, accessProfiles, CAN_READ);
 
         if (!raCaseStates.isEmpty()) {
             String statesParam = "states_" + paramName;
@@ -78,15 +80,6 @@ public interface GrantTypeQueryBuilder {
         }
 
         return tmpQuery;
-    }
-
-    private Set<AccessProfile> generateAccessProfiles(Supplier<Stream<RoleAssignment>> streamSupplier) {
-        return streamSupplier.get()
-            .map(roleAssignment -> AccessProfile.builder()
-                .accessProfile(roleAssignment.getRoleName())
-                .securityClassification(roleAssignment.getClassification())
-                .readOnly(roleAssignment.getReadOnly())
-                .build()).collect(Collectors.toSet());
     }
 
     private Set<String> getClassificationParams(Set<String> classifications) {

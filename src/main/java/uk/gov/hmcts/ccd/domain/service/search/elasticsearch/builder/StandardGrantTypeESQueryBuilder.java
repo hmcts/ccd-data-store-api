@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
@@ -10,6 +11,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -30,7 +32,9 @@ public class StandardGrantTypeESQueryBuilder implements GrantTypeESQueryBuilder 
 
     @Override
     @SuppressWarnings("java:S2789")
-    public BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments, List<CaseStateDefinition> caseStates) {
+    public BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments,
+                                        List<CaseStateDefinition> caseStates,
+                                        Set<AccessProfile> accessProfiles) {
         Supplier<Stream<RoleAssignment>> streamSupplier = () -> roleAssignments.stream()
             .filter(roleAssignment -> GrantType.STANDARD.name().equals(roleAssignment.getGrantType()));
 
@@ -73,7 +77,7 @@ public class StandardGrantTypeESQueryBuilder implements GrantTypeESQueryBuilder 
             standardQuery.must(classificationTermsQuery.get());
         }
 
-        Lists.newArrayList(createCaseStateQuery(streamSupplier, accessControlService, caseStates))
+        Lists.newArrayList(createCaseStateQuery(streamSupplier, accessControlService, caseStates, accessProfiles))
             .stream()
             .filter(query -> query.isPresent())
             .map(query -> query.get())

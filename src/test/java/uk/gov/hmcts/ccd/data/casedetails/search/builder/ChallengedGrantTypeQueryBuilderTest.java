@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -31,7 +32,7 @@ class ChallengedGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.STANDARD, "CASE",
             "PRIVATE", "", "", null);
         String query = challengedGrantTypeQueryBuilder
-            .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap(), null);
+            .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap(), null, Sets.newHashSet());
 
         assertNotNull(query);
         assertEquals("", query);
@@ -42,7 +43,7 @@ class ChallengedGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.CHALLENGED, "CASE",
             "PRIVATE",  "TEST", "", "", null);
         String query = challengedGrantTypeQueryBuilder
-            .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap(), null);
+            .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap(), null, Sets.newHashSet());
 
         assertNotNull(query);
         String expectedValue = "( security_classification in (:classifications_challenged)"

@@ -156,7 +156,7 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         }
     }
 
-    private List<AccessProfile> filteredAccessProfiles(List<RoleAssignment> filteredRoleAssignments,
+    public List<AccessProfile> filteredAccessProfiles(List<RoleAssignment> filteredRoleAssignments,
                                                        CaseTypeDefinition caseTypeDefinition,
                                                        boolean isCreationProfile) {
         if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {

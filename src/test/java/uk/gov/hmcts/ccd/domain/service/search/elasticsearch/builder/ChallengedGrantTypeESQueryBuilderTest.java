@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
 import com.google.common.collect.Lists;
+import org.assertj.core.util.Sets;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ class ChallengedGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest 
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.STANDARD, "CASE",
             "PRIVATE", "", "", null);
         BoolQueryBuilder query = challengedGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(roleAssignment), Lists.newArrayList());
+            .createQuery(Lists.newArrayList(roleAssignment), Lists.newArrayList(), Sets.newHashSet());
 
         assertNotNull(query);
     }
@@ -40,7 +41,7 @@ class ChallengedGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest 
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.CHALLENGED, "CASE",
             "PRIVATE",  "TEST", "", "", null);
         BoolQueryBuilder query = challengedGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(roleAssignment), Lists.newArrayList());
+            .createQuery(Lists.newArrayList(roleAssignment), Lists.newArrayList(), Sets.newHashSet());
 
         assertNotNull(query);
     }
@@ -50,7 +51,7 @@ class ChallengedGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest 
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.CHALLENGED, "CASE",
             "PRIVATE",  "", "", "", null);
         BoolQueryBuilder query = challengedGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(roleAssignment), Lists.newArrayList());
+            .createQuery(Lists.newArrayList(roleAssignment), Lists.newArrayList(), Sets.newHashSet());
 
         assertNotNull(query);
     }
@@ -60,7 +61,7 @@ class ChallengedGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest 
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.CHALLENGED, "CASE",
             "",  "", "", "", null);
         BoolQueryBuilder query = challengedGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(roleAssignment), Lists.newArrayList());
+            .createQuery(Lists.newArrayList(roleAssignment), Lists.newArrayList(), Sets.newHashSet());
 
         assertNotNull(query);
     }

@@ -2,11 +2,13 @@ package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -25,11 +27,12 @@ public class BasicGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
     @Override
     public String createQuery(List<RoleAssignment> roleAssignments,
                               Map<String, Object> params,
-                              List<CaseStateDefinition> caseStates) {
+                              List<CaseStateDefinition> caseStates,
+                              Set<AccessProfile> accessProfiles) {
         Supplier<Stream<RoleAssignment>> roleAssignmentStream = () -> roleAssignments.stream()
             .filter(roleAssignment -> GrantType.BASIC.name().equals(roleAssignment.getGrantType()));
         String query = createClassification(params, "basic",
-            roleAssignmentStream, accessControlService, caseStates);
+            roleAssignmentStream, accessControlService, caseStates, accessProfiles);
         if (StringUtils.isNotBlank(query)) {
             return String.format(QUERY_WRAPPER, query);
         }

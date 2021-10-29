@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import com.google.common.collect.Sets;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -9,8 +11,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 
 import static com.google.common.collect.Maps.newConcurrentMap;
@@ -89,5 +93,14 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
         return noCacheCaseDataAccessControl.shouldRemoveCaseDefinition(accessProfiles,
             access,
             caseTypeId);
+    }
+
+    @Override
+    public Set<AccessProfile> filteredAccessProfiles(List<RoleAssignment> filteredRoleAssignments,
+                                               CaseTypeDefinition caseTypeDefinition,
+                                               boolean isCreationProfile) {
+        return Sets.newHashSet(noCacheCaseDataAccessControl.filteredAccessProfiles(filteredRoleAssignments,
+            caseTypeDefinition,
+            isCreationProfile));
     }
 }

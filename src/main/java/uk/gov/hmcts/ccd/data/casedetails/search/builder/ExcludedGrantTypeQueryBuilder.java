@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -33,14 +34,16 @@ public class ExcludedGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
     @SuppressWarnings("java:S2789")
     public String createQuery(List<RoleAssignment> roleAssignments,
                               Map<String, Object> params,
-                              List<CaseStateDefinition> caseStates) {
+                              List<CaseStateDefinition> caseStates,
+                              Set<AccessProfile> accessProfiles) {
         Supplier<Stream<RoleAssignment>> streamSupplier = () -> roleAssignments.stream()
             .filter(roleAssignment -> GrantType.EXCLUDED.name().equals(roleAssignment.getGrantType()));
 
         String tmpQuery = createClassification(params, "excluded",
             streamSupplier,
             accessControlService,
-            caseStates);
+            caseStates,
+            accessProfiles);
 
 
         Set<String> caseReferences = streamSupplier.get()

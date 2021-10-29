@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
 import com.google.common.collect.Lists;
+import org.assertj.core.util.Sets;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,7 @@ class BasicGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
     void shouldIncludeMustQueryWhenClassificationPresentInRoleAssignment() {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC, "CASE", "PRIVATE", "", "", null);
         BoolQueryBuilder query = basicGrantTypeESQueryBuilder.createQuery(Lists.newArrayList(roleAssignment),
-            Lists.newArrayList());
+            Lists.newArrayList(), Sets.newHashSet());
         assertNotNull(query);
     }
 
@@ -38,7 +39,7 @@ class BasicGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
     void shouldNotIncludeMustQueryWhenClassificationPresentInRoleAssignment() {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC, "CASE", "", "", "", null);
         BoolQueryBuilder query = basicGrantTypeESQueryBuilder.createQuery(Lists.newArrayList(roleAssignment),
-            Lists.newArrayList());
+            Lists.newArrayList(), Sets.newHashSet());
         assertNotNull(query);
     }
 }

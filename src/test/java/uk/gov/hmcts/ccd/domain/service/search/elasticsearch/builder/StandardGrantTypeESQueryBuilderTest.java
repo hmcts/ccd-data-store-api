@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
 import com.google.common.collect.Lists;
+import org.assertj.core.util.Sets;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
 
         BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(standardRoleAssignment), Lists.newArrayList());
+            .createQuery(Lists.newArrayList(standardRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
 
         assertNotNull(queryBuilder);
     }
@@ -42,7 +43,7 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "PRIVATE", "Test", "", "reg1", null, "caseId1");
 
         BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(standardRoleAssignment), Lists.newArrayList());
+            .createQuery(Lists.newArrayList(standardRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
 
         assertNotNull(queryBuilder);
     }
@@ -53,7 +54,7 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "PRIVATE", "Test", "loc1", "", null, "caseId1");
 
         BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(standardRoleAssignment), Lists.newArrayList());
+            .createQuery(Lists.newArrayList(standardRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
 
         assertNotNull(queryBuilder);
     }
@@ -64,7 +65,7 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "PRIVATE", "Test", "", "", null, "caseId1");
 
         BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(standardRoleAssignment), Lists.newArrayList());
+            .createQuery(Lists.newArrayList(standardRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
 
         assertNotNull(queryBuilder);
     }
@@ -75,7 +76,7 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "PRIVATE", "", "", "", null, "caseId1");
 
         BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(standardRoleAssignment), Lists.newArrayList());
+            .createQuery(Lists.newArrayList(standardRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
 
         assertNotNull(queryBuilder);
     }
@@ -86,7 +87,7 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "PRIVATE", "Test", null, "", null, "caseId1");
 
         BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(standardRoleAssignment), Lists.newArrayList());
+            .createQuery(Lists.newArrayList(standardRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
 
         assertNotNull(queryBuilder);
     }

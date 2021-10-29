@@ -11,6 +11,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.search.builder.AccessControlGrantTypeQueryBuilder;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -55,6 +56,9 @@ class SearchQueryFactoryOperationTest {
     @Mock
     private AccessControlGrantTypeQueryBuilder accessControlGrantTypeQueryBuilder;
 
+    @Mock
+    private CaseDataAccessControl caseDataAccessControl;
+
     private SearchQueryFactoryOperation classUnderTest;
 
     @BeforeEach
@@ -68,7 +72,8 @@ class SearchQueryFactoryOperationTest {
             authorisedCaseDefinitionDataService,
             roleAssignmentService,
             caseDefinitionRepository,
-            accessControlGrantTypeQueryBuilder);
+            accessControlGrantTypeQueryBuilder,
+            caseDataAccessControl);
     }
 
     @Test

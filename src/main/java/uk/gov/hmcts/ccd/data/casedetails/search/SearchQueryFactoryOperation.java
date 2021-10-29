@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.data.casedetails.search;
 import com.google.common.collect.Maps;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -16,8 +17,10 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.data.casedetails.search.builder.AccessControlGrantTypeQueryBuilder;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -47,6 +50,7 @@ public class SearchQueryFactoryOperation {
     private final RoleAssignmentService roleAssignmentService;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final AccessControlGrantTypeQueryBuilder accessControlGrantTypeQueryBuilder;
+    private final CaseDataAccessControl caseDataAccessControl;
 
     public SearchQueryFactoryOperation(CriterionFactory criterionFactory,
                                        EntityManager entityManager,
@@ -57,7 +61,8 @@ public class SearchQueryFactoryOperation {
                                        RoleAssignmentService roleAssignmentService,
                                        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                        CaseDefinitionRepository caseDefinitionRepository,
-                                       AccessControlGrantTypeQueryBuilder accessControlGrantTypeQueryBuilder) {
+                                       AccessControlGrantTypeQueryBuilder accessControlGrantTypeQueryBuilder,
+                                       CaseDataAccessControl caseDataAccessControl) {
         this.criterionFactory = criterionFactory;
         this.entityManager = entityManager;
         this.applicationParam = applicationParam;
@@ -67,6 +72,7 @@ public class SearchQueryFactoryOperation {
         this.roleAssignmentService = roleAssignmentService;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlGrantTypeQueryBuilder = accessControlGrantTypeQueryBuilder;
+        this.caseDataAccessControl = caseDataAccessControl;
     }
 
     public Query build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
@@ -102,9 +108,12 @@ public class SearchQueryFactoryOperation {
             List<RoleAssignment> roleAssignments = roleAssignmentService
                 .getRoleAssignments(userAuthorisation.getUserId(), caseTypeDefinition);
 
+            Set<AccessProfile> accessProfiles = caseDataAccessControl
+                .filteredAccessProfiles(roleAssignments, caseTypeDefinition, false);
+
             return accessControlGrantTypeQueryBuilder.createQuery(roleAssignments,
                 params,
-                caseTypeDefinition.getStates());
+                caseTypeDefinition.getStates(), accessProfiles);
 
         } else if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             params.put("user_id", userAuthorisation.getUserId());

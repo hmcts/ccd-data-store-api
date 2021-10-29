@@ -25,7 +25,8 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 public interface GrantTypeESQueryBuilder {
 
     BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments,
-                                 List<CaseStateDefinition> caseStates);
+                                 List<CaseStateDefinition> caseStates,
+                                 Set<AccessProfile> accessProfiles);
 
     default Optional<TermsQueryBuilder>  createClassification(Stream<RoleAssignment> roleAssignmentStream) {
         Set<String> classifications = roleAssignmentStream
@@ -43,24 +44,16 @@ public interface GrantTypeESQueryBuilder {
 
     default Optional<TermsQueryBuilder> createCaseStateQuery(Supplier<Stream<RoleAssignment>> streamSupplier,
                                                              AccessControlService accessControlService,
-                                                             List<CaseStateDefinition> caseStates) {
+                                                             List<CaseStateDefinition> caseStates,
+                                                             Set<AccessProfile> accessProfiles) {
 
         List<CaseStateDefinition> raCaseStates = accessControlService
-            .filterCaseStatesByAccess(caseStates, generateAccessProfiles(streamSupplier), CAN_READ);
+            .filterCaseStatesByAccess(caseStates, accessProfiles, CAN_READ);
 
         if (raCaseStates.size() > 0) {
             return Optional.of(QueryBuilders.termsQuery(SECURITY_CLASSIFICATION_FIELD_COL, raCaseStates));
         }
         return Optional.empty();
-    }
-
-    private Set<AccessProfile> generateAccessProfiles(Supplier<Stream<RoleAssignment>> streamSupplier) {
-        return streamSupplier.get()
-            .map(roleAssignment -> AccessProfile.builder()
-                .accessProfile(roleAssignment.getRoleName())
-                .securityClassification(roleAssignment.getClassification())
-                .readOnly(roleAssignment.getReadOnly())
-                .build()).collect(Collectors.toSet());
     }
 
     private Set<String> getClassificationParams(Set<String> classifications) {

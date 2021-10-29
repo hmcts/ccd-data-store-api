@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
@@ -31,7 +33,8 @@ public class StandardGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
     @SuppressWarnings("java:S2789")
     public String createQuery(List<RoleAssignment> roleAssignments,
                               Map<String, Object> params,
-                              List<CaseStateDefinition> caseStates) {
+                              List<CaseStateDefinition> caseStates,
+                              Set<AccessProfile> accessProfiles) {
         Supplier<Stream<RoleAssignment>> streamSupplier = () -> roleAssignments.stream()
             .filter(roleAssignment -> GrantType.STANDARD.name().equals(roleAssignment.getGrantType()));
 
@@ -62,7 +65,8 @@ public class StandardGrantTypeQueryBuilder implements GrantTypeQueryBuilder {
         String tmpQuery = createClassification(params, "standard",
             streamSupplier,
             accessControlService,
-            caseStates);
+            caseStates,
+            accessProfiles);
 
         if (StringUtils.isNotBlank(regionAndLocationQuery)) {
             tmpQuery = tmpQuery + getOperator(tmpQuery, AND)

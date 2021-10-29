@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,8 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
     void shouldReturnEmptyQueryWhenNoRoleAssignmentsExists() {
         String query = accessControlGrantTypeQueryBuilder.createQuery(Lists.newArrayList(),
             Maps.newHashMap(),
-            Lists.newArrayList());
+            Lists.newArrayList(),
+            Sets.newHashSet());
         assertNotNull(query);
         assertTrue(StringUtils.isBlank(query));
     }
@@ -46,7 +48,9 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
     void shouldReturnBasicQueryWhenRoleAssignmentsWithBasicGrantTypeExists() {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC, "CASE", "PRIVATE", "", "", null);
         String query = accessControlGrantTypeQueryBuilder
-            .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap(), Lists.newArrayList());
+            .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap(),
+                Lists.newArrayList(),
+                Sets.newHashSet());
         String expectedValue =  " AND ( ( security_classification in (:classifications_basic) ) )";
         assertNotNull(query);
         assertEquals(expectedValue, query);
@@ -63,7 +67,8 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             .createQuery(Lists.newArrayList(roleAssignment,
                 specificRoleAssignment),
                 Maps.newHashMap(),
-                Lists.newArrayList());
+                Lists.newArrayList(),
+                Sets.newHashSet());
         String expectedValue =  " AND ( ( ( security_classification in (:classifications_basic) ) "
             + "OR ( security_classification in (:classifications_specific) "
             + "AND jurisdiction in (:jurisdictions_specific) AND reference in (:case_ids_specific) ) ) )";
@@ -86,7 +91,7 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             "CASE", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
         String query = accessControlGrantTypeQueryBuilder.createQuery(Lists.newArrayList(roleAssignment,
             specificRoleAssignment, challengedRoleAssignment, standardRoleAssignment),
-            Maps.newHashMap(), Lists.newArrayList());
+            Maps.newHashMap(), Lists.newArrayList(), Sets.newHashSet());
 
         String expectedValue =  " AND ( ( ( security_classification in (:classifications_basic) ) "
             + "OR ( security_classification in (:classifications_specific) "
@@ -121,7 +126,10 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
         String query = accessControlGrantTypeQueryBuilder.createQuery(Lists.newArrayList(roleAssignment,
             specificRoleAssignment, challengedRoleAssignment,
-            standardRoleAssignment, excludedRoleAssignment), Maps.newHashMap(), Lists.newArrayList());
+            standardRoleAssignment, excludedRoleAssignment),
+            Maps.newHashMap(),
+            Lists.newArrayList(),
+            Sets.newHashSet());
 
         String expectedValue =  " AND ( ( ( security_classification in (:classifications_basic) ) "
             + "OR ( security_classification in (:classifications_specific) "
@@ -150,7 +158,10 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
         String query = accessControlGrantTypeQueryBuilder
             .createQuery(Lists.newArrayList(challengedRoleAssignment,
-                excludedRoleAssignment), Maps.newHashMap(), Lists.newArrayList());
+                excludedRoleAssignment),
+                Maps.newHashMap(),
+                Lists.newArrayList(),
+                Sets.newHashSet());
 
         String expectedValue =  " AND ( ( ( security_classification in (:classifications_challenged) "
             + "AND jurisdiction in (:jurisdictions_challenged) ) ) "
@@ -171,7 +182,9 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
         String query = accessControlGrantTypeQueryBuilder
             .createQuery(Lists.newArrayList(roleAssignment, excludedRoleAssignment),
-                Maps.newHashMap(), Lists.newArrayList());
+                Maps.newHashMap(),
+                Lists.newArrayList(),
+                Sets.newHashSet());
 
         String expectedValue =  " AND ( ( security_classification in (:classifications_basic) ) "
             + "AND NOT ( security_classification in (:classifications_excluded) "
@@ -188,7 +201,10 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             Lists.newArrayList("auth1"), "caseId1");
 
         String query = accessControlGrantTypeQueryBuilder
-            .createQuery(Lists.newArrayList(challengedRoleAssignment), Maps.newHashMap(), Lists.newArrayList());
+            .createQuery(Lists.newArrayList(challengedRoleAssignment),
+                Maps.newHashMap(),
+                Lists.newArrayList(),
+                Sets.newHashSet());
 
         String expectedValue =  " AND ( ( ( security_classification in (:classifications_challenged)"
             + " AND jurisdiction in (:jurisdictions_challenged) ) ) )";
@@ -202,7 +218,10 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             "CASE", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
 
         String query = accessControlGrantTypeQueryBuilder
-            .createQuery(Lists.newArrayList(excludedRoleAssignment), Maps.newHashMap(), Lists.newArrayList());
+            .createQuery(Lists.newArrayList(excludedRoleAssignment),
+                Maps.newHashMap(),
+                Lists.newArrayList(),
+                Sets.newHashSet());
 
         String expectedValue =  " AND NOT ( security_classification in "
             + "(:classifications_excluded) AND reference in (:case_ids_excluded) )";

@@ -1,12 +1,16 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import com.google.common.collect.Lists;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 public interface NoCacheCaseDataAccessControl {
 
@@ -33,4 +37,10 @@ public interface NoCacheCaseDataAccessControl {
     boolean shouldRemoveCaseDefinition(Set<AccessProfile> accessProfiles,
                                        Predicate<AccessControlList> access,
                                        String caseTypeId);
+
+    default List<AccessProfile> filteredAccessProfiles(List<RoleAssignment> filteredRoleAssignments,
+                                                       CaseTypeDefinition caseTypeDefinition,
+                                                       boolean isCreationProfile) {
+        return Lists.newArrayList();
+    }
 }

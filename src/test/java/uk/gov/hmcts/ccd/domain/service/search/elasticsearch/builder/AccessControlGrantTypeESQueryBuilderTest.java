@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -39,6 +40,9 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
     @Mock
     private AccessControlService accessControlService;
 
+    @Mock
+    private CaseDataAccessControl caseDataAccessControl;
+
     private AccessControlGrantTypeESQueryBuilder accessControlGrantTypeQueryBuilder;
 
     @BeforeEach
@@ -52,7 +56,8 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
             new ExcludedGrantTypeESQueryBuilder(accessControlService),
             caseDefinitionRepository,
             roleAssignmentService,
-            userAuthorisation);
+            userAuthorisation,
+            caseDataAccessControl);
         CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         when(caseDefinitionRepository.getCaseType(anyString())).thenReturn(caseTypeDefinition);
         when(userAuthorisation.getUserId()).thenReturn("USER123");

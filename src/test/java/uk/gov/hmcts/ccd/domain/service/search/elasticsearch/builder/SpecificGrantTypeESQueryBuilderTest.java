@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ class SpecificGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "PRIVATE", "Test", "", "", null, "caseId1");
 
         BoolQueryBuilder queryBuilder = specificGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(specificRoleAssignment), Lists.newArrayList());
+            .createQuery(Lists.newArrayList(specificRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
 
         assertNotNull(queryBuilder);
     }
@@ -42,7 +43,7 @@ class SpecificGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "", "Test", "", "", null, "caseId1");
 
         BoolQueryBuilder queryBuilder = specificGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(specificRoleAssignment), Lists.newArrayList());
+            .createQuery(Lists.newArrayList(specificRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
 
         assertNotNull(queryBuilder);
     }
@@ -53,7 +54,7 @@ class SpecificGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "", "Test", "", "", null, "");
 
         BoolQueryBuilder queryBuilder = specificGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(specificRoleAssignment), Lists.newArrayList());
+            .createQuery(Lists.newArrayList(specificRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
 
         assertNotNull(queryBuilder);
     }
@@ -64,7 +65,7 @@ class SpecificGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "", "", "", "", null, "");
 
         BoolQueryBuilder queryBuilder = specificGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(specificRoleAssignment), Lists.newArrayList());
+            .createQuery(Lists.newArrayList(specificRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
 
         assertNotNull(queryBuilder);
     }
