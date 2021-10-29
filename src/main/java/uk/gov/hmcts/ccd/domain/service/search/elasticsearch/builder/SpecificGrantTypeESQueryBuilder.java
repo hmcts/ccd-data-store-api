@@ -9,17 +9,26 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 @Component
 public class SpecificGrantTypeESQueryBuilder implements GrantTypeESQueryBuilder {
 
+    private AccessControlService accessControlService;
+
+    public SpecificGrantTypeESQueryBuilder(AccessControlService accessControlService) {
+        this.accessControlService = accessControlService;
+    }
+
     @Override
-    public BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments) {
+    public BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments, List<CaseStateDefinition> caseStates) {
         Supplier<Stream<RoleAssignment>> streamSupplier = () -> roleAssignments.stream()
             .filter(roleAssignment -> GrantType.SPECIFIC.name().equals(roleAssignment.getGrantType()));
 
         BoolQueryBuilder specificQuery =  QueryBuilders.boolQuery();
         Lists.newArrayList(createClassification(streamSupplier.get()),
+            createCaseStateQuery(streamSupplier, accessControlService, caseStates),
             getJurisdictions(streamSupplier),
             getCaseReferences(streamSupplier))
             .stream()

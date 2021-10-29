@@ -12,6 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,17 +36,20 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
     @Mock
     UserAuthorisation userAuthorisation;
 
+    @Mock
+    private AccessControlService accessControlService;
+
     private AccessControlGrantTypeESQueryBuilder accessControlGrantTypeQueryBuilder;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         accessControlGrantTypeQueryBuilder = new AccessControlGrantTypeESQueryBuilder(
-            new BasicGrantTypeESQueryBuilder(),
-            new SpecificGrantTypeESQueryBuilder(),
-            new StandardGrantTypeESQueryBuilder(),
-            new ChallengedGrantTypeESQueryBuilder(),
-            new ExcludedGrantTypeESQueryBuilder(),
+            new BasicGrantTypeESQueryBuilder(accessControlService),
+            new SpecificGrantTypeESQueryBuilder(accessControlService),
+            new StandardGrantTypeESQueryBuilder(accessControlService),
+            new ChallengedGrantTypeESQueryBuilder(accessControlService),
+            new ExcludedGrantTypeESQueryBuilder(accessControlService),
             caseDefinitionRepository,
             roleAssignmentService,
             userAuthorisation);
@@ -58,7 +62,7 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
     void shouldReturnEmptyQueryWhenNoRoleAssignmentsExists() {
         when(roleAssignmentService.getRoleAssignments(anyString(), any())).thenReturn(Lists.newArrayList());
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query, Lists.newArrayList());
         assertNotNull(query);
         assertFalse(query.hasClauses());
     }
@@ -70,7 +74,7 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
             .thenReturn(Lists.newArrayList(roleAssignment));
 
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query, Lists.newArrayList());
         assertNotNull(query);
         assertEquals(1, query.must().size());
     }
@@ -87,7 +91,7 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
             .thenReturn(Lists.newArrayList(roleAssignment, specificRoleAssignment));
 
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query, Lists.newArrayList());
         assertNotNull(query);
         assertEquals(1, query.must().size());
     }
@@ -111,7 +115,7 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
 
 
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query, Lists.newArrayList());
 
         assertNotNull(query);
         assertEquals(1, query.must().size());
@@ -140,7 +144,7 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
 
 
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query, Lists.newArrayList());
 
         assertNotNull(query);
         assertEquals(1, query.must().size());

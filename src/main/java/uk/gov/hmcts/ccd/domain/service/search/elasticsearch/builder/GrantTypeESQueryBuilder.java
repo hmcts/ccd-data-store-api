@@ -12,15 +12,20 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.JURISDICTION_FIELD_KEYWORD_COL;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REFERENCE_FIELD_COL;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.SECURITY_CLASSIFICATION_FIELD_COL;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 public interface GrantTypeESQueryBuilder {
 
-    BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments);
+    BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments,
+                                 List<CaseStateDefinition> caseStates);
 
     default Optional<TermsQueryBuilder>  createClassification(Stream<RoleAssignment> roleAssignmentStream) {
         Set<String> classifications = roleAssignmentStream
@@ -34,6 +39,28 @@ public interface GrantTypeESQueryBuilder {
             return Optional.of(QueryBuilders.termsQuery(SECURITY_CLASSIFICATION_FIELD_COL, classificationParams));
         }
         return Optional.empty();
+    }
+
+    default Optional<TermsQueryBuilder> createCaseStateQuery(Supplier<Stream<RoleAssignment>> streamSupplier,
+                                                             AccessControlService accessControlService,
+                                                             List<CaseStateDefinition> caseStates) {
+
+        List<CaseStateDefinition> raCaseStates = accessControlService
+            .filterCaseStatesByAccess(caseStates, generateAccessProfiles(streamSupplier), CAN_READ);
+
+        if (raCaseStates.size() > 0) {
+            return Optional.of(QueryBuilders.termsQuery(SECURITY_CLASSIFICATION_FIELD_COL, raCaseStates));
+        }
+        return Optional.empty();
+    }
+
+    private Set<AccessProfile> generateAccessProfiles(Supplier<Stream<RoleAssignment>> streamSupplier) {
+        return streamSupplier.get()
+            .map(roleAssignment -> AccessProfile.builder()
+                .accessProfile(roleAssignment.getRoleName())
+                .securityClassification(roleAssignment.getClassification())
+                .readOnly(roleAssignment.getReadOnly())
+                .build()).collect(Collectors.toSet());
     }
 
     private Set<String> getClassificationParams(Set<String> classifications) {

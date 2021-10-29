@@ -289,6 +289,18 @@ public class AccessControlServiceImpl implements AccessControlService {
     }
 
     @Override
+    public List<CaseStateDefinition> filterCaseStatesByAccess(List<CaseStateDefinition> caseStates,
+                                                       Set<AccessProfile> accessProfiles,
+                                                       Predicate<AccessControlList> access) {
+        return caseStates
+            .stream()
+            .filter(caseState -> hasAccessControlList(accessProfiles,
+                access,
+                caseState.getAccessControlLists()))
+            .collect(toList());
+    }
+
+    @Override
     public List<CaseEventDefinition> filterCaseEventsByAccess(CaseTypeDefinition caseTypeDefinition,
                                                               final Set<AccessProfile> accessProfiles,
                                                               final Predicate<AccessControlList> access) {

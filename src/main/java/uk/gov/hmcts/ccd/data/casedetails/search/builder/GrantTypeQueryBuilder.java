@@ -4,11 +4,17 @@ import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 public interface GrantTypeQueryBuilder {
 
@@ -19,6 +25,8 @@ public interface GrantTypeQueryBuilder {
     String EMPTY = "";
 
     String SECURITY_CLASSIFICATION = "security_classification";
+
+    String STATES = "states";
 
     String JURISDICTION = "jurisdiction";
 
@@ -36,23 +44,49 @@ public interface GrantTypeQueryBuilder {
 
     String AND_NOT = " AND NOT ";
 
-    String createQuery(List<RoleAssignment> roleAssignments, Map<String, Object> params);
+    String createQuery(List<RoleAssignment> roleAssignments,
+                       Map<String, Object> params,
+                       List<CaseStateDefinition> caseStates);
 
     default String createClassification(Map<String, Object> params, String paramName,
-                                        Stream<RoleAssignment> roleAssignmentStream) {
-        Set<String> classifications = roleAssignmentStream
+                                        Supplier<Stream<RoleAssignment>> streamSupplier,
+                                        AccessControlService accessControlService,
+                                        List<CaseStateDefinition> caseStates) {
+        Set<String> classifications = streamSupplier
+            .get()
             .map(roleAssignment -> roleAssignment.getClassification())
             .filter(classification -> StringUtils.isNotBlank(classification))
             .collect(Collectors.toSet());
 
         Set<String> classificationParams = getClassificationParams(classifications);
 
+        String tmpQuery = EMPTY;
+
         if (classificationParams.size() > 0) {
-            params.put(paramName, classificationParams);
-            return String.format(QUERY, SECURITY_CLASSIFICATION, paramName);
+            String classificationsParam = "classifications_" + paramName;
+            params.put(classificationsParam, classificationParams);
+            tmpQuery = String.format(QUERY, SECURITY_CLASSIFICATION, classificationsParam);
         }
 
-        return EMPTY;
+        List<CaseStateDefinition> raCaseStates = accessControlService
+            .filterCaseStatesByAccess(caseStates, generateAccessProfiles(streamSupplier), CAN_READ);
+
+        if (!raCaseStates.isEmpty()) {
+            String statesParam = "states_" + paramName;
+            params.put(statesParam, raCaseStates);
+            return tmpQuery + getOperator(tmpQuery, AND) + String.format(QUERY, STATES, statesParam);
+        }
+
+        return tmpQuery;
+    }
+
+    private Set<AccessProfile> generateAccessProfiles(Supplier<Stream<RoleAssignment>> streamSupplier) {
+        return streamSupplier.get()
+            .map(roleAssignment -> AccessProfile.builder()
+                .accessProfile(roleAssignment.getRoleName())
+                .securityClassification(roleAssignment.getClassification())
+                .readOnly(roleAssignment.getReadOnly())
+                .build()).collect(Collectors.toSet());
     }
 
     private Set<String> getClassificationParams(Set<String> classifications) {

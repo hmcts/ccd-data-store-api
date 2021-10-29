@@ -5,8 +5,11 @@ import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -16,18 +19,25 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
     private AccessControlGrantTypeQueryBuilder accessControlGrantTypeQueryBuilder;
 
+    @Mock
+    private AccessControlService accessControlService;
+
     @BeforeEach
     void setUp() {
-        accessControlGrantTypeQueryBuilder = new AccessControlGrantTypeQueryBuilder(new BasicGrantTypeQueryBuilder(),
-            new SpecificGrantTypeQueryBuilder(),
-            new StandardGrantTypeQueryBuilder(),
-            new ChallengedGrantTypeQueryBuilder(),
-            new ExcludedGrantTypeQueryBuilder());
+        MockitoAnnotations.initMocks(this);
+        accessControlGrantTypeQueryBuilder = new AccessControlGrantTypeQueryBuilder(
+            new BasicGrantTypeQueryBuilder(accessControlService),
+            new SpecificGrantTypeQueryBuilder(accessControlService),
+            new StandardGrantTypeQueryBuilder(accessControlService),
+            new ChallengedGrantTypeQueryBuilder(accessControlService),
+            new ExcludedGrantTypeQueryBuilder(accessControlService));
     }
 
     @Test
     void shouldReturnEmptyQueryWhenNoRoleAssignmentsExists() {
-        String query = accessControlGrantTypeQueryBuilder.createQuery(Lists.newArrayList(), Maps.newHashMap());
+        String query = accessControlGrantTypeQueryBuilder.createQuery(Lists.newArrayList(),
+            Maps.newHashMap(),
+            Lists.newArrayList());
         assertNotNull(query);
         assertTrue(StringUtils.isBlank(query));
     }
@@ -36,8 +46,8 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
     void shouldReturnBasicQueryWhenRoleAssignmentsWithBasicGrantTypeExists() {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC, "CASE", "PRIVATE", "", "", null);
         String query = accessControlGrantTypeQueryBuilder
-            .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap());
-        String expectedValue =  " AND ( ( security_classification in (:classifications) ) )";
+            .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap(), Lists.newArrayList());
+        String expectedValue =  " AND ( ( security_classification in (:classifications_basic) ) )";
         assertNotNull(query);
         assertEquals(expectedValue, query);
     }
@@ -50,8 +60,11 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
         RoleAssignment specificRoleAssignment = createRoleAssignment(GrantType.SPECIFIC,
             "CASE", "PRIVATE", "Test", "", "", null, "caseId1");
         String query = accessControlGrantTypeQueryBuilder
-            .createQuery(Lists.newArrayList(roleAssignment, specificRoleAssignment), Maps.newHashMap());
-        String expectedValue =  " AND ( ( ( security_classification in (:classifications) ) "
+            .createQuery(Lists.newArrayList(roleAssignment,
+                specificRoleAssignment),
+                Maps.newHashMap(),
+                Lists.newArrayList());
+        String expectedValue =  " AND ( ( ( security_classification in (:classifications_basic) ) "
             + "OR ( security_classification in (:classifications_specific) "
             + "AND jurisdiction in (:jurisdictions_specific) AND reference in (:case_ids_specific) ) ) )";
         assertNotNull(query);
@@ -72,9 +85,10 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
         RoleAssignment standardRoleAssignment = createRoleAssignment(GrantType.STANDARD,
             "CASE", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
         String query = accessControlGrantTypeQueryBuilder.createQuery(Lists.newArrayList(roleAssignment,
-            specificRoleAssignment, challengedRoleAssignment, standardRoleAssignment), Maps.newHashMap());
+            specificRoleAssignment, challengedRoleAssignment, standardRoleAssignment),
+            Maps.newHashMap(), Lists.newArrayList());
 
-        String expectedValue =  " AND ( ( ( security_classification in (:classifications) ) "
+        String expectedValue =  " AND ( ( ( security_classification in (:classifications_basic) ) "
             + "OR ( security_classification in (:classifications_specific) "
             + "AND jurisdiction in (:jurisdictions_specific) "
             + "AND reference in (:case_ids_specific) ) ) "
@@ -107,9 +121,9 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
         String query = accessControlGrantTypeQueryBuilder.createQuery(Lists.newArrayList(roleAssignment,
             specificRoleAssignment, challengedRoleAssignment,
-            standardRoleAssignment, excludedRoleAssignment), Maps.newHashMap());
+            standardRoleAssignment, excludedRoleAssignment), Maps.newHashMap(), Lists.newArrayList());
 
-        String expectedValue =  " AND ( ( ( security_classification in (:classifications) ) "
+        String expectedValue =  " AND ( ( ( security_classification in (:classifications_basic) ) "
             + "OR ( security_classification in (:classifications_specific) "
             + "AND jurisdiction in (:jurisdictions_specific) "
             + "AND reference in (:case_ids_specific) ) ) "
@@ -135,7 +149,8 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             "CASE", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
 
         String query = accessControlGrantTypeQueryBuilder
-            .createQuery(Lists.newArrayList(challengedRoleAssignment, excludedRoleAssignment), Maps.newHashMap());
+            .createQuery(Lists.newArrayList(challengedRoleAssignment,
+                excludedRoleAssignment), Maps.newHashMap(), Lists.newArrayList());
 
         String expectedValue =  " AND ( ( ( security_classification in (:classifications_challenged) "
             + "AND jurisdiction in (:jurisdictions_challenged) ) ) "
@@ -155,9 +170,10 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             "CASE", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
 
         String query = accessControlGrantTypeQueryBuilder
-            .createQuery(Lists.newArrayList(roleAssignment, excludedRoleAssignment), Maps.newHashMap());
+            .createQuery(Lists.newArrayList(roleAssignment, excludedRoleAssignment),
+                Maps.newHashMap(), Lists.newArrayList());
 
-        String expectedValue =  " AND ( ( security_classification in (:classifications) ) "
+        String expectedValue =  " AND ( ( security_classification in (:classifications_basic) ) "
             + "AND NOT ( security_classification in (:classifications_excluded) "
             + "AND reference in (:case_ids_excluded) ) )";
 
@@ -172,7 +188,7 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             Lists.newArrayList("auth1"), "caseId1");
 
         String query = accessControlGrantTypeQueryBuilder
-            .createQuery(Lists.newArrayList(challengedRoleAssignment), Maps.newHashMap());
+            .createQuery(Lists.newArrayList(challengedRoleAssignment), Maps.newHashMap(), Lists.newArrayList());
 
         String expectedValue =  " AND ( ( ( security_classification in (:classifications_challenged)"
             + " AND jurisdiction in (:jurisdictions_challenged) ) ) )";
@@ -186,7 +202,7 @@ class AccessControlGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             "CASE", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
 
         String query = accessControlGrantTypeQueryBuilder
-            .createQuery(Lists.newArrayList(excludedRoleAssignment), Maps.newHashMap());
+            .createQuery(Lists.newArrayList(excludedRoleAssignment), Maps.newHashMap(), Lists.newArrayList());
 
         String expectedValue =  " AND NOT ( security_classification in "
             + "(:classifications_excluded) AND reference in (:case_ids_excluded) )";

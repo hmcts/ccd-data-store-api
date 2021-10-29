@@ -102,7 +102,9 @@ public class SearchQueryFactoryOperation {
             List<RoleAssignment> roleAssignments = roleAssignmentService
                 .getRoleAssignments(userAuthorisation.getUserId(), caseTypeDefinition);
 
-            return accessControlGrantTypeQueryBuilder.createQuery(roleAssignments, params);
+            return accessControlGrantTypeQueryBuilder.createQuery(roleAssignments,
+                params,
+                caseTypeDefinition.getStates());
 
         } else if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             params.put("user_id", userAuthorisation.getUserId());

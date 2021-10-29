@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
+import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -11,6 +12,8 @@ import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.JURISDICTION_FIELD_KEYWORD_COL;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.LOCATION;
@@ -19,9 +22,15 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REGION;
 @Component
 public class StandardGrantTypeESQueryBuilder implements GrantTypeESQueryBuilder {
 
+    private AccessControlService accessControlService;
+
+    public StandardGrantTypeESQueryBuilder(AccessControlService accessControlService) {
+        this.accessControlService = accessControlService;
+    }
+
     @Override
     @SuppressWarnings("java:S2789")
-    public BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments) {
+    public BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments, List<CaseStateDefinition> caseStates) {
         Supplier<Stream<RoleAssignment>> streamSupplier = () -> roleAssignments.stream()
             .filter(roleAssignment -> GrantType.STANDARD.name().equals(roleAssignment.getGrantType()));
 
@@ -63,6 +72,12 @@ public class StandardGrantTypeESQueryBuilder implements GrantTypeESQueryBuilder 
         } else if (classificationTermsQuery.isPresent()) {
             standardQuery.must(classificationTermsQuery.get());
         }
+
+        Lists.newArrayList(createCaseStateQuery(streamSupplier, accessControlService, caseStates))
+            .stream()
+            .filter(query -> query.isPresent())
+            .map(query -> query.get())
+            .forEach(query -> standardQuery.must(query));
 
         return standardQuery;
     }

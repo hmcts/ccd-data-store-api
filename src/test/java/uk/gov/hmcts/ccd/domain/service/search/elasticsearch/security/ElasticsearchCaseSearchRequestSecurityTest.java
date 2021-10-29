@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder.AccessControlGrantTypeESQueryBuilder;
@@ -43,13 +44,16 @@ class ElasticsearchCaseSearchRequestSecurityTest {
     @Mock
     private AccessControlGrantTypeESQueryBuilder grantTypeESQueryBuilder;
 
+    @Mock
+    private CaseDefinitionRepository caseDefinitionRepository;
+
     private ElasticsearchCaseSearchRequestSecurity querySecurity;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
         querySecurity = new ElasticsearchCaseSearchRequestSecurity(Collections.singletonList(caseSearchFilter),
-                objectMapperService, grantTypeESQueryBuilder);
+            objectMapperService, grantTypeESQueryBuilder, caseDefinitionRepository);
         when(searchRequestJsonNode.has(QUERY)).thenReturn(true);
         when(searchRequestJsonNode.has(NATIVE_ES_QUERY)).thenReturn(false);
     }

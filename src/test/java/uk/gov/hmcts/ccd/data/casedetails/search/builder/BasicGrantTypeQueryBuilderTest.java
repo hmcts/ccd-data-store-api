@@ -4,8 +4,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -14,19 +17,23 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
     private BasicGrantTypeQueryBuilder basicGrantTypeQueryBuilder;
 
+    @Mock
+    private AccessControlService accessControlService;
+
     @BeforeEach
     void setUp() {
-        basicGrantTypeQueryBuilder = new BasicGrantTypeQueryBuilder();
+        MockitoAnnotations.initMocks(this);
+        basicGrantTypeQueryBuilder = new BasicGrantTypeQueryBuilder(accessControlService);
     }
 
     @Test
     void shouldReturnQueryWhenRoleAssignmentHasClassifications() {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC, "CASE", "PRIVATE", "", "", null);
         String query = basicGrantTypeQueryBuilder
-            .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap());
+            .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap(), null);
 
         assertNotNull(query);
-        String expectedValue =  "( security_classification in (:classifications) )";
+        String expectedValue =  "( security_classification in (:classifications_basic) )";
         assertEquals(expectedValue, query);
     }
 
@@ -37,10 +44,10 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             "PRIVATE", "", "",
             Lists.newArrayList("auth1"));
         String query = basicGrantTypeQueryBuilder
-            .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap());
+            .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap(), null);
 
         assertNotNull(query);
-        assertEquals("( security_classification in (:classifications) )", query);
+        assertEquals("( security_classification in (:classifications_basic) )", query);
     }
 
     @Test
@@ -49,7 +56,7 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             "CASE",
             "PRIVATE", "", "", null);
         String query = basicGrantTypeQueryBuilder
-            .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap());
+            .createQuery(Lists.newArrayList(roleAssignment), Maps.newHashMap(), null);
 
         assertNotNull(query);
         assertEquals("", query);
@@ -68,10 +75,10 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             Lists.newArrayList());
         String query = basicGrantTypeQueryBuilder.createQuery(
             Lists.newArrayList(roleAssignment, roleAssignment2),
-            Maps.newHashMap());
+            Maps.newHashMap(), null);
 
         assertNotNull(query);
-        String expectedValue =  "( security_classification in (:classifications) )";
+        String expectedValue =  "( security_classification in (:classifications_basic) )";
         assertEquals(expectedValue, query);
     }
 
@@ -94,10 +101,10 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
         String query = basicGrantTypeQueryBuilder.createQuery(
             Lists.newArrayList(roleAssignment, roleAssignment2),
-            Maps.newHashMap());
+            Maps.newHashMap(), null);
 
         assertNotNull(query);
-        String expectedValue =  "( security_classification in (:classifications) )";
+        String expectedValue =  "( security_classification in (:classifications_basic) )";
         assertEquals(expectedValue, query);
     }
 }

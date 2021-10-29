@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -45,17 +46,18 @@ public class AccessControlGrantTypeESQueryBuilder {
         this.userAuthorisation = userAuthorisation;
     }
 
-    public void createQuery(String caseTypeId, BoolQueryBuilder mainQuery) {
+    public void createQuery(String caseTypeId, BoolQueryBuilder mainQuery,
+                            List<CaseStateDefinition> caseStates) {
         List<RoleAssignment> roleAssignments = getRoleAssignments(caseTypeId);
-        BoolQueryBuilder standardQuery = standardGrantTypeQueryBuilder.createQuery(roleAssignments);
-        BoolQueryBuilder challengedQuery = challengedGrantTypeQueryBuilder.createQuery(roleAssignments);
+        BoolQueryBuilder standardQuery = standardGrantTypeQueryBuilder.createQuery(roleAssignments, caseStates);
+        BoolQueryBuilder challengedQuery = challengedGrantTypeQueryBuilder.createQuery(roleAssignments, caseStates);
         BoolQueryBuilder orgQuery = prepareQuery(standardQuery, challengedQuery);
 
-        BoolQueryBuilder basicQuery = basicGrantTypeQueryBuilder.createQuery(roleAssignments);
-        BoolQueryBuilder specificQuery = specificGrantTypeQueryBuilder.createQuery(roleAssignments);
+        BoolQueryBuilder basicQuery = basicGrantTypeQueryBuilder.createQuery(roleAssignments, caseStates);
+        BoolQueryBuilder specificQuery = specificGrantTypeQueryBuilder.createQuery(roleAssignments, caseStates);
         BoolQueryBuilder nonOrgQuery = prepareQuery(basicQuery, specificQuery);
 
-        BoolQueryBuilder excludedQuery = excludedGrantTypeQueryBuilder.createQuery(roleAssignments);
+        BoolQueryBuilder excludedQuery = excludedGrantTypeQueryBuilder.createQuery(roleAssignments, caseStates);
 
         if (!nonOrgQuery.hasClauses()
             && !orgQuery.hasClauses()
