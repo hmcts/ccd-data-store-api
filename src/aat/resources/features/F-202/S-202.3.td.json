@@ -8,6 +8,7 @@
 
   "specs": [
     "to create a token for event creation",
+    "Solicitor2",
     "restricted access to create CT2 cases",
     "attempts to search for case type CT2 by field F2=b",
     "attempts to search for case J1-CT2-01",

@@ -5,8 +5,10 @@
   "specs": [
     "restricted access to create a case J1-CT2-01",
     "PUBLIC SC ORGANISATION role assignment access",
-    "attempts to search for case J1-CT2-01",
-    "contains no cases"
+    "attempts to search for case type CT2,CT7 by PUBLIC field F3",
+    "Solicitor1",
+    "contains no cases",
+    "contains J1-CT2-01, J1-CT2-02, J1-CT7-01"
   ],
 
   "users" : {

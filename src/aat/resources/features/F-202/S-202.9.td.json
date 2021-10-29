@@ -6,7 +6,11 @@
     "restricted access to create a case J1-CT2-01",
     "PUBLIC SC ORGANISATION role assignment access",
     "attempts to search for case J1-CT2-01",
-    "contains no cases"
+    "Staff1 with ORGANISATION role assignment to CT2(PUBLIC) and CT2(PRIVATE)",
+    "attempts to search for case types CT1,CT2 by field F2",
+    "contains no cases",
+    "contains J1-CT2-01, J1-CT2-02, J1-CT2-03, J1-CT2-04, J1-CT2-05, J1-CT2-06",
+    "contains J1-CT1-01"
   ],
 
   "users" : {
@@ -23,7 +27,7 @@
     "body": {
       "query": {
         "match": {
-          "data.F2.keyword": "b"
+          "data.F2.keyword": "b${[scenarioContext][customValues][UniqueString]}"
         }
       }
     }

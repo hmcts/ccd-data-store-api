@@ -1,0 +1,68 @@
+{
+  "_guid_": "J1-CT1-02_Issued",
+  "_extends_" : "AC_Update_Case_Base",
+
+
+  "specs": [
+  ],
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][J1-CT1-02][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "F1": "a${[scenarioContext][customValues][UniqueString]}",
+        "F2": "b${[scenarioContext][customValues][UniqueString]}",
+        "F3": "c${[scenarioContext][customValues][UniqueString]}"
+      },
+      "data_classification": {
+        "F1": "RESTRICTED",
+        "F2": "PRIVATE",
+        "F3": "PRIVATE"
+      },
+      "event": {
+        "id": "Issue"
+      },
+      "event_token": "${[scenarioContext][parentContext][childContexts][J1-CT1-02_Update_Token_Creation][testData][actualResponse][body][token]}"
+    }
+    },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body":{
+      "_links" : {
+        "self" : {
+          "href" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id" : "[[ANYTHING_PRESENT]]",
+      "jurisdiction" : "[[ANYTHING_PRESENT]]",
+      "case_type" : "[[ANYTHING_PRESENT]]",
+      "created_on" : "[[ANYTHING_PRESENT]]",
+      "last_modified_on" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on" : "[[ANYTHING_PRESENT]]",
+      "state" : "[[ANYTHING_PRESENT]]",
+      "security_classification" : "[[ANYTHING_PRESENT]]",
+      "data" : {
+        "F1" : "a${[scenarioContext][customValues][UniqueString]}",
+        "F2" : "b${[scenarioContext][customValues][UniqueString]}",
+        "F3" : "c${[scenarioContext][customValues][UniqueString]}"
+      },
+      "data_classification" : {
+        "F1" : "RESTRICTED",
+        "F2" : "PRIVATE",
+        "F3" : "PRIVATE"
+      },
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
+    }
+  }
+
+}

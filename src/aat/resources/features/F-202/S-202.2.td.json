@@ -3,10 +3,13 @@
   "_extends_": "F-202_Test_Data_Base",
 
   "specs": [
-    "restricted access to create a case J1-CT2-01",
-    "PUBLIC SC ORGANISATION role assignment access",
-    "attempts to search for case J1-CT2-01",
-    "contains no cases"
+    "Solicitor3",
+    "superuser access to create PRIVATE case J1-CT1-01",
+    "attempts to search for case J1-CT1-01 by RESTRICTED Field F1",
+    "contains the case J1-CT1-01",
+    "does not contain the RESTRICTED field F1 for J1-CT1-01",
+    "to give Solicitor3 a PRIVATE CASE role assignment to view the previously created case J1-CT2-01",
+    "to give Solicitor3 a PRIVATE CASE role assignment to view the previously created case J1-CT2-01"
   ],
 
   "users" : {
@@ -23,7 +26,7 @@
     "body": {
       "query": {
         "match": {
-          "data.F2.keyword": "b"
+          "data.F1.keyword": "a${[scenarioContext][customValues][UniqueString]}"
         }
       }
     }
@@ -32,7 +35,7 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body" : {
-      "total" : 0,
+      "total" : "todo",
       "cases" : [ ],
       "case_types_results" : [ ]
       }

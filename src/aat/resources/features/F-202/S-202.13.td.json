@@ -3,10 +3,10 @@
   "_extends_": "F-202_Test_Data_Base",
 
   "specs": [
-    "restricted access to create a case J1-CT2-01",
+    "Staff6 with ORGANISATION role assignment to CT2(RESTRICTED) with region and location attribute",
     "PUBLIC SC ORGANISATION role assignment access",
-    "attempts to search for case J1-CT2-01",
-    "contains no cases"
+    "attempts to search for case types CT2 by field F4",
+    "contains J1-CT2-01, J1-CT2-02, J1-CT2-03, J1-CT2-04, J1-CT2-05, J1-CT2-06"
   ],
 
   "users" : {
@@ -23,7 +23,7 @@
     "body": {
       "query": {
         "match": {
-          "data.F4.keyword": "d"
+          "data.F4.keyword": "d${[scenarioContext][customValues][UniqueString]}"
         }
       }
     }

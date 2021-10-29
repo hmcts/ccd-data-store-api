@@ -1,5 +1,5 @@
 {
-  "_guid_": "J1-CT7-01",
+  "_guid_": "J1-CT1-01",
   "_extends_" : "AC_Create_Case_Base",
 
   "specs": [
@@ -8,7 +8,7 @@
 
   "request" : {
     "pathVariables": {
-      "ctid": "CT7"
+      "ctid": "CT1"
     },
     "_extends_": "Common_Request",
     "headers": {
@@ -16,16 +16,16 @@
     },
     "body" : {
       "data": {
-        "F1": "a",
-        "F2": "b",
-        "F3": "c"
+        "F1": "a${[scenarioContext][customValues][UniqueString]}",
+        "F2": "b${[scenarioContext][customValues][UniqueString]}",
+        "F3": "c${[scenarioContext][customValues][UniqueString]}"
       },
       "event": {
         "id": "Create",
         "summary": "",
         "description": ""
       },
-      "event_token": "${[scenarioContext][parentContext][childContexts][J1-CT7-01_Token_Creation][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][parentContext][childContexts][J1-CT1-01_Token_Creation][testData][actualResponse][body][token]}",
       "ignore_warning": false,
       "draft_id": null
     }
@@ -41,19 +41,21 @@
       },
       "id" : "[[ANYTHING_PRESENT]]",
       "jurisdiction" : "J1",
-      "case_type" : "CT7",
+      "case_type" : "CT1",
       "created_on" : "[[ANYTHING_PRESENT]]",
       "last_modified_on" : "[[ANYTHING_PRESENT]]",
       "last_state_modified_on" : "[[ANYTHING_PRESENT]]",
       "state" : "Unissued1",
-      "security_classification" : "PUBLIC",
+      "security_classification" : "PRIVATE",
       "data" : {
-       "_extends_" : "F-202_Case_Data_Base"
+        "F1" : "a${[scenarioContext][customValues][UniqueString]}",
+        "F2" : "b${[scenarioContext][customValues][UniqueString]}",
+        "F3" : "c${[scenarioContext][customValues][UniqueString]}"
       },
       "data_classification" : {
         "F1" : "RESTRICTED",
         "F2" : "PRIVATE",
-        "F3" : "PUBLIC"
+        "F3" : "PRIVATE"
       },
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,

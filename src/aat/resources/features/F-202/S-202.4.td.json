@@ -12,6 +12,11 @@
     "attempts to search for case J1-CT2-01",
     "to give user Solicitor1 their role case role assignments",
     "contains no cases",
+    "attempts to search for case type CT2 by PRIVATE field F2",
+    "Solicitor1",
+    "does not contain J1-CT2-01 as the user does not have SC access to search on that field",
+    "contains J1-CT2-02 with private field F2",
+    "does not contain J1-CT2-01 as the user does not have SC access to search on that field BUT WHYYYYYYYY",
     "to give user Solicitor2 their role case role assignments"
   ],
 

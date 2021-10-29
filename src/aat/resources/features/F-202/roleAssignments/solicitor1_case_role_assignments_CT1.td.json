@@ -1,5 +1,5 @@
 {
-  "_guid_" : "S-202.1_Grant_Role_Assignment",
+  "_guid_" : "solicitor1_case_role_assignments_CT1",
 
   "productName": "Role Assignment Service",
   "operationName": "post role assignment",
@@ -7,13 +7,19 @@
   "uri": "http://localhost:4096/am/role-assignments",
 
   "specs": [
-    "to give user Solicitor1 a PUBLIC CASE role assignment to view the previously created case J1-CT2-01"
+    "a role assignment to access CaseType CT2",
+    "attempts to create a case for CT2",
+    "Solicitor1 a PUBLIC CASE role assignment to view the previously created case J1-CT2-01",
+    "to create a full case",
+    "to give user Solicitor1 a PRIVATE CASE role assignment to view the previously created case",
+    "to give user Solicitor1 their role case role assignments"
+
   ],
 
   "users" : {
     "S1": {
       "username": "ccd.ac.solicitor1@gmail.com",
-      "password": "Pa55word11"
+      "password": "[[$CCD_BEFTA_CASEWORKER_1_PWD]]"
     }
   },
 
@@ -31,7 +37,7 @@
           "actorId" : "${[scenarioContext][testData][users][S1][id]}",
           "actorIdType" : "IDAM",
           "roleType" : "CASE",
-          "roleName" : "Solicitor",
+          "roleName" : "Appellant",
           "roleCategory" : "PROFESSIONAL",
           "classification" : "PUBLIC",
           "grantType" : "SPECIFIC",
@@ -41,7 +47,7 @@
           "attributes" : {
             "jurisdiction" : "J1",
             "caseType" : "CT1",
-            "caseId" : "${[scenarioContext][parentContext][childContexts][F202_Create_Case_CT1][testData][actualResponse][body][id]}"
+            "caseId" : "${[scenarioContext][parentContext][childContexts][J1-CT1-01][testData][actualResponse][body][id]}"
           }
         }
       ]
