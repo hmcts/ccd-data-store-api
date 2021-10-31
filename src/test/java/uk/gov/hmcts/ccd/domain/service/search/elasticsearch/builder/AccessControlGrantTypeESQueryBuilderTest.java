@@ -49,15 +49,14 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
     void setUp() {
         MockitoAnnotations.openMocks(this);
         accessControlGrantTypeQueryBuilder = new AccessControlGrantTypeESQueryBuilder(
-            new BasicGrantTypeESQueryBuilder(accessControlService),
-            new SpecificGrantTypeESQueryBuilder(accessControlService),
-            new StandardGrantTypeESQueryBuilder(accessControlService),
-            new ChallengedGrantTypeESQueryBuilder(accessControlService),
-            new ExcludedGrantTypeESQueryBuilder(accessControlService),
+            new BasicGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl),
+            new SpecificGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl),
+            new StandardGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl),
+            new ChallengedGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl),
+            new ExcludedGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl),
             caseDefinitionRepository,
             roleAssignmentService,
-            userAuthorisation,
-            caseDataAccessControl);
+            userAuthorisation);
         CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         when(caseDefinitionRepository.getCaseType(anyString())).thenReturn(caseTypeDefinition);
         when(userAuthorisation.getUserId()).thenReturn("USER123");
@@ -67,7 +66,7 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
     void shouldReturnEmptyQueryWhenNoRoleAssignmentsExists() {
         when(roleAssignmentService.getRoleAssignments(anyString(), any())).thenReturn(Lists.newArrayList());
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query, Lists.newArrayList());
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
         assertNotNull(query);
         assertFalse(query.hasClauses());
     }
@@ -79,7 +78,7 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
             .thenReturn(Lists.newArrayList(roleAssignment));
 
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query, Lists.newArrayList());
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
         assertNotNull(query);
         assertEquals(1, query.must().size());
     }
@@ -96,7 +95,7 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
             .thenReturn(Lists.newArrayList(roleAssignment, specificRoleAssignment));
 
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query, Lists.newArrayList());
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
         assertNotNull(query);
         assertEquals(1, query.must().size());
     }
@@ -120,7 +119,7 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
 
 
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query, Lists.newArrayList());
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
 
         assertNotNull(query);
         assertEquals(1, query.must().size());
@@ -149,7 +148,7 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
 
 
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query, Lists.newArrayList());
+        accessControlGrantTypeQueryBuilder.createQuery(CASE_TYPE_ID, query);
 
         assertNotNull(query);
         assertEquals(1, query.must().size());

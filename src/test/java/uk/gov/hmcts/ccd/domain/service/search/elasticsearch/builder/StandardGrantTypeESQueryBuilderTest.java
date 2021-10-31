@@ -9,6 +9,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -20,10 +22,17 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
     @Mock
     private AccessControlService accessControlService;
 
+    @Mock
+    private CaseDataAccessControl caseDataAccessControl;
+
+    @Mock
+    private CaseTypeDefinition caseTypeDefinition;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        standardGrantTypeESQueryBuilder = new StandardGrantTypeESQueryBuilder(accessControlService);
+        standardGrantTypeESQueryBuilder =
+            new StandardGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl);
     }
 
     @Test
@@ -32,7 +41,7 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "PRIVATE", "Test", "loc1", "reg1", null, "caseId1");
 
         BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(standardRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
+            .createQuery(Lists.newArrayList(standardRoleAssignment), caseTypeDefinition);
 
         assertNotNull(queryBuilder);
     }
@@ -43,7 +52,7 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "PRIVATE", "Test", "", "reg1", null, "caseId1");
 
         BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(standardRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
+            .createQuery(Lists.newArrayList(standardRoleAssignment), caseTypeDefinition);
 
         assertNotNull(queryBuilder);
     }
@@ -54,7 +63,7 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "PRIVATE", "Test", "loc1", "", null, "caseId1");
 
         BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(standardRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
+            .createQuery(Lists.newArrayList(standardRoleAssignment), caseTypeDefinition);
 
         assertNotNull(queryBuilder);
     }
@@ -65,7 +74,7 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "PRIVATE", "Test", "", "", null, "caseId1");
 
         BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(standardRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
+            .createQuery(Lists.newArrayList(standardRoleAssignment), caseTypeDefinition);
 
         assertNotNull(queryBuilder);
     }
@@ -76,7 +85,7 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "PRIVATE", "", "", "", null, "caseId1");
 
         BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(standardRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
+            .createQuery(Lists.newArrayList(standardRoleAssignment), caseTypeDefinition);
 
         assertNotNull(queryBuilder);
     }
@@ -87,7 +96,7 @@ class StandardGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "PRIVATE", "Test", null, "", null, "caseId1");
 
         BoolQueryBuilder queryBuilder = standardGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(standardRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
+            .createQuery(Lists.newArrayList(standardRoleAssignment), caseTypeDefinition);
 
         assertNotNull(queryBuilder);
     }
