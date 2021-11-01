@@ -32,7 +32,6 @@ Feature: F-1006: Submit Event to Update TTL
       And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
      Then a positive response is received
       And the response has all other details as expected
-#    AND a call [to verify that the Resolved_TTL value is set to NULL in the database] will get the expected response as in [YYY].
 
     @S-1006.3 @AC-3
     Scenario: TTL.Suspended changed to "No", SystemTTL greater than TTLGuard, OverRide TTL is NULL and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
@@ -47,7 +46,6 @@ Feature: F-1006: Submit Event to Update TTL
       And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
      Then a positive response is received
       And the response has all other details as expected
-#    AND a call [to verify that the Resolved_TTL value is set to the given TTL.SystemTTL in the database] will get the expected response as in [YYY].
 
   @S-1006.4 @AC-4
   Scenario: TTL.Suspended changed to "No", SystemTTL is NULL, OverRide TTL is greater than TTLGuard and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
@@ -62,7 +60,6 @@ Feature: F-1006: Submit Event to Update TTL
     And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
-#    AND a call [to verify that the Resolved_TTL value is set to the given TTL.OverrideTTL in the database] will get the expected response as in [YYY].
 
   @S-1006.5 @AC-5
   Scenario:  TTL.Suspended changed to "No", SystemTTL is less than TTLGuard, OverRide TTL is greater than TTLGuard and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
@@ -77,7 +74,6 @@ Feature: F-1006: Submit Event to Update TTL
     And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
-#    AND a call [to verify that the Resolved_TTL value is set to the given TTL.OverrideTTL in the database] will get the expected response as in [YYY].
 
   @S-1006.6 @AC-6
   Scenario:  TTL.Suspended changed to "Yes" and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
@@ -90,7 +86,6 @@ Feature: F-1006: Submit Event to Update TTL
     And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
-#    AND a call [to verify that the Resolved_TTL value is set to NULL in the database] will get the expected response as in [YYY].
 
   @S-1006.7 @AC-7 @AC-8 @AC-9
     Scenario: TTL.Suspended changed to "No", SystemTTL greater than TTLGuard, OverRide TTL is NULL and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST
@@ -135,7 +130,6 @@ Feature: F-1006: Submit Event to Update TTL
     And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
-#    AND a call [to verify that the Resolved_TTL value is set to NULL in the database] will get the expected response as in [YYY].
 
   @S-1006.10 @AC-3 @AC-11
   Scenario: TTL.Suspended changed to "No", SystemTTL greater than TTLGuard, OverRide TTL is NULL and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
@@ -150,7 +144,6 @@ Feature: F-1006: Submit Event to Update TTL
     And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
-#    AND a call [to verify that the Resolved_TTL value is set to the given TTL.SystemTTL in the database] will get the expected response as in [YYY].
 
   @S-1006.11 @AC-4 @AC-11
   Scenario: TTL.Suspended changed to "No", SystemTTL is NULL, OverRide TTL is greater than TTLGuard and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
@@ -165,7 +158,6 @@ Feature: F-1006: Submit Event to Update TTL
     And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
-#    AND a call [to verify that the Resolved_TTL value is set to the given TTL.OverrideTTL in the database] will get the expected response as in [YYY].
 
   @S-1006.12 @AC-5 @AC-11
   Scenario:  TTL.Suspended changed to "No", SystemTTL is less than TTLGuard, OverRide TTL is greater than TTLGuard and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
@@ -180,7 +172,6 @@ Feature: F-1006: Submit Event to Update TTL
     And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
-#    AND a call [to verify that the Resolved_TTL value is set to the given TTL.OverrideTTL in the database] will get the expected response as in [YYY].
 
   @S-1006.13 @AC-6 @AC-11
   Scenario:  TTL.Suspended changed to "Yes" and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
@@ -193,7 +184,6 @@ Feature: F-1006: Submit Event to Update TTL
     And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
-#    AND a call [to verify that the Resolved_TTL value is set to NULL in the database] will get the expected response as in [YYY].
 
   @S-1006.14 @AC-7 @AC-8 @AC-9 @AC-11
   Scenario: TTL.Suspended changed to "No", SystemTTL greater than TTLGuard, OverRide TTL is NULL and Submit Event is invoked on v2_external#/case-controller/createEventUsingPOST
@@ -209,9 +199,6 @@ Feature: F-1006: Submit Event to Update TTL
     And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response has all other details as expected
-
-
-#citzen
 
   @S-1006.15 @AC-1 @AC-10
   Scenario: TTL.Suspended changed to "No", SystemTTL and Override TTL less than Guard value and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
@@ -241,7 +228,6 @@ Feature: F-1006: Submit Event to Update TTL
     And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
-#    AND a call [to verify that the Resolved_TTL value is set to NULL in the database] will get the expected response as in [YYY].
 
   @S-1006.17 @AC-3 @AC-10
   Scenario: TTL.Suspended changed to "No", SystemTTL greater than TTLGuard, OverRide TTL is NULL and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
@@ -256,7 +242,6 @@ Feature: F-1006: Submit Event to Update TTL
     And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
-#    AND a call [to verify that the Resolved_TTL value is set to the given TTL.SystemTTL in the database] will get the expected response as in [YYY].
 
   @S-1006.18 @AC-4 @AC-10
   Scenario: TTL.Suspended changed to "No", SystemTTL is NULL, OverRide TTL is greater than TTLGuard and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
@@ -271,7 +256,6 @@ Feature: F-1006: Submit Event to Update TTL
     And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
-#    AND a call [to verify that the Resolved_TTL value is set to the given TTL.OverrideTTL in the database] will get the expected response as in [YYY].
 
   @S-1006.19 @AC-5 @AC-10
   Scenario:  TTL.Suspended changed to "No", SystemTTL is less than TTLGuard, OverRide TTL is greater than TTLGuard and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
@@ -286,7 +270,6 @@ Feature: F-1006: Submit Event to Update TTL
     And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
-#    AND a call [to verify that the Resolved_TTL value is set to the given TTL.OverrideTTL in the database] will get the expected response as in [YYY].
 
   @S-1006.20 @AC-6 @AC-10
   Scenario:  TTL.Suspended changed to "Yes" and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
@@ -299,7 +282,6 @@ Feature: F-1006: Submit Event to Update TTL
     And it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
-#    AND a call [to verify that the Resolved_TTL value is set to NULL in the database] will get the expected response as in [YYY].
 
   @S-1006.21 @AC-7 @AC-8 @AC-9 @AC-10
   Scenario: TTL.Suspended changed to "No", SystemTTL greater than TTLGuard, OverRide TTL is NULL and Submit Event is invoked on v1_external#/case-details-endpoint/createCaseEventForCitizenUsingPOST
