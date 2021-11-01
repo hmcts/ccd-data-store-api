@@ -1,23 +1,22 @@
 {
-  "_guid_": "S-1006.6",
-  "_extends_": "F-1006_Test_Data_Base",
+  "_guid_": "S-1006.20",
+  "_extends_": "F-1006_Test_Data_Base_Citizen",
 
   "title": "TTL.Suspended changed to \"Yes\"",
-  "prerequisites" : [ {
-    "Token_Creation": "S-1006_GetUpdateTokenCaseworker"
-  }
-  ],
+  "prerequisites" : [{
+    "Token_Creation": "S-1006_GetUpdateTokenCitizen"
+  }],
 
   "specs": [
     "an active profile in CCD",
-    "contains a case Id that has just been created as in F-1006_CreateCasePreRequisiteCaseworker",
+    "contains a case Id that has just been created as in F-1006_CreateCasePreRequisiteCitizen",
     "contains an event token for the case just created above",
     "has TTL.Suspension value changed to Yes from No"
   ],
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}"
     },
     "headers": {
       "_extends_": "Common_Request_Headers"
@@ -74,4 +73,5 @@
       }
     }
   }
+
 }

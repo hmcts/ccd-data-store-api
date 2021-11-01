@@ -2,10 +2,10 @@
   "_guid_": "S-1006.2",
   "_extends_": "F-1006_Test_Data_Base",
 
-  "title": "TTL.Suspended changed to \"N/No/F/False\" or NULL, SystemTTL and Override TTL set to NULL",
+  "title": "TTL.Suspended changed to \"No\", SystemTTL and Override TTL set to NULL",
 
   "prerequisites" : [ {
-    "Token_Creation": "S-1006_GetUpdateSuspendedCaseToken"
+    "Token_Creation": "S-1006_GetUpdateSuspendedCaseTokenCaseworker"
   }
   ],
 
@@ -34,7 +34,7 @@
         }
       },
       "event": {
-        "id": "updateCase",
+        "id": "updateCaseSubmitTTL",
         "summary": "",
         "description": ""
       },

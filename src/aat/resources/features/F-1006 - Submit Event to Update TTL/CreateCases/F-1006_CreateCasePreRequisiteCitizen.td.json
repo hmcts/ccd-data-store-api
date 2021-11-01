@@ -1,11 +1,12 @@
 {
-  "_guid_": "F-1006_CreateCasePreRequisiteCaseworker",
-  "_extends_": "F-1006_CreateCasePreRequisiteCaseworkerBase",
+  "_guid_": "F-1006_CreateCasePreRequisiteCitizen",
+  "_extends_": "F-1005_CreateCasePreRequisiteCitizen",
 
   "request": {
     "body": {
       "data": {
         "TTL": {
+          "Suspended": "No",
           "OverrideTTL" : null,
           "SystemTTL" : null
         }

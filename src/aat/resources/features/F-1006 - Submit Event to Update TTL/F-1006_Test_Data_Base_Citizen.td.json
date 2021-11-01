@@ -1,0 +1,24 @@
+{
+	"_guid_": "F-1006_Test_Data_Base_Citizen",
+
+	"productName": "CCD Data Store",
+	"operationName": "submit event creation as citizen",
+
+	"method": "POST",
+	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+	"request": {
+		"pathVariables": {
+      "uid": "2670973d-ad52-4ae5-8428-3352b0c73e76",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "cid": "${[scenarioContext][childContexts][F-1006_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+		}
+	}
+}

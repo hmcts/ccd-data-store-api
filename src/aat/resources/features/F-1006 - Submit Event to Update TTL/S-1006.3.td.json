@@ -2,10 +2,10 @@
   "_guid_": "S-1006.3",
   "_extends_": "F-1006_Test_Data_Base",
 
-  "title": "TTL.Suspended changed to \"N/No/F/False\" or NULL, SystemTTL and Override TTL greater than Guard value",
+  "title": "TTL.Suspended changed to \"No\", SystemTTL and Override TTL greater than Guard value",
 
   "prerequisites" : [ {
-    "Token_Creation": "S-1006_GetUpdateSuspendedCaseToken"
+    "Token_Creation": "S-1006_GetUpdateSuspendedCaseTokenCaseworker"
   }
   ],
 
@@ -15,7 +15,7 @@
     "contains an event token for the case just created above",
     "has TTL.Suspension value changed to No from Yes",
     "has TTL.SystemTTL set to greater than today + guard value",
-    "has TTL.OverrideTTL set to greater than today + guard value"
+    "has TTL.OverrideTTL set to null"
   ],
 
   "request": {
@@ -30,11 +30,11 @@
         "TTL": {
           "Suspended": "No",
           "OverrideTTL": null,
-          "SystemTTL": "2023-04-30"
+          "SystemTTL": "2030-04-30"
         }
       },
       "event": {
-        "id": "updateCase",
+        "id": "updateCaseSubmitTTL",
         "summary": "",
         "description": ""
       },
@@ -60,7 +60,7 @@
         "TTL" : {
           "Suspended" : "No",
           "OverrideTTL": null,
-          "SystemTTL": "2023-04-30"
+          "SystemTTL": "2030-04-30"
         }
       },
       "data_classification" : {

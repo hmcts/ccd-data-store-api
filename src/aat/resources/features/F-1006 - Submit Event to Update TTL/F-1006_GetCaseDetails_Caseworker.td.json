@@ -1,0 +1,20 @@
+{
+  "_guid_": "F-1006_GetCaseDetails_Caseworker",
+  "_extends_": "F-1006_GetCaseDetails_Base",
+
+  "specs": [
+    "to verify that the TTL.Suspended value has not changed in the database"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][siblingContexts][F-1006_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    }
+  }
+}
