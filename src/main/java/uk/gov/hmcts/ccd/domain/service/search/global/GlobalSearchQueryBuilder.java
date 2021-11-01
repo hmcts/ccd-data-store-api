@@ -20,6 +20,7 @@ import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.search.global.SortCriteria;
 
 import javax.inject.Named;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -49,27 +50,52 @@ import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.S
 public class GlobalSearchQueryBuilder {
 
     static final String STANDARD_ANALYZER = "standard";
+    private int numberOfWildcardFields;
 
     public QueryBuilder globalSearchQuery(GlobalSearchRequestPayload request) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        numberOfWildcardFields = 0;
 
         if (request != null) {
             SearchCriteria searchCriteria = request.getSearchCriteria();
             if (searchCriteria != null) {
+
+                checkForWildcardValues(boolQueryBuilder, REFERENCE, searchCriteria.getCaseReferences());
                 // add terms queries for properties that must match 1 from many
-                addTermsQuery(boolQueryBuilder, REFERENCE, searchCriteria.getCaseReferences());
-                addTermsQuery(boolQueryBuilder, JURISDICTION, searchCriteria.getCcdJurisdictionIds());
                 addTermsQuery(boolQueryBuilder, CASE_TYPE, searchCriteria.getCcdCaseTypeIds());
+                addTermsQuery(boolQueryBuilder, JURISDICTION, searchCriteria.getCcdJurisdictionIds());
                 addTermsQuery(boolQueryBuilder, STATE, searchCriteria.getStateIds());
                 addTermsQuery(boolQueryBuilder, REGION, searchCriteria.getCaseManagementRegionIds());
                 addTermsQuery(boolQueryBuilder, BASE_LOCATION, searchCriteria.getCaseManagementBaseLocationIds());
-                addTermsQuery(boolQueryBuilder, OTHER_REFERENCE_VALUE, searchCriteria.getOtherReferences());
+                checkForWildcardValues(boolQueryBuilder, OTHER_REFERENCE_VALUE, searchCriteria.getOtherReferences());
                 // add parties query for all party values
                 addPartiesQuery(boolQueryBuilder, searchCriteria.getParties());
+                boolQueryBuilder.minimumShouldMatch(numberOfWildcardFields);
             }
         }
 
         return boolQueryBuilder;
+    }
+
+    public void checkForWildcardValues(BoolQueryBuilder boolQueryBuilder, String field, List<String> values) {
+        if (values != null) {
+            List<String> nonWildcardValues = new ArrayList<>();
+            for (String str : values) {
+                if (str.contains("*") || str.contains("?")) {
+                    boolQueryBuilder.should(QueryBuilders.wildcardQuery(field, str));
+                } else {
+                    nonWildcardValues.add(str);
+                }
+            }
+            if (values.size() > nonWildcardValues.size()) {
+                numberOfWildcardFields++;
+            }
+            if(nonWildcardValues.size() != 0) {
+                boolQueryBuilder.should(
+                    QueryBuilders.termsQuery(field, nonWildcardValues.stream().map(String::toLowerCase).collect(Collectors.toList())));
+            }
+
+        }
     }
 
     public List<FieldSortBuilder> globalSearchSort(GlobalSearchRequestPayload request) {
@@ -136,10 +162,15 @@ public class GlobalSearchQueryBuilder {
 
         if (party != null) {
             if (StringUtils.isNotBlank(party.getPartyName())) {
-                boolQueryBuilder.must(
-                    QueryBuilders.matchPhraseQuery(SEARCH_PARTY_NAME, party.getPartyName())
-                        .analyzer(STANDARD_ANALYZER)
-                );
+                String name = party.getPartyName();
+                if (name.contains("*") || name.contains("?")) {
+                    boolQueryBuilder.must(QueryBuilders.wildcardQuery(SEARCH_PARTY_NAME, name));
+                } else {
+                    boolQueryBuilder.must(
+                        QueryBuilders.matchPhraseQuery(SEARCH_PARTY_NAME, name)
+                            .analyzer(STANDARD_ANALYZER)
+                    );
+                }
             }
             if (StringUtils.isNotBlank(party.getEmailAddress())) {
                 boolQueryBuilder.must(
@@ -148,10 +179,15 @@ public class GlobalSearchQueryBuilder {
                 );
             }
             if (StringUtils.isNotBlank(party.getAddressLine1())) {
-                boolQueryBuilder.must(
-                    QueryBuilders.matchPhraseQuery(SEARCH_PARTY_ADDRESS_LINE_1, party.getAddressLine1())
-                        .analyzer(STANDARD_ANALYZER)
-                );
+                String address = party.getAddressLine1();
+                if (address.contains("*") || address.contains("?")) {
+                    boolQueryBuilder.must(QueryBuilders.wildcardQuery(SEARCH_PARTY_ADDRESS_LINE_1, address));
+                } else {
+                    boolQueryBuilder.must(
+                        QueryBuilders.matchPhraseQuery(SEARCH_PARTY_ADDRESS_LINE_1, address)
+                            .analyzer(STANDARD_ANALYZER)
+                    );
+                }
             }
             if (StringUtils.isNotBlank(party.getPostCode())) {
                 boolQueryBuilder.must(
