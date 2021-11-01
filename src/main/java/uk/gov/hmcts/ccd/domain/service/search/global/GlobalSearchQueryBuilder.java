@@ -50,11 +50,11 @@ import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.S
 public class GlobalSearchQueryBuilder {
 
     static final String STANDARD_ANALYZER = "standard";
-    private int numberOfWildcardFields;
+    private int numberOfShouldFields;
 
     public QueryBuilder globalSearchQuery(GlobalSearchRequestPayload request) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        numberOfWildcardFields = 0;
+        numberOfShouldFields = 0;
 
         if (request != null) {
             SearchCriteria searchCriteria = request.getSearchCriteria();
@@ -70,7 +70,7 @@ public class GlobalSearchQueryBuilder {
                 checkForWildcardValues(boolQueryBuilder, OTHER_REFERENCE_VALUE, searchCriteria.getOtherReferences());
                 // add parties query for all party values
                 addPartiesQuery(boolQueryBuilder, searchCriteria.getParties());
-                boolQueryBuilder.minimumShouldMatch(numberOfWildcardFields);
+                boolQueryBuilder.minimumShouldMatch(numberOfShouldFields);
             }
         }
 
@@ -87,14 +87,11 @@ public class GlobalSearchQueryBuilder {
                     nonWildcardValues.add(str);
                 }
             }
-            if (values.size() > nonWildcardValues.size()) {
-                numberOfWildcardFields++;
-            }
             if(nonWildcardValues.size() != 0) {
                 boolQueryBuilder.should(
                     QueryBuilders.termsQuery(field, nonWildcardValues.stream().map(String::toLowerCase).collect(Collectors.toList())));
             }
-
+            numberOfShouldFields++;
         }
     }
 
