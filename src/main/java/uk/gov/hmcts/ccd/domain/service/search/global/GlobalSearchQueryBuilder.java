@@ -164,7 +164,7 @@ public class GlobalSearchQueryBuilder {
             if (StringUtils.isNotBlank(party.getPartyName())) {
                 String name = party.getPartyName();
                 if (name.contains("*") || name.contains("?")) {
-                    boolQueryBuilder.must(QueryBuilders.wildcardQuery(SEARCH_PARTY_NAME, name));
+                    boolQueryBuilder.must(QueryBuilders.wildcardQuery(SEARCH_PARTY_NAME + ".raw", name));
                 } else {
                     boolQueryBuilder.must(
                         QueryBuilders.matchPhraseQuery(SEARCH_PARTY_NAME, name)
@@ -181,7 +181,7 @@ public class GlobalSearchQueryBuilder {
             if (StringUtils.isNotBlank(party.getAddressLine1())) {
                 String address = party.getAddressLine1();
                 if (address.contains("*") || address.contains("?")) {
-                    boolQueryBuilder.must(QueryBuilders.wildcardQuery(SEARCH_PARTY_ADDRESS_LINE_1, address));
+                    boolQueryBuilder.must(QueryBuilders.wildcardQuery(SEARCH_PARTY_ADDRESS_LINE_1 + ".raw", address));
                 } else {
                     boolQueryBuilder.must(
                         QueryBuilders.matchPhraseQuery(SEARCH_PARTY_ADDRESS_LINE_1, address)
