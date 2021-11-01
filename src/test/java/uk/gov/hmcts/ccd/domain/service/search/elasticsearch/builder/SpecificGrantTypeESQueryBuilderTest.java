@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +8,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -20,10 +21,17 @@ class SpecificGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
     @Mock
     private AccessControlService accessControlService;
 
+    @Mock
+    private CaseDataAccessControl caseDataAccessControl;
+
+    @Mock
+    private CaseTypeDefinition caseTypeDefinition;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        specificGrantTypeESQueryBuilder = new SpecificGrantTypeESQueryBuilder(accessControlService);
+        specificGrantTypeESQueryBuilder =
+            new SpecificGrantTypeESQueryBuilder(accessControlService, caseDataAccessControl);
     }
 
     @Test
@@ -32,7 +40,7 @@ class SpecificGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "PRIVATE", "Test", "", "", null, "caseId1");
 
         BoolQueryBuilder queryBuilder = specificGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(specificRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
+            .createQuery(Lists.newArrayList(specificRoleAssignment), caseTypeDefinition);
 
         assertNotNull(queryBuilder);
     }
@@ -43,7 +51,7 @@ class SpecificGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "", "Test", "", "", null, "caseId1");
 
         BoolQueryBuilder queryBuilder = specificGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(specificRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
+            .createQuery(Lists.newArrayList(specificRoleAssignment), caseTypeDefinition);
 
         assertNotNull(queryBuilder);
     }
@@ -54,7 +62,7 @@ class SpecificGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "", "Test", "", "", null, "");
 
         BoolQueryBuilder queryBuilder = specificGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(specificRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
+            .createQuery(Lists.newArrayList(specificRoleAssignment), caseTypeDefinition);
 
         assertNotNull(queryBuilder);
     }
@@ -65,7 +73,7 @@ class SpecificGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             "CASE", "", "", "", "", null, "");
 
         BoolQueryBuilder queryBuilder = specificGrantTypeESQueryBuilder
-            .createQuery(Lists.newArrayList(specificRoleAssignment), Lists.newArrayList(), Sets.newHashSet());
+            .createQuery(Lists.newArrayList(specificRoleAssignment), caseTypeDefinition);
 
         assertNotNull(queryBuilder);
     }
