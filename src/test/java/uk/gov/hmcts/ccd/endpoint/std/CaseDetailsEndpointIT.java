@@ -4061,6 +4061,35 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    public void shouldReturnWhenPostValidateCaseDetailsWithValidDataForCaseworker() throws Exception {
+        final JsonNode DATA = mapper.readTree(exampleData());
+
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent()
+            .withEvent(anEvent()
+                .withEventId(TEST_EVENT_ID)
+                .withSummary(SHORT_COMMENT)
+                .withDescription(LONG_COMMENT)
+                .build())
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID))
+            .withData(JacksonUtils.convertValue(DATA))
+            .withIgnoreWarning(Boolean.FALSE)
+            .build();
+
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE + "/validate?pageId=createCaseInfoPage";
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToValidate))
+        ).andExpect(status().is(200)).andReturn();
+
+        final JsonNode expectedResponse = MAPPER.readTree("{\"data\": " + exampleData() + "}");
+        final String expectedResponseString = mapper.writeValueAsString(expectedResponse);
+        assertEquals("Incorrect Response Content",
+            expectedResponseString,
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).toString());
+    }
+
+    @Test
     public void shouldReturn422WhenPostValidateCaseDetailsWithInvalidDataForCaseworker() throws Exception {
         final JsonNode DATA = mapper.readTree(exampleDataWithInvalidPostcode());
         final CaseDataContent caseDetailsToValidate = newCaseDataContent()
@@ -4947,6 +4976,59 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    public void shouldReturn400WhenPostValidateCaseDetailsMidEventCallbackChangesDataForCaseworker() throws Exception {
+
+        final JsonNode data = mapper.readTree(exampleCaseData());
+        final JsonNode eventData = mapper.readTree(exampleEventDataTTL());
+
+        String callbackMideventURL = "/event-callback/mid-eventttl";
+
+        WizardPageCollection wizardPageCollection = createWizardPageCollection(callbackMideventURL);
+        stubFor(WireMock.get(urlMatching("/api/display/wizard-page-structure.*"))
+            .willReturn(okJson(mapper.writeValueAsString(wizardPageCollection)).withStatus(200)));
+
+        TTL timeToLive = TTL.builder()
+            .suspended("No")
+            .systemTTL(LocalDate.now())
+            .overrideTTL(LocalDate.now())
+            .build();
+
+        Map<String, JsonNode> ttl = new HashMap<>();
+        ttl.put(TTL_CASE_FIELD_ID, mapper.valueToTree(timeToLive));
+
+        Map<String, JsonNode> caseData = new HashMap<>();
+        caseData.put("data", mapper.valueToTree(ttl));
+
+        stubFor(WireMock.post(urlMatching(callbackMideventURL))
+            .willReturn(okJson(mapper.writeValueAsString(caseData))
+                .withStatus(200)));
+
+        final String description = "A very long comment.......";
+        final String summary = "Short comment";
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent()
+            .withEvent(anEvent()
+                .withEventId(TEST_EVENT_ID)
+                .withSummary(summary)
+                .withDescription(description)
+                .build())
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE, TEST_EVENT_ID))
+            .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withIgnoreWarning(Boolean.FALSE)
+            .build();
+
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_VALIDATE
+            + "/validate?pageId=createCaseInfoPage";
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToValidate))
+        ).andExpect(status().is(400)).andReturn();
+
+        assertEquals("Time to live content has been modified by callback",
+            mvcResult.getResolvedException().getMessage());
+    }
+
+    @Test
     public void shouldFilterCaseDataWhoseOrderGreaterThanPassedPageIdMultiplePreviousPages() throws Exception {
         final JsonNode data = mapper.readTree(secondPageData());
         final JsonNode eventData = mapper.readTree(exampleEventDataMultiPages());
@@ -5141,6 +5223,23 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"TelephoneNumber\":\"_ 07865645667\","
             + "\"D8Document\":{"
             + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
+            + "}";
+    }
+
+    private String exampleEventDataTTL() {
+        return "{"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"CaseNumber\":\"_ 1234567\","
+            + "\"TelephoneNumber\":\"_ 07865645667\","
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "},"
+            + "\"TTL\":{"
+            + "\"Suspended\": \"No\","
+            + "\"OverrideTTL\": \"2020-10-12\","
+            + "\"SystemTTL\": \"2020-10-12\""
             + "}"
             + "}";
     }

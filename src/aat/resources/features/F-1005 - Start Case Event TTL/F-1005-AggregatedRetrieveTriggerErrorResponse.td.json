@@ -42,7 +42,7 @@
       "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
       "status" : 400,
       "error" : "Bad Request",
-      "message" : "Time to live content has been modified by aboutToStart callback"
+      "message" : "Time to live content has been modified by callback"
     }
   }
 
