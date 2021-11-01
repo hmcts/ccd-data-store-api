@@ -11,13 +11,13 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.search.builder.AccessControlGrantTypeQueryBuilder;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -114,7 +114,7 @@ class SearchQueryFactoryOperationTest {
 
         verify(sortOrderQueryBuilder).buildSortOrderClause(metadata);
         verify(userAuthorisation, times(1)).getUserId();
-        verify(roleAssignmentService).getRoleAssignments(anyString(), anyObject());
+        verify(caseDataAccessControl).generateRoleAssignments(any(CaseTypeDefinition.class));
         verify(entityManager).createNativeQuery(anyString(), any(Class.class));
     }
 

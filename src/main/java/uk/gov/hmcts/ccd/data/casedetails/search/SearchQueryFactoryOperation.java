@@ -105,8 +105,8 @@ public class SearchQueryFactoryOperation {
         if (applicationParam.getEnableAttributeBasedAccessControl()) {
 
             CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(metadata.getCaseTypeId());
-            List<RoleAssignment> roleAssignments = roleAssignmentService
-                .getRoleAssignments(userAuthorisation.getUserId(), caseTypeDefinition);
+            List<RoleAssignment> roleAssignments = caseDataAccessControl.generateRoleAssignments(caseTypeDefinition);
+
 
             Set<AccessProfile> accessProfiles = caseDataAccessControl
                 .filteredAccessProfiles(roleAssignments, caseTypeDefinition, false);

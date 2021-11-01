@@ -43,4 +43,8 @@ public interface NoCacheCaseDataAccessControl {
                                                        boolean isCreationProfile) {
         return Lists.newArrayList();
     }
+
+    default List<RoleAssignment> generateRoleAssignments(CaseTypeDefinition caseTypeDefinition) {
+        return Lists.newArrayList();
+    }
 }

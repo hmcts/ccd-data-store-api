@@ -36,4 +36,6 @@ public interface CaseDataAccessControl {
     Set<AccessProfile> filteredAccessProfiles(List<RoleAssignment> filteredRoleAssignments,
                                                CaseTypeDefinition caseTypeDefinition,
                                                boolean isCreationProfile);
+
+    List<RoleAssignment> generateRoleAssignments(CaseTypeDefinition caseTypeDefinition);
 }

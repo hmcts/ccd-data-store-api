@@ -32,6 +32,8 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
 
     private final Map<String, Set<AccessProfile>> caseReferenceAccessProfiles = newConcurrentMap();
 
+    private final Map<String, List<RoleAssignment>> caseTypeRoleAssignments = newConcurrentMap();
+
 
     @Autowired
     public CachedCaseDataAccessControlImpl(NoCacheCaseDataAccessControl noCacheCaseDataAccessControl) {
@@ -102,5 +104,11 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
         return Sets.newHashSet(noCacheCaseDataAccessControl.filteredAccessProfiles(filteredRoleAssignments,
             caseTypeDefinition,
             isCreationProfile));
+    }
+
+    @Override
+    public List<RoleAssignment> generateRoleAssignments(CaseTypeDefinition caseTypeDefinition) {
+        return caseTypeRoleAssignments.computeIfAbsent(caseTypeDefinition.getId(),
+            e -> noCacheCaseDataAccessControl.generateRoleAssignments(caseTypeDefinition));
     }
 }
