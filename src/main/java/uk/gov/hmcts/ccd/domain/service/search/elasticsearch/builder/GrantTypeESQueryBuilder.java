@@ -21,7 +21,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
-import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.JURISDICTION_FIELD_KEYWORD_COL;
+import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.JURISDICTION_FIELD_COL;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.LOCATION;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REFERENCE_FIELD_COL;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REGION;
@@ -30,6 +30,8 @@ import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.STATE_FIELD_CO
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
 public abstract class GrantTypeESQueryBuilder {
+
+    private static final String KEYWORD = ".keyword";
 
     protected AccessControlService accessControlService;
     protected CaseDataAccessControl caseDataAccessControl;
@@ -64,7 +66,7 @@ public abstract class GrantTypeESQueryBuilder {
                 }
 
                 addExactMatchQueryForOptionalAttribute(roleAssignment.getAttributes().getJurisdiction(),
-                    innerQuery, JURISDICTION_FIELD_KEYWORD_COL);
+                    innerQuery, JURISDICTION_FIELD_COL);
                 addExactMatchQueryForOptionalAttribute(roleAssignment.getAttributes().getRegion(),
                     innerQuery, REGION);
                 addExactMatchQueryForOptionalAttribute(roleAssignment.getAttributes().getLocation(),
@@ -87,7 +89,7 @@ public abstract class GrantTypeESQueryBuilder {
                                                         BoolQueryBuilder parentQuery,
                                                         String matchName) {
         if (attribute != null && StringUtils.isNotBlank(attribute.orElse(""))) {
-            parentQuery.must(QueryBuilders.termQuery(matchName + ".keyword", attribute.get()));
+            parentQuery.must(QueryBuilders.termQuery(matchName + KEYWORD, attribute.get()));
         }
     }
 
@@ -125,7 +127,7 @@ public abstract class GrantTypeESQueryBuilder {
             .collect(Collectors.toList());
 
         if (!readableCaseStates.isEmpty()) {
-            return Optional.of(QueryBuilders.termsQuery(STATE_FIELD_COL, readableCaseStates));
+            return Optional.of(QueryBuilders.termsQuery(STATE_FIELD_COL + KEYWORD, readableCaseStates));
         }
 
         return Optional.empty();
