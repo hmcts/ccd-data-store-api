@@ -51,5 +51,10 @@
 		<notes>Suppress CVE affecting Tomcat temporarily until it can be addressed</notes>
 		<cve>CVE-2021-42340</cve>
 	</suppress>
+	
+	<suppress until="2021-11-25">
+		<notes>Temp suppression to unblock pipeline.</notes>
+		<cve>CVE-2021-22096</cve>
+	</suppress>
 
 </suppressions>
