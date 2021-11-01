@@ -45,11 +45,6 @@
 		crafted file
 		</notes>
 		<cve>CVE-2020-23171</cve>
-	</suppress> 
-
-	<suppress until="2021-11-25">
-		<notes>Suppress CVE affecting Tomcat temporarily until it can be addressed</notes>
-		<cve>CVE-2021-42340</cve>
 	</suppress>
 
 </suppressions>
