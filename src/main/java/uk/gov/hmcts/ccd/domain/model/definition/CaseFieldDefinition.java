@@ -138,11 +138,11 @@ public class CaseFieldDefinition implements Serializable, CommonField {
         this.order = order;
     }
 
-    public String getShowConditon() {
+    public String getShowCondition() {
         return showConditon;
     }
 
-    public void setShowConditon(String showConditon) {
+    public void setShowCondition(String showConditon) {
         this.showConditon = showConditon;
     }
 
