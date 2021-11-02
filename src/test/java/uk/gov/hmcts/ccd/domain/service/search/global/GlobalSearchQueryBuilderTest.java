@@ -10,6 +10,7 @@ import org.elasticsearch.index.query.NestedQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
+import org.elasticsearch.index.query.WildcardQueryBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.junit.jupiter.api.DisplayName;
@@ -114,13 +115,11 @@ class GlobalSearchQueryBuilderTest {
 
             // ASSERT
             assertAll(
-                () -> assertTermsQuery(output, GlobalSearchFields.REFERENCE, REFERENCE_TERMS),
                 () -> assertTermsQuery(output, GlobalSearchFields.JURISDICTION, JURISDICTION_TERMS),
                 () -> assertTermsQuery(output, GlobalSearchFields.CASE_TYPE, CASE_TYPE_TERMS),
                 () -> assertTermsQuery(output, GlobalSearchFields.STATE, STATE_TERMS),
                 () -> assertTermsQuery(output, CaseDataPaths.REGION, REGION_TERMS),
-                () -> assertTermsQuery(output, CaseDataPaths.BASE_LOCATION, BASE_LOCATION_TERMS),
-                () -> assertTermsQuery(output, CaseDataPaths.OTHER_REFERENCE_VALUE, OTHER_REFERENCE_TERMS)
+                () -> assertTermsQuery(output, CaseDataPaths.BASE_LOCATION, BASE_LOCATION_TERMS)
             );
 
         }
@@ -216,7 +215,7 @@ class GlobalSearchQueryBuilderTest {
                     NestedQueryBuilder nestedQueryBuilder = (NestedQueryBuilder) partyQuery;
 
                     partyQueriesMap.put(
-                        getMatchPhraseValue(nestedQueryBuilder.query(), CaseDataPaths.SEARCH_PARTY_NAME),
+                        getMatchPhraseValue(nestedQueryBuilder.query(), CaseDataPaths.SEARCH_PARTY_NAME + ".keyword"),
                         nestedQueryBuilder
                     );
                 }
@@ -338,7 +337,7 @@ class GlobalSearchQueryBuilderTest {
             assertAll(
                 () -> assertNestedMatchPhrase(
                     actualPartyQuery,
-                    CaseDataPaths.SEARCH_PARTY_NAME,
+                    CaseDataPaths.SEARCH_PARTY_NAME + ".keyword",
                     expectedParty.getPartyName()
                 ),
                 () -> assertNestedMatchPhrase(
@@ -348,7 +347,7 @@ class GlobalSearchQueryBuilderTest {
                 ),
                 () -> assertNestedMatchPhrase(
                     actualPartyQuery,
-                    CaseDataPaths.SEARCH_PARTY_ADDRESS_LINE_1,
+                    CaseDataPaths.SEARCH_PARTY_ADDRESS_LINE_1 + ".keyword",
                     expectedParty.getAddressLine1()
                 ),
                 () -> assertNestedMatchPhrase(
@@ -430,6 +429,12 @@ class GlobalSearchQueryBuilderTest {
                     if (fieldName.equalsIgnoreCase(matchPhraseQueryBuilder.fieldName())) {
                         var value = matchPhraseQueryBuilder.value();
                         return value != null ? value.toString() : null;
+                    }
+                } else if (mustQuery instanceof WildcardQueryBuilder) {
+                    WildcardQueryBuilder wildcardQueryBuilder = (WildcardQueryBuilder) mustQuery;
+
+                    if (fieldName.equalsIgnoreCase(wildcardQueryBuilder.fieldName())) {
+                        return wildcardQueryBuilder.value();
                     }
                 }
             }

@@ -20,7 +20,6 @@ import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.search.global.SortCriteria;
 
 import javax.inject.Named;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -68,6 +67,7 @@ public class GlobalSearchQueryBuilder {
                 addTermsQuery(boolQueryBuilder, REGION, searchCriteria.getCaseManagementRegionIds());
                 addTermsQuery(boolQueryBuilder, BASE_LOCATION, searchCriteria.getCaseManagementBaseLocationIds());
                 checkForWildcardValues(boolQueryBuilder, OTHER_REFERENCE_VALUE, searchCriteria.getOtherReferences());
+
                 // add parties query for all party values
                 addPartiesQuery(boolQueryBuilder, searchCriteria.getParties());
                 boolQueryBuilder.minimumShouldMatch(numberOfShouldFields);
@@ -79,17 +79,8 @@ public class GlobalSearchQueryBuilder {
 
     public void checkForWildcardValues(BoolQueryBuilder boolQueryBuilder, String field, List<String> values) {
         if (values != null) {
-            List<String> nonWildcardValues = new ArrayList<>();
             for (String str : values) {
-                if (str.contains("*") || str.contains("?")) {
-                    boolQueryBuilder.should(QueryBuilders.wildcardQuery(field, str));
-                } else {
-                    nonWildcardValues.add(str);
-                }
-            }
-            if(nonWildcardValues.size() != 0) {
-                boolQueryBuilder.should(
-                    QueryBuilders.termsQuery(field, nonWildcardValues.stream().map(String::toLowerCase).collect(Collectors.toList())));
+                boolQueryBuilder.should(QueryBuilders.wildcardQuery(field + ".keyword", str));
             }
             numberOfShouldFields++;
         }
@@ -159,15 +150,8 @@ public class GlobalSearchQueryBuilder {
 
         if (party != null) {
             if (StringUtils.isNotBlank(party.getPartyName())) {
-                String name = party.getPartyName();
-                if (name.contains("*") || name.contains("?")) {
-                    boolQueryBuilder.must(QueryBuilders.wildcardQuery(SEARCH_PARTY_NAME + ".raw", name));
-                } else {
-                    boolQueryBuilder.must(
-                        QueryBuilders.matchPhraseQuery(SEARCH_PARTY_NAME, name)
-                            .analyzer(STANDARD_ANALYZER)
-                    );
-                }
+                boolQueryBuilder.must(QueryBuilders.wildcardQuery(SEARCH_PARTY_NAME + ".keyword",
+                    party.getPartyName()));
             }
             if (StringUtils.isNotBlank(party.getEmailAddress())) {
                 boolQueryBuilder.must(
@@ -176,15 +160,8 @@ public class GlobalSearchQueryBuilder {
                 );
             }
             if (StringUtils.isNotBlank(party.getAddressLine1())) {
-                String address = party.getAddressLine1();
-                if (address.contains("*") || address.contains("?")) {
-                    boolQueryBuilder.must(QueryBuilders.wildcardQuery(SEARCH_PARTY_ADDRESS_LINE_1 + ".raw", address));
-                } else {
-                    boolQueryBuilder.must(
-                        QueryBuilders.matchPhraseQuery(SEARCH_PARTY_ADDRESS_LINE_1, address)
-                            .analyzer(STANDARD_ANALYZER)
-                    );
-                }
+                boolQueryBuilder.must(QueryBuilders.wildcardQuery(SEARCH_PARTY_ADDRESS_LINE_1 + ".keyword",
+                    party.getAddressLine1()));
             }
             if (StringUtils.isNotBlank(party.getPostCode())) {
                 boolQueryBuilder.must(

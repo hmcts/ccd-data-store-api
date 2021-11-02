@@ -75,6 +75,11 @@
 		<cve>CVE-2021-22147</cve>
 	</suppress>
 
+	<suppress until="2021-11-25">
+		<notes>Suppress CVE affecting Tomcat temporarily until it can be addressed</notes>
+		<cve>CVE-2021-42340</cve>
+	</suppress>
+
 	<!-- Suppress temporarily -->
 	<suppress>
 		<cve>CVE-2021-29425</cve>
