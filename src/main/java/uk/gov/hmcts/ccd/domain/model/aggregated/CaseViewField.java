@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
+import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField;
@@ -9,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @ToString
 public class CaseViewField implements CommonField {
@@ -236,5 +239,10 @@ public class CaseViewField implements CommonField {
         caseViewField.setRetainHiddenValue(caseFieldDefinition.getRetainHiddenValue());
 
         return caseViewField;
+    }
+
+    @JsonIgnore
+    public <T extends CaseViewField> Optional<T> getComplexCaseViewFieldNestedField(String path) {
+        return (Optional<T>) CaseFieldPathUtils.getFieldDefinitionByPath(this, path);
     }
 }

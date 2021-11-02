@@ -222,7 +222,7 @@ public class AccessControlService {
                                                  final Predicate<AccessControlList> access,
                                                  boolean isClassification) {
         if (caseField.isCompoundFieldType()) {
-            caseField.getFieldTypeDefinition().getChildren().stream().forEach(childField -> {
+            caseField.getFieldTypeDefinition().getChildren().forEach(childField -> {
                 if (!hasAccessControlList(userRoles, access, childField.getAccessControlLists())) {
                     locateAndRemoveChildNode(caseField, jsonNode, childField);
                 } else {
@@ -301,24 +301,41 @@ public class AccessControlService {
                                                                   final List<CaseFieldDefinition> caseFieldDefinitions,
                                                                   final Set<String> userRoles,
                                                                   final Predicate<AccessControlList> access) {
-        caseEventTrigger.getCaseFields().stream()
+        caseEventTrigger.getCaseFields()
             .forEach(caseViewField -> {
                 Optional<CaseFieldDefinition> caseFieldOpt = findCaseField(caseFieldDefinitions, caseViewField.getId());
+                boolean isRemoved = false;
 
                 if (caseFieldOpt.isPresent()) {
                     CaseFieldDefinition field = caseFieldOpt.get();
                     if (!hasAccessControlList(userRoles, access, field.getAccessControlLists())) {
                         caseViewField.setDisplayContext(READONLY);
+                        if (!hasAccessControlList(userRoles, CAN_READ, field.getAccessControlLists())) {
+                            locateAndRemoveCaseField(field, caseViewField);
+                            isRemoved = true;
+                        }
                     }
-                    if (field.isCompoundFieldType()) {
+
+                    if (!isRemoved && field.isCompoundFieldType()) {
                         setChildrenAsReadOnlyIfNoAccess(caseEventTrigger.getWizardPages(), field.getId(), field,
                             access, userRoles, caseViewField);
                     }
                 } else {
                     caseViewField.setDisplayContext(READONLY);
+                    hideOnCaseViewFieldsIfNoReadAccess(caseViewField, userRoles);
                 }
             });
         return caseEventTrigger;
+    }
+
+    private void hideOnCaseViewFieldsIfNoReadAccess(CaseViewField caseViewField, Set<String> userRoles) {
+        if (!hasAccessControlList(userRoles, CAN_READ, caseViewField.getAccessControlLists())) {
+            caseViewField.setHidden(true);
+            caseViewField.setShowSummaryChangeOption(false);
+            caseViewField.setShowSummaryContentOption(null);
+            caseViewField.setShowCondition("dummyShowCondition = \"DO NOT SHOW IN UI\"");
+            caseViewField.setRetainHiddenValue(false);
+        }
     }
 
     public CaseUpdateViewEvent updateCollectionDisplayContextParameterByAccess(final CaseUpdateViewEvent
@@ -362,17 +379,26 @@ public class AccessControlService {
                                                  final CaseFieldDefinition caseField,
                                                  final Predicate<AccessControlList> access,
                                                  final Set<String> userRoles,
-                                                 final CommonField caseViewField) {
+                                                 final CaseViewField caseViewField) {
         if (caseField.isCompoundFieldType()) {
-            caseField.getFieldTypeDefinition().getChildren().stream().forEach(childField -> {
+            caseField.getFieldTypeDefinition().getChildren().forEach(childField -> {
+                boolean isRemoved = false;
+
                 if (!hasAccessControlList(userRoles, access, childField.getAccessControlLists())) {
-                    findNestedField(caseViewField, childField.getId()).setDisplayContext(READONLY);
+                    CaseViewField childViewField = findNestedField(caseViewField, childField.getId());
+                    childViewField.setDisplayContext(READONLY);
+
                     Optional<WizardPageField> optionalWizardPageField = getWizardPageField(wizardPages, rootFieldId);
-                    if (optionalWizardPageField.isPresent()) {
-                        setOverrideAsReadOnlyIfNotReadOnly(optionalWizardPageField.get(), rootFieldId, childField);
+                    optionalWizardPageField.ifPresent(wizardPageField ->
+                        setOverrideAsReadOnlyIfNotReadOnly(wizardPageField, rootFieldId, childField));
+
+                    if (!hasAccessControlList(userRoles, CAN_READ, caseField.getAccessControlLists())) {
+                        locateAndRemoveCaseField(caseField, caseViewField);
+                        isRemoved = true;
                     }
                 }
-                if (childField.isCompoundFieldType()) {
+
+                if (!isRemoved && childField.isCompoundFieldType()) {
                     setChildrenAsReadOnlyIfNoAccess(
                         wizardPages,
                         rootFieldId,
@@ -437,7 +463,7 @@ public class AccessControlService {
                         return false;
                     }
                     if (!isEmpty(cf.getComplexACLs())) {
-                        cf.getFieldTypeDefinition().getChildren().stream().forEach(caseField ->
+                        cf.getFieldTypeDefinition().getChildren().forEach(caseField ->
                             filterChildren(caseField, caseViewField, userRoles, access));
                     }
                 } else {
@@ -471,7 +497,7 @@ public class AccessControlService {
         if (!hasAccessControlList(userRoles, access, caseField.getAccessControlLists())) {
             locateAndRemoveCaseField(caseField, caseViewField);
         } else if (caseField.isCompoundFieldType()) {
-            caseField.getFieldTypeDefinition().getChildren().stream().forEach(childField -> {
+            caseField.getFieldTypeDefinition().getChildren().forEach(childField -> {
                 if (!hasAccessControlList(userRoles, access, childField.getAccessControlLists())) {
                     locateAndRemoveChildField(findNestedField(caseViewField, caseField.getId()), childField,
                                                               caseField.isCollectionFieldType());
@@ -501,6 +527,12 @@ public class AccessControlService {
         return caseViewField.getComplexFieldNestedField(childFieldId)
             .orElseThrow(() -> new BadRequestException(format("CaseViewField %s has no nested elements with code %s.",
                                                        caseViewField.getId(), childFieldId)));
+    }
+
+    private CaseViewField findNestedField(final CaseViewField caseViewField, final String childFieldId) {
+        return caseViewField.getComplexCaseViewFieldNestedField(childFieldId)
+            .orElseThrow(() -> new BadRequestException(format("CaseViewField %s has no nested elements with code %s.",
+                caseViewField.getId(), childFieldId)));
     }
 
     private void locateAndRemoveChildField(final CommonField caseViewField,
@@ -562,12 +594,11 @@ public class AccessControlService {
             .filter(o -> {
                 Optional<CaseViewField> optionalCaseViewField = findCaseViewField(caseEventTrigger.getCaseFields(),
                                                                                   fieldId);
-                if (optionalCaseViewField.isPresent()) {
-                    return optionalCaseViewField.get().getComplexFieldNestedField(o.getComplexFieldElementId()
-                        .replace(fieldId + ".", "")).isPresent();
-                } else {
-                    return false;
-                }
+                return optionalCaseViewField
+                    .map(caseViewField ->
+                        caseViewField.getComplexFieldNestedField(o.getComplexFieldElementId()
+                            .replace(fieldId + ".", "")).isPresent())
+                    .orElse(false);
             })
             .collect(toList());
     }
