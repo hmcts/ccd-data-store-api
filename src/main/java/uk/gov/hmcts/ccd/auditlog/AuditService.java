@@ -70,14 +70,14 @@ public class AuditService {
         // Log and Audit Call...
         if (auditCaseRemoteConfiguration.isEnabled() && Objects.nonNull(auditContext.getAuditOperationType())) {
             switch (auditContext.getAuditOperationType()) {
-                case CASE_ACCESSED: auditCaseRemoteOperation.postCaseAction(entry, currentZonedDateTime);
-                break;
-                case CREATE_CASE: auditCaseRemoteOperation.postCaseAction(entry, currentZonedDateTime);
-                break;
-                case UPDATE_CASE: auditCaseRemoteOperation.postCaseAction(entry, currentZonedDateTime);
-                break;
-                case SEARCH_CASE: auditCaseRemoteOperation.postCaseSearch(entry, currentZonedDateTime);
-                break;
+                case CASE_ACCESSED:
+                case CREATE_CASE:
+                case UPDATE_CASE:
+                    auditCaseRemoteOperation.postCaseAction(entry, currentZonedDateTime);
+                    break;
+                case SEARCH_CASE:
+                    auditCaseRemoteOperation.postCaseSearch(entry, currentZonedDateTime);
+                    break;
             }
         }
     }

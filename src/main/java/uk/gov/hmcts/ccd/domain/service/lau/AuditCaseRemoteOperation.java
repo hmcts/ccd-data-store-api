@@ -30,12 +30,11 @@ import java.util.concurrent.CompletableFuture;
 @Qualifier("AuditCaseRemoteOperation")
 public class AuditCaseRemoteOperation implements AuditRemoteOperation {
 
-    private static final String BEARER = "Bearer ";
     private static final String LAU_CASE_ACTION_CREATE = "CREATE";
     private static final String LAU_CASE_ACTION_VIEW = "VIEW";
     private static final String LAU_CASE_ACTION_UPDATE = "UPDATE";
 
-    public static final Map<String, String> caseActionMap = Map.of(
+    public static final Map<String, String> CASE_ACTION_MAP = Map.of(
         AuditOperationType.CREATE_CASE.getLabel(),LAU_CASE_ACTION_CREATE,
         AuditOperationType.CASE_ACCESSED.getLabel(), LAU_CASE_ACTION_VIEW,
         AuditOperationType.UPDATE_CASE.getLabel(), LAU_CASE_ACTION_UPDATE);
@@ -44,48 +43,57 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
 
     private final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration;
 
-    private HttpClient httpClient;
+    private final HttpClient httpClient;
+
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public AuditCaseRemoteOperation(@Lazy final SecurityUtils securityUtils,
                                     @Qualifier("httpClientAudit") final HttpClient httpClient,
+                                    @Qualifier("SimpleObjectMapper") final ObjectMapper objectMapper,
                                     final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration) {
         this.securityUtils = securityUtils;
-        this.auditCaseRemoteConfiguration = auditCaseRemoteConfiguration;
         this.httpClient = httpClient;
+        this.objectMapper = objectMapper;
+        this.auditCaseRemoteConfiguration = auditCaseRemoteConfiguration;
+        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
     }
 
     @Override
-    public CompletableFuture<String> postCaseAction(AuditEntry entry, ZonedDateTime currentDateTime) {
+    public void postCaseAction(AuditEntry entry, ZonedDateTime currentDateTime) {
 
         try {
-            if (entry.getOperationType().equals(AuditOperationType.CREATE_CASE.getLabel())
-                || entry.getOperationType().equals(AuditOperationType.CASE_ACCESSED.getLabel())
-                || entry.getOperationType().equals(AuditOperationType.UPDATE_CASE.getLabel())) {
+            if (CASE_ACTION_MAP.containsKey(entry.getOperationType())) {
 
                 ActionLog actionLog = createActionLogFromAuditEntry(entry, currentDateTime);
                 String lauCaseAuditUrl = auditCaseRemoteConfiguration.getCaseActionAuditUrl();
 
                 CaseActionPostRequest capr = new CaseActionPostRequest(actionLog);
-                ObjectMapper objectMapper = new ObjectMapper();
-                objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-
+                String activity = CASE_ACTION_MAP.get(entry.getOperationType());
                 String requestBody = objectMapper
-                    .writerWithDefaultPrettyPrinter()
                     .writeValueAsString(capr);
 
                 HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(lauCaseAuditUrl))
                     .header("Content-Type", "application/json")
-                    .header("ServiceAuthorization", BEARER + securityUtils.getServiceAuthorization())
+                    .header("ServiceAuthorization", securityUtils.getServiceAuthorization())
                     .POST(java.net.http.HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
 
-                logCorrelationId(entry.getRequestId(), caseActionMap.get(entry.getOperationType()),
+                logCorrelationId(entry.getRequestId(), activity,
                     entry.getJurisdiction(), entry.getIdamId());
 
-                return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                    .thenApply(HttpResponse::body);
+                CompletableFuture<HttpResponse<String>> responseFuture =
+                    httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+
+                responseFuture.whenComplete((response, error) -> {
+                    if (response != null) {
+                        logAuditResponse(activity, response.statusCode(), request.uri());
+                    }
+                    if (error != null) {
+                        log.error("LAU Action Error: ", error);
+                    }
+                });
 
             } else {
                 log.warn("The operational type " + entry.getOperationType()
@@ -93,14 +101,13 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
             }
 
         } catch (Exception excep) {
-            log.error("Error occured while generating remote log and audit action request.", excep);
+            log.error("Error occurred while generating remote log and audit action request.", excep);
         }
 
-        return null;
     }
 
     @Override
-    public CompletableFuture<String> postCaseSearch(AuditEntry entry, ZonedDateTime currentDateTime) {
+    public void postCaseSearch(AuditEntry entry, ZonedDateTime currentDateTime) {
 
         try {
             if (entry.getOperationType().equals(AuditOperationType.SEARCH_CASE.getLabel())) {
@@ -109,24 +116,29 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
                 String lauCaseAuditUrl = auditCaseRemoteConfiguration.getCaseSearchAuditUrl();
 
                 CaseSearchPostRequest cspr = new CaseSearchPostRequest(searchLog);
-                ObjectMapper objectMapper = new ObjectMapper();
-                objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-
                 String requestBody = objectMapper
-                    .writerWithDefaultPrettyPrinter()
                     .writeValueAsString(cspr);
 
                 HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(lauCaseAuditUrl))
                     .header("Content-Type", "application/json")
-                    .header("ServiceAuthorization", BEARER + securityUtils.getServiceAuthorization())
+                    .header("ServiceAuthorization", securityUtils.getServiceAuthorization())
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
 
                 logCorrelationId(entry.getRequestId(), "SEARCH", entry.getJurisdiction(), entry.getIdamId());
 
-                return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                    .thenApply(HttpResponse::body);
+                CompletableFuture<HttpResponse<String>> responseFuture =
+                    httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+
+                responseFuture.whenComplete((response, error) -> {
+                    if (response != null) {
+                        logAuditResponse("SEARCH", response.statusCode(), request.uri());
+                    }
+                    if (error != null) {
+                        log.error("LAU Action Error: ", error);
+                    }
+                });
 
             } else {
                 log.warn("The operational type " + entry.getOperationType()
@@ -134,16 +146,14 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
             }
 
         } catch (Exception excep) {
-            log.error("Error occured while generating remote log and audit search request.", excep);
+            log.error("Error occurred while generating remote log and audit search request.", excep);
         }
-
-        return null;
     }
 
     private ActionLog createActionLogFromAuditEntry(AuditEntry entry, ZonedDateTime zonedDateTime) {
         ActionLog actionLog = new ActionLog();
         actionLog.setUserId(entry.getIdamId());
-        actionLog.setCaseAction(caseActionMap.get(entry.getOperationType()));
+        actionLog.setCaseAction(CASE_ACTION_MAP.get(entry.getOperationType()));
         actionLog.setCaseJurisdictionId(entry.getJurisdiction());
         actionLog.setCaseRef(entry.getCaseId());
         actionLog.setCaseTypeId(entry.getCaseType());
@@ -167,4 +177,10 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
             idamId);
     }
 
+    private void logAuditResponse(String activity, int httpStatus, URI uri) {
+        log.info("LAU Response:REMOTE_LOG_AND_AUDIT_CASE_{},httpStatus:{},url:{}",
+            activity,
+            httpStatus,
+            uri.toString());
+    }
 }

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.lau;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,6 +34,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @DisplayName("audit log specific calls")
@@ -58,6 +61,9 @@ class AuditCaseRemoteOperationTest {
     @Mock
     private AuditCaseRemoteConfiguration auditCaseRemoteConfiguration;
 
+    @Mock
+    private ObjectMapper objectMapper;
+
     @Captor
     ArgumentCaptor<HttpRequest> captor;
 
@@ -80,12 +86,13 @@ class AuditCaseRemoteOperationTest {
         .build();
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws JsonProcessingException {
         MockitoAnnotations.initMocks(this);
-        doReturn("1234").when(securityUtils).getServiceAuthorization();
+        doReturn("Bearer 1234").when(securityUtils).getServiceAuthorization();
         doReturn("http://localhost/caseAction").when(auditCaseRemoteConfiguration).getCaseActionAuditUrl();
         doReturn("http://localhost/caseSearch").when(auditCaseRemoteConfiguration).getCaseSearchAuditUrl();
-        auditCaseRemoteOperation = new AuditCaseRemoteOperation(securityUtils, httpClient,
+        doReturn("{}").when(objectMapper).writeValueAsString(any());
+        auditCaseRemoteOperation = new AuditCaseRemoteOperation(securityUtils, httpClient, objectMapper,
             auditCaseRemoteConfiguration);
     }
 
@@ -111,7 +118,7 @@ class AuditCaseRemoteOperationTest {
         assertThat(captor.getValue().headers().map().get("Content-Type").get(0), is(equalTo("application/json")));
 
         HttpRequest.BodyPublisher bodyPublisher = captor.getValue().bodyPublisher().get();
-        assertThat(bodyPublisher.contentLength(), is(equalTo(250L)));
+        assertThat(bodyPublisher.contentLength(), is(equalTo(2L)));
     }
 
     @Test
@@ -137,7 +144,22 @@ class AuditCaseRemoteOperationTest {
         assertThat(captor.getValue().headers().map().get("Content-Type").get(0), is(equalTo("application/json")));
 
         HttpRequest.BodyPublisher bodyPublisher = captor.getValue().bodyPublisher().get();
-        assertThat(bodyPublisher.contentLength(), is(equalTo(176L)));
+        assertThat(bodyPublisher.contentLength(), is(equalTo(2L)));
+    }
+
+    @Test
+    @DisplayName("should not post case search remote audit request if operational type not search")
+    void shouldNotPostCaseSearchRemoteAuditRequest() {
+
+        ZonedDateTime fixedDateTime = ZonedDateTime.of(LocalDateTime.now(fixedClock), ZoneOffset.UTC);
+        AuditEntry entry = createBaseAuditEntryData(fixedDateTime);
+
+        // Setup as non search operational type.
+        entry.setOperationType(AuditOperationType.GRANT_CASE_ACCESS.getLabel());
+
+        auditCaseRemoteOperation.postCaseSearch(entry, fixedDateTime);
+
+        verifyNoInteractions(httpClient);
     }
 
     private AuditEntry createBaseAuditEntryData(ZonedDateTime fixedDateTime) {
