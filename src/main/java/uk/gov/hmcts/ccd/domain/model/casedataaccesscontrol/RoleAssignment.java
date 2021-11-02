@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol;
 
 import lombok.Builder;
 import lombok.Data;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 
 import java.time.Instant;
 import java.util.List;
@@ -29,6 +30,10 @@ public class RoleAssignment {
         return this.getAttributes() != null
             && this.getAttributes().getCaseId() != null
             && !this.getAttributes().getCaseId().isEmpty();
+    }
+
+    public boolean isGrantType(GrantType grantType) {
+        return getGrantType() != null && grantType.name().equals(getGrantType());
     }
 
     public boolean isNotExpiredRoleAssignment() {
