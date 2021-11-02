@@ -116,6 +116,7 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
                 String lauCaseAuditUrl = auditCaseRemoteConfiguration.getCaseSearchAuditUrl();
 
                 CaseSearchPostRequest cspr = new CaseSearchPostRequest(searchLog);
+                String activity = "SEARCH";
                 String requestBody = objectMapper
                     .writeValueAsString(cspr);
 
@@ -126,14 +127,14 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
 
-                logCorrelationId(entry.getRequestId(), "SEARCH", entry.getJurisdiction(), entry.getIdamId());
+                logCorrelationId(entry.getRequestId(), activity, entry.getJurisdiction(), entry.getIdamId());
 
                 CompletableFuture<HttpResponse<String>> responseFuture =
                     httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
 
                 responseFuture.whenComplete((response, error) -> {
                     if (response != null) {
-                        logAuditResponse("SEARCH", response.statusCode(), request.uri());
+                        logAuditResponse(activity, response.statusCode(), request.uri());
                     }
                     if (error != null) {
                         log.error("LAU Action Error: ", error);
