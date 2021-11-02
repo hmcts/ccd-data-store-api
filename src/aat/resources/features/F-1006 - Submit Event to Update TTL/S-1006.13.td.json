@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-1006.6",
-  "_extends_": "F-1006_Test_Data_Base",
+  "_guid_": "S-1006.13",
+  "_extends_": "F-1006_Test_Data_Base_V2",
 
   "title": "TTL.Suspended changed to \"Yes\"",
   "prerequisites" : [ {
@@ -44,16 +44,16 @@
   "expectedResponse": {
     "_extends_": "Common_201_Response",
     "body" : {
+      "_links" : "[[ANYTHING_PRESENT]]",
       "id" : "[[ANYTHING_PRESENT]]",
       "jurisdiction" : "BEFTA_MASTER",
       "state" : "CaseUpdated",
-      "version" : 1,
-      "case_type_id" : "FT_MasterCaseType",
-      "created_date" : "[[ANYTHING_PRESENT]]",
-      "last_modified" : "[[ANYTHING_PRESENT]]",
-      "last_state_modified_date" : "[[ANYTHING_PRESENT]]",
+      "case_type" : "FT_MasterCaseType",
+      "created_on" : "[[ANYTHING_PRESENT]]",
+      "last_modified_on" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on" : "[[ANYTHING_PRESENT]]",
       "security_classification" : "PUBLIC",
-      "case_data" : {
+      "data" : {
         "TTL" : {
           "Suspended": "Yes",
           "OverrideTTL" : null,
@@ -63,15 +63,11 @@
       "data_classification" : {
         "_extends_": "TTL_Classifications"
       },
-      "supplementary_data" : null,
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,
       "callback_response_status" : null,
       "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null,
-      "security_classifications" : {
-        "_extends_": "TTL_Classifications"
-      }
+      "delete_draft_response_status" : null
     }
   }
 }

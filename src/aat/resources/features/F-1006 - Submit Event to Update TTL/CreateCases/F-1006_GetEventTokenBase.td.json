@@ -1,22 +1,15 @@
 {
-  "_guid_": "S-1006_GetUpdateToken",
+  "_guid_": "F-1006_GetEventTokenBase",
 
   "productName": "CCD Data Store",
   "operationName": "Retrieve a create token",
 
   "method": "GET",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
 
   "specs": [
     "to create a token for case creation",
     "As a prerequisite"
   ],
-
-  "users": {
-    "invokingUser": {
-      "_extends_": "BeftaMasterCaseworker"
-    }
-  },
 
   "request": {
     "headers": {
@@ -26,8 +19,7 @@
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType",
-      "cid": "${[scenarioContext][parentContext][childContexts][F-1006_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
-      "etid": "updateCase"
+      "etid": "updateCaseSubmitTTL"
     }
   },
 
@@ -60,7 +52,7 @@
         "delete_draft_response_status": null,
         "security_classifications": "[[ANYTHING_PRESENT]]"
       },
-      "event_id": "updateCase"
+      "event_id": "updateCaseSubmitTTL"
     }
   }
 }

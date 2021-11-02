@@ -1,9 +1,8 @@
 {
-  "_guid_": "S-1006.1",
-  "_extends_": "F-1006_Test_Data_Base",
+  "_guid_": "S-1006.12",
+  "_extends_": "F-1006_Test_Data_Base_V2",
 
-  "title": "TTL.Suspended changed to \"No\", SystemTTL and Override TTL less than Guard value",
-
+  "title": "TTL.Suspended changed to \"No\", SystemTTL is less than TTLGuard, OverRide TTL is greater than TTLGuard",
   "prerequisites" : [ {
     "Token_Creation": "S-1006_GetUpdateSuspendedCaseTokenCaseworker"
   }
@@ -15,7 +14,7 @@
     "contains an event token for the case just created above",
     "has TTL.Suspension value changed to No from Yes",
     "has TTL.SystemTTL set to less than today + TTL Guard",
-    "has TTL.OverrideTTL set to less than today + TTL Guard"
+    "has TTL.OverrideTTL set to greater than today + guard value"
   ],
 
   "request": {
@@ -29,7 +28,7 @@
       "data": {
         "TTL": {
           "Suspended": "No",
-          "OverrideTTL": "2010-04-30",
+          "OverrideTTL": "2030-04-30",
           "SystemTTL": "2010-04-30"
         }
       },
@@ -45,11 +44,32 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_422_Response",
+    "_extends_": "Common_201_Response",
     "body" : {
-      "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException",
-      "message": "Unsetting a suspension can only be allowed if the deletion will occur beyond the guard period.",
-      "details": null
+      "_links" : "[[ANYTHING_PRESENT]]",
+      "id" : "[[ANYTHING_PRESENT]]",
+      "jurisdiction" : "BEFTA_MASTER",
+      "state" : "CaseUpdated",
+      "case_type" : "FT_MasterCaseType",
+      "created_on" : "[[ANYTHING_PRESENT]]",
+      "last_modified_on" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on" : "[[ANYTHING_PRESENT]]",
+      "security_classification" : "PUBLIC",
+      "data" : {
+        "TTL" : {
+          "Suspended": "No",
+          "OverrideTTL": "2030-04-30",
+          "SystemTTL": "2010-04-30"
+        }
+      },
+      "data_classification" : {
+        "_extends_": "TTL_Classifications"
+      },
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
     }
   }
 }

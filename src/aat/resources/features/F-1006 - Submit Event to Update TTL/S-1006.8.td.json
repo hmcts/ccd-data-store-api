@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-1006.1",
-  "_extends_": "F-1006_Test_Data_Base",
+  "_guid_": "S-1006.8",
+  "_extends_": "F-1006_Test_Data_Base_V2",
 
   "title": "TTL.Suspended changed to \"No\", SystemTTL and Override TTL less than Guard value",
 

@@ -1,17 +1,16 @@
 {
-  "_guid_": "S-1006.7",
-  "_extends_": "F-1006_Test_Data_Base",
+  "_guid_": "S-1006.21",
+  "_extends_": "F-1006_Test_Data_Base_Citizen",
 
   "title": "TTL.Suspended changed to \"No\", SystemTTL and Override TTL greater than Guard value",
 
-  "prerequisites" : [ {
-    "Token_Creation": "S-1006_GetUpdateSuspendedCaseTokenCaseworker"
-  }
-  ],
+  "prerequisites" : [{
+    "Token_Creation": "S-1006_GetUpdateSuspendedCaseTokenCitizen"
+  }],
 
   "specs": [
     "an active profile in CCD",
-    "contains a case Id that has just been created as in F-1006_CreateSuspendedCasePreRequisiteCaseworker",
+    "contains a case Id that has just been created as in F-1006_CreateSuspendedCasePreRequisiteCitizen",
     "contains an event token for the case just created above",
     "has TTL.Suspension value changed to No from Yes",
     "has TTL.SystemTTL set to greater than today + guard value",
@@ -21,7 +20,7 @@
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1006_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][F-1006_CreateSuspendedCasePreRequisiteCitizen][testData][actualResponse][body][id]}"
     },
     "headers": {
       "_extends_": "Common_Request_Headers"
@@ -49,7 +48,7 @@
     "_extends_": "Common_400_Response",
     "body" : {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-      "message": "Time to live content has been modified by callback",
+      "message": "Time to live content has been modified by aboutToStart callback",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null
