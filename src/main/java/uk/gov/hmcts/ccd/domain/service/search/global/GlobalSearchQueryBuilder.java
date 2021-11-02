@@ -50,6 +50,7 @@ public class GlobalSearchQueryBuilder {
 
     static final String STANDARD_ANALYZER = "standard";
     private int numberOfShouldFields;
+    static final String KEYWORD = ".keyword";
 
     public QueryBuilder globalSearchQuery(GlobalSearchRequestPayload request) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
@@ -80,7 +81,7 @@ public class GlobalSearchQueryBuilder {
     public void checkForWildcardValues(BoolQueryBuilder boolQueryBuilder, String field, List<String> values) {
         if (values != null) {
             for (String str : values) {
-                boolQueryBuilder.should(QueryBuilders.wildcardQuery(field + ".keyword", str));
+                boolQueryBuilder.should(QueryBuilders.wildcardQuery(field + KEYWORD, str));
             }
             numberOfShouldFields++;
         }
@@ -150,7 +151,7 @@ public class GlobalSearchQueryBuilder {
 
         if (party != null) {
             if (StringUtils.isNotBlank(party.getPartyName())) {
-                boolQueryBuilder.must(QueryBuilders.wildcardQuery(SEARCH_PARTY_NAME + ".keyword",
+                boolQueryBuilder.must(QueryBuilders.wildcardQuery(SEARCH_PARTY_NAME + KEYWORD,
                     party.getPartyName()));
             }
             if (StringUtils.isNotBlank(party.getEmailAddress())) {
@@ -160,7 +161,7 @@ public class GlobalSearchQueryBuilder {
                 );
             }
             if (StringUtils.isNotBlank(party.getAddressLine1())) {
-                boolQueryBuilder.must(QueryBuilders.wildcardQuery(SEARCH_PARTY_ADDRESS_LINE_1 + ".keyword",
+                boolQueryBuilder.must(QueryBuilders.wildcardQuery(SEARCH_PARTY_ADDRESS_LINE_1 + KEYWORD,
                     party.getAddressLine1()));
             }
             if (StringUtils.isNotBlank(party.getPostCode())) {
