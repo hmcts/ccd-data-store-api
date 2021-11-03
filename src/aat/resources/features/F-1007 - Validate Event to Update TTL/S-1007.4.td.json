@@ -5,13 +5,13 @@
   "title": "TTL.Suspended changed after returning from Mid Event Callback and Validate Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST",
 
   "prerequisites" : [ {
-    "Token_Creation": "S-1007_GetUpdateSuspendedCaseToken"
+    "Token_Creation": "S-1007_GetUpdateSuspendedCaseTokenCitizen"
   }
   ],
 
   "specs": [
     "an active profile in CCD",
-    "contains a case Id that has just been created as in F-1007_CreateSuspendedCasePreRequisiteCaseworker",
+    "contains a case Id that has just been created as in F-1007_CreateSuspendedCasePreRequisiteCitizen",
     "contains an event token for the case just created above",
     "has the mid event callback change the TTL.Suspended value changed"
   ],

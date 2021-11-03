@@ -43,9 +43,9 @@ Feature: F-1007: Submit Event to Update TTL
     @S-1007.4 @AC-4
     Scenario: TTL.Suspended changed after returning from Mid Event Callback and Validate Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
     Given a user with [an active profile in CCD]
-      And a successful call [to create a case] as in [F-1007_CreateSuspendedCasePreRequisiteCaseworker]
+      And a successful call [to create a case] as in [F-1007_CreateSuspendedCasePreRequisiteCitizen]
      When a request is prepared with appropriate values
-      And the request [contains a case Id that has just been created as in F-1007_CreateSuspendedCasePreRequisiteCaseworker]
+      And the request [contains a case Id that has just been created as in F-1007_CreateSuspendedCasePreRequisiteCitizen]
       And the request [contains an event token for the case just created above]
       And the request [has the mid event callback change the TTL.Suspended value changed]
       And it is submitted to call the [validation of a set of fields as Citizen] operation of [CCD Data Store]
@@ -55,9 +55,9 @@ Feature: F-1007: Submit Event to Update TTL
     @S-1007.5 @AC-5
     Scenario: TTL.SystemTTL changed after returning from Mid Event Callback and Validate Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
     Given a user with [an active profile in CCD]
-      And a successful call [to create a case] as in [F-1007_CreateSuspendedCasePreRequisiteCaseworker]
+      And a successful call [to create a case] as in [F-1007_CreateSuspendedCasePreRequisiteCitizen]
      When a request is prepared with appropriate values
-      And the request [contains a case Id that has just been created as in F-1007_CreateSuspendedCasePreRequisiteCaseworker]
+      And the request [contains a case Id that has just been created as in F-1007_CreateSuspendedCasePreRequisiteCitizen]
       And the request [contains an event token for the case just created above]
       And the request [has the mid event callback change the TTL.SystemTTL value changed]
       And it is submitted to call the [validation of a set of fields as Citizen] operation of [CCD Data Store]
@@ -67,9 +67,9 @@ Feature: F-1007: Submit Event to Update TTL
     @S-1007.6 @AC-6
     Scenario: TTL.OverrideTTL changed after returning from Mid Event Callback and Validate Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST_1
     Given a user with [an active profile in CCD]
-      And a successful call [to create a case] as in [F-1007_CreateSuspendedCasePreRequisiteCaseworker]
+      And a successful call [to create a case] as in [F-1007_CreateSuspendedCasePreRequisiteCitizen]
      When a request is prepared with appropriate values
-      And the request [contains a case Id that has just been created as in F-1007_CreateSuspendedCasePreRequisiteCaseworker]
+      And the request [contains a case Id that has just been created as in F-1007_CreateSuspendedCasePreRequisiteCitizen]
       And the request [contains an event token for the case just created above]
       And the request [has the mid event callback change the TTL.OverrideTTL value changed]
       And it is submitted to call the [validation of a set of fields as Citizen] operation of [CCD Data Store]
