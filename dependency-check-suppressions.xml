@@ -99,6 +99,8 @@
 		<cve>CVE-2021-22144</cve>
 		<cve>CVE-2021-22147</cve>
 		<cve>CVE-2020-23171</cve>
+		<cve>CVE-2021-22096</cve>
+		<cve>CVE-2021-42340</cve>
 	</suppress>
 
 </suppressions>
