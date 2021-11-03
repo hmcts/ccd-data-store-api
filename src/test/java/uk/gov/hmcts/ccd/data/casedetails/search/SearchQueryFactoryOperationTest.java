@@ -64,6 +64,8 @@ class SearchQueryFactoryOperationTest {
     @BeforeEach
     public void initMock() throws IOException {
         MockitoAnnotations.initMocks(this);
+        CaseTypeDefinition caseTypeDefinition = mock(CaseTypeDefinition.class);
+        when(caseDefinitionRepository.getCaseType(anyString())).thenReturn(caseTypeDefinition);
         classUnderTest = new SearchQueryFactoryOperation(criterionFactory,
             entityManager,
             applicationParam,
@@ -113,7 +115,6 @@ class SearchQueryFactoryOperationTest {
         classUnderTest.build(metadata, Maps.newHashMap(), false);
 
         verify(sortOrderQueryBuilder).buildSortOrderClause(metadata);
-        verify(userAuthorisation, times(1)).getUserId();
         verify(caseDataAccessControl).generateRoleAssignments(any(CaseTypeDefinition.class));
         verify(entityManager).createNativeQuery(anyString(), any(Class.class));
     }
