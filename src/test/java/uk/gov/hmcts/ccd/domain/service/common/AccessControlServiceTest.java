@@ -3102,6 +3102,119 @@ public class AccessControlServiceTest {
         }
 
         @Test
+        @DisplayName("Should set readonly flag for collection children if relevant acl missing with multiparty fix")
+        void shouldSetReadonlyFlagForCollectionChildrenIfRelevantAclMissingWithMultiPartyFix() {
+            Mockito.when(applicationParams.isMultipartyFixEnabled()).thenReturn(true);
+
+            final CaseTypeDefinition caseType = newCaseType()
+                .withField(newCaseField()
+                    .withId("AddressCollection")
+                    .withFieldType(aFieldType()
+                        .withType(COLLECTION)
+                        .withCollectionField(newCaseField()
+                            .withId("Addresses")
+                            .withFieldType(aFieldType()
+                                .withType(COMPLEX)
+                                .withComplexField(newCaseField()
+                                    .withId("Line1")
+                                    .withFieldType(aFieldType()
+                                        .withId("Text")
+                                        .withType("Text")
+                                        .build())
+                                    .build())
+                                .withComplexField(newCaseField()
+                                    .withId("Line2")
+                                    .withFieldType(aFieldType()
+                                        .withId("Text")
+                                        .withType("Text")
+                                        .build())
+                                    .build())
+                                .build())
+                            .build())
+                        .build())
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Addresses")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withUpdate(true)
+                            .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Addresses.Line1")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withUpdate(false)
+                            .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Addresses.Line2")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withUpdate(false)
+                            .build())
+                    .build())
+                .build();
+            caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
+
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
+                .withField(aViewField()
+                    .withId("AddressCollection")
+                    .withFieldType(aFieldType()
+                        .withType(COLLECTION)
+                        .withCollectionField(newCaseField()
+                            .withId("Addresses")
+                            .withFieldType(aFieldType()
+                                .withType(COMPLEX)
+                                .withComplexField(newCaseField()
+                                    .withId("Line1")
+                                    .withFieldType(aFieldType()
+                                        .withId("Text")
+                                        .withType("Text")
+                                        .build())
+                                    .build())
+                                .withComplexField(
+                                    newCaseField()
+                                        .withId("Line2")
+                                        .withFieldType(aFieldType()
+                                            .withId("Text")
+                                            .withType("Text")
+                                            .build())
+                                        .build())
+                                .build())
+                            .build())
+                        .build())
+                    .build())
+                .build();
+
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
+                USER_ROLES,
+                CAN_UPDATE);
+
+            assertAll(
+                () -> assertThat(eventTrigger.getCaseFields().get(0), not(hasProperty("displayContext",
+                    is(READONLY)))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses"),
+                    not(hasProperty("displayContext", is(READONLY)))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line1"),
+                    hasProperty("displayContext", is(READONLY))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line2"),
+                    hasProperty("displayContext", is(READONLY))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line1"),
+                    hasProperty("showCondition", is("Line1=\"DO NOT SHOW IN UI\""))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line2"),
+                    hasProperty("showCondition", is("Line2=\"DO NOT SHOW IN UI\""))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line1"),
+                    hasProperty("retainHiddenValue", is(false))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line2"),
+                    hasProperty("retainHiddenValue", is(false)))
+            );
+        }
+
+        @Test
         @DisplayName("Should not set readonly flag for collection children if relevant acl is there")
         void shouldNotSetReadonlyFlagForCollectionChildrenIfRelevantAclIsThere() {
             final CaseTypeDefinition caseType = newCaseType()
@@ -3241,6 +3354,41 @@ public class AccessControlServiceTest {
         }
 
         @Test
+        @DisplayName("Should set readonly flag if relevant acl not granting access with multiparty fix")
+        void shouldSetReadonlyFlagIfRelevantAclNotGrantingAccessWithMultiPartyFix() {
+            Mockito.when(applicationParams.isMultipartyFixEnabled()).thenReturn(true);
+            final CaseTypeDefinition caseType = newCaseType()
+                .withField(newCaseField()
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .build())
+                    .build())
+                .build();
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
+                .withField(
+                    aViewField()
+                        .withFieldType(aFieldType().withType("Text").build())
+                        .withId("Addresses")
+                        .build())
+                .build();
+
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
+                USER_ROLES,
+                CAN_UPDATE);
+
+            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
+                is(READONLY))));
+            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("showCondition",
+                is("Addresses=\"DO NOT SHOW IN UI\""))));
+            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("retainHiddenValue",
+                is(false))));
+        }
+
+        @Test
         @DisplayName("Should set readonly flag if ACL true and event name not matching")
         void shouldSetReadonlyFlagIfRelevantAclGrantingAccessAndEventNameNotMatching() {
             final CaseTypeDefinition caseType = newCaseType()
@@ -3267,6 +3415,40 @@ public class AccessControlServiceTest {
 
             assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
                 is(READONLY))));
+        }
+
+        @Test
+        @DisplayName("Should set readonly flag if ACL true and event name not matching with multiparty fix")
+        void shouldSetReadonlyFlagIfRelevantAclGrantingAccessAndEventNameNotMatchingWithMultiPartyFix() {
+            Mockito.when(applicationParams.isMultipartyFixEnabled()).thenReturn(true);
+            final CaseTypeDefinition caseType = newCaseType()
+                .withField(newCaseField()
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withUpdate(true)
+                        .build())
+                    .build())
+                .build();
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
+                .withField(
+                    aViewField()
+                        .withId("DifferentAddresses")
+                        .build())
+                .build();
+
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
+                USER_ROLES,
+                CAN_UPDATE);
+
+            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
+                is(READONLY))));
+            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("showCondition",
+                is("DifferentAddresses=\"DO NOT SHOW IN UI\""))));
+            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("retainHiddenValue",
+                is(false))));
         }
 
         @Test
