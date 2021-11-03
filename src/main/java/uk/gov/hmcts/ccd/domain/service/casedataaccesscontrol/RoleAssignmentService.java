@@ -121,7 +121,8 @@ public class RoleAssignmentService implements AccessControl {
             .filter(roleAssignments, caseTypeDefinition,
                 Lists.newArrayList(
                     MatcherType.GRANTTYPE,
-                    MatcherType.SECURITYCLASSIFICATION
+                    MatcherType.SECURITYCLASSIFICATION,
+                    MatcherType.AUTHORISATION
                 )
             ).getFilteredMatchingRoleAssignments();
     }
