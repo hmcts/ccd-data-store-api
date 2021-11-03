@@ -6,13 +6,17 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -35,6 +39,9 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
     @Mock
     private CaseDataAccessControl caseDataAccessControl;
 
+    @Mock
+    private CaseStateDefinition caseStateDefinition;
+
     private AccessControlGrantTypeESQueryBuilder accessControlGrantTypeQueryBuilder;
 
     @BeforeEach
@@ -50,6 +57,8 @@ class AccessControlGrantTypeESQueryBuilderTest extends  GrantTypeESQueryBuilderT
             caseDataAccessControl);
         CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
         when(caseDefinitionRepository.getCaseType(anyString())).thenReturn(caseTypeDefinition);
+        when(accessControlService.filterCaseStatesByAccess(Mockito.anyList(), any(), any()))
+            .thenReturn(List.of(caseStateDefinition));
     }
 
     @Test
