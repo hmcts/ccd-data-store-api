@@ -79,8 +79,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.WizardPage
 
 @SuppressWarnings("checkstyle:TypeName") // too many legacy TypeName occurrences on '@Nested' classes
 public class AccessControlServiceTest {
-    private Logger logger;
-    private ListAppender<ILoggingEvent> listAppender;
 
     @Mock
     private ApplicationParams applicationParams;
@@ -104,6 +102,7 @@ public class AccessControlServiceTest {
         ROLE_IN_USER_ROLES_2);
 
     private AccessControlService accessControlService;
+    private static final String CASE_REFERENCE = "CASE_REFERENCE";
     private static final String EVENT_ID = "EVENT_ID";
     private static final String EVENT_ID_LOWER_CASE = "event_id";
     private static final String STATE_ID1 = "State1";
@@ -242,8 +241,7 @@ public class AccessControlServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
-
+        MockitoAnnotations.openMocks(this);
         accessControlService = new AccessControlService(applicationParams, new CompoundAccessControlService());
     }
 
@@ -1940,10 +1938,11 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should filter data for missing node and return remaining data")
         void shouldFilterDataForMissingNodeAndReturnRemainingData() throws IOException {
-            logger = (Logger) LoggerFactory.getLogger(AccessControlService.class);
-            listAppender = new ListAppender<>();
+            Logger logger = (Logger) LoggerFactory.getLogger(AccessControlService.class);
+            ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
             listAppender.start();
             logger.addAppender(listAppender);
+
             final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
             people.setAccessControlLists(Collections.singletonList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
@@ -2261,9 +2260,8 @@ public class AccessControlServiceTest {
                     .withId(EVENT_ID)
                     .build())
                 .build();
-            List<AuditEvent> auditEvents = null;
 
-            assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
+            assertThat(accessControlService.filterCaseAuditEventsByReadAccess(null,
                 caseType.getEvents(),
                 USER_ROLES),
                 is(emptyCollectionOf(AuditEvent.class)));
@@ -2282,9 +2280,8 @@ public class AccessControlServiceTest {
                     .withId(EVENT_ID)
                     .build())
                 .build();
-            List<AuditEvent> auditEvents = null;
 
-            assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
+            assertThat(accessControlService.filterCaseAuditEventsByReadAccess(null,
                 caseType.getEvents(),
                 USER_ROLES),
                 is(emptyCollectionOf(AuditEvent.class)));
@@ -2513,6 +2510,8 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_REFERENCE,
+                EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
@@ -2553,6 +2552,8 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_REFERENCE,
+                EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
@@ -2645,6 +2646,8 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_REFERENCE,
+                EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
@@ -2755,6 +2758,8 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_REFERENCE,
+                EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
@@ -2862,6 +2867,8 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_REFERENCE,
+                EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
@@ -2968,6 +2975,8 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_REFERENCE,
+                EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
@@ -3084,6 +3093,8 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_REFERENCE,
+                EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
@@ -3189,6 +3200,8 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_REFERENCE,
+                EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
@@ -3300,6 +3313,8 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_REFERENCE,
+                EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
@@ -3344,6 +3359,8 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_REFERENCE,
+                EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
@@ -3375,6 +3392,8 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_REFERENCE,
+                EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
@@ -3408,6 +3427,8 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_REFERENCE,
+                EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
@@ -3438,6 +3459,8 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_REFERENCE,
+                EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
@@ -3473,6 +3496,8 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_REFERENCE,
+                EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
@@ -3512,6 +3537,8 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_REFERENCE,
+                EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
@@ -3584,7 +3611,10 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
-            CaseUpdateViewEvent actual = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
+            CaseUpdateViewEvent actual = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_REFERENCE,
+                EVENT_ID,
+                caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
                 USER_ROLES,
                 CAN_UPDATE);

@@ -41,7 +41,7 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     private String liveUntil = null;
     private Integer order;
     @JsonProperty("show_condition")
-    private String showConditon = null;
+    private String showCondition = null;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
     @JsonProperty("complexACLs")
@@ -139,11 +139,11 @@ public class CaseFieldDefinition implements Serializable, CommonField {
     }
 
     public String getShowCondition() {
-        return showConditon;
+        return showCondition;
     }
 
-    public void setShowCondition(String showConditon) {
-        this.showConditon = showConditon;
+    public void setShowCondition(String showCondition) {
+        this.showCondition = showCondition;
     }
 
     @Override

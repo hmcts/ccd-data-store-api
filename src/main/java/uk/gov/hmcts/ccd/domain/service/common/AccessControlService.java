@@ -302,10 +302,11 @@ public class AccessControlService {
         }
     }
 
-    public CaseUpdateViewEvent setReadOnlyOnCaseViewFieldsIfNoAccess(final CaseUpdateViewEvent caseEventTrigger,
-                                                                  final List<CaseFieldDefinition> caseFieldDefinitions,
-                                                                  final Set<String> userRoles,
-                                                                  final Predicate<AccessControlList> access) {
+    public CaseUpdateViewEvent setReadOnlyOnCaseViewFieldsIfNoAccess(
+        final String caseReference, final String eventId, final CaseUpdateViewEvent caseEventTrigger,
+        final List<CaseFieldDefinition> caseFieldDefinitions, final Set<String> userRoles,
+        final Predicate<AccessControlList> access) {
+
         caseEventTrigger.getCaseFields()
             .forEach(caseViewField -> {
                 Optional<CaseFieldDefinition> caseFieldOpt = findCaseField(caseFieldDefinitions, caseViewField.getId());
@@ -314,25 +315,28 @@ public class AccessControlService {
                     CaseFieldDefinition field = caseFieldOpt.get();
                     if (!hasAccessControlList(userRoles, access, field.getAccessControlLists())) {
                         caseViewField.setDisplayContext(READONLY);
-                        hideOnCaseViewFieldsIfNoReadAccess(caseViewField, userRoles);
+                        hideOnCaseViewFieldsIfNoReadAccess(caseReference, eventId, caseViewField, userRoles);
                     }
                     if (field.isCompoundFieldType()) {
-                        setChildrenAsReadOnlyIfNoAccess(caseEventTrigger.getWizardPages(), field.getId(), field,
-                            access, userRoles, caseViewField);
+                        setChildrenAsReadOnlyIfNoAccess(caseReference, eventId, caseEventTrigger.getWizardPages(),
+                            field.getId(), field, access, userRoles, caseViewField);
                     }
                 } else {
                     caseViewField.setDisplayContext(READONLY);
-                    hideOnCaseViewFieldsIfNoReadAccess(caseViewField, userRoles);
+                    hideOnCaseViewFieldsIfNoReadAccess(caseReference, eventId, caseViewField, userRoles);
                 }
             });
         return caseEventTrigger;
     }
 
-    private void hideOnCaseViewFieldsIfNoReadAccess(CommonField caseViewField, Set<String> userRoles) {
+    private void hideOnCaseViewFieldsIfNoReadAccess(String caseReference, String eventId,
+                                                    CommonField caseViewField, Set<String> userRoles) {
         if (this.applicationParams.isMultipartyFixEnabled()
             && !hasAccessControlList(userRoles, CAN_READ, caseViewField.getAccessControlLists())) {
             caseViewField.setShowCondition(caseViewField.getId() + "=\"DO NOT SHOW IN UI\"");
             caseViewField.setRetainHiddenValue(false);
+            LOG.debug("Case view field {} has been hidden for case {} and event {} as part of mutliparty fix",
+                caseViewField.getId(), caseReference, eventId);
         }
     }
 
@@ -372,7 +376,8 @@ public class AccessControlService {
                                                                                    collectionAccess);
     }
 
-    private void setChildrenAsReadOnlyIfNoAccess(final List<WizardPage> wizardPages,
+    private void setChildrenAsReadOnlyIfNoAccess(final String caseReference, final String eventId,
+                                                 final List<WizardPage> wizardPages,
                                                  final String rootFieldId,
                                                  final CaseFieldDefinition caseField,
                                                  final Predicate<AccessControlList> access,
@@ -383,7 +388,7 @@ public class AccessControlService {
                 if (!hasAccessControlList(userRoles, access, childField.getAccessControlLists())) {
                     CommonField childViewField = findNestedField(caseViewField, childField.getId());
                     childViewField.setDisplayContext(READONLY);
-                    hideOnCaseViewFieldsIfNoReadAccess(childViewField, userRoles);
+                    hideOnCaseViewFieldsIfNoReadAccess(caseReference, eventId, childViewField, userRoles);
 
                     Optional<WizardPageField> optionalWizardPageField = getWizardPageField(wizardPages, rootFieldId);
                     optionalWizardPageField.ifPresent(wizardPageField ->
@@ -391,6 +396,8 @@ public class AccessControlService {
                 }
                 if (childField.isCompoundFieldType()) {
                     setChildrenAsReadOnlyIfNoAccess(
+                        caseReference,
+                        eventId,
                         wizardPages,
                         rootFieldId,
                         childField,
@@ -554,7 +561,7 @@ public class AccessControlService {
                             .stream()
                             .filter(id -> id.equalsIgnoreCase(wizardPageField.getCaseFieldId()))
                             .findAny();
-                        return !toBeRemovedField.isPresent();
+                        return toBeRemovedField.isEmpty();
                     })
                     .map(wizardPageField -> {
                         if (!wizardPageField.getComplexFieldOverrides().isEmpty()) {
