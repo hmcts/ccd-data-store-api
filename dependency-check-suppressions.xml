@@ -62,5 +62,4 @@
 	<suppress>
 		<cve>CVE-2021-22096</cve>
 	</suppress>
-
 </suppressions>
