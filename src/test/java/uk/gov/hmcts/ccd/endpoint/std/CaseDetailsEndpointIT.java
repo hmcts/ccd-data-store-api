@@ -184,6 +184,85 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn201WithTTLWhenPostCreateCaseEventWithValidDataForCaseworker()
+        throws Exception {
+        shouldReturn201WithTTLWhenPostCreateCaseEventWithValidData("caseworkers");
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn201WithTTLWhenPostCreateCaseEventWithValidDataForCitizen()
+        throws Exception {
+        shouldReturn201WithTTLWhenPostCreateCaseEventWithValidData("citizens");
+    }
+
+    private void shouldReturn201WithTTLWhenPostCreateCaseEventWithValidData(String userRole)
+        throws Exception {
+        final String urlPortionForCaseType = "bookcase-definition-ttl.json";
+        final String caseReference = "9816494993793181";
+        final String url = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
+            + urlPortionForCaseType + "/cases/" + caseReference + "/events";
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
+        final String token = generateEventToken(template, UID, JURISDICTION, urlPortionForCaseType, caseReference,
+            TEST_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+        final JsonNode DATA = mapper.readTree("{"
+            + "\"PersonAddress\":{"
+            + "\"Country\":\"_ Wales\","
+            + "\"Postcode\":\"_ WB11DDF\","
+            + "\"AddressLine1\":\"_ Flat 9\","
+            + "\"AddressLine2\":\"_ 2 Hubble Avenue\","
+            + "\"AddressLine3\":\"_ ButtonVillie\"},"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"TTL\":{"
+            + "\"Suspended\":\"No\","
+            + "\"SystemTTL\":\"2021-09-30\","
+            + "\"OverrideTTL\":\"2021-08-30\"}}");
+        caseDetailsToSave.setData(JacksonUtils.convertValue(DATA));
+
+        final MvcResult mvcResult = mockMvc.perform(post(url)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
+            .andReturn();
+
+        assertEquals("Incorrect Response Content",
+            DATA.toString(),
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
+
+        final CaseDetails savedCaseDetails = caseDetailsList.stream()
+            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .findFirst()
+            .orElse(null);
+        assertNotNull(savedCaseDetails);
+        assertEquals("Incorrect Case Type", CASE_TYPE_TTL, savedCaseDetails.getCaseTypeId());
+        assertEquals(
+            "Incorrect Data content: Data should have changed",
+            caseDetailsToSave.getData(),
+            savedCaseDetails.getData());
+        assertEquals("State should have been updated", "state3", savedCaseDetails.getState());
+
+        final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
+        assertEquals("A new event should have been created", 5, caseAuditEventList.size());
+
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(4);
+        assertEquals("123", caseAuditEvent.getUserId());
+        assertEquals("Strife", caseAuditEvent.getUserLastName());
+        assertEquals("Cloud", caseAuditEvent.getUserFirstName());
+        assertEquals("TEST EVENT NAME", caseAuditEvent.getEventName());
+        assertEquals(savedCaseDetails.getId(), caseAuditEvent.getCaseDataId());
+        assertEquals(savedCaseDetails.getCaseTypeId(), caseAuditEvent.getCaseTypeId());
+        assertEquals(1, caseAuditEvent.getCaseTypeVersion().intValue());
+        assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
+    }
+
+    @Test
     public void shouldReturn409WhenPostCreateCaseAndNonUniqueReferenceOccursTwiceForCitizen() throws Exception {
         when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE);
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";

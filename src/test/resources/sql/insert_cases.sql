@@ -652,7 +652,7 @@ VALUES (20, 'TestAddressBookCaseTTL', 'PROBATE', 'CaseCreated', 'PUBLIC',
           }
         }',
         '{
-          "PersonFirstName": "PRIVATE",
+          "PersonFirstName": "PUBLIC",
           "PersonLastName": "PUBLIC",
           "PersonAddress": {
             "classification" : "PUBLIC",
@@ -709,8 +709,6 @@ INSERT INTO case_event (
         '2017-05-09 14:31:43.000000',
         '{}'
     );
-
-
 
 INSERT INTO case_event (
         case_data_id,

@@ -1,0 +1,80 @@
+{
+  "_guid_": "S-1006.18",
+  "_extends_": "F-1006_Test_Data_Base_Citizen",
+
+  "title": "TTL.Suspended changed to \"No\", SystemTTL is NULL, OverRide TTL is greater than TTLGuard",
+
+  "prerequisites" : [{
+    "Token_Creation": "S-1006_GetUpdateSuspendedCaseTokenCitizen"
+  }],
+
+  "specs": [
+    "an active profile in CCD",
+    "contains a case Id that has just been created as in F-1006_CreateSuspendedCasePreRequisiteCitizen",
+    "contains an event token for the case just created above",
+    "has TTL.Suspension value changed to No from Yes",
+    "has TTL.OverrideTTL set to greater than today + guard value",
+    "has TTL.SystemTTL set to null"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1006_CreateSuspendedCasePreRequisiteCitizen][testData][actualResponse][body][id]}"
+    },
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "body": {
+      "data": {
+        "TTL": {
+          "Suspended": "No",
+          "OverrideTTL": "2030-04-30",
+          "SystemTTL": null
+        }
+      },
+      "event": {
+        "id": "updateCaseSubmitTTL",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body" : {
+      "id" : "[[ANYTHING_PRESENT]]",
+      "jurisdiction" : "BEFTA_MASTER",
+      "state" : "CaseUpdated",
+      "version" : 1,
+      "case_type_id" : "FT_MasterCaseType",
+      "created_date" : "[[ANYTHING_PRESENT]]",
+      "last_modified" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_date" : "[[ANYTHING_PRESENT]]",
+      "security_classification" : "PUBLIC",
+      "case_data" : {
+        "TTL" : {
+          "Suspended": "No",
+          "OverrideTTL": "2030-04-30",
+          "SystemTTL": null
+        }
+      },
+      "data_classification" : {
+        "_extends_": "TTL_Classifications"
+      },
+      "supplementary_data" : null,
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null,
+      "security_classifications" : {
+        "_extends_": "TTL_Classifications"
+      }
+    }
+  }
+
+}
