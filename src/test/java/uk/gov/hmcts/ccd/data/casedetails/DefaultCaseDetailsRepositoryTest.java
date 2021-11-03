@@ -11,7 +11,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextListener;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -21,7 +20,6 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
@@ -35,13 +33,11 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.equalTo;
@@ -52,14 +48,10 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.GET_ROLE_ASSIGNMENTS_PREFIX;
-import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.createRoleAssignmentRecord;
-import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.createRoleAssignmentResponse;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.emptyRoleAssignmentResponseJson;
-import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleToAccessProfileDefinition;
 
 @Transactional
 public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
@@ -276,30 +268,6 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void findByWildcardReturnCorrectRecords() {
-        ReflectionTestUtils.setField(applicationParams, "wildcardSearchAllowed", true);
-        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
-
-        Map<String, String> params = Maps.newHashMap();
-        params.put("PersonFirstName", "%An%");
-        final PaginatedSearchMetadata byMetaData = caseDetailsRepository.getPaginatedSearchMetadata(metadata, params);
-        // See case types and citizen names in insert_cases.sql to understand this result.
-        assertThat(byMetaData.getTotalResultsCount(), is(5));
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void getFindByMetadataReturnCorrectRecords() {
-        assumeDataInitialised();
-
-        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
-        final PaginatedSearchMetadata byMetaData =
-            caseDetailsRepository.getPaginatedSearchMetadata(metadata, Maps.newHashMap());
-        assertThat(byMetaData.getTotalResultsCount(), is(7));
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void getFindByMetadataAndFieldDataSortDescByMetaDataField() {
         assumeDataInitialised();
 
@@ -353,55 +321,6 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void getFindByMetadataAndFieldDataReturnCorrectRecords() {
-        assumeDataInitialised();
-
-        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
-        HashMap<String, String> searchParams = new HashMap<>();
-        searchParams.put("PersonFirstName", "Janet");
-        final List<CaseDetails> byMetaDataAndFieldData = caseDetailsRepository.findByMetaDataAndFieldData(metadata,
-            searchParams);
-        assertAll(
-            () -> assertThat(byMetaDataAndFieldData.size(), is(2)),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getId(), is("1")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getJurisdiction(), is("PROBATE")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getState(), is("CaseCreated")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getCaseTypeId(), is("TestAddressBookCase")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getSecurityClassification(),
-                is(SecurityClassification.PUBLIC)),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getReference(), is(1504259907353529L)),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonFirstName").asText(), is("Janet")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonLastName").asText(), is("Parker")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine1").asText(),
-                is("123")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine2").asText(),
-                is("Fake Street")),
-            () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine3").asText(),
-                is("Hexton")),
-            () -> verify(authorisedCaseDefinitionDataService).getUserAuthorisedCaseStateIds("PROBATE",
-                "TestAddressBookCase", CAN_READ)
-        );
-    }
-
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    public void getPaginatedSearchMetadataShouldReturnPaginationInfoWhenSearchedWithMetadata() {
-        assumeDataInitialised();
-
-        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
-        metadata.setState(Optional.of("CaseCreated"));
-        final PaginatedSearchMetadata paginatedSearchMetadata =
-            caseDetailsRepository.getPaginatedSearchMetadata(metadata,
-            new HashMap<>());
-        assertAll(
-            () -> assertThat(paginatedSearchMetadata.getTotalResultsCount(), is(5)),
-            () -> assertThat(paginatedSearchMetadata.getTotalPagesCount(), is(3))
-        );
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void getPaginatedSearchMetadataShouldReturnPaginationInfoWhenSearchedWithSearchParams() {
         assumeDataInitialised();
 
@@ -443,64 +362,6 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
                 hasProperty("reference", equalTo(1504254784737847L))
             )))
         );
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
-        "classpath:sql/insert_cases.sql",
-        "classpath:sql/insert_case_users.sql"
-    })
-    public void searchWithParams_withAccessLevelGranted() throws Exception {
-        String userId = "1";
-        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
-        when(userAuthorisation.getUserId()).thenReturn(userId);
-
-        CaseTypeDefinition caseTypeDefinition = loadCaseTypeDefinition("/mappings/bookcase-definition.json");
-        caseTypeDefinition.setRoleToAccessProfiles(asList(roleToAccessProfileDefinition("[CREATOR]")));
-
-        stubFor(WireMock.get(urlMatching("/api/data/case-type/TestAddressBookCase"))
-            .willReturn(okJson(defaultObjectMapper.writeValueAsString(caseTypeDefinition))
-                .withStatus(200)));
-
-        stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + userId))
-            .willReturn(okJson(defaultObjectMapper.writeValueAsString(
-                createRoleAssignmentResponse(
-                    singletonList(createRoleAssignmentRecord("assignment", "1504254784737847", "TestAddressBookCase",
-                        JURISDICTION, "[CREATOR]", userId, false)))))
-                .withStatus(200)));
-
-        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
-        HashMap<String, String> searchParams = new HashMap<>();
-        searchParams.put("PersonFirstName", "Janet");
-
-        final List<CaseDetails> results = caseDetailsRepository.findByMetaDataAndFieldData(metadata, searchParams);
-
-        assertAll(
-            () -> assertThat(results, hasSize(1)),
-            () -> assertThat(results, hasItem(allOf(
-                hasProperty("id", equalTo("16")),
-                hasProperty("reference", equalTo(1504254784737847L))
-            )))
-        );
-        assertThat(caseDetailsRepository.getPaginatedSearchMetadata(metadata, searchParams).getTotalResultsCount(),
-            is(1));
-    }
-
-    @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {
-        "classpath:sql/insert_cases.sql",
-        "classpath:sql/insert_case_with_restricted_state.sql"
-    })
-    public void searchWithParams_restrictedStates() {
-        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE",
-            "TestAddressBookCase", CAN_READ))
-            .thenReturn(asList("CaseRestricted"));
-
-        MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
-        final List<CaseDetails> results = caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
-
-        assertThat(results.size(), is(1));
-        assertThat(results.get(0).getReference(), is(1504254784737848L));
     }
 
     @Test
