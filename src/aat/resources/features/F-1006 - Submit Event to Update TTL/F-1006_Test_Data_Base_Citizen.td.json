@@ -15,7 +15,7 @@
 
 	"request": {
 		"pathVariables": {
-      "uid": "2670973d-ad52-4ae5-8428-3352b0c73e76",
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType",
       "cid": "${[scenarioContext][childContexts][F-1006_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
