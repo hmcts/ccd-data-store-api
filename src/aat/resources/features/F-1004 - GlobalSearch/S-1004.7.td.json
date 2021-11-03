@@ -1,0 +1,51 @@
+{
+  "title": "Successfully search for case with the new global search parameters",
+  "_guid_": "S-1004.7",
+  "_extends_": "Search_Case_Base",
+  "specs": [
+    "an active profile in CCD",
+    "contains at least one fields from new global search screen",
+    "contains all the mandatory parameters",
+    "has 200 return code"
+  ],
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "caseReferences": [
+          "${[scenarioContext][childContexts][F-1004_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+        ]
+      }
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "resultInfo": {
+        "casesReturned": 1,
+        "caseStartRecord": 1,
+        "moreResultsToGo": false
+      },
+      "results": [
+        {
+          "stateId" : "CaseCreated",
+          "processForAccess" : null,
+          "caseReference" : "${}${[scenarioContext][childContexts][F-1004_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+          "otherReferences" : [ "FirstNameValue" ],
+          "caseNameHmctsInternal" : null,
+          "baseLocationId" : null,
+          "baseLocationName" : null,
+          "caseManagementCategoryId" : null,
+          "caseManagementCategoryName" : null,
+          "regionId" : null,
+          "regionName" : null,
+          "CCDJurisdictionId" : "BEFTA_MASTER",
+          "CCDJurisdictionName" : "BEFTA Master",
+          "HMCTSServiceId" : null,
+          "HMCTSServiceShortDescription" : null,
+          "CCDCaseTypeId" : "FT_GlobalSearch",
+          "CCDCaseTypeName" : "FT_GlobalSearch"
+        }
+      ]
+    }
+  }
+}
+

@@ -1,0 +1,28 @@
+{
+  "_guid_": "Search_Case_Base",
+  "productName": "CCD Data Store",
+  "operationName": "Global Search",
+  "method": "POST",
+  "uri": "/globalSearch",
+  "specs": [
+    "to search a full case"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "vary": "accept-encoding",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}
