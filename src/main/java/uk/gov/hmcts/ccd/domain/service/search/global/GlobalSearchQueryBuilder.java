@@ -49,25 +49,26 @@ import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.S
 public class GlobalSearchQueryBuilder {
 
     static final String STANDARD_ANALYZER = "standard";
-    private int numberOfShouldFields;
     static final String KEYWORD = ".keyword";
 
     public QueryBuilder globalSearchQuery(GlobalSearchRequestPayload request) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        numberOfShouldFields = 0;
+        int numberOfShouldFields = 0;
 
         if (request != null) {
             SearchCriteria searchCriteria = request.getSearchCriteria();
             if (searchCriteria != null) {
 
-                checkForWildcardValues(boolQueryBuilder, REFERENCE, searchCriteria.getCaseReferences());
+                numberOfShouldFields += checkForWildcardValues(boolQueryBuilder, REFERENCE,
+                    searchCriteria.getCaseReferences());
                 // add terms queries for properties that must match 1 from many
                 addTermsQuery(boolQueryBuilder, CASE_TYPE, searchCriteria.getCcdCaseTypeIds());
                 addTermsQuery(boolQueryBuilder, JURISDICTION, searchCriteria.getCcdJurisdictionIds());
                 addTermsQuery(boolQueryBuilder, STATE, searchCriteria.getStateIds());
                 addTermsQuery(boolQueryBuilder, REGION, searchCriteria.getCaseManagementRegionIds());
                 addTermsQuery(boolQueryBuilder, BASE_LOCATION, searchCriteria.getCaseManagementBaseLocationIds());
-                checkForWildcardValues(boolQueryBuilder, OTHER_REFERENCE_VALUE, searchCriteria.getOtherReferences());
+                numberOfShouldFields += checkForWildcardValues(boolQueryBuilder, OTHER_REFERENCE_VALUE,
+                    searchCriteria.getOtherReferences());
 
                 // add parties query for all party values
                 addPartiesQuery(boolQueryBuilder, searchCriteria.getParties());
@@ -78,13 +79,14 @@ public class GlobalSearchQueryBuilder {
         return boolQueryBuilder;
     }
 
-    public void checkForWildcardValues(BoolQueryBuilder boolQueryBuilder, String field, List<String> values) {
+    public int checkForWildcardValues(BoolQueryBuilder boolQueryBuilder, String field, List<String> values) {
         if (values != null) {
             for (String str : values) {
                 boolQueryBuilder.should(QueryBuilders.wildcardQuery(field + KEYWORD, str));
             }
-            numberOfShouldFields++;
+            return 1;
         }
+        return 0;
     }
 
     public List<FieldSortBuilder> globalSearchSort(GlobalSearchRequestPayload request) {

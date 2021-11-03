@@ -119,8 +119,14 @@ class GlobalSearchQueryBuilderTest {
                 () -> assertTermsQuery(output, GlobalSearchFields.CASE_TYPE, CASE_TYPE_TERMS),
                 () -> assertTermsQuery(output, GlobalSearchFields.STATE, STATE_TERMS),
                 () -> assertTermsQuery(output, CaseDataPaths.REGION, REGION_TERMS),
-                () -> assertTermsQuery(output, CaseDataPaths.BASE_LOCATION, BASE_LOCATION_TERMS)
+                () -> assertTermsQuery(output, CaseDataPaths.BASE_LOCATION, BASE_LOCATION_TERMS),
+                () -> assertWildcardQuery(output, CaseDataPaths.OTHER_REFERENCE_VALUE + ".keyword",
+                    OTHER_REFERENCE_TERMS),
+                () -> assertWildcardQuery(output, GlobalSearchFields.REFERENCE + ".keyword", REFERENCE_TERMS)
             );
+
+            BoolQueryBuilder boolQueryBuilder = (BoolQueryBuilder) output;
+            assertEquals(2, Integer.valueOf(boolQueryBuilder.minimumShouldMatch()));
 
         }
 
@@ -330,6 +336,14 @@ class GlobalSearchQueryBuilderTest {
             assertTrue(actualTerms.containsAll(expectedTermsLowerCase));
         }
 
+        private void assertWildcardQuery(QueryBuilder output, String fieldName, List<String> expectedValues) {
+            List<WildcardQueryBuilder> wildcardQueryBuilderList = getWildcardQueryBuilder(output, fieldName);
+            assertNotNull(wildcardQueryBuilderList);
+            List<String> actualValues = getValuesFromWildcardQueryBuilder(wildcardQueryBuilderList);
+            assertEquals(expectedValues.size(), actualValues.size());
+            assertEquals(expectedValues, actualValues);
+        }
+
         private void assertPartyQuery(Party expectedParty, NestedQueryBuilder actualPartyQuery) {
             assertNotNull(actualPartyQuery);
 
@@ -480,8 +494,32 @@ class GlobalSearchQueryBuilderTest {
             return null;
         }
 
+        private List<WildcardQueryBuilder> getWildcardQueryBuilder(QueryBuilder queryBuilder, String fieldName) {
+            BoolQueryBuilder boolQueryBuilder = toBoolQueryBuilder(queryBuilder);
+            List<WildcardQueryBuilder> queries = new ArrayList<>();
+
+            for (var mustQuery : boolQueryBuilder.should()) {
+                if (mustQuery instanceof WildcardQueryBuilder) {
+                    WildcardQueryBuilder wildcardQueryBuilder = (WildcardQueryBuilder)mustQuery;
+
+                    if (fieldName.equalsIgnoreCase(wildcardQueryBuilder.fieldName())) {
+                        queries.add(wildcardQueryBuilder);
+                    }
+                }
+            }
+            return queries;
+        }
+
         private List<String> getValuesFromTermsQueryBuilder(TermsQueryBuilder termsQueryBuilder) {
             return termsQueryBuilder.values().stream().map(Object::toString).collect(Collectors.toList());
+        }
+
+        private List<String> getValuesFromWildcardQueryBuilder(List<WildcardQueryBuilder> wildcardQueryBuilderList) {
+            List<String> wildcardValues = new ArrayList<>();
+            for (WildcardQueryBuilder wildcardQueryBuilder : wildcardQueryBuilderList) {
+                wildcardValues.add(wildcardQueryBuilder.value());
+            }
+            return wildcardValues;
         }
     }
 
