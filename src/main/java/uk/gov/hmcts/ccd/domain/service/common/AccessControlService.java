@@ -11,6 +11,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
@@ -42,6 +45,9 @@ import static uk.gov.hmcts.ccd.domain.model.common.DisplayContextParameterCollec
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
 public interface AccessControlService {
+
+    Logger LOG = LoggerFactory.getLogger(AccessControlService.class);
+
     Predicate<AccessControlList> CAN_CREATE = AccessControlList::isCreate;
     Predicate<AccessControlList> CAN_UPDATE = AccessControlList::isUpdate;
     Predicate<AccessControlList> CAN_READ = AccessControlList::isRead;
@@ -200,7 +206,17 @@ public interface AccessControlService {
         if (caseField.isCollectionFieldType() && jsonNode.isArray()) {
             jsonNode.forEach(jsonNode1 -> ((ObjectNode) jsonNode1.get(VALUE)).remove(childField.getId()));
         } else {
-            ((ObjectNode) jsonNode).remove(childField.getId());
+            // We are getting class com.fasterxml.jackson.databind.node.MissingNode cannot be cast to class
+            // com.fasterxml.jackson.databind.node.ObjectNode exception when childField.getId() is null, so this
+            // is added to check if the value exists.
+            if (jsonNode instanceof ObjectNode) {
+                ((ObjectNode) jsonNode).remove(childField.getId());
+            } else {
+                LOG.debug("Logging below details as we are getting com.fasterxml.jackson.databind.node.MissingNode "
+                    + " cannot be cast to class com.fasterxml.jackson.databind.node.ObjectNode");
+                LOG.info("Can not find field with caseFieldId={}, accessControlList={}",
+                    caseField.getId(), caseField.getAccessControlLists());
+            }
         }
     }
 
