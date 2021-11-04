@@ -9,7 +9,7 @@
 
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaCitizen3"
+      "_extends_": "BeftaCitizen2"
     }
   },
 
