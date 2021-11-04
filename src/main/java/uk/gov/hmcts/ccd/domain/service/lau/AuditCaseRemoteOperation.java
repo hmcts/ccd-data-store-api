@@ -73,27 +73,7 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
                 String requestBody = objectMapper
                     .writeValueAsString(capr);
 
-                HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(lauCaseAuditUrl))
-                    .header("Content-Type", "application/json")
-                    .header("ServiceAuthorization", securityUtils.getServiceAuthorization())
-                    .POST(java.net.http.HttpRequest.BodyPublishers.ofString(requestBody))
-                    .build();
-
-                logCorrelationId(entry.getRequestId(), activity,
-                    entry.getJurisdiction(), entry.getIdamId());
-
-                CompletableFuture<HttpResponse<String>> responseFuture =
-                    httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-
-                responseFuture.whenComplete((response, error) -> {
-                    if (response != null) {
-                        logAuditResponse(entry.getRequestId(), activity, response.statusCode(), request.uri());
-                    }
-                    if (error != null) {
-                        log.error("Error occurred while processing response for remote log and audit request. ", error);
-                    }
-                });
+                postAsyncAuditRequestAndHandleResponse(entry, activity, requestBody, lauCaseAuditUrl);
 
             } else {
                 log.warn("The operational type " + entry.getOperationType()
@@ -120,26 +100,7 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
                 String requestBody = objectMapper
                     .writeValueAsString(cspr);
 
-                HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(lauCaseAuditUrl))
-                    .header("Content-Type", "application/json")
-                    .header("ServiceAuthorization", securityUtils.getServiceAuthorization())
-                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                    .build();
-
-                logCorrelationId(entry.getRequestId(), activity, entry.getJurisdiction(), entry.getIdamId());
-
-                CompletableFuture<HttpResponse<String>> responseFuture =
-                    httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-
-                responseFuture.whenComplete((response, error) -> {
-                    if (response != null) {
-                        logAuditResponse(entry.getRequestId(), activity, response.statusCode(), request.uri());
-                    }
-                    if (error != null) {
-                        log.error("Error occurred while processing response for remote log and audit request. ", error);
-                    }
-                });
+                postAsyncAuditRequestAndHandleResponse(entry, activity, requestBody, lauCaseAuditUrl);
 
             } else {
                 log.warn("The operational type " + entry.getOperationType()
@@ -149,6 +110,29 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
         } catch (Exception excep) {
             log.error("Error occurred while generating remote log and audit search request.", excep);
         }
+    }
+
+    private void postAsyncAuditRequestAndHandleResponse(AuditEntry entry, String activity, String body, String url) {
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .header("Content-Type", "application/json")
+            .header("ServiceAuthorization", securityUtils.getServiceAuthorization())
+            .POST(HttpRequest.BodyPublishers.ofString(body))
+            .build();
+
+        logCorrelationId(entry.getRequestId(), activity, entry.getJurisdiction(), entry.getIdamId());
+
+        CompletableFuture<HttpResponse<String>> responseFuture =
+            httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+
+        responseFuture.whenComplete((response, error) -> {
+            if (response != null) {
+                logAuditResponse(entry.getRequestId(), activity, response.statusCode(), request.uri());
+            }
+            if (error != null) {
+                log.error("Error occurred while processing response for remote log and audit request. ", error);
+            }
+        });
     }
 
     private ActionLog createActionLogFromAuditEntry(AuditEntry entry, ZonedDateTime zonedDateTime) {
