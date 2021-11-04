@@ -88,10 +88,10 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
 
                 responseFuture.whenComplete((response, error) -> {
                     if (response != null) {
-                        logAuditResponse(activity, response.statusCode(), request.uri());
+                        logAuditResponse(entry.getRequestId(), activity, response.statusCode(), request.uri());
                     }
                     if (error != null) {
-                        log.error("LAU Action Error: ", error);
+                        log.error("Error occurred while processing response for remote log and audit request. ", error);
                     }
                 });
 
@@ -101,7 +101,7 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
             }
 
         } catch (Exception excep) {
-            log.error("Error occurred while generating remote log and audit action request.", excep);
+            log.error("Error occurred while generating remote log and audit action request. ", excep);
         }
 
     }
@@ -134,10 +134,10 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
 
                 responseFuture.whenComplete((response, error) -> {
                     if (response != null) {
-                        logAuditResponse(activity, response.statusCode(), request.uri());
+                        logAuditResponse(entry.getRequestId(), activity, response.statusCode(), request.uri());
                     }
                     if (error != null) {
-                        log.error("LAU Action Error: ", error);
+                        log.error("Error occurred while processing response for remote log and audit request. ", error);
                     }
                 });
 
@@ -178,9 +178,10 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
             idamId);
     }
 
-    private void logAuditResponse(String activity, int httpStatus, URI uri) {
-        log.info("LAU Response:REMOTE_LOG_AND_AUDIT_CASE_{},httpStatus:{},url:{}",
+    private void logAuditResponse(String requestId, String activity, int httpStatus, URI uri) {
+        log.info("LAU Response:REMOTE_LOG_AND_AUDIT_CASE_{},Request-ID:{},httpStatus:{},url:{}",
             activity,
+            requestId,
             httpStatus,
             uri.toString());
     }
