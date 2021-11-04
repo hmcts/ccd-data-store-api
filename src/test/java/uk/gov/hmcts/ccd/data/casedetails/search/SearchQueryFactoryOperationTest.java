@@ -13,14 +13,12 @@ import uk.gov.hmcts.ccd.data.casedetails.search.builder.AccessControlGrantTypeQu
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
-import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -43,9 +41,6 @@ class SearchQueryFactoryOperationTest {
 
     @Mock
     private AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
-
-    @Mock
-    private RoleAssignmentService roleAssignmentService;
 
     @Mock
     private EntityManager entityManager;
@@ -72,7 +67,6 @@ class SearchQueryFactoryOperationTest {
             userAuthorisation,
             sortOrderQueryBuilder,
             authorisedCaseDefinitionDataService,
-            roleAssignmentService,
             caseDefinitionRepository,
             accessControlGrantTypeQueryBuilder,
             caseDataAccessControl);
@@ -131,7 +125,6 @@ class SearchQueryFactoryOperationTest {
 
         verify(sortOrderQueryBuilder).buildSortOrderClause(metadata);
         verify(userAuthorisation).getUserId();
-        verify(roleAssignmentService, times(0)).getCaseReferencesForAGivenUser(anyString());
         verify(entityManager).createNativeQuery(anyString(), any(Class.class));
     }
 }

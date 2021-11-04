@@ -2,13 +2,11 @@ package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 import static uk.gov.hmcts.ccd.data.casedetails.search.builder.GrantTypeQueryBuilder.AND_NOT;
 import static uk.gov.hmcts.ccd.data.casedetails.search.builder.GrantTypeQueryBuilder.EMPTY;
@@ -42,23 +40,22 @@ public class AccessControlGrantTypeQueryBuilder {
 
     public String createQuery(List<RoleAssignment> roleAssignments,
                               Map<String, Object> params,
-                              List<CaseStateDefinition> caseStates,
-                              Set<AccessProfile> accessProfiles) {
+                              CaseTypeDefinition caseTypeDefinition) {
         String basicQuery = basicGrantTypeQueryBuilder
-            .createQuery(roleAssignments, params, caseStates, accessProfiles);
+            .createQuery(roleAssignments, params, caseTypeDefinition);
 
         String specificQuery = specificGrantTypeQueryBuilder
-            .createQuery(roleAssignments, params, caseStates, accessProfiles);
+            .createQuery(roleAssignments, params, caseTypeDefinition);
 
         String standardQuery = standardGrantTypeQueryBuilder
-            .createQuery(roleAssignments, params, caseStates, accessProfiles);
+            .createQuery(roleAssignments, params, caseTypeDefinition);
 
         String challengedQuery = challengedGrantTypeQueryBuilder
-            .createQuery(roleAssignments, params, caseStates, accessProfiles);
+            .createQuery(roleAssignments, params, caseTypeDefinition);
 
         String orgQuery = mergeQuery(standardQuery, challengedQuery, OR);
         String excludedQuery = excludedGrantTypeQueryBuilder
-            .createQuery(roleAssignments, params, caseStates, accessProfiles);
+            .createQuery(roleAssignments, params, caseTypeDefinition);
 
         String nonOrgQuery = mergeQuery(basicQuery, specificQuery, OR);
 

@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.data.casedetails.search;
 import com.google.common.collect.Maps;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -17,11 +16,9 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.data.casedetails.search.builder.AccessControlGrantTypeQueryBuilder;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
-import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
@@ -47,7 +44,6 @@ public class SearchQueryFactoryOperation {
     private final UserAuthorisation userAuthorisation;
     private final SortOrderQueryBuilder sortOrderQueryBuilder;
     private final AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
-    private final RoleAssignmentService roleAssignmentService;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final AccessControlGrantTypeQueryBuilder accessControlGrantTypeQueryBuilder;
     private final CaseDataAccessControl caseDataAccessControl;
@@ -58,7 +54,6 @@ public class SearchQueryFactoryOperation {
                                        UserAuthorisation userAuthorisation,
                                        SortOrderQueryBuilder sortOrderQueryBuilder,
                                        AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService,
-                                       RoleAssignmentService roleAssignmentService,
                                        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                        CaseDefinitionRepository caseDefinitionRepository,
                                        AccessControlGrantTypeQueryBuilder accessControlGrantTypeQueryBuilder,
@@ -69,7 +64,6 @@ public class SearchQueryFactoryOperation {
         this.userAuthorisation = userAuthorisation;
         this.sortOrderQueryBuilder = sortOrderQueryBuilder;
         this.authorisedCaseDefinitionDataService = authorisedCaseDefinitionDataService;
-        this.roleAssignmentService = roleAssignmentService;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlGrantTypeQueryBuilder = accessControlGrantTypeQueryBuilder;
         this.caseDataAccessControl = caseDataAccessControl;
@@ -107,13 +101,7 @@ public class SearchQueryFactoryOperation {
             CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(metadata.getCaseTypeId());
             List<RoleAssignment> roleAssignments = caseDataAccessControl.generateRoleAssignments(caseTypeDefinition);
 
-
-            Set<AccessProfile> accessProfiles = caseDataAccessControl
-                .filteredAccessProfiles(roleAssignments, caseTypeDefinition, false);
-
-            return accessControlGrantTypeQueryBuilder.createQuery(roleAssignments,
-                params,
-                caseTypeDefinition.getStates(), accessProfiles);
+            return accessControlGrantTypeQueryBuilder.createQuery(roleAssignments, params, caseTypeDefinition);
 
         } else if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             params.put("user_id", userAuthorisation.getUserId());
