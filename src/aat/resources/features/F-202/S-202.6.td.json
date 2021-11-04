@@ -23,6 +23,7 @@
       "ctid": "CT2,CT7"
     },
     "body": {
+      "_source": ["alias.F1","alias.F2","alias.F3","alias.F4"],
       "query": {
         "match": {
           "data.F3.keyword": "c${[scenarioContext][customValues][UniqueString]}"
@@ -34,9 +35,34 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body" : {
-      "total" : 0,
-      "cases" : [ ],
-      "case_types_results" : [ ]
+      "total" : 3,
+      "cases" : [
+        {
+          "__ordering__": "unordered",
+          "__elementId__": "id"
+        },
+        {
+        "_extends_" : "J1-CT2-01_result"
+        },
+        {
+          "_extends_" : "J1-CT2-02_result",
+          "case_data" : {
+            "F2" : "b${[scenarioContext][customValues][UniqueString]}"
+          }
+        },
+        {
+          "_extends_" : "J1-CT7-01_result"
+        }],
+      "case_types_results" : [
+        {
+          "total" : 2,
+          "case_type_id" : "CT2"
+        },
+        {
+          "total" : 1,
+          "case_type_id" : "CT7"
+        }
+      ]
       }
     }
 

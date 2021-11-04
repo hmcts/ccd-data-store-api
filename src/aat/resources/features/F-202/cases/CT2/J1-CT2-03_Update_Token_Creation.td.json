@@ -7,6 +7,32 @@
       "cid": "${[scenarioContext][parentContext][childContexts][J1-CT2-03][testData][actualResponse][body][id]}",
       "etid": "Issue"
     }
-  }
+  },
 
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers" : {
+      "Content-Type": "application/vnd.uk.gov.hmcts.ccd-data-store-api.start-case-trigger.v2+json;charset=UTF-8"
+    },
+    "body" : {
+      "token" : "[[ANYTHING_PRESENT]]",
+      "_links" : {
+        "self" : {
+          "href" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "case_details" : {
+        "case_data" : {
+          "F4" : "d${[scenarioContext][customValues][UniqueString]}"
+        },
+        "data_classification" : {
+          "F4" : "RESTRICTED"
+        },
+        "security_classifications" : {
+          "F4" : "RESTRICTED"
+
+        }
+      }
+    }
+  }
 }

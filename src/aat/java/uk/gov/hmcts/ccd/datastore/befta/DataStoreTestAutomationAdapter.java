@@ -51,11 +51,11 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
             .orElse("error cant find tag");
     }
 
-//    @Override
-//    protected BeftaTestDataLoader buildTestDataLoader() {
-//        return new DataLoaderToDefinitionStore(this,
-//            DataLoaderToDefinitionStore.VALID_CCD_TEST_DEFINITIONS_PATH);
-//    }
+    @Override
+    protected BeftaTestDataLoader buildTestDataLoader() {
+        return new DataLoaderToDefinitionStore(this,
+            DataLoaderToDefinitionStore.VALID_CCD_TEST_DEFINITIONS_PATH);
+    }
 
     @Override
     public Object calculateCustomValue(BackEndFunctionalTestScenarioContext scenarioContext, Object key) {
@@ -63,8 +63,9 @@ public class DataStoreTestAutomationAdapter extends DefaultTestAutomationAdapter
         if (key.toString().startsWith("caseIdAsIntegerFrom")) {
             String childContext = key.toString().replace("caseIdAsIntegerFrom_","");
             try {
-                return (long) ReflectionUtils.deepGetFieldInObject(scenarioContext,"childContexts." + childContext
-                                                                  + ".testData.actualResponse.body.id");
+                String s = (String) ReflectionUtils.deepGetFieldInObject(scenarioContext,"childContexts." + childContext
+                    + ".testData.actualResponse.body.id");
+                return Long.valueOf(s).longValue();
             } catch (Exception e) {
                 throw new FunctionalTestException("Problem getting case id as long", e);
             }

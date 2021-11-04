@@ -3,5 +3,6 @@
 
   "F1" : "a${[scenarioContext][customValues][UniqueString]}",
   "F2" : "b${[scenarioContext][customValues][UniqueString]}",
-  "F3" : "c${[scenarioContext][customValues][UniqueString]}"
+  "F3" : "c${[scenarioContext][customValues][UniqueString]}",
+  "F4" : "d${[scenarioContext][customValues][UniqueString]}"
 }

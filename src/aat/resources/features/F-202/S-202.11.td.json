@@ -32,9 +32,61 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body" : {
-      "total" : 0,
-      "cases" : [ ],
-      "case_types_results" : [ ]
+      "total" : 6,
+      "cases" : [{
+        "_extends_" : "J1-CT2-01_result",
+        "case_data" : {
+          "F1" : "a${[scenarioContext][customValues][UniqueString]}",
+          "F2" : "b${[scenarioContext][customValues][UniqueString]}",
+          "F4" : "d${[scenarioContext][customValues][UniqueString]}"
+        }
+      },
+        {
+          "_extends_" : "J1-CT2-02_result",
+          "case_data" : {
+            "F1" : "a${[scenarioContext][customValues][UniqueString]}",
+            "F2" : "b${[scenarioContext][customValues][UniqueString]}",
+            "F4" : "d${[scenarioContext][customValues][UniqueString]}"
+          }
+        },
+        {
+          "_extends_" : "J1-CT2-03_result",
+          "case_data" : {
+            "F1" : "a${[scenarioContext][customValues][UniqueString]}",
+            "F2" : "b${[scenarioContext][customValues][UniqueString]}",
+            "F4" : "d${[scenarioContext][customValues][UniqueString]}"
+          }
+        },
+        {
+          "_extends_" : "J1-CT2-04_result",
+          "case_data" : {
+            "F1" : "a${[scenarioContext][customValues][UniqueString]}",
+            "F2" : "b${[scenarioContext][customValues][UniqueString]}",
+            "F4" : "d${[scenarioContext][customValues][UniqueString]}"
+          }
+        },
+        {
+          "_extends_" : "J1-CT2-05_result",
+          "case_data" : {
+            "F1" : "a${[scenarioContext][customValues][UniqueString]}",
+            "F2" : "b${[scenarioContext][customValues][UniqueString]}",
+            "F4" : "d${[scenarioContext][customValues][UniqueString]}"
+          }
+        },
+        {
+          "_extends_" : "J1-CT2-06_result",
+          "case_data" : {
+            "F1" : "a${[scenarioContext][customValues][UniqueString]}",
+            "F2" : "b${[scenarioContext][customValues][UniqueString]}",
+            "F4" : "d${[scenarioContext][customValues][UniqueString]}"
+          }
+        } ],
+      "case_types_results" : [
+        {
+          "total" : 6,
+          "case_type_id" : "CT2"
+        }
+      ]
       }
     }
 

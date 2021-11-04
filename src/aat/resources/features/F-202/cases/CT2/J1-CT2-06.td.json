@@ -16,9 +16,8 @@
     },
     "body" : {
       "data": {
-        "F1": "a${[scenarioContext][customValues][UniqueString]}",
-        "F2": "b${[scenarioContext][customValues][UniqueString]}",
-        "F3": "c${[scenarioContext][customValues][UniqueString]}",
+        "_extends_" : "F-202_Case_Data_Base",
+
         "caseManagementLocation": {
           "region": null,
           "baseLocation": "Newcastle"
@@ -52,9 +51,8 @@
       "state" : "Unissued1",
       "security_classification" : "PUBLIC",
       "data" : {
-        "F1" : "a${[scenarioContext][customValues][UniqueString]}",
-        "F2" : "b${[scenarioContext][customValues][UniqueString]}",
-        "F3" : "c${[scenarioContext][customValues][UniqueString]}",
+        "_extends_" : "F-202_Case_Data_Base",
+
         "caseManagementLocation": {
           "region": null,
           "baseLocation": "Newcastle"
@@ -71,7 +69,8 @@
         },
         "F1" : "RESTRICTED",
         "F2" : "PRIVATE",
-        "F3" : "PUBLIC"
+        "F3" : "PUBLIC",
+        "F4" : "RESTRICTED"
       },
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,

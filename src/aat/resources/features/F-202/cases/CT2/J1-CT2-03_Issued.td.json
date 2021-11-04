@@ -15,14 +15,31 @@
     },
     "body": {
       "data": {
-        "F1": "a${[scenarioContext][customValues][UniqueString]}",
-        "F2": "b${[scenarioContext][customValues][UniqueString]}",
-        "F3": "c${[scenarioContext][customValues][UniqueString]}"
+        "_extends_" : "F-202_Case_Data_Base"
+
       },
       "event": {
         "id": "Issue"
       },
       "event_token": "${[scenarioContext][parentContext][childContexts][J1-CT2-03_Update_Token_Creation][testData][actualResponse][body][token]}"
     }
+  },
+
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body":{
+      "data" : {
+        "_extends_" : "F-202_Case_Data_Base"
+
+      },
+      "data_classification" : {
+        "F1" : "RESTRICTED",
+        "F2" : "PRIVATE",
+        "F3" : "PUBLIC",
+        "F4" : "RESTRICTED"
+      }
+    }
   }
+
 }

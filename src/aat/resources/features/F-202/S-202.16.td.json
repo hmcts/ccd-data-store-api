@@ -21,20 +21,13 @@
       "ctid": "CT2,CT1"
     },
     "body": {
+      "_source": ["alias.F1","alias.F2","alias.F3","alias.F4"],
       "query": {
         "match_all": {
         }
       }
     }
-  },
+  }
 
-  "expectedResponse": {
-    "_extends_": "Common_200_Response",
-    "body" : {
-      "total" : 0,
-      "cases" : [ ],
-      "case_types_results" : [ ]
-      }
-    }
 
 }

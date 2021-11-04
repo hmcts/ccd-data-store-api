@@ -35,7 +35,7 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body" : {
-      "total" : "todo",
+      "total" : "1",
       "cases" : [ ],
       "case_types_results" : [ ]
       }

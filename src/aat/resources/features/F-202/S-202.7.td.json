@@ -35,9 +35,16 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body" : {
-      "total" : 0,
-      "cases" : [ ],
-      "case_types_results" : [ ]
+      "total" : 1,
+      "cases" : [
+        {"_extends_" : "J1-CT2-03_result"}
+      ],
+      "case_types_results" : [
+        {
+          "total" : 1,
+          "case_type_id" : "CT2"
+        }
+      ]
       }
     }
 

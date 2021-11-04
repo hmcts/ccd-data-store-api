@@ -1,7 +1,7 @@
 {
   "roleRequest" : {
     "assignerId" : "[[$ROLE_ASSIGNMENT_SUPER_USER]]",
-    "process" : "ccd-fta-data-setup",
+    "process" : "ccd-fta-data-setup2",
     "reference" : "[[$ROLE_ASSIGNMENT_SUPER_USER]]",
     "replaceExisting" : true
   },
@@ -48,22 +48,7 @@
       "beginTime" : "2021-01-01T00:00:00Z",
       "attributes" : {
         "jurisdiction" : "J1",
-        "caseType" : "CT2"
-      }
-    },
-    {
-      "actorId" : "[[$ROLE_ASSIGNMENT_SUPER_USER]]",
-      "actorIdType" : "IDAM",
-      "roleType" : "ORGANISATION",
-      "roleName" : "Solicitor",
-      "roleCategory" : "PROFESSIONAL",
-      "classification" : "RESTRICTED",
-      "grantType" : "STANDARD",
-      "readOnly" : false,
-      "beginTime" : "2021-01-01T00:00:00Z",
-      "attributes" : {
-        "jurisdiction" : "J1",
-        "caseType" : "CT6"
+        "caseType" : "CT27"
       }
     },
     {
@@ -72,42 +57,12 @@
       "roleType" : "ORGANISATION",
       "roleName" : "Staff",
       "roleCategory" : "PROFESSIONAL",
-      "classification" : "RESTRICTED",
-      "grantType" : "STANDARD",
-      "readOnly" : false,
-      "beginTime" : "2021-01-01T00:00:00Z",
-      "attributes" : {"jurisdiction" : "J1",
-        "caseType" : "CT6"
-      }
-    },
-    {
-      "actorId" : "[[$ROLE_ASSIGNMENT_SUPER_USER]]",
-      "actorIdType" : "IDAM",
-      "roleType" : "ORGANISATION",
-      "roleName" : "Solicitor",
-      "roleCategory" : "PROFESSIONAL",
-      "classification" : "RESTRICTED",
+      "classification" : "PRIVATE",
       "grantType" : "STANDARD",
       "readOnly" : false,
       "beginTime" : "2021-01-01T00:00:00Z",
       "attributes" : {
-        "jurisdiction" : "J1",
-        "caseType" : "CT7"
-      }
-    },
-
-    {
-      "actorId" : "[[$ROLE_ASSIGNMENT_SUPER_USER]]",
-      "actorIdType" : "IDAM",
-      "roleType" : "ORGANISATION",
-      "roleName" : "caseworker-J1-solicitor",
-      "roleCategory" : "PROFESSIONAL",
-      "classification" : "RESTRICTED",
-      "grantType" : "STANDARD",
-      "readOnly" : false,
-      "beginTime" : "2021-01-01T00:00:00Z",
-      "attributes" : {"jurisdiction" : "J1",
-        "caseType" : "CT7"
+        "jurisdiction" : "J1"
       }
     },
     {
@@ -116,7 +71,7 @@
       "roleType" : "ORGANISATION",
       "roleName" : "Staff",
       "roleCategory" : "PROFESSIONAL",
-      "classification" : "RESTRICTED",
+      "classification" : "PUBLIC",
       "grantType" : "STANDARD",
       "readOnly" : false,
       "beginTime" : "2021-01-01T00:00:00Z",

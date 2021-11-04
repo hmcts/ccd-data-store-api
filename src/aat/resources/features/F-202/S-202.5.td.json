@@ -35,9 +35,27 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body" : {
-      "total" : 0,
-      "cases" : [ ],
-      "case_types_results" : [ ]
+      "total" : 2,
+      "cases" : [
+        {
+          "__ordering__": "unordered",
+          "__elementId__": "id"
+
+        },
+        {
+        "_extends_" : "J1-CT2-01_result"
+        },
+        {
+          "_extends_" : "J1-CT2-02_result",
+          "case_data" : {
+            "F2" : "b${[scenarioContext][customValues][UniqueString]}"
+          }
+        }
+      ],
+      "case_types_results" : [ {
+        "total" : 2,
+        "case_type_id" : "CT2"
+      } ]
       }
     }
 

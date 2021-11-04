@@ -26,6 +26,7 @@
       "experimental": true
     },
     "body": {
+      "_source": ["alias.F1","alias.F2","alias.F3","alias.F4"],
       "query": {
         "match": {
           "match_all": {
