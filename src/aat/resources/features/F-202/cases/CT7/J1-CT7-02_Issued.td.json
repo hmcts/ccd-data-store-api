@@ -15,8 +15,9 @@
     },
     "body": {
       "data": {
-        "_extends_" : "F-202_Case_Data_Base"
-
+        "F1": "a${[scenarioContext][customValues][UniqueString]}",
+        "F2": "b${[scenarioContext][customValues][UniqueString]}",
+        "F3": "c${[scenarioContext][customValues][UniqueString]}"
       },
       "event": {
         "id": "Issue"
