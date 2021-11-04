@@ -75,6 +75,8 @@
 		This could lead to an authenticated user gaining access to information that they are unauthorized to view
 		</notes>
 		<cve>CVE-2021-22147</cve>
+		<cve>CVE-2021-22096</cve>
+		<cve>CVE-2021-42340</cve>
 	</suppress>
 
 </suppressions>
