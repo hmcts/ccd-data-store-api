@@ -21,7 +21,7 @@ public class RoleNameMatcher implements RoleAttributeMatcher {
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseTypeDefinition caseTypeDefinition) {
         String roleName = roleAssignment.getRoleName();
         List<RoleToAccessProfileDefinition> roleToAccessProfiles = caseTypeDefinition.getRoleToAccessProfiles();
-        boolean matchedRoleName = roleToAccessProfiles
+        boolean matchedRoleName = roleToAccessProfiles == null || roleToAccessProfiles.isEmpty() || roleToAccessProfiles
             .stream()
             .filter(e -> e.getRoleName() != null)
             .map(RoleToAccessProfileDefinition::getRoleName)

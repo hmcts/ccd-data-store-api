@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.EXCLUDED;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.SPECIFIC;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.STANDARD;
 import static uk.gov.hmcts.ccd.domain.service.AccessControl.IDAM_PREFIX;
@@ -45,7 +46,7 @@ public class PseudoRoleAssignmentsGenerator {
         List<RoleAssignment> pseudoRoleAssignments = new ArrayList<>();
 
         if (!isCreationProfile && caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()) {
-            if (atLeastOneCaseRoleExists(filteredRoleAssignments)) {
+            if (atLeastOneNonExcludedCaseRoleExists(filteredRoleAssignments)) {
                 pseudoRoleAssignments.addAll(createPseudoRoleAssignmentsForGrantedOnlyAccess(idamUserRoles));
             }
         } else {
@@ -83,9 +84,10 @@ public class PseudoRoleAssignmentsGenerator {
             .collect(Collectors.toList());
     }
 
-    public boolean atLeastOneCaseRoleExists(List<RoleAssignment> roleAssignments) {
+    private boolean atLeastOneNonExcludedCaseRoleExists(List<RoleAssignment> roleAssignments) {
         return roleAssignments
             .stream()
+            .filter(roleAssignment -> !roleAssignment.isGrantType(EXCLUDED))
             .anyMatch(RoleAssignment::isCaseRoleAssignment);
     }
 }
