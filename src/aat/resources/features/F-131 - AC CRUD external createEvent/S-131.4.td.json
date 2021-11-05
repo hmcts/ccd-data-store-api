@@ -1,0 +1,63 @@
+{
+  "_guid_" : "S-131.4",
+  "_extends_" : "F-131_Test_Data_Base",
+
+  "specs" : [
+    "with no R access for a field being created",
+    "attempts to create an event for the previously created case",
+    "does not display the newly created text field"
+  ],
+
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][F-131_CreateCase][testData][actualResponse][body][id]}"
+    },
+
+    "body": {
+      "data": {
+        "TextField2" : "value2"
+      },
+      "event": {
+        "id" : "event3"
+      },
+      "event_token": "${[scenarioContext][childContexts][S-131.4_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_" : "Common_201_Response",
+    "headers": {
+      "Connection" : "keep-alive",
+      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.create-case.v2+json;charset=UTF-8",
+      "Keep-Alive" : "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding" : "chunked"
+    },
+    "body" : {
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "id" : "[[ANYTHING_PRESENT]]",
+      "jurisdiction" : "BEFTA_MASTER",
+      "case_type" : "FT_CRUD",
+      "created_on" : "[[ANYTHING_PRESENT]]",
+      "last_modified_on" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on" : "[[ANYTHING_PRESENT]]",
+      "state" : "CaseCreated",
+      "security_classification" : "PUBLIC",
+      "data": {
+        "TextField": "[[ANYTHING_PRESENT]]"},
+      "data_classification": {
+        "TextField": "[[ANYTHING_PRESENT]]"},
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
+
+    }
+  }
+
+}

@@ -8,6 +8,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
 
@@ -46,6 +47,9 @@ public class ApplicationParams {
 
     @Value("${ccd.case-definition.host}")
     private String caseDefinitionHost;
+
+    @Value("${role.assignment.api.host}")
+    private String roleAssignmentServiceHost;
 
     @Value("${ccd.draft.host}")
     private String draftHost;
@@ -134,6 +138,12 @@ public class ApplicationParams {
     @Value("${search.elastic.nodes.discovery.filter}")
     private String elasticsearchNodeDiscoveryFilter;
 
+    @Value("${search.global.index.name}")
+    private String globalSearchIndexName;
+
+    @Value("${search.global.index.type}")
+    private String globalSearchIndexType;
+
     @Value("#{'${audit.log.ignore.statues}'.split(',')}")
     private List<Integer> auditLogIgnoreStatuses;
 
@@ -146,14 +156,38 @@ public class ApplicationParams {
     @Value("${ccd.access-control.caseworker.role.regex}")
     private String ccdAccessControlCaseworkerRoleRegex;
 
+    @Value("${enable-attribute-based-access-control}")
+    private boolean enableAttributeBasedAccessControl;
+
+    @Value("${enable-pseudo-role-assignments-generation}")
+    private boolean enablePseudoRoleAssignmentsGeneration;
+
+    @Value("${enable-pseudo-access-profiles-generation}")
+    private boolean enablePseudoAccessProfilesGeneration;
+
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
+
+    @Value("${document.hash.check.enabled}")
+    private boolean enableDocumentHashCheck;
+
+    @Value("${ccd.case-document-am-api.attachDocumentEnabled:true}")
+    private boolean attachDocumentEnabled;
 
     @Value("${idam.data-store.system-user.username}")
     private String dataStoreSystemUserId;
 
     @Value("${idam.data-store.system-user.password}")
     private String dataStoreSystemUserPassword;
+
+    @Value("#{'${case.data.issue.logging.jurisdictions}'.split(',')}")
+    private List<String> caseDataIssueLoggingJurisdictions;
+
+    @Value("${reference.data.api.url}")
+    private String referenceDataApiUrl;
+
+    @Value("${reference.data.cache.ttl.in.days}")
+    private String referenceDataCacheTtlInDays;
 
     public static String encode(final String stringToEncode) {
         try {
@@ -192,7 +226,7 @@ public class ApplicationParams {
     }
 
     public String draftURL(String draftId) {
-        return draftHost + "/drafts/" + draftId;
+        return draftHost + "/drafts/" + encode(draftId);
     }
 
     public String getDraftEncryptionKey() {
@@ -265,8 +299,31 @@ public class ApplicationParams {
         return caseDefinitionHost + "/api/data/caseworkers/uid/jurisdictions/jid/case-types";
     }
 
+    public String accessProfileRolesURL(String caseTypeId) {
+        return String.format(
+            "%s/api/data/caseworkers/uid/jurisdictions/jid/case-types/%s/access/profile/roles", caseDefinitionHost,
+            encode(caseTypeId)
+        );
+    }
+
+    public String roleAssignmentBaseURL() {
+        return roleAssignmentServiceHost + "/am/role-assignments";
+    }
+
+    public String amDeleteByQueryRoleAssignmentsURL() {
+        return roleAssignmentBaseURL() + "/query/delete";
+    }
+
+    public String amGetRoleAssignmentsURL() {
+        return roleAssignmentBaseURL() + "/actors/{uid}";
+    }
+
+    public String amQueryRoleAssignmentsURL() {
+        return roleAssignmentBaseURL() + "/query";
+    }
+
     public String userDefaultSettingsURL() {
-        return userProfileHost + "/user-profile/users?uid={uid}";
+        return userProfileHost + "/user-profile/users";
     }
 
     public String getTokenSecret() {
@@ -357,6 +414,14 @@ public class ApplicationParams {
         return elasticsearchNodeDiscoveryFilter;
     }
 
+    public String getGlobalSearchIndexName() {
+        return globalSearchIndexName;
+    }
+
+    public String getGlobalSearchIndexType() {
+        return globalSearchIndexType;
+    }
+
     public List<String> getWriteToCCDCaseTypesOnly() {
         return writeToCCDCaseTypesOnly;
     }
@@ -401,6 +466,18 @@ public class ApplicationParams {
         return ccdAccessControlCaseworkerRoleRegex;
     }
 
+    public boolean getEnableAttributeBasedAccessControl() {
+        return enableAttributeBasedAccessControl;
+    }
+
+    public boolean getEnablePseudoRoleAssignmentsGeneration() {
+        return enablePseudoRoleAssignmentsGeneration;
+    }
+
+    public boolean getEnablePseudoAccessProfilesGeneration() {
+        return enablePseudoAccessProfilesGeneration;
+    }
+
     public List<String> getCcdAccessControlCitizenRoles() {
         return ccdAccessControlCitizenRoles;
     }
@@ -411,6 +488,14 @@ public class ApplicationParams {
 
     public Integer getCasesIndexNameCaseTypeIdGroupPosition() {
         return casesIndexNameCaseTypeIdGroupPosition;
+    }
+
+    public boolean isDocumentHashCheckingEnabled() {
+        return enableDocumentHashCheck;
+    }
+
+    public boolean isAttachDocumentEnabled() {
+        return attachDocumentEnabled;
     }
 
     public String getDataStoreSystemUserId() {
@@ -428,4 +513,17 @@ public class ApplicationParams {
     public void setDataStoreSystemUserPassword(String dataStoreSystemUserPassword) {
         this.dataStoreSystemUserPassword = dataStoreSystemUserPassword;
     }
+
+    public List<String> getCaseDataIssueLoggingJurisdictions() {
+        return caseDataIssueLoggingJurisdictions;
+    }
+
+    public String getReferenceDataApiUrl() {
+        return referenceDataApiUrl;
+    }
+
+    public int getRefDataCacheTtlInSec() {
+        return Math.toIntExact(Duration.ofDays(Long.parseLong(referenceDataCacheTtlInDays)).toSeconds());
+    }
+
 }

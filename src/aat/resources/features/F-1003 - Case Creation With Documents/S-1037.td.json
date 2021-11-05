@@ -1,0 +1,40 @@
+{
+  "_guid_": "S-1037",
+  "_extends_": "F-1003-Test_Base_data",
+  "title": "must get an error response for a malformed document ID",
+  "specs": [
+    "contains a malformed document ID"
+  ],
+  "request": {
+    "body": {
+      "data": {
+        "DocumentField1": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url": "{{DM_STORE_BASE_URL}}/documents/123e4567-e89b-12d3-&^%$-426655440000/binary",
+          "document_hash": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][hashToken]}"
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_422_Response",
+    "headers": {
+      "Content-Encoding" : "[[ANYTHING_PRESENT]]",
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
+      "Content-Type" : "application/json"
+    },
+    "body": {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
+      "message" : "Case data validation failed",
+      "details" : {
+        "field_errors" : [ {
+          "id" : "DocumentField1",
+          "message" : "{{DM_STORE_BASE_URL}}/documents/123e4567-e89b-12d3-&^%$-426655440000/binary does not match Document Management domain or expected URL path"
+        } ]
+      },
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

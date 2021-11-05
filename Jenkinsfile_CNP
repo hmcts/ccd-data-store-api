@@ -18,8 +18,8 @@ def component = "data-store-api"
 
 // Variables to switch pipeline logic and wiring per type of build
 
-def definitionStoreDevelopPr = "PR-575" // This doesn't change frequently, but when it does, only change this value.
-def dataStoreApiDevelopPr    = "PR-1260" // This doesn't change frequently, but when it does, only change this value.
+def definitionStoreDevelopPr = "PR-1073" // This doesn't change frequently, but when it does, only change this value.
+def dataStoreApiDevelopPr    = "PR-1652" // This doesn't change frequently, but when it does, only change this value.
 def prsToUseAat              = "PR-1575" // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
 
 def secrets = [
@@ -83,6 +83,7 @@ def vaultOverrides = [
 // vars needed for functional tests
 // Other env variables needed for BEFTA.
 env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
+env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
 env.RD_PROFESSIONAL_API_BASE_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
 env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN"
 env.ELASTIC_SEARCH_FTA_ENABLED = "false"

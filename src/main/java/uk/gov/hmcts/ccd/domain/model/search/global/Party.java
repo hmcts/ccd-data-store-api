@@ -24,6 +24,10 @@ public class Party {
         ValidationError.DATE_OF_BIRTH_INVALID)
     private String dateOfBirth;
 
+    @Pattern(regexp = "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$", message =
+        ValidationError.DATE_OF_DEATH_INVALID)
+    private String dateOfDeath;
+
     @JsonIgnore
     public int getNumberOfNonNullFields() throws IllegalAccessException {
         Field[] partyFields = Party.class.getDeclaredFields();

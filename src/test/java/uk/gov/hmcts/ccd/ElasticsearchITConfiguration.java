@@ -22,7 +22,7 @@ public class ElasticsearchITConfiguration {
     private static final String INDEX_SETTINGS = "classpath:" + CONFIG_DIR + "/index-settings.json";
     public static final String INDEX_TYPE = "_doc";
     public static final String[] INDICES = { "aat_cases", "mapper_cases", "security_cases",
-        "restricted_security_cases" };
+        "restricted_security_cases", "global_search" };
 
     @Value("${search.elastic.version}")
     private String elasticVersion;

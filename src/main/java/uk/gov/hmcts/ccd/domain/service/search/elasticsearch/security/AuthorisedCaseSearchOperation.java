@@ -1,5 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
+import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -7,34 +13,25 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.jooq.lambda.function.Functions.not;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.PathNotFoundException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
-import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
-import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchCaseSearchOperation;
-import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 
 @Service
 @Qualifier(AuthorisedCaseSearchOperation.QUALIFIER)
@@ -49,34 +46,31 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     private final CaseSearchOperation caseSearchOperation;
     private final AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
     private final AccessControlService accessControlService;
-    private final SecurityClassificationService classificationService;
     private final ObjectMapperService objectMapperService;
-    private final UserRepository userRepository;
+    private final CaseDataAccessControl caseDataAccessControl;
 
     @Autowired
     public AuthorisedCaseSearchOperation(
-        @Qualifier(ElasticsearchCaseSearchOperation.QUALIFIER) CaseSearchOperation caseSearchOperation,
+        @Qualifier("classified") CaseSearchOperation caseSearchOperation,
         AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService,
         AccessControlService accessControlService,
-        SecurityClassificationService classificationService,
         ObjectMapperService objectMapperService,
-        @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
+        CaseDataAccessControl caseDataAccessControl) {
 
         this.caseSearchOperation = caseSearchOperation;
         this.authorisedCaseDefinitionDataService = authorisedCaseDefinitionDataService;
         this.accessControlService = accessControlService;
-        this.classificationService = classificationService;
         this.objectMapperService = objectMapperService;
-        this.userRepository = userRepository;
+        this.caseDataAccessControl = caseDataAccessControl;
     }
 
     @Override
-    public CaseSearchResult execute(CrossCaseTypeSearchRequest searchRequest) {
+    public CaseSearchResult execute(CrossCaseTypeSearchRequest searchRequest, boolean dataClassification) {
         List<CaseTypeDefinition> authorisedCaseTypes = getAuthorisedCaseTypes(searchRequest);
         CrossCaseTypeSearchRequest authorisedSearchRequest =
             createAuthorisedSearchRequest(authorisedCaseTypes, searchRequest);
 
-        return searchCasesAndFilterFieldsByAccess(authorisedCaseTypes, authorisedSearchRequest);
+        return searchCasesAndFilterFieldsByAccess(authorisedCaseTypes, authorisedSearchRequest, dataClassification);
     }
 
     private List<CaseTypeDefinition> getAuthorisedCaseTypes(CrossCaseTypeSearchRequest searchRequest) {
@@ -93,29 +87,31 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         List<String> authorisedCaseTypeIds =
             authorisedCaseTypes.stream().map(CaseTypeDefinition::getId).collect(Collectors.toList());
 
-        return new CrossCaseTypeSearchRequest.Builder()
+        // clone CCT search request object :: then replace case type list
+        return new CrossCaseTypeSearchRequest.Builder(originalSearchRequest)
             .withCaseTypes(authorisedCaseTypeIds)
-            .withSearchRequest(originalSearchRequest.getElasticSearchRequest())
+            // NB: preserve original MultiCaseType processing instruction
             .withMultiCaseTypeSearch(originalSearchRequest.isMultiCaseTypeSearch())
-            .withSourceFilterAliasFields(originalSearchRequest.getAliasFields())
             .build();
     }
 
     private CaseSearchResult searchCasesAndFilterFieldsByAccess(List<CaseTypeDefinition> authorisedCaseTypes,
-                                                                CrossCaseTypeSearchRequest authorisedSearchRequest) {
+                                                                CrossCaseTypeSearchRequest authorisedSearchRequest,
+                                                                boolean dataClassification) {
         if (authorisedCaseTypes.isEmpty()) {
             return CaseSearchResult.EMPTY;
         }
 
-        CaseSearchResult result = caseSearchOperation.execute(authorisedSearchRequest);
-        filterCaseDataByCaseType(authorisedCaseTypes, result.getCases(), authorisedSearchRequest);
+        CaseSearchResult result = caseSearchOperation.execute(authorisedSearchRequest, dataClassification);
+        filterCaseDataByCaseType(authorisedCaseTypes, result.getCases(), authorisedSearchRequest, dataClassification);
 
         return result;
     }
 
     private void filterCaseDataByCaseType(List<CaseTypeDefinition> authorisedCaseTypes,
                                           List<CaseDetails> cases,
-                                          CrossCaseTypeSearchRequest authorisedSearchRequest) {
+                                          CrossCaseTypeSearchRequest authorisedSearchRequest,
+                                          boolean dataClassification) {
         Map<String, CaseTypeDefinition> caseTypeIdByCaseType = authorisedCaseTypes
             .stream()
             .collect(Collectors.toMap(CaseTypeDefinition::getId, Function.identity()));
@@ -124,27 +120,26 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
             .filter(caseDetails -> caseTypeIdByCaseType.containsKey(caseDetails.getCaseTypeId()))
             .forEach(caseDetails -> filterCaseData(caseTypeIdByCaseType.get(caseDetails.getCaseTypeId()),
                                                    caseDetails,
-                                                   authorisedSearchRequest));
+                                                   authorisedSearchRequest,
+                                                   dataClassification));
     }
 
     private void filterCaseData(CaseTypeDefinition authorisedCaseType,
                                 CaseDetails caseDetails,
-                                CrossCaseTypeSearchRequest authorisedSearchRequest) {
+                                CrossCaseTypeSearchRequest authorisedSearchRequest,
+                                boolean dataClassification) {
         filterCaseDataByAclAccess(authorisedCaseType, caseDetails);
-        filterCaseDataBySecurityClassification(caseDetails);
         filterCaseDataForMultiCaseTypeSearch(authorisedSearchRequest, authorisedCaseType, caseDetails);
     }
 
     private void filterCaseDataByAclAccess(CaseTypeDefinition authorisedCaseType, CaseDetails caseDetails) {
+        log.debug("Case Reference={}, caseTypeId={}", caseDetails.getReference(), caseDetails.getCaseTypeId());
         JsonNode caseData = caseDataToJsonNode(caseDetails);
         JsonNode accessFilteredData =
             accessControlService.filterCaseFieldsByAccess(caseData, authorisedCaseType.getCaseFieldDefinitions(),
-                                                          getUserRoles(), CAN_READ, false);
+                                                            getAccessProfiles(authorisedCaseType.getId()),
+                                                            CAN_READ, false);
         caseDetails.setData(jsonNodeToCaseData(accessFilteredData));
-    }
-
-    private void filterCaseDataBySecurityClassification(CaseDetails caseDetails) {
-        classificationService.applyClassification(caseDetails);
     }
 
     /**
@@ -171,7 +166,10 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     private void filterCaseDataForMultiCaseTypeSearch(CrossCaseTypeSearchRequest searchRequest,
                                                       CaseTypeDefinition authorisedCaseType,
                                                       CaseDetails caseDetails) {
-        if (searchRequest.isMultiCaseTypeSearch() && caseDetails.getData() != null) {
+        if (searchRequest.isMultiCaseTypeSearch() && caseDetails.getData() != null
+            // NB: bypass MultiCaseType CaseData filters if using a single search index (required for GlobalSearch)
+            && searchRequest.getSearchIndex().isEmpty()) {
+
             JsonNode caseData = caseDataToJsonNode(caseDetails);
             String caseDataJson = caseData.toString();
             JsonNode filteredMultiCaseTypeSearchData = objectMapperService.createEmptyJsonNode();
@@ -225,8 +223,8 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         return path == null ? "" : path.split(SEARCH_ALIAS_CASE_FIELD_PATH_SEPARATOR_REGEX)[0];
     }
 
-    private Set<String> getUserRoles() {
-        return userRepository.getUserRoles();
+    private Set<AccessProfile> getAccessProfiles(String caseTypeId) {
+        return caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
     }
 
     private JsonNode caseDataToJsonNode(CaseDetails caseDetails) {
