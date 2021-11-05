@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.endpoint.ui;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -14,6 +15,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
+import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
@@ -43,6 +45,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
@@ -815,6 +819,13 @@ public class QueryEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void validGetCase() throws Exception {
+
+        final String jsonString = TestFixtures.fromFileAsString("__files/test-addressbook-case.json")
+            .replace("${CALLBACK_URL}", hostUrl + "/callback/document")
+            .replace("${GET_CASE_CALLBACK_URL}", hostUrl + "/callback/getcase");
+
+        stubFor(WireMock.get(urlMatching("/api/data/case-type/" + TEST_CASE_TYPE))
+            .willReturn(okJson(jsonString).withStatus(200)));
 
         // Check that we have the expected test data set size
         final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);

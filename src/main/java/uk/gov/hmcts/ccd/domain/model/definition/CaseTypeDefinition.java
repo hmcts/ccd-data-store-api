@@ -37,6 +37,10 @@ public class CaseTypeDefinition implements Serializable {
     private String printableDocumentsUrl;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
+    @JsonProperty("callbackGetCaseUrl")
+    private String callbackGetCaseUrl;
+    @JsonProperty("retriesGetCaseUrl")
+    private List<Integer> retriesGetCaseUrl;
     private final List<SearchAliasField> searchAliasFields = new ArrayList<>();
 
     public String getId() {
@@ -156,6 +160,22 @@ public class CaseTypeDefinition implements Serializable {
         return events.stream()
             .filter(event -> event.getId().equalsIgnoreCase(eventId))
             .findFirst();
+    }
+
+    public String getCallbackGetCaseUrl() {
+        return callbackGetCaseUrl;
+    }
+
+    public void setCallbackGetCaseUrl(String callbackGetCaseUrl) {
+        this.callbackGetCaseUrl = callbackGetCaseUrl;
+    }
+
+    public List<Integer> getRetriesGetCaseUrl() {
+        return retriesGetCaseUrl;
+    }
+
+    public void setRetriesGetCaseUrl(List<Integer> retriesGetCaseUrl) {
+        this.retriesGetCaseUrl = retriesGetCaseUrl;
     }
 
     public List<SearchAliasField> getSearchAliasFields() {
