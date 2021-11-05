@@ -1,0 +1,44 @@
+[
+  {
+    "metadata": false,
+    "id": "draftOrderDoc",
+    "case_type_id": "MoneyClaimTest",
+    "label": "Simple Document",
+    "hint_text": null,
+    "field_type": {
+      "id": "Document",
+      "type": "Document",
+      "min": null,
+      "max": null,
+      "regular_expression": null,
+      "fixed_list_items": [],
+      "complex_fields": [],
+      "collection_field_type": null
+    },
+    "hidden": null,
+    "security_classification": "PUBLIC",
+    "live_from": null,
+    "live_until": null,
+    "acls": [
+      {
+        "role": "caseworker-cmc-legaladvisor",
+        "create": true,
+        "read": true,
+        "update": true,
+        "delete": true
+      },
+      {
+        "role": "caseworker-cmc-judge",
+        "create": true,
+        "read": true,
+        "update": true,
+        "delete": true
+      }
+    ],
+    "complexACLs": [],
+    "order": null,
+    "show_condition": null,
+    "display_context_parameter": null,
+    "retain_hidden_value": null
+  }
+]
