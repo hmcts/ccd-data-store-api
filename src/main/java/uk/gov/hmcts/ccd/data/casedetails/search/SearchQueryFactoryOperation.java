@@ -19,6 +19,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
@@ -44,9 +45,9 @@ public class SearchQueryFactoryOperation {
     private final UserAuthorisation userAuthorisation;
     private final SortOrderQueryBuilder sortOrderQueryBuilder;
     private final AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
-    private final CaseDefinitionRepository caseDefinitionRepository;
     private final AccessControlGrantTypeQueryBuilder accessControlGrantTypeQueryBuilder;
     private final CaseDataAccessControl caseDataAccessControl;
+    private final CaseTypeService caseTypeService;
 
     public SearchQueryFactoryOperation(CriterionFactory criterionFactory,
                                        EntityManager entityManager,
@@ -54,19 +55,18 @@ public class SearchQueryFactoryOperation {
                                        UserAuthorisation userAuthorisation,
                                        SortOrderQueryBuilder sortOrderQueryBuilder,
                                        AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService,
-                                       @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                       CaseDefinitionRepository caseDefinitionRepository,
                                        AccessControlGrantTypeQueryBuilder accessControlGrantTypeQueryBuilder,
-                                       CaseDataAccessControl caseDataAccessControl) {
+                                       CaseDataAccessControl caseDataAccessControl,
+                                       CaseTypeService caseTypeService) {
         this.criterionFactory = criterionFactory;
         this.entityManager = entityManager;
         this.applicationParam = applicationParam;
         this.userAuthorisation = userAuthorisation;
         this.sortOrderQueryBuilder = sortOrderQueryBuilder;
         this.authorisedCaseDefinitionDataService = authorisedCaseDefinitionDataService;
-        this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlGrantTypeQueryBuilder = accessControlGrantTypeQueryBuilder;
         this.caseDataAccessControl = caseDataAccessControl;
+        this.caseTypeService = caseTypeService;
     }
 
     public Query build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
@@ -97,8 +97,8 @@ public class SearchQueryFactoryOperation {
 
     private String addUserCaseAccessClause(Map<String, Object> params, MetaData metadata) {
         if (applicationParam.getEnableAttributeBasedAccessControl()) {
-
-            CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(metadata.getCaseTypeId());
+            CaseTypeDefinition caseTypeDefinition = caseTypeService.
+                getCaseTypeForJurisdiction(metadata.getCaseTypeId(), metadata.getJurisdiction());
             List<RoleAssignment> roleAssignments = caseDataAccessControl.generateRoleAssignments(caseTypeDefinition);
 
             return accessControlGrantTypeQueryBuilder.createQuery(roleAssignments, params, caseTypeDefinition);

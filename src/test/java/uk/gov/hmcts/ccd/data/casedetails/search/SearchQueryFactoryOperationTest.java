@@ -10,9 +10,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.search.builder.AccessControlGrantTypeQueryBuilder;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
@@ -46,7 +46,7 @@ class SearchQueryFactoryOperationTest {
     private EntityManager entityManager;
 
     @Mock
-    private CaseDefinitionRepository caseDefinitionRepository;
+    private CaseTypeService caseTypeService;
 
     @Mock
     private AccessControlGrantTypeQueryBuilder accessControlGrantTypeQueryBuilder;
@@ -60,16 +60,16 @@ class SearchQueryFactoryOperationTest {
     public void initMock() throws IOException {
         MockitoAnnotations.initMocks(this);
         CaseTypeDefinition caseTypeDefinition = mock(CaseTypeDefinition.class);
-        when(caseDefinitionRepository.getCaseType(anyString())).thenReturn(caseTypeDefinition);
+        when(caseTypeService.getCaseTypeForJurisdiction(anyString(), anyString())).thenReturn(caseTypeDefinition);
         classUnderTest = new SearchQueryFactoryOperation(criterionFactory,
             entityManager,
             applicationParam,
             userAuthorisation,
             sortOrderQueryBuilder,
             authorisedCaseDefinitionDataService,
-            caseDefinitionRepository,
             accessControlGrantTypeQueryBuilder,
-            caseDataAccessControl);
+            caseDataAccessControl,
+            caseTypeService);
     }
 
     @Test
