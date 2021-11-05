@@ -1,41 +1,38 @@
 {
-  "_guid_": "S-1006.7",
-  "_extends_": "F-1006_Test_Data_Base",
+  "_guid_": "S-1007.9",
+  "_extends_": "F-1007_Test_Data_Base_V2",
 
-  "title": "TTL.Suspended changed to \"No\", SystemTTL and Override TTL greater than Guard value",
+  "title": "TTL.OverrideTTL changed after returning from Mid Event Callback and Validate Event is invoked on v2_external#/case-data-validator-controller/validateUsingPOST",
 
   "prerequisites" : [ {
-    "Token_Creation": "S-1006_GetUpdateSuspendedCaseTokenCaseworker"
+    "Token_Creation": "S-1007_GetUpdateSuspendedCaseToken"
   }
   ],
 
   "specs": [
     "an active profile in CCD",
-    "contains a case Id that has just been created as in F-1006_CreateSuspendedCasePreRequisiteCaseworker",
+    "contains a case Id that has just been created as in F-1007_CreateSuspendedCasePreRequisiteCaseworker",
     "contains an event token for the case just created above",
-    "has TTL.Suspension value changed to No from Yes",
-    "has TTL.SystemTTL set to greater than today + guard value",
-    "has TTL.OverrideTTL set to greater than today + guard value",
-    "callback About to submit changes TTL.Suspended value"
+    "has the mid event callback change the TTL.OverrideTTL value changed"
   ],
 
   "request": {
-    "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1006_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
-    },
     "headers": {
       "_extends_": "Common_Request_Headers"
+    },
+    "queryParams": {
+      "pageId": "updateMidEventModifiedOverrideTTLSingleFormPage"
     },
     "body": {
       "data": {
         "TTL": {
           "Suspended": "Yes",
-          "OverrideTTL": "2023-04-30",
-          "SystemTTL": "2023-04-30"
+          "OverrideTTL": "2010-04-30",
+          "SystemTTL": "2010-04-30"
         }
       },
       "event": {
-        "id": "updateCaseSubmitSuspendedTTL",
+        "id": "updateMidEventModifiedOverrideTTL",
         "summary": "",
         "description": ""
       },

@@ -1,0 +1,23 @@
+{
+	"_guid_": "F-1007_Test_Data_Base_Citizen",
+
+	"productName": "CCD Data Store",
+	"operationName": "validation of a set of fields as Citizen",
+
+	"method": "POST",
+	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+	"request": {
+		"pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType"
+		}
+	}
+}

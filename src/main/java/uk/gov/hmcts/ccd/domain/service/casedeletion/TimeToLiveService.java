@@ -24,7 +24,7 @@ import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.TTL_CASE_FIELD_ID;
 public class TimeToLiveService {
 
     protected static final String TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE =
-        "Time to live content has been modified by aboutToStart callback";
+        "Time to live content has been modified by callback";
     protected static final String FAILED_TO_READ_TTL_FROM_CASE_DATA = "Failed to read TTL from case data";
 
     private ObjectMapper objectMapper;

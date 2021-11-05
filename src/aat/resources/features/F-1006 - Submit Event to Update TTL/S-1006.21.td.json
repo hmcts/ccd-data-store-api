@@ -48,7 +48,7 @@
     "_extends_": "Common_400_Response",
     "body" : {
       "exception": "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
-      "message": "Time to live content has been modified by aboutToStart callback",
+      "message": "Time to live content has been modified by callback",
       "details": null,
       "callbackErrors": null,
       "callbackWarnings": null
