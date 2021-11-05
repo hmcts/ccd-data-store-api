@@ -4,12 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +18,13 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Comparator.comparingInt;
@@ -109,6 +110,14 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
         final Optional<SecurityClassification> userClassification = getUserClassification(jurisdictionId);
         return userClassification.map(securityClassification ->
             securityClassification.higherOrEqualTo(caseTypeDefinition.getClassificationForField(fieldId)))
+            .orElse(false);
+    }
+
+    public boolean userHasEnoughSecurityClassificationForField(String jurisdictionId,
+                                                               SecurityClassification otherClassification) {
+        final Optional<SecurityClassification> userClassification = getUserClassification(jurisdictionId);
+        return userClassification.map(securityClassification ->
+            securityClassification.higherOrEqualTo(otherClassification))
             .orElse(false);
     }
 

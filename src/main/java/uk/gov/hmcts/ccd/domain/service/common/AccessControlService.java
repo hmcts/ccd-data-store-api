@@ -2,16 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
@@ -30,6 +20,16 @@ import uk.gov.hmcts.ccd.domain.model.definition.WizardPageComplexFieldOverride;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPageField;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.format;
@@ -57,6 +57,15 @@ public interface AccessControlService {
     String NO_EVENT_FOUND = "No event found";
     String NO_FIELD_FOUND = "No field found";
     String VALUE = "value";
+
+    static boolean hasAccess(Set<String> userRoles,
+                             Predicate<AccessControlList> criteria,
+                             List<AccessControlList> accessControlLists) {
+        return accessControlLists != null && accessControlLists
+            .stream()
+            .filter(acls -> userRoles.contains(acls.getAccessProfile()))
+            .anyMatch(criteria);
+    }
 
     boolean canAccessCaseTypeWithCriteria(CaseTypeDefinition caseType,
                                           Set<AccessProfile> accessProfiles,

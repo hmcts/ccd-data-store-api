@@ -55,7 +55,7 @@ public class GlobalSearchParser {
                 (field.contains(FIELD_SEPARATOR)) ? caseTypeDefinition.getComplexSubfieldDefinitionByPath(field)
                     : caseTypeDefinition.getCaseField(field);
             if (caseFieldDefinition.isPresent() && ((!AccessControlService
-                .hasAccessControlList(userRepository.getUserRoles(), CAN_READ,
+                .hasAccess(userRepository.getUserRoles(), CAN_READ,
                     caseFieldDefinition.get().getAccessControlLists()))
                 || !securityClassificationService
                 .userHasEnoughSecurityClassificationForField(caseTypeDefinition.getJurisdictionId(),
