@@ -75,10 +75,9 @@
 		<cve>CVE-2021-22147</cve>
 	</suppress>
 
-	<!-- Suppress temporarily -->
 	<suppress>
 		<cve>CVE-2021-29425</cve>
-
+		<cve>CVE-2021-42340</cve>
 		<cve>CVE-2020-29243</cve>
 		<cve>CVE-2020-29242</cve>
 		<cve>CVE-2020-29245</cve>

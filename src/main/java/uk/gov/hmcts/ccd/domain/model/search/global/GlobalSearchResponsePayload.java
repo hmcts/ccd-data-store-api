@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.search.global;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Value;
@@ -26,6 +27,7 @@ public class GlobalSearchResponsePayload {
     @Value
     @Builder
     @Jacksonized
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Result {
         String stateId;
         String processForAccess;
