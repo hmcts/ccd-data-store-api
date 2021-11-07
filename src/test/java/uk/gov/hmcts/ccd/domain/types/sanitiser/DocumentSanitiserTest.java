@@ -46,12 +46,14 @@ class DocumentSanitiserTest {
     private static final FieldTypeDefinition DOCUMENT_FIELD_TYPE = new FieldTypeDefinition();
     private static final String DOCUMENT_FIELD_ID = "D8Document";
     private static final CaseFieldDefinition DOCUMENT_FIELD = new CaseFieldDefinition();
-    private static final ObjectNode DOCUMENT_VALUE_INITIAL = JSON_FACTORY.objectNode();
-    private static final ObjectNode DOCUMENT_VALUE_SANITISED = JSON_FACTORY.objectNode();
     private static final String DOCUMENT_URL_VALUE = "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0";
     private static final String BINARY_URL = "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0/binary";
     private static final String FILENAME = "Seagulls_Sqaure.jpg";
     private static final String DOCUMENT_HASH = "document_hash";
+    private static final String DOCUMENT_HASH_VALUE = "document_hash_value";
+
+    private ObjectNode documentValueInitial = JSON_FACTORY.objectNode();
+    private ObjectNode documentValueSanitised = JSON_FACTORY.objectNode();
 
     static {
         DOCUMENT_FIELD_TYPE.setId(TYPE_DOCUMENT);
@@ -73,49 +75,87 @@ class DocumentSanitiserTest {
         MockitoAnnotations.initMocks(this);
 
         documentSanitiser = new DocumentSanitiser(documentManagementRestClient);
-        DOCUMENT_VALUE_INITIAL.put("document_url", DOCUMENT_URL_VALUE);
-        DOCUMENT_VALUE_SANITISED.put("document_url", DOCUMENT_URL_VALUE);
-        DOCUMENT_VALUE_SANITISED.put("document_binary_url",BINARY_URL);
-        DOCUMENT_VALUE_SANITISED.put("document_filename", FILENAME);
+        documentValueInitial.put("document_url", DOCUMENT_URL_VALUE);
+        documentValueSanitised.put("document_url", DOCUMENT_URL_VALUE);
+        documentValueSanitised.put("document_binary_url",BINARY_URL);
+        documentValueSanitised.put("document_filename", FILENAME);
     }
 
     @Test
-    @DisplayName("should sanitise valid document")
+    @DisplayName("should not sanitise document when null node")
+    void shouldNotSanitizeIfDocumentIsNullNode() {
+        final NullNode initialValue = JSON_FACTORY.nullNode();
+
+        final JsonNode saneValue = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, initialValue);
+
+        assertThat(saneValue, sameInstance(initialValue));
+    }
+
+    @Test
+    @DisplayName("should not sanitise document when document has binary url and file name")
+    void shouldNotSanitizeIfDocumentHasBinaryAndFileName() {
+        documentValueInitial.put("document_binary_url", BINARY_URL);
+        documentValueInitial.put("document_filename", FILENAME);
+
+        final JsonNode saneValue = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
+
+        assertThat(saneValue, sameInstance(documentValueInitial));
+    }
+
+    @Test
+    @DisplayName("should sanitise valid document when both binary_url and fileNames are NOT present")
     void shouldSanitizeValidDocument() {
         final Document document = buildDocument(BINARY_URL);
         document.setOriginalDocumentName(FILENAME);
         when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
-        DOCUMENT_VALUE_INITIAL.put("document_hash", DOCUMENT_HASH);
-        JsonNode sanitisedDocument = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, DOCUMENT_VALUE_INITIAL);
+        documentValueInitial.put(DOCUMENT_HASH, DOCUMENT_HASH_VALUE);
+        JsonNode sanitisedDocument = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
 
-        DOCUMENT_VALUE_SANITISED.put("document_hash", DOCUMENT_HASH);
-        assertThat(sanitisedDocument, is(DOCUMENT_VALUE_SANITISED));
+        documentValueSanitised.put(DOCUMENT_HASH, DOCUMENT_HASH_VALUE);
+        assertThat(sanitisedDocument, is(documentValueSanitised));
     }
 
     @Test
-    @DisplayName("should sanitise when hashToken null")
+    @DisplayName("should sanitise valid document when binary url is present but no fileName")
+    void shouldSanitizeValidDocumentWhenBinaryUrlIsPresentButNoFileName() {
+        documentValueInitial.put("document_binary_url", BINARY_URL);
+
+        final Document document = buildDocument(BINARY_URL);
+        document.setOriginalDocumentName(FILENAME);
+        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
+
+        documentValueInitial.put(DOCUMENT_HASH, DOCUMENT_HASH_VALUE);
+        JsonNode sanitisedDocument = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
+
+        documentValueSanitised.put(DOCUMENT_HASH, DOCUMENT_HASH_VALUE);
+        assertThat(sanitisedDocument, is(documentValueSanitised));
+    }
+
+    @Test
+    @DisplayName("should sanitise when no hashToken")
+    void shouldSanitizeIfDocumentRetrievedButNoHashToken() {
+        final Document document = buildDocument(BINARY_URL);
+        document.setOriginalDocumentName(FILENAME);
+        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
+
+        JsonNode sanitisedDocument = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
+
+        assertThat(sanitisedDocument, is(documentValueSanitised));
+    }
+
+    @Test
+    @DisplayName("should sanitise and keep same value when hashToken is NullNode")
     void shouldSanitizeIfDocumentRetrievedButNullHashToken() {
         final Document document = buildDocument(BINARY_URL);
         document.setOriginalDocumentName(FILENAME);
         when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
-        JsonNode sanitisedDocument = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, DOCUMENT_VALUE_INITIAL);
+        documentValueInitial.set(DOCUMENT_HASH, NullNode.getInstance());
+        JsonNode sanitisedDocument = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
 
-        assertThat(sanitisedDocument, is(DOCUMENT_VALUE_SANITISED));
-    }
-
-    @Test
-    @DisplayName("should sanitise when hashToken is empty")
-    void shouldSanitizeIfDocumentRetrievedButEmptyHashToken() {
-        final Document document = buildDocument(BINARY_URL);
-        document.setOriginalDocumentName(FILENAME);
-        when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
-
-        DOCUMENT_VALUE_INITIAL.put("document_hash", "");
-        JsonNode sanitisedDocument = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, DOCUMENT_VALUE_INITIAL);
-
-        assertThat(sanitisedDocument, is(DOCUMENT_VALUE_SANITISED));
+        documentValueSanitised.set(DOCUMENT_HASH, NullNode.getInstance());
+        assertThat(sanitisedDocument, is(documentValueSanitised));
     }
 
     @Test
@@ -146,7 +186,7 @@ class DocumentSanitiserTest {
         when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
         assertThrows(ValidationException.class, () -> {
-            documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, DOCUMENT_VALUE_INITIAL);
+            documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
         });
     }
 
@@ -158,7 +198,7 @@ class DocumentSanitiserTest {
         when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
         assertThrows(ValidationException.class, () -> {
-            documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, DOCUMENT_VALUE_INITIAL);
+            documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
         });
     }
 
@@ -170,7 +210,7 @@ class DocumentSanitiserTest {
         when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
         assertThrows(ValidationException.class, () -> {
-            documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, DOCUMENT_VALUE_INITIAL);
+            documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
         });
     }
 
@@ -182,7 +222,7 @@ class DocumentSanitiserTest {
         when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
         assertThrows(ValidationException.class, () -> {
-            documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, DOCUMENT_VALUE_INITIAL);
+            documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
         });
     }
 
@@ -193,7 +233,7 @@ class DocumentSanitiserTest {
         when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
         assertThrows(ValidationException.class, () -> {
-            documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, DOCUMENT_VALUE_INITIAL);
+            documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
         });
     }
 
@@ -205,18 +245,8 @@ class DocumentSanitiserTest {
         when(documentManagementRestClient.getDocument(DOCUMENT_FIELD_TYPE, DOCUMENT_URL_VALUE)).thenReturn(document);
 
         assertThrows(ValidationException.class, () -> {
-            documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, DOCUMENT_VALUE_INITIAL);
+            documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, documentValueInitial);
         });
-    }
-
-    @Test
-    @DisplayName("should not sanitise document when null node")
-    void shouldNotSanitizeIfDocumentIsNullNode() {
-        final NullNode initialValue = JSON_FACTORY.nullNode();
-
-        final JsonNode saneValue = documentSanitiser.sanitise(DOCUMENT_FIELD_TYPE, initialValue);
-
-        assertThat(saneValue, sameInstance(initialValue));
     }
 
     private Document buildDocument() {

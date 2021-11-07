@@ -40,13 +40,6 @@
 	</suppress>
 
 	<suppress until="2021-11-25">
-		<notes>Elasticsearch versions before 7.13.3 and 6.8.17 an uncontrolled recursion vulnerability
-		Suppressed until fix in place
-		</notes>
-		<cve>CVE-2021-22144</cve>
-	</suppress>
-
-	<suppress until="2021-11-25">
 		<notes>A vulnerability in all versions of Nim-lang allows unauthenticated attackers to write files to
 		arbitrary directories via a crafted zip file with dot-slash characters included in the name of the
 		crafted file
@@ -55,8 +48,8 @@
 	</suppress>
 
 	<suppress until="2021-11-25">
-		<notes>Suppress CVE affecting Tomcat temporarily until it can be addressed</notes>
-		<cve>CVE-2021-42340</cve>
+		<notes>Suppress CVE affecting spring-core temporarily until it can be addressed</notes>
+		<cve>CVE-2021-22096</cve>
 	</suppress>
 
 	<suppress>
