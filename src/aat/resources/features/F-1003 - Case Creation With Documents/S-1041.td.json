@@ -1,8 +1,78 @@
 {
   "_guid_": "S-1041",
-  "_extends_": "F-1003-SubmitCaseCreationWithNoFilename",
-  "title": "must successfully create a case with new document uploaded",
+  "productName": "CCD Data Store",
+  "operationName": "Submit Case Creation",
+  "title": "Submit case creation event without any documents but callback adds a document to the case_data",
+  "specs": [
+    "an active caseworker profile in CCD with full permissions on a document field",
+    "does not contain a document",
+    "contains a document attached to the case"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+  "method": "POST",
+  "uri": "case-types/{CaseTypeID}/cases",
+  "request": {
+    "headers": {
+      "Authorization": "[[DEFAULT_AUTO_VALUE]]",
+      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]",
+      "Content-Type": "application/json;charset=UTF-8",
+      "experimental": true
+    },
+    "pathVariables": {
+      "CaseTypeID": "FT_MasterCaseType"
+    },
+    "body": {
+      "data": {},
+      "event": {
+        "id": "documentHashCallback",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][S-1041_Case_Data_Create_Token_Creation][testData][actualResponse][body][token]}",
+      "ignore_warning": false,
+      "draft_id": null
+    }
+  },
   "expectedResponse": {
-    "_extends_": "F-1003-SubmitCaseCreationNoFilenameResponse"
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Encoding" : "[[ANYTHING_PRESENT]]",
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
+      "Content-Type" : "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "_links" : {
+        "self" : "[[ANYTHING_PRESENT]]"
+      },
+      "id" : "[[ANYTHING_PRESENT]]",
+      "jurisdiction" : "BEFTA_MASTER",
+      "case_type" : "FT_MasterCaseType",
+      "created_on" : "[[ANYTHING_PRESENT]]",
+      "last_modified_on" : "[[ANYTHING_PRESENT]]",
+      "last_state_modified_on" : "[[ANYTHING_PRESENT]]",
+      "state" : "CaseCreated",
+      "security_classification" : "PUBLIC",
+      "data" : {
+        "DocumentField" : {
+          "document_url" : "${[scenarioContext][childContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][_links][self][href]}",
+          "document_filename" : "${[scenarioContext][childContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_binary_url" : "${[scenarioContext][childContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][_links][binary][href]}"
+        },
+        "TextField" : "Test1"
+      },
+      "data_classification" : {
+        "DocumentField" : "PUBLIC",
+        "TextField" : "PUBLIC"
+      },
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
+    }
   }
 }

@@ -40,6 +40,8 @@ public abstract class WireMockBaseTest extends BaseTest {
     @Value("${wiremock.server.port}")
     protected Integer wiremockPort;
 
+    protected String hostUrl;
+
     @Inject
     protected ApplicationParams applicationParams;
 
@@ -50,7 +52,7 @@ public abstract class WireMockBaseTest extends BaseTest {
     @BeforeEach
     public void initMock() throws IOException {
         super.initMock();
-        final String hostUrl = "http://localhost:" + wiremockPort;
+        hostUrl = "http://localhost:" + wiremockPort;
 
         LOG.info("Wire mock test, host url is {}", hostUrl);
 
@@ -93,8 +95,8 @@ public abstract class WireMockBaseTest extends BaseTest {
     }
 
     protected void stubUserInfo(String userId) {
-        stubUserInfo(userId, "caseworker", "caseworker-test", "caseworker-PROBATE-public", "caseworker-PROBATE",
-            "caseworker-DIVORCE", "caseworker-SSCS");
+        stubUserInfo(userId, "caseworker", "caseworker-test", "caseworker-probate-public", "caseworker-probate",
+            "caseworker-divorce", "caseworker-sscs");
     }
 
     protected void stubUserInfo(String userId, String... roles) {
@@ -116,8 +118,8 @@ public abstract class WireMockBaseTest extends BaseTest {
                 + "      \"email\": \"Cloud.Strife@test.com\","
                 + "      \"forename\": \"Cloud\","
                 + "      \"surname\": \"Strife\","
-                + "      \"roles\": [ \"caseworker\", \"caseworker-test\", \"caseworker-PROBATE-public\","
-                + " \"caseworker-PROBATE\", \"caseworker-DIVORCE\", \"caseworker-SSCS\" ]"
+                + "      \"roles\": [ \"caseworker\", \"caseworker-test\", \"caseworker-probate-public\","
+                + " \"caseworker-probate\", \"caseworker-divorce\", \"caseworker-sscs\" ]"
                 + "    }").withStatus(200)));
     }
 }
