@@ -63,7 +63,6 @@ public abstract class GrantTypeQueryBuilder {
 
     protected abstract GrantType getGrantType();
 
-    @SuppressWarnings("java:S2789")
     public String createQuery(List<RoleAssignment> roleAssignments,
                               Map<String, Object> params,
                               CaseTypeDefinition caseType) {
@@ -75,12 +74,12 @@ public abstract class GrantTypeQueryBuilder {
             .filter(roleAssignment -> roleAssignment.getAttributes() != null)
             .map(roleAssignment -> {
 
-                String innerQuery =  EMPTY;
+                String innerQuery = EMPTY;
                 int count = index.incrementAndGet();
 
                 Set<AccessProfile> accessProfiles = getAccessProfiles(roleAssignment, caseType);
                 List<String> raCaseStates = getCaseStates(caseStates, accessProfiles);
-                if (raCaseStates.size() > 0) {
+                if (!raCaseStates.isEmpty()) {
                     String statesParam = String.format(CASE_STATES_PARAM, count, paramName);
                     params.put(statesParam, raCaseStates);
                     innerQuery = String.format(QUERY, STATES, statesParam);
@@ -88,34 +87,19 @@ public abstract class GrantTypeQueryBuilder {
                     return innerQuery;
                 }
 
-                Optional<String> jurisdiction = roleAssignment.getAttributes().getJurisdiction();
-                if (jurisdiction != null && jurisdiction.isPresent() && StringUtils.isNotBlank(jurisdiction.get())) {
-                    innerQuery = innerQuery + getOperator(innerQuery, AND)
-                        + String.format("%s='%s'", JURISDICTION, jurisdiction.get());
-                }
-
-                Optional<String> region = roleAssignment.getAttributes().getRegion();
-                if (region != null && region.isPresent() && StringUtils.isNotBlank(region.get())) {
-                    innerQuery = innerQuery + getOperator(innerQuery, AND)
-                        + String.format("%s='%s'", REGION, region.get());
-                }
-
-                Optional<String> location = roleAssignment.getAttributes().getLocation();
-                if (location != null && location.isPresent() && StringUtils.isNotBlank(location.get())) {
-                    innerQuery = innerQuery + getOperator(innerQuery, AND)
-                        + String.format("%s='%s'", LOCATION, location.get());
-                }
-
-                Optional<String> reference = roleAssignment.getAttributes().getCaseId();
-                if (reference != null && reference.isPresent() && StringUtils.isNotBlank(reference.get())) {
-                    innerQuery = innerQuery + getOperator(innerQuery, AND)
-                        + String.format("%s='%s'", REFERENCE, reference.get());
-                }
+                innerQuery = addEqualsClauseForOptionalAttribute(roleAssignment.getAttributes().getJurisdiction(),
+                    innerQuery, JURISDICTION);
+                innerQuery = addEqualsClauseForOptionalAttribute(roleAssignment.getAttributes().getRegion(),
+                    innerQuery, REGION);
+                innerQuery = addEqualsClauseForOptionalAttribute(roleAssignment.getAttributes().getLocation(),
+                    innerQuery, LOCATION);
+                innerQuery = addEqualsClauseForOptionalAttribute(roleAssignment.getAttributes().getCaseId(),
+                    innerQuery, REFERENCE);
 
                 String classification = roleAssignment.getClassification();
                 if (StringUtils.isNotBlank(classification)) {
                     List<String> classifications = getClassifications(roleAssignment);
-                    if (classifications.size() > 0) {
+                    if (!classifications.isEmpty()) {
                         String classificationsParam = String.format(CLASSIFICATIONS_PARAM, count, paramName);
                         params.put(classificationsParam, classifications);
                         innerQuery = innerQuery + getOperator(innerQuery, AND)
@@ -125,6 +109,17 @@ public abstract class GrantTypeQueryBuilder {
 
                 return StringUtils.isNotBlank(innerQuery) ? String.format(QUERY_WRAPPER, innerQuery) : innerQuery;
             }).filter(strQuery -> !StringUtils.isEmpty(strQuery)).collect(Collectors.joining(" OR "));
+    }
+
+    @SuppressWarnings("java:S2789")
+    private String addEqualsClauseForOptionalAttribute(Optional<String> attribute,
+                                                       String parentQuery,
+                                                       String matchName) {
+        if (attribute != null && attribute.isPresent() && StringUtils.isNotBlank(attribute.get())) {
+            parentQuery = parentQuery + getOperator(parentQuery, AND)
+                + String.format("%s='%s'", matchName, attribute.get());
+        }
+        return parentQuery;
     }
 
     protected Supplier<Stream<RoleAssignment>> filterGrantTypeRoleAssignments(List<RoleAssignment> roleAssignments) {

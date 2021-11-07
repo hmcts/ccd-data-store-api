@@ -85,10 +85,11 @@ public abstract class GrantTypeESQueryBuilder {
         return query;
     }
 
+    @SuppressWarnings("java:S2789")
     private void addExactMatchQueryForOptionalAttribute(Optional<String> attribute,
                                                         BoolQueryBuilder parentQuery,
                                                         String matchName) {
-        if (attribute != null && StringUtils.isNotBlank(attribute.orElse(""))) {
+        if (attribute != null && attribute.isPresent() && StringUtils.isNotBlank(attribute.get())) {
             parentQuery.must(QueryBuilders.termQuery(matchName + KEYWORD, attribute.get()));
         }
     }
