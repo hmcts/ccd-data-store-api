@@ -71,7 +71,7 @@ public abstract class GrantTypeQueryBuilder {
         List<CaseStateDefinition> caseStates = caseType == null ? Lists.newArrayList() : caseType.getStates();
         Supplier<Stream<RoleAssignment>> streamSupplier = filterGrantTypeRoleAssignments(roleAssignments);
         AtomicInteger index = new AtomicInteger();
-        String query = streamSupplier.get()
+        return streamSupplier.get()
             .filter(roleAssignment -> roleAssignment.getAttributes() != null)
             .map(roleAssignment -> {
 
@@ -125,7 +125,6 @@ public abstract class GrantTypeQueryBuilder {
 
                 return StringUtils.isNotBlank(innerQuery) ? String.format(QUERY_WRAPPER, innerQuery) : innerQuery;
             }).filter(strQuery -> !StringUtils.isEmpty(strQuery)).collect(Collectors.joining(" OR "));
-        return query;
     }
 
     protected Supplier<Stream<RoleAssignment>> filterGrantTypeRoleAssignments(List<RoleAssignment> roleAssignments) {

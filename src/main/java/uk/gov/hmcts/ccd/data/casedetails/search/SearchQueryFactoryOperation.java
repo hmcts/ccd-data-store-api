@@ -10,12 +10,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.data.casedetails.search.builder.AccessControlGrantTypeQueryBuilder;
-import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
@@ -97,8 +94,8 @@ public class SearchQueryFactoryOperation {
 
     private String addUserCaseAccessClause(Map<String, Object> params, MetaData metadata) {
         if (applicationParam.getEnableAttributeBasedAccessControl()) {
-            CaseTypeDefinition caseTypeDefinition = caseTypeService.
-                getCaseTypeForJurisdiction(metadata.getCaseTypeId(), metadata.getJurisdiction());
+            CaseTypeDefinition caseTypeDefinition = caseTypeService
+                .getCaseTypeForJurisdiction(metadata.getCaseTypeId(), metadata.getJurisdiction());
             List<RoleAssignment> roleAssignments = caseDataAccessControl.generateRoleAssignments(caseTypeDefinition);
 
             return accessControlGrantTypeQueryBuilder.createQuery(roleAssignments, params, caseTypeDefinition);
