@@ -39,6 +39,29 @@ public class SearchCriteria {
     @Valid
     private List<Party> parties;
 
+    public enum SearchCriteriaEnum {
+        REGION("caseManagementRegionIds", "caseManagementLocation.region"),
+        BASE_LOCATION("caseManagementBaseLocationIds", "caseManagementLocation.baseLocation"),
+        PARTIES("parties", "SearchCriteria.SearchParties"),
+        OTHER_CASE_REFERENCES("otherReferences", "SearchCriteria.OtherCaseReferences");
+
+        private final String searchCriteriaField;
+        private final String ccdField;
+
+        SearchCriteriaEnum(String searchCriteriaField, String ccdField) {
+            this.searchCriteriaField = searchCriteriaField;
+            this.ccdField = ccdField;
+        }
+
+        public String getSearchCriteriaField() {
+            return searchCriteriaField;
+        }
+
+        public String getCcdField() {
+            return ccdField;
+        }
+    }
+
     @JsonIgnore
     public Boolean getNonNullFields() throws IllegalAccessException {
         Field[] searchCriteriaFields = SearchCriteria.class.getDeclaredFields();
@@ -61,5 +84,3 @@ public class SearchCriteria {
         return !nonNullFields.isEmpty();
     }
 }
-
-
