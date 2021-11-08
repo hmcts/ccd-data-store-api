@@ -31,10 +31,7 @@ import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_HISTORY_VIEWER;
 
@@ -92,14 +89,10 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
             return metadataFields;
         }
         List<CaseViewField> updatedMetadata = new ArrayList<>(metadataFields);
-        GetCaseCallbackResponse callbackResponse = getCaseCallback.invoke(caseTypeDefinition, caseDetails);
 
-        Collection<String> caseViewFieldIds = metadataFields
-            .stream().map(CaseViewField::getId).collect(Collectors.toSet());
-
-        updatedMetadata.addAll(callbackResponse.getMetadataFields().stream()
-            .filter(caseViewField -> caseViewFieldIds.contains(caseViewField.getId()))
-            .collect(Collectors.toList()));
+        GetCaseCallbackResponse callbackResponse = getCaseCallback
+            .invoke(caseTypeDefinition, caseDetails, metadataFields);
+        updatedMetadata.addAll(callbackResponse.getMetadataFields());
 
         return updatedMetadata;
     }
