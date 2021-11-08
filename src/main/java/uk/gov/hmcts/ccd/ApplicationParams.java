@@ -152,6 +152,9 @@ public class ApplicationParams {
     @Value("${document.hash.check.enabled}")
     private boolean enableDocumentHashCheck;
 
+    @Value("${ccd.multiparty.fix.enabled}")
+    private boolean multipartyFixEnabled;
+
     @Value("${ccd.case-document-am-api.attachDocumentEnabled:true}")
     private boolean attachDocumentEnabled;
 
@@ -455,5 +458,9 @@ public class ApplicationParams {
 
     public boolean isDocumentHashCloneEnabled() {
         return this.documentHashCloneEnabled;
+    }
+
+    public boolean isMultipartyFixEnabled() {
+        return multipartyFixEnabled;
     }
 }
