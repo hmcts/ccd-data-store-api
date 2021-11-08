@@ -6,8 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
@@ -19,12 +18,11 @@ import uk.gov.hmcts.ccd.domain.service.AccessControl;
 
 import static com.google.common.collect.Maps.newConcurrentMap;
 
-@Component
-@Lazy
+@Service
 @RequestScope
 public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, AccessControl {
 
-    private NoCacheCaseDataAccessControl noCacheCaseDataAccessControl;
+    private final NoCacheCaseDataAccessControl noCacheCaseDataAccessControl;
 
     private final Map<String, Set<AccessProfile>> caseTypeAccessProfiles = newConcurrentMap();
 
