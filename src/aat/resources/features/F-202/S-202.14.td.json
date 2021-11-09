@@ -34,6 +34,9 @@
     "body" : {
       "total" : 5,
       "cases" : [{
+        "__ordering__": "unordered",
+        "__elementId__": "id"
+      },{
         "_extends_" : "J1-CT2-01_result",
         "case_data" : {
           "F1" : "a${[scenarioContext][customValues][UniqueString]}",
