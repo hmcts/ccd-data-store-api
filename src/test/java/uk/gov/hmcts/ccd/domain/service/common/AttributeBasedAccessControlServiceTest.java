@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 
@@ -29,6 +30,9 @@ class AttributeBasedAccessControlServiceTest {
     private static final String ACCESS_PROFILE_4 = "ACCESS_PROFILE_4";
 
     @Mock
+    private ApplicationParams applicationParams;
+
+    @Mock
     private CompoundAccessControlService compoundAccessControlService;
 
     @InjectMocks
@@ -36,7 +40,7 @@ class AttributeBasedAccessControlServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test

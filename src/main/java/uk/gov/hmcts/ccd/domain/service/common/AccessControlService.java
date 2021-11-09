@@ -88,7 +88,9 @@ public interface AccessControlService {
                                          List<CaseFieldDefinition> caseFieldDefinitions,
                                          Set<AccessProfile> accessProfiles);
 
-    CaseUpdateViewEvent setReadOnlyOnCaseViewFieldsIfNoAccess(CaseUpdateViewEvent caseEventTrigger,
+    CaseUpdateViewEvent setReadOnlyOnCaseViewFieldsIfNoAccess(String caseReference,
+                                                              String eventId,
+                                                              CaseUpdateViewEvent caseEventTrigger,
                                                               List<CaseFieldDefinition> caseFieldDefinitions,
                                                               Set<AccessProfile> accessProfiles,
                                                               Predicate<AccessControlList> access);
@@ -147,7 +149,7 @@ public interface AccessControlService {
                                                  Predicate<AccessControlList> access,
                                                  boolean isClassification) {
         if (caseField.isCompoundFieldType()) {
-            caseField.getFieldTypeDefinition().getChildren().stream().forEach(childField -> {
+            caseField.getFieldTypeDefinition().getChildren().forEach(childField -> {
                 if (!hasAccessControlList(accessProfiles, access, childField.getAccessControlLists())) {
                     locateAndRemoveChildNode(caseField, jsonNode, childField);
                 } else {
@@ -252,29 +254,50 @@ public interface AccessControlService {
             collectionAccess);
     }
 
-    default void setChildrenAsReadOnlyIfNoAccess(List<WizardPage> wizardPages,
+    default void hideOnCaseViewFieldsIfNoReadAccess(boolean isMultipartyFixEnabled, String caseReference,
+                                                    String eventId, CommonField caseViewField,
+                                                    Set<AccessProfile> userRoles) {
+        if (isMultipartyFixEnabled
+            && !hasAccessControlList(userRoles, CAN_READ, caseViewField.getAccessControlLists())) {
+            caseViewField.setShowCondition(caseViewField.getId() + "=\"DO NOT SHOW IN UI\"");
+            caseViewField.setRetainHiddenValue(false);
+            LOG.debug("Case view field {} has been hidden for case {} and event {} as part of mutliparty fix",
+                caseViewField.getId(), caseReference, eventId);
+        }
+    }
+
+    default void setChildrenAsReadOnlyIfNoAccess(String caseReference,
+                                                 String eventId,
+                                                 List<WizardPage> wizardPages,
                                                  String rootFieldId,
                                                  CaseFieldDefinition caseField,
                                                  Predicate<AccessControlList> access,
                                                  Set<AccessProfile> accessProfiles,
-                                                 CommonField caseViewField) {
+                                                 CommonField caseViewField,
+                                                 boolean isMultipartyFixEnabled) {
         if (caseField.isCompoundFieldType()) {
-            caseField.getFieldTypeDefinition().getChildren().stream().forEach(childField -> {
+            caseField.getFieldTypeDefinition().getChildren().forEach(childField -> {
                 if (!hasAccessControlList(accessProfiles, access, childField.getAccessControlLists())) {
-                    findNestedField(caseViewField, childField.getId()).setDisplayContext(READONLY);
+                    CommonField childViewField = findNestedField(caseViewField, childField.getId());
+                    childViewField.setDisplayContext(READONLY);
+                    hideOnCaseViewFieldsIfNoReadAccess(isMultipartyFixEnabled, caseReference, eventId,
+                        childViewField, accessProfiles);
+
                     Optional<WizardPageField> optionalWizardPageField = getWizardPageField(wizardPages, rootFieldId);
-                    if (optionalWizardPageField.isPresent()) {
-                        setOverrideAsReadOnlyIfNotReadOnly(optionalWizardPageField.get(), rootFieldId, childField);
-                    }
+                    optionalWizardPageField.ifPresent(wizardPageField ->
+                        setOverrideAsReadOnlyIfNotReadOnly(wizardPageField, rootFieldId, childField));
                 }
                 if (childField.isCompoundFieldType()) {
                     setChildrenAsReadOnlyIfNoAccess(
+                        caseReference,
+                        eventId,
                         wizardPages,
                         rootFieldId,
                         childField,
                         access,
                         accessProfiles,
-                        findNestedField(caseViewField, childField.getId())
+                        findNestedField(caseViewField, childField.getId()),
+                        isMultipartyFixEnabled
                     );
                 }
             });
@@ -335,7 +358,7 @@ public interface AccessControlService {
         if (!hasAccessControlList(accessProfiles, access, caseField.getAccessControlLists())) {
             locateAndRemoveCaseField(caseField, caseViewField);
         } else if (caseField.isCompoundFieldType()) {
-            caseField.getFieldTypeDefinition().getChildren().stream().forEach(childField -> {
+            caseField.getFieldTypeDefinition().getChildren().forEach(childField -> {
                 if (!hasAccessControlList(accessProfiles, access, childField.getAccessControlLists())) {
                     locateAndRemoveChildField(findNestedField(caseViewField, caseField.getId()), childField,
                         caseField.isCollectionFieldType());
@@ -401,7 +424,7 @@ public interface AccessControlService {
                             .stream()
                             .filter(id -> id.equalsIgnoreCase(wizardPageField.getCaseFieldId()))
                             .findAny();
-                        return !toBeRemovedField.isPresent();
+                        return toBeRemovedField.isEmpty();
                     })
                     .map(wizardPageField -> {
                         if (!wizardPageField.getComplexFieldOverrides().isEmpty()) {
@@ -426,12 +449,11 @@ public interface AccessControlService {
             .filter(o -> {
                 Optional<CaseViewField> optionalCaseViewField = findCaseViewField(caseEventTrigger.getCaseFields(),
                     fieldId);
-                if (optionalCaseViewField.isPresent()) {
-                    return optionalCaseViewField.get().getComplexFieldNestedField(o.getComplexFieldElementId()
-                        .replace(fieldId + ".", "")).isPresent();
-                } else {
-                    return false;
-                }
+                return optionalCaseViewField
+                    .map(caseViewField ->
+                        caseViewField.getComplexFieldNestedField(o.getComplexFieldElementId()
+                            .replace(fieldId + ".", "")).isPresent())
+                    .orElse(false);
             })
             .collect(toList());
     }
@@ -487,7 +509,7 @@ public interface AccessControlService {
             .stream()
             .filter(caseEventDef ->
                 nonNull(caseEventDef.getAccessControlLists()) && caseEventDef.getId().equals(eventId))
-            .map(caseEventDef -> caseEventDef.getAccessControlLists())
+            .map(CaseEventDefinition::getAccessControlLists)
             .findAny().orElse(newArrayList());
     }
 
@@ -532,7 +554,7 @@ public interface AccessControlService {
         return caseFieldDefinitions
             .stream()
             .filter(caseField -> nonNull(caseField.getAccessControlLists()) && caseField.getId().equals(fieldName))
-            .map(caseField -> caseField.getAccessControlLists())
+            .map(CaseFieldDefinition::getAccessControlLists)
             .findAny().orElse(newArrayList());
     }
 
@@ -556,7 +578,7 @@ public interface AccessControlService {
 
     static Set<String> extractAccessProfileNames(Set<AccessProfile> accessProfiles) {
         return accessProfiles.stream()
-            .map(accessProfile -> accessProfile.getAccessProfile())
+            .map(AccessProfile::getAccessProfile)
             .collect(Collectors.toSet());
     }
 

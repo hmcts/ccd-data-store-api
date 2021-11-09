@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
@@ -13,14 +14,14 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-
 @Service
 @ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "true")
 public class AttributeBasedAccessControlService extends AccessControlServiceImpl implements AccessControl {
 
     @Autowired
-    public AttributeBasedAccessControlService(final CompoundAccessControlService compoundAccessControlService) {
-        super(compoundAccessControlService);
+    public AttributeBasedAccessControlService(final ApplicationParams applicationParams,
+                                              final CompoundAccessControlService compoundAccessControlService) {
+        super(applicationParams, compoundAccessControlService);
     }
 
     @Override
