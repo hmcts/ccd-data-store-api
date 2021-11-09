@@ -282,6 +282,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());
     }
 
+
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void findByWildcardReturnCorrectRecords() {
