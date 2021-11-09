@@ -6,7 +6,6 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpHeaders;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -47,8 +46,6 @@ public class UICaseControllerGetCaseCallbackIT extends WireMockBaseTest {
 
     private MockMvc mockMvc;
 
-    private JdbcTemplate template;
-
     HttpHeaders headers = new HttpHeaders();
 
     @Before
@@ -56,7 +53,6 @@ public class UICaseControllerGetCaseCallbackIT extends WireMockBaseTest {
         MockUtils.setSecurityAuthorities(RandomStringUtils.randomAlphanumeric(10), authentication,
             MockUtils.ROLE_CASEWORKER_PUBLIC);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-        template = new JdbcTemplate(db);
 
         WireMock.resetAllRequests();
 

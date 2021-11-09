@@ -33,11 +33,17 @@ public class GetCaseCallback {
                 .invokeGetCaseCallback(caseTypeDefinition, caseDetails);
 
             response = getCaseCallbackResponse.getBody();
-        } catch (CallbackException e) {
+        } catch (Exception e) {
             LOG.error("CCD_CDI_CallbackGetCaseUrl: " + e.getMessage());
-            throw e;
+            throw new CallbackException(e.getMessage());
         }
 
+        validateNewMetadataFields(metadataFields, response);
+
+        return response;
+    }
+
+    private void validateNewMetadataFields(List<CaseViewField> metadataFields, GetCaseCallbackResponse response) {
         Set<String> caseViewFieldIds = metadataFields.stream()
             .map(CaseViewField::getId).collect(Collectors.toSet());
         Set<String> callbackMetadataIds = response.getMetadataFields().stream()
@@ -46,9 +52,7 @@ public class GetCaseCallback {
 
         if (callbackMetadataIds.size() > 0) {
             throw new CallbackException("CCD_CDI_CallbackGetCaseUrl: "
-                + "Following metadata ids are present in the case_details" + callbackMetadataIds);
+                + "Following metadata ids are already present in the case_details" + callbackMetadataIds);
         }
-
-        return response;
     }
 }

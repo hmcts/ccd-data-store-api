@@ -3,10 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.Lists;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,7 +14,9 @@ import org.mockito.Spy;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
+import uk.gov.hmcts.ccd.domain.model.callbacks.GetCaseCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -33,9 +31,15 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
+import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseCallback;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.getevents.GetEventsOperation;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -50,6 +54,7 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.any;
@@ -72,6 +77,8 @@ class DefaultGetCaseViewOperationTest {
     private static final String EVENT_SUMMARY_2 = "Another summary";
     private static final String STATE = "Plop";
     private static final String TITLE_DISPLAY = "titleDisplay";
+    public static final String GET_CASE_METADATA_FIELD_ID = "anotherFieldId";
+    public static final String GET_CASE_METADATA_FIELD_VALUE = "getCaseMetadataFieldValue";
 
     @Mock
     private GetCaseOperation getCaseOperation;
@@ -102,6 +109,9 @@ class DefaultGetCaseViewOperationTest {
 
     @Mock
     private CaseEventEnablingService caseEventEnablingService;
+
+    @Mock
+    private GetCaseCallback getCaseCallback;
 
     @Spy
     @InjectMocks
@@ -326,6 +336,26 @@ class DefaultGetCaseViewOperationTest {
     }
 
     @Test
+    @DisplayName("should add metadata fields from the get case callback")
+    void shouldAddMetadataFieldsFromTheGetCaseCallback() {
+        caseTypeDefinition.setCallbackGetCaseUrl("/callback/getCase");
+        GetCaseCallbackResponse callbackResponse = new GetCaseCallbackResponse();
+        callbackResponse.setMetadataFields(singletonList(caseViewField()));
+        doReturn(callbackResponse)
+            .when(getCaseCallback).invoke(any(CaseTypeDefinition.class), any(CaseDetails.class), anyList());
+
+        final CaseView caseView = defaultGetCaseViewOperation.execute(CASE_REFERENCE);
+
+        assertAll(
+            () -> assertThat(caseView.getMetadataFields().size(), equalTo(2)),
+            () -> assertThat(caseView.getMetadataFields().get(0).getId(), equalTo("[CASE_TYPE]")),
+            () -> assertThat(caseView.getMetadataFields().get(0).getValue(), equalTo(CASE_TYPE_ID)),
+            () -> assertThat(caseView.getMetadataFields().get(1).getId(), equalTo(GET_CASE_METADATA_FIELD_ID)),
+            () -> assertThat(caseView.getMetadataFields().get(1).getValue(), equalTo(GET_CASE_METADATA_FIELD_VALUE))
+        );
+    }
+
+    @Test
     @DisplayName("should retrieve only the authorised audit events")
     void shouldRetrieveOnlyAuthorisedAuditEvents() {
         Map<String, JsonNode> dataMap = buildData("dataTestField2");
@@ -344,6 +374,13 @@ class DefaultGetCaseViewOperationTest {
             () -> assertThat(caseView.getEvents(), hasItemInArray(hasProperty("summary",
                 equalTo(EVENT_SUMMARY_2))))
         );
+    }
+
+    private CaseViewField caseViewField() {
+        CaseViewField caseViewField = new CaseViewField();
+        caseViewField.setId(GET_CASE_METADATA_FIELD_ID);
+        caseViewField.setValue(GET_CASE_METADATA_FIELD_VALUE);
+        return caseViewField;
     }
 
     private Map<String, JsonNode> buildData(String... dataFieldIds) {

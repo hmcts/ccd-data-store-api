@@ -92,7 +92,9 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
 
         GetCaseCallbackResponse callbackResponse = getCaseCallback
             .invoke(caseTypeDefinition, caseDetails, metadataFields);
-        updatedMetadata.addAll(callbackResponse.getMetadataFields());
+        if (callbackResponse.getMetadataFields() != null) {
+            updatedMetadata.addAll(callbackResponse.getMetadataFields());
+        }
 
         return updatedMetadata;
     }
