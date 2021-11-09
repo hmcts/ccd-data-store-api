@@ -15,6 +15,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -23,10 +24,10 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLECTION;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.PREDEFINED_COMPLEX_ADDRESS_UK;
@@ -69,8 +70,7 @@ class AccessControlServiceFilterTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
-
+        MockitoAnnotations.openMocks(this);
         accessControlService = new AccessControlService(applicationParams, new CompoundAccessControlService());
     }
 
@@ -344,7 +344,7 @@ class AccessControlServiceFilterTest {
                         .build())
                     .build())
                 .build();
-            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
             final CaseViewField caseViewField1 = aViewField()
                 .withId("Name")
@@ -407,7 +407,7 @@ class AccessControlServiceFilterTest {
         @DisplayName("Should filter child fields of a collection caseField if UPDATE ACL is missing for child fields")
         void filterCollectionCaseFieldChildrenByUpdateAccess() {
             final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
+            people.setAccessControlLists(Collections.singletonList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withUpdate(true)
                 .build()));
@@ -474,7 +474,7 @@ class AccessControlServiceFilterTest {
                         .build())
                     .build())
                 .build();
-            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
             final CaseViewField caseViewField1 = aViewField()
                 .withId("Name")
@@ -583,7 +583,7 @@ class AccessControlServiceFilterTest {
             + " - alternate")
         void filterCollectionCaseFieldChildrenByUpdateAccessAlternate() {
             final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
+            people.setAccessControlLists(Collections.singletonList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withUpdate(true)
                 .build()));
@@ -650,7 +650,7 @@ class AccessControlServiceFilterTest {
                         .build())
                     .build())
                 .build();
-            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
             final CaseViewField caseViewField1 = aViewField()
                 .withId("Name")
@@ -708,7 +708,7 @@ class AccessControlServiceFilterTest {
         @DisplayName("Should filter child fields of a collection caseField if CREATE ACL is missing for child fields")
         void filterCollectionCaseFieldChildrenByCreateAccess() {
             final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
+            people.setAccessControlLists(Collections.singletonList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
                 .build()));
@@ -825,7 +825,7 @@ class AccessControlServiceFilterTest {
                         .build())
                     .build())
                 .build();
-            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
             final CaseViewField caseViewField1 = aViewField()
                 .withId("Name")
@@ -1086,7 +1086,7 @@ class AccessControlServiceFilterTest {
         @DisplayName("Should filter all when filtered for UPDATE but ACLs are for CREATE")
         void filterAllByUpdateAccessWhenAllAccessIsOnCreate() {
             final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
+            people.setAccessControlLists(Collections.singletonList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
                 .build()));
@@ -1203,7 +1203,7 @@ class AccessControlServiceFilterTest {
                         .build())
                     .build())
                 .build();
-            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
             final CaseViewField caseViewField1 = aViewField()
                 .withId("Name")
@@ -1285,7 +1285,7 @@ class AccessControlServiceFilterTest {
                 .build();
             caseType.getCaseFieldDefinitions().get(2).getFieldTypeDefinition().setComplexFields(
                 getPredefinedAddressFields());
-            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
             final CaseViewField caseViewField1 = aViewField()
                 .withId("Name")
@@ -1367,7 +1367,7 @@ class AccessControlServiceFilterTest {
                 .build();
             caseType.getCaseFieldDefinitions().get(2).getFieldTypeDefinition().setComplexFields(
                 getPredefinedAddressFields());
-            caseType.getCaseFieldDefinitions().stream().forEach(caseField -> caseField.propagateACLsToNestedFields());
+            caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
             final CaseViewField caseViewField1 = aViewField()
                 .withId("Name")
@@ -1436,7 +1436,7 @@ class AccessControlServiceFilterTest {
             caseViewField1.getFieldTypeDefinition().setCollectionFieldTypeDefinition(getPersonFieldType());
             caseViewField1.getFieldTypeDefinition().getChildren().stream()
                 .filter(e -> e.getId().equals("Addresses")).findFirst()
-                .get().setAccessControlLists(asList(anAcl()
+                .get().setAccessControlLists(Collections.singletonList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withCreate(true)
                 .withDelete(true)
@@ -1672,7 +1672,7 @@ class AccessControlServiceFilterTest {
         @DisplayName("Should filter sub fields of caseFields based on Complex ACLs on READ")
         void filterCaseFieldsUserHasReadAccess() {
             final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
+            people.setAccessControlLists(Collections.singletonList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withRead(true)
                 .build()));
@@ -1711,7 +1711,7 @@ class AccessControlServiceFilterTest {
             people.propagateACLsToNestedFields();
 
             final List<CaseFieldDefinition> filteredCaseFields =
-                accessControlService.filterCaseFieldsByAccess(asList(people), USER_ROLES, CAN_READ);
+                accessControlService.filterCaseFieldsByAccess(Collections.singletonList(people), USER_ROLES, CAN_READ);
 
             assertAll(
                 () -> assertThat(filteredCaseFields, hasSize(1)),
@@ -1735,7 +1735,7 @@ class AccessControlServiceFilterTest {
         @DisplayName("Should filter sub fields of caseFields based on Complex ACLs on UPDATE")
         void filterCaseFieldsUserHasUpdateAccess() {
             final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(asList(anAcl()
+            people.setAccessControlLists(Collections.singletonList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withUpdate(true)
                 .build()));
@@ -1774,7 +1774,7 @@ class AccessControlServiceFilterTest {
             people.propagateACLsToNestedFields();
 
             final List<CaseFieldDefinition> filteredCaseFields = accessControlService.filterCaseFieldsByAccess(
-                asList(people), USER_ROLES, CAN_UPDATE);
+                Collections.singletonList(people), USER_ROLES, CAN_UPDATE);
 
             assertAll(
                 () -> assertThat(filteredCaseFields, hasSize(1)),
