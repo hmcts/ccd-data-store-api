@@ -87,7 +87,7 @@ class AuthorisedGetUserProfileOperationTest {
         test1JurisdictionDisplayProperties.setCaseTypeDefinitions(caseTypes1Definition);
         test2JurisdictionDisplayProperties.setCaseTypeDefinitions(caseTypes2Definition);
 
-        when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(any()))
+        when(caseDataAccessControl.generateOrganisationalAccessProfilesByCaseTypeId(any()))
             .thenReturn(accessProfiles);
         doReturn(userProfile).when(getUserProfileOperation).execute(CAN_READ);
         doReturn(true).when(accessControlService).canAccessCaseTypeWithCriteria(any(), any(), any());
@@ -109,8 +109,8 @@ class AuthorisedGetUserProfileOperationTest {
     public void execute() {
         doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(eq(notAllowedCaseTypeDefinition),
             eq(accessProfiles), eq(CAN_READ));
-        doReturn(caseStateDefinitions).when(accessControlService).filterCaseStatesByAccess(any(), eq(accessProfiles),
-            eq(CAN_READ));
+        doReturn(caseStateDefinitions).when(accessControlService)
+            .filterCaseStatesByAccess(any(CaseTypeDefinition.class), eq(accessProfiles), eq(CAN_READ));
         doReturn(caseEventDefinitions).when(accessControlService).filterCaseEventsByAccess(any(), eq(accessProfiles),
             eq(CAN_READ));
 
@@ -135,8 +135,8 @@ class AuthorisedGetUserProfileOperationTest {
     public void executeForCreate() {
         doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(eq(notAllowedCaseTypeDefinition),
             eq(accessProfiles), eq(CAN_CREATE));
-        doReturn(caseStateDefinitions).when(accessControlService).filterCaseStatesByAccess(any(), eq(accessProfiles),
-            eq(CAN_CREATE));
+        doReturn(caseStateDefinitions).when(accessControlService)
+            .filterCaseStatesByAccess(any(CaseTypeDefinition.class), eq(accessProfiles), eq(CAN_CREATE));
         doReturn(caseEventDefinitions).when(accessControlService).filterCaseEventsByAccess(any(), eq(accessProfiles),
             eq(CAN_CREATE));
         doReturn(userProfile).when(getUserProfileOperation).execute(CAN_CREATE);
@@ -163,8 +163,8 @@ class AuthorisedGetUserProfileOperationTest {
     public void executeForCreateWithNonOrganisationProfile() {
         doReturn(false).when(accessControlService).canAccessCaseTypeWithCriteria(eq(notAllowedCaseTypeDefinition),
             eq(accessProfiles), eq(CAN_CREATE));
-        doReturn(caseStateDefinitions).when(accessControlService).filterCaseStatesByAccess(any(), eq(accessProfiles),
-            eq(CAN_CREATE));
+        doReturn(caseStateDefinitions).when(accessControlService)
+            .filterCaseStatesByAccess(any(CaseTypeDefinition.class), eq(accessProfiles), eq(CAN_CREATE));
         doReturn(caseEventDefinitions).when(accessControlService).filterCaseEventsByAccess(any(), eq(accessProfiles),
             eq(CAN_CREATE));
         doReturn(userProfile).when(getUserProfileOperation).execute(CAN_CREATE);

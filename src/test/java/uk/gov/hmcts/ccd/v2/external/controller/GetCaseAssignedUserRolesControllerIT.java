@@ -10,6 +10,9 @@ import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseAssignedUserRolesResource;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -20,6 +23,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleAssignmentResponseJson;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.userRoleAssignmentJson;
 import static uk.gov.hmcts.ccd.v2.V2.Error.OTHER_USER_CASE_ROLE_ACCESS_NOT_GRANTED;
 
 class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesControllerIT {
@@ -63,6 +68,13 @@ class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
     void shouldGetSelfCaseUserRolesAssigned() throws Exception {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
 
+        String roleAssignmentResponseJson = roleAssignmentResponseJson(
+            userRoleAssignmentJson("89000", "[CREATOR]", "7578590391163133")
+        );
+
+        stubFor(post(urlMatching("/am/role-assignments/query"))
+            .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
+
         final MvcResult result = mockMvc.perform(get(getCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
             .param(PARAM_CASE_IDS, CASE_IDS)
@@ -94,6 +106,15 @@ class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
     })
     void shouldGetAllUserCaseRolesRelatingToAllUsersWhenNoUserIDPassedForPassedCaseId() throws Exception {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
+
+        String roleAssignmentResponseJson = roleAssignmentResponseJson(
+            userRoleAssignmentJson("89001", "[DEFENDANT]", "6375837333991692"),
+            userRoleAssignmentJson("89001", "[SOLICITOR]", "6375837333991692"),
+            userRoleAssignmentJson("89002", "[DEFENDANT]", "6375837333991692")
+        );
+
+        stubFor(post(urlMatching("/am/role-assignments/query"))
+            .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
 
         final MvcResult result = mockMvc.perform(get(getCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)
@@ -135,6 +156,16 @@ class GetCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesCont
     })
     void shouldGetAllUserCaseRolesRelatingToAllUsersWhenNoUserIDPassedForListOfCaseIds() throws Exception {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC, caseworkerCaa);
+
+        String roleAssignmentResponseJson = roleAssignmentResponseJson(
+            userRoleAssignmentJson("89000", "[CREATOR]", "7578590391163133"),
+            userRoleAssignmentJson("89001", "[DEFENDANT]", "6375837333991692"),
+            userRoleAssignmentJson("89001", "[SOLICITOR]", "6375837333991692"),
+            userRoleAssignmentJson("89002", "[DEFENDANT]", "6375837333991692")
+        );
+
+        stubFor(post(urlMatching("/am/role-assignments/query"))
+            .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
 
         final MvcResult result = mockMvc.perform(get(getCaseAssignedUserRoles)
             .contentType(JSON_CONTENT_TYPE)

@@ -158,14 +158,23 @@ public class ApplicationParams {
     @Value("${enable-pseudo-access-profiles-generation}")
     private boolean enablePseudoAccessProfilesGeneration;
 
+    @Value("${enable-case-users-db-sync}")
+    private boolean enableCaseUsersDbSync;
+
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
 
     @Value("${document.hash.check.enabled}")
     private boolean enableDocumentHashCheck;
 
+    @Value("${ccd.multiparty.fix.enabled}")
+    private boolean multipartyFixEnabled;
+
     @Value("${ccd.case-document-am-api.attachDocumentEnabled:true}")
     private boolean attachDocumentEnabled;
+
+    @Value("${ccd.documentHashCloneEnabled:true}")
+    private boolean documentHashCloneEnabled;
 
     @Value("${idam.data-store.system-user.username}")
     private String dataStoreSystemUserId;
@@ -457,6 +466,10 @@ public class ApplicationParams {
         return enablePseudoAccessProfilesGeneration;
     }
 
+    public boolean getEnableCaseUsersDbSync() {
+        return enableCaseUsersDbSync;
+    }
+
     public List<String> getCcdAccessControlCitizenRoles() {
         return ccdAccessControlCitizenRoles;
     }
@@ -495,5 +508,13 @@ public class ApplicationParams {
 
     public List<String> getCaseDataIssueLoggingJurisdictions() {
         return caseDataIssueLoggingJurisdictions;
+    }
+
+    public boolean isDocumentHashCloneEnabled() {
+        return this.documentHashCloneEnabled;
+    }
+
+    public boolean isMultipartyFixEnabled() {
+        return multipartyFixEnabled;
     }
 }

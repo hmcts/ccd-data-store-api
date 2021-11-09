@@ -79,7 +79,8 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
             .forEach(userClassification ->
                 userRoleClassifications.putIfAbsent(userClassification.getRole(), userClassification));
 
-        return userRoles.stream().map(userRoleClassifications::get).collect(Collectors.toList());
+        return userRoles.stream().map(userRoleClassifications::get)
+            .filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     @Override

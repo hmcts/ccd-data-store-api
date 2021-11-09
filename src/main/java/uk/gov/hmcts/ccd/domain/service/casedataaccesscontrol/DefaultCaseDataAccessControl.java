@@ -1,6 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -8,6 +16,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
+import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
+import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -18,24 +28,21 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.MatcherType;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 @Component
 @ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "true")
 @Lazy
-public class DefaultCaseDataAccessControl implements CaseDataAccessControl, AccessControl {
+public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessControl, AccessControl {
 
     private final RoleAssignmentService roleAssignmentService;
     private final SecurityUtils securityUtils;
@@ -46,19 +53,24 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     private final PseudoRoleToAccessProfileGenerator pseudoRoleToAccessProfileGenerator;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseDetailsRepository caseDetailsRepository;
+    private final UserAuthorisation userAuthorisation;
+    private final CaseUserRepository caseUserRepository;
 
     @Autowired
     public DefaultCaseDataAccessControl(RoleAssignmentService roleAssignmentService,
-                                        SecurityUtils securityUtils,
-                                        RoleAssignmentsFilteringService roleAssignmentsFilteringService,
-                                        PseudoRoleAssignmentsGenerator pseudoRoleAssignmentsGenerator,
-                                        ApplicationParams applicationParams,
-                                        AccessProfileService accessProfileService,
-                                        PseudoRoleToAccessProfileGenerator pseudoRoleToAccessProfileGenerator,
-                                        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                                SecurityUtils securityUtils,
+                                                RoleAssignmentsFilteringService roleAssignmentsFilteringService,
+                                                PseudoRoleAssignmentsGenerator pseudoRoleAssignmentsGenerator,
+                                                ApplicationParams applicationParams,
+                                                AccessProfileService accessProfileService,
+                                                PseudoRoleToAccessProfileGenerator pseudoRoleToAccessProfileGenerator,
+                                                @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                             final CaseDefinitionRepository caseDefinitionRepository,
-                                        @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
-                                                CaseDetailsRepository caseDetailsRepository) {
+                                                @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                                CaseDetailsRepository caseDetailsRepository,
+                                                UserAuthorisation userAuthorisation,
+                                        @Qualifier(CachedCaseUserRepository.QUALIFIER)
+                                                CaseUserRepository caseUserRepository) {
         this.roleAssignmentService = roleAssignmentService;
         this.securityUtils = securityUtils;
         this.roleAssignmentsFilteringService = roleAssignmentsFilteringService;
@@ -68,6 +80,8 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         this.pseudoRoleToAccessProfileGenerator = pseudoRoleToAccessProfileGenerator;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseDetailsRepository = caseDetailsRepository;
+        this.userAuthorisation = userAuthorisation;
+        this.caseUserRepository = caseUserRepository;
     }
 
     // Returns List<AccessProfile>. Returns list of access profiles
@@ -78,7 +92,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     }
 
     @Override
-    public Set<AccessProfile> generateCreationAccessProfilesByCaseTypeId(String caseTypeId) {
+    public Set<AccessProfile> generateOrganisationalAccessProfilesByCaseTypeId(String caseTypeId) {
         return generateAllTypesOfProfilesByCaseTypeId(caseTypeId, true);
     }
 
@@ -93,9 +107,22 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         List<RoleAssignment> filteredRoleAssignments = roleAssignmentsFilteringService
             .filter(roleAssignments, caseTypeDefinition).getFilteredMatchingRoleAssignments();
 
-        return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments, caseTypeDefinition));
+        return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments, caseTypeDefinition, isCreationProfile));
     }
 
+    // use for ES searchCases - we don't want to fetch the case, because it should be taken from the ES
+    @Override
+    public Set<AccessProfile> generateAccessProfilesByCaseDetails(CaseDetails caseDetails) {
+        RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
+
+        FilteredRoleAssignments filteredRoleAssignments =
+            roleAssignmentsFilteringService.filter(roleAssignments, caseDetails);
+
+        CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
+
+        return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments.getFilteredMatchingRoleAssignments(),
+            caseTypeDefinition, false));
+    }
 
     @Override
     public Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference) {
@@ -103,7 +130,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         // R.A uses external micro-services which referer cases by caseReference
         // Non R.A uses internal case id. Both cases should be contemplated in the code.
         if (caseDetails.isEmpty()) {
-            caseDetails = caseDetailsRepository.findById(null,Long.parseLong(caseReference));
+            caseDetails = caseDetailsRepository.findById(null, Long.parseLong(caseReference));
             if (caseDetails.isEmpty()) {
                 return Sets.newHashSet();
             }
@@ -117,22 +144,55 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.get().getCaseTypeId());
 
         return Sets.newHashSet(filteredAccessProfiles(filteredRoleAssignments.getFilteredMatchingRoleAssignments(),
-            caseTypeDefinition));
+            caseTypeDefinition, false));
     }
 
-    private List<AccessProfile> filteredAccessProfiles(List<RoleAssignment> filteredRoleAssignments,
-                                                       CaseTypeDefinition caseTypeDefinition) {
+    @Override
+    public void grantAccess(CaseDetails caseDetails, String idamUserId) {
+        if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
+            roleAssignmentService.createCaseRoleAssignments(caseDetails, idamUserId, Set.of(CREATOR.getRole()), false);
+            if (applicationParams.getEnableCaseUsersDbSync()) {
+                caseUserRepository.grantAccess(Long.valueOf(caseDetails.getId()), idamUserId, CREATOR.getRole());
+            }
+        }
+    }
+
+    @Override
+    public List<AccessProfile> filteredAccessProfiles(List<RoleAssignment> filteredRoleAssignments,
+                                                       CaseTypeDefinition caseTypeDefinition,
+                                                       boolean isCreationProfile) {
+        filteredRoleAssignments = pseudoGenerateRoleAssignments(filteredRoleAssignments, isCreationProfile);
+
+        return generateAccessProfiles(filteredRoleAssignments, caseTypeDefinition);
+    }
+
+    @Override
+    public List<RoleAssignment> generateRoleAssignments(CaseTypeDefinition caseTypeDefinition) {
+        RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
+        List<RoleAssignment> filteredRoleAssignments = roleAssignmentsFilteringService
+            .filter(roleAssignments, caseTypeDefinition,
+                Lists.newArrayList(
+                    MatcherType.GRANTTYPE,
+                    MatcherType.SECURITYCLASSIFICATION
+                )
+            ).getFilteredMatchingRoleAssignments();
+
+        filteredRoleAssignments = pseudoGenerateRoleAssignments(filteredRoleAssignments, false);
+        return filteredRoleAssignments;
+    }
+
+    private List<RoleAssignment> pseudoGenerateRoleAssignments(List<RoleAssignment> filteredRoleAssignments,
+                                                               boolean isCreationProfile) {
         if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
             List<RoleAssignment> pseudoRoleAssignments = pseudoRoleAssignmentsGenerator
-                .createPseudoRoleAssignments(filteredRoleAssignments);
+                .createPseudoRoleAssignments(filteredRoleAssignments, isCreationProfile);
             filteredRoleAssignments = augment(filteredRoleAssignments, pseudoRoleAssignments);
         }
 
         if (hasGrantTypeExcludedRole(filteredRoleAssignments)) {
             filteredRoleAssignments = retainBasicAndSpecificGrantTypeRolesOnly(filteredRoleAssignments);
         }
-
-        return generateAccessProfiles(filteredRoleAssignments, caseTypeDefinition);
+        return filteredRoleAssignments;
     }
 
 
@@ -141,9 +201,17 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
         List<RoleToAccessProfileDefinition> pseudoAccessProfilesMappings = new ArrayList<>();
         pseudoAccessProfilesMappings.addAll(caseTypeDefinition.getRoleToAccessProfiles());
         if (applicationParams.getEnablePseudoAccessProfilesGeneration()) {
-            pseudoAccessProfilesMappings.addAll(pseudoRoleToAccessProfileGenerator.generate(caseTypeDefinition));
+            List<RoleToAccessProfileDefinition> generated =
+                pseudoRoleToAccessProfileGenerator.generate(caseTypeDefinition);
+            pseudoAccessProfilesMappings.addAll(generated.stream()
+                .filter(e -> getRoleNamesAsStream(caseTypeDefinition).noneMatch(p -> p.equals(e.getRoleName())))
+                .collect(Collectors.toList()));
         }
         return accessProfileService.generateAccessProfiles(filteredRoleAssignments, pseudoAccessProfilesMappings);
+    }
+
+    private Stream<String> getRoleNamesAsStream(CaseTypeDefinition caseTypeDefinition) {
+        return caseTypeDefinition.getRoleToAccessProfiles().stream().map(RoleToAccessProfileDefinition::getRoleName);
     }
 
     private List<RoleAssignment> augment(List<RoleAssignment> filteredRoleAssignments,
@@ -218,7 +286,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
     private List<RoleAssignment> appendGeneratedPseudoRoleAssignments(List<RoleAssignment> filteringResults) {
         if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
             List<RoleAssignment> pseudoRoleAssignments = pseudoRoleAssignmentsGenerator
-                .createPseudoRoleAssignments(filteringResults);
+                .createPseudoRoleAssignments(filteringResults, false);
             filteringResults = augment(filteringResults, pseudoRoleAssignments);
         }
         return filteringResults;
@@ -256,7 +324,7 @@ public class DefaultCaseDataAccessControl implements CaseDataAccessControl, Acce
                                               Predicate<AccessControlList> access,
                                               String caseTypeId) {
         // In R.A if the access is create the RoleType has to be organisation.
-        final var accessProfile = generateCreationAccessProfilesByCaseTypeId(caseTypeId);
+        final var accessProfile = generateOrganisationalAccessProfilesByCaseTypeId(caseTypeId);
         return access.test(getCreateAccessControlList()) && accessProfile.isEmpty();
     }
 

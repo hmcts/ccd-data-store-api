@@ -8,9 +8,6 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentServi
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Component
 public class UserAuthorisationSecurity implements CaseDetailsAuthorisationSecurity {
 
@@ -30,12 +27,7 @@ public class UserAuthorisationSecurity implements CaseDetailsAuthorisationSecuri
     @Override
     public <T> void secure(CaseDetailsQueryBuilder<T> builder, MetaData metadata) {
         if (AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
-            if (applicationParams.getEnableAttributeBasedAccessControl()) {
-                final List<Long> caseReferences =
-                    roleAssignmentService.getCaseReferencesForAGivenUser(userAuthorisation.getUserId())
-                    .stream().map(Long::parseLong).collect(Collectors.toList());
-                builder.whereGrantedAccessOnlyForRA(caseReferences);
-            } else {
+            if (!applicationParams.getEnableAttributeBasedAccessControl()) {
                 builder.whereGrantedAccessOnly(userAuthorisation.getUserId());
             }
         }

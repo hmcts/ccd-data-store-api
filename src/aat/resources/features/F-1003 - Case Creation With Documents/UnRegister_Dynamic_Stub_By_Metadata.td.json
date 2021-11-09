@@ -1,0 +1,10 @@
+{
+  "_guid_": "UnRegister_Dynamic_Stub_By_Metadata",
+  "productName": "CCD Test Stub Service",
+  "operationName": "UnRegister all stubs matching specified metadata",
+  "specs": [
+    "Unregister all stubs specified by metadata from the Wiremock server running within ccd-test-stubs service"
+  ],
+  "method": "POST",
+  "uri": "{{BEFTA_TEST_STUB_SERVICE_BASE_URL}}/__admin/mappings/remove-by-metadata"
+ }

@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import java.util.Optional;
-import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -13,6 +11,9 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+
+import java.util.Optional;
+import java.util.Set;
 
 import static java.util.Comparator.comparingInt;
 
@@ -38,10 +39,10 @@ public class AttributeBasedSecurityClassificationService
     public Optional<SecurityClassification> getUserClassification(CaseDetails caseDetails, boolean create) {
         Set<AccessProfile> accessProfiles;
         if (create) {
-            accessProfiles = caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseDetails.getCaseTypeId());
-        } else {
             accessProfiles = caseDataAccessControl
-                .generateAccessProfilesByCaseReference(caseDetails.getReferenceAsString());
+                .generateOrganisationalAccessProfilesByCaseTypeId(caseDetails.getCaseTypeId());
+        } else {
+            accessProfiles = caseDataAccessControl.generateAccessProfilesByCaseDetails(caseDetails);
         }
         return getMaxSecurityClassification(accessProfiles);
     }

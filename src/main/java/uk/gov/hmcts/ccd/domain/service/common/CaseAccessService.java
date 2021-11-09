@@ -138,7 +138,7 @@ public class CaseAccessService {
 
     public Set<AccessProfile> getCreationAccessProfiles(String caseTypeId) {
         Set<AccessProfile> accessProfiles =
-            caseDataAccessControl.generateCreationAccessProfilesByCaseTypeId(caseTypeId);
+            caseDataAccessControl.generateOrganisationalAccessProfilesByCaseTypeId(caseTypeId);
         if (accessProfiles == null) {
             throw new ValidationException("Cannot find access profiles for the user");
         }

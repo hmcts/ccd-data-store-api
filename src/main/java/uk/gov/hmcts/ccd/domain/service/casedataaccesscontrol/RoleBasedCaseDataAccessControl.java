@@ -8,14 +8,19 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -29,19 +34,25 @@ import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 @Component
 @Lazy
 @ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "false", matchIfMissing = true)
-public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, AccessControl {
+public class RoleBasedCaseDataAccessControl implements NoCacheCaseDataAccessControl, AccessControl {
     private final UserAuthorisation userAuthorisation;
     private final CaseUserRepository caseUserRepository;
     private final UserRepository userRepository;
+    private final CaseDetailsRepository caseDetailsRepository;
+
 
     @Autowired
     public RoleBasedCaseDataAccessControl(final UserAuthorisation userAuthorisation,
                                           final @Qualifier(CachedCaseUserRepository.QUALIFIER)
                                               CaseUserRepository caseUserRepository,
-                                          @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
+                                          @Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository,
+                                          final @Qualifier(CachedCaseDetailsRepository.QUALIFIER)
+                                              CaseDetailsRepository caseDetailsRepository
+                                          ) {
         this.userAuthorisation = userAuthorisation;
         this.caseUserRepository = caseUserRepository;
         this.userRepository = userRepository;
+        this.caseDetailsRepository = caseDetailsRepository;
     }
 
     @Override
@@ -50,7 +61,7 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
     }
 
     @Override
-    public Set<AccessProfile> generateCreationAccessProfilesByCaseTypeId(String caseTypeId) {
+    public Set<AccessProfile> generateOrganisationalAccessProfilesByCaseTypeId(String caseTypeId) {
         return userRoleToAccessProfiles(userRepository.getUserRoles());
     }
 
@@ -58,14 +69,22 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
     public Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference) {
         Set<String> roles = Sets.union(userRepository.getUserRoles(),
             Sets.newHashSet(caseUserRepository
-                .findCaseRoles(Long.valueOf(caseReference), userRepository.getUserId())));
+                .findCaseRoles(Long.valueOf(getCaseId(caseReference)), userRepository.getUserId())));
         return userRoleToAccessProfiles(roles);
     }
 
     @Override
-    public void grantAccess(String caseId, String idamUserId) {
+    public Set<AccessProfile> generateAccessProfilesByCaseDetails(CaseDetails caseDetails) {
+        Set<String> roles = Sets.union(userRepository.getUserRoles(),
+            Sets.newHashSet(caseUserRepository
+                .findCaseRoles(Long.valueOf(caseDetails.getId()), userRepository.getUserId())));
+        return userRoleToAccessProfiles(roles);
+    }
+
+    @Override
+    public void grantAccess(CaseDetails caseDetails, String idamUserId) {
         if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
-            caseUserRepository.grantAccess(Long.valueOf(caseId), idamUserId, CREATOR.getRole());
+            caseUserRepository.grantAccess(Long.valueOf(caseDetails.getId()), idamUserId, CREATOR.getRole());
         }
     }
 
@@ -102,6 +121,18 @@ public class RoleBasedCaseDataAccessControl implements CaseDataAccessControl, Ac
             .stream()
             .map(AccessProfile::new)
             .collect(Collectors.toSet());
+    }
+
+    private String getCaseId(String caseReference) {
+        Optional<CaseDetails> optionalCaseDetails =  caseDetailsRepository.findByReference(caseReference);
+        // R.A uses external micro-services which referer cases by caseReference
+        // Non R.A uses internal case id. Both cases should be contemplated in the code.
+        if (optionalCaseDetails.isEmpty()) {
+            optionalCaseDetails = caseDetailsRepository.findById(null,Long.parseLong(caseReference));
+        }
+
+        CaseDetails caseDetails = optionalCaseDetails.orElseThrow(() -> new CaseNotFoundException(caseReference));
+        return caseDetails.getId();
     }
 
 

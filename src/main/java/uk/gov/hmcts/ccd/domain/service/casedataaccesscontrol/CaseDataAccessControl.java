@@ -1,27 +1,27 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
-import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
-
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
+import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
 public interface CaseDataAccessControl {
     Set<AccessProfile> generateAccessProfilesByCaseTypeId(String caseTypeId);
 
-    Set<AccessProfile> generateCreationAccessProfilesByCaseTypeId(String caseTypeId);
+    Set<AccessProfile> generateOrganisationalAccessProfilesByCaseTypeId(String caseTypeId);
 
     Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference);
 
-    default Set<AccessProfile> getCaseUserAccessProfilesByUserId() {
-        return new HashSet<>();
-    }
+    Set<AccessProfile> generateAccessProfilesByCaseDetails(CaseDetails caseDetails);
 
-    default void grantAccess(String caseId, String idamUserId) {
+    Set<AccessProfile> getCaseUserAccessProfilesByUserId();
 
-    }
+    void grantAccess(CaseDetails caseDetails, String idamUserId);
 
     CaseAccessMetadata generateAccessMetadataWithNoCaseId();
 
@@ -32,4 +32,10 @@ public interface CaseDataAccessControl {
     boolean shouldRemoveCaseDefinition(Set<AccessProfile> accessProfiles,
                                        Predicate<AccessControlList> access,
                                        String caseTypeId);
+
+    Set<AccessProfile> filteredAccessProfiles(List<RoleAssignment> filteredRoleAssignments,
+                                               CaseTypeDefinition caseTypeDefinition,
+                                               boolean isCreationProfile);
+
+    List<RoleAssignment> generateRoleAssignments(CaseTypeDefinition caseTypeDefinition);
 }
