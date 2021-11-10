@@ -101,8 +101,8 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
         verifyMandatoryAccessForCase(eventId, caseDetails, caseTypeDefinition, userRoles);
 
-        CaseUpdateViewEvent caseUpdateViewEvent = filterUpsertAccessForCase(caseTypeDefinition, userRoles,
-            getEventTriggerOperation.executeForCase(caseReference, eventId, ignoreWarning));
+        CaseUpdateViewEvent caseUpdateViewEvent = filterUpsertAccessForCase(caseReference, eventId, caseTypeDefinition,
+            userRoles, getEventTriggerOperation.executeForCase(caseReference, eventId, ignoreWarning));
         return accessControlService.updateCollectionDisplayContextParameterByAccess(caseUpdateViewEvent, userRoles);
     }
 
@@ -191,10 +191,13 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
             CAN_CREATE);
     }
 
-    private CaseUpdateViewEvent filterUpsertAccessForCase(CaseTypeDefinition caseTypeDefinition,
+    private CaseUpdateViewEvent filterUpsertAccessForCase(String caseReference, String eventId,
+                                                          CaseTypeDefinition caseTypeDefinition,
                                                           Set<String> userRoles,
                                                           CaseUpdateViewEvent caseUpdateViewEvent) {
         return accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            caseReference,
+            eventId,
             caseUpdateViewEvent,
             caseTypeDefinition.getCaseFieldDefinitions(),
             userRoles,
