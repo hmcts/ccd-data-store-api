@@ -44,6 +44,9 @@ public class GetCaseCallback {
     }
 
     private void validateNewMetadataFields(List<CaseViewField> metadataFields, GetCaseCallbackResponse response) {
+        if (response == null) {
+            throw new CallbackException("CCD_CDI_CallbackGetCaseUrl: response body not set");
+        }
         Set<String> caseViewFieldIds = metadataFields.stream()
             .map(CaseViewField::getId).collect(Collectors.toSet());
         Set<String> callbackMetadataIds = response.getMetadataFields().stream()

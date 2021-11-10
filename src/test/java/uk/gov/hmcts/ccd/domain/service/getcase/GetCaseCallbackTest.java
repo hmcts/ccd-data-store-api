@@ -18,7 +18,6 @@ import java.util.List;
 
 import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -80,18 +79,15 @@ public class GetCaseCallbackTest {
     }
 
     @Test
-    @DisplayName("should handle null GetCaseCallbackResponse")
-    void shouldHandleNullGetCaseCallbackResponse() {
-        doReturn(getCaseCallbackResponse).when(response).getBody();
+    @DisplayName("should throw CallbackException when GetCaseCallbackResponse body is null")
+    void shouldThrowCallbackExceptionWhenGetCaseCallbackResponseBodyIsNull() {
+        String errorMessage = "CCD_CDI_CallbackGetCaseUrl: response body not set";
+        doReturn(null).when(response).getBody();
 
-        GetCaseCallbackResponse result = getCaseCallback.invoke(caseTypeDefinition, caseDetails, emptyList());
-        assertAll(
-            () -> assertNotNull(result),
-            () -> assertNotNull(result.getMetadataFields()),
-            () -> assertThat(result.getMetadataFields().size(), equalTo(0)),
-            () -> verify(callbackInvoker)
-                .invokeGetCaseCallback(caseTypeDefinition, caseDetails)
-        );
+        CallbackException callbackException = assertThrows(CallbackException.class,
+            () -> getCaseCallback.invoke(caseTypeDefinition, caseDetails, emptyList()));
+        assertTrue(callbackException.getMessage()
+            .endsWith(errorMessage));
     }
 
     @Test
