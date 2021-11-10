@@ -9,7 +9,7 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 @Slf4j
 @Component
-public class SpecificGrantTypeQueryBuilder extends GrantTypeQueryBuilder {
+public class SpecificGrantTypeQueryBuilder extends GrantTypeSqlQueryBuilder {
 
     @Autowired
     public SpecificGrantTypeQueryBuilder(AccessControlService accessControlService,

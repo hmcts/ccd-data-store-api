@@ -88,7 +88,7 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
     void shouldReturnQueryWhenAtLeastOneRoleAssignmentHasNoAuthorisations() {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC,
             "CASE",
-            "ROLE1", "PRIVATE", "", "",
+            "ROLE1", "PUBLIC", "", "",
             Lists.newArrayList("auth1"));
 
         RoleAssignment roleAssignment2 = createRoleAssignment(GrantType.BASIC,
@@ -110,7 +110,7 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
     void shouldReturnQueryWhenMoreThanOneRoleAssignmentHasNoAuthorisations() {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC,
             "CASE",
-            "ROLE1", "PRIVATE", "", "",
+            "ROLE1", "PUBLIC", "", "",
             Lists.newArrayList("auth1"));
 
         RoleAssignment roleAssignment2 = createRoleAssignment(GrantType.BASIC,

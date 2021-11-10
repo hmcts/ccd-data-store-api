@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 
-import static uk.gov.hmcts.ccd.data.casedetails.search.builder.GrantTypeQueryBuilder.AND_NOT;
-import static uk.gov.hmcts.ccd.data.casedetails.search.builder.GrantTypeQueryBuilder.EMPTY;
-import static uk.gov.hmcts.ccd.data.casedetails.search.builder.GrantTypeQueryBuilder.OR;
+import static uk.gov.hmcts.ccd.data.casedetails.search.builder.GrantTypeSqlQueryBuilder.AND_NOT;
+import static uk.gov.hmcts.ccd.data.casedetails.search.builder.GrantTypeSqlQueryBuilder.EMPTY;
+import static uk.gov.hmcts.ccd.data.casedetails.search.builder.GrantTypeSqlQueryBuilder.OR;
 
 @Component
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")

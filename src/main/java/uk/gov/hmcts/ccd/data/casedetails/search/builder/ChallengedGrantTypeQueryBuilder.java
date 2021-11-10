@@ -10,7 +10,7 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 @Slf4j
 @Component
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
-public class ChallengedGrantTypeQueryBuilder extends GrantTypeQueryBuilder {
+public class ChallengedGrantTypeQueryBuilder extends GrantTypeSqlQueryBuilder {
 
     @Autowired
     public ChallengedGrantTypeQueryBuilder(AccessControlService accessControlService,
