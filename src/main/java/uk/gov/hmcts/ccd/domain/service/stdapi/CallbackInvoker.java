@@ -132,6 +132,7 @@ public class CallbackInvoker {
         CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setId("GetCaseCallback");
         caseEventDefinition.setName("GetCaseCallback");
+
         ResponseEntity<GetCaseCallbackResponse> getCaseCallbackResponseEntity;
         if (isRetriesDisabled(retries)) {
             getCaseCallbackResponseEntity =

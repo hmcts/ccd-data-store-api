@@ -29,7 +29,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class GetCaseCallbackTest {
+
     private AutoCloseable closeable;
+
     @Mock
     private CallbackInvoker callbackInvoker;
     @Mock
@@ -50,7 +52,8 @@ public class GetCaseCallbackTest {
         getCaseCallbackResponse = new GetCaseCallbackResponse();
         getCaseCallbackResponse.setMetadataFields(emptyList());
 
-        doReturn(response).when(callbackInvoker).invokeGetCaseCallback(caseTypeDefinition, caseDetails);
+        doReturn(response).when(callbackInvoker)
+            .invokeGetCaseCallback(caseTypeDefinition, caseDetails);
         doReturn(getCaseCallbackResponse).when(response).getBody();
     }
 
@@ -71,7 +74,8 @@ public class GetCaseCallbackTest {
             () -> assertNotNull(result),
             () -> assertNotNull(result.getMetadataFields()),
             () -> assertThat(result.getMetadataFields(), sameInstance(metadataFields)),
-            () -> verify(callbackInvoker).invokeGetCaseCallback(caseTypeDefinition, caseDetails)
+            () -> verify(callbackInvoker)
+                .invokeGetCaseCallback(caseTypeDefinition, caseDetails)
         );
     }
 
@@ -85,7 +89,8 @@ public class GetCaseCallbackTest {
             () -> assertNotNull(result),
             () -> assertNotNull(result.getMetadataFields()),
             () -> assertThat(result.getMetadataFields().size(), equalTo(0)),
-            () -> verify(callbackInvoker).invokeGetCaseCallback(caseTypeDefinition, caseDetails)
+            () -> verify(callbackInvoker)
+                .invokeGetCaseCallback(caseTypeDefinition, caseDetails)
         );
     }
 
