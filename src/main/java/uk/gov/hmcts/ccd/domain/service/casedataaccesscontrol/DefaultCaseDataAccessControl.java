@@ -177,7 +177,11 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
                 )
             ).getFilteredMatchingRoleAssignments();
 
-        filteredRoleAssignments = pseudoGenerateRoleAssignments(filteredRoleAssignments, false);
+        if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
+            List<RoleAssignment> pseudoRoleAssignments = pseudoRoleAssignmentsGenerator
+                .createPseudoRoleAssignments(filteredRoleAssignments, false);
+            filteredRoleAssignments = augment(filteredRoleAssignments, pseudoRoleAssignments);
+        }
         return filteredRoleAssignments;
     }
 
