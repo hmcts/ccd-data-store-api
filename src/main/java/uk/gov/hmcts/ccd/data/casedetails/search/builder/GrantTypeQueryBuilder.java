@@ -49,7 +49,7 @@ public abstract class GrantTypeQueryBuilder {
      * @param roleAssignments Role assignments to group
      * @param caseType Case type for which the role assignments relate to
      * @return Grouped role assignments for search. Note that case reference is ignored in the grouping, so
-     * SearchRoleAssignments in the same group can have different case reference values.
+     *      SearchRoleAssignments in the same group can have different case reference values.
      */
     protected Map<Integer, List<SearchRoleAssignment>> getGroupedSearchRoleAssignments(
         List<RoleAssignment> roleAssignments,
