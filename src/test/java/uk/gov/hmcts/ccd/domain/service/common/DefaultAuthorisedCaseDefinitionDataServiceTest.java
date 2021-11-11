@@ -1,5 +1,11 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -7,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
@@ -15,14 +20,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.security.DefaultAuthorisedCaseDefinitionDataService;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -47,8 +44,6 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
     private AccessControlService accessControlService;
     @Mock
     private UserRepository userRepository;
-    @Mock
-    private ApplicationParams applicationParams;
 
     @Mock
     private CaseDataAccessControl caseDataAccessControl;
@@ -145,7 +140,6 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
             when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
                 .thenReturn(accessProfiles);
             when(caseTypeDefinition.getSecurityClassification()).thenReturn(SecurityClassification.PRIVATE);
-            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
         }
 
         @Test
@@ -190,20 +184,6 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
             assertThat(result.isPresent(), is(false));
             verify(userRepository).getHighestUserClassification(anyString());
             verifyCalls();
-        }
-
-        @Test
-        @DisplayName("should not return case type when user classification is not defined for caseType jurisdiction")
-        void shouldNotReturnCaseTypeWhenUserHasNoClassificationForJurisdiction() {
-            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ))
-                .thenReturn(true);
-            when(userRepository.getUserClassifications(anyString())).thenReturn(Collections.emptySet());
-            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
-
-            Optional<CaseTypeDefinition> result = authorisedCaseDataService.getAuthorisedCaseType(CASE_TYPE, CAN_READ);
-
-            assertThat(result.isPresent(), is(false));
-            verify(userRepository).getUserClassifications(anyString());
         }
 
         void verifyCalls() {
