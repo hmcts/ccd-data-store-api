@@ -74,4 +74,37 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
 
         assertThrows(DataIntegrityViolationException.class, () -> caseLinkRepository.save(caseLinkEntity));
     }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void testDeleteByCaseReferenceAndLinkedCaseReference() {
+
+        CaseLinkEntity savedEntity = caseLinkRepository.save(caseLinkEntity);
+
+        int deletedCount = caseLinkRepository.deleteByCaseReferenceAndLinkedCaseReference(
+            1504259907353651L,
+            1504259907353598L);
+
+        assertFalse(caseLinkRepository.findById(savedEntity.getCaseLinkPrimaryKey()).isPresent());
+
+        assertEquals(1, deletedCount);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void testInsertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId() {
+
+        CaseLinkEntity.CaseLinkPrimaryKey pk = new CaseLinkEntity.CaseLinkPrimaryKey();
+        pk.setCaseId(19L);
+        pk.setLinkedCaseId(20L);
+
+        assertFalse(caseLinkRepository.findById(pk).isPresent());
+
+        caseLinkRepository.insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(1601933818308168L,
+                                                                            9816494993793181L,
+                                                                            "test");
+
+        assertTrue(caseLinkRepository.findById(pk).isPresent());
+    }
+
 }

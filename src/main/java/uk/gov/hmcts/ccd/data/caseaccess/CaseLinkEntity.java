@@ -16,7 +16,7 @@ public class CaseLinkEntity {
         @Column(name = "linked_case_id", nullable = false)
         private Long linkedCaseId;
 
-        public long getCaseId() {
+        public Long getCaseId() {
             return caseId;
         }
 
@@ -24,7 +24,7 @@ public class CaseLinkEntity {
             this.caseId = caseId;
         }
 
-        public long getLinkedCaseId() {
+        public Long getLinkedCaseId() {
             return linkedCaseId;
         }
 
