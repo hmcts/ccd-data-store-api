@@ -128,7 +128,7 @@ public class CaseDataExtractor {
         List<String> returnValue = new ArrayList<>(paths);
         FieldTypeDefinition fieldTypeDefinition = caseFieldDefinition.getFieldTypeDefinition();
 
-        if (fieldTypeDefinition.getType() != null && caseFieldDefinition.getFieldTypeDefinition().getType()
+        if (fieldTypeDefinition.getId() != null && caseFieldDefinition.getFieldTypeDefinition().getId()
             .equals(fieldType)) {
             returnValue.add(fieldIdPrefix + fieldId);
         }

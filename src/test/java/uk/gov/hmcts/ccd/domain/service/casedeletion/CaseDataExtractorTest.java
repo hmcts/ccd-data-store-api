@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.casedeletion;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.ccd.BaseTest;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,39 +26,56 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CaseDataExtractorTest extends WireMockBaseTest {
 
-    private static final String CASE_FIELD_JSON = "/tests/CaseDataValidator_CaseField.json";
+    private static final String CASE_FIELD_JSON = "/tests/CaseDataExtractor_CaseField.json";
     private static List<CaseFieldDefinition> caseFields;
 
     private CaseDataExtractor caseDataExtractor = new CaseDataExtractor();
 
     private static final String SIMPLE_DATA =
-        "{\n" +
-            "  \"CaseReference\" : \"Address Line 1\"\n" +
-            "}";
+        "{\n"
+        + "  \"CaseReference\" : \"Address Line 1\"\n"
+        + "}";
 
     private static final String COLLECTION_DATA =
-        "{\n" +
-            "  \"CaseLink\" : [\n" +
-            "    {\n" +
-            "      \"value\": " +
-            "        {\n" +
-            "          \"CaseLink1\": \"1596104840593131\",\n" +
-            "          \"CaseLink2\": \"1596104840593131\"\n" +
-            "        }\n" +
-            "    }" +
-            "  ]\n" +
-            "}";
+        "{\n"
+        + "  \"CaseLink\" : [\n"
+        + "    {\n"
+        + "      \"value\": "
+        + "        {\n"
+        + "          \"CaseLink1\": \"1596104840593131\",\n"
+        + "          \"CaseLink2\": \"1596104840593131\"\n"
+        + "        }\n"
+        + "    }"
+        + "  ]\n"
+        + "}";
 
     private static final String COMPLEX_OBJECT_DATA =
-        "{\n" +
-            "   \"Person\": {\n" +
-            "        \"Name\": \"NameValue\",\n" +
-            "        \"Address\": {\n" +
-            "            \"Line1\": \"Address Line1\"\n," +
-            "            \"Line2\": \"Address Line1\"\n" +
-            "         }\n" +
-            "  }\n" +
-            "}";
+        "{\n"
+        + "   \"Person\": {\n"
+        + "        \"CaseLink1\": \"1596104840593131\",\n"
+        + "        \"Address\": {\n"
+        + "            \"Line1\": \"Address Line1\"\n,"
+        + "            \"Line2\": \"Address Line1\"\n"
+        + "         }\n"
+        + "  }\n"
+        + "}";
+
+    private static final String COMPLEX_OBJECT_DATA_TEST =
+        "{\n"
+            + "   \"Person\": {\n"
+            + "        \"Name\": \"NameValue\",\n"
+            + "        \"Address\": {\n"
+            + "            \"Line1\": \"Address Line1\"\n,"
+            + "            \"Line2\": \"Address Line1\"\n"
+            + "         }\n"
+            + "  },\n"
+            + "   \"CaseLink1\": {\n"
+            + "        \"CaseReference\": \"1596104840593131\"\n"
+            + "    },"
+            + "   \"CaseLink2\": {\n"
+            + "        \"CaseReference\": \"1596104840593131\"\n"
+            + "    }"
+            + "}";
 
     @ParameterizedTest
     @MethodSource("provideExtractFieldTypePathsParameters")
@@ -65,7 +84,8 @@ class CaseDataExtractorTest extends WireMockBaseTest {
             = JacksonUtils.MAPPER.readValue(data, new TypeReference<HashMap<String, JsonNode>>() { });
         caseFields = getCaseFieldsFromJson(BaseTest.getResourceAsString(CASE_FIELD_JSON));
 
-        List<String> extractedFieldTypePaths = caseDataExtractor.extractFieldTypePaths(jsonData, caseFields, "Text");
+        List<String> extractedFieldTypePaths =
+            caseDataExtractor.extractFieldTypePaths(jsonData, caseFields, "TextCaseReference");
 
         assertEquals(expectedFieldTypePaths.size(), extractedFieldTypePaths.size());
         assertTrue(extractedFieldTypePaths.containsAll(expectedFieldTypePaths));
@@ -75,7 +95,8 @@ class CaseDataExtractorTest extends WireMockBaseTest {
         return Stream.of(
             Arguments.of(SIMPLE_DATA, List.of("CaseReference")),
             Arguments.of(COLLECTION_DATA, List.of("CaseLink.0.CaseLink1", "CaseLink.0.CaseLink2")),
-            Arguments.of(COMPLEX_OBJECT_DATA, List.of("Person.Name", "Person.Address.Line1", "Person.Address.Line2"))
+            Arguments.of(COMPLEX_OBJECT_DATA, List.of("Person.CaseLink1")),
+            Arguments.of(COMPLEX_OBJECT_DATA_TEST, List.of("CaseLink1.CaseReference", "CaseLink2.CaseReference"))
         );
     }
 
@@ -113,5 +134,38 @@ class CaseDataExtractorTest extends WireMockBaseTest {
                     "state.2.partyDetail.2.type")),
             Arguments.of("DocumentCaseTypeDefinitions_timeline.json", List.of("timeline.0.type", "timeline.1.type"))
         );
+    }
+
+    @Test
+    public void extractFieldTypeUnknownType() throws IOException {
+        final Map<String, JsonNode> jsonData
+            = JacksonUtils.MAPPER.readValue(SIMPLE_DATA, new TypeReference<HashMap<String, JsonNode>>() { });
+        caseFields = getCaseFieldsFromJson(BaseTest.getResourceAsString(CASE_FIELD_JSON));
+
+        List<String> extractedFieldTypePaths = caseDataExtractor.extractFieldTypePaths(jsonData, caseFields, "Unknown");
+
+        assertTrue(extractedFieldTypePaths.isEmpty());
+    }
+
+    @Test
+    void extractFieldTypeTypeNotFound() throws IOException {
+        final Map<String, JsonNode> jsonData
+            = JacksonUtils.MAPPER.readValue(SIMPLE_DATA, new TypeReference<HashMap<String, JsonNode>>() { });
+        caseFields = getCaseFieldsFromJson(BaseTest.getResourceAsString(CASE_FIELD_JSON));
+
+        CaseFieldDefinition caseFieldDefinition  = new CaseFieldDefinition();
+        FieldTypeDefinition fieldTypeDefinition = new FieldTypeDefinition();
+        fieldTypeDefinition.setType("CustomType");
+
+        caseFieldDefinition.setId("id");
+        caseFieldDefinition.setFieldTypeDefinition(fieldTypeDefinition);
+
+        caseFields.add(caseFieldDefinition);
+
+        List<String> extractedFieldTypePaths = caseDataExtractor.extractFieldTypePaths(jsonData,
+                                                                                       caseFields,
+                                                                                       "CustomType");
+
+        assertTrue(extractedFieldTypePaths.isEmpty());
     }
 }
