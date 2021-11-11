@@ -188,6 +188,85 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn201WithTTLWhenPostCreateCaseEventWithValidDataForCaseworker()
+        throws Exception {
+        shouldReturn201WithTTLWhenPostCreateCaseEventWithValidData("caseworkers");
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn201WithTTLWhenPostCreateCaseEventWithValidDataForCitizen()
+        throws Exception {
+        shouldReturn201WithTTLWhenPostCreateCaseEventWithValidData("citizens");
+    }
+
+    private void shouldReturn201WithTTLWhenPostCreateCaseEventWithValidData(String userRole)
+        throws Exception {
+        final String urlPortionForCaseType = "bookcase-definition-ttl.json";
+        final String caseReference = "9816494993793181";
+        final String url = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
+            + urlPortionForCaseType + "/cases/" + caseReference + "/events";
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent(TEST_EVENT_ID, SUMMARY, DESCRIPTION));
+        final String token = generateEventToken(template, UID, JURISDICTION, urlPortionForCaseType, caseReference,
+            TEST_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+        final JsonNode DATA = mapper.readTree("{"
+            + "\"PersonAddress\":{"
+            + "\"Country\":\"_ Wales\","
+            + "\"Postcode\":\"_ WB11DDF\","
+            + "\"AddressLine1\":\"_ Flat 9\","
+            + "\"AddressLine2\":\"_ 2 Hubble Avenue\","
+            + "\"AddressLine3\":\"_ ButtonVillie\"},"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"TTL\":{"
+            + "\"Suspended\":\"No\","
+            + "\"SystemTTL\":\"2021-09-30\","
+            + "\"OverrideTTL\":\"2021-08-30\"}}");
+        caseDetailsToSave.setData(JacksonUtils.convertValue(DATA));
+
+        final MvcResult mvcResult = mockMvc.perform(post(url)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
+            .andReturn();
+
+        assertEquals("Incorrect Response Content",
+            DATA.toString(),
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases: No case should be created", NUMBER_OF_CASES, caseDetailsList.size());
+
+        final CaseDetails savedCaseDetails = caseDetailsList.stream()
+            .filter(c -> caseReference.equals(c.getReference().toString()))
+            .findFirst()
+            .orElse(null);
+        assertNotNull(savedCaseDetails);
+        assertEquals("Incorrect Case Type", CASE_TYPE_TTL, savedCaseDetails.getCaseTypeId());
+        assertEquals(
+            "Incorrect Data content: Data should have changed",
+            caseDetailsToSave.getData(),
+            savedCaseDetails.getData());
+        assertEquals("State should have been updated", "state3", savedCaseDetails.getState());
+
+        final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
+        assertEquals("A new event should have been created", 5, caseAuditEventList.size());
+
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(4);
+        assertEquals("123", caseAuditEvent.getUserId());
+        assertEquals("Strife", caseAuditEvent.getUserLastName());
+        assertEquals("Cloud", caseAuditEvent.getUserFirstName());
+        assertEquals("TEST EVENT NAME", caseAuditEvent.getEventName());
+        assertEquals(savedCaseDetails.getId(), caseAuditEvent.getCaseDataId());
+        assertEquals(savedCaseDetails.getCaseTypeId(), caseAuditEvent.getCaseTypeId());
+        assertEquals(1, caseAuditEvent.getCaseTypeVersion().intValue());
+        assertEquals(savedCaseDetails.getData(), caseAuditEvent.getData());
+    }
+
+    @Test
     public void shouldReturn409WhenPostCreateCaseAndNonUniqueReferenceOccursTwiceForCitizen() throws Exception {
         when(uidService.generateUID()).thenReturn(REFERENCE).thenReturn(REFERENCE).thenReturn(REFERENCE);
         final String URL = "/citizens/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases";
@@ -4114,6 +4193,35 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    public void shouldReturnWhenPostValidateCaseDetailsWithValidDataForCaseworker() throws Exception {
+        final JsonNode DATA = mapper.readTree(exampleData());
+
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent()
+            .withEvent(anEvent()
+                .withEventId(TEST_EVENT_ID)
+                .withSummary(SHORT_COMMENT)
+                .withDescription(LONG_COMMENT)
+                .build())
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, TEST_EVENT_ID))
+            .withData(JacksonUtils.convertValue(DATA))
+            .withIgnoreWarning(Boolean.FALSE)
+            .build();
+
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE + "/validate?pageId=createCaseInfoPage";
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToValidate))
+        ).andExpect(status().is(200)).andReturn();
+
+        final JsonNode expectedResponse = MAPPER.readTree("{\"data\": " + exampleData() + "}");
+        final String expectedResponseString = mapper.writeValueAsString(expectedResponse);
+        assertEquals("Incorrect Response Content",
+            expectedResponseString,
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).toString());
+    }
+
+    @Test
     public void shouldReturn422WhenPostValidateCaseDetailsWithInvalidDataForCaseworker() throws Exception {
         final JsonNode DATA = mapper.readTree(exampleDataWithInvalidPostcode());
         final CaseDataContent caseDetailsToValidate = newCaseDataContent()
@@ -5000,6 +5108,59 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     }
 
     @Test
+    public void shouldReturn400WhenPostValidateCaseDetailsMidEventCallbackChangesDataForCaseworker() throws Exception {
+
+        final JsonNode data = mapper.readTree(exampleCaseData());
+        final JsonNode eventData = mapper.readTree(exampleEventDataTTL());
+
+        String callbackMideventURL = "/event-callback/mid-eventttl";
+
+        WizardPageCollection wizardPageCollection = createWizardPageCollection(callbackMideventURL);
+        stubFor(WireMock.get(urlMatching("/api/display/wizard-page-structure.*"))
+            .willReturn(okJson(mapper.writeValueAsString(wizardPageCollection)).withStatus(200)));
+
+        TTL timeToLive = TTL.builder()
+            .suspended("No")
+            .systemTTL(LocalDate.now())
+            .overrideTTL(LocalDate.now())
+            .build();
+
+        Map<String, JsonNode> ttl = new HashMap<>();
+        ttl.put(TTL_CASE_FIELD_ID, mapper.valueToTree(timeToLive));
+
+        Map<String, JsonNode> caseData = new HashMap<>();
+        caseData.put("data", mapper.valueToTree(ttl));
+
+        stubFor(WireMock.post(urlMatching(callbackMideventURL))
+            .willReturn(okJson(mapper.writeValueAsString(caseData))
+                .withStatus(200)));
+
+        final String description = "A very long comment.......";
+        final String summary = "Short comment";
+        final CaseDataContent caseDetailsToValidate = newCaseDataContent()
+            .withEvent(anEvent()
+                .withEventId(TEST_EVENT_ID)
+                .withSummary(summary)
+                .withDescription(description)
+                .build())
+            .withToken(generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_VALIDATE, TEST_EVENT_ID))
+            .withData(mapper.convertValue(data, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withEventData(mapper.convertValue(eventData, new TypeReference<HashMap<String, JsonNode>>() {}))
+            .withIgnoreWarning(Boolean.FALSE)
+            .build();
+
+        final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE_VALIDATE
+            + "/validate?pageId=createCaseInfoPage";
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToValidate))
+        ).andExpect(status().is(400)).andReturn();
+
+        assertEquals("Time to live content has been modified by callback",
+            mvcResult.getResolvedException().getMessage());
+    }
+
+    @Test
     public void shouldFilterCaseDataWhoseOrderGreaterThanPassedPageIdMultiplePreviousPages() throws Exception {
         final JsonNode data = mapper.readTree(secondPageData());
         final JsonNode eventData = mapper.readTree(exampleEventDataMultiPages());
@@ -5194,6 +5355,23 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             + "\"TelephoneNumber\":\"_ 07865645667\","
             + "\"D8Document\":{"
             + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "}"
+            + "}";
+    }
+
+    private String exampleEventDataTTL() {
+        return "{"
+            + "\"PersonLastName\":\"_ Roof\","
+            + "\"PersonFirstName\":\"_ George\","
+            + "\"CaseNumber\":\"_ 1234567\","
+            + "\"TelephoneNumber\":\"_ 07865645667\","
+            + "\"D8Document\":{"
+            + "\"document_url\": \"http://localhost:" + getPort() + "/documents/05e7cd7e-7041-4d8a-826a-7bb49dfd83d0\""
+            + "},"
+            + "\"TTL\":{"
+            + "\"Suspended\": \"No\","
+            + "\"OverrideTTL\": \"2020-10-12\","
+            + "\"SystemTTL\": \"2020-10-12\""
             + "}"
             + "}";
     }

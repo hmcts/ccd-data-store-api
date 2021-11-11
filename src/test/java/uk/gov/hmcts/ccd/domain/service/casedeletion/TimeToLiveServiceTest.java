@@ -3,12 +3,15 @@ package uk.gov.hmcts.ccd.domain.service.casedeletion;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.config.JacksonObjectMapperConfig;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
@@ -20,10 +23,13 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.hamcrest.core.StringStartsWith.startsWith;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TimeToLiveServiceTest {
@@ -32,14 +38,19 @@ class TimeToLiveServiceTest {
     private TimeToLiveService timeToLiveService;
     private CaseEventDefinition caseEventDefinition;
     private static final Integer TTL_INCREMENT = 10;
+    private static final Integer TTL_GUARD = 365;
     private Map<String, JsonNode> caseData = new HashMap<>();
 
     @Spy
     private ObjectMapper objectMapper = new JacksonObjectMapperConfig().defaultObjectMapper();
 
+    @Mock
+    private ApplicationParams applicationParams;
+
     @BeforeEach
     void setUp() throws JsonProcessingException {
         caseData.put("key", objectMapper.readTree("{\"Value\": \"value\"}"));
+        //timeToLiveService = new TimeToLiveService(objectMapper, applicationParams);
         caseEventDefinition = new CaseEventDefinition();
     }
 
@@ -125,6 +136,149 @@ class TimeToLiveServiceTest {
         });
 
         assertEquals(TimeToLiveService.TIME_TO_LIVE_MODIFIED_ERROR_MESSAGE, exception.getMessage());
+    }
+
+
+    @Test
+    void verifyTTLSuspensionNotChanged() {
+        TTL ttl = TTL
+            .builder()
+            .systemTTL(LocalDate.now())
+            .suspended(TTL.NO)
+            .overrideTTL(LocalDate.now())
+            .build();
+        caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+        TTL updatedTtl = TTL.builder()
+            .systemTTL(LocalDate.now())
+            .suspended(TTL.NO)
+            .overrideTTL(LocalDate.now())
+            .build();
+        Map<String, JsonNode> updatedCaseData = new HashMap<>();
+        updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
+
+        assertDoesNotThrow(() -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
+    }
+
+    @Test
+    void verifyTTLSuspensionChanged() {
+        when(applicationParams.getTtlGuard()).thenReturn(TTL_GUARD);
+
+        TTL ttl = TTL
+            .builder()
+            .systemTTL(LocalDate.now())
+            .suspended(TTL.YES)
+            .overrideTTL(LocalDate.now())
+            .build();
+        caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+        TTL updatedTtl = TTL
+            .builder()
+            .systemTTL(LocalDate.now())
+            .suspended(TTL.NO)
+            .overrideTTL(LocalDate.now())
+            .build();
+        Map<String, JsonNode> updatedCaseData = new HashMap<>();
+        updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
+
+        final ValidationException exception = assertThrows(ValidationException.class,
+            () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
+        Assert.assertThat(exception.getMessage(),
+            startsWith("Unsetting a suspension can only be allowed "
+                + "if the deletion will occur beyond the guard period."));
+    }
+
+    @Test
+    void verifyTTLGuardSystemTtlNotBeforeTtlGuard() {
+        when(applicationParams.getTtlGuard()).thenReturn(TTL_GUARD);
+
+        TTL ttl = TTL
+            .builder()
+            .systemTTL(LocalDate.now())
+            .suspended(TTL.YES)
+            .overrideTTL(LocalDate.now())
+            .build();
+        caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+        TTL updatedTtl = TTL
+            .builder()
+            .systemTTL(LocalDate.now().plusDays(TTL_GUARD))
+            .suspended(TTL.NO)
+            .overrideTTL(LocalDate.now())
+            .build();
+        Map<String, JsonNode> updatedCaseData = new HashMap<>();
+        updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
+
+        assertDoesNotThrow(() -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
+    }
+
+    @Test
+    void verifyTTLGuardSystemTtlIsBeforeTtlGuard() {
+
+        when(applicationParams.getTtlGuard()).thenReturn(TTL_GUARD);
+
+        TTL ttl = TTL
+            .builder()
+            .systemTTL(LocalDate.now())
+            .suspended(TTL.YES)
+            .overrideTTL(LocalDate.now())
+            .build();
+        caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+        TTL updatedTtl = TTL
+            .builder()
+            .systemTTL(LocalDate.now().plusDays(TTL_GUARD - 1))
+            .suspended(TTL.NO)
+            .overrideTTL(LocalDate.now())
+            .build();
+        Map<String, JsonNode> updatedCaseData = new HashMap<>();
+        updatedCaseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(updatedTtl));
+
+        final ValidationException exception = assertThrows(ValidationException.class,
+            () -> timeToLiveService.validateSuspensionChange(updatedCaseData, caseData));
+        Assert.assertThat(exception.getMessage(),
+            startsWith("Unsetting a suspension can only be allowed "
+                + "if the deletion will occur beyond the guard period."));
+    }
+
+    @Test
+    void verifyResolvedTtlSetToNullWhenTtlSuspended() {
+        TTL ttl = TTL.builder().systemTTL(LocalDate.now()).overrideTTL(LocalDate.now()).suspended(TTL.YES).build();
+        caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+        LocalDate updatedResolvedTTL = timeToLiveService.getUpdatedResolvedTTL(caseData);
+
+        assertNull(updatedResolvedTTL);
+    }
+
+    @Test
+    void verifyResolvedTtlSetToNullWhenTtlNotSuspended() {
+        TTL ttl = TTL.builder().systemTTL(null).overrideTTL(null).suspended(TTL.NO).build();
+        caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+        LocalDate updatedResolvedTTL = timeToLiveService.getUpdatedResolvedTTL(caseData);
+
+        assertNull(updatedResolvedTTL);
+    }
+
+    @Test
+    void verifyResolvedTTLSetToOverrideTTL() {
+        TTL ttl = TTL.builder().systemTTL(LocalDate.now()).overrideTTL(LocalDate.now()).suspended(TTL.NO).build();
+        caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+        LocalDate updatedResolvedTTL = timeToLiveService.getUpdatedResolvedTTL(caseData);
+
+        assertEquals(ttl.getOverrideTTL(), updatedResolvedTTL);
+    }
+
+    @Test
+    void verifyResolvedTTLSetToSystemTTL() {
+        TTL ttl = TTL.builder().systemTTL(LocalDate.now()).overrideTTL(null).suspended(TTL.NO).build();
+        caseData.put(TTL.TTL_CASE_FIELD_ID, objectMapper.valueToTree(ttl));
+
+        LocalDate updatedResolvedTTL = timeToLiveService.getUpdatedResolvedTTL(caseData);
+
+        assertEquals(ttl.getSystemTTL(), updatedResolvedTTL);
     }
 
     @Test

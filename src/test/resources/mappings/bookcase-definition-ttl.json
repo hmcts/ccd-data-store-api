@@ -107,6 +107,18 @@
               "update": true,
               "delete": false
             }]
+        },
+        {
+          "id": "state3",
+          "name": "Case in state 3",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": false,
+              "read": true,
+              "update": true,
+              "delete": false
+            }]
         }
       ],
       "case_fields": [
@@ -119,7 +131,7 @@
             {
               "role": "caseworker-probate-public",
               "create": true,
-              "read": false,
+              "read": true,
               "update": true,
               "delete": false
             }],

@@ -653,7 +653,7 @@ VALUES (20, 'TestAddressBookCaseTTL', 'PROBATE', 'CaseCreated', 'PUBLIC',
           }
         }',
         '{
-          "PersonFirstName": "PRIVATE",
+          "PersonFirstName": "PUBLIC",
           "PersonLastName": "PUBLIC",
           "PersonAddress": {
             "classification" : "PUBLIC",

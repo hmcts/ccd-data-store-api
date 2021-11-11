@@ -34,6 +34,8 @@ public abstract class WireMockBaseTest extends BaseTest {
     @Value("${wiremock.server.port}")
     protected Integer wiremockPort;
 
+    protected String hostUrl;
+
     @Inject
     protected ApplicationParams applicationParams;
 
@@ -44,7 +46,7 @@ public abstract class WireMockBaseTest extends BaseTest {
     @BeforeEach
     public void initMock() throws IOException {
         super.initMock();
-        final String hostUrl = "http://localhost:" + wiremockPort;
+        hostUrl = "http://localhost:" + wiremockPort;
 
         LOG.info("Wire mock test, host url is {}", hostUrl);
 

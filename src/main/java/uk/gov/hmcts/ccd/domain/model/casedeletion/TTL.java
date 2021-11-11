@@ -17,10 +17,16 @@ import java.time.LocalDate;
 public class TTL {
 
     public static final String TTL_CASE_FIELD_ID = "TTL";
+    public static final String YES = "Yes";
+    public static final String NO = "No";
 
     private LocalDate systemTTL;
 
     private LocalDate overrideTTL;
 
     private String suspended;
+
+    public boolean isSuspended() {
+        return suspended != null && !suspended.equals(NO);
+    }
 }

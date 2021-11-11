@@ -22,6 +22,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.TimeToLiveService;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseDataExtractor;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
@@ -100,7 +101,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private CaseService caseService;
     @Mock
     private UserAuthorisation userAuthorisation;
-
+    @Mock
+    private TimeToLiveService timeToLiveService;
     @Mock
     private FieldProcessorService fieldProcessorService;
     @Mock
