@@ -1,5 +1,6 @@
 DELETE FROM case_event;
 DELETE FROM case_data;
+DELETE FROM case_link;
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, created_date, last_modified, last_state_modified_date)
 VALUES (1, 'TestAddressBookCase', 'PROBATE', 'CaseCreated', 'PUBLIC',
@@ -676,6 +677,43 @@ VALUES (20, 'TestAddressBookCaseTTL', 'PROBATE', 'CaseCreated', 'PUBLIC',
         '9816494993793181'
        );
 
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference)
+VALUES (21, 'TestAddressBookCaseCaseLinks', 'PROBATE', 'CaseCreated', 'PUBLIC',
+        '{
+          "PersonFirstName": "Peter",
+          "PersonLastName": "Pullen",
+          "PersonAddress": {
+            "AddressLine1": "Governer House",
+            "AddressLine2": "1 Puddle Lane",
+            "AddressLine3": "London",
+            "Country": "England",
+            "Postcode": "SE1 4EE"
+          },
+          "CaseLink3" : {
+            "CaseReference": "1504259907353537"
+          }
+        }',
+        '{
+          "PersonFirstName": "PRIVATE",
+          "PersonLastName": "PUBLIC",
+          "PersonAddress": {
+            "classification" : "PUBLIC",
+            "value" : {
+                "AddressLine1": "PUBLIC",
+                "AddressLine2": "PUBLIC",
+                "AddressLine3": "PUBLIC",
+                "Country": "PUBLIC",
+                "Postcode": "PUBLIC"
+            }
+          },
+          "CaseLink3": "PUBLIC"
+        }',
+        '3393027116986763'
+       );
+
+INSERT INTO case_link(case_id, linked_case_id, case_type_id)
+VALUES (21, 3, 'TestAddressBookCaseCaseLinks');
+
 INSERT INTO case_event (
         case_data_id,
         case_type_id,
@@ -709,8 +747,6 @@ INSERT INTO case_event (
         '2017-05-09 14:31:43.000000',
         '{}'
     );
-
-
 
 INSERT INTO case_event (
         case_data_id,
@@ -813,3 +849,37 @@ INSERT INTO case_event (
         '2017-05-09 15:31:43.000000',
         '{}'
     );
+
+INSERT INTO case_event (
+    case_data_id,
+    case_type_id,
+    case_type_version,
+    description,
+    summary,
+    event_id,
+    event_name,
+    user_id,
+    user_first_name,
+    user_last_name,
+    state_id,
+    state_name,
+    security_classification,
+    created_date,
+    data
+) VALUES (
+             21,
+             'TestAddressBookCaseCaseLinks',
+             1,
+             'Some comment 2',
+             'The summary 2',
+             'Goodness',
+             'GRACIOUS',
+             0,
+             'Justin',
+             'Smith',
+             'state4',
+             'Case in state 4',
+             'PUBLIC',
+             '2017-05-09 15:31:43.000000',
+             '{}'
+         );

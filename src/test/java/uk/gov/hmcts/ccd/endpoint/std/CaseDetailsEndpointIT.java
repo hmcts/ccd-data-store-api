@@ -15,6 +15,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.jdbc.Sql;
@@ -33,6 +34,7 @@ import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
+import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.TTL;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
@@ -80,6 +82,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
+import static uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink.builder;
 import static uk.gov.hmcts.ccd.domain.model.casedeletion.TTL.TTL_CASE_FIELD_ID;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
@@ -128,7 +131,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     private static final String MID_EVENT_CALL_BACK = "/event-callback/mid-event";
     private static final String MID_EVENT_CALL_BACK_MULTI_PAGE = "/event-callback/multi-page-mid-event";
-
+    public static final int EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED = 5;
+    public static final int EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED = 6;
     @Inject
     private WebApplicationContext wac;
     private MockMvc mockMvc;
@@ -1778,10 +1782,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             JSONCompareMode.LENIENT);
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("A new event should have been created", 5, caseAuditEventList.size());
+        assertEquals("A new event should have been created", EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED,
+            caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(4);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -1862,10 +1867,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             JSONCompareMode.LENIENT);
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("A new event should have been created", 5, caseAuditEventList.size());
+        assertEquals("A new event should have been created", EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED,
+            caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(4);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2019,13 +2025,14 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("State should have been updated", "state3", savedCaseDetails.getState());
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("A new event should have been created", 5, caseAuditEventList.size());
+        assertEquals("A new event should have been created",
+            EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED, caseAuditEventList.size());
 
         final List<MessageQueueCandidate> messageQueueList =
             template.query("SELECT * FROM message_queue_candidates", this::mapMessageCandidate);
         assertEquals("Incorrect number of rows in messageQueue", 0, messageQueueList.size());
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(4);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2090,10 +2097,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("State should have been updated", "state3", savedCaseDetails.getState());
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("A new event should have been created", 5, caseAuditEventList.size());
+        assertEquals("A new event should have been created",
+            EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED,
+            caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(4);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2158,10 +2167,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("State should have been updated", "CaseCreated", savedCaseDetails.getState());
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("A new event should have been created", 5, caseAuditEventList.size());
+        assertEquals("A new event should have been created",
+            EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED,
+            caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(4);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2227,10 +2238,12 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("State should have been updated", "CaseCreated", savedCaseDetails.getState());
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("A new event should have been created", 5, caseAuditEventList.size());
+        assertEquals("A new event should have been created",
+            EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED,
+            caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(4);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
@@ -2353,7 +2366,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(5, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2389,7 +2402,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(5, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2425,7 +2438,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(5, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2471,7 +2484,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(5, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2520,7 +2533,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2557,7 +2570,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2594,7 +2607,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2631,7 +2644,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2667,7 +2680,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2703,7 +2716,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2737,7 +2750,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2771,7 +2784,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
 
         final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
@@ -2807,7 +2820,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -2832,7 +2845,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -2858,7 +2871,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -2884,7 +2897,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -2935,7 +2948,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("State should NOT have been updated", "CaseCreated", savedCaseDetails.getState());
 
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -2986,7 +2999,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("State should NOT have been updated", "CaseCreated", savedCaseDetails.getState());
 
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -3014,7 +3027,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -3042,7 +3055,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -3071,7 +3084,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -3100,7 +3113,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         // No database entry created
         template.query("SELECT COUNT(*) FROM case_event", resultSet -> {
-            assertEquals(4, resultSet.getInt(1));
+            assertEquals(EXPECTED_CASE_EVENT_COUNT_NO_DB_ENTRY_CREATED, resultSet.getInt(1));
         });
     }
 
@@ -3570,6 +3583,125 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn201AndInsertCaseLinksWhenCreateCaseEvent()
+        throws Exception {
+        final String reference = "3393027116986763";
+        final String URL = "/caseworkers/0/jurisdictions/"
+            + JURISDICTION
+            + "/case-types/TestAddressBookCaseCaseLinks/cases/"
+            + reference
+            + "/events";
+
+        stubFor(WireMock.post(urlMatching("/callback_about_to_start_caselink"))
+            .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+
+        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
+        final String token = generateEventToken(template,
+            UID, JURISDICTION, CASE_TYPE, reference, PRE_STATES_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+        final JsonNode data = mapper.readTree(
+            "{"
+                + "\"CaseLink1\": {"
+                + "     \"CaseReference\": \"1504259907353529\""
+                + "},"
+                + "\"CaseLink2\": {"
+                + "     \"CaseReference\": \"1504259907353545\""
+                + "}"
+            + "}");
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
+
+        mockMvc.perform(post(URL).contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave)))
+            .andExpect(status().is(201))
+            .andReturn();
+
+        long expectedCaseId = 21;
+        String expectedCaseTypeId = "TestAddressBookCaseCaseLinks";
+
+        List<CaseLink> expectedCaseLinks = List.of(
+            builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(1L)
+                .caseTypeId(expectedCaseTypeId)
+                .build(),
+            builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(2L)
+                .caseTypeId(expectedCaseTypeId)
+                .build(),
+            builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(3L)
+                .caseTypeId(expectedCaseTypeId)
+                .build()
+        );
+
+        List<CaseLink> caseLinks = template.query(
+            String.format("SELECT * FROM case_link where case_id=%s", 21),
+            new BeanPropertyRowMapper<>(CaseLink.class));
+
+        assertTrue(expectedCaseLinks.containsAll(caseLinks));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void shouldReturn201AndDeleteCaseLinksWhenCreateCaseEvent()
+        throws Exception {
+        final String reference = "3393027116986763";
+        final String URL = "/caseworkers/0/jurisdictions/"
+            + JURISDICTION
+            + "/case-types/TestAddressBookCaseCaseLinks/cases/"
+            + reference
+            + "/events";
+
+        final String callbackData =
+              " {\"data\": {"
+            + "     \"CaseLink1\": {"
+            + "         \"CaseReference\": \"1504259907353529\""
+            + "     }"
+            + " }"
+            + "}";
+
+        stubFor(WireMock.post(urlMatching("/callback_about_to_start_caselink"))
+            .willReturn(okJson(callbackData).withStatus(201)));
+
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+
+        caseDetailsToSave.setEvent(createEvent(PRE_STATES_EVENT_ID, SUMMARY, DESCRIPTION));
+        final String token = generateEventToken(template,
+            UID, JURISDICTION, CASE_TYPE, reference, PRE_STATES_EVENT_ID);
+        caseDetailsToSave.setToken(token);
+
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL).contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave)))
+            .andExpect(status().is(201))
+            .andReturn();
+
+        String expectedCaseTypeId = "TestAddressBookCaseCaseLinks";
+
+        List<CaseLink> expectedCaseLinks = List.of(
+            builder()
+                .caseId(21L)
+                .linkedCaseId(1L)
+                .caseTypeId(expectedCaseTypeId)
+                .build()
+        );
+
+        List<CaseLink> caseLinks = template.query(
+            String.format("SELECT * FROM case_link where case_id=%s", 21),
+            new BeanPropertyRowMapper<>(CaseLink.class));
+
+        assertTrue(caseLinks.containsAll(expectedCaseLinks));
+    }
+
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldErrorIfTriggerStartForCaseDetectsAboutToCallStartCallbackHasModifiedTTL() throws Exception {
         final String reference = "9816494993793181";
         final String URL = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" +
@@ -3870,10 +4002,10 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .LENIENT);
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("A new event should have been created", 5, caseAuditEventList.size());
+        assertEquals("A new event should have been created", 6, caseAuditEventList.size());
 
         // Assertion belows are for creation event
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(4);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());
