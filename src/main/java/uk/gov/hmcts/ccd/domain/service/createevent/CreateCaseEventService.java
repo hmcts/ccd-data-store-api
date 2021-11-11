@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -16,12 +17,15 @@ import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseDataExtractor;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseService;
@@ -51,6 +55,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
@@ -80,6 +85,10 @@ public class CreateCaseEventService {
     private final MessageService messageService;
     private final CaseDocumentService caseDocumentService;
     private final CaseDataIssueLogger caseDataIssueLogger;
+    private final CaseLinkService caseLinkService;
+    private final CaseDataExtractor caseDataExtractor;
+
+    private static final String TEXT_CASE_REFERENCE = "TextCaseReference";
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -104,7 +113,9 @@ public class CreateCaseEventService {
                                   @Qualifier("utcClock") final Clock clock,
                                   @Qualifier("caseEventMessageService") final MessageService messageService,
                                   final CaseDocumentService caseDocumentService,
-                                  final CaseDataIssueLogger caseDataIssueLogger) {
+                                  final CaseDataIssueLogger caseDataIssueLogger,
+                                  final CaseLinkService caseLinkService,
+                                  final CaseDataExtractor caseDataExtractor) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
@@ -126,6 +137,8 @@ public class CreateCaseEventService {
         this.messageService = messageService;
         this.caseDocumentService = caseDocumentService;
         this.caseDataIssueLogger = caseDataIssueLogger;
+        this.caseLinkService = caseLinkService;
+        this.caseDataExtractor = caseDataExtractor;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -195,6 +208,9 @@ public class CreateCaseEventService {
             newState,
             timeNow
         );
+
+        updateCaseLinks(caseDetailsInDatabase, caseDetailsAfterCallback, caseTypeDefinition.getCaseFieldDefinitions());
+
         saveAuditEventForCaseDetails(
             aboutToSubmitCallbackResponse,
             content.getEvent(),
@@ -218,6 +234,25 @@ public class CreateCaseEventService {
             .savedCaseDetails(savedCaseDetails)
             .eventTrigger(caseEventDefinition)
             .build();
+    }
+
+    private void updateCaseLinks(CaseDetails caseDetailsBeforeCallback,
+                                 CaseDetails caseDetailsAfterCallback,
+                                 List<CaseFieldDefinition> caseFieldDefinitions) {
+
+        List<String> preCallbackCaseLinks = getCaseLinks(caseDetailsBeforeCallback.getData(), caseFieldDefinitions);
+        List<String> postCallbackCaseLinks = getCaseLinks(caseDetailsAfterCallback.getData(), caseFieldDefinitions);
+
+        caseLinkService.updateCaseLinks(caseDetailsBeforeCallback.getReference(),
+                                        caseDetailsBeforeCallback.getCaseTypeId(),
+                                        preCallbackCaseLinks, postCallbackCaseLinks);
+    }
+
+    private List<String> getCaseLinks(Map<String, JsonNode> data, List<CaseFieldDefinition> caseFieldDefinitions) {
+        return caseDataExtractor.extractFieldTypePaths(data, caseFieldDefinitions, TEXT_CASE_REFERENCE)
+            .stream()
+            .map(caseReference ->  JacksonUtils.getValueFromPath(caseReference, data))
+            .collect(Collectors.toList());
     }
 
     private CaseEventDefinition findAndValidateCaseEvent(final CaseTypeDefinition caseTypeDefinition,
