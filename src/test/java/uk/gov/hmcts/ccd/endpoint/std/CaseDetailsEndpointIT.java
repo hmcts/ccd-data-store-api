@@ -253,9 +253,11 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("State should have been updated", "state3", savedCaseDetails.getState());
 
         final List<AuditEvent> caseAuditEventList = template.query("SELECT * FROM case_event", this::mapAuditEvent);
-        assertEquals("A new event should have been created", 5, caseAuditEventList.size());
+        assertEquals("A new event should have been created",
+            EXPECTED_CASE_EVENT_COUNT_DB_ENTRY_CREATED,
+            caseAuditEventList.size());
 
-        final AuditEvent caseAuditEvent = caseAuditEventList.get(4);
+        final AuditEvent caseAuditEvent = caseAuditEventList.get(5);
         assertEquals("123", caseAuditEvent.getUserId());
         assertEquals("Strife", caseAuditEvent.getUserLastName());
         assertEquals("Cloud", caseAuditEvent.getUserFirstName());

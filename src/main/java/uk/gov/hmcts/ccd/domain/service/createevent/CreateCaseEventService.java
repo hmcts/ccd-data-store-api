@@ -116,7 +116,7 @@ public class CreateCaseEventService {
                                   @Qualifier("caseEventMessageService") final MessageService messageService,
                                   final CaseDocumentService caseDocumentService,
                                   final CaseDataIssueLogger caseDataIssueLogger,
-                                  final TimeToLiveService timeToLiveService) {
+                                  final TimeToLiveService timeToLiveService,
                                   final CaseLinkService caseLinkService,
                                   final CaseDataExtractor caseDataExtractor) {
         this.userRepository = userRepository;
