@@ -38,7 +38,8 @@ public class AuthorisationMapper {
     }
 
     public Map<String, RoleToAccessProfileDefinition> toRoleNameAsKeyMap(String caseTypeId) {
-        return toRoleNameAsKeyMap(caseTypeService.getCaseType(caseTypeId));
+        return caseTypeRoleToAccessProfileDefinition.computeIfAbsent(caseTypeId,
+            id -> toRoleNameAsKeyMap(caseTypeService.getCaseType(caseTypeId)));
     }
 
     public Map<String, RoleToAccessProfileDefinition> toRoleNameAsKeyMap(
