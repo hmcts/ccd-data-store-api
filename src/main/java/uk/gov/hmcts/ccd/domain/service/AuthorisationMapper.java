@@ -16,7 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
-import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Maps.newConcurrentMap;
 
 @Component
 @RequestScope
@@ -25,7 +25,7 @@ public class AuthorisationMapper {
     private final CaseTypeService caseTypeService;
 
     private final Map<String, Map<String, RoleToAccessProfileDefinition>> caseTypeRoleToAccessProfileDefinition
-        = newHashMap();
+        = newConcurrentMap();
 
     @Autowired
     public AuthorisationMapper(CaseTypeService caseTypeService) {
