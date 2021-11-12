@@ -11,8 +11,8 @@
     "name": "Test",
     "description": "Test Jurisdiction"
   },
-  "callbackGetCaseUrl": "${GET_CASE_CALLBACK_URL}",
-  "retriesGetCaseUrl": [],
+  "callback_get_case_url": "${GET_CASE_CALLBACK_URL}",
+  "retries_get_case_url": [],
   "security_classification": "PUBLIC",
   "acls": [
     {

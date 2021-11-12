@@ -27,20 +27,18 @@ public class GetCaseCallback {
 
     public GetCaseCallbackResponse invoke(final CaseTypeDefinition caseTypeDefinition, final CaseDetails caseDetails,
                                           final List<CaseViewField> metadataFields) {
-        GetCaseCallbackResponse response;
         try {
             ResponseEntity<GetCaseCallbackResponse> getCaseCallbackResponse = callbackInvoker
                 .invokeGetCaseCallback(caseTypeDefinition, caseDetails);
 
-            response = getCaseCallbackResponse.getBody();
+            final GetCaseCallbackResponse response = getCaseCallbackResponse.getBody();
+            validateNewMetadataFields(metadataFields, response);
+
+            return response;
         } catch (Exception e) {
             LOG.error("CCD_CDI_CallbackGetCaseUrl: " + e.getMessage());
             throw new CallbackException(e.getMessage());
         }
-
-        validateNewMetadataFields(metadataFields, response);
-
-        return response;
     }
 
     private void validateNewMetadataFields(List<CaseViewField> metadataFields, GetCaseCallbackResponse response) {

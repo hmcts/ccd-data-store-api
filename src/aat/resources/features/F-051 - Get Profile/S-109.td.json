@@ -344,8 +344,8 @@
                   "_extends_": "CaseworkerCaaAccessControlList"
 								}
 							],
-              "callbackGetCaseUrl": null,
-              "retriesGetCaseUrl": null
+              "callback_get_case_url": null,
+              "retries_get_case_url": []
 						},
 						{
 							"id": "CASE_TYPE_WITH_NO_CASES",
@@ -620,8 +620,8 @@
                   "_extends_": "CaseworkerBeftaJurisdiction1AccessControlList"
 								}
 							],
-              "callbackGetCaseUrl": null,
-              "retriesGetCaseUrl": null
+              "callback_get_case_url": null,
+              "retries_get_case_url": []
 						}
 					]
 				}

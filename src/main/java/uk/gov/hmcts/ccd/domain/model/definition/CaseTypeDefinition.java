@@ -37,9 +37,9 @@ public class CaseTypeDefinition implements Serializable {
     private String printableDocumentsUrl;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
-    @JsonProperty("callbackGetCaseUrl")
+    @JsonProperty("callback_get_case_url")
     private String callbackGetCaseUrl;
-    @JsonProperty("retriesGetCaseUrl")
+    @JsonProperty("retries_get_case_url")
     private List<Integer> retriesGetCaseUrl;
     private final List<SearchAliasField> searchAliasFields = new ArrayList<>();
 
