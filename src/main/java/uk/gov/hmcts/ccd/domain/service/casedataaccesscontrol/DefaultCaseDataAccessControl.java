@@ -20,6 +20,7 @@ import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
@@ -336,5 +337,12 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         var accessControlList = new AccessControlList();
         accessControlList.setCreate(true);
         return accessControlList;
+    }
+
+    public Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition) {
+        Set<AccessProfile> accessProfiles = generateAccessProfilesByCaseTypeId(caseTypeDefinition.getId());
+        return accessProfiles.stream()
+            .map(accessProfile -> SecurityClassification.valueOf(accessProfile.getSecurityClassification()))
+            .collect(Collectors.toSet());
     }
 }

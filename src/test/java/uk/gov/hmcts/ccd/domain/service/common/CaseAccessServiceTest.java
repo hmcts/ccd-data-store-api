@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import java.util.regex.Pattern;
 import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -712,6 +713,16 @@ class CaseAccessServiceTest {
         void shouldReturnFalseWhenUserHasAccess() {
             boolean canAccess = caseAccessService.isJurisdictionAccessAllowed("autotest1");
             assertFalse(canAccess);
+        }
+
+        @Test
+        void testGrantedUserRegExpression() {
+            Pattern pattern = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-."
+                + "+-localAuthority$");
+            List<String> userRoles = Lists.newArrayList("caseworker", "caseworker-befta_master");
+
+            boolean access = userRoles.stream().anyMatch(role -> pattern.matcher(role).matches());
+            System.out.println(access);
         }
     }
 

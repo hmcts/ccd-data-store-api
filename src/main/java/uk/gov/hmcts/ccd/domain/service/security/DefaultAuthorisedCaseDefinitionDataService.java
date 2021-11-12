@@ -1,12 +1,13 @@
 package uk.gov.hmcts.ccd.domain.service.security;
 
 import com.google.common.collect.Sets;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -14,11 +15,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
 
@@ -30,20 +26,16 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
 
     private final CaseTypeService caseTypeService;
     private final AccessControlService accessControlService;
-    private final UserRepository userRepository;
     private final CaseDataAccessControl caseDataAccessControl;
     private final ApplicationParams applicationParams;
 
     @Autowired
     public DefaultAuthorisedCaseDefinitionDataService(CaseTypeService caseTypeService,
                                                       AccessControlService accessControlService,
-                                                      @Qualifier(CachedUserRepository.QUALIFIER)
-                                                              UserRepository userRepository,
                                                       CaseDataAccessControl caseDataAccessControl,
                                                       ApplicationParams applicationParams) {
         this.caseTypeService = caseTypeService;
         this.accessControlService = accessControlService;
-        this.userRepository = userRepository;
         this.caseDataAccessControl = caseDataAccessControl;
         this.applicationParams = applicationParams;
     }
@@ -53,7 +45,7 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
         CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseTypeId);
 
         if (applicationParams.getEnableAttributeBasedAccessControl()
-            && !userHasClassificationForJurisdiction(caseTypeDefinition.getJurisdictionDefinition().getId())) {
+            && !userHasClassificationForJurisdiction(caseTypeDefinition)) {
             return Optional.empty();
         }
 
@@ -92,13 +84,12 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     }
 
     private boolean verifySecurityClassificationOnCaseType(CaseTypeDefinition caseTypeDefinition) {
-        return userRepository.getHighestUserClassification(
-            caseTypeDefinition.getJurisdictionDefinition().getId())
+        return caseDataAccessControl.getHighestUserClassification(caseTypeDefinition)
             .higherOrEqualTo(caseTypeDefinition.getSecurityClassification());
     }
 
-    private boolean userHasClassificationForJurisdiction(String jurisdictionId) {
-        return !userRepository.getUserClassifications(jurisdictionId).isEmpty();
+    private boolean userHasClassificationForJurisdiction(CaseTypeDefinition caseTypeDefinition) {
+        return !caseDataAccessControl.getUserClassifications(caseTypeDefinition).isEmpty();
     }
 
     private List<CaseStateDefinition> filterCaseStatesForUser(CaseTypeDefinition caseTypeDefinition,

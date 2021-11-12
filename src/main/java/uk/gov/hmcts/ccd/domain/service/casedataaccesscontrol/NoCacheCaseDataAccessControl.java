@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
@@ -47,4 +48,6 @@ public interface NoCacheCaseDataAccessControl {
     default List<RoleAssignment> generateRoleAssignments(CaseTypeDefinition caseTypeDefinition) {
         return Lists.newArrayList();
     }
+
+    Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition);
 }
