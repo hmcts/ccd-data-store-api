@@ -117,8 +117,12 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
 
     @Override
     public Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition) {
-        return caseTypeClassifications.computeIfAbsent(caseTypeDefinition.getId(),
-            e -> noCacheCaseDataAccessControl.getUserClassifications(caseTypeDefinition));
+        return noCacheCaseDataAccessControl.getUserClassifications(caseTypeDefinition);
+    }
+
+    @Override
+    public Set<SecurityClassification> getUserClassifications(CaseDetails caseDetails) {
+        return noCacheCaseDataAccessControl.getUserClassifications(caseDetails);
     }
 
     @Override

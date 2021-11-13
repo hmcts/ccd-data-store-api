@@ -277,6 +277,34 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         return accessProfileNames.contains(accessProfile);
     }
 
+
+    @Override
+    public boolean shouldRemoveCaseDefinition(Set<AccessProfile> accessProfiles,
+                                              Predicate<AccessControlList> access,
+                                              String caseTypeId) {
+        // In R.A if the access is create the RoleType has to be organisation.
+        final var accessProfile = generateOrganisationalAccessProfilesByCaseTypeId(caseTypeId);
+        return access.test(getCreateAccessControlList()) && accessProfile.isEmpty();
+    }
+
+    @Override
+    public Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition) {
+        Set<AccessProfile> accessProfiles = generateAccessProfilesByCaseTypeId(caseTypeDefinition.getId());
+        return getSecurityClassifications(accessProfiles);
+    }
+
+    @Override
+    public Set<SecurityClassification> getUserClassifications(CaseDetails caseDetails) {
+        Set<AccessProfile> accessProfiles = generateAccessProfilesByCaseDetails(caseDetails);
+        return getSecurityClassifications(accessProfiles);
+    }
+
+    private Set<SecurityClassification> getSecurityClassifications(Set<AccessProfile> accessProfiles) {
+        return accessProfiles.stream()
+            .map(accessProfile -> SecurityClassification.valueOf(accessProfile.getSecurityClassification()))
+            .collect(Collectors.toSet());
+    }
+
     private void populateCaseAccessMetadata(CaseAccessMetadata caseAccessMetadata,
                                             FilteredRoleAssignments filteredRoleAssignments) {
         List<RoleAssignment> pseudoRoleAssignments
@@ -324,25 +352,9 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
             .collect(Collectors.toList());
     }
 
-    @Override
-    public boolean shouldRemoveCaseDefinition(Set<AccessProfile> accessProfiles,
-                                              Predicate<AccessControlList> access,
-                                              String caseTypeId) {
-        // In R.A if the access is create the RoleType has to be organisation.
-        final var accessProfile = generateOrganisationalAccessProfilesByCaseTypeId(caseTypeId);
-        return access.test(getCreateAccessControlList()) && accessProfile.isEmpty();
-    }
-
     private AccessControlList getCreateAccessControlList() {
         var accessControlList = new AccessControlList();
         accessControlList.setCreate(true);
         return accessControlList;
-    }
-
-    public Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition) {
-        Set<AccessProfile> accessProfiles = generateAccessProfilesByCaseTypeId(caseTypeDefinition.getId());
-        return accessProfiles.stream()
-            .map(accessProfile -> SecurityClassification.valueOf(accessProfile.getSecurityClassification()))
-            .collect(Collectors.toSet());
     }
 }

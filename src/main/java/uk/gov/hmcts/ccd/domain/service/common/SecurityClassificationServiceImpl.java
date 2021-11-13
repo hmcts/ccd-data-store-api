@@ -14,16 +14,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Comparator.comparingInt;
@@ -32,7 +32,6 @@ import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils
 import static uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationUtils.getSecurityClassification;
 
 @Service
-@ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "false", matchIfMissing = true)
 public class SecurityClassificationServiceImpl implements SecurityClassificationService {
 
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -42,11 +41,15 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
 
     private static final Logger LOG = LoggerFactory.getLogger(SecurityClassificationServiceImpl.class);
 
-    private final UserRepository userRepository;
+    private final CaseDataAccessControl caseDataAccessControl;
+    private CaseDefinitionRepository caseDefinitionRepository;
 
     @Autowired
-    public SecurityClassificationServiceImpl(@Qualifier(CachedUserRepository.QUALIFIER) UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public SecurityClassificationServiceImpl(CaseDataAccessControl caseDataAccessControl,
+                                             @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                             final CaseDefinitionRepository caseDefinitionRepository) {
+        this.caseDataAccessControl = caseDataAccessControl;
+        this.caseDefinitionRepository = caseDefinitionRepository;
     }
 
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails) {
@@ -106,21 +109,29 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
 
     public boolean userHasEnoughSecurityClassificationForField(String jurisdictionId,
                                                                CaseTypeDefinition caseTypeDefinition, String fieldId) {
-        final Optional<SecurityClassification> userClassification = getUserClassification(jurisdictionId);
+        final Optional<SecurityClassification> userClassification = getUserClassification(caseTypeDefinition);
         return userClassification.map(securityClassification ->
             securityClassification.higherOrEqualTo(caseTypeDefinition.getClassificationForField(fieldId)))
             .orElse(false);
     }
 
-    public Optional<SecurityClassification> getUserClassification(String jurisdictionId) {
-        return userRepository.getUserClassifications(jurisdictionId)
+    public Optional<SecurityClassification> getUserClassification(CaseTypeDefinition caseTypeDefinition) {
+        return caseDataAccessControl.getUserClassifications(caseTypeDefinition)
             .stream()
             .max(comparingInt(SecurityClassification::getRank));
     }
 
     @Override
     public Optional<SecurityClassification> getUserClassification(CaseDetails caseDetails, boolean create) {
-        return getUserClassification(caseDetails.getJurisdiction());
+        if (create) {
+            return caseDataAccessControl.getUserClassifications(
+                caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId()))
+                .stream()
+                .max(comparingInt(SecurityClassification::getRank));
+        }
+        return caseDataAccessControl.getUserClassifications(caseDetails)
+            .stream()
+            .max(comparingInt(SecurityClassification::getRank));
     }
 
     private JsonNode filterNestedObject(JsonNode data, JsonNode dataClassification,

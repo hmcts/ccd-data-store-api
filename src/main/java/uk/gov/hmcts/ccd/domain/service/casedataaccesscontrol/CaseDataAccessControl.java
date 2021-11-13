@@ -42,5 +42,7 @@ public interface CaseDataAccessControl {
 
     Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition);
 
+    Set<SecurityClassification> getUserClassifications(CaseDetails caseDetails);
+
     SecurityClassification getHighestUserClassification(CaseTypeDefinition caseTypeDefinition);
 }

@@ -50,4 +50,6 @@ public interface NoCacheCaseDataAccessControl {
     }
 
     Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition);
+
+    Set<SecurityClassification> getUserClassifications(CaseDetails caseDetails);
 }

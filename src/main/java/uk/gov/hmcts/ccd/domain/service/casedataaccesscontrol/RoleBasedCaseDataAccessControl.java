@@ -117,8 +117,14 @@ public class RoleBasedCaseDataAccessControl implements NoCacheCaseDataAccessCont
         return new CaseAccessMetadata();
     }
 
+    @Override
     public Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition) {
         return userRepository.getUserClassifications(caseTypeDefinition.getJurisdictionId());
+    }
+
+    @Override
+    public Set<SecurityClassification> getUserClassifications(CaseDetails caseDetails) {
+        return userRepository.getUserClassifications(caseDetails.getJurisdiction());
     }
 
     private Set<AccessProfile> userRoleToAccessProfiles(Set<String> roles) {

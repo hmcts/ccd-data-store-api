@@ -2,7 +2,12 @@ package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import java.util.regex.Pattern;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,13 +28,6 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentServi
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -713,16 +711,6 @@ class CaseAccessServiceTest {
         void shouldReturnFalseWhenUserHasAccess() {
             boolean canAccess = caseAccessService.isJurisdictionAccessAllowed("autotest1");
             assertFalse(canAccess);
-        }
-
-        @Test
-        void testGrantedUserRegExpression() {
-            Pattern pattern = Pattern.compile(".+-solicitor$|.+-panelmember$|^citizen(-.*)?$|^letter-holder$|^caseworker-."
-                + "+-localAuthority$");
-            List<String> userRoles = Lists.newArrayList("caseworker", "caseworker-befta_master");
-
-            boolean access = userRoles.stream().anyMatch(role -> pattern.matcher(role).matches());
-            System.out.println(access);
         }
     }
 
