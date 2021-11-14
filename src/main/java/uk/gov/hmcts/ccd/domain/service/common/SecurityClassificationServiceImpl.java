@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,21 +117,21 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     }
 
     public Optional<SecurityClassification> getUserClassification(CaseTypeDefinition caseTypeDefinition) {
-        return caseDataAccessControl.getUserClassifications(caseTypeDefinition)
-            .stream()
-            .max(comparingInt(SecurityClassification::getRank));
+        return maxSecurityClassification(caseDataAccessControl.getUserClassifications(caseTypeDefinition));
     }
 
     @Override
     public Optional<SecurityClassification> getUserClassification(CaseDetails caseDetails, boolean create) {
         if (create) {
-            return caseDataAccessControl.getUserClassifications(
-                caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId()))
-                .stream()
-                .max(comparingInt(SecurityClassification::getRank));
+            return maxSecurityClassification(caseDataAccessControl.getUserClassifications(
+                caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId())));
         }
-        return caseDataAccessControl.getUserClassifications(caseDetails)
-            .stream()
+        return maxSecurityClassification(caseDataAccessControl.getUserClassifications(caseDetails));
+    }
+
+    private Optional<SecurityClassification> maxSecurityClassification(Set<SecurityClassification> classifications) {
+        return classifications.stream()
+            .filter(classification -> classification != null)
             .max(comparingInt(SecurityClassification::getRank));
     }
 

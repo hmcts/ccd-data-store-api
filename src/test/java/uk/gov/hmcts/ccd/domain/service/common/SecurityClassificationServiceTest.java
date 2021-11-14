@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -191,6 +192,9 @@ public class SecurityClassificationServiceTest {
             when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class)))
                 .thenReturn(newHashSet(userClassification));
 
+            when(caseDataAccessControl.getUserClassifications(any(CaseDetails.class)))
+                .thenReturn(newHashSet(userClassification));
+
             caseDetails.setSecurityClassification(caseClassification);
 
             return securityClassificationService.applyClassification(caseDetails);
@@ -241,8 +245,8 @@ public class SecurityClassificationServiceTest {
             restrictedEvent = new AuditEvent();
             restrictedEvent.setSecurityClassification(RESTRICTED);
 
-            when(securityClassificationService.getUserClassification(any(CaseTypeDefinition.class)))
-                .thenReturn(Optional.empty());
+            doReturn(Optional.empty()).when(securityClassificationService)
+                .getUserClassification(any(CaseTypeDefinition.class));
         }
 
         @Test
@@ -260,7 +264,7 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should return all events when user has higher classification")
         void shouldReturnAllEventsWhenUserHigherClassification() {
-            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class)))
+            when(caseDataAccessControl.getUserClassifications(any(CaseDetails.class)))
                 .thenReturn(newHashSet(RESTRICTED));
 
             final List<AuditEvent> classifiedEvents =
@@ -278,7 +282,7 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should filter out events with higher classification")
         void shouldFilterOutEventsHigherClassification() {
-            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class)))
+            when(caseDataAccessControl.getUserClassifications(any(CaseDetails.class)))
                 .thenReturn(newHashSet(PUBLIC));
 
             final List<AuditEvent> classifiedEvents =
@@ -365,9 +369,14 @@ public class SecurityClassificationServiceTest {
             caseDetails.setJurisdiction(JURISDICTION_ID);
         }
 
-        CaseDetails applyClassification(SecurityClassification userClassification) {
-            when(securityClassificationService.getUserClassification(any(CaseTypeDefinition.class)))
-                .thenReturn(Optional.ofNullable(userClassification));
+        CaseDetails  applyClassification(SecurityClassification userClassification) {
+            doReturn(Optional.ofNullable(userClassification)).when(securityClassificationService)
+                .getUserClassification(any(CaseTypeDefinition.class));
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class))).thenReturn(
+                Sets.newHashSet(userClassification));
+
+            when(caseDataAccessControl.getUserClassifications(any(CaseDetails.class))).thenReturn(
+                Sets.newHashSet(userClassification));
 
             caseDetails.setSecurityClassification(PRIVATE);
 
