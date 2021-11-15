@@ -44,11 +44,6 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     public Optional<CaseTypeDefinition> getAuthorisedCaseType(String caseTypeId, Predicate<AccessControlList> access) {
         CaseTypeDefinition caseTypeDefinition = caseTypeService.getCaseType(caseTypeId);
 
-        if (applicationParams.getEnableAttributeBasedAccessControl()
-            && !userHasClassificationForJurisdiction(caseTypeDefinition)) {
-            return Optional.empty();
-        }
-
         if (verifyAclOnCaseType(caseTypeDefinition, access)
             && verifySecurityClassificationOnCaseType(caseTypeDefinition)) {
             return Optional.of(caseTypeDefinition);

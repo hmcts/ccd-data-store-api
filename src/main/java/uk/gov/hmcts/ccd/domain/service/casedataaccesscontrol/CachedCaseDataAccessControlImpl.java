@@ -37,6 +37,9 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
 
     private final Map<String, Set<SecurityClassification>> caseTypeClassifications = newConcurrentMap();
 
+    private final Map<String, Set<SecurityClassification>> caseReferenceClassifications = newConcurrentMap();
+
+
 
     @Autowired
     public CachedCaseDataAccessControlImpl(NoCacheCaseDataAccessControl noCacheCaseDataAccessControl) {
@@ -117,12 +120,14 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
 
     @Override
     public Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition) {
-        return noCacheCaseDataAccessControl.getUserClassifications(caseTypeDefinition);
+        return caseTypeClassifications.computeIfAbsent(caseTypeDefinition.getId(),
+            e -> noCacheCaseDataAccessControl.getUserClassifications(caseTypeDefinition));
     }
 
     @Override
     public Set<SecurityClassification> getUserClassifications(CaseDetails caseDetails) {
-        return noCacheCaseDataAccessControl.getUserClassifications(caseDetails);
+        return caseReferenceClassifications.computeIfAbsent(caseDetails.getReferenceAsString(),
+            e -> noCacheCaseDataAccessControl.getUserClassifications(caseDetails));
     }
 
     @Override
