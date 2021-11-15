@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.lau;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +54,6 @@ public class AuditCaseRemoteOperation implements AuditRemoteOperation {
         this.httpClient = httpClient;
         this.objectMapper = objectMapper;
         this.auditCaseRemoteConfiguration = auditCaseRemoteConfiguration;
-        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
     }
 
     @Override

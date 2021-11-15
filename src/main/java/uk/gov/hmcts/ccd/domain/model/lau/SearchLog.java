@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.model.lau;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.ccd.auditlog.aop.AuditContext;
@@ -13,6 +14,7 @@ import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 
 @NoArgsConstructor
 @Setter
+@Getter
 public class SearchLog implements Serializable {
 
     public static final long serialVersionUID = 432973322;
