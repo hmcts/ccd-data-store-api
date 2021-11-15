@@ -1219,7 +1219,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
 
                 CaseSearchResult caseSearchResult =
-                    executeRequest(searchRequest, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B, CASE_TYPE_C),
+                    executeRequest(searchRequest, caseTypesParam(CASE_TYPE_B),
                         AUTOTEST2_PUBLIC);
                 Set<String> caseTypIds = caseSearchResult.getCases()
                         .stream()

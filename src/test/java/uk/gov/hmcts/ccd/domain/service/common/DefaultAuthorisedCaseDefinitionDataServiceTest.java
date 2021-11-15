@@ -14,9 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -44,10 +42,6 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
     private CaseTypeService caseTypeService;
     @Mock
     private AccessControlService accessControlService;
-    @Mock
-    private UserRepository userRepository;
-    @Mock
-    private ApplicationParams applicationParams;
 
     @Mock
     private CaseDataAccessControl caseDataAccessControl;
@@ -144,7 +138,6 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
             when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
                 .thenReturn(accessProfiles);
             when(caseTypeDefinition.getSecurityClassification()).thenReturn(SecurityClassification.PRIVATE);
-            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
         }
 
         @Test
@@ -200,7 +193,6 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
                 .thenReturn(Collections.emptySet());
             when(caseDataAccessControl.getHighestUserClassification(any(CaseTypeDefinition.class)))
                 .thenReturn(SecurityClassification.PUBLIC);
-            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
 
             Optional<CaseTypeDefinition> result = authorisedCaseDataService.getAuthorisedCaseType(CASE_TYPE, CAN_READ);
 

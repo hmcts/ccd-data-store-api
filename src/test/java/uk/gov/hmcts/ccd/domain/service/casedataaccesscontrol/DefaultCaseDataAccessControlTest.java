@@ -27,6 +27,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.AuthorisationMapper;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import java.util.ArrayList;
@@ -93,8 +94,11 @@ class DefaultCaseDataAccessControlTest {
     @Mock
     private RoleAssignmentsFilteringService roleAssignmentsFilteringService;
 
+    @Mock
+    private CaseTypeService caseTypeService;
+
     private final AccessProfileService accessProfileService =
-        spy(new AccessProfileServiceImpl(new AuthorisationMapper()));
+        spy(new AccessProfileServiceImpl(new AuthorisationMapper(caseTypeService)));
 
     @Mock
     private PseudoRoleAssignmentsGenerator pseudoRoleAssignmentsGenerator;

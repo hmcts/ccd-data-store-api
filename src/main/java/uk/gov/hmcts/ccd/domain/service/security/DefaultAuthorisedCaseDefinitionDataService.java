@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -27,17 +26,14 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     private final CaseTypeService caseTypeService;
     private final AccessControlService accessControlService;
     private final CaseDataAccessControl caseDataAccessControl;
-    private final ApplicationParams applicationParams;
 
     @Autowired
     public DefaultAuthorisedCaseDefinitionDataService(CaseTypeService caseTypeService,
                                                       AccessControlService accessControlService,
-                                                      CaseDataAccessControl caseDataAccessControl,
-                                                      ApplicationParams applicationParams) {
+                                                      CaseDataAccessControl caseDataAccessControl) {
         this.caseTypeService = caseTypeService;
         this.accessControlService = accessControlService;
         this.caseDataAccessControl = caseDataAccessControl;
-        this.applicationParams = applicationParams;
     }
 
     @Override
@@ -81,10 +77,6 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     private boolean verifySecurityClassificationOnCaseType(CaseTypeDefinition caseTypeDefinition) {
         return caseDataAccessControl.getHighestUserClassification(caseTypeDefinition)
             .higherOrEqualTo(caseTypeDefinition.getSecurityClassification());
-    }
-
-    private boolean userHasClassificationForJurisdiction(CaseTypeDefinition caseTypeDefinition) {
-        return !caseDataAccessControl.getUserClassifications(caseTypeDefinition).isEmpty();
     }
 
     private List<CaseStateDefinition> filterCaseStatesForUser(CaseTypeDefinition caseTypeDefinition,
