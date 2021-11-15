@@ -21,7 +21,7 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 @Slf4j
 @Component
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
-public class ExcludedGrantTypeQueryBuilder extends GrantTypeQueryBuilder {
+public class ExcludedGrantTypeQueryBuilder extends GrantTypeSqlQueryBuilder {
 
     @Autowired
     public ExcludedGrantTypeQueryBuilder(AccessControlService accessControlService,

@@ -55,7 +55,7 @@ public class ExcludedGrantTypeESQueryBuilder extends GrantTypeESQueryBuilder {
             .collect(Collectors.toSet());
 
         if (!caseReferences.isEmpty()) {
-            return Optional.of(QueryBuilders.termsQuery(REFERENCE_FIELD_COL, caseReferences));
+            return Optional.of(QueryBuilders.termsQuery(REFERENCE_FIELD_COL + KEYWORD, caseReferences));
         }
         return Optional.empty();
     }
