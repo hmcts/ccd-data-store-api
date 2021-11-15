@@ -198,6 +198,8 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
                 .thenReturn(true);
             when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class)))
                 .thenReturn(Collections.emptySet());
+            when(caseDataAccessControl.getHighestUserClassification(any(CaseTypeDefinition.class)))
+                .thenReturn(SecurityClassification.PUBLIC);
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
 
             Optional<CaseTypeDefinition> result = authorisedCaseDataService.getAuthorisedCaseType(CASE_TYPE, CAN_READ);
