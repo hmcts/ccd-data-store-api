@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<suppressions
-	xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
 
 	<suppress until="2021-11-25">
 		<notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security
@@ -45,11 +44,6 @@
 		crafted file
 		</notes>
 		<cve>CVE-2020-23171</cve>
-	</suppress>
-
-	<suppress until="2021-11-25">
-		<notes>Suppress CVE affecting spring-core temporarily until it can be addressed</notes>
-		<cve>CVE-2021-22096</cve>
 	</suppress>
 
 </suppressions>
