@@ -194,6 +194,12 @@ class CaseDocumentUtilsTest extends TestFixtures {
                 DOCUMENT_HASH_PAIR_B,
                 DOCUMENT_HASH_PAIR_C,
                 List.of(HASH_TOKEN_A1, HASH_TOKEN_A2, HASH_TOKEN_B1)
+            ),
+            Arguments.of(
+                emptyList(),
+                SAME_DOCUMENT_WITH_WITHOUT_HASH,
+                DOCUMENT_NO_HASH_PAIR_A,
+                List.of(HASH_TOKEN_A1, DOC_A2)
             )
         );
     }

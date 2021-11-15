@@ -43,9 +43,16 @@ public abstract class TestFixtures {
             "36fc7aa586a54bffc2982ed490c4503f4aca875b7160c9d24b6690276886617d")
     );
 
+
     protected static final List<Tuple2<String, String>> DOCUMENT_NO_HASH_PAIR_A = List.of(
         new Tuple2<>("http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976", null),
         new Tuple2<>("http://dm-store:8080/documents/c1f160ca-cf52-4c0a-8376-3b51c340d00c", null)
+    );
+
+    protected static final List<Tuple2<String, String>> SAME_DOCUMENT_WITH_WITHOUT_HASH = List.of(
+        new Tuple2<>("http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976",
+            "36fc7aa586a54bffc2982ed490c4503f4aca875b7160c9d24b6690276886tytu"),
+        new Tuple2<>("http://dm-store:8080/documents/8da17150-c001-47d7-bfeb-3dabed9e0976", null)
     );
 
     protected static final List<Tuple2<String, String>> DOCUMENT_HASH_PAIR_B = List.of(

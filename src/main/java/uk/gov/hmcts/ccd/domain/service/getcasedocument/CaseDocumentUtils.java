@@ -7,6 +7,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 import javax.inject.Named;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,7 +30,7 @@ public class CaseDocumentUtils {
         };
 
     public static final String DOCUMENT_URL = "document_url";
-    public static final String DOCUMENT_BINARY_URL = "document_url";
+    public static final String DOCUMENT_BINARY_URL = "document_binary_url";
     public static final String DOCUMENT_HASH = "document_hash";
     public static final String BINARY = "/binary";
     public static final String HEARING_RECORDINGS = "hearing-recordings";
@@ -70,7 +71,7 @@ public class CaseDocumentUtils {
 
     public List<JsonNode> findDocumentNodes(@NonNull final Map<String, JsonNode> data) {
         return data.values().stream()
-            .map(node -> node.findParents(DOCUMENT_URL))
+            .map(node -> node.findParents(DOCUMENT_BINARY_URL))
             .flatMap(List::stream)
             .filter(Objects::nonNull)
             .filter(docNode -> nonHearingRecordingUrl(docNode))
@@ -109,7 +110,8 @@ public class CaseDocumentUtils {
 
         final List<Tuple2<String, String>> postCallbackNewDocs = FILTER.apply(postCallbackDocs).apply(preCallbackDocs);
 
-        final List<Tuple2<String, String>> combined = CollectionUtils.listsUnion(eventNewDocs, postCallbackNewDocs);
+        final Collection<Tuple2<String, String>> combined = removeDuplicateDocuments(
+            CollectionUtils.listsUnion(eventNewDocs, postCallbackNewDocs));
 
         return combined.stream()
             .map(pair -> DocumentHashToken.builder()
@@ -123,6 +125,14 @@ public class CaseDocumentUtils {
         return documentHashes.stream()
             .filter(pair -> pair.getHashToken() == null)
             .collect(Collectors.toUnmodifiableList());
+    }
+
+    // give preference to one with hash_token if there is a collision
+    private Collection<Tuple2<String, String>> removeDuplicateDocuments(List<Tuple2<String, String>> docs)  {
+        return docs.stream()
+            .collect(Collectors.toMap(Tuple2::v1, Function.identity(),
+                (t1, t2) -> t1.v2 != null ? t1 : t2))
+            .values();
     }
 
 }
