@@ -2,6 +2,17 @@ package uk.gov.hmcts.ccd.data.casedetails;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Maps;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
+import javax.inject.Inject;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRequestEvent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,22 +32,13 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
-
-import javax.inject.Inject;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRequestEvent;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
@@ -52,7 +54,9 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.GET_ROLE_ASSIGNMENTS_PREFIX;
@@ -82,6 +86,10 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
     @MockBean
     private AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
+
+    @MockBean
+    private AccessControlService accessControlService;
+
 
     @Inject
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
@@ -377,9 +385,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
             () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine2").asText(),
                 is("Fake Street")),
             () -> assertThat(byMetaDataAndFieldData.get(0).getData().get("PersonAddress").get("AddressLine3").asText(),
-                is("Hexton")),
-            () -> verify(authorisedCaseDefinitionDataService).getUserAuthorisedCaseStateIds("PROBATE",
-                "TestAddressBookCase", CAN_READ)
+                is("Hexton"))
         );
     }
 
@@ -451,10 +457,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         "classpath:sql/insert_case_users.sql"
     })
     public void searchWithParams_withAccessLevelGranted() throws Exception {
-        String userId = "1";
-        when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.GRANTED);
-        when(userAuthorisation.getUserId()).thenReturn(userId);
-
+        String userId = "123";
         CaseTypeDefinition caseTypeDefinition = loadCaseTypeDefinition("/mappings/bookcase-definition.json");
         caseTypeDefinition.setRoleToAccessProfiles(asList(roleToAccessProfileDefinition("[CREATOR]")));
 
@@ -465,13 +468,27 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + userId))
             .willReturn(okJson(defaultObjectMapper.writeValueAsString(
                 createRoleAssignmentResponse(
-                    singletonList(createRoleAssignmentRecord("assignment", "1504254784737847", "TestAddressBookCase",
-                        JURISDICTION, "[CREATOR]", userId, false)))))
+                    singletonList(createRoleAssignmentRecord("assignment",
+                        "1504254784737847",
+                        "TestAddressBookCase",
+                        JURISDICTION,
+                        "[CREATOR]",
+                        userId,
+                        false)))))
                 .withStatus(200)));
 
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
         HashMap<String, String> searchParams = new HashMap<>();
         searchParams.put("PersonFirstName", "Janet");
+
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
+            caseStateDefinition.setId("CaseCreated");
+
+            when(accessControlService
+                .filterCaseStatesByAccess(anyList(), anySet(), any(Predicate.class)))
+                .thenReturn(asList(caseStateDefinition), asList());
+        }
 
         final List<CaseDetails> results = caseDetailsRepository.findByMetaDataAndFieldData(metadata, searchParams);
 
@@ -483,7 +500,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
             )))
         );
         assertThat(caseDetailsRepository.getPaginatedSearchMetadata(metadata, searchParams).getTotalResultsCount(),
-            is(1));
+            is(2));
     }
 
     @Test
@@ -492,9 +509,18 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
         "classpath:sql/insert_case_with_restricted_state.sql"
     })
     public void searchWithParams_restrictedStates() {
-        when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE",
-            "TestAddressBookCase", CAN_READ))
-            .thenReturn(asList("CaseRestricted"));
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            CaseStateDefinition caseStateDefinition = new CaseStateDefinition();
+            caseStateDefinition.setId("CaseRestricted");
+
+            when(accessControlService
+                .filterCaseStatesByAccess(anyList(), anySet(), any(Predicate.class)))
+                .thenReturn(asList(caseStateDefinition));
+        } else {
+            when(authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds("PROBATE",
+                "TestAddressBookCase", CAN_READ))
+                .thenReturn(asList("CaseRestricted"));
+        }
 
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
         final List<CaseDetails> results = caseDetailsRepository.findByMetaDataAndFieldData(metadata, Maps.newHashMap());

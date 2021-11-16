@@ -9,7 +9,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AuthorisationMapper;
-import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
 import java.util.List;
 import java.util.Map;
@@ -20,14 +19,10 @@ import static java.lang.String.join;
 @Component
 public class AuthorisationsMatcher implements RoleAttributeMatcher {
 
-    private CaseTypeService caseTypeService;
-
     private AuthorisationMapper authorisationMapper;
 
     @Autowired
-    AuthorisationsMatcher(CaseTypeService caseTypeService,
-                          AuthorisationMapper authorisationMapper) {
-        this.caseTypeService = caseTypeService;
+    AuthorisationsMatcher(AuthorisationMapper authorisationMapper) {
         this.authorisationMapper = authorisationMapper;
     }
 
@@ -38,18 +33,21 @@ public class AuthorisationsMatcher implements RoleAttributeMatcher {
 
     @Override
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseDetails caseDetails) {
-        return matchAuthorisations(roleAssignment, caseTypeService.getCaseType(caseDetails.getCaseTypeId()));
+        Map<String, RoleToAccessProfileDefinition> roleToAccessProfileDefinitionMap =
+            authorisationMapper.toRoleNameAsKeyMap(caseDetails.getCaseTypeId());
+
+        return matchAuthorisations(roleAssignment, roleToAccessProfileDefinitionMap);
     }
 
     @Override
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseTypeDefinition caseTypeDefinition) {
-        return matchAuthorisations(roleAssignment, caseTypeDefinition);
+        Map<String, RoleToAccessProfileDefinition> roleToAccessProfileDefinitionMap =
+            authorisationMapper.toRoleNameAsKeyMap(caseTypeDefinition);
+        return matchAuthorisations(roleAssignment, roleToAccessProfileDefinitionMap);
     }
 
-    private boolean matchAuthorisations(RoleAssignment roleAssignment, CaseTypeDefinition caseTypeDefinition) {
-        Map<String, RoleToAccessProfileDefinition> roleToAccessProfileDefinitionMap =
-            authorisationMapper.toRoleNameAsKeyMap(caseTypeDefinition.getRoleToAccessProfiles());
-
+    private boolean matchAuthorisations(RoleAssignment roleAssignment,
+                                        Map<String, RoleToAccessProfileDefinition> roleToAccessProfileDefinitionMap) {
         RoleToAccessProfileDefinition roleToAccessProfileDefinition = roleToAccessProfileDefinitionMap
             .get(roleAssignment.getRoleName());
         List<String> roleAssignmentAuthorisations = roleAssignment.getAuthorisations();

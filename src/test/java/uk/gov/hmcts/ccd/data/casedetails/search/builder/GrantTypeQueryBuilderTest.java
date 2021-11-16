@@ -10,26 +10,29 @@ abstract class GrantTypeQueryBuilderTest {
 
     protected static final RoleAssignment createRoleAssignment(GrantType grantType,
                                                                String roleType,
+                                                               String roleName,
                                                                String classification,
                                                                String location,
                                                                String region,
                                                                List<String> autorisations) {
-        return createRoleAssignment(grantType, roleType, classification, "", location, region, autorisations);
+        return createRoleAssignment(grantType, roleType, roleName,
+            classification, "", location, region, autorisations);
     }
 
     protected static final RoleAssignment createRoleAssignment(GrantType grantType,
-                                                             String roleType,
-                                                             String classification,
-                                                             String jurisdiction,
-                                                             String location,
-                                                             String region,
-                                                             List<String> autorisations) {
-        return createRoleAssignment(grantType, roleType, classification,
+                                                               String roleType,
+                                                               String roleName, String classification,
+                                                               String jurisdiction,
+                                                               String location,
+                                                               String region,
+                                                               List<String> autorisations) {
+        return createRoleAssignment(grantType, roleType, roleName, classification,
             jurisdiction, location, region, autorisations, "");
     }
 
     protected static final RoleAssignment createRoleAssignment(GrantType grantType,
                                                                String roleType,
+                                                               String roleName,
                                                                String classification,
                                                                String jurisdiction,
                                                                String location,
@@ -43,6 +46,7 @@ abstract class GrantTypeQueryBuilderTest {
             .caseId(Optional.ofNullable(caseId))
             .build();
         return RoleAssignment.builder()
+            .roleName(roleName)
             .grantType(grantType.name())
             .authorisations(autorisations)
             .roleType(roleType)

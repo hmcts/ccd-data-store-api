@@ -107,8 +107,8 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
         verifyMandatoryAccessForCase(eventId, caseDetails, caseTypeDefinition, accessProfiles);
 
-        CaseUpdateViewEvent caseUpdateViewEvent = filterUpsertAccessForCase(caseTypeDefinition, accessProfiles,
-            getEventTriggerOperation.executeForCase(caseReference, eventId, ignoreWarning));
+        CaseUpdateViewEvent caseUpdateViewEvent = filterUpsertAccessForCase(caseReference, eventId, caseTypeDefinition,
+            accessProfiles, getEventTriggerOperation.executeForCase(caseReference, eventId, ignoreWarning));
         updateWithAccessControlMetadata(caseUpdateViewEvent);
         return accessControlService
             .updateCollectionDisplayContextParameterByAccess(caseUpdateViewEvent, accessProfiles);
@@ -149,7 +149,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     }
 
     private CaseDetails getCaseDetails(String caseReference) {
-        CaseDetails caseDetails = null;
+        CaseDetails caseDetails;
         try {
             caseDetails = caseDetailsRepository.findByReference(caseReference)
                 .orElseThrow(() -> new ResourceNotFoundException("No case exist with id=" + caseReference));
@@ -214,10 +214,13 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
             CAN_CREATE);
     }
 
-    private CaseUpdateViewEvent filterUpsertAccessForCase(CaseTypeDefinition caseTypeDefinition,
+    private CaseUpdateViewEvent filterUpsertAccessForCase(String caseReference, String eventId,
+                                                          CaseTypeDefinition caseTypeDefinition,
                                                           Set<AccessProfile> accessProfiles,
                                                           CaseUpdateViewEvent caseUpdateViewEvent) {
         return accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            caseReference,
+            eventId,
             caseUpdateViewEvent,
             caseTypeDefinition.getCaseFieldDefinitions(),
             accessProfiles,

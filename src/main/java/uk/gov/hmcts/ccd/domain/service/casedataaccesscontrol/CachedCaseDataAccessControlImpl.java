@@ -1,32 +1,44 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import com.google.common.collect.Sets;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import static com.google.common.collect.Maps.newConcurrentMap;
+import static java.util.Comparator.comparingInt;
 
-@Component
-@Lazy
+@Service
 @RequestScope
 public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, AccessControl {
 
-    private NoCacheCaseDataAccessControl noCacheCaseDataAccessControl;
+    private final NoCacheCaseDataAccessControl noCacheCaseDataAccessControl;
 
     private final Map<String, Set<AccessProfile>> caseTypeAccessProfiles = newConcurrentMap();
 
     private final Map<String, Set<AccessProfile>> caseTypeOrganisationalAccessProfiles = newConcurrentMap();
 
     private final Map<String, Set<AccessProfile>> caseReferenceAccessProfiles = newConcurrentMap();
+
+    private final Map<String, List<RoleAssignment>> caseTypeRoleAssignments = newConcurrentMap();
+
+    private final Map<String, Set<SecurityClassification>> caseTypeClassifications = newConcurrentMap();
+
+    private final Map<String, Set<SecurityClassification>> caseReferenceClassifications = newConcurrentMap();
+
 
 
     @Autowired
@@ -89,5 +101,40 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
         return noCacheCaseDataAccessControl.shouldRemoveCaseDefinition(accessProfiles,
             access,
             caseTypeId);
+    }
+
+    @Override
+    public Set<AccessProfile> filteredAccessProfiles(List<RoleAssignment> filteredRoleAssignments,
+                                               CaseTypeDefinition caseTypeDefinition,
+                                               boolean isCreationProfile) {
+        return Sets.newHashSet(noCacheCaseDataAccessControl.filteredAccessProfiles(filteredRoleAssignments,
+            caseTypeDefinition,
+            isCreationProfile));
+    }
+
+    @Override
+    public List<RoleAssignment> generateRoleAssignments(CaseTypeDefinition caseTypeDefinition) {
+        return caseTypeRoleAssignments.computeIfAbsent(caseTypeDefinition.getId(),
+            e -> noCacheCaseDataAccessControl.generateRoleAssignments(caseTypeDefinition));
+    }
+
+    @Override
+    public Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition) {
+        return caseTypeClassifications.computeIfAbsent(caseTypeDefinition.getId(),
+            e -> noCacheCaseDataAccessControl.getUserClassifications(caseTypeDefinition));
+    }
+
+    @Override
+    public Set<SecurityClassification> getUserClassifications(CaseDetails caseDetails) {
+        return caseReferenceClassifications.computeIfAbsent(caseDetails.getReferenceAsString(),
+            e -> noCacheCaseDataAccessControl.getUserClassifications(caseDetails));
+    }
+
+    @Override
+    public SecurityClassification getHighestUserClassification(CaseTypeDefinition caseTypeDefinition) {
+        return getUserClassifications(caseTypeDefinition)
+            .stream()
+            .max(comparingInt(SecurityClassification::getRank))
+            .orElseThrow(() -> new ServiceException("No security classification found for user"));
     }
 }
