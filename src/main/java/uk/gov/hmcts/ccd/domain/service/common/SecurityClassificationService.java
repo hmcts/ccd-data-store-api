@@ -20,7 +20,7 @@ public interface SecurityClassificationService {
     boolean userHasEnoughSecurityClassificationForField(String jurisdictionId,
                                                         CaseTypeDefinition caseTypeDefinition, String fieldId);
 
-    Optional<SecurityClassification> getUserClassification(String jurisdictionId);
+    Optional<SecurityClassification> getUserClassification(CaseTypeDefinition caseTypeDefinition);
 
     Optional<SecurityClassification>  getUserClassification(CaseDetails caseDetails, boolean create);
 

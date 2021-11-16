@@ -6,10 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -28,18 +25,14 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
 
     private final CaseTypeService caseTypeService;
     private final AccessControlService accessControlService;
-    private final UserRepository userRepository;
     private final CaseDataAccessControl caseDataAccessControl;
 
     @Autowired
     public DefaultAuthorisedCaseDefinitionDataService(CaseTypeService caseTypeService,
                                                       AccessControlService accessControlService,
-                                                      @Qualifier(CachedUserRepository.QUALIFIER)
-                                                              UserRepository userRepository,
                                                       CaseDataAccessControl caseDataAccessControl) {
         this.caseTypeService = caseTypeService;
         this.accessControlService = accessControlService;
-        this.userRepository = userRepository;
         this.caseDataAccessControl = caseDataAccessControl;
     }
 
@@ -82,8 +75,7 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     }
 
     private boolean verifySecurityClassificationOnCaseType(CaseTypeDefinition caseTypeDefinition) {
-        return userRepository.getHighestUserClassification(
-            caseTypeDefinition.getJurisdictionDefinition().getId())
+        return caseDataAccessControl.getHighestUserClassification(caseTypeDefinition)
             .higherOrEqualTo(caseTypeDefinition.getSecurityClassification());
     }
 

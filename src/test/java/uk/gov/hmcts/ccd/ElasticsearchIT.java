@@ -1209,19 +1209,14 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             @Test
             void shouldOnlyReturnCasesFromCaseTypesWithJurisdictionRole() throws Exception {
-                if (applicationParams.getEnableAttributeBasedAccessControl()) {
-                    stubUserInfo("123", AUTOTEST2_PUBLIC);
-                }
-                stubCaseTypeRoleAssignments("AAT", "MAPPER", "SECURITY");
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
 
                 CaseSearchResult caseSearchResult =
-                    executeRequest(searchRequest, caseTypesParam(CASE_TYPE_B),
+                    executeRequest(searchRequest, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B, CASE_TYPE_C),
                         AUTOTEST2_PUBLIC);
 
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
-                    () -> assertThat(caseSearchResult.getCases().get(0).getReference(), is(1588870615652827L)),
                     () -> assertThat(caseSearchResult.getCases().get(0).getCaseTypeId(), is(CASE_TYPE_B))
                 );
             }

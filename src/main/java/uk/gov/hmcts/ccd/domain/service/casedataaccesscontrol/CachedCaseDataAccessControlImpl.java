@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
@@ -15,8 +16,10 @@ import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import static com.google.common.collect.Maps.newConcurrentMap;
+import static java.util.Comparator.comparingInt;
 
 @Service
 @RequestScope
@@ -31,6 +34,11 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
     private final Map<String, Set<AccessProfile>> caseReferenceAccessProfiles = newConcurrentMap();
 
     private final Map<String, List<RoleAssignment>> caseTypeRoleAssignments = newConcurrentMap();
+
+    private final Map<String, Set<SecurityClassification>> caseTypeClassifications = newConcurrentMap();
+
+    private final Map<String, Set<SecurityClassification>> caseReferenceClassifications = newConcurrentMap();
+
 
 
     @Autowired
@@ -108,5 +116,25 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
     public List<RoleAssignment> generateRoleAssignments(CaseTypeDefinition caseTypeDefinition) {
         return caseTypeRoleAssignments.computeIfAbsent(caseTypeDefinition.getId(),
             e -> noCacheCaseDataAccessControl.generateRoleAssignments(caseTypeDefinition));
+    }
+
+    @Override
+    public Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition) {
+        return caseTypeClassifications.computeIfAbsent(caseTypeDefinition.getId(),
+            e -> noCacheCaseDataAccessControl.getUserClassifications(caseTypeDefinition));
+    }
+
+    @Override
+    public Set<SecurityClassification> getUserClassifications(CaseDetails caseDetails) {
+        return caseReferenceClassifications.computeIfAbsent(caseDetails.getReferenceAsString(),
+            e -> noCacheCaseDataAccessControl.getUserClassifications(caseDetails));
+    }
+
+    @Override
+    public SecurityClassification getHighestUserClassification(CaseTypeDefinition caseTypeDefinition) {
+        return getUserClassifications(caseTypeDefinition)
+            .stream()
+            .max(comparingInt(SecurityClassification::getRank))
+            .orElseThrow(() -> new ServiceException("No security classification found for user"));
     }
 }

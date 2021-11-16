@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
@@ -38,4 +39,10 @@ public interface CaseDataAccessControl {
                                                boolean isCreationProfile);
 
     List<RoleAssignment> generateRoleAssignments(CaseTypeDefinition caseTypeDefinition);
+
+    Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition);
+
+    Set<SecurityClassification> getUserClassifications(CaseDetails caseDetails);
+
+    SecurityClassification getHighestUserClassification(CaseTypeDefinition caseTypeDefinition);
 }
