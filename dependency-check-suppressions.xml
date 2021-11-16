@@ -45,8 +45,8 @@
 		</notes>
 		<cve>CVE-2021-22144</cve>
 	</suppress>
+	<suppress until="2021-11-25">
 
-	<suppress until="2021-10-25">
 		<notes>A vulnerability in all versions of Nim-lang allows unauthenticated attackers to write files to
 		arbitrary directories via a crafted zip file with dot-slash characters included in the name of the
 		crafted file
@@ -55,7 +55,8 @@
 	</suppress>
 
 	<!-- Suppress temporarily -->
-	<suppress>
+	<suppress until="2021-11-25">
+
 		<cve>CVE-2021-29425</cve>
 
 		<cve>CVE-2020-29243</cve>
@@ -80,6 +81,8 @@
 		<cve>CVE-2020-23171</cve>
 		<cve>CVE-2021-22096</cve>
 		<cve>CVE-2021-42340</cve>
+		<notes>Suppress CVE affecting spring-core temporarily until it can be addressed</notes>
+		<cve>CVE-2021-22096</cve>
 	</suppress>
 
 </suppressions>

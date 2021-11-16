@@ -1,0 +1,77 @@
+{
+  "_guid_": "Register_Doc_Info_Stub",
+  "_extends_": "Register_Dynamic_Stub",
+  "specs": [
+    "to register a document info callback stub with the ccd-test-stubs service"
+  ],
+
+  "prerequisites": [
+    "UnRegister_All_Doc_Info_Stubs_By_Metadata"
+  ],
+
+  "request": {
+    "body": {
+      "request": {
+        "method": "POST",
+        "urlPath": "/document_hash_callback"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "data": {
+            "TextField": "Test1",
+            "DocumentField": {
+              "document_url" : "${[scenarioContext][siblingContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][_links][self][href]}",
+              "document_filename" : "${[scenarioContext][siblingContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][originalDocumentName]}",
+              "document_binary_url" : "${[scenarioContext][siblingContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][_links][binary][href]}",
+              "document_hash" : "${[scenarioContext][siblingContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][hashToken]}"
+            }
+          }
+        },
+        "transformers": [
+          "dynamic-case-data-response-transformer"
+        ]
+      },
+      "metadata": {
+        "testId": "S-1041"
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "id": "[[ANY_STRING_NOT_NULLABLE]]",
+      "request": {
+        "urlPath": "/document_hash_callback",
+        "method": "POST"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "data": {
+            "TextField": "Test1",
+            "DocumentField": {
+              "document_url" : "${[scenarioContext][siblingContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][_links][self][href]}",
+              "document_filename" : "${[scenarioContext][siblingContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][originalDocumentName]}",
+              "document_binary_url" : "${[scenarioContext][siblingContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][_links][binary][href]}",
+              "document_hash" : "${[scenarioContext][siblingContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][hashToken]}"
+            }
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "transformers": [
+          "dynamic-case-data-response-transformer"
+        ]
+      },
+      "uuid": "[[ANY_STRING_NOT_NULLABLE]]",
+      "metadata": {
+        "testId": "S-1041"
+      }
+    }
+  }
+}
