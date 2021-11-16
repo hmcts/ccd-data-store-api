@@ -33,8 +33,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -95,7 +95,7 @@ class AuthorisedGetEventTriggerOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         authorisedGetEventTriggerOperation = new AuthorisedGetEventTriggerOperation(
             getEventTriggerOperation,
@@ -155,8 +155,7 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      events,
                                                                                      createCaseUserRoles,
                                                                                      CAN_CREATE);
-            doReturn(caseEventTrigger).when(accessControlService)
-                .setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger, caseFields, createCaseUserRoles, CAN_CREATE);
+
             doReturn(caseEventTrigger).when(accessControlService).filterCaseViewFieldsByAccess(caseEventTrigger,
                                                                                                caseFields,
                                                                                                createCaseUserRoles,
@@ -284,7 +283,8 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      eq(userRoles),
                                                                                      eq(CAN_UPDATE));
             doReturn(caseEventTrigger).when(accessControlService)
-                .setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger, caseFields, userRoles, CAN_UPDATE);
+                .setReadOnlyOnCaseViewFieldsIfNoAccess(CASE_REFERENCE, EVENT_TRIGGER_ID, caseEventTrigger, caseFields,
+                    userRoles, CAN_UPDATE);
             doReturn(caseEventTrigger).when(accessControlService)
                 .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, userRoles);
         }
@@ -332,10 +332,12 @@ class AuthorisedGetEventTriggerOperationTest {
                 () -> inOrder.verify(getEventTriggerOperation).executeForCase(CASE_REFERENCE,
                                                                               EVENT_TRIGGER_ID,
                                                                               IGNORE),
-                () -> inOrder.verify(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(eq(caseEventTrigger),
-                                                                                                 eq(caseFields),
-                                                                                                 eq(userRoles),
-                                                                                                 eq(CAN_UPDATE)),
+                () -> inOrder.verify(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(eq(CASE_REFERENCE),
+                    eq(EVENT_TRIGGER_ID),
+                    eq(caseEventTrigger),
+                    eq(caseFields),
+                    eq(userRoles),
+                    eq(CAN_UPDATE)),
                 () -> inOrder.verify(accessControlService)
                     .updateCollectionDisplayContextParameterByAccess(eq(caseEventTrigger), eq(userRoles))
             );
