@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseLinkRepository;
+import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,10 +14,12 @@ import java.util.stream.Collectors;
 public class CaseLinkService {
 
     private final CaseLinkRepository caseLinkRepository;
+    private final CaseLinkMapper caseLinkMapper;
 
     @Autowired
-    public CaseLinkService(CaseLinkRepository caseLinkRepository) {
+    public CaseLinkService(CaseLinkRepository caseLinkRepository, CaseLinkMapper caseLinkMapper) {
         this.caseLinkRepository = caseLinkRepository;
+        this.caseLinkMapper = caseLinkMapper;
     }
 
     public void updateCaseLinks(Long caseId,
@@ -56,5 +59,10 @@ public class CaseLinkService {
                 caseType);
             log.debug("inserted case link with id {}, linkedCaseId {} and caseTYpe {}", caseId, caseLink, caseType);
         });
+    }
+
+    public List<CaseLink> findCaseLinks(String caseReference) {
+        return caseLinkMapper.entitiesToModels(
+            caseLinkRepository.findAllByCaseReference(Long.parseLong(caseReference)));
     }
 }
