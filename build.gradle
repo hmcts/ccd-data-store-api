@@ -48,7 +48,7 @@ def versions = [
         pact_version: '4.1.7'
 ]
 ext['spring-security.version'] = '5.4.7'
-ext['spring-framework.version'] = '5.3.7'
+ext['spring-framework.version'] = '5.3.12'
 
 
 dependencyUpdates.resolutionStrategy = {
@@ -287,8 +287,9 @@ dependencyManagement {
         // Versions prior to 30.0 vulnerable to CVE-2020-8908
         dependency 'com.google.guava:guava:30.1-jre'
 
-        // CVE-2019-0232 - Java and Command Line injections in Windows
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.50') {
+        // CVE-2019-0232 - Java and Command Line injections in Windows (updated to version 9.0.19)
+        // CVE-2021-42340 - Memory leak (updated to version 9.0.54)
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.54') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
