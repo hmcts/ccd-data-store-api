@@ -3,8 +3,6 @@ package uk.gov.hmcts.ccd;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.experimental.runners.Enclosed;
@@ -64,7 +62,6 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -1212,33 +1209,15 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             @Test
             void shouldOnlyReturnCasesFromCaseTypesWithJurisdictionRole() throws Exception {
-                if (applicationParams.getEnableAttributeBasedAccessControl()) {
-                    stubUserInfo("123", AUTOTEST2_PUBLIC);
-                }
-                stubCaseTypeRoleAssignments("AAT", "MAPPER", "SECURITY");
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
 
                 CaseSearchResult caseSearchResult =
-                    executeRequest(searchRequest, caseTypesParam(CASE_TYPE_B),
+                    executeRequest(searchRequest, caseTypesParam(CASE_TYPE_A, CASE_TYPE_B, CASE_TYPE_C),
                         AUTOTEST2_PUBLIC);
-                Set<String> caseTypIds = caseSearchResult.getCases()
-                        .stream()
-                            .map(c1 -> c1.getCaseTypeId())
-                                .collect(Collectors.toSet());
-
-                Set<Long> references = caseSearchResult.getCases()
-                    .stream()
-                    .map(c1 -> c1.getReference())
-                    .collect(Collectors.toSet());
 
                 assertAll(
-                    () -> assertThat(caseSearchResult.getTotal(), is(5L)),
-                    () -> assertThat(caseTypIds, containsInAnyOrder(CASE_TYPE_A, CASE_TYPE_B, CASE_TYPE_C)),
-                    () -> assertThat(references, containsInAnyOrder(1589460125872336L,
-                        1588870649839697L,
-                        1588866820969121L,
-                        1589460056217857L,
-                        1588870615652827L))
+                    () -> assertThat(caseSearchResult.getTotal(), is(1L)),
+                    () -> assertThat(caseSearchResult.getCases().get(0).getCaseTypeId(), is(CASE_TYPE_B))
                 );
             }
 
