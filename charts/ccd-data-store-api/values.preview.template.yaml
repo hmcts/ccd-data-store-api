@@ -31,6 +31,7 @@ java:
     ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
     ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"
     LOG_CALLBACK_DETAILS:
+    JAVA_TOOL_OPTIONS: "-XX:InitialRAMPercentage=30.0 -XX:MaxRAMPercentage=65.0 -XX:MinRAMPercentage=30.0 -XX:+UseConcMarkSweepGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
   postgresql:
     enabled: true
 
