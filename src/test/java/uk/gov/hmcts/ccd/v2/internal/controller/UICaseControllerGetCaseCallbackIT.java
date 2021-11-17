@@ -124,8 +124,6 @@ public class UICaseControllerGetCaseCallbackIT extends WireMockBaseTest {
                 .headers(headers))
             .andExpect(status().is(504))
             .andReturn();
-
-        verifyWireMock(3, postRequestedFor(urlMatching(GET_CASE_CALLBACK)));
     }
 
     // AC-3: Valid CallbackGetCaseUrl configured in CaseType tab and callback invoked but received error response.
