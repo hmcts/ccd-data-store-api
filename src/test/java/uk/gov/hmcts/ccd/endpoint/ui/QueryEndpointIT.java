@@ -1534,7 +1534,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         //            () -> assertThat(jurisdictions[2].getCaseTypeDefinitions().get(0).getEvents().size(),
         //                is(equalTo(2)))
         //        );
-        //    }
+    //    }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
