@@ -184,11 +184,6 @@ class AuthorisedGetEventTriggerOperationTest {
                     createCaseAccessProfiles,
                     CAN_CREATE);
             doReturn(caseEventTrigger).when(accessControlService)
-                .setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
-                    caseFields,
-                    createCaseAccessProfiles,
-                    CAN_CREATE);
-            doReturn(caseEventTrigger).when(accessControlService)
                 .filterCaseViewFieldsByAccess(caseEventTrigger,
                     caseFields,
                     createCaseAccessProfiles,

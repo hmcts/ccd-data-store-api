@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,14 +36,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
@@ -2578,7 +2569,7 @@ public class AccessControlServiceTest {
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
@@ -2784,7 +2775,7 @@ public class AccessControlServiceTest {
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertAll(
@@ -3226,7 +3217,7 @@ public class AccessControlServiceTest {
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertAll(
@@ -3385,7 +3376,7 @@ public class AccessControlServiceTest {
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
@@ -3453,7 +3444,7 @@ public class AccessControlServiceTest {
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
