@@ -1533,7 +1533,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
         //                is(equalTo(2))),
         //            () -> assertThat(jurisdictions[2].getCaseTypeDefinitions().get(0).getEvents().size(),
         //                is(equalTo(2)))
-        //        );
+    //        );
     //    }
 
     @Test
