@@ -73,7 +73,11 @@
           "case_data" : {
             "F1" : "a${[scenarioContext][customValues][UniqueString]}",
             "F2" : "b${[scenarioContext][customValues][UniqueString]}",
-            "F4" : "d${[scenarioContext][customValues][UniqueString]}"
+            "F4" : "d${[scenarioContext][customValues][UniqueString]}",
+            "caseManagementLocation" : {
+              "baseLocation" : "Newcastle",
+              "region" : "North East"
+            }
           }
         },
         {
@@ -81,7 +85,11 @@
           "case_data" : {
             "F1" : "a${[scenarioContext][customValues][UniqueString]}",
             "F2" : "b${[scenarioContext][customValues][UniqueString]}",
-            "F4" : "d${[scenarioContext][customValues][UniqueString]}"
+            "F4" : "d${[scenarioContext][customValues][UniqueString]}",
+            "caseManagementLocation" : {
+              "baseLocation" : "Newcastle",
+              "region" : null
+            }
           }
         } ],
       "case_types_results" : [

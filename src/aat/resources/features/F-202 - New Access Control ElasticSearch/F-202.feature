@@ -32,7 +32,7 @@ Feature: Access Control Search Tests
     And a successful call [to update the case] as in [J1-CT1-01_Issued]
     And a wait time of [10] seconds [to allow for Logstash to index the case just created],
 
-    And a successful call [to give Solicitor3 a PRIVATE CASE role assignment to view the previously created case J1-CT2-01] as in [solicitor3_case_role_assignments]
+    And a successful call [to give Solicitor3 a PRIVATE CASE role assignment to view the previously created case J1-CT1-01] as in [solicitor3_case_role_assignments]
     When a request is prepared with appropriate values
     And the request [attempts to search for case J1-CT1-01 by RESTRICTED Field F1]
     And it is submitted to call the [ES Search] operation of [CCD Data Store]
@@ -120,9 +120,9 @@ Feature: Access Control Search Tests
 #    And the response has all other details as expected
 
 
-    #todo see s-202.4 above
+    #todo PASS
   @S-202.5
-  Scenario: USer Searching can only return cases that have access to the state for
+  Scenario: User Searching can only return cases that have access to the state for
     Given a user [Solicitor1]
 
     And a case that has just been created as in [J1-CT2-01]
@@ -146,8 +146,6 @@ Feature: Access Control Search Tests
     And the response has all other details as expected
 
 
-    #todo we dont get the ct-07 back with the case ra
-    #todo pulling back all 6 ct2 cases (authCaseState bug)
   @S-202.6
   Scenario: User can search for case only configured with idam role
     Given a user [Solicitor1]

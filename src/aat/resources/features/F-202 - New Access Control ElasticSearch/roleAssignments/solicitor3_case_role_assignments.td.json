@@ -8,7 +8,7 @@
 
   "specs": [
     "a role assignment to access CaseType CT2",
-    "to give Solicitor3 a PRIVATE CASE role assignment to view the previously created case J1-CT2-01",
+    "to give Solicitor3 a PRIVATE CASE role assignment to view the previously created case J1-CT1-01",
     "attempts to create a case for CT2",
     "to create a full case",
     "to give user Solicitor1 a PRIVATE CASE role assignment to view the previously created case",

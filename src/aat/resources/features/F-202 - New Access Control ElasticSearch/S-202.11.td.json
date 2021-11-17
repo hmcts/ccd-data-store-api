@@ -1,17 +1,17 @@
 {
-  "_guid_": "S-202.12",
+  "_guid_": "S-202.11",
   "_extends_": "F-202_Test_Data_Base",
 
   "specs": [
-    "Staff5 with ORGANISATION role assignment to CT2(RESTRICTED) with region attribute",
-    "PUBLIC SC ORGANISATION role assignment access",
-    "attempts to search for case types CT2 by field F4",
-    "contains J1-CT2-01, J1-CT2-02, J1-CT2-03, J1-CT2-04, J1-CT2-05, J1-CT2-06"
+    "Staff2 with ORGANISATION role assignment to CT2(RESTRICTED)",
+    "attempts to search for case types CT1,CT2 by field F4",
+    "contains J1-CT2-01, J1-CT2-02, J1-CT2-03, J1-CT2-04, J1-CT2-05, J1-CT2-06",
+    "attempts to search for case types CT2 by field F4"
   ],
 
   "users" : {
     "invokingUser": {
-      "username": "ccd.ac.staff5@gmail.com",
+      "username": "ccd.ac.staff2@gmail.com",
       "password": "Pa55word11"
     }
   },
@@ -33,10 +33,11 @@
     "_extends_": "Common_200_Response",
     "body" : {
       "total" : 6,
-      "cases" : [{
-        "__ordering__": "unordered",
-        "__elementId__": "id"
-      },{
+      "cases" : [
+        {
+          "__ordering__": "unordered",
+          "__elementId__": "id"
+        },{
         "_extends_" : "J1-CT2-01_result",
         "case_data" : {
           "F1" : "a${[scenarioContext][customValues][UniqueString]}",
@@ -73,7 +74,11 @@
           "case_data" : {
             "F1" : "a${[scenarioContext][customValues][UniqueString]}",
             "F2" : "b${[scenarioContext][customValues][UniqueString]}",
-            "F4" : "d${[scenarioContext][customValues][UniqueString]}"
+            "F4" : "d${[scenarioContext][customValues][UniqueString]}",
+            "caseManagementLocation" : {
+              "baseLocation" : "Newcastle",
+              "region" : "North East"
+            }
           }
         },
         {
@@ -81,7 +86,11 @@
           "case_data" : {
             "F1" : "a${[scenarioContext][customValues][UniqueString]}",
             "F2" : "b${[scenarioContext][customValues][UniqueString]}",
-            "F4" : "d${[scenarioContext][customValues][UniqueString]}"
+            "F4" : "d${[scenarioContext][customValues][UniqueString]}",
+            "caseManagementLocation" : {
+              "baseLocation" : "Newcastle",
+              "region" : null
+            }
           }
         } ],
       "case_types_results" : [
@@ -90,8 +99,7 @@
           "case_type_id" : "CT2"
         }
       ]
+      }
     }
-  }
-
 
 }

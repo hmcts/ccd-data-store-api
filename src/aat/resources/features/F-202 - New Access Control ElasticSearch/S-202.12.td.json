@@ -1,17 +1,17 @@
 {
-  "_guid_": "S-202.14",
+  "_guid_": "S-202.12",
   "_extends_": "F-202_Test_Data_Base",
 
   "specs": [
-    "Staff7 with ORGANISATION role assignment to CT2(RESTRICTED) with region and location attribute",
+    "Staff5 with ORGANISATION role assignment to CT2(RESTRICTED) with region attribute",
+    "PUBLIC SC ORGANISATION role assignment access",
     "attempts to search for case types CT2 by field F4",
-    "contains J1-CT2-01, J1-CT2-02, J1-CT2-03, J1-CT2-04, J1-CT2-05",
-    "does not contain J1-CT2-06 due to non matching Location attribute"
+    "contains J1-CT2-01, J1-CT2-02, J1-CT2-03, J1-CT2-04, J1-CT2-05, J1-CT2-06"
   ],
 
   "users" : {
     "invokingUser": {
-      "username": "ccd.ac.staff7@gmail.com",
+      "username": "ccd.ac.staff5@gmail.com",
       "password": "Pa55word11"
     }
   },
@@ -32,7 +32,7 @@
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body" : {
-      "total" : 5,
+      "total" : 6,
       "cases" : [{
         "__ordering__": "unordered",
         "__elementId__": "id"
@@ -73,12 +73,28 @@
           "case_data" : {
             "F1" : "a${[scenarioContext][customValues][UniqueString]}",
             "F2" : "b${[scenarioContext][customValues][UniqueString]}",
-            "F4" : "d${[scenarioContext][customValues][UniqueString]}"
+            "F4" : "d${[scenarioContext][customValues][UniqueString]}",
+            "caseManagementLocation" : {
+              "baseLocation" : "Newcastle",
+              "region" : "North East"
+            }
           }
-        }],
+        },
+        {
+          "_extends_" : "J1-CT2-06_result",
+          "case_data" : {
+            "F1" : "a${[scenarioContext][customValues][UniqueString]}",
+            "F2" : "b${[scenarioContext][customValues][UniqueString]}",
+            "F4" : "d${[scenarioContext][customValues][UniqueString]}",
+            "caseManagementLocation" : {
+              "baseLocation" : "Newcastle",
+              "region" : null
+            }
+          }
+        } ],
       "case_types_results" : [
         {
-          "total" : 5,
+          "total" : 6,
           "case_type_id" : "CT2"
         }
       ]
