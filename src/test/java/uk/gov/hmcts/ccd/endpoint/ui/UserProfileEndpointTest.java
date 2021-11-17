@@ -8,10 +8,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-    //import uk.gov.hmcts.ccd.domain.model.aggregated.IdamProperties;
-    //import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
-    //import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
-    //import uk.gov.hmcts.ccd.domain.model.aggregated.WorkbasketDefault;
+import uk.gov.hmcts.ccd.domain.model.aggregated.IdamProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.JurisdictionDisplayProperties;
+import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
+//    import uk.gov.hmcts.ccd.domain.model.aggregated.WorkbasketDefault;
 
 import javax.inject.Inject;
 
