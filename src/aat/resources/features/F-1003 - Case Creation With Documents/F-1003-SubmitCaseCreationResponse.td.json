@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-1003-SubmitCaseCreationNoFilenameResponse",
+  "_guid_": "F-1003-SubmitCaseCreationResponse",
   "_extends_": "Common_201_Response",
   "headers": {
     "Content-Type" : "application/json;charset=UTF-8",
@@ -23,7 +23,7 @@
       "DocumentField1" : {
         "document_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
         "document_binary_url" : "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}/binary",
-        "document_filename" : "[[ANYTHING_PRESENT]]"
+        "document_filename" : "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}"
       }
     },
     "data_classification" : {

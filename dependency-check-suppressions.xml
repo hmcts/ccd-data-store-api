@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<suppressions
-	xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
 
 	<suppress until="2021-10-25">
 		<notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security
@@ -45,8 +44,8 @@
 		</notes>
 		<cve>CVE-2021-22144</cve>
 	</suppress>
+	<suppress until="2021-11-25">
 
-	<suppress until="2021-10-25">
 		<notes>A vulnerability in all versions of Nim-lang allows unauthenticated attackers to write files to
 		arbitrary directories via a crafted zip file with dot-slash characters included in the name of the
 		crafted file
@@ -55,8 +54,33 @@
 	</suppress>
 
 	<!-- Suppress temporarily -->
-	<suppress>
-		<cve>CVE-2021-22147</cve>
-	</suppress>
+	<suppress until="2021-11-25">
 
+		<cve>CVE-2021-29425</cve>
+
+		<cve>CVE-2020-29243</cve>
+		<cve>CVE-2020-29242</cve>
+		<cve>CVE-2020-29245</cve>
+		<cve>CVE-2020-29244</cve>
+
+		<cve>CVE-2007-1652</cve>
+		<cve>CVE-2018-1258</cve>
+		<cve>CVE-2007-1651</cve>
+		<cve>CVE-2021-22112</cve>
+		<cve>CVE-2021-22135</cve>
+		<cve>CVE-2021-22137</cve>
+		<cve>CVE-2021-22118</cve>
+		<cve>CVE-2021-27568</cve>
+		<cve>CVE-2021-22144</cve>
+
+		<cve>CVE-2021-28170</cve>
+		<cve>CVE-2021-22119</cve>
+		<cve>CVE-2021-22144</cve>
+		<cve>CVE-2021-22147</cve>
+		<cve>CVE-2020-23171</cve>
+		<cve>CVE-2021-22096</cve>
+		<cve>CVE-2021-42340</cve>
+		<notes>Suppress CVE affecting spring-core temporarily until it can be addressed</notes>
+		<cve>CVE-2021-22096</cve>
+	</suppress>
 </suppressions>

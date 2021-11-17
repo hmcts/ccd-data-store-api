@@ -15,6 +15,7 @@ properties(
 def type = "java"
 def product = "ccd"
 def component = "data-store-api"
+def branchesToSync = ['demo', 'ithc', 'perftest']
 
 // Variables to switch pipeline logic and wiring per type of build
 
@@ -65,6 +66,7 @@ def secrets = [
         secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
         secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT'),
         secret('microservicekey-ccd-data', 'ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_KEY'),
+        secret('microservicekey-xui-webapp', 'BEFTA_S2S_CLIENT_SECRET_OF_XUI_WEBAPP')
 
     ]
 ]
@@ -93,6 +95,8 @@ env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
 env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
 env.MAX_NUM_PARALLEL_THREADS=6
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
+env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal"
+env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
 
 //RA Data Setup
 env.ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_ID = "ccd_data"
@@ -132,6 +136,7 @@ withPipeline(type, product, component) {
 
     echo "ES FTA Enabled = ${env.ELASTIC_SEARCH_FTA_ENABLED} on branch ${env.BRANCH_NAME}"
 
+    syncBranchesWithMaster(branchesToSync)
     overrideVaultEnvironments(vaultOverrides)
     enableAksStagingDeployment()
     disableLegacyDeploymentOnAAT()

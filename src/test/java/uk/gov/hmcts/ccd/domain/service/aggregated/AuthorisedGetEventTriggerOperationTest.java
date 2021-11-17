@@ -46,8 +46,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -111,7 +111,7 @@ class AuthorisedGetEventTriggerOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         authorisedGetEventTriggerOperation = new AuthorisedGetEventTriggerOperation(
             getEventTriggerOperation,
@@ -181,11 +181,6 @@ class AuthorisedGetEventTriggerOperationTest {
             doReturn(true).when(accessControlService)
                 .canAccessCaseEventWithCriteria(EVENT_TRIGGER_ID,
                     events,
-                    createCaseAccessProfiles,
-                    CAN_CREATE);
-            doReturn(caseEventTrigger).when(accessControlService)
-                .setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger,
-                    caseFields,
                     createCaseAccessProfiles,
                     CAN_CREATE);
             doReturn(caseEventTrigger).when(accessControlService)
@@ -346,7 +341,8 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      eq(accessProfiles),
                                                                                      eq(CAN_UPDATE));
             doReturn(caseEventTrigger).when(accessControlService)
-                .setReadOnlyOnCaseViewFieldsIfNoAccess(caseEventTrigger, caseFields, accessProfiles, CAN_UPDATE);
+                .setReadOnlyOnCaseViewFieldsIfNoAccess(CASE_REFERENCE, EVENT_TRIGGER_ID, caseEventTrigger, caseFields,
+                    accessProfiles, CAN_UPDATE);
             doReturn(caseEventTrigger).when(accessControlService)
                 .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, accessProfiles);
             doReturn(new CaseAccessMetadata()).when(caseDataAccessControl).generateAccessMetadata(anyString());
@@ -394,10 +390,12 @@ class AuthorisedGetEventTriggerOperationTest {
                 () -> inOrder.verify(getEventTriggerOperation).executeForCase(CASE_REFERENCE,
                                                                               EVENT_TRIGGER_ID,
                                                                               IGNORE),
-                () -> inOrder.verify(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(eq(caseEventTrigger),
-                                                                                                 eq(caseFields),
-                                                                                                 eq(accessProfiles),
-                                                                                                 eq(CAN_UPDATE)),
+                () -> inOrder.verify(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(eq(CASE_REFERENCE),
+                    eq(EVENT_TRIGGER_ID),
+                    eq(caseEventTrigger),
+                    eq(caseFields),
+                    eq(accessProfiles),
+                    eq(CAN_UPDATE)),
                 () -> inOrder.verify(accessControlService)
                     .updateCollectionDisplayContextParameterByAccess(eq(caseEventTrigger), eq(accessProfiles))
             );
