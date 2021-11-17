@@ -63,6 +63,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
     @Override
     public CaseSearchResult execute(CrossCaseTypeSearchRequest request, boolean dataClassification) {
         MultiSearchResult result = search(request);
+        log.info("ES Search Cases Result  {}", result);
         if (result.isSucceeded()) {
             return toCaseDetailsSearchResult(result, request);
         } else {

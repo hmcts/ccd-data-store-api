@@ -69,6 +69,7 @@ public class SearchQueryOperation {
     public SearchResultView execute(final String view,
                                     final MetaData metadata,
                                     final Map<String, String> queryParameters) {
+        log.info("Search Query Operation View {} and Request {}", view, metadata);
 
         Optional<CaseTypeDefinition> caseType = this.getCaseTypeOperation.execute(metadata.getCaseTypeId(), CAN_READ);
 

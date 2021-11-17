@@ -66,6 +66,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
 
     @Override
     public CaseSearchResult execute(CrossCaseTypeSearchRequest searchRequest, boolean dataClassification) {
+        log.info("ES Search Cases Request {}", searchRequest);
         List<CaseTypeDefinition> authorisedCaseTypes = getAuthorisedCaseTypes(searchRequest);
         CrossCaseTypeSearchRequest authorisedSearchRequest =
             createAuthorisedSearchRequest(authorisedCaseTypes, searchRequest);
@@ -105,6 +106,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         CaseSearchResult result = caseSearchOperation.execute(authorisedSearchRequest, dataClassification);
         filterCaseDataByCaseType(authorisedCaseTypes, result.getCases(), authorisedSearchRequest, dataClassification);
 
+        log.info("ES Search Cases Result {}", result);
         return result;
     }
 

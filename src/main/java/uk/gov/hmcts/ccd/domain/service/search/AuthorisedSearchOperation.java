@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import static uk.gov.hmcts.ccd.domain.service.search.AuthorisedSearchOperation.Q
 
 @Service
 @Qualifier(QUALIFIER)
+@Slf4j
 public class AuthorisedSearchOperation implements SearchOperation {
     public static final String QUALIFIER = "authorised";
 
@@ -52,6 +54,7 @@ public class AuthorisedSearchOperation implements SearchOperation {
 
     @Override
     public List<CaseDetails> execute(MetaData metaData, Map<String, String> criteria) {
+        log.info("SQL Search Cases Request  {}", metaData);
 
         final List<CaseDetails> results = searchOperation.execute(metaData, criteria);
         CaseTypeDefinition caseTypeDefinition = getCaseType(metaData.getCaseTypeId());

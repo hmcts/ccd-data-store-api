@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.search;
 
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.Map;
 
 @Service
 @Qualifier("default")
+@Slf4j
 public class DefaultSearchOperation implements SearchOperation {
     private final CaseDetailsRepository caseDetailsRepository;
 
@@ -29,6 +31,8 @@ public class DefaultSearchOperation implements SearchOperation {
         if (!metaData.validateAndConvertReference()) {
             return Lists.newArrayList();
         }
-        return caseDetailsRepository.findByMetaDataAndFieldData(metaData, criteria);
+        List<CaseDetails> results = caseDetailsRepository.findByMetaDataAndFieldData(metaData, criteria);
+        log.info("SQL Default Search  {}", results);
+        return results;
     }
 }

@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -43,6 +44,7 @@ import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 @Component
 @ConditionalOnProperty(name = "enable-attribute-based-access-control", havingValue = "true")
 @Lazy
+@Slf4j
 public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessControl, AccessControl {
 
     private final RoleAssignmentService roleAssignmentService;
@@ -98,6 +100,7 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
     }
 
     private Set<AccessProfile> generateAllTypesOfProfilesByCaseTypeId(String caseTypeId, boolean isCreationProfile) {
+        log.info("Generate Access Profiles by case type id {} and Creation profile {}", caseTypeId, isCreationProfile);
         CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
         final RoleAssignments roleAssignments;
         if (isCreationProfile) {
@@ -114,6 +117,8 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
     // use for ES searchCases - we don't want to fetch the case, because it should be taken from the ES
     @Override
     public Set<AccessProfile> generateAccessProfilesByCaseDetails(CaseDetails caseDetails) {
+        log.info("Generate Access Profile by CaseDetails ID: {}", caseDetails.getReferenceAsString());
+
         RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
 
         FilteredRoleAssignments filteredRoleAssignments =
@@ -127,6 +132,7 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
 
     @Override
     public Set<AccessProfile> generateAccessProfilesByCaseReference(String caseReference) {
+        log.info("Generate Access Profile by CaseReference {}", caseReference);
         Optional<CaseDetails> caseDetails =  caseDetailsRepository.findByReference(caseReference);
         // R.A uses external micro-services which referer cases by caseReference
         // Non R.A uses internal case id. Both cases should be contemplated in the code.
@@ -162,6 +168,9 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
     public List<AccessProfile> filteredAccessProfiles(List<RoleAssignment> filteredRoleAssignments,
                                                        CaseTypeDefinition caseTypeDefinition,
                                                        boolean isCreationProfile) {
+        log.info("Filter Role assignments Based on CaseTypeDefinition ID: {} and Creation Profile {}",
+            caseTypeDefinition.getId(), isCreationProfile);
+
         filteredRoleAssignments = pseudoGenerateRoleAssignments(filteredRoleAssignments, isCreationProfile);
 
         return generateAccessProfiles(filteredRoleAssignments, caseTypeDefinition);
@@ -169,6 +178,8 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
 
     @Override
     public List<RoleAssignment> generateRoleAssignments(CaseTypeDefinition caseTypeDefinition) {
+        log.info("Generate Role Assignments for CaseTypeDefinition ID: {}", caseTypeDefinition.getId());
+
         RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
         List<RoleAssignment> filteredRoleAssignments = roleAssignmentsFilteringService
             .filter(roleAssignments, caseTypeDefinition,
@@ -188,6 +199,7 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
 
     private List<RoleAssignment> pseudoGenerateRoleAssignments(List<RoleAssignment> filteredRoleAssignments,
                                                                boolean isCreationProfile) {
+        log.info("Pseudo Generate Role Assignments Creation profile {}", isCreationProfile);
         if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
             List<RoleAssignment> pseudoRoleAssignments = pseudoRoleAssignmentsGenerator
                 .createPseudoRoleAssignments(filteredRoleAssignments, isCreationProfile);
@@ -289,6 +301,7 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
 
     @Override
     public Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition) {
+        log.info("Get User Classifications for CaseTypeDefinition ID: {}", caseTypeDefinition.getId());
         Set<AccessProfile> accessProfiles = generateOrganisationalAccessProfilesByCaseTypeId(
             caseTypeDefinition.getId()
         );
@@ -297,6 +310,7 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
 
     @Override
     public Set<SecurityClassification> getUserClassifications(CaseDetails caseDetails) {
+        log.info("Get User Classifications for CaseDetails ID: {}", caseDetails.getReferenceAsString());
         Set<AccessProfile> accessProfiles = generateAccessProfilesByCaseDetails(caseDetails);
         return getSecurityClassifications(accessProfiles);
     }

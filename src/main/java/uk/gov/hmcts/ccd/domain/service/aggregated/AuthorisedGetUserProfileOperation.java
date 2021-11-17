@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import com.google.common.collect.Sets;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Qualifier(AuthorisedGetUserProfileOperation.QUALIFIER)
+@Slf4j
 public class AuthorisedGetUserProfileOperation implements GetUserProfileOperation {
     public static final String QUALIFIER = "authorised";
 
@@ -41,6 +43,7 @@ public class AuthorisedGetUserProfileOperation implements GetUserProfileOperatio
     }
 
     private UserProfile filterCaseTypes(UserProfile userProfile, Predicate<AccessControlList> access) {
+        log.info("Filter User profile {}", userProfile);
         Arrays.stream(userProfile.getJurisdictions()).forEach(
             jurisdiction -> jurisdiction.setCaseTypeDefinitions(
                 jurisdiction.getCaseTypeDefinitions()

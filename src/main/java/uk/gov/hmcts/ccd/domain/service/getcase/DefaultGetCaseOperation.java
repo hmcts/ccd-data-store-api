@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.getcase;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import java.util.Optional;
 
 @Service
 @Qualifier("default")
+@Slf4j
 public class DefaultGetCaseOperation implements GetCaseOperation {
     private final CaseDetailsRepository caseDetailsRepository;
     private final UIDService uidService;
@@ -29,6 +31,8 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
     public Optional<CaseDetails> execute(final String jurisdictionId,
                                          final String caseTypeId,
                                          final String caseReference) {
+        log.info("Get case operation Creator Jurisdiction {}  CaseTypeId {}, CaseReference {}",
+            jurisdictionId, caseTypeId, caseReference);
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
         }
@@ -38,6 +42,7 @@ public class DefaultGetCaseOperation implements GetCaseOperation {
 
     @Override
     public Optional<CaseDetails> execute(String caseReference) {
+        log.info("Get case operation Creator CaseReference {}", caseReference);
         if (!uidService.validateUID(caseReference)) {
             throw new BadRequestException("Case reference is not valid");
         }

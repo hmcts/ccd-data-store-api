@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,7 @@ import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantTyp
 import static uk.gov.hmcts.ccd.domain.service.AccessControl.IDAM_PREFIX;
 
 @Component
+@Slf4j
 public class PseudoRoleAssignmentsGenerator {
 
     private final UserRepository userRepository;
@@ -43,6 +45,8 @@ public class PseudoRoleAssignmentsGenerator {
     public List<RoleAssignment> createPseudoRoleAssignments(List<RoleAssignment> filteredRoleAssignments,
                                                             boolean isCreationProfile) {
 
+        log.info("Pseudo Generate Role Assignments Creation Profile {}", isCreationProfile);
+
         List<String> idamUserRoles = new ArrayList<>(userRepository.getUserRoles());
         List<RoleAssignment> pseudoRoleAssignments = new ArrayList<>();
 
@@ -60,6 +64,8 @@ public class PseudoRoleAssignmentsGenerator {
     }
 
     private List<RoleAssignment> createPseudoRoleAssignmentsByIdamRoles(List<String> idamRoles) {
+        log.info("Pseudo Generate Role Assignments by idam roles");
+
         // TODO: potential performance issue here, to review
         List<UserRole> classifications = caseDefinitionRepository
             .getClassificationsForUserRoleList(idamRoles);
@@ -79,6 +85,7 @@ public class PseudoRoleAssignmentsGenerator {
 
     private List<RoleAssignment> createPseudoRoleAssignmentsForGrantedOnlyAccess(List<String> idamRoles,
                                                                                  List<RoleAssignment> caseRoles) {
+        log.info("Pseudo Generate Role Assignments for Granted User");
         return caseRoles.stream().map(roleAssignment ->
             idamRoles.stream()
                 .map(role -> RoleAssignment.builder()

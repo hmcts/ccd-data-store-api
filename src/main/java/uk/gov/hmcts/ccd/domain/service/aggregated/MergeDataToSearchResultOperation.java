@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -30,6 +31,7 @@ import static uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils.getNestedC
 
 @Named
 @Singleton
+@Slf4j
 public class MergeDataToSearchResultOperation {
 
     private final DateTimeSearchResultProcessor dateTimeSearchResultProcessor;
@@ -45,6 +47,7 @@ public class MergeDataToSearchResultOperation {
                                     final SearchResultDefinition searchResult,
                                     final List<CaseDetails> caseDetails,
                                     final String resultError) {
+        log.info("Merge case search result to search result view {}", caseDetails);
 
         final List<SearchResultViewColumn> viewColumns = buildSearchResultViewColumn(caseTypeDefinition, searchResult);
 

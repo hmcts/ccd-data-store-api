@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.search;
 
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 
 @Service
 @Qualifier("classified")
+@Slf4j
 public class ClassifiedSearchOperation implements SearchOperation {
     private final SearchOperation searchOperation;
     private final SecurityClassificationServiceImpl classificationService;
@@ -34,6 +36,7 @@ public class ClassifiedSearchOperation implements SearchOperation {
         if (null == results) {
             return Lists.newArrayList();
         }
+        log.info("SQL Search Classified result  {}", results);
 
         return results.stream()
                       .map(classificationService::applyClassification)

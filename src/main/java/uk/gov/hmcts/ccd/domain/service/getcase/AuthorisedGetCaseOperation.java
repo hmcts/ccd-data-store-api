@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.getcase;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -19,6 +20,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_RE
 
 @Service
 @Qualifier("authorised")
+@Slf4j
 public class AuthorisedGetCaseOperation implements GetCaseOperation {
     private final GetCaseOperation getCaseOperation;
     private final CaseDefinitionRepository caseDefinitionRepository;
@@ -39,7 +41,8 @@ public class AuthorisedGetCaseOperation implements GetCaseOperation {
 
     @Override
     public Optional<CaseDetails> execute(String jurisdictionId, String caseTypeId, String caseReference) {
-
+        log.info("Get case operation authorised Jurisdiction {}  CaseTypeId {}, CaseReference {}",
+            jurisdictionId, caseTypeId, caseReference);
         return this.execute(caseReference);
     }
 
