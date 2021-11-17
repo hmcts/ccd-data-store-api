@@ -141,7 +141,7 @@ public class SecurityClassificationServiceTest {
         public void shouldRetrieveClassificationsFromRepository() {
             when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
                 .thenReturn(newHashSet(PUBLIC, PRIVATE));
-            securityClassificationService.getUserClassification(new CaseTypeDefinition(), anyBoolean());
+            securityClassificationService.getUserClassification(new CaseTypeDefinition(), true);
 
             verify(caseDataAccessControl, times(1))
                 .getUserClassifications(any(CaseTypeDefinition.class), anyBoolean());
@@ -154,7 +154,7 @@ public class SecurityClassificationServiceTest {
                 .thenReturn(newHashSet(PUBLIC, PRIVATE));
 
             Optional<SecurityClassification> userClassification = securityClassificationService
-                .getUserClassification(new CaseTypeDefinition(), anyBoolean());
+                .getUserClassification(new CaseTypeDefinition(), true);
 
             assertEquals(PRIVATE,
                 userClassification.get(),
@@ -171,7 +171,7 @@ public class SecurityClassificationServiceTest {
                 .thenReturn(newHashSet());
 
             Optional<SecurityClassification> userClassification = securityClassificationService.getUserClassification(
-                new CaseTypeDefinition(), anyBoolean());
+                new CaseTypeDefinition(), true);
 
             assertFalse(userClassification.isPresent(), "Should not have classification");
         }
