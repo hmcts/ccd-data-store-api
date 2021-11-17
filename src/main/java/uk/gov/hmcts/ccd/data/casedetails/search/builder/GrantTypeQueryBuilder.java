@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 
 import com.google.common.collect.Lists;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,18 +48,13 @@ public abstract class GrantTypeQueryBuilder {
      * Groups role assignments by those which are "similar" in the context of building a search query
      * i.e. *most* of the relevant values to search match in each group.
      * @param roleAssignments Role assignments to group
-     * @param caseType Case type for which the role assignments relate to
      * @return Grouped role assignments for search. Note that case reference is ignored in the grouping, so
      *      SearchRoleAssignments in the same group can have different case reference values.
      */
     protected Map<Integer, List<SearchRoleAssignment>> getGroupedSearchRoleAssignments(
-        List<RoleAssignment> roleAssignments,
-        CaseTypeDefinition caseType) {
-        List<CaseStateDefinition> caseStates = getStatesForCaseType(caseType);
+        List<RoleAssignment> roleAssignments) {
         return filterGrantTypeRoleAssignments(roleAssignments).get()
-            .map(roleAssignment ->
-                new SearchRoleAssignment(roleAssignment, getReadableCaseStates(roleAssignment, caseStates, caseType)))
-            .filter(SearchRoleAssignment::hasReadableCaseStates)
+            .map(SearchRoleAssignment::new)
             .collect(Collectors.groupingBy(SearchRoleAssignment::hashCode));
     }
 
@@ -83,10 +79,10 @@ public abstract class GrantTypeQueryBuilder {
         return searchRoleAssignments.stream().allMatch(SearchRoleAssignment::hasCaseReference);
     }
 
-    private Set<String> getReadableCaseStates(RoleAssignment roleAssignment,
-                                              List<CaseStateDefinition> allCaseStates,
-                                              CaseTypeDefinition caseType) {
-        Set<AccessProfile> accessProfiles = getAccessProfiles(roleAssignment, caseType);
+    protected Set<String> getReadableCaseStates(SearchRoleAssignment searchRoleAssignment,
+                                                List<CaseStateDefinition> allCaseStates,
+                                                CaseTypeDefinition caseType) {
+        Set<AccessProfile> accessProfiles = getAccessProfiles(searchRoleAssignment.getRoleAssignment(), caseType);
         return accessControlService
             .filterCaseStatesByAccess(allCaseStates, accessProfiles, CAN_READ)
             .stream()
