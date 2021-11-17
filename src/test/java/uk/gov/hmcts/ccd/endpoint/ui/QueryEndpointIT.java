@@ -1514,27 +1514,27 @@ public class QueryEndpointIT extends WireMockBaseTest {
     }
 
 
-    //    @Test
-    //    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
-    //    public void shouldGetJurisdictionsForReadAccess() throws Exception {
-    //        final MvcResult result = mockMvc.perform(get(GET_JURISDICTIONS_READ_ACCESS)
-    //            .contentType(JSON_CONTENT_TYPE)
-    //            .header(AUTHORIZATION, "Bearer user1"))
-    //            .andExpect(status().is(200))
-    //            .andReturn();
-    //
-    //        final JurisdictionDisplayProperties[] jurisdictions = mapper.readValue(
-    //            result.getResponse().getContentAsString(), JurisdictionDisplayProperties[].class);
-    //
-    //        assertAll(
-    //            () -> assertThat(jurisdictions.length, is(equalTo(4))),
-    //            () -> assertThat(jurisdictions[2].getCaseTypeDefinitions().size(), is(equalTo(1))),
-    //            () -> assertThat(jurisdictions[2].getCaseTypeDefinitions().get(0).getStates().size(),
-    //                is(equalTo(2))),
-    //            () -> assertThat(jurisdictions[2].getCaseTypeDefinitions().get(0).getEvents().size(),
-    //                is(equalTo(2)))
-    //        );
-    //    }
+        //    @Test
+        //    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+        //    public void shouldGetJurisdictionsForReadAccess() throws Exception {
+        //        final MvcResult result = mockMvc.perform(get(GET_JURISDICTIONS_READ_ACCESS)
+        //            .contentType(JSON_CONTENT_TYPE)
+        //            .header(AUTHORIZATION, "Bearer user1"))
+        //            .andExpect(status().is(200))
+        //            .andReturn();
+        //
+        //        final JurisdictionDisplayProperties[] jurisdictions = mapper.readValue(
+        //            result.getResponse().getContentAsString(), JurisdictionDisplayProperties[].class);
+        //
+        //        assertAll(
+        //            () -> assertThat(jurisdictions.length, is(equalTo(4))),
+        //            () -> assertThat(jurisdictions[2].getCaseTypeDefinitions().size(), is(equalTo(1))),
+        //            () -> assertThat(jurisdictions[2].getCaseTypeDefinitions().get(0).getStates().size(),
+        //                is(equalTo(2))),
+        //            () -> assertThat(jurisdictions[2].getCaseTypeDefinitions().get(0).getEvents().size(),
+        //                is(equalTo(2)))
+        //        );
+        //    }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
