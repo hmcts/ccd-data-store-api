@@ -77,7 +77,7 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
 
     private boolean verifySecurityClassificationOnCaseType(CaseTypeDefinition caseTypeDefinition) {
         try {
-            return caseDataAccessControl.getHighestUserClassification(caseTypeDefinition)
+            return caseDataAccessControl.getHighestUserClassification(caseTypeDefinition, false)
                 .higherOrEqualTo(caseTypeDefinition.getSecurityClassification());
         } catch (ServiceException ex) {
             // If no SC found then user has no access

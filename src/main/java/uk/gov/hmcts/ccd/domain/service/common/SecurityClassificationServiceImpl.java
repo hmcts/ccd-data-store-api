@@ -109,22 +109,26 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     }
 
     public boolean userHasEnoughSecurityClassificationForField(String jurisdictionId,
-                                                               CaseTypeDefinition caseTypeDefinition, String fieldId) {
-        final Optional<SecurityClassification> userClassification = getUserClassification(caseTypeDefinition);
+                                                               CaseTypeDefinition caseTypeDefinition,
+                                                               String fieldId) {
+        final Optional<SecurityClassification> userClassification =
+            getUserClassification(caseTypeDefinition, false);
         return userClassification.map(securityClassification ->
             securityClassification.higherOrEqualTo(caseTypeDefinition.getClassificationForField(fieldId)))
             .orElse(false);
     }
 
-    public Optional<SecurityClassification> getUserClassification(CaseTypeDefinition caseTypeDefinition) {
-        return maxSecurityClassification(caseDataAccessControl.getUserClassifications(caseTypeDefinition));
+    public Optional<SecurityClassification> getUserClassification(CaseTypeDefinition caseTypeDefinition,
+                                                                  boolean isCreateProfile) {
+        return maxSecurityClassification(caseDataAccessControl
+            .getUserClassifications(caseTypeDefinition, isCreateProfile));
     }
 
     @Override
     public Optional<SecurityClassification> getUserClassification(CaseDetails caseDetails, boolean create) {
         if (create) {
             return maxSecurityClassification(caseDataAccessControl.getUserClassifications(
-                caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId())));
+                caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId()), true));
         }
         return maxSecurityClassification(caseDataAccessControl.getUserClassifications(caseDetails));
     }

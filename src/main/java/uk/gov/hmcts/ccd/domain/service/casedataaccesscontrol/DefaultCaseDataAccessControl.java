@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -288,10 +289,14 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
     }
 
     @Override
-    public Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition) {
-        Set<AccessProfile> accessProfiles = generateAccessProfilesByCaseTypeId(
-            caseTypeDefinition.getId()
-        );
+    public Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition,
+                                                              boolean isCreateProfile) {
+        Set<AccessProfile> accessProfiles;
+        if (isCreateProfile) {
+            accessProfiles = generateOrganisationalAccessProfilesByCaseTypeId(caseTypeDefinition.getId());
+        } else {
+            accessProfiles = generateAccessProfilesByCaseTypeId(caseTypeDefinition.getId());
+        }
         return getSecurityClassifications(accessProfiles);
     }
 
