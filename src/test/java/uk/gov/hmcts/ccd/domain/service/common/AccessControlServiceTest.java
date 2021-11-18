@@ -23,8 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.ApplicationParams;
 import org.slf4j.LoggerFactory;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
@@ -102,7 +102,6 @@ public class AccessControlServiceTest {
         ROLE_IN_USER_ROLES_2));
 
     private AccessControlService accessControlService;
-
     private static final String CASE_REFERENCE = "CASE_REFERENCE";
     private static final String EVENT_ID = "EVENT_ID";
     private static final String EVENT_ID_LOWER_CASE = "event_id";
@@ -243,7 +242,6 @@ public class AccessControlServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-
         accessControlService = new AccessControlServiceImpl(applicationParams, new CompoundAccessControlService());
     }
 

@@ -1529,10 +1529,10 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
         assertAll(
             () -> assertThat(jurisdictions.length, is(equalTo(4))),
-            () -> assertThat(jurisdictions[1].getCaseTypeDefinitions().size(), is(equalTo(1))),
-            () -> assertThat(jurisdictions[1].getCaseTypeDefinitions().get(0).getStates().size(),
+            () -> assertThat(jurisdictions[2].getCaseTypeDefinitions().size(), is(equalTo(1))),
+            () -> assertThat(jurisdictions[2].getCaseTypeDefinitions().get(0).getStates().size(),
                 is(equalTo(2))),
-            () -> assertThat(jurisdictions[1].getCaseTypeDefinitions().get(0).getEvents().size(),
+            () -> assertThat(jurisdictions[2].getCaseTypeDefinitions().get(0).getEvents().size(),
                 is(equalTo(2)))
         );
     }

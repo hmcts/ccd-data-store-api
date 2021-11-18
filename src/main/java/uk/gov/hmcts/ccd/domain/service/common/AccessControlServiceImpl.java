@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
@@ -195,11 +194,8 @@ public class AccessControlServiceImpl implements AccessControlService {
 
     @Override
     public CaseUpdateViewEvent setReadOnlyOnCaseViewFieldsIfNoAccess(
-        final String caseReference,
-        final String eventId,
-        final CaseUpdateViewEvent caseEventTrigger,
-        final List<CaseFieldDefinition> caseFieldDefinitions,
-        final Set<AccessProfile> accessProfiles,
+        final String caseReference, final String eventId, final CaseUpdateViewEvent caseEventTrigger,
+        final List<CaseFieldDefinition> caseFieldDefinitions, final Set<AccessProfile> accessProfiles,
         final Predicate<AccessControlList> access) {
 
         boolean isMultipartyFixEnabled = applicationParams.isMultipartyFixEnabled();
@@ -212,16 +208,18 @@ public class AccessControlServiceImpl implements AccessControlService {
                     CaseFieldDefinition field = caseFieldOpt.get();
                     if (!hasAccessControlList(accessProfiles, access, field.getAccessControlLists())) {
                         caseViewField.setDisplayContext(READONLY);
-                        hideOnCaseViewFieldsIfNoReadAccess(isMultipartyFixEnabled, caseReference, eventId,
+                        hideOnCaseViewFieldsIfNoReadAccess(caseReference, eventId, isMultipartyFixEnabled,
                             caseViewField, accessProfiles);
                     }
+
                     if (field.isCompoundFieldType()) {
-                        setChildrenAsReadOnlyIfNoAccess(caseReference, eventId, caseEventTrigger.getWizardPages(),
-                            field.getId(), field, access, accessProfiles, caseViewField, isMultipartyFixEnabled);
+                        setChildrenAsReadOnlyIfNoAccess(caseReference, eventId, isMultipartyFixEnabled,
+                            caseEventTrigger.getWizardPages(), field.getId(), field, access, accessProfiles,
+                            caseViewField);
                     }
                 } else {
                     caseViewField.setDisplayContext(READONLY);
-                    hideOnCaseViewFieldsIfNoReadAccess(isMultipartyFixEnabled, caseReference, eventId,
+                    hideOnCaseViewFieldsIfNoReadAccess(caseReference, eventId, isMultipartyFixEnabled,
                         caseViewField, accessProfiles);
                 }
             });

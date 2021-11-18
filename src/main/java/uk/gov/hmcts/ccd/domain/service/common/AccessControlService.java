@@ -88,8 +88,7 @@ public interface AccessControlService {
                                          List<CaseFieldDefinition> caseFieldDefinitions,
                                          Set<AccessProfile> accessProfiles);
 
-    CaseUpdateViewEvent setReadOnlyOnCaseViewFieldsIfNoAccess(String caseReference,
-                                                              String eventId,
+    CaseUpdateViewEvent setReadOnlyOnCaseViewFieldsIfNoAccess(String caseReference, String eventId,
                                                               CaseUpdateViewEvent caseEventTrigger,
                                                               List<CaseFieldDefinition> caseFieldDefinitions,
                                                               Set<AccessProfile> accessProfiles,
@@ -249,16 +248,15 @@ public interface AccessControlService {
             collectionAccess.add(ALLOW_UPDATE.getOption());
         }
 
-
         return DisplayContextParameterUtil.updateCollectionDisplayContextParameter(field.getDisplayContextParameter(),
             collectionAccess);
     }
 
-    default void hideOnCaseViewFieldsIfNoReadAccess(boolean isMultipartyFixEnabled, String caseReference,
-                                                    String eventId, CommonField caseViewField,
-                                                    Set<AccessProfile> userRoles) {
+    default void hideOnCaseViewFieldsIfNoReadAccess(String caseReference, String eventId,
+                                                    boolean isMultipartyFixEnabled, CommonField caseViewField,
+                                                    Set<AccessProfile> accessProfiles) {
         if (isMultipartyFixEnabled
-            && !hasAccessControlList(userRoles, CAN_READ, caseViewField.getAccessControlLists())) {
+            && !hasAccessControlList(accessProfiles, CAN_READ, caseViewField.getAccessControlLists())) {
             caseViewField.setShowCondition(caseViewField.getId() + "=\"DO NOT SHOW IN UI\"");
             caseViewField.setRetainHiddenValue(false);
             LOG.debug("Case view field {} has been hidden for case {} and event {} as part of mutliparty fix",
@@ -266,21 +264,20 @@ public interface AccessControlService {
         }
     }
 
-    default void setChildrenAsReadOnlyIfNoAccess(String caseReference,
-                                                 String eventId,
+    default void setChildrenAsReadOnlyIfNoAccess(final String caseReference, final String eventId,
+                                                 boolean isMultipartyFixEnabled,
                                                  List<WizardPage> wizardPages,
                                                  String rootFieldId,
                                                  CaseFieldDefinition caseField,
                                                  Predicate<AccessControlList> access,
                                                  Set<AccessProfile> accessProfiles,
-                                                 CommonField caseViewField,
-                                                 boolean isMultipartyFixEnabled) {
+                                                 CommonField caseViewField) {
         if (caseField.isCompoundFieldType()) {
             caseField.getFieldTypeDefinition().getChildren().forEach(childField -> {
                 if (!hasAccessControlList(accessProfiles, access, childField.getAccessControlLists())) {
                     CommonField childViewField = findNestedField(caseViewField, childField.getId());
                     childViewField.setDisplayContext(READONLY);
-                    hideOnCaseViewFieldsIfNoReadAccess(isMultipartyFixEnabled, caseReference, eventId,
+                    hideOnCaseViewFieldsIfNoReadAccess(caseReference, eventId, isMultipartyFixEnabled,
                         childViewField, accessProfiles);
 
                     Optional<WizardPageField> optionalWizardPageField = getWizardPageField(wizardPages, rootFieldId);
@@ -291,13 +288,13 @@ public interface AccessControlService {
                     setChildrenAsReadOnlyIfNoAccess(
                         caseReference,
                         eventId,
+                        isMultipartyFixEnabled,
                         wizardPages,
                         rootFieldId,
                         childField,
                         access,
                         accessProfiles,
-                        findNestedField(caseViewField, childField.getId()),
-                        isMultipartyFixEnabled
+                        findNestedField(caseViewField, childField.getId())
                     );
                 }
             });
@@ -448,7 +445,7 @@ public interface AccessControlService {
             .stream()
             .filter(o -> {
                 Optional<CaseViewField> optionalCaseViewField = findCaseViewField(caseEventTrigger.getCaseFields(),
-                    fieldId);
+                                                                                  fieldId);
                 return optionalCaseViewField
                     .map(caseViewField ->
                         caseViewField.getComplexFieldNestedField(o.getComplexFieldElementId()
