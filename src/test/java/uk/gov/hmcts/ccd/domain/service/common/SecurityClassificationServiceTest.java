@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -111,7 +112,7 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should return TRUE when user has enough SC rank")
         void userHasEnoughSecurityClassificationForField() {
-            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class)))
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
                 .thenReturn(newHashSet(PUBLIC, PRIVATE));
 
             assertTrue(securityClassificationService.userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
@@ -122,7 +123,7 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should return FALSE when user doesn't have enough SC rank")
         void userDoesNotHaveEnoughSecurityClassificationForField() {
-            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class)))
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
                 .thenReturn(newHashSet(PUBLIC, PRIVATE));
 
             assertFalse(securityClassificationService.userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
@@ -138,21 +139,22 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should retrieve user classifications from user repository")
         public void shouldRetrieveClassificationsFromRepository() {
-            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class)))
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
                 .thenReturn(newHashSet(PUBLIC, PRIVATE));
-            securityClassificationService.getUserClassification(new CaseTypeDefinition());
+            securityClassificationService.getUserClassification(new CaseTypeDefinition(), true);
 
-            verify(caseDataAccessControl, times(1)).getUserClassifications(any(CaseTypeDefinition.class));
+            verify(caseDataAccessControl, times(1))
+                .getUserClassifications(any(CaseTypeDefinition.class), anyBoolean());
         }
 
         @Test
         @DisplayName("should keep highest ranked classification")
         public void shouldRetrieveHigherRankedRole() {
-            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class)))
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
                 .thenReturn(newHashSet(PUBLIC, PRIVATE));
 
             Optional<SecurityClassification> userClassification = securityClassificationService
-                .getUserClassification(new CaseTypeDefinition());
+                .getUserClassification(new CaseTypeDefinition(), true);
 
             assertEquals(PRIVATE,
                 userClassification.get(),
@@ -163,13 +165,13 @@ public class SecurityClassificationServiceTest {
         @DisplayName("should retrieve no security classification if empty list of classifications returned by user "
             + "repository")
         public void shouldRetrieveNoSecurityClassificationIfEmptyListOfClassifications() {
-            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class)))
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
                 .thenReturn(newHashSet());
-            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class)))
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
                 .thenReturn(newHashSet());
 
             Optional<SecurityClassification> userClassification = securityClassificationService.getUserClassification(
-                new CaseTypeDefinition());
+                new CaseTypeDefinition(), true);
 
             assertFalse(userClassification.isPresent(), "Should not have classification");
         }
@@ -189,7 +191,7 @@ public class SecurityClassificationServiceTest {
 
         Optional<CaseDetails> applyClassification(SecurityClassification userClassification,
                                                   SecurityClassification caseClassification) {
-            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class)))
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
                 .thenReturn(newHashSet(userClassification));
 
             when(caseDataAccessControl.getUserClassifications(any(CaseDetails.class)))
@@ -246,7 +248,7 @@ public class SecurityClassificationServiceTest {
             restrictedEvent.setSecurityClassification(RESTRICTED);
 
             doReturn(Optional.empty()).when(securityClassificationService)
-                .getUserClassification(any(CaseTypeDefinition.class));
+                .getUserClassification(any(CaseTypeDefinition.class), anyBoolean());
         }
 
         @Test
@@ -369,10 +371,10 @@ public class SecurityClassificationServiceTest {
             caseDetails.setJurisdiction(JURISDICTION_ID);
         }
 
-        CaseDetails  applyClassification(SecurityClassification userClassification) {
+        CaseDetails applyClassification(SecurityClassification userClassification) {
             doReturn(Optional.ofNullable(userClassification)).when(securityClassificationService)
-                .getUserClassification(any(CaseTypeDefinition.class));
-            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class))).thenReturn(
+                .getUserClassification(any(CaseTypeDefinition.class), anyBoolean());
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean())).thenReturn(
                 Sets.newHashSet(userClassification));
 
             when(caseDataAccessControl.getUserClassifications(any(CaseDetails.class))).thenReturn(

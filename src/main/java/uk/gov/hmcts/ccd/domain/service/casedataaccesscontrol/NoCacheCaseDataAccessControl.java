@@ -49,7 +49,7 @@ public interface NoCacheCaseDataAccessControl {
         return Lists.newArrayList();
     }
 
-    Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition);
+    Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition, boolean isCreateProfile);
 
     Set<SecurityClassification> getUserClassifications(CaseDetails caseDetails);
 }

@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import static java.util.stream.Collectors.toList;
 
@@ -75,8 +76,13 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     }
 
     private boolean verifySecurityClassificationOnCaseType(CaseTypeDefinition caseTypeDefinition) {
-        return caseDataAccessControl.getHighestUserClassification(caseTypeDefinition)
-            .higherOrEqualTo(caseTypeDefinition.getSecurityClassification());
+        try {
+            return caseDataAccessControl.getHighestUserClassification(caseTypeDefinition, false)
+                .higherOrEqualTo(caseTypeDefinition.getSecurityClassification());
+        } catch (ServiceException ex) {
+            // If no SC found then user has no access
+            return false;
+        }
     }
 
     private List<CaseStateDefinition> filterCaseStatesForUser(CaseTypeDefinition caseTypeDefinition,
