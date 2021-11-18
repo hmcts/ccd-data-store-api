@@ -26,6 +26,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -146,7 +147,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         void shouldGetAuthorisedCaseType() {
             when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ))
                 .thenReturn(true);
-            when(caseDataAccessControl.getHighestUserClassification(any(CaseTypeDefinition.class)))
+            when(caseDataAccessControl.getHighestUserClassification(any(CaseTypeDefinition.class), anyBoolean()))
                 .thenReturn(SecurityClassification.PRIVATE);
 
             Optional<CaseTypeDefinition> result = authorisedCaseDataService.getAuthorisedCaseType(CASE_TYPE, CAN_READ);
@@ -161,7 +162,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         void shouldNotReturnCaseTypeWhenNoAccess() {
             when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ))
                 .thenReturn(false);
-            when(caseDataAccessControl.getHighestUserClassification(any(CaseTypeDefinition.class)))
+            when(caseDataAccessControl.getHighestUserClassification(any(CaseTypeDefinition.class), anyBoolean()))
                 .thenReturn(SecurityClassification.PRIVATE);
 
             Optional<CaseTypeDefinition> result = authorisedCaseDataService.getAuthorisedCaseType(CASE_TYPE, CAN_READ);
@@ -175,7 +176,7 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         void shouldNotReturnCaseTypeWhenClassificationNotMatched() {
             when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ))
                 .thenReturn(true);
-            when(caseDataAccessControl.getHighestUserClassification(any(CaseTypeDefinition.class)))
+            when(caseDataAccessControl.getHighestUserClassification(any(CaseTypeDefinition.class), anyBoolean()))
                 .thenReturn(SecurityClassification.PUBLIC);
 
             Optional<CaseTypeDefinition> result = authorisedCaseDataService.getAuthorisedCaseType(CASE_TYPE, CAN_READ);
@@ -189,9 +190,9 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         void shouldNotReturnCaseTypeWhenUserHasNoClassificationForJurisdiction() {
             when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ))
                 .thenReturn(true);
-            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class)))
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
                 .thenReturn(Collections.emptySet());
-            when(caseDataAccessControl.getHighestUserClassification(any(CaseTypeDefinition.class)))
+            when(caseDataAccessControl.getHighestUserClassification(any(CaseTypeDefinition.class), anyBoolean()))
                 .thenReturn(SecurityClassification.PUBLIC);
 
             Optional<CaseTypeDefinition> result = authorisedCaseDataService.getAuthorisedCaseType(CASE_TYPE, CAN_READ);

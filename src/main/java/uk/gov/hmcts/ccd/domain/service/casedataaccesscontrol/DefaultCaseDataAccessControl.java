@@ -288,10 +288,14 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
     }
 
     @Override
-    public Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition) {
-        Set<AccessProfile> accessProfiles = generateOrganisationalAccessProfilesByCaseTypeId(
-            caseTypeDefinition.getId()
-        );
+    public Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition,
+                                                              boolean isCreateProfile) {
+        Set<AccessProfile> accessProfiles;
+        if (isCreateProfile) {
+            accessProfiles = generateOrganisationalAccessProfilesByCaseTypeId(caseTypeDefinition.getId());
+        } else {
+            accessProfiles = generateAccessProfilesByCaseTypeId(caseTypeDefinition.getId());
+        }
         return getSecurityClassifications(accessProfiles);
     }
 

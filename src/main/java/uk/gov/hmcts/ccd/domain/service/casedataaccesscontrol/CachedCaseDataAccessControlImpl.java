@@ -37,9 +37,9 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
 
     private final Map<String, Set<SecurityClassification>> caseTypeClassifications = newConcurrentMap();
 
+    private final Map<String, Set<SecurityClassification>> caseTypeOrganisationalClassifications = newConcurrentMap();
+
     private final Map<String, Set<SecurityClassification>> caseReferenceClassifications = newConcurrentMap();
-
-
 
     @Autowired
     public CachedCaseDataAccessControlImpl(NoCacheCaseDataAccessControl noCacheCaseDataAccessControl) {
@@ -119,9 +119,15 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
     }
 
     @Override
-    public Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition) {
-        return caseTypeClassifications.computeIfAbsent(caseTypeDefinition.getId(),
-            e -> noCacheCaseDataAccessControl.getUserClassifications(caseTypeDefinition));
+    public Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition,
+                                                              boolean isCreateProfile) {
+        if (isCreateProfile) {
+            return caseTypeClassifications.computeIfAbsent(caseTypeDefinition.getId(),
+                e -> noCacheCaseDataAccessControl.getUserClassifications(caseTypeDefinition, true));
+        } else {
+            return caseTypeOrganisationalClassifications.computeIfAbsent(caseTypeDefinition.getId(),
+                e -> noCacheCaseDataAccessControl.getUserClassifications(caseTypeDefinition, false));
+        }
     }
 
     @Override
@@ -131,8 +137,9 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
     }
 
     @Override
-    public SecurityClassification getHighestUserClassification(CaseTypeDefinition caseTypeDefinition) {
-        return getUserClassifications(caseTypeDefinition)
+    public SecurityClassification getHighestUserClassification(CaseTypeDefinition caseTypeDefinition,
+                                                               boolean isCreateProfile) {
+        return getUserClassifications(caseTypeDefinition, isCreateProfile)
             .stream()
             .max(comparingInt(SecurityClassification::getRank))
             .orElseThrow(() -> new ServiceException("No security classification found for user"));

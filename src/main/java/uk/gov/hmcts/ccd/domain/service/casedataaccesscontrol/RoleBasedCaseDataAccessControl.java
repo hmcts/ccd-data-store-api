@@ -118,7 +118,8 @@ public class RoleBasedCaseDataAccessControl implements NoCacheCaseDataAccessCont
     }
 
     @Override
-    public Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition) {
+    public Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition,
+                                                              boolean isCreateProfile) {
         return userRepository.getUserClassifications(caseTypeDefinition.getJurisdictionId());
     }
 

@@ -40,9 +40,10 @@ public interface CaseDataAccessControl {
 
     List<RoleAssignment> generateRoleAssignments(CaseTypeDefinition caseTypeDefinition);
 
-    Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition);
+    Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition, boolean isCreateProfile);
 
     Set<SecurityClassification> getUserClassifications(CaseDetails caseDetails);
 
-    SecurityClassification getHighestUserClassification(CaseTypeDefinition caseTypeDefinition);
+    SecurityClassification getHighestUserClassification(CaseTypeDefinition caseTypeDefinition,
+                                                        boolean isCreateProfile);
 }
