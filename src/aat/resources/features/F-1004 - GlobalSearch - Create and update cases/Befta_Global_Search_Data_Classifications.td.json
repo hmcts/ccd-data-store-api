@@ -4,6 +4,7 @@
     "DateOfBirth": "PUBLIC",
     "DateOfDeath": "PUBLIC",
     "Email": "PUBLIC",
+    "caseManagementCategory" : "PUBLIC",
     "Address": {
       "classification": "PUBLIC",
       "value": {
@@ -13,6 +14,14 @@
     "FirstName": "PUBLIC",
     "LastName": "PUBLIC",
     "PostCode": "PUBLIC",
+    "caseManagementLocation" : {
+      "classification" : "PUBLIC",
+      "value" : {
+        "baseLocation" : "PUBLIC",
+        "region" : "PUBLIC"
+      }
+    },
+  "caseNameHmctsInternal" : "PUBLIC",
     "SearchCriteria" : {
       "classification" : "PUBLIC",
       "value" : {

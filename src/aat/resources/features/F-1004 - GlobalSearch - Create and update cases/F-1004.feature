@@ -67,14 +67,3 @@ Feature: F-1004: Global Search - Create and update cases
     Then a positive response is received
     And the response has all other details as expected
 
-  @S-1004.7
-  Scenario: Successfully search for case with the new global search parameters
-    Given a user with [an active profile in CCD]
-    And a successful call [to create a case] as in [F-1004_CreateCasePreRequisiteCaseworker]
-    When a request is prepared with appropriate values
-    And the request [contains at least one fields from new global search screen]
-    And the request [contains all the mandatory parameters]
-    And it is submitted to call the [Global Search] operation of [CCD Data Store]
-    Then a positive response is received,
-    And the response [has 200 return code],
-    And the response has all other details as expected.

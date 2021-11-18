@@ -18,7 +18,6 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_200_Response",
     "headers": {
       "Content-Encoding": "gzip",
       "vary": "accept-encoding",

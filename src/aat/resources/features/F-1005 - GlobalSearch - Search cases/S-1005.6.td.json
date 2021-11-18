@@ -1,0 +1,55 @@
+{
+  "title": "Successfully search for an updated case with the new values",
+  "_guid_": "S-1005.6",
+  "_extends_": "Search_Case_Base",
+  "specs": [
+    "an active profile in CCD",
+    "contains the field that has been updated",
+    "contains all the mandatory parameters",
+    "has 200 return code",
+    "returns the updated case"
+  ],
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "caseReferences": [
+          "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+        ],
+        "parties": [
+          {
+            "addressLine1": "updated Address"
+          }
+        ]
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "resultInfo": {
+        "casesReturned": 1,
+        "caseStartRecord": 1,
+        "moreResultsToGo": false
+      },
+      "results": [
+        {
+          "stateId" : "CaseUpdated",
+          "caseReference" : "${}${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+          "otherReferences" : [ "FirstNameValue" ],
+          "caseNameHmctsInternal" : "Name Internal",
+          "baseLocationId" : "123",
+          "baseLocationName" : "54 HAGLEY ROAD (BIRMINGHAM OFFICES)",
+          "caseManagementCategoryId" : "987",
+          "caseManagementCategoryName" : "Category label",
+          "regionId" : "1",
+          "regionName" : "Midlands",
+          "CCDJurisdictionId" : "BEFTA_MASTER",
+          "CCDJurisdictionName" : "BEFTA Master",
+          "CCDCaseTypeId" : "FT_GlobalSearch",
+          "CCDCaseTypeName" : "FT_GlobalSearch"
+        }
+      ]
+    }
+  }
+}
+

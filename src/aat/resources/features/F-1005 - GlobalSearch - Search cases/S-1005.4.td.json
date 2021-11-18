@@ -1,0 +1,44 @@
+{
+  "title": "Unsuccessful search for case with invalid schema",
+  "_guid_": "S-1005.4",
+  "_extends_": "Search_Case_Base",
+  "specs": [
+    "an active profile in CCD",
+    "contains at least one fields from new global search screen",
+    "contains all the mandatory parameters",
+    "contains an invalid schema",
+    "has 400 return code",
+    "contains the error message 'Input not valid'"
+  ],
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "caseReferences": [
+          "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+        ]
+      },
+      "sortCriteria": [
+        {
+          "sortBy": "createdDate",
+          "sortDirection": "up"
+        }
+      ]
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "body" : {
+      "exception" : "org.springframework.web.bind.MethodArgumentNotValidException",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "status" : 400,
+      "error" : "Bad Request",
+      "message" : "Input not valid",
+      "path" : "/globalSearch",
+      "details" : [ "Sort direction invalid" ],
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}
+
