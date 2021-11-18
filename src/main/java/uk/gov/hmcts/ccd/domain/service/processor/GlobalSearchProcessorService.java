@@ -19,13 +19,15 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataFields.SEARCH_CRITERIA;
+
 @Service
 public class GlobalSearchProcessorService {
 
-    private static final String SEARCH_CRITERIA = "SearchCriteria";
-
     public Map<String, JsonNode> populateGlobalSearchData(CaseTypeDefinition caseTypeDefinition,
                                                           Map<String, JsonNode> data) {
+
+        // NB: only need to generate GlobalSearch data if 'SearchCriteria' field is present in the case type definition
         if (caseTypeDefinition.getCaseField(SEARCH_CRITERIA).isPresent()) {
             Map<String, JsonNode> clonedData = null;
             if (data != null) {
@@ -44,9 +46,13 @@ public class GlobalSearchProcessorService {
             if (!searchPartyList.isEmpty()) {
                 searchCriteria.setSearchParties(searchPartyList);
             }
-            if (!searchCriteria.isEmpty() && clonedData != null) {
-                clonedData.put(SEARCH_CRITERIA, JacksonUtils.convertValueJsonNode(searchCriteria));
+
+            // NB: always output data with 'SearchCriteria' field even if empty; as used by logstash process as a
+            //     trigger to tell it to send a subset of the case data to the Global Search index
+            if (clonedData == null) {
+                clonedData = new HashMap<>();
             }
+            clonedData.put(SEARCH_CRITERIA, JacksonUtils.convertValueJsonNode(searchCriteria));
 
             return clonedData;
         } else {
@@ -131,11 +137,11 @@ public class GlobalSearchProcessorService {
 
             String name = namesToValuesMap.keySet()
                 .stream()
-                .map(key -> namesToValuesMap.get(key))
+                .map(namesToValuesMap::get)
                 .filter(value -> !value.isBlank())
                 .collect(Collectors.joining(" "));
 
-            if (name != null && !name.isBlank()) {
+            if (!name.isBlank()) {
                 searchPartyValue.setName(name);
             }
         }
@@ -154,12 +160,19 @@ public class GlobalSearchProcessorService {
 
         if (valueToFind != null && mapToSearch != null) {
             for (Map.Entry<String, JsonNode> entry : mapToSearch.entrySet()) {
+                boolean processedValue = false;
+
                 if (isComplexField(valueToFind, entry.getKey())) {
                     returnValue = getNestedValue(entry.getValue(), valueToFind);
-                    break;
+                    processedValue = true; // i.e. processed as a nested value
+
                 } else if (entry.getKey().equals(valueToFind)) {
                     returnValue = entry.getValue().textValue();
-                    break;
+                    processedValue = true;
+                }
+
+                if (processedValue) {
+                    break; // NB: only one break per loop as per S135
                 }
             }
         }
