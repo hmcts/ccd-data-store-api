@@ -5,10 +5,13 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AuthorisationMapper;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.AccessProfileServiceImpl;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -19,9 +22,13 @@ class AccessProfileServiceImplTest {
 
     private AccessProfileServiceImpl roleAssignmentMapper;
 
+    @Mock
+    private CaseTypeService caseTypeService;
+
     @BeforeEach
     void setUp() {
-        AuthorisationMapper authorisationMapper = new AuthorisationMapper();
+        MockitoAnnotations.openMocks(this);
+        AuthorisationMapper authorisationMapper = new AuthorisationMapper(caseTypeService);
         roleAssignmentMapper = new AccessProfileServiceImpl(authorisationMapper);
     }
 

@@ -1,6 +1,14 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -12,6 +20,7 @@ import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProcess;
@@ -20,6 +29,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignments;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.matcher.MatcherType;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -27,14 +37,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
@@ -156,9 +158,36 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         }
     }
 
-    private List<AccessProfile> filteredAccessProfiles(List<RoleAssignment> filteredRoleAssignments,
+    @Override
+    public List<AccessProfile> filteredAccessProfiles(List<RoleAssignment> filteredRoleAssignments,
                                                        CaseTypeDefinition caseTypeDefinition,
                                                        boolean isCreationProfile) {
+        filteredRoleAssignments = pseudoGenerateRoleAssignments(filteredRoleAssignments, isCreationProfile);
+
+        return generateAccessProfiles(filteredRoleAssignments, caseTypeDefinition);
+    }
+
+    @Override
+    public List<RoleAssignment> generateRoleAssignments(CaseTypeDefinition caseTypeDefinition) {
+        RoleAssignments roleAssignments = roleAssignmentService.getRoleAssignments(securityUtils.getUserId());
+        List<RoleAssignment> filteredRoleAssignments = roleAssignmentsFilteringService
+            .filter(roleAssignments, caseTypeDefinition,
+                Lists.newArrayList(
+                    MatcherType.GRANTTYPE,
+                    MatcherType.SECURITYCLASSIFICATION
+                )
+            ).getFilteredMatchingRoleAssignments();
+
+        if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
+            List<RoleAssignment> pseudoRoleAssignments = pseudoRoleAssignmentsGenerator
+                .createPseudoRoleAssignments(filteredRoleAssignments, false);
+            filteredRoleAssignments = augment(filteredRoleAssignments, pseudoRoleAssignments);
+        }
+        return filteredRoleAssignments;
+    }
+
+    private List<RoleAssignment> pseudoGenerateRoleAssignments(List<RoleAssignment> filteredRoleAssignments,
+                                                               boolean isCreationProfile) {
         if (applicationParams.getEnablePseudoRoleAssignmentsGeneration()) {
             List<RoleAssignment> pseudoRoleAssignments = pseudoRoleAssignmentsGenerator
                 .createPseudoRoleAssignments(filteredRoleAssignments, isCreationProfile);
@@ -168,8 +197,7 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         if (hasGrantTypeExcludedRole(filteredRoleAssignments)) {
             filteredRoleAssignments = retainBasicAndSpecificGrantTypeRolesOnly(filteredRoleAssignments);
         }
-
-        return generateAccessProfiles(filteredRoleAssignments, caseTypeDefinition);
+        return filteredRoleAssignments;
     }
 
 
@@ -249,6 +277,40 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         return accessProfileNames.contains(accessProfile);
     }
 
+
+    @Override
+    public boolean shouldRemoveCaseDefinition(Set<AccessProfile> accessProfiles,
+                                              Predicate<AccessControlList> access,
+                                              String caseTypeId) {
+        // In R.A if the access is create the RoleType has to be organisation.
+        final var accessProfile = generateOrganisationalAccessProfilesByCaseTypeId(caseTypeId);
+        return access.test(getCreateAccessControlList()) && accessProfile.isEmpty();
+    }
+
+    @Override
+    public Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition,
+                                                              boolean isCreateProfile) {
+        Set<AccessProfile> accessProfiles;
+        if (isCreateProfile) {
+            accessProfiles = generateOrganisationalAccessProfilesByCaseTypeId(caseTypeDefinition.getId());
+        } else {
+            accessProfiles = generateAccessProfilesByCaseTypeId(caseTypeDefinition.getId());
+        }
+        return getSecurityClassifications(accessProfiles);
+    }
+
+    @Override
+    public Set<SecurityClassification> getUserClassifications(CaseDetails caseDetails) {
+        Set<AccessProfile> accessProfiles = generateAccessProfilesByCaseDetails(caseDetails);
+        return getSecurityClassifications(accessProfiles);
+    }
+
+    private Set<SecurityClassification> getSecurityClassifications(Set<AccessProfile> accessProfiles) {
+        return accessProfiles.stream()
+            .map(accessProfile -> SecurityClassification.valueOf(accessProfile.getSecurityClassification()))
+            .collect(Collectors.toSet());
+    }
+
     private void populateCaseAccessMetadata(CaseAccessMetadata caseAccessMetadata,
                                             FilteredRoleAssignments filteredRoleAssignments) {
         List<RoleAssignment> pseudoRoleAssignments
@@ -294,15 +356,6 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
         return roleAssignments.stream()
             .map(roleAssignment -> GrantType.valueOf(roleAssignment.getGrantType()))
             .collect(Collectors.toList());
-    }
-
-    @Override
-    public boolean shouldRemoveCaseDefinition(Set<AccessProfile> accessProfiles,
-                                              Predicate<AccessControlList> access,
-                                              String caseTypeId) {
-        // In R.A if the access is create the RoleType has to be organisation.
-        final var accessProfile = generateOrganisationalAccessProfilesByCaseTypeId(caseTypeId);
-        return access.test(getCreateAccessControlList()) && accessProfile.isEmpty();
     }
 
     private AccessControlList getCreateAccessControlList() {

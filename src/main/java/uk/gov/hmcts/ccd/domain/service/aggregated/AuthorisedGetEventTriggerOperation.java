@@ -149,7 +149,7 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
     }
 
     private CaseDetails getCaseDetails(String caseReference) {
-        CaseDetails caseDetails = null;
+        CaseDetails caseDetails;
         try {
             caseDetails = caseDetailsRepository.findByReference(caseReference)
                 .orElseThrow(() -> new ResourceNotFoundException("No case exist with id=" + caseReference));

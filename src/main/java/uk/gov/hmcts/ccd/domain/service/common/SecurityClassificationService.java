@@ -18,9 +18,11 @@ public interface SecurityClassificationService {
                                                      CaseEventDefinition caseEventDefinition);
 
     boolean userHasEnoughSecurityClassificationForField(String jurisdictionId,
-                                                        CaseTypeDefinition caseTypeDefinition, String fieldId);
+                                                        CaseTypeDefinition caseTypeDefinition,
+                                                        String fieldId);
 
-    Optional<SecurityClassification> getUserClassification(String jurisdictionId);
+    Optional<SecurityClassification> getUserClassification(CaseTypeDefinition caseTypeDefinition,
+                                                           boolean isCreateProfile);
 
     Optional<SecurityClassification>  getUserClassification(CaseDetails caseDetails, boolean create);
 

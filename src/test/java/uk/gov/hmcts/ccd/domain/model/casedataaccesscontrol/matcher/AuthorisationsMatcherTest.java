@@ -35,7 +35,7 @@ class AuthorisationsMatcherTest extends BaseFilter {
     @BeforeEach
     void setUp() {
         caseTypeService = mock(CaseTypeService.class);
-        classUnderTest = new AuthorisationsMatcher(caseTypeService, new AuthorisationMapper());
+        classUnderTest = new AuthorisationsMatcher(new AuthorisationMapper(caseTypeService));
     }
 
     @Test

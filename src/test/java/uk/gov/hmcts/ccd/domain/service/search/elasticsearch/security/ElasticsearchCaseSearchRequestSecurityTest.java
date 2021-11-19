@@ -49,7 +49,7 @@ class ElasticsearchCaseSearchRequestSecurityTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
         querySecurity = new ElasticsearchCaseSearchRequestSecurity(Collections.singletonList(caseSearchFilter),
-                objectMapperService, grantTypeESQueryBuilder);
+            objectMapperService, grantTypeESQueryBuilder);
         when(searchRequestJsonNode.has(QUERY)).thenReturn(true);
         when(searchRequestJsonNode.has(NATIVE_ES_QUERY)).thenReturn(false);
     }
