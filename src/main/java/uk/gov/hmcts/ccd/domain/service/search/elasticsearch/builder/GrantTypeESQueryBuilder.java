@@ -38,16 +38,20 @@ public abstract class GrantTypeESQueryBuilder extends GrantTypeQueryBuilder {
         List<CaseStateDefinition> caseStates = getStatesForCaseType(caseType);
         BoolQueryBuilder query = QueryBuilders.boolQuery();
 
-        getGroupedSearchRoleAssignments(roleAssignments, caseType)
+        getGroupedSearchRoleAssignments(roleAssignments)
             .forEach((hash, groupedSearchRoleAssignments) -> {
                 BoolQueryBuilder innerQuery = QueryBuilders.boolQuery();
                 SearchRoleAssignment representative = groupedSearchRoleAssignments.get(0);
+                Set<String> readableCaseStates = getReadableCaseStates(representative, caseStates, caseType);
+                if (readableCaseStates.isEmpty()) {
+                    return;
+                }
 
                 addTermQueryForOptionalAttribute(representative.getJurisdiction(), innerQuery, JURISDICTION_FIELD_COL);
                 addTermQueryForOptionalAttribute(representative.getRegion(), innerQuery, REGION);
                 addTermQueryForOptionalAttribute(representative.getLocation(), innerQuery, LOCATION);
                 addTermsQueryForReference(groupedSearchRoleAssignments, innerQuery);
-                addTermsQueryForState(caseStates, innerQuery, representative);
+                addTermsQueryForState(readableCaseStates, caseStates, innerQuery);
                 addTermsQueryForClassification(representative, innerQuery);
 
                 query.should(innerQuery);
@@ -56,11 +60,10 @@ public abstract class GrantTypeESQueryBuilder extends GrantTypeQueryBuilder {
         return query;
     }
 
-    private void addTermsQueryForState(List<CaseStateDefinition> caseStates,
-                                       BoolQueryBuilder parentQuery,
-                                       SearchRoleAssignment searchRoleAssignment) {
-        Set<String> readableCaseStates = searchRoleAssignment.getReadableCaseStates();
-        if (readableCaseStates.size() != caseStates.size()) {
+    private void addTermsQueryForState(Set<String> readableCaseStates,
+                                       List<CaseStateDefinition> allCaseStates,
+                                       BoolQueryBuilder parentQuery) {
+        if (readableCaseStates.size() != allCaseStates.size()) {
             parentQuery.must(QueryBuilders.termsQuery(STATE_FIELD_COL + KEYWORD, readableCaseStates));
         }
     }

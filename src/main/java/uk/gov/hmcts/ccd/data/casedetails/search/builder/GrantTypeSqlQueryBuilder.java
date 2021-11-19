@@ -58,12 +58,16 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
         List<CaseStateDefinition> caseStates = getStatesForCaseType(caseType);
         AtomicInteger index = new AtomicInteger();
 
-        return getGroupedSearchRoleAssignments(roleAssignments, caseType)
+        return getGroupedSearchRoleAssignments(roleAssignments)
             .values().stream()
             .map(groupedSearchRoleAssignments -> {
                 final int count = index.incrementAndGet();
                 String innerQuery = EMPTY;
                 SearchRoleAssignment representative = groupedSearchRoleAssignments.get(0);
+                Set<String> readableCaseStates = getReadableCaseStates(representative, caseStates, caseType);
+                if (readableCaseStates.isEmpty()) {
+                    return innerQuery;
+                }
 
                 innerQuery = addEqualsQueryForOptionalAttribute(representative.getJurisdiction(),
                     innerQuery, JURISDICTION);
@@ -73,7 +77,7 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
                     innerQuery, LOCATION);
                 innerQuery = addInQueryForReference(params, paramName, innerQuery,
                     groupedSearchRoleAssignments, count);
-                innerQuery = addInQueryForState(params, paramName, caseStates, innerQuery, representative, count);
+                innerQuery = addInQueryForState(params, paramName, readableCaseStates, caseStates, innerQuery, count);
                 innerQuery = addInQueryForClassification(params, paramName, innerQuery, representative, count);
 
                 return StringUtils.isNotBlank(innerQuery) ? String.format(QUERY_WRAPPER, innerQuery) : innerQuery;
@@ -82,12 +86,11 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
 
     private String addInQueryForState(Map<String, Object> params,
                                       String paramName,
-                                      List<CaseStateDefinition> caseStates,
+                                      Set<String> readableCaseStates,
+                                      List<CaseStateDefinition> allCaseStates,
                                       String parentQuery,
-                                      SearchRoleAssignment searchRoleAssignment,
                                       int count) {
-        Set<String> readableCaseStates = searchRoleAssignment.getReadableCaseStates();
-        if (readableCaseStates.size() != caseStates.size()) {
+        if (readableCaseStates.size() != allCaseStates.size()) {
             String statesParam = String.format(CASE_STATES_PARAM, count, paramName);
             params.put(statesParam, readableCaseStates);
             parentQuery = parentQuery + getOperator(parentQuery, AND)
