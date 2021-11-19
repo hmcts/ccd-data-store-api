@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.ccd.v2.V2;
 
 @RestController
 @RequestMapping(path = "/testing-support")
+@ConditionalOnProperty(value = "testing.support.endpoint.enabled", havingValue = "false")
 public class TestingSupportController {
 
     private CaseLinkService caseLinkService;
