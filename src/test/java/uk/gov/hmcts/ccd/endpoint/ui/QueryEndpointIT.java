@@ -1536,6 +1536,7 @@ public class QueryEndpointIT extends WireMockBaseTest {
     //        );
     //    }
 
+
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
         scripts = {"classpath:sql/insert_case_event_history.sql"})
