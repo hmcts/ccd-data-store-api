@@ -1209,10 +1209,6 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             @Test
             void shouldOnlyReturnCasesFromCaseTypesWithJurisdictionRole() throws Exception {
-                if (applicationParams.getEnableAttributeBasedAccessControl()) {
-                    stubUserInfo("123", AUTOTEST2_PUBLIC);
-                }
-                stubCaseTypeRoleAssignments("AAT", "MAPPER", "SECURITY");
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
 
                 CaseSearchResult caseSearchResult =
@@ -1221,7 +1217,6 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
-                    () -> assertThat(caseSearchResult.getCases().get(0).getReference(), is(1588870615652827L)),
                     () -> assertThat(caseSearchResult.getCases().get(0).getCaseTypeId(), is(CASE_TYPE_B))
                 );
             }
@@ -1311,8 +1306,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         void shouldOnlyReturnCasesSolicitorHasBeenGrantedAccessTo() throws Exception {
             if (applicationParams.getEnableAttributeBasedAccessControl()) {
                 String roleAssignmentResponseJson = roleAssignmentResponseJson(
-                    securityCTSpecificPublicUserRoleAssignmentJson("123","idam:caseworker-autotest1-solicitor",
-                        "1589460125872336"),
+                    securityCTSpecificPublicUserRoleAssignmentJson("123","[CREATOR]", "1589460125872336"),
                     securityCTSpecificPublicUserRoleAssignmentJson("123","[DEFENDANT]", "1589460099608691")
                 );
 
@@ -1336,18 +1330,8 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 "classpath:sql/insert_elasticsearch_case_users.sql"})
         void shouldReturnAllCasesForCaseworker() throws Exception {
             if (applicationParams.getEnableAttributeBasedAccessControl()) {
-                String roleAssignmentResponseJson = roleAssignmentResponseJson(
-                    securityCTSpecificPublicUserRoleAssignmentJson("123", "idam:caseworker-autotest1",
-                        "1589460099608690"),
-                    securityCTSpecificPrivateUserRoleAssignmentJson("123", "idam:caseworker-autotest1-private",
-                        "1588870649839697"),
-                    securityCTSpecificPublicUserRoleAssignmentJson("123","idam:caseworker-autotest1-restricted",
-                        "1589460125872336"),
-                    securityCTSpecificPublicUserRoleAssignmentJson("123","[DEFENDANT]", "1589460099608691")
-                );
-
                 stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "123"))
-                    .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
+                    .willReturn(okJson(roleAssignmentResponseJson()).withStatus(200)));
             }
 
             ElasticsearchTestRequest searchRequest = matchAllRequest();
@@ -1355,7 +1339,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_RESTRICTED);
 
             assertAll(
-                () -> assertThat(caseSearchResult.getTotal(), is(4L))
+                () -> assertThat(caseSearchResult.getTotal(), is(3L))
             );
         }
 

@@ -192,6 +192,7 @@ public class AccessControlServiceImpl implements AccessControlService {
         return filteredCaseFields;
     }
 
+    @Override
     public CaseUpdateViewEvent setReadOnlyOnCaseViewFieldsIfNoAccess(
         final String caseReference, final String eventId, final CaseUpdateViewEvent caseEventTrigger,
         final List<CaseFieldDefinition> caseFieldDefinitions, final Set<AccessProfile> accessProfiles,
@@ -292,6 +293,18 @@ public class AccessControlServiceImpl implements AccessControlService {
                                                               final Set<AccessProfile> accessProfiles,
                                                               final Predicate<AccessControlList> access) {
         return caseType.getStates()
+            .stream()
+            .filter(caseState -> hasAccessControlList(accessProfiles,
+                access,
+                caseState.getAccessControlLists()))
+            .collect(toList());
+    }
+
+    @Override
+    public List<CaseStateDefinition> filterCaseStatesByAccess(List<CaseStateDefinition> caseStates,
+                                                       Set<AccessProfile> accessProfiles,
+                                                       Predicate<AccessControlList> access) {
+        return caseStates
             .stream()
             .filter(caseState -> hasAccessControlList(accessProfiles,
                 access,

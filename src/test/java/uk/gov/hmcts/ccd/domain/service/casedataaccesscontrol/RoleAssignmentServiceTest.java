@@ -631,7 +631,9 @@ class RoleAssignmentServiceTest {
             given(filteredRoleAssignments.getFilteredMatchingRoleAssignments())
                 .willReturn(roleAssignments.getRoleAssignments());
             given(roleAssignmentFilteringService.filter(roleAssignments, caseTypeDefinition,
-                Lists.newArrayList(MatcherType.GRANTTYPE)))
+                Lists.newArrayList(MatcherType.GRANTTYPE,
+                    MatcherType.SECURITYCLASSIFICATION,
+                    MatcherType.AUTHORISATION)))
                 .willReturn(filteredRoleAssignments);
 
             List<RoleAssignment> resultCases =

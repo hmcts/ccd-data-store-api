@@ -121,6 +121,10 @@ public interface AccessControlService {
                                                        Set<AccessProfile> accessProfiles,
                                                        Predicate<AccessControlList> access);
 
+    List<CaseStateDefinition> filterCaseStatesByAccess(List<CaseStateDefinition> caseStates,
+                                                       Set<AccessProfile> accessProfiles,
+                                                       Predicate<AccessControlList> access);
+
     List<CaseEventDefinition> filterCaseEventsByAccess(CaseTypeDefinition caseTypeDefinition,
                                                        Set<AccessProfile> accessProfiles,
                                                        Predicate<AccessControlList> access);

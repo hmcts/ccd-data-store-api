@@ -69,8 +69,7 @@ class AccessControlServiceFilterTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
-
+        MockitoAnnotations.openMocks(this);
         accessControlService = new AccessControlServiceImpl(applicationParams, new CompoundAccessControlService());
     }
 

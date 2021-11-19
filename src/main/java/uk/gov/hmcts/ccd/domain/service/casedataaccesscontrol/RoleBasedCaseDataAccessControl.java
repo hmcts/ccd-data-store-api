@@ -1,6 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import com.google.common.collect.Sets;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -10,20 +14,17 @@ import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.CaseAccessMetadata;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
-
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
@@ -114,6 +115,17 @@ public class RoleBasedCaseDataAccessControl implements NoCacheCaseDataAccessCont
     @Override
     public CaseAccessMetadata generateAccessMetadataWithNoCaseId() {
         return new CaseAccessMetadata();
+    }
+
+    @Override
+    public Set<SecurityClassification> getUserClassifications(CaseTypeDefinition caseTypeDefinition,
+                                                              boolean isCreateProfile) {
+        return userRepository.getUserClassifications(caseTypeDefinition.getJurisdictionId());
+    }
+
+    @Override
+    public Set<SecurityClassification> getUserClassifications(CaseDetails caseDetails) {
+        return userRepository.getUserClassifications(caseDetails.getJurisdiction());
     }
 
     private Set<AccessProfile> userRoleToAccessProfiles(Set<String> roles) {

@@ -7,13 +7,40 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.BooleanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
+
+import static com.google.common.collect.Maps.newConcurrentMap;
 
 @Component
+@RequestScope
 public class AuthorisationMapper {
+
+    private final CaseTypeService caseTypeService;
+
+    private final Map<String, Map<String, RoleToAccessProfileDefinition>> caseTypeRoleToAccessProfileDefinition
+        = newConcurrentMap();
+
+    @Autowired
+    public AuthorisationMapper(CaseTypeService caseTypeService) {
+        this.caseTypeService = caseTypeService;
+    }
+
+    public Map<String, RoleToAccessProfileDefinition> toRoleNameAsKeyMap(CaseTypeDefinition caseTypeDefinition) {
+        return caseTypeRoleToAccessProfileDefinition.computeIfAbsent(caseTypeDefinition.getId(),
+            id -> toRoleNameAsKeyMap(caseTypeDefinition.getRoleToAccessProfiles()));
+    }
+
+    public Map<String, RoleToAccessProfileDefinition> toRoleNameAsKeyMap(String caseTypeId) {
+        return caseTypeRoleToAccessProfileDefinition.computeIfAbsent(caseTypeId,
+            id -> toRoleNameAsKeyMap(caseTypeService.getCaseType(caseTypeId).getRoleToAccessProfiles()));
+    }
 
     public Map<String, RoleToAccessProfileDefinition> toRoleNameAsKeyMap(
         List<RoleToAccessProfileDefinition> roleToAccessProfiles) {

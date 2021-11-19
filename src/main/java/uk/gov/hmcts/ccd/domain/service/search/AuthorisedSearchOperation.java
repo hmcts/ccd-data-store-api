@@ -19,6 +19,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -33,17 +34,20 @@ public class AuthorisedSearchOperation implements SearchOperation {
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final AccessControlService accessControlService;
     private final CaseDataAccessControl caseDataAccessControl;
+    private final AuthorisedCaseDefinitionDataService caseDefinitionDataService;
 
     @Autowired
     public AuthorisedSearchOperation(@Qualifier("classified") final SearchOperation searchOperation,
                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                          final CaseDefinitionRepository caseDefinitionRepository,
                                      final AccessControlService accessControlService,
-                                     CaseDataAccessControl caseDataAccessControl) {
+                                     CaseDataAccessControl caseDataAccessControl,
+                                     AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService) {
         this.searchOperation = searchOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlService = accessControlService;
         this.caseDataAccessControl = caseDataAccessControl;
+        this.caseDefinitionDataService = authorisedCaseDefinitionDataService;
     }
 
     @Override
@@ -51,12 +55,12 @@ public class AuthorisedSearchOperation implements SearchOperation {
 
         final List<CaseDetails> results = searchOperation.execute(metaData, criteria);
         CaseTypeDefinition caseTypeDefinition = getCaseType(metaData.getCaseTypeId());
-        Set<AccessProfile> accessProfiles = getAccessProfiles(caseTypeDefinition);
+        if (results == null
+            || caseDefinitionDataService.getAuthorisedCaseType(metaData.getCaseTypeId(), CAN_READ).isEmpty()) {
+            return Lists.newArrayList();
+        }
 
-        return (null == results || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition,
-            accessProfiles,
-            CAN_READ))
-            ? Lists.newArrayList() : filterByReadAccess(results, caseTypeDefinition);
+        return filterByReadAccess(results, caseTypeDefinition);
     }
 
     private Set<AccessProfile> getAccessProfiles(CaseTypeDefinition caseTypeDefinition) {
