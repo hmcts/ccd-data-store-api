@@ -19,7 +19,6 @@
     "_extends_": "Common_400_Response",
     "body" : {
       "exception" : "org.springframework.web.bind.MethodArgumentNotValidException",
-      "timestamp" : "[[ANYTHING_PRESENT]]",
       "status" : 400,
       "error" : "Bad Request",
       "message" : "Input not valid",

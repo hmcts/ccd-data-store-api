@@ -21,12 +21,7 @@
   },
 
   "expectedResponse": {
-    "responseCode": 201,
-    "responseMessage": "OK",
-    "headers": {
-      "_extends_": "Common_Response_Headers",
-      "Vary": "Accept-Encoding"
-    },
+    "_extends_": "Common_201_Response",
     "body": {
       "jurisdiction": "BEFTA_MASTER",
       "state": "CaseUpdated",
