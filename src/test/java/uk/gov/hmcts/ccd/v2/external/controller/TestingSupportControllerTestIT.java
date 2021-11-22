@@ -31,6 +31,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 public class TestingSupportControllerTestIT extends WireMockBaseTest {
 
+    private static final String URL =  "/testing-support/case-link/";
+
     @Inject
     private WebApplicationContext wac;
 
@@ -55,7 +57,7 @@ public class TestingSupportControllerTestIT extends WireMockBaseTest {
     @Test
     public void testGetCaseLinkNoResults() throws Exception {
         final String caseReference = "9816494993793181";
-        final String url = "/testing-support/case-link/" + caseReference;
+        final String url = URL + caseReference;
 
         final MvcResult mvcResult = mockMvc.perform(get(url).header("experimental", "true"))
             .andExpect(status().is(200))
@@ -72,7 +74,7 @@ public class TestingSupportControllerTestIT extends WireMockBaseTest {
     @Test
     public void testGetCaseLinkReturnsResult() throws Exception {
         final String caseReference = "3393027116986763";
-        final String url = "/testing-support/case-link/" + caseReference;
+        final String url = URL + caseReference;
 
         final MvcResult mvcResult = mockMvc.perform(get(url).header("experimental", "true"))
             .andExpect(status().is(200))
@@ -92,7 +94,7 @@ public class TestingSupportControllerTestIT extends WireMockBaseTest {
         caseLinkRepository.save(caseLinkEntity);
 
         final String caseReference = "3393027116986763";
-        final String url = "/testing-support/case-link/" + caseReference;
+        final String url = URL + caseReference;
 
         final MvcResult mvcResult = mockMvc.perform(get(url).header("experimental", "true"))
             .andExpect(status().is(200))
