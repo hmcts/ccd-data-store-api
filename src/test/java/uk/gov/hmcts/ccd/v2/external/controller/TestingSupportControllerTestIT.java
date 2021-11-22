@@ -82,7 +82,7 @@ public class TestingSupportControllerTestIT extends WireMockBaseTest {
             CaseLinksResource.class);
 
         assertEquals(1,caseLinksResource.getCaseLinks().size());
-        assertEquals(3L, caseLinksResource.getCaseLinks().get(0).getLinkedCaseReference());
+        assertEquals(1504259907353537L, caseLinksResource.getCaseLinks().get(0).getLinkedCaseId());
     }
 
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
@@ -103,9 +103,9 @@ public class TestingSupportControllerTestIT extends WireMockBaseTest {
 
         final List<CaseLink> caseLinks = caseLinksResource.getCaseLinks();
         final List<Long> foundCaseLinks = caseLinks.stream()
-            .map(caseLink -> caseLink.getLinkedCaseReference())
+            .map(caseLink -> caseLink.getLinkedCaseId())
             .collect(Collectors.toList());
         assertEquals(2, foundCaseLinks.size());
-        assertTrue(foundCaseLinks.containsAll(List.of(3L, 4L)));
+        assertTrue(foundCaseLinks.containsAll(List.of(1504259907353537L, 1504259907353552L)));
     }
 }

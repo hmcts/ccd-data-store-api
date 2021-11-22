@@ -110,39 +110,6 @@ class CaseLinkServiceTest {
 
         final Long caseId = 1L;
         final List<Long> linkedCaseIds = List.of(2L, 3L, 4L);
-        final List<CaseLinkEntity> caseLinkEntities = List.of(
-            new CaseLinkEntity(caseId, linkedCaseIds.get(0), caseTypeId),
-            new CaseLinkEntity(caseId, linkedCaseIds.get(1), caseTypeId),
-            new CaseLinkEntity(caseId, linkedCaseIds.get(2), caseTypeId));
-
-        final List<CaseLink> caseLinksModels = List.of(
-            new CaseLink(caseId, linkedCaseIds.get(0), caseTypeId),
-            new CaseLink(caseId, linkedCaseIds.get(1), caseTypeId),
-            new CaseLink(caseId, linkedCaseIds.get(2), caseTypeId)
-        );
-
-        when(caseLinkRepository.findAllByCaseReference(caseReferenceToFindLong)).thenReturn(caseLinkEntities);
-        when(caseLinkMapper.entitiesToModels(caseLinkEntities)).thenReturn(caseLinksModels);
-
-        final List<CaseLink> caseLinks = caseLinkService.findCaseLinks(caseReferenceToFind);
-        assertFalse(caseLinks.isEmpty());
-
-        final List<Long> foundLinkedCaseIds = caseLinks.stream()
-            .map(CaseLink::getLinkedCaseReference)
-            .collect(Collectors.toList());
-
-        assertTrue(foundLinkedCaseIds.containsAll(linkedCaseIds));
-        verify(caseLinkRepository).findAllByCaseReference(caseReferenceToFindLong);
-    }
-
-    @Test
-    void findCaseLinks(){
-        final String caseReferenceToFind = "1504259907353545";
-        final Long caseReferenceToFindLong = Long.parseLong(caseReferenceToFind);
-        final String caseTypeId = "Test";
-
-        final Long caseId = 1L;
-        final List<Long> linkedCaseIds = List.of(2L, 3L, 4L);
         final List<Long> linkedCaseReferences = List.of(1504259907353545L, 1504259907353545L, 1504259907353545L);
         final List<CaseLinkEntity> caseLinkEntities = List.of(
             new CaseLinkEntity(caseId, linkedCaseIds.get(0), caseTypeId),
@@ -163,7 +130,7 @@ class CaseLinkServiceTest {
         assertFalse(caseLinks.isEmpty());
 
         final List<Long> foundLinkedCaseReferences = caseLinks.stream()
-            .map(CaseLink::getLinkedCaseReference)
+            .map(CaseLink::getLinkedCaseId)
             .collect(Collectors.toList());
 
         assertTrue(foundLinkedCaseReferences.containsAll(linkedCaseReferences));

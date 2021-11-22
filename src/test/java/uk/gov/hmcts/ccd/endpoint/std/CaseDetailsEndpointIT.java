@@ -3705,18 +3705,18 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         List<CaseLink> expectedCaseLinks = List.of(
             builder()
-                .caseReference(expectedCaseId)
-                .linkedCaseReference(1L)
+                .caseId(expectedCaseId)
+                .linkedCaseId(1L)
                 .caseTypeId(expectedCaseTypeId)
                 .build(),
             builder()
-                .caseReference(expectedCaseId)
-                .linkedCaseReference(2L)
+                .caseId(expectedCaseId)
+                .linkedCaseId(2L)
                 .caseTypeId(expectedCaseTypeId)
                 .build(),
             builder()
-                .caseReference(expectedCaseId)
-                .linkedCaseReference(3L)
+                .caseId(expectedCaseId)
+                .linkedCaseId(3L)
                 .caseTypeId(expectedCaseTypeId)
                 .build()
         );
@@ -3767,8 +3767,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
 
         List<CaseLink> expectedCaseLinks = List.of(
             builder()
-                .caseReference(21L)
-                .linkedCaseReference(1L)
+                .caseId(21L)
+                .linkedCaseId(1L)
                 .caseTypeId(expectedCaseTypeId)
                 .build()
         );

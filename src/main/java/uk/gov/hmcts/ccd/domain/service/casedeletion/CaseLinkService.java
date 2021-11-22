@@ -93,9 +93,9 @@ public class CaseLinkService {
     private void updateCaseLinkObjectIdsToReferences(List<CaseLink> allLinkedCases,
                                                      List<Long> linkedCaseReferences,
                                                      Long caseReference) {
-        for(int i = 0; i < allLinkedCases.size(); i++) {
-            allLinkedCases.get(i).setCaseReference(caseReference);
-            allLinkedCases.get(i).setLinkedCaseReference(linkedCaseReferences.get(i));
+        for (int i = 0; i < allLinkedCases.size(); i++) {
+            allLinkedCases.get(i).setCaseId(caseReference);
+            allLinkedCases.get(i).setLinkedCaseId(linkedCaseReferences.get(i));
         }
     }
 }

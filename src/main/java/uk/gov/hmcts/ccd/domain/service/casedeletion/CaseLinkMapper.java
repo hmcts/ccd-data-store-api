@@ -19,8 +19,8 @@ public class CaseLinkMapper {
         }
 
         return CaseLink.builder()
-            .caseReference(caseLinkEntity.getCaseLinkPrimaryKey().getCaseId())
-            .linkedCaseReference(caseLinkEntity.getCaseLinkPrimaryKey().getLinkedCaseId())
+            .caseId(caseLinkEntity.getCaseLinkPrimaryKey().getCaseId())
+            .linkedCaseId(caseLinkEntity.getCaseLinkPrimaryKey().getLinkedCaseId())
             .caseTypeId(caseLinkEntity.getCaseTypeId())
             .build();
     }
@@ -36,7 +36,10 @@ public class CaseLinkMapper {
             return null;
         }
 
-        return new CaseLinkEntity(caseLink.getCaseReference(), caseLink.getLinkedCaseReference(), caseLink.getCaseTypeId());
+        return new CaseLinkEntity(
+            caseLink.getCaseId(),
+            caseLink.getLinkedCaseId(),
+            caseLink.getCaseTypeId());
     }
 }
 

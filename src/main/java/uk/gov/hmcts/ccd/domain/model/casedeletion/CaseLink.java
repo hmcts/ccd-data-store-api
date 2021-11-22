@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class CaseLink {
-    private Long caseReference;
-    private Long linkedCaseReference;
+    private Long caseId;
+    private Long linkedCaseId;
     private String caseTypeId;
 }
