@@ -18,8 +18,10 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -79,6 +81,12 @@ class AuthorisedCreateCaseOperationTest {
     @Mock
     private CaseAccessService caseAccessService;
 
+    @Mock
+    private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
+
+    @Mock
+    private SupplementaryDataUpdateRequestValidator validator;
+
     private AuthorisedCreateCaseOperation authorisedCreateCaseOperation;
     private CaseDetails classifiedCase;
     private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
@@ -92,7 +100,10 @@ class AuthorisedCreateCaseOperationTest {
         MockitoAnnotations.initMocks(this);
 
         authorisedCreateCaseOperation = new AuthorisedCreateCaseOperation(
-            classifiedCreateCaseOperation, caseDefinitionRepository, accessControlService, caseAccessService);
+            classifiedCreateCaseOperation, caseDefinitionRepository,
+            accessControlService, caseAccessService,
+            supplementaryDataUpdateOperation,
+            validator);
         classifiedCase = new CaseDetails();
         classifiedCase.setData(Maps.newHashMap());
         EVENT.setEventId(EVENT_ID);

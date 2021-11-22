@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.createcase;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Map;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
@@ -10,13 +12,13 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
+import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.util.Map;
-import java.util.Set;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -32,19 +34,24 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final AccessControlService accessControlService;
     private final CaseAccessService caseAccessService;
-
+    private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
+    private SupplementaryDataUpdateRequestValidator validator;
 
     public AuthorisedCreateCaseOperation(@Qualifier("classified") final CreateCaseOperation createCaseOperation,
                                          @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                          final CaseDefinitionRepository caseDefinitionRepository,
                                          final AccessControlService accessControlService,
-                                         final CaseAccessService caseAccessService) {
+                                         final CaseAccessService caseAccessService,
+                                         @Qualifier("authorised")
+                                             SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
+                                         SupplementaryDataUpdateRequestValidator validator) {
 
         this.createCaseOperation = createCaseOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlService = accessControlService;
         this.caseAccessService = caseAccessService;
-
+        this.supplementaryDataUpdateOperation = supplementaryDataUpdateOperation;
+        this.validator = validator;
     }
 
     @Override
@@ -69,7 +76,18 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
         final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId,
             caseDataContent,
             ignoreWarning);
+        createSupplementaryData(caseDataContent, caseDetails);
         return verifyReadAccess(caseTypeDefinition, userRoles, caseDetails);
+    }
+
+    private void createSupplementaryData(CaseDataContent caseDataContent, CaseDetails caseDetails) {
+        SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = caseDataContent
+            .getSupplementaryDataUpdateRequest();
+        if (supplementaryDataUpdateRequest != null) {
+            validator.validate(supplementaryDataUpdateRequest);
+        }
+        supplementaryDataUpdateOperation.updateSupplementaryData(caseDetails.getReferenceAsString(),
+            caseDataContent.getSupplementaryDataUpdateRequest());
     }
 
     private CaseDetails verifyReadAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles,
