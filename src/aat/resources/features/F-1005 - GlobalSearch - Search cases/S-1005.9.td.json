@@ -1,30 +1,26 @@
 {
-  "title": "Successfully verifies the pagination",
-  "_guid_": "S-1005.8",
+  "title": "Successfully searches across different Case Types",
+  "_guid_": "S-1005.9",
   "_extends_": "F-1005_Search_Case_Base",
   "specs": [
     "an active profile in CCD",
-    "contains the sortCriteria",
+    "contains two different Case Types",
     "contains all the mandatory parameters",
     "has 200 return code",
-    "contains the cases in correct order"
+    "contains both cases"
   ],
   "request": {
     "body": {
       "searchCriteria": {
+        "CCDCaseTypeIds": [
+          "FT_GlobalSearch",
+          "FT_MasterCaseType"
+        ],
         "caseReferences": [
           "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
-          "${[scenarioContext][childContexts][F-1005_CreateSecondCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+          "${[scenarioContext][childContexts][F-1005_CreateCaseMasterCaseType][testData][actualResponse][body][id]}"
         ]
-      },
-      "sortCriteria": [
-        {
-          "sortBy": "createdDate",
-          "sortDirection": "descending"
-        }
-      ],
-      "maxReturnRecordCount": 500,
-      "startRecordNumber": 1
+      }
     }
   },
   "expectedResponse": {
@@ -36,24 +32,6 @@
         "moreResultsToGo": false
       },
       "results": [
-        {
-          "stateId": "CaseCreated",
-          "caseReference": "${}${[scenarioContext][childContexts][F-1005_CreateSecondCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
-          "otherReferences": [
-            "FirstNameValue"
-          ],
-          "caseNameHmctsInternal": "Name Internal",
-          "baseLocationId": "123",
-          "baseLocationName": "54 HAGLEY ROAD (BIRMINGHAM OFFICES)",
-          "caseManagementCategoryId": "987",
-          "caseManagementCategoryName": "Category label",
-          "regionId": "1",
-          "regionName": "Midlands",
-          "CCDJurisdictionId": "BEFTA_MASTER",
-          "CCDJurisdictionName": "BEFTA Master",
-          "CCDCaseTypeId": "FT_GlobalSearch",
-          "CCDCaseTypeName": "FT_GlobalSearch"
-        },
         {
           "stateId": "CaseCreated",
           "caseReference": "${}${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
@@ -71,6 +49,18 @@
           "CCDJurisdictionName": "BEFTA Master",
           "CCDCaseTypeId": "FT_GlobalSearch",
           "CCDCaseTypeName": "FT_GlobalSearch"
+        },
+        {
+          "stateId": "CaseCreated",
+          "caseReference": "${}${[scenarioContext][childContexts][F-1005_CreateCaseMasterCaseType][testData][actualResponse][body][id]}",
+          "baseLocationId": "123",
+          "baseLocationName": "54 HAGLEY ROAD (BIRMINGHAM OFFICES)",
+          "regionId": "1",
+          "regionName": "Midlands",
+          "CCDJurisdictionId": "BEFTA_MASTER",
+          "CCDJurisdictionName": "BEFTA Master",
+          "CCDCaseTypeId": "FT_MasterCaseType",
+          "CCDCaseTypeName": "FT_MasterCaseType"
         }
       ]
     }

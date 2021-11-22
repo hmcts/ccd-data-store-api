@@ -1,7 +1,7 @@
 {
   "title": "Successfully search for case using wildcards",
   "_guid_": "S-1005.7",
-  "_extends_": "Search_Case_Base",
+  "_extends_": "F-1005_Search_Case_Base",
   "specs": [
     "an active profile in CCD",
     "contains one of the global search fields using a wildcard character",
