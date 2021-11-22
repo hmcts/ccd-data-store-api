@@ -13,7 +13,7 @@ import uk.gov.hmcts.ccd.v2.V2;
 
 @RestController
 @RequestMapping(path = "/testing-support")
-//@ConditionalOnProperty(value = "testing.support.endpoint.enabled", havingValue = "false")
+@ConditionalOnProperty(value = "testing.support.endpoint.enabled", havingValue = "false")
 public class TestingSupportController {
 
     private CaseLinkService caseLinkService;
