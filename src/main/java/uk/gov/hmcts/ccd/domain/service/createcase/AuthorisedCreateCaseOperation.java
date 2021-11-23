@@ -12,6 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
@@ -85,10 +86,11 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
             .getSupplementaryDataUpdateRequest();
         if (supplementaryDataUpdateRequest != null) {
             validator.validate(supplementaryDataUpdateRequest);
-            supplementaryDataUpdateOperation.updateSupplementaryData(
+            SupplementaryData supplementaryData = supplementaryDataUpdateOperation.updateSupplementaryData(
                 caseDetails.getReferenceAsString(),
                 supplementaryDataUpdateRequest
             );
+            caseDetails.setSupplementaryData(JacksonUtils.convertValue(supplementaryData));
         }
     }
 
