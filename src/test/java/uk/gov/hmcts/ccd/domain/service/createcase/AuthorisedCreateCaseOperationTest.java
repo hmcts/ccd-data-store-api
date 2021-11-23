@@ -23,6 +23,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
@@ -37,6 +38,8 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.doReturn;
@@ -69,6 +72,7 @@ class AuthorisedCreateCaseOperationTest {
         newCaseDataContent().withEvent(EVENT).withData(DATA).withToken(TOKEN).build();
     private static final Boolean IGNORE = Boolean.TRUE;
     private static final CaseDataContent NULL_EVENT_DATA = null;
+    private static final Long CASE_REFERENCE = 12345678L;
 
     @Mock
     private CreateCaseOperation classifiedCreateCaseOperation;
@@ -108,6 +112,7 @@ class AuthorisedCreateCaseOperationTest {
         classifiedCase = new CaseDetails();
         classifiedCase.setData(Maps.newHashMap());
         EVENT.setEventId(EVENT_ID);
+        classifiedCase.setReference(CASE_REFERENCE);
         doReturn(classifiedCase).when(classifiedCreateCaseOperation).createCaseDetails(CASE_TYPE_ID,
                                                                                        EVENT_DATA,
                                                                                        IGNORE);
@@ -126,6 +131,10 @@ class AuthorisedCreateCaseOperationTest {
             eq(caseFieldDefinitions), eq(userRoles), eq(CAN_CREATE))).thenReturn(true);
         when(accessControlService.filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFieldDefinitions),
             eq(userRoles), eq(CAN_READ), anyBoolean())).thenReturn(MAPPER.createObjectNode());
+
+        SupplementaryData supplementaryData = new SupplementaryData();
+        when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+            .thenReturn(supplementaryData);
     }
 
     @Test
