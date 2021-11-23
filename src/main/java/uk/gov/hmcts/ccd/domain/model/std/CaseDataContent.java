@@ -38,7 +38,7 @@ public class CaseDataContent {
     private String onBehalfOfUserToken;
 
     @JsonProperty("supplementary_data_request")
-    private Map<String, Map<String, Object>> supplementaryDataUpdateRequest;
+    private Map<String, Map<String, Object>> supplementaryDataRequest;
 
     public Event getEvent() {
         return event;
@@ -125,11 +125,11 @@ public class CaseDataContent {
         this.onBehalfOfUserToken = onBehalfOfUserToken;
     }
 
-    public Map<String, Map<String, Object>>  getSupplementaryDataUpdateRequest() {
-        return supplementaryDataUpdateRequest;
+    public Map<String, Map<String, Object>> getSupplementaryDataRequest() {
+        return supplementaryDataRequest;
     }
 
-    public void setSupplementaryDataUpdateRequest(Map<String, Map<String, Object>>  supplementaryDataUpdateRequest) {
-        this.supplementaryDataUpdateRequest = supplementaryDataUpdateRequest;
+    public void setSupplementaryDataRequest(Map<String, Map<String, Object>> supplementaryDataRequest) {
+        this.supplementaryDataRequest = supplementaryDataRequest;
     }
 }

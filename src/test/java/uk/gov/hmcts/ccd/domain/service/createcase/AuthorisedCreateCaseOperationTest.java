@@ -203,7 +203,7 @@ class AuthorisedCreateCaseOperationTest {
     void shouldReturnAuthorisedCaseDetailsAndSaveSupplementaryData() {
 
         Map<String, Map<String, Object>> request = createSupplementaryDataRequest();
-        EVENT_DATA.setSupplementaryDataUpdateRequest(request);
+        EVENT_DATA.setSupplementaryDataRequest(request);
         final CaseDetails output = authorisedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
             EVENT_DATA,
             IGNORE);
@@ -234,7 +234,7 @@ class AuthorisedCreateCaseOperationTest {
     @DisplayName("should not save supplementary data when invalid data passed")
     void shouldReturnAuthorisedCaseDetailsAndShouldNotSaveSupplementaryDataWhenRequestEmpty() {
 
-        EVENT_DATA.setSupplementaryDataUpdateRequest(null);
+        EVENT_DATA.setSupplementaryDataRequest(null);
         final CaseDetails output = authorisedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
             EVENT_DATA,
             IGNORE);

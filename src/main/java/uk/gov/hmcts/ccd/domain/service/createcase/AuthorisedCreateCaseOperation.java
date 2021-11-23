@@ -83,7 +83,7 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
 
     private void createSupplementaryData(CaseDataContent caseDataContent, CaseDetails caseDetails) {
         Map<String, Map<String, Object>>  supplementaryDataUpdateRequest = caseDataContent
-            .getSupplementaryDataUpdateRequest();
+            .getSupplementaryDataRequest();
         if (supplementaryDataUpdateRequest != null) {
             SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest(supplementaryDataUpdateRequest);
             validator.validate(request);
