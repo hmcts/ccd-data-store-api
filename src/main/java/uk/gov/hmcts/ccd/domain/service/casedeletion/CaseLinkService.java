@@ -28,7 +28,9 @@ public class CaseLinkService {
     }
 
     public void createCaseLinks(Long caseReference, String caseTypeId, List<String> caseLinks) {
-        caseLinks.forEach(caseLink -> {
+        caseLinks.stream()
+            .filter(caseLinkString -> caseLinkString != null && !caseLinkString.isEmpty())
+            .forEach(caseLink -> {
             caseLinkRepository.insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(caseReference,
                 Long.parseLong(caseLink),
                 caseTypeId);
@@ -44,6 +46,7 @@ public class CaseLinkService {
 
         final var caseLinksToDelete = preCallbackData.stream()
             .distinct()
+            .filter(caseLinkString -> caseLinkString != null && !caseLinkString.isEmpty())
             .filter(caseLink -> !postCallbackData.contains(caseLink))
             .collect(Collectors.toList());
 

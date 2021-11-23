@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseLinkRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Collections.EMPTY_LIST;
@@ -92,6 +93,40 @@ class CaseLinkServiceTest {
                 .insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(CASE_ID,
                                                                           Long.valueOf(caseLink),
                                                                           CASE_TYPE_ID));
+    }
+
+    @Test
+    void createCaseLinksFiltersOutNullOrBlanks() {
+
+        final List<String> validCaseLinks = createPostCallbackCaseLinks();
+        final List<String> allCaseLinks = new ArrayList<>(validCaseLinks);
+        allCaseLinks.add(null);
+        allCaseLinks.add("");
+
+        caseLinkService.createCaseLinks(CASE_ID, CASE_TYPE_ID, allCaseLinks);
+
+        validCaseLinks.forEach(caseLink ->
+            Mockito.verify(caseLinkRepository)
+                .insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(CASE_ID,
+                    Long.valueOf(caseLink),
+                    CASE_TYPE_ID));
+    }
+
+    @Test
+    void createCaseLinksNullAndBlankValuesNotInsertedToDB() {
+
+        final List<String> caseLinks = new ArrayList<String>();
+        caseLinks.add(null);
+        caseLinks.add("");
+        caseLinks.add(null);
+
+        caseLinkService.createCaseLinks(CASE_ID, CASE_TYPE_ID, caseLinks);
+
+        caseLinks.forEach(caseLink ->
+            Mockito.verify(caseLinkRepository, never())
+                .insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(anyLong(),
+                    anyLong(),
+                    anyString()));
     }
 
     private List<String> createPreCallbackCaseLinks() {
