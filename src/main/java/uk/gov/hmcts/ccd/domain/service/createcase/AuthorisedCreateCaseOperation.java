@@ -82,13 +82,13 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
     }
 
     private void createSupplementaryData(CaseDataContent caseDataContent, CaseDetails caseDetails) {
-        SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = caseDataContent
+        Map<String, Map<String, Object>>  supplementaryDataUpdateRequest = caseDataContent
             .getSupplementaryDataUpdateRequest();
         if (supplementaryDataUpdateRequest != null) {
-            validator.validate(supplementaryDataUpdateRequest);
+            SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest(supplementaryDataUpdateRequest);
+            validator.validate(request);
             SupplementaryData supplementaryData = supplementaryDataUpdateOperation.updateSupplementaryData(
-                caseDetails.getReferenceAsString(),
-                supplementaryDataUpdateRequest
+                caseDetails.getReferenceAsString(), request
             );
             caseDetails.setSupplementaryData(JacksonUtils.convertValue(supplementaryData.getResponse()));
         }

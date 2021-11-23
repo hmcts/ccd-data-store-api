@@ -202,7 +202,7 @@ class AuthorisedCreateCaseOperationTest {
     @DisplayName("should save supplementary data when valid data passed")
     void shouldReturnAuthorisedCaseDetailsAndSaveSupplementaryData() {
 
-        SupplementaryDataUpdateRequest request = createSupplementaryDataRequest();
+        Map<String, Map<String, Object>> request = createSupplementaryDataRequest();
         EVENT_DATA.setSupplementaryDataUpdateRequest(request);
         final CaseDetails output = authorisedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
             EVENT_DATA,
@@ -221,7 +221,7 @@ class AuthorisedCreateCaseOperationTest {
             () -> inOrder.verify(accessControlService).canAccessCaseFieldsWithCriteria(any(JsonNode.class),
                 eq(caseFieldDefinitions), eq(userRoles), eq(CAN_CREATE)),
             () -> inOrder.verify(classifiedCreateCaseOperation).createCaseDetails(CASE_TYPE_ID, EVENT_DATA, IGNORE),
-            () -> inOrder.verify(validator).validate(eq(request)),
+            () -> inOrder.verify(validator).validate(any(SupplementaryDataUpdateRequest.class)),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
                 eq(userRoles), eq(CAN_READ)),
             () -> inOrder.verify(accessControlService, times(2))
@@ -234,8 +234,7 @@ class AuthorisedCreateCaseOperationTest {
     @DisplayName("should not save supplementary data when invalid data passed")
     void shouldReturnAuthorisedCaseDetailsAndShouldNotSaveSupplementaryDataWhenRequestEmpty() {
 
-        SupplementaryDataUpdateRequest request = null;
-        EVENT_DATA.setSupplementaryDataUpdateRequest(request);
+        EVENT_DATA.setSupplementaryDataUpdateRequest(null);
         final CaseDetails output = authorisedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
             EVENT_DATA,
             IGNORE);
@@ -369,13 +368,13 @@ class AuthorisedCreateCaseOperationTest {
     }
 
 
-    private SupplementaryDataUpdateRequest createSupplementaryDataRequest() {
+    private Map<String, Map<String, Object>> createSupplementaryDataRequest() {
         Map<String, Map<String, Object>> requestData = new HashMap<>();
         Map<String, Object> setOperationData = new HashMap<>();
         requestData.put("$set", setOperationData);
         setOperationData.put("orgs_assigned_users.organisationC", 32);
         setOperationData.put("orgs_assigned_users.organisationA", 54);
 
-        return new SupplementaryDataUpdateRequest(requestData);
+        return requestData;
     }
 }

@@ -63,11 +63,9 @@
 				]
 			},
       "supplementary_data_request": {
-        "supplementary_data_updates": {
-          "$set": {
-            "orgs_assigned_users.OrgA": 22,
-            "HMCTSServiceId": "AAA1"
-          }
+        "$set": {
+          "orgs_assigned_users.OrgA": 22,
+          "HMCTSServiceId": "AAA1"
         }
       },
 			"event":	 {
