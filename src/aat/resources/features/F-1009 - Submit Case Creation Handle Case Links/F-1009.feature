@@ -14,7 +14,7 @@ Feature: F-1009: Submit Case Creation Handle Case Links
       And   it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
       Then  a positive response is received
       And   the response has all other details as expected
-      And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1009-VerifyCaseLink]
+      And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1009-VerifyCaseLinks]
 
     @S-1009.2 @AC-2
     Scenario: CaseLink field contains blank value and Submit Case Creation Event is invoked on
@@ -25,7 +25,7 @@ Feature: F-1009: Submit Case Creation Handle Case Links
       And     it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
       Then    a positive response is received
       And     the response has all other details as expected
-      And     a successful call [to verify that the Case Link has NOT been created in the CASE_LINK table with correct value] as in [F-1009-VerifyCaseLinkNotInserted]
+      And     a successful call [to verify that no Case Links have been created in the CASE_LINK table] as in [F-1009-VerifyCaseLinksNotInserted]
 
     @S-1009.3 @AC-3
     Scenario: CaseLink field contains Invalid CaseReference value and Submit Case Creation Event is invoked on
@@ -37,7 +37,6 @@ Feature: F-1009: Submit Case Creation Handle Case Links
       Then    a negative response is received,
       And     the response [has the 422 return code],
       And     the response has all other details as expected.
-      And     a successful call [to verify that the Case Link has NOT been created in the CASE_LINK table with correct value] as in [F-1009-VerifyCaseLinkNotInserted]
 
     @S-1009.4 @AC-4
     Scenario: CaseLink field contains valid CaseReference value but case data invalid and Submit Case Creation Event
@@ -51,7 +50,6 @@ Feature: F-1009: Submit Case Creation Handle Case Links
       Then    a negative response is received,
       And     the response [has the 422 return code],
       And     the response has all other details as expected.
-      And     a successful call [to verify that the Case Link has NOT been created in the CASE_LINK table with correct value] as in [F-1009-VerifyCaseLinkNotInserted]
 
     @S-1009.5 @AC-5
     Scenario: Collection of CaseLink fields contains CaseReference value and Submit Case Creation Event is invoked on
@@ -64,4 +62,5 @@ Feature: F-1009: Submit Case Creation Handle Case Links
       And     it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
       Then    a positive response is received
       And     the response has all other details as expected
-      And     a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1009-VerifyCaseLink]
+      And     a successful call [to verify that the Case Links have been created in the CASE_LINK table with correct values] as in [F-1009-VerifyMultipleCaseLinks]
+

@@ -80,6 +80,7 @@ class JacksonUtilsTest {
 
     @Test
     void testGetValueFromPath() throws JsonProcessingException {
+
         final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
             "{"
             + "  \"Name\": \"NameValue\","
@@ -130,7 +131,18 @@ class JacksonUtilsTest {
             + "             \"document_binary_url\": \"http://dm-store:8080/documents/84f04693-56ae-4aad-97e8-d1fc7592acea/binary\""
             + "     },"
             + "     \"description\": null"
-            + "  }"
+            + "  },"
+            + " \"CaseLinkCollection\" : [ {\n"
+            + "        \"value\" : {\n"
+            + "          \"CaseReference\" : \"1637697929437509\"\n"
+            + "        },\n"
+            + "        \"id\" : \"90a2df83-f256-43ec-aaa0-48e127a44402\"\n"
+            + "      }, {\n"
+            + "        \"value\" : {\n"
+            + "          \"CaseReference\" : \"1637697929619312\"\n"
+            + "        },\n"
+            + "        \"id\" : \"84e22baf-5bec-4eec-a31f-7a3954efc9c3\"\n"
+            + "      } ]"
             + "}"));
 
         assertEquals("ClassNameValue1", JacksonUtils.getValueFromPath("Class.0.value.ClassName", data));
@@ -146,6 +158,8 @@ class JacksonUtilsTest {
             JacksonUtils.getValueFromPath("evidence.type.document_url", data));
         assertEquals(null,
             JacksonUtils.getValueFromPath("description", data));
+        assertEquals("1637697929437509", JacksonUtils.getValueFromPath("CaseLinkCollection.0.CaseReference", data));
+        assertEquals("1637697929619312", JacksonUtils.getValueFromPath("CaseLinkCollection.1.CaseReference", data));
     }
 
     static Map<String, JsonNode> mySchoolDataWithNestedCollection(String name, String className1, String className2)

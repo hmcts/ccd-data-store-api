@@ -136,7 +136,12 @@ public final class JacksonUtils {
                         final var keyToArrayContent = truncatedKey.substring(truncatedKey.indexOf(".") + 1);
                         if (StringUtils.isNumeric(arrayIndex)) {
                             JsonNode jsonNodeFromArray = arrayNode.get(Integer.parseInt(arrayIndex));
-                            jsonValue[0] = getValue(getNestedCaseFieldByPath(jsonNodeFromArray, keyToArrayContent));
+                            JsonNode nestedCaseFieldByPath =
+                                getNestedCaseFieldByPath(jsonNodeFromArray, keyToArrayContent);
+                            if (nestedCaseFieldByPath == null) {
+                                nestedCaseFieldByPath = jsonNodeFromArray.get("value");
+                            }
+                            jsonValue[0] = getValue(nestedCaseFieldByPath);
                         }
                     } else {
                         JsonNode foundJsonNode = getNestedCaseFieldByPath(entry.getValue(), truncatedKey);
@@ -159,7 +164,12 @@ public final class JacksonUtils {
             if (jsonNode instanceof IntNode) {
                 returnValue = jsonNode.toString();
             } else {
-                returnValue = jsonNode.textValue();
+                if (jsonNode.iterator().hasNext()) {
+                    returnValue = jsonNode.iterator().next().textValue();
+                }
+                if (returnValue == null) {
+                    returnValue = jsonNode.textValue();
+                }
             }
         }
         return returnValue;

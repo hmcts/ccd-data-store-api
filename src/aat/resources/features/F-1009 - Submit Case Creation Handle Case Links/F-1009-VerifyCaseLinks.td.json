@@ -1,0 +1,45 @@
+{
+	"title": "should retrieve case links for a specified case reference",
+	"_guid_": "F-1009-VerifyCaseLinks",
+
+	"productName": "CCD Data Store",
+	"operationName": "Retrieve case links for an existing case reference",
+
+	"method": "GET",
+	"uri": "/testing-support/case-link/{cid}",
+
+	"specs": [
+		"to verify that the Case Link has been created in the CASE_LINK table with correct value"
+	],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers",
+      "experimental": "true"
+		},
+		"pathVariables": {
+			"cid": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Encoding": "gzip",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		},
+		"body": {
+      "CaseLinks" : [ {
+        "CaseId" : "[[ANYTHING_PRESENT]]",
+        "LinkedCaseId" : "[[ANYTHING_PRESENT]]",
+        "CaseTypeId" : "FT_MasterCaseType"
+      }]
+		}
+	}
+}

@@ -43,12 +43,12 @@ public class CaseLinkService {
         caseLinks.stream()
             .filter(caseLinkString -> caseLinkString != null && !caseLinkString.isEmpty())
             .forEach(caseLink -> {
-            caseLinkRepository.insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(caseReference,
-                Long.parseLong(caseLink),
-                caseTypeId);
-            log.debug("inserted case link with id {}, linkedCaseId {} and caseType {}",
-                caseReference, caseLink, caseTypeId);
-        });
+                caseLinkRepository.insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(caseReference,
+                        Long.parseLong(caseLink),
+                        caseTypeId);
+                log.debug("inserted case link with id {}, linkedCaseId {} and caseType {}",
+                    caseReference, caseLink, caseTypeId);
+            });
 
     }
 
