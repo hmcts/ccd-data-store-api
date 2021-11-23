@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -171,7 +172,7 @@ public class CaseTypeDefinition implements Serializable {
     }
 
     public List<Integer> getRetriesGetCaseUrl() {
-        return retriesGetCaseUrl;
+        return retriesGetCaseUrl == null ? Collections.emptyList() : retriesGetCaseUrl;
     }
 
     public void setRetriesGetCaseUrl(List<Integer> retriesGetCaseUrl) {
