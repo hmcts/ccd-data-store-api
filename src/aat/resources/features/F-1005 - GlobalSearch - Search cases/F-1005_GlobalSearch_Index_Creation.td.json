@@ -3,7 +3,7 @@
   "productName": "CCD Definition Store",
   "operationName": "to create the global search index",
   "method": "POST",
-  "uri": "{{DEFINITION_STORE_HOST}}/elastic-support/global-search/index",
+  "uri": "http://ccd-definition-store-api-pr-1073.service.core-compute-preview.internal/elastic-support/global-search/index",
   "specs": [
     "to create the global search index"
   ],
