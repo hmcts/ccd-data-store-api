@@ -7,6 +7,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Transactional
 @Repository
 public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseLinkEntity.CaseLinkPrimaryKey> {
@@ -28,4 +30,8 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
                                                                   @Param("linkedCaseReference")
                                                                       Long linkedCaseReference,
                                                                   @Param("caseTypeId") String caseTypeId);
+
+    @Query(value = "select cle from CaseLinkEntity cle where cle.caseLinkPrimaryKey.caseId = "
+        + "(select cd.id from CaseDetailsEntity cd where cd.reference=:caseReference)")
+    List<CaseLinkEntity> findAllByCaseReference(@Param("caseReference") Long caseReference);
 }
