@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
 import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
@@ -36,6 +37,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.doReturn;
@@ -189,6 +191,70 @@ class AuthorisedCreateCaseOperationTest {
     }
 
     @Test
+    @DisplayName("should save supplementary data when valid data passed")
+    void shouldReturnAuthorisedCaseDetailsAndSaveSupplementaryData() {
+
+        SupplementaryDataUpdateRequest request = createSupplementaryDataRequest();
+        EVENT_DATA.setSupplementaryDataUpdateRequest(request);
+        final CaseDetails output = authorisedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
+            EVENT_DATA,
+            IGNORE);
+
+        InOrder inOrder = inOrder(caseDefinitionRepository, caseAccessService, classifiedCreateCaseOperation,
+            accessControlService, validator, supplementaryDataUpdateOperation);
+        assertAll(
+            () -> assertThat(output, sameInstance(classifiedCase)),
+            () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
+            () -> inOrder.verify(caseAccessService).getCaseCreationRoles(),
+            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
+                eq(userRoles), eq(CAN_CREATE)),
+            () -> inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(eq(EVENT_ID), eq(events),
+                eq(userRoles), eq(CAN_CREATE)),
+            () -> inOrder.verify(accessControlService).canAccessCaseFieldsWithCriteria(any(JsonNode.class),
+                eq(caseFieldDefinitions), eq(userRoles), eq(CAN_CREATE)),
+            () -> inOrder.verify(classifiedCreateCaseOperation).createCaseDetails(CASE_TYPE_ID, EVENT_DATA, IGNORE),
+            () -> inOrder.verify(validator).validate(eq(request)),
+            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
+                eq(userRoles), eq(CAN_READ)),
+            () -> inOrder.verify(accessControlService, times(2))
+                .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFieldDefinitions), eq(userRoles), eq(CAN_READ),
+                    anyBoolean())
+        );
+    }
+
+    @Test
+    @DisplayName("should not save supplementary data when invalid data passed")
+    void shouldReturnAuthorisedCaseDetailsAndShouldNotSaveSupplementaryDataWhenRequestEmpty() {
+
+        SupplementaryDataUpdateRequest request = null;
+        EVENT_DATA.setSupplementaryDataUpdateRequest(request);
+        final CaseDetails output = authorisedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
+            EVENT_DATA,
+            IGNORE);
+
+        InOrder inOrder = inOrder(caseDefinitionRepository, caseAccessService, classifiedCreateCaseOperation,
+            accessControlService, validator, supplementaryDataUpdateOperation);
+        assertAll(
+            () -> assertThat(output, sameInstance(classifiedCase)),
+            () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
+            () -> inOrder.verify(caseAccessService).getCaseCreationRoles(),
+            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
+                eq(userRoles), eq(CAN_CREATE)),
+            () -> inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(eq(EVENT_ID), eq(events),
+                eq(userRoles), eq(CAN_CREATE)),
+            () -> inOrder.verify(accessControlService).canAccessCaseFieldsWithCriteria(any(JsonNode.class),
+                eq(caseFieldDefinitions), eq(userRoles), eq(CAN_CREATE)),
+            () -> inOrder.verify(classifiedCreateCaseOperation).createCaseDetails(CASE_TYPE_ID, EVENT_DATA, IGNORE),
+            () -> inOrder.verify(validator, never()).validate(any()),
+            () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
+                eq(userRoles), eq(CAN_READ)),
+            () -> inOrder.verify(accessControlService, times(2))
+                .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFieldDefinitions), eq(userRoles), eq(CAN_READ),
+                    anyBoolean())
+        );
+    }
+
+    @Test
     @DisplayName("should fail if null case type")
     void shouldFailIfNullCaseTypeFound() {
 
@@ -294,4 +360,14 @@ class AuthorisedCreateCaseOperationTest {
         assertThat(caseDetails, is(nullValue()));
     }
 
+
+    private SupplementaryDataUpdateRequest createSupplementaryDataRequest() {
+        Map<String, Map<String, Object>> requestData = new HashMap<>();
+        Map<String, Object> setOperationData = new HashMap<>();
+        requestData.put("$set", setOperationData);
+        setOperationData.put("orgs_assigned_users.organisationC", 32);
+        setOperationData.put("orgs_assigned_users.organisationA", 54);
+
+        return new SupplementaryDataUpdateRequest(requestData);
+    }
 }
