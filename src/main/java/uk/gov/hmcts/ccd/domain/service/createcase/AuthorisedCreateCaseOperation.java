@@ -90,7 +90,7 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
                 caseDetails.getReferenceAsString(),
                 supplementaryDataUpdateRequest
             );
-            caseDetails.setSupplementaryData(JacksonUtils.convertValue(supplementaryData));
+            caseDetails.setSupplementaryData(JacksonUtils.convertValue(supplementaryData.getResponse()));
         }
     }
 
