@@ -4,12 +4,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseLinkRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -175,7 +177,7 @@ class CaseLinkServiceTest {
     @Test
     void createCaseLinksNullAndBlankValuesNotInsertedToDB() {
 
-        final List<String> caseLinks = new ArrayList<String>();
+        final List<String> caseLinks = new ArrayList<>();
         caseLinks.add(null);
         caseLinks.add("");
         caseLinks.add(null);
