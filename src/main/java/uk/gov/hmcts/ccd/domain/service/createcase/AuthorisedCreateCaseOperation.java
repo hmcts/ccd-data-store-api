@@ -85,9 +85,11 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
             .getSupplementaryDataUpdateRequest();
         if (supplementaryDataUpdateRequest != null) {
             validator.validate(supplementaryDataUpdateRequest);
+            supplementaryDataUpdateOperation.updateSupplementaryData(
+                caseDetails.getReferenceAsString(),
+                supplementaryDataUpdateRequest
+            );
         }
-        supplementaryDataUpdateOperation.updateSupplementaryData(caseDetails.getReferenceAsString(),
-            caseDataContent.getSupplementaryDataUpdateRequest());
     }
 
     private CaseDetails verifyReadAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles,
