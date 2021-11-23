@@ -45,8 +45,10 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.model.std.MessageQueueCandidate;
 
 import javax.inject.Inject;
+import java.rmi.server.UID;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,6 +107,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
     private static final String CASE_TYPE_NO_READ_FIELD_ACCESS = "TestAddressBookCaseNoReadFieldAccess";
     private static final String CASE_TYPE_NO_READ_CASE_TYPE_ACCESS = "TestAddressBookCaseNoReadCaseTypeAccess";
     private static final String CASE_TYPE_TTL = "TestAddressBookCaseTTL";
+    private static final String CASE_TYPE_CASELINK = "TestAddressBookCaseCaseLinks";
     private static final String JURISDICTION = "PROBATE";
     private static final String TEST_EVENT_ID = "TEST_EVENT";
     private static final String CREATE_EVENT_ID = "Create2";
@@ -3721,11 +3724,7 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
                 .build()
         );
 
-        List<CaseLink> caseLinks = template.query(
-            String.format("SELECT * FROM case_link where case_id=%s", 21),
-            new BeanPropertyRowMapper<>(CaseLink.class));
-
-        assertTrue(expectedCaseLinks.containsAll(caseLinks));
+        assertCaseLinks(expectedCaseId, expectedCaseLinks);
     }
 
     @Test
@@ -5212,6 +5211,164 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals("Incorrect Response Content",
             expectedResponseValue,
             mapper.readTree(mvcResult.getResponse().getContentAsString()).toString());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_case_links.sql"})
+    public void shouldReturn201WithCaseLinksInsertedInDbWhenPostCreateCaseEventWithValidDataForCaseworker()
+        throws Exception {
+
+        shouldReturn201WithCaseLinksInsertedInDbWhenPostCreateCaseEventWithValidData("caseworkers");
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_case_links.sql"})
+    public void shouldReturn201WithCaseLinksInsertedInDbWhenPostCreateCaseEventWithValidDataForCitizen()
+        throws Exception {
+
+        shouldReturn201WithCaseLinksInsertedInDbWhenPostCreateCaseEventWithValidData("citizens");
+    }
+
+    private void shouldReturn201WithCaseLinksInsertedInDbWhenPostCreateCaseEventWithValidData(String userRole)
+        throws Exception {
+        final String url = "/" + userRole + "/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE_CASELINK + "/cases";
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent("TEST_EVENT_NO_PRE_STATE", SUMMARY, DESCRIPTION));
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "TEST_EVENT_NO_PRE_STATE");
+
+        caseDetailsToSave.setToken(token);
+
+        final JsonNode data = mapper.readTree(
+            "{"
+            + "\"CaseLink1\": {"
+            + "     \"CaseReference\": \"1504259907353537\""
+            + "},"
+            + "\"CaseLink2\": {"
+            + "     \"CaseReference\": \"1504259907353545\""
+            + "}"
+            + "}");
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
+
+        final MvcResult mvcResult = mockMvc.perform(post(url)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
+            .andReturn();
+
+        assertEquals("Incorrect Response Content",
+            data.toString(),
+            mapper.readTree(mvcResult.getResponse().getContentAsString()).get("case_data").toString());
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases: case with case links should be created", 4, caseDetailsList.size());
+
+        Long expectedCaseId = 1L;
+
+        List<CaseLink> expectedCaseLinks = List.of(
+            builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(999L)
+                .caseTypeId(CASE_TYPE_CASELINK)
+                .build(),
+            builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(998L)
+                .caseTypeId(CASE_TYPE_CASELINK)
+                .build()
+        );
+
+        assertCaseLinks(expectedCaseId, expectedCaseLinks);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_case_links.sql"})
+    public void shouldReturn422BadRequestWhenCaseLinksSpecifiedDoesNotExist()
+        throws Exception {
+        final String url = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE_CASELINK + "/cases";
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent("TEST_EVENT_NO_PRE_STATE", SUMMARY, DESCRIPTION));
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "TEST_EVENT_NO_PRE_STATE");
+        caseDetailsToSave.setToken(token);
+
+        final JsonNode data = mapper.readTree(
+            " {"
+            + "    \"CaseLink1\": {"
+            + "        \"CaseReference\": \"3257164579659325\""
+            + "    }"
+            + "}");
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
+
+        final MvcResult mvcResult = mockMvc.perform(post(url)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(422))
+            .andReturn();
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases: No case should be created", 3, caseDetailsList.size());
+
+        Long expectedCaseId = 1L;
+
+        List<CaseLink> expectedCaseLinks = List.of(
+            builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(999L)
+                .caseTypeId(CASE_TYPE_CASELINK)
+                .build(),
+            builder()
+                .caseId(expectedCaseId)
+                .linkedCaseId(998L)
+                .caseTypeId(CASE_TYPE_CASELINK)
+                .build()
+        );
+
+        assertCaseLinks(expectedCaseId, expectedCaseLinks);
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_case_links.sql"})
+    public void shouldReturn201CaseCreatedButNotInsertCaseLinkInDBWhenCaseLinkIsBLank()
+        throws Exception {
+        final String url = "/caseworkers/" + UID + "/jurisdictions/" + JURISDICTION + "/case-types/"
+            + CASE_TYPE_CASELINK + "/cases";
+        final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
+        caseDetailsToSave.setEvent(createEvent("TEST_EVENT_NO_PRE_STATE", SUMMARY, DESCRIPTION));
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, "TEST_EVENT_NO_PRE_STATE");
+        caseDetailsToSave.setToken(token);
+
+        final JsonNode data = mapper.readTree(
+            " {"
+                + "    \"CaseLink1\": {"
+                + "    }"
+                + "}");
+        caseDetailsToSave.setData(JacksonUtils.convertValue(data));
+
+        final MvcResult mvcResult = mockMvc.perform(post(url)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsBytes(caseDetailsToSave))
+        ).andExpect(status().is(201))
+            .andReturn();
+
+        final List<CaseDetails> caseDetailsList = template.query("SELECT * FROM case_data", this::mapCaseData);
+        assertEquals("Incorrect number of cases: No case should be created", 4, caseDetailsList.size());
+
+        Long expectedCaseId = 1L;
+
+        assertCaseLinks(expectedCaseId, Collections.emptyList());
+    }
+
+    private void assertCaseLinks(Long expectedCaseId, List<CaseLink> expectedCaseLinks) {
+        List<CaseLink> caseLinks = template.query(
+            String.format("SELECT * FROM case_link where case_id=%s", expectedCaseId),
+            new BeanPropertyRowMapper<>(CaseLink.class));
+
+        assertTrue(expectedCaseLinks.containsAll(caseLinks));
     }
 
     private String requestBodyJsonMultiPage() {

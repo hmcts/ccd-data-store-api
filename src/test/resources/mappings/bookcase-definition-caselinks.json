@@ -92,6 +92,25 @@
               "update": false,
               "delete": false
             }]
+        },
+        {
+          "id": "TEST_EVENT_NO_PRE_STATE",
+          "name": "TEST EVENT NO PRE STATE NAME",
+          "description": "Just a test",
+          "post_states": [{
+            "enabling_condition" : null,
+            "priority" : 99,
+            "post_state_reference" : "CaseCreated"
+          }],
+          "security_classification": "PRIVATE",
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": false,
+              "delete": false
+            }]
         }
       ],
       "states": [

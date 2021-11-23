@@ -3,8 +3,10 @@ package uk.gov.hmcts.ccd.domain.service.createcase;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +21,14 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkExtractor;
+import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -54,6 +59,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     private final DraftGateway draftGateway;
     private final CasePostStateService casePostStateService;
     private final CaseDataIssueLogger caseDataIssueLogger;
+    private final CaseLinkService caseLinkService;
+    private final CaseLinkExtractor caseLinkExtractor;
 
     @Inject
     public DefaultCreateCaseOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -69,7 +76,9 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
                                       final ValidateCaseFieldsOperation validateCaseFieldsOperation,
                                       final CasePostStateService casePostStateService,
                                       @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
-                                      final CaseDataIssueLogger caseDataIssueLogger) {
+                                      final CaseDataIssueLogger caseDataIssueLogger,
+                                      final CaseLinkService caseLinkService,
+                                      final CaseLinkExtractor caseLinkExtractor) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.eventTriggerService = eventTriggerService;
@@ -83,6 +92,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         this.casePostStateService = casePostStateService;
         this.draftGateway = draftGateway;
         this.caseDataIssueLogger = caseDataIssueLogger;
+        this.caseLinkService = caseLinkService;
+        this.caseLinkExtractor = caseLinkExtractor;
     }
 
     @Override
@@ -143,9 +154,16 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
 
         submittedCallback(caseEventDefinition, savedCaseDetails);
 
+        insertCaseLinks(savedCaseDetails, caseTypeDefinition.getCaseFieldDefinitions());
+
         deleteDraft(caseDataContent, savedCaseDetails);
 
         return savedCaseDetails;
+    }
+
+    private void insertCaseLinks(CaseDetails caseDetails, List<CaseFieldDefinition> caseFieldDefinitions) {
+        final List<String> caseLinks = caseLinkExtractor.getCaseLinks(caseDetails.getData(), caseFieldDefinitions);
+        caseLinkService.createCaseLinks(caseDetails.getReference(), caseDetails.getCaseTypeId(), caseLinks);
     }
 
     private void updateCaseState(CaseEventDefinition caseEventDefinition, CaseDetails newCaseDetails) {

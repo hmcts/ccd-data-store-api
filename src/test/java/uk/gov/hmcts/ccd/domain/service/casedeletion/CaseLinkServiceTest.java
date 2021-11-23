@@ -24,56 +24,74 @@ class CaseLinkServiceTest {
     @InjectMocks
     private CaseLinkService caseLinkService;
 
+    private static final String CASE_TYPE_ID = "Test";
+
+    private static final long CASE_ID = 1L;
+
     @Test
     void updateCaseLinksDeletesAndInsertsCaseLinkFields() {
-        caseLinkService.updateCaseLinks(1L, "Test",
+        caseLinkService.updateCaseLinks(CASE_ID, "Test",
             createPreCallbackCaseLinks(),
             createPostCallbackCaseLinks());
 
-        Mockito.verify(caseLinkRepository).deleteByCaseReferenceAndLinkedCaseReference(1L, 1504259907353545L);
-        Mockito.verify(caseLinkRepository).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(1L,
+        Mockito.verify(caseLinkRepository).deleteByCaseReferenceAndLinkedCaseReference(CASE_ID, 1504259907353545L);
+        Mockito.verify(caseLinkRepository).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(CASE_ID,
                                                                                             1504259907353594L,
-                                                                                            "Test");
+                                                                                            CASE_TYPE_ID);
     }
 
     @Test
     void updateCaseLinksDeletesCaseLinkFields() {
-        caseLinkService.updateCaseLinks(1L, "Test",
+        caseLinkService.updateCaseLinks(CASE_ID, CASE_TYPE_ID,
             createPreCallbackCaseLinks(),
             EMPTY_LIST);
 
-        Mockito.verify(caseLinkRepository).deleteByCaseReferenceAndLinkedCaseReference(1L, 1504259907353545L);
-        Mockito.verify(caseLinkRepository).deleteByCaseReferenceAndLinkedCaseReference(1L, 1504259907353552L);
-        Mockito.verify(caseLinkRepository, never()).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(1L,
+        Mockito.verify(caseLinkRepository).deleteByCaseReferenceAndLinkedCaseReference(CASE_ID, 1504259907353545L);
+        Mockito.verify(caseLinkRepository).deleteByCaseReferenceAndLinkedCaseReference(CASE_ID, 1504259907353552L);
+        Mockito.verify(caseLinkRepository, never()).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(CASE_ID,
                                                                                                     1504259907353594L,
-                                                                                                    "Test");
+                                                                                                    CASE_TYPE_ID);
 
     }
 
     @Test
     void updateCaseLinksInsertsCaseLinkFields() {
-        caseLinkService.updateCaseLinks(1L, "Test",
+        caseLinkService.updateCaseLinks(CASE_ID, CASE_TYPE_ID,
             EMPTY_LIST,
             createPostCallbackCaseLinks());
 
-        Mockito.verify(caseLinkRepository).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(1L,
+        Mockito.verify(caseLinkRepository).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(CASE_ID,
                                                                                             1504259907353552L,
-                                                                                            "Test");
-        Mockito.verify(caseLinkRepository).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(1L,
+                                                                                            CASE_TYPE_ID);
+        Mockito.verify(caseLinkRepository).insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(CASE_ID,
                                                                                             1504259907353594L,
-                                                                                            "Test");
+                                                                                            CASE_TYPE_ID);
     }
 
     @Test
     void updateCaseLinksNoRepositoryInteractionCaseLinksIdentical() {
-        caseLinkService.updateCaseLinks(1L,
-            "Test",
+        caseLinkService.updateCaseLinks(CASE_ID,
+            CASE_TYPE_ID,
             createPostCallbackCaseLinks(),
             createPostCallbackCaseLinks());
 
         Mockito.verify(caseLinkRepository, never())
             .insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(anyLong(), anyLong(), anyString());
         Mockito.verify(caseLinkRepository, never()).deleteByCaseReferenceAndLinkedCaseReference(anyLong(), anyLong());
+    }
+
+    @Test
+    void createCaseLinks() {
+
+        final List<String> caseLinks = createPostCallbackCaseLinks();
+
+        caseLinkService.createCaseLinks(CASE_ID, CASE_TYPE_ID, caseLinks);
+
+        caseLinks.forEach(caseLink ->
+            Mockito.verify(caseLinkRepository)
+                .insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(CASE_ID,
+                                                                          Long.valueOf(caseLink),
+                                                                          CASE_TYPE_ID));
     }
 
     private List<String> createPreCallbackCaseLinks() {
