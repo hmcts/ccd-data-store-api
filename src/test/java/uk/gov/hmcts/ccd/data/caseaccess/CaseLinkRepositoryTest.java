@@ -7,6 +7,8 @@ import org.springframework.test.context.jdbc.Sql;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 
 import javax.inject.Inject;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -16,6 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CaseLinkRepositoryTest extends WireMockBaseTest {
 
+    private static final String TEST_ADDRESS_BOOK_CASE = "TestAddressBookCase";
+
     @Inject
     private CaseLinkRepository caseLinkRepository;
 
@@ -23,7 +27,7 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
 
     @Before
     public void setup() {
-        caseLinkEntity = new CaseLinkEntity(13L, 14L, "TestAddressBookCase");
+        caseLinkEntity = new CaseLinkEntity(13L, 14L, TEST_ADDRESS_BOOK_CASE);
     }
 
     @Test
@@ -62,7 +66,7 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void testSaveFailsIfCaseIdDoesNotExist() {
-        caseLinkEntity = new CaseLinkEntity(1003L, 1L, "TestAddressBookCase");
+        caseLinkEntity = new CaseLinkEntity(1003L, 1L, TEST_ADDRESS_BOOK_CASE);
 
         assertThrows(DataIntegrityViolationException.class, () -> caseLinkRepository.save(caseLinkEntity));
     }
@@ -105,6 +109,32 @@ public class CaseLinkRepositoryTest extends WireMockBaseTest {
                                                                             "test");
 
         assertTrue(caseLinkRepository.findById(pk).isPresent());
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
+    public void testFindAllByCaseReference() {
+        final List<Long> linkedCaseIds = List.of(2L, 3L, 4L);
+
+        final List<CaseLinkEntity> caseLinkEntities = List.of(
+            new CaseLinkEntity(1L, linkedCaseIds.get(0), TEST_ADDRESS_BOOK_CASE),
+            new CaseLinkEntity(1L, linkedCaseIds.get(1), TEST_ADDRESS_BOOK_CASE),
+            new CaseLinkEntity(1L, linkedCaseIds.get(2), TEST_ADDRESS_BOOK_CASE)
+        );
+
+        caseLinkRepository.saveAll(caseLinkEntities);
+
+        final List<CaseLinkEntity> allByCaseReference = caseLinkRepository.findAllByCaseReference(1504259907353529L);
+
+        assertEquals(caseLinkEntities.size(), allByCaseReference.size());
+
+        final List<Long> foundLinkedCaseIds = allByCaseReference.stream()
+            .filter(caseLinkEntity -> caseLinkEntity.getCaseTypeId().equals(TEST_ADDRESS_BOOK_CASE)
+                && caseLinkEntity.getCaseLinkPrimaryKey().getCaseId().equals(1L))
+            .map(cle -> cle.getCaseLinkPrimaryKey().getLinkedCaseId())
+            .collect(Collectors.toList());
+
+        assertTrue(foundLinkedCaseIds.containsAll(linkedCaseIds));
     }
 
 }

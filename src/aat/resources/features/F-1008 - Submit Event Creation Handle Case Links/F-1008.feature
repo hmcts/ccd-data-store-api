@@ -17,7 +17,7 @@ Feature: F-1008: Submit Event Creation Handle Case Links
       And   it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
       Then  a positive response is received
       And   the response has all other details as expected
-      And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1008-VerifyCaseLink]
+      And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1008-VerifyCaseLinks]
 
 #      And the request [contains a case Id that has just been created as in F-1007_CreateSuspendedCasePreRequisiteCaseworker]
 #      And the request [contains an event token for the case just created above]
