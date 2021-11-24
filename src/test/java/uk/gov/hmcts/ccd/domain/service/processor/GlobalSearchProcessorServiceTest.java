@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -19,7 +21,18 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataFields.SEARCH_CRITERIA;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.SearchCriteriaFields.OTHER_CASE_REFERENCES;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.SearchCriteriaFields.SEARCH_PARTIES;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.SearchPartyFields.ADDRESS_LINE_1;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.SearchPartyFields.DATE_OF_BIRTH;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.SearchPartyFields.DATE_OF_DEATH;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.SearchPartyFields.EMAIL_ADDRESS;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.SearchPartyFields.NAME;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.SearchPartyFields.POSTCODE;
 
 class GlobalSearchProcessorServiceTest {
 
@@ -29,18 +42,8 @@ class GlobalSearchProcessorServiceTest {
     private List<String> searchPartyPropertyNames;
     private SearchParty searchParty;
 
-    private static final String SEARCH_CRITERIA = "SearchCriteria";
-    private static final String SEARCH_PARTIES = "SearchParties";
-    private static final String OTHER_CASE_REFERENCES = "OtherCaseReferences";
     private static final String ID = "id";
     private static final String VALUE = "value";
-
-    private static final String NAME = "Name";
-    private static final String ADDRESS_LINE = "AddressLine1";
-    private static final String EMAIL_ADDRESS = "EmailAddress";
-    private static final String POST_CODE = "PostCode";
-    private static final String DATE_OF_BIRTH = "DateOfBirth";
-    private static final String DATE_OF_DEATH = "DateOfDeath";
 
     @BeforeEach
     void setup() throws JsonProcessingException {
@@ -57,7 +60,7 @@ class GlobalSearchProcessorServiceTest {
         caseData = new HashMap<>();
         caseData.put("PersonFirstName", JacksonUtils.MAPPER.readTree("\"FirstNameValue\""));
 
-        searchPartyPropertyNames = List.of(NAME, ADDRESS_LINE, EMAIL_ADDRESS, POST_CODE, DATE_OF_BIRTH, DATE_OF_DEATH);
+        searchPartyPropertyNames = List.of(NAME, ADDRESS_LINE_1, EMAIL_ADDRESS, POSTCODE, DATE_OF_BIRTH, DATE_OF_DEATH);
         searchParty = new SearchParty();
     }
 
@@ -69,10 +72,28 @@ class GlobalSearchProcessorServiceTest {
         assertNull(globalSearchData.get(SEARCH_CRITERIA));
     }
 
-    @Test
-    void checkNoMatchingCaseDataResultsInNoSearchCriteriaCreation() {
-        globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
-        assertNull(caseData.get(SEARCH_CRITERIA));
+    @ParameterizedTest(name = "Should return empty SearchCriteria for empty or null case data: {0}")
+    @NullAndEmptySource
+    void checkNullAndEmptyCaseDataResultsInEmptySearchCriteriaCreation(Map<String, JsonNode> testData) {
+
+        // ARRANGE
+        SearchCriteria searchCriteria = new SearchCriteria();
+        searchCriteria.setOtherCaseReference("TextField1");
+
+        SearchParty searchParty = new SearchParty();
+        searchParty.setSearchPartyName("TextField1");
+
+        caseTypeDefinition.setSearchCriterias(List.of(searchCriteria));
+        caseTypeDefinition.setSearchParties(List.of(searchParty));
+
+        // ACT
+        Map<String, JsonNode> globalSearchData =
+            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, testData);
+
+        // ASSERT
+        assertNotNull(globalSearchData.get(SEARCH_CRITERIA));
+        assertTrue(globalSearchData.get(SEARCH_CRITERIA).isEmpty());
+
     }
 
     @Test
@@ -175,6 +196,34 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
+    void checkCommaSeparatedValuesSearchPartyNameWithNullAndMissingValuesPopulatedInSearchCriteria()
+        throws JsonProcessingException {
+
+        final String searchPartyNameFirstName = "John";
+        final String searchPartyNameLastName = "Johnson";
+
+        final String firstName = "FirstName";
+        final String middleName = "MiddleName"; // test will set this field to null in case data
+        final String missingName = "MissingName"; // test will miss this field out of the case data
+        final String lastName = "LastName";
+
+        searchParty.setSearchPartyName(String.format("%s,%s,%s,%s", firstName, middleName, missingName, lastName));
+        caseTypeDefinition.setSearchParties(List.of(searchParty));
+
+        caseData.put(firstName, JacksonUtils.MAPPER.readTree("\""  + searchPartyNameFirstName  + "\""));
+        caseData.put(middleName, JacksonUtils.MAPPER.readTree("null"));
+        caseData.put(lastName, JacksonUtils.MAPPER.readTree("\""  + searchPartyNameLastName  + "\""));
+
+        Map<String, String> expectedValues = new HashMap<>();
+
+        expectedValues.put(NAME, String.format("%s %s",
+            searchPartyNameFirstName,
+            searchPartyNameLastName)); // i.e. only the two values returned with no extra spaces for missing values
+
+        assertSearchCriteriaFields(expectedValues);
+    }
+
+    @Test
     void checkCommaSeparatedComplexValuesSearchPartyNamePopulatedInSearchCriteria() throws JsonProcessingException {
         final String searchPartyNameFirstName = "John";
         final String searchPartyNameMiddleName = "Johnny";
@@ -205,6 +254,41 @@ class GlobalSearchProcessorServiceTest {
         assertSearchCriteriaFields(expectedValues);
     }
 
+    @Test
+    void checkCommaSeparatedComplexValuesSearchPartyNameWithNullAndMissingValuesPopulatedInSearchCriteria()
+        throws JsonProcessingException {
+
+        final String searchPartyNameFirstName = "John";
+        final String searchPartyNameLastName = "Johnson";
+
+        final String firstName = "MyPerson.Person.FirstName";
+        final String middleName = "MyPerson.Person.MiddleName"; // test will set this field to null in case data
+        final String missingName = "MyPerson.Person.MissingName"; // test will miss this field out of the case data
+        final String lastName = "MyPerson.Person.LastName";
+
+        searchParty.setSearchPartyName(String.format("%s,%s,%s,%s", firstName, middleName, missingName, lastName));
+        caseTypeDefinition.setSearchParties(List.of(searchParty));
+
+        caseData.put("MyPerson", JacksonUtils.MAPPER.readTree("{\n"
+            + "   \"Person\":{\n"
+            + "         \"FirstName\":\"" + searchPartyNameFirstName + "\",\n"
+            + "         \"MiddleName\": null,\n"
+            + "         \"LastName\":\"" + searchPartyNameLastName + "\"\n"
+            + "      }\n"
+            + "   }\n"
+            + "}"));
+
+
+        Map<String, String> expectedValues = new HashMap<>();
+
+        expectedValues.put(NAME,
+            String.format("%s %s",
+                searchPartyNameFirstName,
+                searchPartyNameLastName)); // i.e. only the two values returned with no extra spaces for missing values
+
+        assertSearchCriteriaFields(expectedValues);
+    }
+
 
     @Test
     void checkSearchPartyAddressLinePopulatedInSearchCriteria() throws JsonProcessingException {
@@ -214,7 +298,7 @@ class GlobalSearchProcessorServiceTest {
         final String address = "MyAddress";
         caseData.put("SearchPartyAddress", JacksonUtils.MAPPER.readTree("\""  + address  + "\""));
 
-        assertSearchCriteriaField(ADDRESS_LINE, address);
+        assertSearchCriteriaField(ADDRESS_LINE_1, address);
     }
 
     @Test
@@ -227,7 +311,7 @@ class GlobalSearchProcessorServiceTest {
         final String address = "MyAddress";
         caseData.put("SearchParty", JacksonUtils.MAPPER.readTree("{\"Address\": \"" + address  + "\"}"));
 
-        assertSearchCriteriaField(ADDRESS_LINE, address);
+        assertSearchCriteriaField(ADDRESS_LINE_1, address);
     }
 
     @Test
@@ -264,7 +348,7 @@ class GlobalSearchProcessorServiceTest {
         final String postCode = "AB1 2CD";
         caseData.put("SearchPartyPostCode", JacksonUtils.MAPPER.readTree("\""  + postCode  + "\""));
 
-        assertSearchCriteriaField(POST_CODE, postCode);
+        assertSearchCriteriaField(POSTCODE, postCode);
     }
 
     @Test
@@ -284,7 +368,7 @@ class GlobalSearchProcessorServiceTest {
             + "   }\n"
             + "}"));
 
-        assertSearchCriteriaField(POST_CODE, postCode);
+        assertSearchCriteriaField(POSTCODE, postCode);
     }
 
     @Test
@@ -369,9 +453,9 @@ class GlobalSearchProcessorServiceTest {
         Map<String, String> expectedFieldValues = new HashMap<>();
 
         expectedFieldValues.put(NAME, name);
-        expectedFieldValues.put(ADDRESS_LINE, address);
+        expectedFieldValues.put(ADDRESS_LINE_1, address);
         expectedFieldValues.put(EMAIL_ADDRESS, email);
-        expectedFieldValues.put(POST_CODE, postCode);
+        expectedFieldValues.put(POSTCODE, postCode);
         expectedFieldValues.put(DATE_OF_BIRTH, dob);
         expectedFieldValues.put(DATE_OF_DEATH, dod);
 
@@ -490,9 +574,9 @@ class GlobalSearchProcessorServiceTest {
         Map<String, String> expectedFieldValues = new HashMap<>();
 
         expectedFieldValues.put(NAME, name);
-        expectedFieldValues.put(ADDRESS_LINE, address);
+        expectedFieldValues.put(ADDRESS_LINE_1, address);
         expectedFieldValues.put(EMAIL_ADDRESS, email);
-        expectedFieldValues.put(POST_CODE, postCode);
+        expectedFieldValues.put(POSTCODE, postCode);
         expectedFieldValues.put(DATE_OF_BIRTH, dob);
         expectedFieldValues.put(DATE_OF_DEATH, dod);
 
