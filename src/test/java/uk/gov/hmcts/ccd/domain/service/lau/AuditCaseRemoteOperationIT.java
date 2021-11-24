@@ -59,6 +59,14 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
     private static int ASYNC_DELAY_TIMEOUT_MILLISECONDS = 2000;
     private static int ASYNC_DELAY_INTERVAL_MILLISECONDS = 200;
 
+    private static final String EXPECTED_CASE_ACTION_LOG_JSON =
+        "{\"actionLog\":{\"userId\":\"1234\",\"caseAction\":\"VIEW\",\"caseRef\":\"1504259907353529\","
+        + "\"caseJurisdictionId\":\"PROBATE\",\"caseTypeId\":\"Caveat\",\"timestamp\":\"2018-08-19T16:02:42.010Z\"}}";
+
+    private static final String EXPECTED_CASE_SEARCH_LOG_JSON =
+        "{\"searchLog\":{\"userId\":\"1234\",\"caseRefs\":[\"1504259907353529\"],"
+        + "\"timestamp\":\"2018-08-19T16:02:42.010Z\"}}";
+
     private static final String JURISDICTION = "PROBATE";
     private static final String CASE_TYPE = "Caveat";
     private static final String CASE_ID = "1504259907353529";
@@ -159,7 +167,8 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
         assertThat(captor.getValue().getJurisdiction(), is(equalTo(JURISDICTION)));
         assertThat(captor.getValue().getCaseId(), is(equalTo(CASE_ID)));
         assertThat(captor.getValue().getCaseType(), is(equalTo(CASE_TYPE)));
-        verifyWireMock(1, postRequestedFor(urlEqualTo(SEARCH_AUDIT_ENDPOINT)));
+        verifyWireMock(1, postRequestedFor(urlEqualTo(SEARCH_AUDIT_ENDPOINT))
+            .withRequestBody(equalToJson(EXPECTED_CASE_SEARCH_LOG_JSON)));
     }
 
     @Test
@@ -198,7 +207,8 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
         assertThat(captor.getValue().getJurisdiction(), is(equalTo(JURISDICTION)));
         assertThat(captor.getValue().getCaseId(), is(equalTo(CASE_ID)));
         assertThat(captor.getValue().getCaseType(), is(equalTo(CASE_TYPE)));
-        verifyWireMock(1, postRequestedFor(urlEqualTo(ACTION_AUDIT_ENDPOINT)));
+        verifyWireMock(1, postRequestedFor(urlEqualTo(ACTION_AUDIT_ENDPOINT))
+            .withRequestBody(equalToJson(EXPECTED_CASE_ACTION_LOG_JSON)));
     }
 
     @Test(expected = Test.None.class)
@@ -230,7 +240,8 @@ public class AuditCaseRemoteOperationIT extends WireMockBaseTest {
         auditService.audit(auditContext);
         waitForPossibleAuditResponse(ACTION_AUDIT_ENDPOINT);
 
-        verifyWireMock(1, postRequestedFor(urlEqualTo(ACTION_AUDIT_ENDPOINT)));
+        verifyWireMock(1, postRequestedFor(urlEqualTo(ACTION_AUDIT_ENDPOINT))
+            .withRequestBody(equalToJson(EXPECTED_CASE_ACTION_LOG_JSON)));
     }
 
     private void waitForPossibleAuditResponse(String pathPrefix) throws InterruptedException {
