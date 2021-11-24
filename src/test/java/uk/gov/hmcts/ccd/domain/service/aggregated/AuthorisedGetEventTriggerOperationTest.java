@@ -283,8 +283,8 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      eq(userRoles),
                                                                                      eq(CAN_UPDATE));
             doReturn(caseEventTrigger).when(accessControlService)
-                .setReadOnlyOnCaseViewFieldsIfNoAccess(CASE_REFERENCE, EVENT_TRIGGER_ID, caseEventTrigger, caseFields,
-                    userRoles, CAN_UPDATE);
+                .setReadOnlyOnCaseViewFieldsIfNoAccess(CASE_TYPE_ID,CASE_REFERENCE, EVENT_TRIGGER_ID, caseEventTrigger,
+                    caseFields, userRoles, CAN_UPDATE);
             doReturn(caseEventTrigger).when(accessControlService)
                 .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, userRoles);
         }
@@ -332,7 +332,9 @@ class AuthorisedGetEventTriggerOperationTest {
                 () -> inOrder.verify(getEventTriggerOperation).executeForCase(CASE_REFERENCE,
                                                                               EVENT_TRIGGER_ID,
                                                                               IGNORE),
-                () -> inOrder.verify(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(eq(CASE_REFERENCE),
+                () -> inOrder.verify(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(
+                    eq(CASE_TYPE_ID),
+                    eq(CASE_REFERENCE),
                     eq(EVENT_TRIGGER_ID),
                     eq(caseEventTrigger),
                     eq(caseFields),

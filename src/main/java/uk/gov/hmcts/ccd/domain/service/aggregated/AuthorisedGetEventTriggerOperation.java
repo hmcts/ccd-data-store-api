@@ -89,8 +89,9 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
                                               String eventId,
                                               Boolean ignoreWarning) {
         final CaseDetails caseDetails = getCaseDetails(caseReference);
+        final String caseTypeId = caseDetails.getCaseTypeId();
         final CaseTypeDefinition caseTypeDefinition =
-            caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
+            caseDefinitionRepository.getCaseType(caseTypeId);
         final CaseEventDefinition caseEventDefinition = getCaseEventDefinition(eventId, caseTypeDefinition);
 
         validateEventDefinition(() -> !eventTriggerService.isPreStateValid(
@@ -101,8 +102,9 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
 
         verifyMandatoryAccessForCase(eventId, caseDetails, caseTypeDefinition, userRoles);
 
-        CaseUpdateViewEvent caseUpdateViewEvent = filterUpsertAccessForCase(caseReference, eventId, caseTypeDefinition,
-            userRoles, getEventTriggerOperation.executeForCase(caseReference, eventId, ignoreWarning));
+        CaseUpdateViewEvent caseUpdateViewEvent = filterUpsertAccessForCase(caseTypeId, caseReference, eventId,
+            caseTypeDefinition, userRoles,
+            getEventTriggerOperation.executeForCase(caseReference, eventId, ignoreWarning));
         return accessControlService.updateCollectionDisplayContextParameterByAccess(caseUpdateViewEvent, userRoles);
     }
 
@@ -191,11 +193,12 @@ public class AuthorisedGetEventTriggerOperation implements GetEventTriggerOperat
             CAN_CREATE);
     }
 
-    private CaseUpdateViewEvent filterUpsertAccessForCase(String caseReference, String eventId,
+    private CaseUpdateViewEvent filterUpsertAccessForCase(String caseTypeId, String caseReference, String eventId,
                                                           CaseTypeDefinition caseTypeDefinition,
                                                           Set<String> userRoles,
                                                           CaseUpdateViewEvent caseUpdateViewEvent) {
         return accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+            caseTypeId,
             caseReference,
             eventId,
             caseUpdateViewEvent,
