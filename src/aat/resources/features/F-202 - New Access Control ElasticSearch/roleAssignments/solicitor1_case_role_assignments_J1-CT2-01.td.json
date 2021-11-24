@@ -1,5 +1,5 @@
 {
-  "_guid_" : "solicitor1_case_role_assignments_CT7",
+  "_guid_" : "solicitor1_case_role_assignments_J1-CT2-01",
 
   "productName": "Role Assignment Service",
   "operationName": "post role assignment",
@@ -8,12 +8,10 @@
 
   "specs": [
     "a role assignment to access CaseType CT2",
+    "to give Solicitor1 a PUBLIC CASE role assignment to the previously created case J1-CT2-01",
     "attempts to create a case for CT2",
-    "to give Solicitor1 a role assignment to the previously created case J1-CT7-01",
     "to create a full case",
-    "attempts to search for case type CT2 by PUBLIC field F3",
-    "to give Solicitor1 case role assignment for J1-CT7-01",
-    "contains J1-CT2-01, J1-CT2-02, J1-CT7-01",
+    "to give Solicitor1 case role assignment to J1-CT2-02(PRIVATE) and J1-CT2-01(PUBLIC)",
     "to give user Solicitor1 a PRIVATE CASE role assignment to view the previously created case",
     "to give user Solicitor1 their role case role assignments"
 
@@ -40,7 +38,7 @@
           "actorId" : "${[scenarioContext][testData][users][S1][id]}",
           "actorIdType" : "IDAM",
           "roleType" : "CASE",
-          "roleName" : "[CREATOR]",
+          "roleName" : "Appellant",
           "roleCategory" : "PROFESSIONAL",
           "classification" : "PUBLIC",
           "grantType" : "SPECIFIC",
@@ -49,8 +47,8 @@
           "endTime" : "2023-01-01T00:00:00Z",
           "attributes" : {
             "jurisdiction" : "J1",
-            "caseType" : "CT7",
-            "caseId" : "${[scenarioContext][parentContext][childContexts][J1-CT7-01][testData][actualResponse][body][id]}"
+            "caseType" : "CT2",
+            "caseId" : "${[scenarioContext][parentContext][childContexts][J1-CT2-01][testData][actualResponse][body][id]}"
           }
         }
       ]

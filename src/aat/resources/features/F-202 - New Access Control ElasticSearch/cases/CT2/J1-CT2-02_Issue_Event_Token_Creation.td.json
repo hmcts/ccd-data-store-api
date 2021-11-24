@@ -1,0 +1,24 @@
+{
+  "_guid_": "J1-CT2-02_Issue_Event_Token_Creation",
+  "_extends_" : "AC_Update_Token_Creation_Base",
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][J1-CT2-02][testData][actualResponse][body][id]}",
+      "etid": "Issue"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body" : {
+      "token" : "[[ANYTHING_PRESENT]]",
+      "_links" : {
+        "self" : {
+          "href" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "event_id" : "Issue"
+    }
+  }
+}

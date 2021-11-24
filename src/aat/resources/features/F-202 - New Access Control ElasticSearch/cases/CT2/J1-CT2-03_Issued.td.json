@@ -21,7 +21,7 @@
       "event": {
         "id": "Issue"
       },
-      "event_token": "${[scenarioContext][parentContext][childContexts][J1-CT2-03_Update_Token_Creation][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][parentContext][childContexts][J1-CT2-03_Issue_Event_Token_Creation][testData][actualResponse][body][token]}"
     }
   },
 

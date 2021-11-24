@@ -1,29 +1,11 @@
 {
-  "_guid_": "AC_Update_Token_Creation_Base",
-
-  "productName": "CCD Data Store",
-  "operationName": "Start event creation as Case worker",
-
-  "method": "GET",
-  "uri": "/cases/{cid}/event-triggers/{etid}",
-
-  "specs": [
-    "to create a token for case creation",
-    "to create a full case",
-    "to create a token for event creation"
-  ],
-
-  "users": {
-    "invokingUser": {
-      "username": "ccd.ac.superuser@gmail.com",
-      "password": "Pa55word11"
-    }
-  },
+  "_guid_": "J1-CT1-02_Update_Event_Token_Creation",
+  "_extends_" : "AC_Update_Token_Creation_Base",
 
   "request": {
-    "headers":{
-      "_extends_": "Common_Request_Headers",
-      "experimental": "true"
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][J1-CT1-02][testData][actualResponse][body][id]}",
+      "etid": "Update"
     }
   },
 
@@ -48,12 +30,16 @@
         "created_date" : "[[ANYTHING_PRESENT]]",
         "last_modified" : "[[ANYTHING_PRESENT]]",
         "last_state_modified_date" : "[[ANYTHING_PRESENT]]",
-        "security_classification" : "PUBLIC",
-        "case_data" : "[[ANYTHING_PRESENT]]",
+        "security_classification" : "PRIVATE",
+        "case_data" : {
+          "F1" : "a${[scenarioContext][customValues][UniqueString]}",
+          "F2" : "b${[scenarioContext][customValues][UniqueString]}",
+          "F3" : "c${[scenarioContext][customValues][UniqueString]}"
+        },
         "data_classification" : {
           "F1" : "RESTRICTED",
           "F2" : "PRIVATE",
-          "F3" : "PUBLIC"
+          "F3" : "PRIVATE"
         },
         "supplementary_data" : null,
         "after_submit_callback_response" : null,
@@ -64,10 +50,11 @@
         "security_classifications" : {
           "F1" : "RESTRICTED",
           "F2" : "PRIVATE",
-          "F3" : "PUBLIC"
+          "F3" : "PRIVATE"
         }
       },
-      "event_id" : "[[ANYTHING_PRESENT]]"
+      "event_id" : "Update"
     }
   }
+
 }

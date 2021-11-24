@@ -22,7 +22,7 @@
       "event": {
         "id": "Issue"
       },
-      "event_token": "${[scenarioContext][parentContext][childContexts][J1-CT7-02_Update_Token_Creation][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][parentContext][childContexts][J1-CT7-02_Issue_Event_Token_Creation][testData][actualResponse][body][token]}"
     }
   }
 }

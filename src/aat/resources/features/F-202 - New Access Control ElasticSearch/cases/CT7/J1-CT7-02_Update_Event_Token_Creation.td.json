@@ -1,11 +1,11 @@
 {
-  "_guid_": "J1-CT7-02_Issue_Event_Token_Creation",
+  "_guid_": "J1-CT7-02_Update_Event_Token_Creation",
   "_extends_" : "AC_Update_Token_Creation_Base",
 
   "request": {
     "pathVariables": {
       "cid": "${[scenarioContext][parentContext][childContexts][J1-CT7-02][testData][actualResponse][body][id]}",
-      "etid": "Issue"
+      "etid": "Update"
     }
   }
 

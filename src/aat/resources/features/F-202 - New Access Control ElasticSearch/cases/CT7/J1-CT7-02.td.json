@@ -48,7 +48,8 @@
       "state" : "Unissued1",
       "security_classification" : "PUBLIC",
       "data" : {
-        "F3" : "c${[scenarioContext][customValues][UniqueString]}"
+        "F3" : "c${[scenarioContext][customValues][UniqueString]}",
+        "F2": "b${[scenarioContext][customValues][UniqueString]}"
       },
       "data_classification" : {
         "F1" : "RESTRICTED",
