@@ -36,7 +36,7 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
     private final AccessControlService accessControlService;
     private final CaseAccessService caseAccessService;
     private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
-    private SupplementaryDataUpdateRequestValidator validator;
+    private SupplementaryDataUpdateRequestValidator supplementaryDataValidator;
 
     public AuthorisedCreateCaseOperation(@Qualifier("classified") final CreateCaseOperation createCaseOperation,
                                          @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
