@@ -341,8 +341,8 @@ class AuthorisedGetEventTriggerOperationTest {
                                                                                      eq(accessProfiles),
                                                                                      eq(CAN_UPDATE));
             doReturn(caseEventTrigger).when(accessControlService)
-                .setReadOnlyOnCaseViewFieldsIfNoAccess(CASE_REFERENCE, EVENT_TRIGGER_ID, caseEventTrigger, caseFields,
-                    accessProfiles, CAN_UPDATE);
+                .setReadOnlyOnCaseViewFieldsIfNoAccess(CASE_TYPE_ID,CASE_REFERENCE, EVENT_TRIGGER_ID, caseEventTrigger,
+                    caseFields, accessProfiles, CAN_UPDATE);
             doReturn(caseEventTrigger).when(accessControlService)
                 .updateCollectionDisplayContextParameterByAccess(caseEventTrigger, accessProfiles);
             doReturn(new CaseAccessMetadata()).when(caseDataAccessControl).generateAccessMetadata(anyString());
@@ -390,7 +390,9 @@ class AuthorisedGetEventTriggerOperationTest {
                 () -> inOrder.verify(getEventTriggerOperation).executeForCase(CASE_REFERENCE,
                                                                               EVENT_TRIGGER_ID,
                                                                               IGNORE),
-                () -> inOrder.verify(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(eq(CASE_REFERENCE),
+                () -> inOrder.verify(accessControlService).setReadOnlyOnCaseViewFieldsIfNoAccess(
+                    eq(CASE_TYPE_ID),
+                    eq(CASE_REFERENCE),
                     eq(EVENT_TRIGGER_ID),
                     eq(caseEventTrigger),
                     eq(caseFields),
