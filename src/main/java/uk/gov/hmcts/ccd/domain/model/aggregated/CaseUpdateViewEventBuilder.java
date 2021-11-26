@@ -73,6 +73,8 @@ public class CaseUpdateViewEventBuilder {
                                                                                                      eventId);
         caseUpdateViewEvent.setWizardPages(wizardPageCollection);
 
+        caseUpdateViewEvent.setSupplementaryData(startEventResult.getCaseDetails().getSupplementaryData());
+
         return caseUpdateViewEvent;
     }
 

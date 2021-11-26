@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.domain.model.aggregated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Map;
 import uk.gov.hmcts.ccd.domain.model.definition.WizardPage;
 
 import java.util.List;
@@ -27,6 +29,8 @@ public class CaseUpdateViewEvent {
     private Boolean canSaveDraft;
     @JsonProperty("title_display")
     private String titleDisplay;
+    @JsonProperty("supplementary_data")
+    private Map<String, JsonNode> supplementaryData;
 
     public String getId() {
         return id;
@@ -122,5 +126,13 @@ public class CaseUpdateViewEvent {
 
     public void setTitleDisplay(String titleDisplay) {
         this.titleDisplay = titleDisplay;
+    }
+
+    public Map<String, JsonNode> getSupplementaryData() {
+        return supplementaryData;
+    }
+
+    public void setSupplementaryData(Map<String, JsonNode> supplementaryData) {
+        this.supplementaryData = supplementaryData;
     }
 }
