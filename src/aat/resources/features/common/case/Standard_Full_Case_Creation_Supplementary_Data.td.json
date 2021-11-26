@@ -15,7 +15,7 @@
 		},
 		"body": {
 			"data": {
-				"_extends_": "Standard_Full_Case_Data",
+				"_extends_": "Standard_Full_Case_Data"
       },
       "supplementary_data_request": {
         "$set": {
