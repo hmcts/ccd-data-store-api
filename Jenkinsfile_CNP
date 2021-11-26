@@ -92,7 +92,6 @@ env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
 env.MAX_NUM_PARALLEL_THREADS=6
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 env.DEFINITION_STORE_HOST= "http://ccd-definition-store-api-pr-1073.service.core-compute-preview.internal"
-env.ROLE_ASSIGNMENT_URL="https://am-role-assignment-service-pr-929.service.core-compute-preview.internal"
 
 withPipeline(type, product, component) {
     onMaster {
