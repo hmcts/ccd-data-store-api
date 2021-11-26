@@ -16,11 +16,11 @@
 		"body": {
 			"data": {
 				"_extends_": "Standard_Full_Case_Data",
-        "supplementary_data_request": {
-          "$set": {
-            "orgs_assigned_users.OrgA": 22,
-            "HMCTSServiceId": "AAA1"
-          }
+      },
+      "supplementary_data_request": {
+        "$set": {
+          "orgs_assigned_users.OrgA": 22,
+          "HMCTSServiceId": "AAA1"
         }
       }
 		}

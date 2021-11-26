@@ -812,7 +812,8 @@
       "show_event_notes": null,
       "end_button_label": null,
       "can_save_draft": null,
-      "title_display": null
+      "title_display": null,
+      "supplementary_data" : null
     }
   }
 }
