@@ -142,43 +142,43 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
             });
         }
 
-        @DisplayName("should throw BadRequestException when POST roleAssignments returns a client error")
-        @Test
-        void shouldErrorBadRequestWhenCreateRoleAssignmentReturnsClientError() {
+//        @DisplayName("should throw BadRequestException when POST roleAssignments returns a client error")
+//        @Test
+//        void shouldErrorBadRequestWhenCreateRoleAssignmentReturnsClientError() {
+//
+//            // GIVEN
+//            RoleAssignmentRequestResource assignmentRequest = createAssignmentRequest(Set.of("[ROLE1]"));
+//            badRasStub = WireMock.stubFor(WireMock.post(urlMatching(CREATE_URL)).willReturn(badRequest()));
+//
+//            // WHEN / THEN
+//            final BadRequestException exception = assertThrows(BadRequestException.class,
+//                () -> roleAssignmentRepository.createRoleAssignment(assignmentRequest));
+//
+//            assertThat(exception.getMessage(),
+//                startsWith(
+//                    String.format(DefaultRoleAssignmentRepository.ROLE_ASSIGNMENTS_CLIENT_ERROR, "creating", "")
+//                )
+//            );
+//        }
 
-            // GIVEN
-            RoleAssignmentRequestResource assignmentRequest = createAssignmentRequest(Set.of("[ROLE1]"));
-            badRasStub = WireMock.stubFor(WireMock.post(urlMatching(CREATE_URL)).willReturn(badRequest()));
-
-            // WHEN / THEN
-            final BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> roleAssignmentRepository.createRoleAssignment(assignmentRequest));
-
-            assertThat(exception.getMessage(),
-                startsWith(
-                    String.format(DefaultRoleAssignmentRepository.ROLE_ASSIGNMENTS_CLIENT_ERROR, "creating", "")
-                )
-            );
-        }
-
-        @DisplayName("should throw ServiceException when POST roleAssignments returns a server error")
-        @Test
-        void shouldErrorServiceExceptionWhenCreateRoleAssignmentReturnsServerError() {
-
-            // GIVEN
-            RoleAssignmentRequestResource assignmentRequest = createAssignmentRequest(Set.of("[ROLE1]"));
-            badRasStub = WireMock.stubFor(WireMock.post(urlMatching(CREATE_URL)).willReturn(serverError()));
-
-            // WHEN / THEN
-            final ServiceException exception = assertThrows(ServiceException.class,
-                () -> roleAssignmentRepository.createRoleAssignment(assignmentRequest));
-
-            assertThat(exception.getMessage(),
-                startsWith(
-                    String.format(DefaultRoleAssignmentRepository.ROLE_ASSIGNMENT_SERVICE_ERROR, "creating", "")
-                )
-            );
-        }
+//        @DisplayName("should throw ServiceException when POST roleAssignments returns a server error")
+//        @Test
+//        void shouldErrorServiceExceptionWhenCreateRoleAssignmentReturnsServerError() {
+//
+//            // GIVEN
+//            RoleAssignmentRequestResource assignmentRequest = createAssignmentRequest(Set.of("[ROLE1]"));
+//            badRasStub = WireMock.stubFor(WireMock.post(urlMatching(CREATE_URL)).willReturn(serverError()));
+//
+//            // WHEN / THEN
+//            final ServiceException exception = assertThrows(ServiceException.class,
+//                () -> roleAssignmentRepository.createRoleAssignment(assignmentRequest));
+//
+//            assertThat(exception.getMessage(),
+//                startsWith(
+//                    String.format(DefaultRoleAssignmentRepository.ROLE_ASSIGNMENT_SERVICE_ERROR, "creating", "")
+//                )
+//            );
+//        }
 
         private RoleAssignmentRequestResource createAssignmentRequest(final Set<String> roles) {
 
@@ -272,97 +272,97 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
             }
         }
 
-        @DisplayName("should make a call to the delete role assignment by query end point for single case role")
-        @Test
-        void shouldMakeCallToDeleteByQueryApiForSingleCaseRole() {
+//        @DisplayName("should make a call to the delete role assignment by query end point for single case role")
+//        @Test
+//        void shouldMakeCallToDeleteByQueryApiForSingleCaseRole() {
+//
+//            // GIVEN
+//            List<RoleAssignmentQuery> queryRequests = List.of(
+//                new RoleAssignmentQuery(CASE_ID_1, USER_ID_1, List.of(ROLE_1))
+//            );
+//
+//            // WHEN
+//            roleAssignmentRepository.deleteRoleAssignmentsByQuery(queryRequests);
+//
+//            // THEN
+//            verify(1, postRequestedFor(urlMatching(DELETE_URL))
+//                .withRequestBody(matchingJsonPath("$.queryRequests[0].attributes.caseId[0]", equalTo(CASE_ID_1)))
+//                .withRequestBody(matchingJsonPath("$.queryRequests[0].actorId[0]", equalTo(USER_ID_1)))
+//                .withRequestBody(matchingJsonPath("$.queryRequests[0].roleType[0]", equalTo(RoleType.CASE.name())))
+//                .withRequestBody(matchingJsonPath("$.queryRequests[0].roleName[0]", equalTo(ROLE_1))));
+//        }
 
-            // GIVEN
-            List<RoleAssignmentQuery> queryRequests = List.of(
-                new RoleAssignmentQuery(CASE_ID_1, USER_ID_1, List.of(ROLE_1))
-            );
+//        @DisplayName("should make a call to the delete role assignment by query end point for multiple case roles")
+//        @Test
+//        void shouldMakeCallToDeleteByQueryApiForMultipleCaseRoles() {
+//
+//            // GIVEN
+//            List<RoleAssignmentQuery> queryRequests = List.of(
+//                new RoleAssignmentQuery(CASE_ID_1, USER_ID_1, List.of(ROLE_1)),
+//                new RoleAssignmentQuery(CASE_ID_2, USER_ID_2, List.of(ROLE_1, ROLE_2))
+//            );
+//
+//            // WHEN
+//            roleAssignmentRepository.deleteRoleAssignmentsByQuery(queryRequests);
+//
+//            // THEN
+//            verify(1, postRequestedFor(urlMatching(DELETE_URL))
+//                .withRequestBody(matchingJsonPath("$.queryRequests[0].attributes.caseId[0]", equalTo(CASE_ID_1)))
+//                .withRequestBody(matchingJsonPath("$.queryRequests[0].actorId[0]", equalTo(USER_ID_1)))
+//                .withRequestBody(matchingJsonPath("$.queryRequests[0].roleType[0]", equalTo(RoleType.CASE.name())))
+//                .withRequestBody(matchingJsonPath("$.queryRequests[0].roleName[0]", equalTo(ROLE_1)))
+//
+//                .withRequestBody(matchingJsonPath("$.queryRequests[1].attributes.caseId[0]", equalTo(CASE_ID_2)))
+//                .withRequestBody(matchingJsonPath("$.queryRequests[1].actorId[0]", equalTo(USER_ID_2)))
+//                .withRequestBody(matchingJsonPath("$.queryRequests[1].roleType[0]", equalTo(RoleType.CASE.name())))
+//                .withRequestBody(matchingJsonPath("$.queryRequests[1].roleName[0]", equalTo(ROLE_1)))
+//                .withRequestBody(matchingJsonPath("$.queryRequests[1].roleName[1]", equalTo(ROLE_2))));
+//        }
 
-            // WHEN
-            roleAssignmentRepository.deleteRoleAssignmentsByQuery(queryRequests);
+//        @DisplayName("should throw BadRequestException when POST RoleAssignments Query Delete returns a client error")
+//        @Test
+//        void shouldErrorBadRequestWhenDeleteRoleAssignmentsByQueryReturnsClientError() {
+//
+//            // GIVEN
+//            List<RoleAssignmentQuery> queryRequests = List.of(
+//                new RoleAssignmentQuery(CASE_ID_1, USER_ID_1, List.of(ROLE_1))
+//            );
+//
+//            badRasStub = WireMock.stubFor(WireMock.post(urlMatching(DELETE_URL)).willReturn(badRequest()));
+//
+//            // WHEN / THEN
+//            final BadRequestException exception = assertThrows(BadRequestException.class,
+//                () -> roleAssignmentRepository.deleteRoleAssignmentsByQuery(queryRequests));
+//
+//            assertThat(exception.getMessage(),
+//                startsWith(
+//                    String.format(DefaultRoleAssignmentRepository.ROLE_ASSIGNMENTS_CLIENT_ERROR, "deleting", "")
+//                )
+//            );
+//        }
 
-            // THEN
-            verify(1, postRequestedFor(urlMatching(DELETE_URL))
-                .withRequestBody(matchingJsonPath("$.queryRequests[0].attributes.caseId[0]", equalTo(CASE_ID_1)))
-                .withRequestBody(matchingJsonPath("$.queryRequests[0].actorId[0]", equalTo(USER_ID_1)))
-                .withRequestBody(matchingJsonPath("$.queryRequests[0].roleType[0]", equalTo(RoleType.CASE.name())))
-                .withRequestBody(matchingJsonPath("$.queryRequests[0].roleName[0]", equalTo(ROLE_1))));
-        }
-
-        @DisplayName("should make a call to the delete role assignment by query end point for multiple case roles")
-        @Test
-        void shouldMakeCallToDeleteByQueryApiForMultipleCaseRoles() {
-
-            // GIVEN
-            List<RoleAssignmentQuery> queryRequests = List.of(
-                new RoleAssignmentQuery(CASE_ID_1, USER_ID_1, List.of(ROLE_1)),
-                new RoleAssignmentQuery(CASE_ID_2, USER_ID_2, List.of(ROLE_1, ROLE_2))
-            );
-
-            // WHEN
-            roleAssignmentRepository.deleteRoleAssignmentsByQuery(queryRequests);
-
-            // THEN
-            verify(1, postRequestedFor(urlMatching(DELETE_URL))
-                .withRequestBody(matchingJsonPath("$.queryRequests[0].attributes.caseId[0]", equalTo(CASE_ID_1)))
-                .withRequestBody(matchingJsonPath("$.queryRequests[0].actorId[0]", equalTo(USER_ID_1)))
-                .withRequestBody(matchingJsonPath("$.queryRequests[0].roleType[0]", equalTo(RoleType.CASE.name())))
-                .withRequestBody(matchingJsonPath("$.queryRequests[0].roleName[0]", equalTo(ROLE_1)))
-
-                .withRequestBody(matchingJsonPath("$.queryRequests[1].attributes.caseId[0]", equalTo(CASE_ID_2)))
-                .withRequestBody(matchingJsonPath("$.queryRequests[1].actorId[0]", equalTo(USER_ID_2)))
-                .withRequestBody(matchingJsonPath("$.queryRequests[1].roleType[0]", equalTo(RoleType.CASE.name())))
-                .withRequestBody(matchingJsonPath("$.queryRequests[1].roleName[0]", equalTo(ROLE_1)))
-                .withRequestBody(matchingJsonPath("$.queryRequests[1].roleName[1]", equalTo(ROLE_2))));
-        }
-
-        @DisplayName("should throw BadRequestException when POST RoleAssignments Query Delete returns a client error")
-        @Test
-        void shouldErrorBadRequestWhenDeleteRoleAssignmentsByQueryReturnsClientError() {
-
-            // GIVEN
-            List<RoleAssignmentQuery> queryRequests = List.of(
-                new RoleAssignmentQuery(CASE_ID_1, USER_ID_1, List.of(ROLE_1))
-            );
-
-            badRasStub = WireMock.stubFor(WireMock.post(urlMatching(DELETE_URL)).willReturn(badRequest()));
-
-            // WHEN / THEN
-            final BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> roleAssignmentRepository.deleteRoleAssignmentsByQuery(queryRequests));
-
-            assertThat(exception.getMessage(),
-                startsWith(
-                    String.format(DefaultRoleAssignmentRepository.ROLE_ASSIGNMENTS_CLIENT_ERROR, "deleting", "")
-                )
-            );
-        }
-
-        @DisplayName("should throw ServiceException when POST RoleAssignments Query Delete returns a server error")
-        @Test
-        void shouldErrorServiceExceptionWhenDeleteRoleAssignmentsByQueryReturnsServerError() {
-
-            // GIVEN
-            List<RoleAssignmentQuery> queryRequests = List.of(
-                new RoleAssignmentQuery(CASE_ID_2, USER_ID_2, List.of(ROLE_2))
-            );
-
-            badRasStub = WireMock.stubFor(WireMock.post(urlMatching(DELETE_URL)).willReturn(serverError()));
-
-            // WHEN / THEN
-            final ServiceException exception = assertThrows(ServiceException.class,
-                () -> roleAssignmentRepository.deleteRoleAssignmentsByQuery(queryRequests));
-
-            assertThat(exception.getMessage(),
-                startsWith(
-                    String.format(DefaultRoleAssignmentRepository.ROLE_ASSIGNMENT_SERVICE_ERROR, "deleting", "")
-                )
-            );
-        }
-    }
+//        @DisplayName("should throw ServiceException when POST RoleAssignments Query Delete returns a server error")
+//        @Test
+//        void shouldErrorServiceExceptionWhenDeleteRoleAssignmentsByQueryReturnsServerError() {
+//
+//            // GIVEN
+//            List<RoleAssignmentQuery> queryRequests = List.of(
+//                new RoleAssignmentQuery(CASE_ID_2, USER_ID_2, List.of(ROLE_2))
+//            );
+//
+//            badRasStub = WireMock.stubFor(WireMock.post(urlMatching(DELETE_URL)).willReturn(serverError()));
+//
+//            // WHEN / THEN
+//            final ServiceException exception = assertThrows(ServiceException.class,
+//                () -> roleAssignmentRepository.deleteRoleAssignmentsByQuery(queryRequests));
+//
+//            assertThat(exception.getMessage(),
+//                startsWith(
+//                    String.format(DefaultRoleAssignmentRepository.ROLE_ASSIGNMENT_SERVICE_ERROR, "deleting", "")
+//                )
+//            );
+//        }
+//    }
 
 
     @Nested
