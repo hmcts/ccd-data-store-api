@@ -362,7 +362,7 @@ class DefaultRoleAssignmentRepositoryIT extends WireMockBaseTest {
 //                )
 //            );
 //        }
-//    }
+    }
 
 
     @Nested
