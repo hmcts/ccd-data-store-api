@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.data.definition;
 
-import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
-
+import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,20 +12,9 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import javax.inject.Inject;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -36,6 +24,18 @@ import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
 
 @SuppressWarnings("checkstyle:SummaryJavadoc")
 // partial javadoc attributes added prior to checkstyle implementation in module
@@ -224,28 +224,60 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
     @Override
     public List<String> getCaseTypesIDsByJurisdictions(List<String> jurisdictionIds) {
-
-        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(
-                Optional.of(jurisdictionIds));
-        if (jurisdictionDefinitions.isEmpty()) {
-            LOG.warn("Definitions not found for requested jurisdictions {}", jurisdictionIds);
-            return Collections.emptyList();
-        }
-        List<String> caseTypes = getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
+        val caseTypes = getCaseTypesIdByJurisdictionIds(Optional.of(jurisdictionIds));
         return caseTypes;
     }
 
     @Override
     public List<String> getAllCaseTypesIDs() {
+        val r = getCaseTypesId();
+
         List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(
                 Optional.ofNullable(null));
-        return getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
+        val r1 = getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
+        return r1;
     }
 
     private List<String> getCaseTypeIdFromJurisdictionDefinition(List<JurisdictionDefinition> jurisdictionDefinitions) {
         return jurisdictionDefinitions.stream()
                 .flatMap(jurisdictionDefinition -> jurisdictionDefinition.getCaseTypesIDs().stream()).distinct()
                 .collect(Collectors.toList());
+    }
+
+    private List<String> getCaseTypesId() {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(applicationParams.getElasticSupportCaseTypes());
+        final var results = restTemplate.getForObject(builder.build().encode().toUri(), String[].class);
+        return Arrays.asList(results);
+    }
+
+    private List<String> getCaseTypesIdByJurisdictionIds(Optional<List<String>> jurisdictionIds) {
+
+        try {
+            val  builder = UriComponentsBuilder.fromHttpUrl(applicationParams.getCasesIdByjurisdictionDefURL());
+            if (jurisdictionIds.isPresent()) {
+                builder.queryParam("ids", String.join(",", jurisdictionIds.get()));
+            }
+            LOG.debug("Retrieving jurisdiction ids: {}.", jurisdictionIds.orElse(Collections.emptyList()));
+            val requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
+            val results = restTemplate.exchange(
+                                builder.build().encode().toUri(),
+                                HttpMethod.GET,
+                                requestEntity,
+                                new ParameterizedTypeReference<List<String>>() {}
+            ).getBody();
+            return results;
+        } catch (RestClientException exception) {
+            LOG.warn("Error while retrieving jurisdictions ids  definition", exception);
+            if (exception instanceof HttpClientErrorException
+                && ((HttpClientErrorException) exception).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                LOG.warn("Jurisdiction object(s) configured for user couldn't be found on definition store: {}.",
+                    jurisdictionIds.orElse(Collections.emptyList()));
+                return new ArrayList<>();
+            } else {
+                throw new ServiceException("Problem retrieving jurisdictions definition because of "
+                    + exception.getMessage());
+            }
+        }
     }
 
     private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {

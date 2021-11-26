@@ -170,6 +170,7 @@ public class ApplicationParams {
     @Value("#{'${case.data.issue.logging.jurisdictions}'.split(',')}")
     private List<String> caseDataIssueLoggingJurisdictions;
 
+
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -463,4 +464,14 @@ public class ApplicationParams {
     public boolean isMultipartyFixEnabled() {
         return multipartyFixEnabled;
     }
+
+    public String getElasticSupportCaseTypes() {
+        return caseDefinitionHost + "/elastic-support/case-types";
+    }
+
+    public String getCasesIdByjurisdictionDefURL() {
+        return caseDefinitionHost + "/api/data/jurisdictions/case-type-ids";
+    }
+
+
 }
