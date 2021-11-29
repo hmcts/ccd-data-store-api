@@ -1,0 +1,63 @@
+tags:
+  sscs-ccd-idam-pr: true
+
+java:
+  environment:
+    DEFINITION_STORE_HOST: http://ccd-definition-store-${SERVICE_FQDN}
+    USER_PROFILE_HOST: http://ccd-user-profile-api-${SERVICE_FQDN}
+    # ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-${SERVICE_FQDN}
+    ROLE_ASSIGNMENT_URL: 
+    ELASTIC_SEARCH_ENABLED: false # TODO
+    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: false # TODO
+    ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
+    ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"
+
+ccd:
+  enabled: true
+  ccd:
+    postgresql:
+      enabled: false
+    s2s:
+      enabled: false
+    dataStore:
+      enabled: false
+    adminWeb:
+      enabled: false
+    definitionImporter:
+      enabled: false
+    userProfileImporter:
+      enabled: false
+    apiGatewayWeb:
+      enabled: true
+    ras:
+      enabled: false
+    # elastic:
+    #   enabled: false
+
+  ingressHost: ${SERVICE_FQDN}
+
+  global:
+    ccdDefinitionStoreUrl: http://ccd-definition-store-${SERVICE_FQDN}
+    ccdUserProfileUrl: http://ccd-user-profile-api-${SERVICE_FQDN}
+    dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
+    idamApiUrl: https://idam-api.aat.platform.hmcts.net
+    idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
+    s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+    enableKeyVaults: true
+    devMode: true
+
+  ccd-definition-store-api:
+    java:
+      image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
+      imagePullPolicy: Always
+      environment:
+        ELASTIC_SEARCH_ENABLED: true
+        ELASTIC_SEARCH_HOST: "{{ .Release.Name }}-es-master:9200"
+        ELASTIC_SEARCH_FAIL_ON_IMPORT: true
+        
+  am-role-assignment-service:
+    java:
+      keyVaults: 
+        am:
+          secrets:
+            - role-assignment-service-LD-SDK-KEY

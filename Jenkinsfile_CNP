@@ -115,6 +115,16 @@ withPipeline(type, product, component) {
         enablePactAs([
                 AppPipelineDsl.PactRoles.PROVIDER
         ])
+        after('checkout') {
+            sh 'env'
+            def githubApi = new GithubAPI(this)
+            githubApi.addLabelsToCurrentPR(["pr-values:ccd"])
+            echo 'Getting labels...'
+            for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values") ) {
+                def prLabel = label.minus("pr-values:")
+                echo "Found PR label ${prLabel}"
+            }
+        }
     }
 
     // Check if the build should be wired to an environment higher than 'preview'.

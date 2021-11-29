@@ -18,3 +18,7 @@ dependencies:
     version: 2.4.1
     repository: '@hmctspublic'
     condition: elastic.enabled
+  - name: ccd
+    version: 6.0.0
+    repository: '@hmctspublic'
+    condition: ccd.enabled
