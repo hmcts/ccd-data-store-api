@@ -3,6 +3,7 @@ tags:
 
 java:
   environment:
+    DATA_STORE_DB_NAME: data-store
     DEFINITION_STORE_HOST: http://ccd-definition-store-${SERVICE_FQDN}
     USER_PROFILE_HOST: http://ccd-user-profile-api-${SERVICE_FQDN}
     # ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-${SERVICE_FQDN}
@@ -15,8 +16,6 @@ java:
 ccd:
   enabled: true
   ccd:
-    postgresql:
-      enabled: false
     s2s:
       enabled: false
     dataStore:
@@ -28,11 +27,11 @@ ccd:
     userProfileImporter:
       enabled: false
     apiGatewayWeb:
-      enabled: true
-    ras:
       enabled: false
-    # elastic:
-    #   enabled: false
+    ras:
+      enabled: false # TODO
+    elastic:
+      enabled: false # TODO
 
   ingressHost: ${SERVICE_FQDN}
 
@@ -51,6 +50,7 @@ ccd:
       image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
       imagePullPolicy: Always
       environment:
+        DEFINITION_STORE_DB_NAME: definition-store
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOST: "{{ .Release.Name }}-es-master:9200"
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
@@ -63,6 +63,8 @@ ccd:
     java:
       image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
       imagePullPolicy: Always
+      environment:
+        USER_PROFILE_DB_NAME: user-profile
       keyVaults:
         ccd:
           secrets:
