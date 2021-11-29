@@ -54,6 +54,20 @@ ccd:
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOST: "{{ .Release.Name }}-es-master:9200"
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
+      keyVaults:
+        ccd:
+          secrets:
+            - ccd-definition-s2s-secret
+  
+  ccd-user-profile-api:
+    java:
+      image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
+      imagePullPolicy: Always
+      keyVaults:
+        ccd:
+          secrets:
+            - name: AppInsightsInstrumentationKey
+              alias: azure.application-insights.instrumentation-key
         
   am-role-assignment-service:
     java:
