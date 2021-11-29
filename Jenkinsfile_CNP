@@ -133,7 +133,7 @@ withPipeline(type, product, component) {
     if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'demo' || env.BRANCH_NAME == 'perftest' || env.BRANCH_NAME == 'ithc' || prsToUseAat.toLowerCase().contains(env.BRANCH_NAME.toLowerCase())) {
         env.ELASTIC_SEARCH_FTA_ENABLED = "true" 
     } else {
-        env.DEFINITION_STORE_URL_BASE = "ccd-definition-store-ccd-data-store-api-${BRANCH_NAME}.service.core-compute-preview.internal".toLowerCase() // TODO
+        env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-ccd-data-store-api-${BRANCH_NAME}.service.core-compute-preview.internal".toLowerCase() // TODO
     }
 
     echo "ES FTA Enabled = ${env.ELASTIC_SEARCH_FTA_ENABLED} on branch ${env.BRANCH_NAME}"
