@@ -24,43 +24,43 @@
     "body": {
       "case_details" : {
         "jurisdiction" : "BEFTA_MASTER",
-        "case_type_id" : "FT_MasterCaseType"
-      },
-      "case_data" : {
-        "DynamicList" : {
-          "value" : {
-            "code" : "List1",
-            "label" : " List 1"
-          },
-          "list_items" : [ {
-            "code" : "List1",
-            "label" : " List 1"
-          }, {
-            "code" : "List2",
-            "label" : " List 2"
-          }, {
-            "code" : "List3",
-            "label" : " List 3"
-          }, {
-            "code" : "List4",
-            "label" : " List 4"
-          }, {
-            "code" : "List5",
-            "label" : " List 5"
-          }, {
-            "code" : "List6",
-            "label" : " List 6"
-          }, {
-            "code" : "List7",
-            "label" : " List 7"
-          } ]
+        "case_type_id" : "FT_MasterCaseType",
+        "case_data" : {
+          "DynamicList" : {
+            "value" : {
+              "code" : "List1",
+              "label" : " List 1"
+            },
+            "list_items" : [ {
+              "code" : "List1",
+              "label" : " List 1"
+            }, {
+              "code" : "List2",
+              "label" : " List 2"
+            }, {
+              "code" : "List3",
+              "label" : " List 3"
+            }, {
+              "code" : "List4",
+              "label" : " List 4"
+            }, {
+              "code" : "List5",
+              "label" : " List 5"
+            }, {
+              "code" : "List6",
+              "label" : " List 6"
+            }, {
+              "code" : "List7",
+              "label" : " List 7"
+            } ]
+          }
+        },
+        "data_classification" : {
+          "DynamicList" : "PUBLIC"
+        },
+        "security_classifications" : {
+          "DynamicList" : "PUBLIC"
         }
-      },
-      "data_classification" : {
-        "DynamicList" : "PUBLIC"
-      },
-      "security_classifications" : {
-        "DynamicList" : "PUBLIC"
       },
       "event_id": "createCase"
     }
