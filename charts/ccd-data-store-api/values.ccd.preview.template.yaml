@@ -3,6 +3,8 @@
 java:
   environment:
     DATA_STORE_DB_NAME: data-store
+    DATA_STORE_DB_USERNAME: hmcts
+    DATA_STORE_DB_PASSWORD: hmcts
     DEFINITION_STORE_HOST: http://ccd-definition-store-${SERVICE_FQDN}
     USER_PROFILE_HOST: http://ccd-user-profile-api-${SERVICE_FQDN}
     ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-${SERVICE_FQDN} # TODO
