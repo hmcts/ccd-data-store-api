@@ -2,6 +2,16 @@
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
 
 	<suppress>
+		<notes>
+			Declared as False positive on library com.nimbusds:lang-tag #3594
+			https://github.com/jeremylong/DependencyCheck/issues/3594
+			CVE-2020-23171 Reference https://tools.hmcts.net/jira/browse/CCD-1871
+		</notes>
+		<packageUrl regex="true">^pkg:maven/com\.nimbusds/lang\-tag@.*$</packageUrl>
+		<cpe>cpe:/a:nim-lang:nim-lang</cpe>
+		<cve>CVE-2020-23171</cve>
+	</suppress>
+  <suppress>
 		<notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security
 			(any version), see https://pivotal.io/security/cve-2018-1258
 			False positive confirmed.
@@ -51,4 +61,3 @@
 		<cve>CVE-2021-22096</cve>
 	</suppress>
 
-</suppressions>
