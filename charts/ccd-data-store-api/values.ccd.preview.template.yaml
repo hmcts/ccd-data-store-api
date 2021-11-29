@@ -49,6 +49,7 @@ ccd:
 
   ccd-definition-store-api:
     java:
+      ingressHost: ccd-definition-store-${SERVICE_FQDN}
       image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
       imagePullPolicy: Always
       environment:
@@ -62,6 +63,7 @@ ccd:
   
   ccd-user-profile-api:
     java:
+      ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
       image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
       imagePullPolicy: Always
       keyVaults:
