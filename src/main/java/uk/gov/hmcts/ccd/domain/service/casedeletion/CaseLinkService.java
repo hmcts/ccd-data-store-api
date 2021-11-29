@@ -39,12 +39,26 @@ public class CaseLinkService {
         insertNewCaseLinks(caseId, caseTypeId, preCallbackCaseLinks, postCallbackCaseLinks);
     }
 
+    public void createCaseLinks(Long caseReference, String caseTypeId, List<String> caseLinks) {
+        caseLinks.stream()
+            .filter(caseLinkString -> caseLinkString != null && !caseLinkString.isEmpty())
+            .forEach(caseLink -> {
+                caseLinkRepository.insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(caseReference,
+                    Long.parseLong(caseLink),
+                    caseTypeId);
+                log.debug("inserted case link with id {}, linkedCaseId {} and caseType {}",
+                    caseReference, caseLink, caseTypeId);
+            });
+
+    }
+
     private void deleteRemovedCaseLinks(Long caseId,
-                                                List<String> preCallbackData,
-                                                List<String> postCallbackData) {
+                                        List<String> preCallbackData,
+                                        List<String> postCallbackData) {
 
         final var caseLinksToDelete = preCallbackData.stream()
             .distinct()
+            .filter(caseLinkString -> caseLinkString != null && !caseLinkString.isEmpty())
             .filter(caseLink -> !postCallbackData.contains(caseLink))
             .collect(Collectors.toList());
 
@@ -54,7 +68,8 @@ public class CaseLinkService {
         });
     }
 
-    private void insertNewCaseLinks(Long caseId, String caseType,
+    private void insertNewCaseLinks(Long caseId,
+                                    String caseTypeId,
                                     List<String> preCallbackData,
                                     List<String> postCallbackData) {
         final var caseLinksToInsert = postCallbackData.stream()
@@ -62,12 +77,7 @@ public class CaseLinkService {
             .filter(caseLink -> !preCallbackData.contains(caseLink))
             .collect(Collectors.toList());
 
-        caseLinksToInsert.forEach(caseLink -> {
-            caseLinkRepository.insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(caseId,
-                Long.parseLong(caseLink),
-                caseType);
-            log.debug("inserted case link with id {}, linkedCaseId {} and caseTYpe {}", caseId, caseLink, caseType);
-        });
+        createCaseLinks(caseId, caseTypeId, caseLinksToInsert);
     }
 
     public List<CaseLink> findCaseLinks(String caseReference) {

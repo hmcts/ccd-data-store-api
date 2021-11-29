@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-1008.1",
-  "_extends_": "F-1008_Test_Data_Base",
+  "_guid_": "S-1008.21",
+  "_extends_": "F-1008_Test_Data_Base_Citizen",
 
   "title": "Case Link does not exist at present and CaseLink field in the Request contains CaseReference value and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST",
 
@@ -12,35 +12,35 @@
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][F-1008_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
     },
     "body": {
       "data": {
         "CaseLinkField": {
-          "CaseReference": "${}${[scenarioContext][childContexts][F-1008_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+          "CaseReference": "${}${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
         },
-        "TextField" : "S-1008.1"
+        "TextField" : "S-1008.21"
       },
       "event": {
-        "id": "updateCase",
+        "id": "updateCaseCitizen",
         "summary": "",
         "description": ""
       },
       "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][F-1008-GetUpdateEventToken][testData][actualResponse][body][token]}",
+      "event_token" : "${[scenarioContext][childContexts][F-1008-GetCitizenUpdateEventToken][testData][actualResponse][body][token]}",
       "ignore_warning": true
     }
   },
 
   "expectedResponse": {
     "body" : {
-      "id": "${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+      "id": "${[scenarioContext][childContexts][F-1008_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
       "jurisdiction" : "BEFTA_MASTER",
       "case_type_id" : "FT_MasterCaseType",
       "case_data" : {
-        "TextField" : "S-1008.1",
+        "TextField" : "S-1008.21",
         "CaseLinkField" : {
-          "CaseReference" : "${}${[scenarioContext][childContexts][F-1008_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+          "CaseReference" : "${}${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
         }
       },
       "data_classification" : {

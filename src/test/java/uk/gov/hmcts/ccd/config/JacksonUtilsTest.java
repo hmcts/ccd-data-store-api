@@ -65,73 +65,85 @@ class JacksonUtilsTest {
     public void shouldOmitNestedCollectionOnMerge() throws Exception {
 
         Map<String, JsonNode> caseData = mySchoolDataWithNestedCollection("Test school name",
-                                                                          "Class Name 1",
-                                                                          "Class Name 2");
+            "Class Name 1",
+            "Class Name 2");
         Map<String, JsonNode> defaultValueData = mySchoolDefaultValueData("Updated name", "Updated Class Name");
 
         JacksonUtils.merge(defaultValueData, caseData);
 
         Map<String, JsonNode> expectedData = mySchoolDataWithNestedCollection("Updated name",
-                                                                              "Class Name 1",
-                                                                              "Class Name 2");
+            "Class Name 1",
+            "Class Name 2");
         assertEquals("Merged defaultValue does not match expected", expectedData, caseData);
 
     }
 
     @Test
     void testGetValueFromPath() throws JsonProcessingException {
+
         final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
             "{"
-            + "  \"Name\": \"NameValue\","
-            + "  \"Class\": ["
-            + "    {"
-            + "      \"id\": \"6da7a0cf-8186-49d4-813d-c299d8f3491b\","
-            + "      \"value\": {"
-            + "        \"ClassName\": \"ClassNameValue1\""
-            + "      }"
-            + "    },"
-            + "    {"
-            + "      \"id\": \"b7662626-b640-48bb-8afa-9fa78dcbd2ec\","
-            + "      \"value\": {"
-            + "        \"ClassName\": \"ClassNameValue2\""
-            + "      }"
-            + "    }"
-            + "  ],"
-            + "  \"Number\": 123,"
-            + "  \"NumberCollection\": ["
-            + "     {\"Number\" : 456},"
-            + "     {\"Number\" : 789}"
-            + "  ],"
-            + "  \"AddressCollection\": ["
-            + "    {"
-            + "        \"id\": null,"
-            + "        \"value\": {"
-            + "            \"AddressLine1\": \"Page Street 50\""
-            + "        }"
-            + "    },"
-            + "    {"
-            + "        \"id\": null,"
-            + "        \"value\": {"
-            + "            \"AddressLine1\": \"Blueberry Rd 8\""
-            + "        }"
-            + "    }"
-            + "   ],"
-            + "   \"Person\": {\n"
-            + "        \"Name\": \"NameValue\",\n"
-            + "        \"Address\": {\n"
-            + "            \"Line1\": \"Address Line1\"\n,"
-            + "            \"Line2\": \"Address Line1\"\n"
-            + "         }\n"
-            + "  },\n"
-            + "  \"evidence\": {"
-            + "     \"type\": {"
-            + "             \"document_url\": \"http://dm-store:8080/documents/84f04693-56ae-4aad-97e8-d1fc7592acea\","
-            + "             \"document_filename\": \"B_Document Inside Complex Type.docx\","
-            + "             \"document_binary_url\": \"http://dm-store:8080/documents/84f04693-56ae-4aad-97e8-d1fc7592acea/binary\""
-            + "     },"
-            + "     \"description\": null"
-            + "  }"
-            + "}"));
+                + "  \"Name\": \"NameValue\","
+                + "  \"Class\": ["
+                + "    {"
+                + "      \"id\": \"6da7a0cf-8186-49d4-813d-c299d8f3491b\","
+                + "      \"value\": {"
+                + "        \"ClassName\": \"ClassNameValue1\""
+                + "      }"
+                + "    },"
+                + "    {"
+                + "      \"id\": \"b7662626-b640-48bb-8afa-9fa78dcbd2ec\","
+                + "      \"value\": {"
+                + "        \"ClassName\": \"ClassNameValue2\""
+                + "      }"
+                + "    }"
+                + "  ],"
+                + "  \"Number\": 123,"
+                + "  \"NumberCollection\": ["
+                + "     {\"Number\" : 456},"
+                + "     {\"Number\" : 789}"
+                + "  ],"
+                + "  \"AddressCollection\": ["
+                + "    {"
+                + "        \"id\": null,"
+                + "        \"value\": {"
+                + "            \"AddressLine1\": \"Page Street 50\""
+                + "        }"
+                + "    },"
+                + "    {"
+                + "        \"id\": null,"
+                + "        \"value\": {"
+                + "            \"AddressLine1\": \"Blueberry Rd 8\""
+                + "        }"
+                + "    }"
+                + "   ],"
+                + "   \"Person\": {\n"
+                + "        \"Name\": \"NameValue\",\n"
+                + "        \"Address\": {\n"
+                + "            \"Line1\": \"Address Line1\"\n,"
+                + "            \"Line2\": \"Address Line1\"\n"
+                + "         }\n"
+                + "  },\n"
+                + "  \"evidence\": {"
+                + "     \"type\": {"
+                + "             \"document_url\": \"http://dm-store:8080/documents/84f04693-56ae-4aad-97e8-d1fc7592acea\","
+                + "             \"document_filename\": \"B_Document Inside Complex Type.docx\","
+                + "             \"document_binary_url\": \"http://dm-store:8080/documents/84f04693-56ae-4aad-97e8-d1fc7592acea/binary\""
+                + "     },"
+                + "     \"description\": null"
+                + "  },"
+                + " \"CaseLinkCollection\" : [ {\n"
+                + "        \"value\" : {\n"
+                + "          \"CaseReference\" : \"1637697929437509\"\n"
+                + "        },\n"
+                + "        \"id\" : \"90a2df83-f256-43ec-aaa0-48e127a44402\"\n"
+                + "      }, {\n"
+                + "        \"value\" : {\n"
+                + "          \"CaseReference\" : \"1637697929619312\"\n"
+                + "        },\n"
+                + "        \"id\" : \"84e22baf-5bec-4eec-a31f-7a3954efc9c3\"\n"
+                + "      } ]"
+                + "}"));
 
         assertEquals("ClassNameValue1", JacksonUtils.getValueFromPath("Class.0.value.ClassName", data));
         assertEquals("ClassNameValue2", JacksonUtils.getValueFromPath("Class.1.value.ClassName", data));
@@ -146,6 +158,8 @@ class JacksonUtilsTest {
             JacksonUtils.getValueFromPath("evidence.type.document_url", data));
         assertEquals(null,
             JacksonUtils.getValueFromPath("description", data));
+        assertEquals("1637697929437509", JacksonUtils.getValueFromPath("CaseLinkCollection.0.CaseReference", data));
+        assertEquals("1637697929619312", JacksonUtils.getValueFromPath("CaseLinkCollection.1.CaseReference", data));
     }
 
     static Map<String, JsonNode> mySchoolDataWithNestedCollection(String name, String className1, String className2)
@@ -196,20 +210,20 @@ class JacksonUtilsTest {
         throws JsonProcessingException {
 
         JsonNode data = MAPPER.readTree(""
-                                            + "["
-                                            + "    {"
-                                            + "        \"id\": null,"
-                                            + "        \"value\": {"
-                                            + "            \"AddressLine1\": \"Page Street 50\""
-                                            + "        }"
-                                            + "    },"
-                                            + "    {"
-                                            + "        \"id\": null,"
-                                            + "        \"value\": {"
-                                            + "            \"AddressLine1\": \"Blueberry Rd 8\""
-                                            + "        }"
-                                            + "    }"
-                                            + "]");
+            + "["
+            + "    {"
+            + "        \"id\": null,"
+            + "        \"value\": {"
+            + "            \"AddressLine1\": \"Page Street 50\""
+            + "        }"
+            + "    },"
+            + "    {"
+            + "        \"id\": null,"
+            + "        \"value\": {"
+            + "            \"AddressLine1\": \"Blueberry Rd 8\""
+            + "        }"
+            + "    }"
+            + "]");
 
         Map<String, JsonNode> result = new HashMap<>();
         result.put("CollectionComplexField", data);
@@ -220,9 +234,9 @@ class JacksonUtilsTest {
         throws JsonProcessingException {
 
         JsonNode data = MAPPER.readTree(""
-                                            + "{"
-                                            + "  \"AddressLine1\": \"Updated Address\""
-                                            + "}");
+            + "{"
+            + "  \"AddressLine1\": \"Updated Address\""
+            + "}");
 
         Map<String, JsonNode> result = new HashMap<>();
         result.put("CollectionComplexField", data);
@@ -233,14 +247,14 @@ class JacksonUtilsTest {
         throws JsonProcessingException {
 
         JsonNode data = MAPPER.readTree(""
-                                            + "{"
-                                            + "  \"Organisation\": {"
-                                            + "    \"OrganisationID\": null,"
-                                            + "    \"OrganisationName\": null"
-                                            + "  },"
-                                            + "  \"OrgPolicyReference\": null,"
-                                            + "  \"OrgPolicyCaseAssignedRole\": \"" + role + "\""
-                                            + "}");
+            + "{"
+            + "  \"Organisation\": {"
+            + "    \"OrganisationID\": null,"
+            + "    \"OrganisationName\": null"
+            + "  },"
+            + "  \"OrgPolicyReference\": null,"
+            + "  \"OrgPolicyCaseAssignedRole\": \"" + role + "\""
+            + "}");
 
         Map<String, JsonNode> result = new HashMap<>();
         result.put("OrganisationPolicyField", data);
@@ -251,9 +265,9 @@ class JacksonUtilsTest {
         throws JsonProcessingException {
 
         JsonNode data = MAPPER.readTree(""
-                                            + "{"
-                                            + "  \"OrgPolicyCaseAssignedRole\": \"" + role + "\""
-                                            + "}");
+            + "{"
+            + "  \"OrgPolicyCaseAssignedRole\": \"" + role + "\""
+            + "}");
 
         Map<String, JsonNode> result = new HashMap<>();
         result.put("OrganisationPolicyField", data);

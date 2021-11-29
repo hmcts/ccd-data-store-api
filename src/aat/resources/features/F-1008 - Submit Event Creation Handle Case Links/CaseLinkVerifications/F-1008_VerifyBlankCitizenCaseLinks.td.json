@@ -1,0 +1,11 @@
+{
+	"title": "should retrieve case links for a specified case reference",
+	"_guid_": "F-1008_VerifyBlankCitizenCaseLinks",
+  "_extends_": "F-1008_VerifyBlankCaseLinks",
+
+	"request": {
+		"pathVariables": {
+			"cid": "${[scenarioContext][parentContext][childContexts][F-1008_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
+		}
+	}
+}

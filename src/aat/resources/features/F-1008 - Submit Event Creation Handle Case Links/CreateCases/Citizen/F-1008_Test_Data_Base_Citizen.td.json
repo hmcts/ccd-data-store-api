@@ -1,15 +1,15 @@
 {
-	"_guid_": "F-1008_Test_Data_Base",
+	"_guid_": "F-1008_Test_Data_Base_Citizen",
 
 	"productName": "CCD Data Store",
-	"operationName": "Submit event creation as Case worker",
+	"operationName": "Submit event creation as Citizen",
 
 	"method": "POST",
-	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
+	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
 
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaMasterCaseworker"
+      "_extends_": "BeftaCitizen2"
     }
   },
 
@@ -46,5 +46,5 @@
       "delete_draft_response_status_code" : null,
       "delete_draft_response_status" : null
     }
-    }
+  }
 }

@@ -1,0 +1,23 @@
+{
+	"title": "should retrieve case links for a specified case reference",
+	"_guid_": "F-1008_VerifyBlankCaseLinks",
+  "_extends_": "F-1008_VerifyCaseLinksBase",
+
+
+  "specs": [
+    "to verify that no Case Links exist in the CASE_LINK table"
+  ],
+
+
+	"request": {
+		"pathVariables": {
+			"cid": "${[scenarioContext][parentContext][childContexts][F-1008_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+		}
+	},
+
+	"expectedResponse": {
+		"body": {
+      "CaseLinks" : [ ]
+		}
+	}
+}

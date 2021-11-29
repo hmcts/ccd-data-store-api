@@ -1,0 +1,80 @@
+{
+  "_guid_": "F-1008_CreateMultipleLinkedCasePreRequisiteCaseworkerBase",
+  "_extends_": "F-1008_CreateCasePreRequisiteCaseworkerBase",
+
+  "request": {
+    "body": {
+      "data": {
+        "TextField": "This is the case that is currently linked to the case being updated",
+        "CaseLinkCollection" : [
+          {
+            "id": "90a2df83-f256-43ec-aaa0-48e127a44402",
+            "value": {
+              "CaseReference": "${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+            }
+          },
+          {
+            "id": "84e22baf-5bec-4eec-a31f-7a3954efc9c3",
+            "value": {
+              "CaseReference": "${[scenarioContext][childContexts][F-1008_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+            }
+          }]
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data" : {
+        "TextField": "This is the case that is currently linked to the case being updated",
+        "CaseLinkCollection" : [
+          {
+            "id": "90a2df83-f256-43ec-aaa0-48e127a44402",
+            "value": {
+              "CaseReference": "${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+            }
+          },
+          {
+            "id": "84e22baf-5bec-4eec-a31f-7a3954efc9c3",
+            "value": {
+              "CaseReference": "${[scenarioContext][childContexts][F-1008_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+            }
+          }]
+      },
+      "data_classification" : {
+        "TextField": "PUBLIC",
+        "CaseLinkCollection" : {
+          "classification" : "PUBLIC",
+          "value" : [ {
+            "value" : {
+              "CaseReference" : "PUBLIC"
+            },
+            "id" : "90a2df83-f256-43ec-aaa0-48e127a44402"
+          }, {
+            "value" : {
+              "CaseReference" : "PUBLIC"
+            },
+            "id" : "84e22baf-5bec-4eec-a31f-7a3954efc9c3"
+          } ]
+        }
+      },
+      "security_classifications" : {
+        "TextField": "PUBLIC",
+        "CaseLinkCollection" : {
+          "classification" : "PUBLIC",
+          "value" : [ {
+            "value" : {
+              "CaseReference" : "PUBLIC"
+            },
+            "id" : "90a2df83-f256-43ec-aaa0-48e127a44402"
+          }, {
+            "value" : {
+              "CaseReference" : "PUBLIC"
+            },
+            "id" : "84e22baf-5bec-4eec-a31f-7a3954efc9c3"
+          } ]
+        }
+      }
+    }
+  }
+}
