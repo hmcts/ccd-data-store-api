@@ -33,7 +33,9 @@
       "title_display": "CUSTOM  TITLE DISPLAY",
       "supplementary_data": {
         "HMCTSServiceId": "AAA1",
-        "orgs_assigned_users.OrgA": 22
+        "orgs_assigned_users": {
+          "OrgA": 22
+        }
       },
       "_links": {
         "self": {
