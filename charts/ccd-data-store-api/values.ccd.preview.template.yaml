@@ -51,7 +51,6 @@ ccd:
       image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
       imagePullPolicy: Always
       environment:
-        DEFINITION_STORE_DB_OPTIONS: ""
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOST: "{{ .Release.Name }}-es-master:9200"
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
@@ -64,8 +63,6 @@ ccd:
     java:
       image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
       imagePullPolicy: Always
-      environment:
-        USER_PROFILE_DB_OPTIONS: "?stringtype=unspecified"
       keyVaults:
         ccd:
           secrets:
