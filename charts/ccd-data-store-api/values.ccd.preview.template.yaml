@@ -1,5 +1,4 @@
-tags:
-  sscs-ccd-idam-pr: true
+
 
 java:
   environment:
@@ -12,6 +11,8 @@ java:
     ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: false # TODO
     ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
     ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"
+  postgresql:
+    enabled: false
 
 ccd:
   enabled: true
@@ -50,7 +51,6 @@ ccd:
       image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
       imagePullPolicy: Always
       environment:
-        DEFINITION_STORE_DB_NAME: definition-store
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOST: "{{ .Release.Name }}-es-master:9200"
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
@@ -63,8 +63,6 @@ ccd:
     java:
       image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
       imagePullPolicy: Always
-      environment:
-        USER_PROFILE_DB_NAME: user-profile
       keyVaults:
         ccd:
           secrets:
