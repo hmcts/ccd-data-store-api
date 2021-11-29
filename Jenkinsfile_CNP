@@ -142,9 +142,14 @@ withPipeline(type, product, component) {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
     }
+    
+    before('smoketest:preview') {
+        sh 'env'
+    }
 
     after('smoketest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
+        sh 'env'
     }
 
     after('smoketest:aat') {
