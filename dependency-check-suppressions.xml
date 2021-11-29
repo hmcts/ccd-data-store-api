@@ -11,7 +11,7 @@
 		<cpe>cpe:/a:nim-lang:nim-lang</cpe>
 		<cve>CVE-2020-23171</cve>
 	</suppress>
-  <suppress>
+  	<suppress>
 		<notes>We do not use: Spring Framework 5.0.5.RELEASE + Spring Security
 			(any version), see https://pivotal.io/security/cve-2018-1258
 			False positive confirmed.
@@ -61,3 +61,4 @@
 		<cve>CVE-2021-22096</cve>
 	</suppress>
 
+</suppressions>
