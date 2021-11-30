@@ -5,6 +5,7 @@
 
 	"specs": [
 		"an active profile in CCD",
+		"testUser - with an active profile in CCD",
 		"does not provide valid authentication credentials",
 		"contains an HTTP-401 Unauthorized"
 	],

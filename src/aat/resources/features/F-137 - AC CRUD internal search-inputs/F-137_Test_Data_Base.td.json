@@ -1,0 +1,27 @@
+{
+	"_guid_": "F-137_Test_Data_Base",
+	"productName": "CCD Data Store",
+	"operationName": "retrieve search input details",
+	"method": "GET",
+  "uri": "/internal/case-types/{ctid}/search-inputs",
+
+  "specs" : [
+    "an active profile in CCD"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+	"request": {
+    "headers":{
+      "_extends_": "Common_Request_Headers",
+      "Experimental" : "true"
+    }
+  },
+
+  "expectedResponse": {
+  }
+}
