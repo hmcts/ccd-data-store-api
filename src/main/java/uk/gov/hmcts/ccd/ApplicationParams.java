@@ -213,8 +213,12 @@ public class ApplicationParams {
         return caseDefinitionHost + "/api/data/jurisdictions/" + encode(jurisdictionId) + "/case-type";
     }
 
-    public String caseTypeDefURL(final String caseTypeId) {
+    public String caseTypesDefURL(final String caseTypeId) {
         return caseDefinitionHost + "/api/data/case-type/" + encode(caseTypeId);
+    }
+
+    public String caseTypesDefURL() {
+        return caseDefinitionHost + "/api/data/case-types";
     }
 
     public String draftBaseURL() {
@@ -517,4 +521,14 @@ public class ApplicationParams {
     public boolean isMultipartyFixEnabled() {
         return multipartyFixEnabled;
     }
+
+    public String getElasticSupportCaseTypes() {
+        return caseDefinitionHost + "/elastic-support/case-types";
+    }
+
+    public String getCasesIdByjurisdictionDefURL() {
+        return caseDefinitionHost + "/api/data/jurisdictions/case-type-ids";
+    }
+
+
 }

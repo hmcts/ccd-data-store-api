@@ -20,4 +20,6 @@ public interface AuthorisedCaseDefinitionDataService {
 
     List<String> getUserAuthorisedCaseStateIds(String caseTypeId, Predicate<AccessControlList> access);
 
+    List<CaseTypeDefinition> getAuthorisedCaseType(List<String> caseTypeIds, Predicate<AccessControlList> access);
+
 }

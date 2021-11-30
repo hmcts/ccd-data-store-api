@@ -1,10 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.security;
 
 import com.google.common.collect.Sets;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
@@ -15,6 +12,12 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessContr
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -46,6 +49,15 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
             return Optional.of(caseTypeDefinition);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public List<CaseTypeDefinition> getAuthorisedCaseType(List<String> caseTypeIds, Predicate<AccessControlList> access) {
+
+        val caseTypeDefinitions = caseTypeService.getCaseTypeByIds(caseTypeIds).stream().filter(caseTypeDefinition ->
+            (verifyAclOnCaseType(caseTypeDefinition, access) && verifySecurityClassificationOnCaseType(caseTypeDefinition))
+        ).collect(Collectors.toList());
+        return caseTypeDefinitions;
     }
 
     @Override

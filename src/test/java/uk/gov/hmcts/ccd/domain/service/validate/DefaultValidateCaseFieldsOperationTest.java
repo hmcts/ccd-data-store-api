@@ -41,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -325,7 +326,7 @@ class DefaultValidateCaseFieldsOperationTest {
                 null));
         assertThat(exception.getMessage(),
             startsWith("Cannot validate case field because of event is not specified"));
-        verify(caseDefinitionRepository, never()).getCaseType(any());
+        verify(caseDefinitionRepository, never()).getCaseType(anyString());
         verify(caseTypeService, never()).validateData(anyMap(), any());
     }
 
@@ -338,7 +339,7 @@ class DefaultValidateCaseFieldsOperationTest {
                 caseDataContent));
         assertThat(exception.getMessage(),
             startsWith("Cannot validate case field because of event is not specified"));
-        verify(caseDefinitionRepository, never()).getCaseType(any());
+        verify(caseDefinitionRepository, never()).getCaseType(anyString());
         verify(caseTypeService, never()).validateData(anyMap(), any());
     }
 
@@ -350,8 +351,8 @@ class DefaultValidateCaseFieldsOperationTest {
             assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID,
                 caseDataContent));
         assertThat(exception.getMessage(),
-            startsWith("Cannot validate case field because of event is not specified"));
-        verify(caseDefinitionRepository, never()).getCaseType(any());
+            startsWith("Cannot validate case fiel   d because of event is not specified"));
+        verify(caseDefinitionRepository, never()).getCaseType(anyString());
         verify(caseTypeService, never()).validateData(anyMap(), any());
     }
 

@@ -95,6 +95,12 @@ public class CaseTypeService {
                 new ResourceNotFoundException(String.format("Case type with id %s could not be found", caseTypeId)));
     }
 
+    public List<CaseTypeDefinition> getCaseTypeByIds(List<String> caseTypeIds) {
+        return ofNullable(caseDefinitionRepository.getCaseType(caseTypeIds))
+            .orElseThrow(() ->
+                new ResourceNotFoundException(String.format("Case type with id %s could not be found", caseTypeIds)));
+    }
+
     /**
      *
      * @deprecated current implementation has serious performance issues

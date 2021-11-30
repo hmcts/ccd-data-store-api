@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.SwaggerDefinition;
 import io.swagger.annotations.Tag;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
@@ -22,7 +23,9 @@ import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.user.DefaultJurisdictionsResolver;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
+import uk.gov.hmcts.ccd.data.user.JurisdictionsResolver;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
@@ -56,6 +59,7 @@ public class CaseSearchEndpoint {
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final UserRepository userRepository;
     private final ApplicationParams applicationParams;
+    private final JurisdictionsResolver jurisdictionsResolver;
 
     @Autowired
     public CaseSearchEndpoint(@Qualifier(AuthorisedCaseSearchOperation.QUALIFIER)
@@ -64,12 +68,16 @@ public class CaseSearchEndpoint {
                                   CaseDefinitionRepository caseDefinitionRepository,
                               @Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository,
                               ElasticsearchQueryHelper elasticsearchQueryHelper,
-                              ApplicationParams applicationParams) {
+                              ApplicationParams applicationParams,
+                              @Qualifier(DefaultJurisdictionsResolver.QUALIFIER)
+                                      JurisdictionsResolver jurisdictionsResolver) {
+
         this.caseSearchOperation = caseSearchOperation;
         this.elasticsearchQueryHelper = elasticsearchQueryHelper;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.userRepository = userRepository;
         this.applicationParams = applicationParams;
+        this.jurisdictionsResolver = jurisdictionsResolver;
     }
 
     @Transactional
@@ -133,7 +141,7 @@ public class CaseSearchEndpoint {
     }
 
     private List<String> getCaseTypesFromIdamRoles() {
-        List<String> jurisdictions = userRepository.getCaseworkerUserRolesJurisdictions();
+        val jurisdictions = jurisdictionsResolver.getJurisdictions();
         return caseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictions);
     }
 

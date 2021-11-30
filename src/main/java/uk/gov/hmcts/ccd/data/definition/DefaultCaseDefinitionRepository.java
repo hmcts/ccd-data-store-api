@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data.definition;
 
+import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ccd.ApplicationParams;
@@ -31,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.ApplicationParams.encodeBase64;
 
@@ -91,29 +92,66 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
+    public List<CaseTypeDefinition> getCaseType(final List<String> caseTypeIds) {
+        LOG.debug("retrieving case type definition for case type: {}", caseTypeIds);
+
+        try {
+            val  builder = UriComponentsBuilder.fromHttpUrl(applicationParams.caseTypesDefURL());
+            if (caseTypeIds!=null) {
+                builder.queryParam("ids", String.join(",", caseTypeIds));
+            }
+            val requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
+            val caseTypeDefinition = Arrays.asList( restTemplate.exchange(
+                builder.build().encode().toUri(),
+                HttpMethod.GET,
+                requestEntity,
+                CaseTypeDefinition[].class
+            ).getBody());
+
+            if (caseTypeDefinition != null) {
+                caseTypeDefinition.stream().forEach( currentCaseType ->
+                    currentCaseType.getCaseFieldDefinitions().stream().forEach(
+                        caseFieldDefinition -> caseFieldDefinition.propagateACLsToNestedFields()
+                    )
+                );
+            }
+            return caseTypeDefinition;
+        } catch (Exception e) {
+            LOG.warn("Error while retrieving case type", e);
+            if (e instanceof HttpClientErrorException
+                    && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                throw new ResourceNotFoundException("Resource not found when getting case type definition for "
+                        + caseTypeIds + " because of " + e.getMessage());
+            } else {
+                throw new ServiceException(
+                        "Problem getting case type definition for " + caseTypeIds + " because of " + e.getMessage());
+            }
+        }
+    }
+
     public CaseTypeDefinition getCaseType(final String caseTypeId) {
         LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
         try {
             final HttpEntity<CaseTypeDefinition> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
             final CaseTypeDefinition caseTypeDefinition = restTemplate
-                    .exchange(applicationParams.caseTypeDefURL(caseTypeId), HttpMethod.GET, requestEntity,
-                            CaseTypeDefinition.class)
-                    .getBody();
+                .exchange(applicationParams.caseTypesDefURL(caseTypeId), HttpMethod.GET, requestEntity,
+                    CaseTypeDefinition.class)
+                .getBody();
             if (caseTypeDefinition != null) {
                 caseTypeDefinition.getCaseFieldDefinitions().stream()
-                        .forEach(CaseFieldDefinition::propagateACLsToNestedFields);
+                    .forEach(CaseFieldDefinition::propagateACLsToNestedFields);
             }
             return caseTypeDefinition;
 
         } catch (Exception e) {
             LOG.warn("Error while retrieving case type", e);
             if (e instanceof HttpClientErrorException
-                    && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
                 throw new ResourceNotFoundException("Resource not found when getting case type definition for "
-                        + caseTypeId + " because of " + e.getMessage());
+                    + caseTypeId + " because of " + e.getMessage());
             } else {
                 throw new ServiceException(
-                        "Problem getting case type definition for " + caseTypeId + " because of " + e.getMessage());
+                    "Problem getting case type definition for " + caseTypeId + " because of " + e.getMessage());
             }
         }
     }
@@ -220,36 +258,54 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         return jurisdictionDefinitions.get(0);
     }
 
+
     @Override
     public List<String> getCaseTypesIDsByJurisdictions(List<String> jurisdictionIds) {
-
-        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(
-                Optional.of(jurisdictionIds));
-        if (jurisdictionDefinitions.isEmpty()) {
-            LOG.warn("Definitions not found for requested jurisdictions {}", jurisdictionIds);
-            return Collections.emptyList();
-        }
-        List<String> caseTypes = getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
+        val caseTypes = getCaseTypesIdByJurisdictionIds(Optional.of(jurisdictionIds));
         return caseTypes;
     }
 
     @Override
     public List<String> getAllCaseTypesIDs() {
-        List<JurisdictionDefinition> jurisdictionDefinitions = getJurisdictionsFromDefinitionStore(
-                Optional.ofNullable(null));
-        return getCaseTypeIdFromJurisdictionDefinition(jurisdictionDefinitions);
-    }
-
-    private List<String> getCaseTypeIdFromJurisdictionDefinition(List<JurisdictionDefinition> jurisdictionDefinitions) {
-        return jurisdictionDefinitions.stream()
-                .flatMap(jurisdictionDefinition -> jurisdictionDefinition.getCaseTypesIDs().stream()).distinct()
-                .collect(Collectors.toList());
+        val builder = UriComponentsBuilder.fromHttpUrl(applicationParams.getElasticSupportCaseTypes());
+        val  results = restTemplate.getForObject(builder.build().encode().toUri(), String[].class);
+        return Arrays.asList(results);
     }
 
     @Cacheable(value = "allJurisdictionsCache")
     @Override
     public List<JurisdictionDefinition> getAllJurisdictionsFromDefinitionStore() {
         return getJurisdictionsFromDefinitionStore(Optional.of(Collections.emptyList()));
+    }
+
+    private List<String> getCaseTypesIdByJurisdictionIds(Optional<List<String>> jurisdictionIds) {
+
+        try {
+            val  builder = UriComponentsBuilder.fromHttpUrl(applicationParams.getCasesIdByjurisdictionDefURL());
+            if (jurisdictionIds.isPresent()) {
+                builder.queryParam("ids", String.join(",", jurisdictionIds.get()));
+            }
+            LOG.debug("Retrieving jurisdiction ids: {}.", jurisdictionIds.orElse(Collections.emptyList()));
+            val requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
+            val results = restTemplate.exchange(
+                                builder.build().encode().toUri(),
+                                HttpMethod.GET,
+                                requestEntity,
+                                new ParameterizedTypeReference<List<String>>() {}
+            ).getBody();
+            return results;
+        } catch (RestClientException exception) {
+            LOG.warn("Error while retrieving jurisdictions ids  definition", exception);
+            if (exception instanceof HttpClientErrorException
+                && ((HttpClientErrorException) exception).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                LOG.warn("Jurisdiction object(s) configured for user couldn't be found on definition store: {}.",
+                    jurisdictionIds.orElse(Collections.emptyList()));
+                return new ArrayList<>();
+            } else {
+                throw new ServiceException("Problem retrieving jurisdictions definition because of "
+                    + exception.getMessage());
+            }
+        }
     }
 
     private List<JurisdictionDefinition> getJurisdictionsFromDefinitionStore(Optional<List<String>> jurisdictionIds) {

@@ -109,8 +109,7 @@ class TestConfiguration extends ContextCleanupListener {
         ReflectionTestUtils.setField(caseDefinitionRepository, "applicationParams", applicationParams);
         ReflectionTestUtils.setField(caseDefinitionRepository, "restTemplate", new RestTemplate());
 
-        when(caseDefinitionRepository.getCaseType(any())).thenCallRealMethod();
-        when(caseDefinitionRepository.getLatestVersion(anyString())).thenCallRealMethod();
+        when(caseDefinitionRepository.getCaseType(anyString())).thenCallRealMethod();
         when(caseDefinitionRepository.getLatestVersionFromDefinitionStore(anyString())).thenCallRealMethod();
         when(caseDefinitionRepository.getCaseType(anyInt(), anyString())).thenCallRealMethod();
         when(caseDefinitionRepository.getCaseTypesForJurisdiction(any())).thenCallRealMethod();

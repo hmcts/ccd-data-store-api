@@ -110,6 +110,11 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
+    public List<CaseTypeDefinition> getCaseType(List<String> caseTypeIds) {
+        return caseDefinitionRepository.getCaseType(caseTypeIds);
+    }
+
+    @Override
     public List<FieldTypeDefinition> getBaseTypes() {
         return baseTypes.computeIfAbsent("baseTypes", e -> caseDefinitionRepository.getBaseTypes());
     }
