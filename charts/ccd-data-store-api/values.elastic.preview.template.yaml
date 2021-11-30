@@ -1,0 +1,56 @@
+
+
+java:
+  environment:
+    ELASTIC_SEARCH_ENABLED: true
+    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: true
+    ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
+    ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"
+
+ccd:
+  ccd-definition-store-api:
+    java:
+      environment:
+        ELASTIC_SEARCH_ENABLED: true
+        ELASTIC_SEARCH_HOST: "{{ .Release.Name }}-es-master"
+        ELASTIC_SEARCH_FAIL_ON_IMPORT: true
+
+elastic:
+  enabled: true
+
+elasticsearch:
+  clusterName: "es"
+  imageTag: "6.4.2"
+  replicas: 1
+  minimumMasterNodes: 1
+  antiAffinity: "soft"
+  esJavaOpts: "-Xmx512m -Xms512m"
+  persistence:
+    enabled: false
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: traefik
+    path: /
+    hosts:
+      - es-${SERVICE_FQDN}
+logstash:
+  image:
+    repository: hmctspublic.azurecr.io/ccd/logstash
+    tag: latest
+    pullPolicy: IfNotPresent
+  logstashJavaOpts: -Xmx1g -Xms512M
+  persistence:
+    enabled: false
+  volumeMounts:
+    - name: pipeline
+      mountPath: /usr/share/logstash/files # hack to prevent override of default pipeline in the custom image hmcts/ccd-logstash
+  elasticsearch:
+    host: "{{ .Release.Name }}-es-master"
+    port: 9200
+  configTpl:
+    xpack.monitoring.enabled: "false"
+    db.url: "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/data-store?stringtype=unspecified"
+    db.user: "hmcts"
+    db.pwd: "hmcts"
+    es.data.nodes.url: "http://{{ .Release.Name }}-es-master:9200"
