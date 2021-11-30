@@ -8,10 +8,6 @@ java:
     DEFINITION_STORE_HOST: http://ccd-definition-store-${SERVICE_FQDN}
     USER_PROFILE_HOST: http://ccd-user-profile-api-${SERVICE_FQDN}
     ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-${SERVICE_FQDN} # TODO
-    ELASTIC_SEARCH_ENABLED: false # TODO
-    ELASTIC_SEARCH_NODES_DISCOVERY_ENABLED: false # TODO
-    ELASTIC_SEARCH_HOSTS: "{{ .Release.Name }}-es-master:9200"
-    ELASTIC_SEARCH_DATA_NODES_HOSTS: "http://{{ .Release.Name }}-es-master:9200"
   postgresql:
     enabled: false # CCD chart includes an instance we'll re-use
 
@@ -52,10 +48,6 @@ ccd:
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
       image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
       imagePullPolicy: Always
-      environment:
-        ELASTIC_SEARCH_ENABLED: false # TODO
-        ELASTIC_SEARCH_HOST: "{{ .Release.Name }}-es-master:9200"
-        ELASTIC_SEARCH_FAIL_ON_IMPORT: false # TODO
       keyVaults:
         ccd:
           secrets:
