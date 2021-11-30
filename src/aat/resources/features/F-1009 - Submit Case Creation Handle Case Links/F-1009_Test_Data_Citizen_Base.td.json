@@ -1,15 +1,15 @@
 {
-	"_guid_": "F-1009_Test_Data_Base",
+	"_guid_": "F-1009_Test_Data_Citizen_Base",
 
 	"productName": "CCD Data Store",
-	"operationName": "Submit case creation as Case worker",
+	"operationName": "Submit case creation as Citizen",
 
 	"method": "POST",
-	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
+	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
 
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaMasterCaseworker"
+      "_extends_": "BeftaCitizen2"
     }
   },
 
