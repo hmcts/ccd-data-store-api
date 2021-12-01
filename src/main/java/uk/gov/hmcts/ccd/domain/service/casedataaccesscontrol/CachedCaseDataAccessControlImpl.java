@@ -67,6 +67,10 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
 
     @Override
     public Set<AccessProfile> generateAccessProfilesByCaseDetails(CaseDetails caseDetails) {
+        if (Strings.isNullOrEmpty(caseDetails.getReferenceAsString())) {
+            // Legacy cases from outside sources do NOT have a CCD case reference, so we can't cache
+            return noCacheCaseDataAccessControl.generateAccessProfilesByCaseDetails(caseDetails);
+        }
         return caseReferenceAccessProfiles.computeIfAbsent(caseDetails.getReferenceAsString(),
             e -> noCacheCaseDataAccessControl.generateAccessProfilesByCaseDetails(caseDetails));
     }
