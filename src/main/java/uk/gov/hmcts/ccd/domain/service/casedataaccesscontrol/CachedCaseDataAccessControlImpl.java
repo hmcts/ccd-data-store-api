@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +67,10 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
 
     @Override
     public Set<AccessProfile> generateAccessProfilesByCaseDetails(CaseDetails caseDetails) {
+        if (Strings.isNullOrEmpty(caseDetails.getReferenceAsString())) {
+            // Legacy cases from outside sources do NOT have a CCD case reference, so we can't cache
+            return noCacheCaseDataAccessControl.generateAccessProfilesByCaseDetails(caseDetails);
+        }
         return caseReferenceAccessProfiles.computeIfAbsent(caseDetails.getReferenceAsString(),
             e -> noCacheCaseDataAccessControl.generateAccessProfilesByCaseDetails(caseDetails));
     }
@@ -132,6 +137,10 @@ public class CachedCaseDataAccessControlImpl implements CaseDataAccessControl, A
 
     @Override
     public Set<SecurityClassification> getUserClassifications(CaseDetails caseDetails) {
+        if (Strings.isNullOrEmpty(caseDetails.getReferenceAsString())) {
+            // Legacy cases from outside sources do NOT have a CCD case reference, so we can't cache
+            return noCacheCaseDataAccessControl.getUserClassifications(caseDetails);
+        }
         return caseReferenceClassifications.computeIfAbsent(caseDetails.getReferenceAsString(),
             e -> noCacheCaseDataAccessControl.getUserClassifications(caseDetails));
     }
