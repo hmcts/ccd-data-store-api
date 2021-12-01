@@ -33,6 +33,8 @@ class CachedCaseDefinitionRepositoryTest {
     private static final String USER_ROLE_2 = "caseworker-probate-loa1";
     private static final String USER_ROLE_3 = "caseworker-some-loa1";
     private static final String USER_ROLE_4 = "caseworker-other-loa1";
+    private static final String MISSING_USER_ROLE = "[MISSING_ONE]";
+
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
     private CachedCaseDefinitionRepository cachedCaseDefinitionRepository;
@@ -236,6 +238,21 @@ class CachedCaseDefinitionRepositoryTest {
             assertAll(
                 () -> assertThat(userRolesList, is(expectedUserRolesList)),
                 () -> verify(caseDefinitionRepository, times(2)).getUserRoleClassifications(
+                    anyString())
+            );
+        }
+
+        @Test
+        @DisplayName("should filter out missing user roles from decorated repository")
+        void shouldFilterOutMissingUserRolesFromDecorated() {
+            List<UserRole> expectedUserRolesList = Arrays.asList(userRole1, userRole2);
+            List<String> userRoles = Arrays.asList(USER_ROLE_1, USER_ROLE_2, MISSING_USER_ROLE);
+
+            List<UserRole> userRolesList = cachedCaseDefinitionRepository.getClassificationsForUserRoleList(userRoles);
+
+            assertAll(
+                () -> assertThat(userRolesList, is(expectedUserRolesList)),
+                () -> verify(caseDefinitionRepository, times(3)).getUserRoleClassifications(
                     anyString())
             );
         }
