@@ -11,3 +11,6 @@ SELECT cd.id, cd.case_type_id, cd.version FROM case_data cd INNER JOIN
     ON cd.reference = grouped_cd.reference
     AND (cd.version != grouped_cd.MaxVersion AND 
 		 cd.created_date <= 'now'::timestamp - '3 MONTHS'::INterval)
+
+-- List cases by jurisdiction and case [data] containing specific information
+SELECT * FROM case_data WHERE Jurisdiction = 'HRS' AND data->>'recordingReference' LIKE 'FUNCTEST%' 
