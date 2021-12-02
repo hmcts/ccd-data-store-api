@@ -47,6 +47,9 @@ public class ApplicationParams {
     @Value("${ccd.case-definition.host}")
     private String caseDefinitionHost;
 
+    @Value("${role.assignment.api.host}")
+    private String roleAssignmentServiceHost;
+
     @Value("${ccd.draft.host}")
     private String draftHost;
 
@@ -145,6 +148,18 @@ public class ApplicationParams {
 
     @Value("${ccd.access-control.caseworker.role.regex}")
     private String ccdAccessControlCaseworkerRoleRegex;
+
+    @Value("${enable-attribute-based-access-control}")
+    private boolean enableAttributeBasedAccessControl;
+
+    @Value("${enable-pseudo-role-assignments-generation}")
+    private boolean enablePseudoRoleAssignmentsGeneration;
+
+    @Value("${enable-pseudo-access-profiles-generation}")
+    private boolean enablePseudoAccessProfilesGeneration;
+
+    @Value("${enable-case-users-db-sync}")
+    private boolean enableCaseUsersDbSync;
 
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
@@ -278,6 +293,29 @@ public class ApplicationParams {
 
     public String caseRolesURL() {
         return caseDefinitionHost + "/api/data/caseworkers/uid/jurisdictions/jid/case-types";
+    }
+
+    public String accessProfileRolesURL(String caseTypeId) {
+        return String.format(
+            "%s/api/data/caseworkers/uid/jurisdictions/jid/case-types/%s/access/profile/roles", caseDefinitionHost,
+            encode(caseTypeId)
+        );
+    }
+
+    public String roleAssignmentBaseURL() {
+        return roleAssignmentServiceHost + "/am/role-assignments";
+    }
+
+    public String amDeleteByQueryRoleAssignmentsURL() {
+        return roleAssignmentBaseURL() + "/query/delete";
+    }
+
+    public String amGetRoleAssignmentsURL() {
+        return roleAssignmentBaseURL() + "/actors/{uid}";
+    }
+
+    public String amQueryRoleAssignmentsURL() {
+        return roleAssignmentBaseURL() + "/query";
     }
 
     public String userDefaultSettingsURL() {
@@ -414,6 +452,22 @@ public class ApplicationParams {
 
     public String getCcdAccessControlCaseworkerRoleRegex() {
         return ccdAccessControlCaseworkerRoleRegex;
+    }
+
+    public boolean getEnableAttributeBasedAccessControl() {
+        return enableAttributeBasedAccessControl;
+    }
+
+    public boolean getEnablePseudoRoleAssignmentsGeneration() {
+        return enablePseudoRoleAssignmentsGeneration;
+    }
+
+    public boolean getEnablePseudoAccessProfilesGeneration() {
+        return enablePseudoAccessProfilesGeneration;
+    }
+
+    public boolean getEnableCaseUsersDbSync() {
+        return enableCaseUsersDbSync;
     }
 
     public List<String> getCcdAccessControlCitizenRoles() {

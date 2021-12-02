@@ -13,6 +13,7 @@
       "fields": [
         {
           "metadata": false,
+          "case_type_id": "AAT",
           "case_field_id": "MoneyGBPField",
           "case_field_element_path": null,
           "label": "`Money GBP` field",
@@ -24,6 +25,7 @@
         },
         {
           "metadata": false,
+          "case_type_id": "AAT",
           "case_field_id": "EmailField",
           "case_field_element_path": null,
           "label": "`Email` field",

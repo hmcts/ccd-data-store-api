@@ -6,8 +6,6 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.ccd.data.caseaccess.CachedCaseUserRepository;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
@@ -18,6 +16,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.service.AccessControl;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
@@ -27,8 +27,6 @@ import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ReferenceKeyUniqueConstraintException;
-import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
-import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
 import javax.inject.Inject;
@@ -36,10 +34,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
-import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 @Service
-public class SubmitCaseTransaction {
+public class SubmitCaseTransaction implements AccessControl {
 
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
@@ -47,8 +44,7 @@ public class SubmitCaseTransaction {
     private final CallbackInvoker callbackInvoker;
     private final UIDService uidService;
     private final SecurityClassificationService securityClassificationService;
-    private final CaseUserRepository caseUserRepository;
-    private final UserAuthorisation userAuthorisation;
+    private final CaseDataAccessControl caseDataAccessControl;
     private final MessageService messageService;
     private final CaseDocumentService caseDocumentService;
 
@@ -60,20 +56,17 @@ public class SubmitCaseTransaction {
                                  final CallbackInvoker callbackInvoker,
                                  final UIDService uidService,
                                  final SecurityClassificationService securityClassificationService,
-                                 final @Qualifier(CachedCaseUserRepository.QUALIFIER)
-                                     CaseUserRepository caseUserRepository,
-                                 final UserAuthorisation userAuthorisation,
+                                 final CaseDataAccessControl caseDataAccessControl,
                                  final @Qualifier("caseEventMessageService") MessageService messageService,
                                  final CaseDocumentService caseDocumentService
-    ) {
+                                 ) {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
         this.caseTypeService = caseTypeService;
         this.callbackInvoker = callbackInvoker;
         this.uidService = uidService;
         this.securityClassificationService = securityClassificationService;
-        this.caseUserRepository = caseUserRepository;
-        this.userAuthorisation = userAuthorisation;
+        this.caseDataAccessControl = caseDataAccessControl;
         this.messageService = messageService;
         this.caseDocumentService = caseDocumentService;
     }
@@ -135,9 +128,7 @@ public class SubmitCaseTransaction {
             caseDetailsAfterCallbackWithoutHashes
         );
 
-        if (AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
-            caseUserRepository.grantAccess(Long.valueOf(savedCaseDetails.getId()), idamUser.getId(), CREATOR.getRole());
-        }
+        caseDataAccessControl.grantAccess(savedCaseDetails, idamUser.getId());
 
         caseDocumentService.attachCaseDocuments(
             caseDetails.getReferenceAsString(),
