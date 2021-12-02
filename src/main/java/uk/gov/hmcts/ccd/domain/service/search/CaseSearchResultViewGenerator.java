@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
+import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
@@ -205,14 +207,16 @@ public class CaseSearchResultViewGenerator {
             caseDetails.getMetadata()
         );
 
-        updateCaseFieldsWithAccessControlMetadata(caseFields, caseDetails.getReference().toString());
+        updateCaseFieldsWithAccessControlMetadata(caseFields, caseDetails);
 
         return new SearchResultViewItem(caseDetails.getReferenceAsString(), caseFields, new HashMap<>(caseFields),
                 caseDetails.getSupplementaryData());
     }
 
-    private void updateCaseFieldsWithAccessControlMetadata(Map<String, Object> caseFields, String caseReference) {
-        CaseAccessMetadata caseAccessMetadata = caseSearchesViewAccessControl.getCaseAccessMetaData(caseReference);
+    private void updateCaseFieldsWithAccessControlMetadata(Map<String, Object> caseFields, CaseDetails caseDetails) {
+        CaseAccessMetadata caseAccessMetadata = Strings.isNullOrEmpty(caseDetails.getReferenceAsString())
+            ? caseDataAccessControl.generateAccessMetadataWithNoCaseId()
+            : caseSearchesViewAccessControl.getCaseAccessMetaData(caseDetails.getReference().toString());
         caseFields.put(ACCESS_GRANTED, new TextNode(caseAccessMetadata.getAccessGrantsString()));
         caseFields.put(ACCESS_PROCESS, new TextNode(caseAccessMetadata.getAccessProcessString()));
     }
