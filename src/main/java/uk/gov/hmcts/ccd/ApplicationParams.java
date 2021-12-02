@@ -170,6 +170,12 @@ public class ApplicationParams {
     @Value("${ccd.multiparty.fix.enabled}")
     private boolean multipartyFixEnabled;
 
+    @Value("#{'${ccd.multiparty.events}'.split(',')}")
+    private List<String> multipartyEvents;
+
+    @Value("#{'${ccd.multiparty.case-types}'.split(',')}")
+    private List<String> multipartyCaseTypes;
+
     @Value("${ccd.case-document-am-api.attachDocumentEnabled:true}")
     private boolean attachDocumentEnabled;
 
@@ -516,5 +522,13 @@ public class ApplicationParams {
 
     public boolean isMultipartyFixEnabled() {
         return multipartyFixEnabled;
+    }
+
+    public List<String> getMultipartyEvents() {
+        return multipartyEvents;
+    }
+
+    public List<String> getMultipartyCaseTypes() {
+        return multipartyCaseTypes;
     }
 }
