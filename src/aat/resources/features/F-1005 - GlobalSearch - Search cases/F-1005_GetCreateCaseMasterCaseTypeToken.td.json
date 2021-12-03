@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-1005_FT-MasterCaseType_CreateCase_Token",
+  "_guid_": "F-1005_GetCreateCaseMasterCaseTypeToken",
   "_extends_": "Standard_Token_Creation_Data_For_Case_Creation",
   "specs": [
     "to create a token for case creation as a caseworker",

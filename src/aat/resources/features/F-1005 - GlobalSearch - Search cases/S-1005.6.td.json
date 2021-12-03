@@ -1,7 +1,7 @@
 {
   "title": "Successfully search for an updated case with the new values",
   "_guid_": "S-1005.6",
-  "_extends_": "F-1005_Search_Case_Base",
+  "_extends_": "F-1005_SearchCaseBase",
   "specs": [
     "an active profile in CCD",
     "contains the field that has been updated",
@@ -34,6 +34,7 @@
       "results": [
         {
           "stateId" : "CaseUpdated",
+          "processForAccess" : "NONE",
           "caseReference" : "${}${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
           "otherReferences" : [ "FirstNameValue" ],
           "caseNameHmctsInternal" : "Name Internal",

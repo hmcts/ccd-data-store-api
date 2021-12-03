@@ -1,7 +1,7 @@
 {
   "title": "Successfully searches across different Case Types",
   "_guid_": "S-1005.9",
-  "_extends_": "F-1005_Search_Case_Base",
+  "_extends_": "F-1005_SearchCaseBase",
   "specs": [
     "an active profile in CCD",
     "contains two different Case Types",
@@ -34,6 +34,7 @@
       "results": [
         {
           "stateId": "CaseCreated",
+          "processForAccess" : "NONE",
           "caseReference": "${}${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
           "otherReferences": [
             "FirstNameValue"
@@ -52,15 +53,17 @@
         },
         {
           "stateId": "CaseCreated",
+          "processForAccess" : "NONE",
           "caseReference": "${}${[scenarioContext][childContexts][F-1005_CreateCaseMasterCaseType][testData][actualResponse][body][id]}",
-          "baseLocationId": "123",
-          "baseLocationName": "54 HAGLEY ROAD (BIRMINGHAM OFFICES)",
-          "regionId": "1",
-          "regionName": "Midlands",
-          "CCDJurisdictionId": "BEFTA_MASTER",
-          "CCDJurisdictionName": "BEFTA Master",
-          "CCDCaseTypeId": "FT_MasterCaseType",
-          "CCDCaseTypeName": "FT_MasterCaseType"
+          "otherReferences" : [ ],
+          "baseLocationId" : "123",
+          "baseLocationName" : "54 HAGLEY ROAD (BIRMINGHAM OFFICES)",
+          "regionId" : "1",
+          "regionName" : "Midlands",
+          "CCDJurisdictionId" : "BEFTA_MASTER",
+          "CCDJurisdictionName" : "BEFTA Master",
+          "CCDCaseTypeId" : "FT_MasterCaseType",
+          "CCDCaseTypeName" : "FT-All Field Data Types"
         }
       ]
     }

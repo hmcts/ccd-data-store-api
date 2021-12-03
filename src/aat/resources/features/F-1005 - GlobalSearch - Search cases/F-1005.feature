@@ -3,7 +3,7 @@ Feature: F-1005: Global Search - Search cases
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
-    And a successful call [to create the global search index] as in [F-1005_GlobalSearch_Index_Creation]
+    And a successful call [to create the global search index] as in [F-1005_GlobalSearchIndexCreation]
     And a case that has just been created as in [F-1005_CreateCasePreRequisiteCaseworker]
     And a wait time of [5] seconds [to allow for Logstash to index the case just created]
 
@@ -98,6 +98,7 @@ Feature: F-1005: Global Search - Search cases
   Scenario: Successfully verifies the pagination
     Given a user with [an active profile in CCD]
     And a successful call [to create a case] as in [F-1005_CreateSecondCasePreRequisiteCaseworker]
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created]
     When a request is prepared with appropriate values
     And the request [contains the sortCriteria]
     And the request [contains all the mandatory parameters]
@@ -111,6 +112,7 @@ Feature: F-1005: Global Search - Search cases
   Scenario: Successfully searches across different Case Types
     Given a user with [an active profile in CCD]
     And a successful call [to create a case] as in [F-1005_CreateCaseMasterCaseType]
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created]
     When a request is prepared with appropriate values
     And the request [contains two different Case Types]
     And the request [contains all the mandatory parameters]
@@ -118,4 +120,18 @@ Feature: F-1005: Global Search - Search cases
     Then a positive response is received,
     And the response [has 200 return code],
     And the response [contains both cases],
+    And the response has all other details as expected.
+
+  @S-1005.10
+  Scenario: Successfully searches for a case that was modified by a callback
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1005_CreateCaseWithCallback]
+    And a wait time of [5] seconds [to allow for Logstash to index the case just created]
+    When a request is prepared with appropriate values
+    And the request [contains the fields modified by the callback]
+    And the request [contains all the mandatory parameters]
+    And it is submitted to call the [Global Search] operation of [CCD Data Store]
+    Then a positive response is received,
+    And the response [has 200 return code],
+    And the response [contains the case modified by the callback],
     And the response has all other details as expected.

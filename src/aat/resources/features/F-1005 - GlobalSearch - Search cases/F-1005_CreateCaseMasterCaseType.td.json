@@ -6,7 +6,7 @@
     "to create a case"
   ],
   "prerequisites" : [ {
-    "Token_Creation": "F-1005_FT-MasterCaseType_CreateCase_Token"
+    "Token_Creation": "F-1005_GetCreateCaseMasterCaseTypeToken"
     }
    ],
   "users": {

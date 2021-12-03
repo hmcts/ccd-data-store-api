@@ -1,7 +1,7 @@
 {
   "title": "Successfully search for case with one of the new global search parameters",
   "_guid_": "S-1005.1",
-  "_extends_": "F-1005_Search_Case_Base",
+  "_extends_": "F-1005_SearchCaseBase",
   "specs": [
     "an active profile in CCD",
     "contains at least one fields from new global search screen",
@@ -28,6 +28,7 @@
       "results": [
         {
           "stateId" : "CaseCreated",
+          "processForAccess" : "NONE",
           "caseReference" : "${}${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
           "otherReferences" : [ "FirstNameValue" ],
           "caseNameHmctsInternal" : "Name Internal",
