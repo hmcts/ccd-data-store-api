@@ -4,7 +4,7 @@ Feature: F-134: Get CaseType with access Internal API CRUD Tests
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
-  @S-134.1
+  @S-134.1 @Ignore
   Scenario: User getting Profile with no CaseEvent R access has that event filtered out of the response
     Given a user with [an active profile in CCD having read case access for a jurisdiction]
     When a request is prepared with appropriate values,
@@ -16,7 +16,7 @@ Feature: F-134: Get CaseType with access Internal API CRUD Tests
     And the response has all other details as expected,
     And the response [does not contain the event5 of FT_CRUD case type with no R CRUD access].
 
-  @S-134.2
+  @S-134.2 @Ignore
   Scenario: User getting Profile with no CaseState R access has that state filtered out of the response
     Given a user with [an active profile in CCD having read case access for a jurisdiction]
     When a request is prepared with appropriate values,
@@ -28,7 +28,7 @@ Feature: F-134: Get CaseType with access Internal API CRUD Tests
     And the response has all other details as expected,
     And the response [does not contain the state3 of FT_CRUD case type with no R CRUD access].
 
-  @S-134.3
+  @S-134.3 @Ignore
   Scenario: User getting Profile with no CaseType R access has that caseType filtered out of the response
     Given a user with [an active profile in CCD having read case access for a jurisdiction]
     When a request is prepared with appropriate values,
