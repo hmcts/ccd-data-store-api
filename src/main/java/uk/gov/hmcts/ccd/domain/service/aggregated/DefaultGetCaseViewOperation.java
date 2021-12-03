@@ -72,7 +72,7 @@ public class DefaultGetCaseViewOperation extends AbstractDefaultGetCaseViewOpera
     public CaseView execute(String caseReference) {
         validateCaseReference(caseReference);
 
-        final CaseDetails caseDetails = getCaseDetails(caseReference);
+        final CaseDetails caseDetails =     getCaseDetails(caseReference);
 
         final CaseTypeDefinition caseTypeDefinition =
             getCaseType(caseDetails.getJurisdiction(), caseDetails.getCaseTypeId());

@@ -329,6 +329,7 @@
 								}
 							],
 							"searchAliasFields": [],
+              "roleToAccessProfiles": [],
 							"security_classification": null,
 							"case_fields": [],
 							"printable_document_url": null,
@@ -608,6 +609,7 @@
 								}
 							],
 							"searchAliasFields": [],
+              "roleToAccessProfiles": [],
 							"security_classification": null,
 							"case_fields": [],
 							"printable_document_url": null,

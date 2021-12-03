@@ -1,7 +1,20 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.security;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Collections;
 import java.util.Optional;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder.AccessControlGrantTypeESQueryBuilder;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.any;
@@ -15,19 +28,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.NATIVE_ES_QUERY;
 import static uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest.QUERY;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
-import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchRequest;
-
 @ExtendWith(MockitoExtension.class)
 class ElasticsearchCaseSearchRequestSecurityTest {
 
@@ -40,13 +40,16 @@ class ElasticsearchCaseSearchRequestSecurityTest {
     @Mock
     private ObjectNode searchRequestJsonNode;
 
+    @Mock
+    private AccessControlGrantTypeESQueryBuilder grantTypeESQueryBuilder;
+
     private ElasticsearchCaseSearchRequestSecurity querySecurity;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
         querySecurity = new ElasticsearchCaseSearchRequestSecurity(Collections.singletonList(caseSearchFilter),
-                objectMapperService);
+            objectMapperService, grantTypeESQueryBuilder);
         when(searchRequestJsonNode.has(QUERY)).thenReturn(true);
         when(searchRequestJsonNode.has(NATIVE_ES_QUERY)).thenReturn(false);
     }

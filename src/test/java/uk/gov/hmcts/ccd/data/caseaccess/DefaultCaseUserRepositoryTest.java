@@ -9,7 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
-import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleCategory;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.RoleCategory;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentCategoryService;
 
 import javax.persistence.EntityManager;
@@ -22,8 +22,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
 
 @Transactional
 public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
@@ -65,6 +65,7 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldGrantAccessAsCustomCaseRole() {
         doReturn(RoleCategory.CITIZEN).when(roleAssignmentCategoryService).getRoleCategory(any());
+
         repository.grantAccess(CASE_ID, USER_ID, CASE_ROLE);
 
         assertThat(countAccesses(CASE_ID, USER_ID, CASE_ROLE), equalTo(1));
@@ -97,7 +98,7 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
         caseIds = repository.findCasesUserIdHasAccessTo(USER_ID_GRANTED);
 
         assertThat(caseIds.size(), equalTo(3));
-        assertThat(caseIds, containsInAnyOrder(CASE_ID_GRANTED,CASE_ID_GRANTED,CASE_ID_3));
+        assertThat(caseIds, containsInAnyOrder(CASE_ID_GRANTED, CASE_ID_GRANTED, CASE_ID_3));
     }
 
     private Integer countAccesses(Long caseId, String userId) {
@@ -131,7 +132,7 @@ public class DefaultCaseUserRepositoryTest extends WireMockBaseTest {
         caseRoles = repository.findCaseRoles(CASE_ID_GRANTED, USER_ID_GRANTED);
 
         assertThat(caseRoles.size(), equalTo(2));
-        assertThat(caseRoles, containsInAnyOrder(CASE_ROLE,CASE_ROLE_SOLICITOR));
+        assertThat(caseRoles, containsInAnyOrder(CASE_ROLE, CASE_ROLE_SOLICITOR));
     }
 
     @Test

@@ -5,10 +5,6 @@ import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
 import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.SearchResult;
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -27,6 +23,11 @@ import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
+
+import javax.inject.Inject;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
@@ -70,8 +71,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
 
         String caseDetailElastic = create1CaseDetailsElastic("1535450291607660");
 
-
-        stubElasticSearchSearchRequestWillReturn(caseDetailElastic,createCaseDetails("1535450291607660"));
+        stubElasticSearchSearchRequestWillReturn(caseDetailElastic, createCaseDetails("1535450291607660"));
 
         String searchRequest = "{\"query\": {\"match_all\": {}}}";
         MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
@@ -85,12 +85,11 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
         CaseSearchResult caseSearchResults = mapper.readValue(responseAsString,
                                                               CaseSearchResult.class);
 
-        assertThat(caseSearchResults.getTotal(), is(30L));
         List<CaseDetails> caseDetails = caseSearchResults.getCases();
         assertThat(caseDetails, hasSize(1));
         assertThat(caseDetails, hasItem(hasProperty("reference", equalTo(1535450291607660L))));
-        assertThat(caseDetails, hasItem(hasProperty("jurisdiction", equalTo("AUTOTEST1"))));
-        assertThat(caseDetails, hasItem(hasProperty("caseTypeId", equalTo("AAT"))));
+        assertThat(caseDetails, hasItem(hasProperty("jurisdiction", equalTo("PROBATE"))));
+        assertThat(caseDetails, hasItem(hasProperty("caseTypeId", equalTo("TestAddressBookCase"))));
         assertThat(caseDetails, hasItem(hasProperty("lastModified",
                                                     equalTo(LocalDateTime.parse("2018-08-28T09:58:11.643")))));
         assertThat(caseDetails, hasItem(hasProperty("createdDate",
@@ -182,12 +181,12 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
             + "\"data_classification\": {},\n"
             + "\"id\": 18,\n"
             + "\"security_classification\": \"PUBLIC\",\n"
-            + "\"jurisdiction\": \"AUTOTEST1\",\n"
+            + "\"jurisdiction\": \"PROBATE\",\n"
             + "\"@timestamp\": \"2018-08-28T09:58:13.044Z\",\n"
             + "\"data\": {},\n"
             + "\"created_date\": \"2018-08-28T09:58:11.627Z\",\n"
-            + "\"index_id\": \"autotest1_aat_cases\",\n"
-            + "\"case_type_id\": \"AAT\"\n"
+            + "\"index_id\": \"probate_aat_cases\",\n"
+            + "\"case_type_id\": \"TestAddressBookCase\"\n"
             + "}";
     }
 
