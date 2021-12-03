@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,6 +38,10 @@ public class CaseTypeDefinition implements Serializable {
     private String printableDocumentsUrl;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
+    @JsonProperty("callback_get_case_url")
+    private String callbackGetCaseUrl;
+    @JsonProperty("retries_get_case_url")
+    private List<Integer> retriesGetCaseUrl;
     private final List<SearchAliasField> searchAliasFields = new ArrayList<>();
     @JsonProperty("roleToAccessProfiles")
     private List<RoleToAccessProfileDefinition> roleToAccessProfiles = new ArrayList<>();
@@ -158,6 +163,22 @@ public class CaseTypeDefinition implements Serializable {
         return events.stream()
             .filter(event -> event.getId().equalsIgnoreCase(eventId))
             .findFirst();
+    }
+
+    public String getCallbackGetCaseUrl() {
+        return callbackGetCaseUrl;
+    }
+
+    public void setCallbackGetCaseUrl(String callbackGetCaseUrl) {
+        this.callbackGetCaseUrl = callbackGetCaseUrl;
+    }
+
+    public List<Integer> getRetriesGetCaseUrl() {
+        return retriesGetCaseUrl == null ? Collections.emptyList() : retriesGetCaseUrl;
+    }
+
+    public void setRetriesGetCaseUrl(List<Integer> retriesGetCaseUrl) {
+        this.retriesGetCaseUrl = retriesGetCaseUrl;
     }
 
     public List<SearchAliasField> getSearchAliasFields() {
