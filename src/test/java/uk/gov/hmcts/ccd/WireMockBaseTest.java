@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.common.FileSource;
 import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformer;
@@ -23,6 +24,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 
 @AutoConfigureWireMock(port = 0)
 public abstract class WireMockBaseTest extends BaseTest {
@@ -34,6 +40,8 @@ public abstract class WireMockBaseTest extends BaseTest {
     @Value("${wiremock.server.port}")
     protected Integer wiremockPort;
 
+    protected String hostUrl;
+
     @Inject
     protected ApplicationParams applicationParams;
 
@@ -44,7 +52,7 @@ public abstract class WireMockBaseTest extends BaseTest {
     @BeforeEach
     public void initMock() throws IOException {
         super.initMock();
-        final String hostUrl = "http://localhost:" + wiremockPort;
+        hostUrl = "http://localhost:" + wiremockPort;
 
         LOG.info("Wire mock test, host url is {}", hostUrl);
 
@@ -52,6 +60,7 @@ public abstract class WireMockBaseTest extends BaseTest {
         ReflectionTestUtils.setField(applicationParams, "uiDefinitionHost", hostUrl);
         ReflectionTestUtils.setField(applicationParams, "userProfileHost", hostUrl);
         ReflectionTestUtils.setField(applicationParams, "draftHost", hostUrl);
+        ReflectionTestUtils.setField(applicationParams, "roleAssignmentServiceHost", hostUrl);
     }
 
     public void stubFor(MappingBuilder mappingBuilder) {
@@ -83,5 +92,34 @@ public abstract class WireMockBaseTest extends BaseTest {
                 }
             });
         }
+    }
+
+    protected void stubUserInfo(String userId) {
+        stubUserInfo(userId, "caseworker", "caseworker-test", "caseworker-probate-public", "caseworker-probate",
+            "caseworker-divorce", "caseworker-sscs");
+    }
+
+    protected void stubUserInfo(String userId, String... roles) {
+        String rolesList = Stream.of(roles)
+            .map(e -> "\"" + e + "\"")
+            .collect(Collectors.joining(","));
+        stubFor(WireMock.get(urlMatching("/o/userinfo"))
+            .willReturn(okJson("{"
+                + "      \"uid\": \"" + userId + "\","
+                + "      \"sub\": \"Cloud.Strife@test.com\","
+                + "      \"roles\": [ " + rolesList + " ]"
+                + "    }").withStatus(200)));
+    }
+
+    protected void stubIdamRolesForUser(String userId) {
+        stubFor(WireMock.get(urlMatching("/api/v1/users/" + userId))
+            .willReturn(okJson("{"
+                + "      \"id\": \" " + userId + "\","
+                + "      \"email\": \"Cloud.Strife@test.com\","
+                + "      \"forename\": \"Cloud\","
+                + "      \"surname\": \"Strife\","
+                + "      \"roles\": [ \"caseworker\", \"caseworker-test\", \"caseworker-probate-public\","
+                + " \"caseworker-probate\", \"caseworker-divorce\", \"caseworker-sscs\" ]"
+                + "    }").withStatus(200)));
     }
 }

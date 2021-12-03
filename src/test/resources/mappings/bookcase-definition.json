@@ -38,6 +38,13 @@
           "delete": false
         },
         {
+          "role": "caseworker-test-public",
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false
+        },
+        {
           "role": "citizen",
           "create": true,
           "read": true,
@@ -297,6 +304,13 @@
               "delete": false
             },
             {
+              "role": "caseworker-test-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
               "role": "caseworker-probate-private",
               "create": true,
               "read": true,
@@ -322,6 +336,13 @@
               "delete": false
             },
             {
+              "role": "caseworker-test-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
               "role": "caseworker-probate-private",
               "create": true,
               "read": true,
@@ -341,6 +362,13 @@
           "acls": [
             {
               "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": false
+            },
+            {
+              "role": "caseworker-test-public",
               "create": true,
               "read": true,
               "update": true,

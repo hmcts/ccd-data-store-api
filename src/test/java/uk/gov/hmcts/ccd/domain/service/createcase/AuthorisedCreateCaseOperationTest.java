@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import java.util.stream.Collectors;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +13,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -34,6 +36,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.doReturn;
@@ -83,8 +86,8 @@ class AuthorisedCreateCaseOperationTest {
     private CaseDetails classifiedCase;
     private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
     private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList();
-    private final Set<String> userRoles =
-        Sets.newHashSet(CASEWORKER_DIVORCE, CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA3);
+    private final Set<AccessProfile> accessProfiles =
+        createAccessProfiles(Sets.newHashSet(CASEWORKER_DIVORCE, CASEWORKER_PROBATE_LOA1, CASEWORKER_PROBATE_LOA3));
     private final List<CaseEventDefinition> events = Lists.newArrayList();
 
     @BeforeEach
@@ -103,17 +106,28 @@ class AuthorisedCreateCaseOperationTest {
         caseTypeDefinition.setJurisdictionDefinition(newJurisdiction().withJurisdictionId(JURISDICTION_ID).build());
         caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
-        when(caseAccessService.getCaseCreationRoles()).thenReturn(userRoles);
-        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(userRoles), eq(CAN_CREATE)))
+        when(caseAccessService.getCaseCreationRoles(anyString())).thenReturn(accessProfiles);
+        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
+            eq(accessProfiles), eq(CAN_CREATE)))
             .thenReturn(true);
-        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(userRoles), eq(CAN_READ)))
+        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
+            eq(accessProfiles), eq(CAN_READ)))
             .thenReturn(true);
-        when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_ID), eq(events), eq(userRoles),
+        when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_ID), eq(events),
+            eq(accessProfiles),
             eq(CAN_CREATE))).thenReturn(true);
         when(accessControlService.canAccessCaseFieldsWithCriteria(any(JsonNode.class),
-            eq(caseFieldDefinitions), eq(userRoles), eq(CAN_CREATE))).thenReturn(true);
+            eq(caseFieldDefinitions), eq(accessProfiles), eq(CAN_CREATE))).thenReturn(true);
         when(accessControlService.filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFieldDefinitions),
-            eq(userRoles), eq(CAN_READ), anyBoolean())).thenReturn(MAPPER.createObjectNode());
+            eq(accessProfiles), eq(CAN_READ), anyBoolean())).thenReturn(MAPPER.createObjectNode());
+    }
+
+    private Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+        return userRoles.stream()
+            .map(userRole -> AccessProfile.builder().readOnly(false)
+                .accessProfile(userRole)
+                .build())
+            .collect(Collectors.toSet());
     }
 
     @Test
@@ -142,9 +156,9 @@ class AuthorisedCreateCaseOperationTest {
         assertAll(
             () -> assertThat(output, is(nullValue())),
             () -> verify(accessControlService, never()).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
-                eq(userRoles), eq(CAN_READ)),
+                eq(accessProfiles), eq(CAN_READ)),
             () -> verify(accessControlService, never()).filterCaseFieldsByAccess(any(JsonNode.class),
-                eq(caseFieldDefinitions), eq(userRoles), eq(CAN_READ), anyBoolean())
+                eq(caseFieldDefinitions), eq(accessProfiles), eq(CAN_READ), anyBoolean())
         );
     }
 
@@ -161,18 +175,19 @@ class AuthorisedCreateCaseOperationTest {
         assertAll(
             () -> assertThat(output, sameInstance(classifiedCase)),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-            () -> inOrder.verify(caseAccessService).getCaseCreationRoles(),
+            () -> inOrder.verify(caseAccessService).getCaseCreationRoles(CASE_TYPE_ID),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
-                eq(userRoles), eq(CAN_CREATE)),
+                eq(accessProfiles), eq(CAN_CREATE)),
             () -> inOrder.verify(accessControlService).canAccessCaseEventWithCriteria(eq(EVENT_ID), eq(events),
-                eq(userRoles), eq(CAN_CREATE)),
+                eq(accessProfiles), eq(CAN_CREATE)),
             () -> inOrder.verify(accessControlService).canAccessCaseFieldsWithCriteria(any(JsonNode.class),
-                eq(caseFieldDefinitions), eq(userRoles), eq(CAN_CREATE)),
+                eq(caseFieldDefinitions), eq(accessProfiles), eq(CAN_CREATE)),
             () -> inOrder.verify(classifiedCreateCaseOperation).createCaseDetails(CASE_TYPE_ID, EVENT_DATA, IGNORE),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
-                eq(userRoles), eq(CAN_READ)),
+                eq(accessProfiles), eq(CAN_READ)),
             () -> inOrder.verify(accessControlService, times(2))
-                .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFieldDefinitions), eq(userRoles), eq(CAN_READ),
+                .filterCaseFieldsByAccess(any(JsonNode.class), eq(caseFieldDefinitions),
+                    eq(accessProfiles), eq(CAN_READ),
                     anyBoolean())
         );
     }
@@ -201,7 +216,7 @@ class AuthorisedCreateCaseOperationTest {
     @DisplayName("should fail if user roles not found")
     void shouldFailIfNoUserRolesFound() {
 
-        doReturn(null).when(caseAccessService).getCaseCreationRoles();
+        doReturn(null).when(caseAccessService).getCaseCreationRoles(anyString());
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(null),
             eq(CAN_CREATE))).thenThrow(NullPointerException.class);
 
@@ -214,7 +229,7 @@ class AuthorisedCreateCaseOperationTest {
     @DisplayName("should fail if empty user roles not found")
     void shouldFailIfEmptyUserRolesFound() {
 
-        doReturn(new HashSet<>()).when(caseAccessService).getCaseCreationRoles();
+        doReturn(new HashSet<>()).when(caseAccessService).getCaseCreationRoles(anyString());
 
         assertThrows(ResourceNotFoundException.class, () ->
             authorisedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID, EVENT_DATA, IGNORE));
@@ -224,7 +239,7 @@ class AuthorisedCreateCaseOperationTest {
     @DisplayName("should fail if no create case access")
     void shouldFailIfNoCreateCaseAccess() {
 
-        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(userRoles),
+        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(accessProfiles),
             eq(CAN_CREATE))).thenReturn(false);
 
         assertThrows(ResourceNotFoundException.class, () ->
@@ -250,7 +265,7 @@ class AuthorisedCreateCaseOperationTest {
     @DisplayName("should fail if no create event access")
     void shouldFailIfNoCreateEventAccess() {
 
-        when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_ID), eq(events), eq(userRoles),
+        when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_ID), eq(events), eq(accessProfiles),
             eq(CAN_CREATE))).thenReturn(false);
 
         assertThrows(ResourceNotFoundException.class, () ->
@@ -263,7 +278,7 @@ class AuthorisedCreateCaseOperationTest {
 
         when(accessControlService.canAccessCaseFieldsWithCriteria(any(JsonNode.class),
             eq(caseFieldDefinitions),
-            eq(userRoles),
+            eq(accessProfiles),
             eq(CAN_CREATE))).thenReturn(false);
 
         assertThrows(ResourceNotFoundException.class, () ->
@@ -274,7 +289,7 @@ class AuthorisedCreateCaseOperationTest {
     @DisplayName("should return empty case if no read case access")
     void shouldReturnEmptyIfNoCaseReadAccess() {
 
-        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(userRoles),
+        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(accessProfiles),
             eq(CAN_READ))).thenReturn(false);
 
         final CaseDetails caseDetails = authorisedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,

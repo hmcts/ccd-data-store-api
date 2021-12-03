@@ -4,10 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.definition.UIDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewType;
+import uk.gov.hmcts.ccd.domain.model.aggregated.CompoundFieldOrderService;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
@@ -60,7 +60,7 @@ public class DefaultGetCaseHistoryViewOperation extends AbstractDefaultGetCaseVi
         String caseTypeId = caseDetails.getCaseTypeId();
         CaseTypeDefinition caseTypeDefinition = getCaseType(jurisdictionId, caseTypeId);
 
-        AuditEvent event = getEventsOperation.getEvent(jurisdictionId, caseTypeId, eventId).orElseThrow(
+        AuditEvent event = getEventsOperation.getEvent(caseDetails, caseTypeId, eventId).orElseThrow(
             () -> new ResourceNotFoundException(EVENT_NOT_FOUND));
 
         return merge(caseDetails, event, caseTypeDefinition);
