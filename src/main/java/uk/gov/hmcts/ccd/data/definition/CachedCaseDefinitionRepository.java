@@ -36,14 +36,14 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
 
     @Autowired
     public CachedCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
-                                                  CaseDefinitionRepository caseDefinitionRepository) {
+                                              CaseDefinitionRepository caseDefinitionRepository) {
         this.caseDefinitionRepository = caseDefinitionRepository;
     }
 
     @Override
     public List<CaseTypeDefinition> getCaseTypesForJurisdiction(final String jurisdictionId) {
         return caseTypesForJurisdictions.computeIfAbsent(jurisdictionId,
-                                                         caseDefinitionRepository::getCaseTypesForJurisdiction);
+            caseDefinitionRepository::getCaseTypesForJurisdiction);
     }
 
     @Override
@@ -55,6 +55,11 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     @Override
     public CaseTypeDefinition getCaseType(int version, String caseTypeId) {
         return caseDefinitionRepository.getCaseType(version, caseTypeId);
+    }
+
+    @Override
+    public List<CaseTypeDefinition> getCaseType(List<String> caseTypeIds) {
+        return caseDefinitionRepository.getCaseType(caseTypeIds);
     }
 
     @Override
@@ -110,15 +115,9 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
-    public List<CaseTypeDefinition> getCaseType(List<String> caseTypeIds) {
-        return caseDefinitionRepository.getCaseType(caseTypeIds);
-    }
-
-    @Override
     public List<FieldTypeDefinition> getBaseTypes() {
         return baseTypes.computeIfAbsent("baseTypes", e -> caseDefinitionRepository.getBaseTypes());
     }
-
 
     public CaseDefinitionRepository getCaseDefinitionRepository() {
         return caseDefinitionRepository;

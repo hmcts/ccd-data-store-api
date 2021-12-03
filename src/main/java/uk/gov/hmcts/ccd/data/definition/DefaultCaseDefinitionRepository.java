@@ -97,11 +97,11 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
 
         try {
             val  builder = UriComponentsBuilder.fromHttpUrl(applicationParams.caseTypesDefURL());
-            if (caseTypeIds!=null) {
+            if (caseTypeIds != null) {
                 builder.queryParam("ids", String.join(",", caseTypeIds));
             }
             val requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
-            val caseTypeDefinition = Arrays.asList( restTemplate.exchange(
+            val caseTypeDefinition = Arrays.asList(restTemplate.exchange(
                 builder.build().encode().toUri(),
                 HttpMethod.GET,
                 requestEntity,
@@ -109,7 +109,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             ).getBody());
 
             if (caseTypeDefinition != null) {
-                caseTypeDefinition.stream().forEach( currentCaseType ->
+                caseTypeDefinition.stream().forEach(currentCaseType ->
                     currentCaseType.getCaseFieldDefinitions().stream().forEach(
                         caseFieldDefinition -> caseFieldDefinition.propagateACLsToNestedFields()
                     )
