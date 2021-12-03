@@ -89,12 +89,14 @@ public class UICaseControllerGetCaseCallbackIT extends WireMockBaseTest {
         assertNotNull("Content Should not be null", content);
         CaseViewResource savedCaseResource = mapper.readValue(content, CaseViewResource.class);
         assertNotNull("Saved Case Details should not be null", savedCaseResource);
-        assertEquals("Should contain events with case role access", 3, savedCaseResource.getMetadataFields().size());
+        assertEquals("Should contain events with case role access", 5, savedCaseResource.getMetadataFields().size());
         List<String> metadataIds = savedCaseResource.getMetadataFields().stream()
             .map(CaseViewField::getId)
             .collect(Collectors.toList());
         assertTrue(metadataIds.contains("[CREATED_DATE]"));
         assertTrue(metadataIds.contains("[JURISDICTION]"));
+        assertTrue(metadataIds.contains("[ACCESS_GRANTED]"));
+        assertTrue(metadataIds.contains("[ACCESS_PROCESS]"));
         assertTrue(metadataIds.contains("callbackMetadataFieldA"));
     }
 
