@@ -114,6 +114,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
                 throw new BadSearchRequest(errMsg);
             }
             if (response.searchResult != null) {
+                log.info("Results found from query: {}", response.searchResult.getTotal());
                 buildCaseTypesResults(response, caseTypeResults, crossCaseTypeSearchRequest);
                 caseDetails.addAll(searchResultToCaseList(response.searchResult));
                 totalHits += response.searchResult.getTotal();
