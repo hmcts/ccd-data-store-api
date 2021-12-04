@@ -756,6 +756,8 @@
       "show_event_notes": null,
       "end_button_label": null,
       "can_save_draft": null,
+      "access_granted" : "STANDARD",
+      "access_process" : "NONE",
       "title_display": null,
       "_links": {
         "self": {

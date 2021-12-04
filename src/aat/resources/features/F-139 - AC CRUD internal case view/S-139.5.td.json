@@ -1,0 +1,74 @@
+{
+  "_guid_": "S-139.5",
+  "_extends_": "F-139_Test_Data_Base",
+  "specs": [
+    "no U access to case type",
+    "contains HTTP 200 Ok status code",
+    "does not contain the case events under triggers"
+  ],
+  "request": {
+    "_extends_": "Common_Request",
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][S-139.5_CreateCase][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "responseCode" : 200,
+    "responseMessage" : "OK",
+    "headers" : {
+      "Cache-Control" : "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.ui-case-view.v2+json;charset=UTF-8",
+      "Date" : "[[ANYTHING_PRESENT]]",
+      "Expires" : "0",
+      "Pragma" : "no-cache",
+      "Strict-Transport-Security" : "max-age=31536000 ; includeSubDomains",
+      "Transfer-Encoding" : "chunked",
+      "X-Content-Type-Options" : "nosniff",
+      "X-Frame-Options" : "DENY",
+      "X-Xss-Protection" : "1; mode=block"
+    },
+    "body": {
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "case_id": "${[scenarioContext][childContexts][S-139.5_CreateCase][testData][actualResponse][body][id]}",
+      "case_type": {
+        "id": "FT_CRUD_3",
+        "name": "FT- CRUD-3",
+        "description": "Case Type with no U CRUD access",
+        "jurisdiction": {
+          "id": "BEFTA_MASTER",
+          "name": "BEFTA Master",
+          "description": "Content for the BEFTA Master Jurisdiction."
+        },
+        "printEnabled": false
+      },
+      "tabs": "[[ANYTHING_PRESENT]]",
+      "metadataFields": "[[ANYTHING_PRESENT]]",
+      "state": "[[ANYTHING_PRESENT]]",
+      "triggers": [],
+      "events": [
+  {
+    "id": "[[ANYTHING_PRESENT]]",
+    "timestamp": "[[ANYTHING_PRESENT]]",
+    "summary": "",
+    "comment": "",
+    "event_id": "createCase",
+    "event_name": "Create a case",
+    "user_id": "[[ANYTHING_PRESENT]]",
+    "user_last_name": "[[ANYTHING_PRESENT]]",
+    "user_first_name": "[[ANYTHING_PRESENT]]",
+    "state_name": "Create case",
+    "state_id": "CaseCreated",
+    "significant_item": null,
+    "proxied_by": null,
+    "proxied_by_last_name": null,
+    "proxied_by_first_name": null
+  }
+]
+    }
+  }
+}
+

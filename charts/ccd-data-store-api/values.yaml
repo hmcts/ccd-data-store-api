@@ -75,6 +75,7 @@ java:
     CCD_DRAFT_STORE_URL: http://draft-store-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     CCD_DEFAULTPRINTURL: https://return-case-doc-ccd.nonprod.platform.hmcts.net/jurisdictions/:jid/case-types/:ctid/cases/:cid
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
 
     HTTP_CLIENT_CONNECTION_TIMEOUT: '10000'
     HTTP_CLIENT_READ_TIMEOUT: '60000'
@@ -86,3 +87,7 @@ java:
     DATA_STORE_CROSS_JURISDICTIONAL_ROLES: caseworker-caa,caseworker-approver
     DATA_STORE_CITIZEN_ROLES: citizen,letter-holder
     DATA_STORE_SECURITY_LOGGING_FILTER_PATH_REGEX: '.*'
+
+    ENABLE_ATTRIBUTE_BASED_ACCESS_CONTROL: "false" # TEMP
+    ENABLE_PSEUDO_ROLE_ASSIGNMENTS_GENERATION: "false" # TEMP
+    ENABLE_PSEUDO_ACCESS_PROFILES_GENERATION: "false" # TEMP

@@ -1,0 +1,48 @@
+{
+  {{#assign 'correlationId'}}{{request.headers.x-correlation-id}}{{/assign}}
+  "roleAssignmentResponse": {
+    "roleRequest": {
+      "id": "{{randomValue type='UUID'}}",
+      "authenticatedUserId": "{{randomValue type='UUID'}}",
+      {{#if (eq correlationId '')}}
+      "correlationId": "{{randomValue type='UUID'}}",
+      {{else}}
+      "correlationId": "{{correlationId}}",
+      {{/if}}
+      "assignerId": "{{jsonPath request.body '$.roleRequest.assignerId'}}",
+      "requestType": "CREATE",
+      "process": "CCD",
+      "reference": "{{jsonPath request.body '$.roleRequest.reference'}}",
+      "replaceExisting": true,
+      "status": "APPROVED",
+      "created": "{{now timezone='UTC' format='yyyy-MM-dd\'T\'HH:mm:ss\'.\'SSS\'Z\''}}",
+      "log": "Request has been approved"
+    },
+    "requestedRoles": [
+      {{#each (jsonPath request.body '$.requestedRoles') as |role|}}
+      {
+        "id": "{{randomValue type='UUID'}}",
+        "actorIdType": "IDAM",
+        "actorId": "{{role.actorId}}",
+        "roleType": "{{role.roleType}}",
+        "roleName": "{{role.roleName}}",
+        "classification": "{{role.classification}}",
+        "grantType": "{{role.grantType}}",
+        "roleCategory": "{{role.roleCategory}}",
+        "readOnly": false,
+        "beginTime": "{{role.beginTime}}",
+        "process": "{{jsonPath request.body '$.roleRequest.process'}}",
+        "reference": "{{jsonPath request.body '$.roleRequest.reference'}}",
+        "status": "LIVE",
+        "created": "{{now timezone='UTC' format='yyyy-MM-dd\'T\'HH:mm:ss\'.\'SSS\'Z\''}}",
+        "log": "Create",
+        "attributes": {
+          "jurisdiction": "{{role.attributes.jurisdiction}}",
+          "caseType": "{{role.attributes.caseType}}",
+          "caseId": "{{role.attributes.caseId}}"
+        }
+      }{{#unless @last}},{{/unless}}
+      {{/each}}
+    ]
+  }
+}

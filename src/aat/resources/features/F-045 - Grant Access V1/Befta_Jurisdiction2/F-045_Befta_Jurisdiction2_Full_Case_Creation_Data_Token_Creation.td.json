@@ -1,0 +1,14 @@
+{
+	"_guid_": "F-045_Befta_Jurisdiction2_Full_Case_Creation_Data_Token_Creation",
+	"_extends_": "Befta_Jurisdiction2_Default_Token_Creation_Data_For_Case_Creation_Solicitor_1",
+
+	"specs": [
+		"to create a token for case creation"
+	],
+
+	"users": {
+		"invokingUser": {
+			"_extends_": "BeftaCaseworker2Solicitor2"
+		}
+	}
+}
