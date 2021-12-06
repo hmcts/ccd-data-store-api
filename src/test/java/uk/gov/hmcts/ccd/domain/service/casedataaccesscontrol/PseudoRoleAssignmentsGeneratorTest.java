@@ -29,6 +29,7 @@ import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.EXCLUDED;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.SPECIFIC;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.STANDARD;
 import static uk.gov.hmcts.ccd.domain.service.AccessControl.IDAM_PREFIX;
@@ -79,7 +80,7 @@ class PseudoRoleAssignmentsGeneratorTest {
                                                                                  ROLE_LOCAL_AUTHORITY)));
             given(caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()).willReturn(true);
 
-            List<RoleAssignment> roleAssignments = singletonList(caseRoleAssignment());
+            List<RoleAssignment> roleAssignments = singletonList(caseRoleAssignment(SPECIFIC.name()));
 
             List<RoleAssignment> augmentedRoleAssignments = pseudoRoleAssignmentsGenerator
                 .createPseudoRoleAssignments(roleAssignments, false);
@@ -121,15 +122,18 @@ class PseudoRoleAssignmentsGeneratorTest {
 
         @Test
         @DisplayName("should not create pseudo RoleAssignments for granted roles"
-            + " when no single case RoleAssignment present")
-        public void shouldNotAddFakeRoleAssignmentsForGrantedUserRolesWhenNoSingleCaseRoleAssignmentPresent() {
+            + " when no single non-EXCLUDED case RoleAssignment present")
+        public void shouldNotAddFakeRoleAssignmentsForGrantedUserRolesWhenNoNonExcludedCaseRoleAssignmentPresent() {
             given(userRepository.getUserRoles()).willReturn(new HashSet<>(asList(ROLE_CASEWORKER_1,
                                                                                  ROLE_CASEWORKER_2,
                                                                                  ROLE_SOLICITOR,
                                                                                  ROLE_LOCAL_AUTHORITY)));
             given(caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()).willReturn(true);
 
-            List<RoleAssignment> roleAssignments = singletonList(organisationRoleAssignment());
+            List<RoleAssignment> roleAssignments = List.of(
+                organisationRoleAssignment(STANDARD.name()),
+                caseRoleAssignment(EXCLUDED.name())
+            );
 
             List<RoleAssignment> augmentedRoleAssignments = pseudoRoleAssignmentsGenerator
                 .createPseudoRoleAssignments(roleAssignments, false);
@@ -151,7 +155,7 @@ class PseudoRoleAssignmentsGeneratorTest {
                 .willReturn(userRolesWithClassification);
             given(caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()).willReturn(false);
 
-            List<RoleAssignment> roleAssignments = singletonList(organisationRoleAssignment());
+            List<RoleAssignment> roleAssignments = singletonList(organisationRoleAssignment(STANDARD.name()));
 
             List<RoleAssignment> augmentedRoleAssignments = pseudoRoleAssignmentsGenerator
                 .createPseudoRoleAssignments(roleAssignments, false);
@@ -197,7 +201,7 @@ class PseudoRoleAssignmentsGeneratorTest {
             given(caseDefinitionRepository.getClassificationsForUserRoleList(anyList()))
                 .willReturn(userRolesWithClassification);
 
-            List<RoleAssignment> roleAssignments = singletonList(organisationRoleAssignment());
+            List<RoleAssignment> roleAssignments = singletonList(organisationRoleAssignment(STANDARD.name()));
 
             List<RoleAssignment> augmentedRoleAssignments = pseudoRoleAssignmentsGenerator
                 .createPseudoRoleAssignments(roleAssignments, true);
@@ -237,17 +241,18 @@ class PseudoRoleAssignmentsGeneratorTest {
             );
         }
 
-        private RoleAssignment caseRoleAssignment() {
-            return roleAssignment(Optional.of("12345"));
+        private RoleAssignment caseRoleAssignment(String grantType) {
+            return roleAssignment(Optional.of("12345"), grantType);
         }
 
-        private RoleAssignment organisationRoleAssignment() {
-            return roleAssignment(Optional.empty());
+        private RoleAssignment organisationRoleAssignment(String grantType) {
+            return roleAssignment(Optional.empty(), grantType);
         }
 
-        private RoleAssignment roleAssignment(Optional<String> caseId) {
+        private RoleAssignment roleAssignment(Optional<String> caseId, String grantType) {
             return RoleAssignment.builder()
                 .roleName(ROLE_PROVIDED)
+                .grantType(grantType)
                 .attributes(RoleAssignmentAttributes.builder().caseId(caseId).build())
                 .build();
         }

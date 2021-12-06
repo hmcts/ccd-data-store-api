@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.GlobalSearchTestFixture;
 import uk.gov.hmcts.ccd.MockUtils;
+import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
@@ -42,10 +43,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.verify;
@@ -59,7 +60,7 @@ import static uk.gov.hmcts.ccd.v2.V2.Error.CASE_ID_INVALID;
 import static uk.gov.hmcts.ccd.v2.V2.Error.CASE_NOT_FOUND;
 import static uk.gov.hmcts.ccd.v2.V2.Error.NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA;
 
-public class CaseControllerTestIT extends WireMockBaseTest {
+class CaseControllerTestIT extends WireMockBaseTest {
 
     private static final String CASE_TYPE = "TestAddressBookCase";
     private static final String CASE_TYPE_WITH_SEARCH_PARTY = "TestAddressBookCase2";
@@ -83,7 +84,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     @SpyBean
     private AuditRepository auditRepository;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
@@ -93,7 +94,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldLogAuditInfoForGetCaseById() throws Exception {
         String caseId = "1504259907353529";
-        final String URL =  "/cases/" + caseId;
+        final String URL = "/cases/" + caseId;
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
             .header(EXPERIMENTAL_HEADER, "experimental")
@@ -126,7 +127,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldLogAuditInfoForGetCaseByIdWithNullRequestId() throws Exception {
         String caseId = "1504259907353529";
-        final String URL =  "/cases/" + caseId;
+        final String URL = "/cases/" + caseId;
 
         final MvcResult mvcResult = mockMvc.perform(get(URL)
             .header(EXPERIMENTAL_HEADER, "experimental")
@@ -158,7 +159,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldLogAuditInfoForCreateEventByCaseId() throws Exception {
         String caseId = "1504259907353529";
-        final String URL =  "/cases/" + caseId + "/events";
+        final String URL = "/cases/" + caseId + "/events";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent()
             .withCaseReference(caseId)
@@ -200,7 +201,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldSaveOnBehalfOfUserAndProxiedByUser() throws Exception {
         String caseId = "1504259907353529";
-        final String URL =  "/cases/" + caseId + "/events";
+        final String URL = "/cases/" + caseId + "/events";
 
         UserInfo userInfo = UserInfo.builder()
             .uid("TestUserId")
@@ -237,7 +238,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn201WhenPostCreateCase() throws Exception {
-        final String URL =  "/case-types/" + CASE_TYPE + "/cases";
+        final String URL = "/case-types/" + CASE_TYPE + "/cases";
         final String description = "A very long comment.......";
         final String summary = "Short comment";
 
@@ -442,9 +443,65 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         GlobalSearchTestFixture.assertGlobalSearchData(savedCaseResource.getData());
     }
 
+    @DisplayName("Submit case creation event without any documents but "
+        + "upload a document with 'document_hash' field via about_to_submit callback")
+    public void shouldReturn201WhenPostCreateCaseAndAboutToSubmitCallbackWithDocument() throws Exception {
+        final String callbackEventId = "TEST_SUBMIT_CALLBACK_EVENT";
+        final String URL = "/case-types/" + CASE_TYPE + "/cases";
+        final String description = "A very long comment.......";
+        final String summary = "Short comment";
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE, callbackEventId);
+
+        final Event triggeringEvent = anEvent()
+            .withEventId(callbackEventId)
+            .withDescription(description)
+            .withSummary(summary)
+            .build();
+        final CaseDataContent caseDetailsToSave = newCaseDataContent()
+            .withEvent(triggeringEvent)
+            .withToken(token)
+            .build();
+
+        final String jsonString = TestFixtures.fromFileAsString("__files/test-addressbook-case.json")
+            .replace("${CALLBACK_URL}", hostUrl + "/callback/document");
+
+        stubFor(WireMock.get(urlMatching("/api/data/case-type/" + CASE_TYPE))
+            .willReturn(okJson(jsonString).withStatus(200)));
+
+        final MvcResult mvcResult = mockMvc.perform(post(URL)
+            .header(EXPERIMENTAL_HEADER, "experimental")
+            .header(REQUEST_ID, REQUEST_ID_VALUE)
+            .contentType(JSON_CONTENT_TYPE)
+            .content(mapper.writeValueAsString(caseDetailsToSave))
+        ).andReturn();
+
+        Assertions.assertEquals(201, mvcResult.getResponse().getStatus());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        final String content = mvcResult.getResponse().getContentAsString();
+        Assertions.assertNotNull(content, "Content Should not be null");
+        final CaseResource savedCaseResource = mapper.readValue(content, CaseResource.class);
+        Assertions.assertNotNull(savedCaseResource, "Saved Case Details should not be null");
+
+        final ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
+        verify(auditRepository).save(captor.capture());
+
+        Assertions.assertAll(() -> {
+            assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CREATE_CASE.getLabel()));
+            assertThat(captor.getValue().getOperationType(), is(AuditOperationType.CREATE_CASE.getLabel()));
+            assertThat(captor.getValue().getCaseId(), is(savedCaseResource.getReference()));
+            assertThat(captor.getValue().getIdamId(), is(UID));
+            assertThat(captor.getValue().getInvokingService(), is(MockUtils.CCD_GW));
+            assertThat(captor.getValue().getHttpStatus(), is(201));
+            assertThat(captor.getValue().getCaseType(), is(CASE_TYPE));
+            assertThat(captor.getValue().getJurisdiction(), is(JURISDICTION));
+            assertThat(captor.getValue().getEventSelected(), is(callbackEventId));
+            assertThat(captor.getValue().getRequestId(), is(REQUEST_ID_VALUE));
+        });
+    }
+
     @Test
     public void shouldReturn201WhenPostCreateCaseV3() throws Exception {
-        final String url =  "/case-types/" + CASE_TYPE + "/cases";
+        final String url = "/case-types/" + CASE_TYPE + "/cases";
         final String description = "A very long comment.......";
         final String summary = "Short comment";
 
@@ -483,7 +540,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         final String description = "A very long comment.......";
         final String summary = "Short comment";
 
-        final String URL =  "/case-types/" + CASE_TYPE_CREATOR_ROLE + "/cases";
+        final String URL = "/case-types/" + CASE_TYPE_CREATOR_ROLE + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
         final Event triggeringEvent = anEvent().build();
@@ -511,15 +568,15 @@ public class CaseControllerTestIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturn404WhenPostCreateCaseWithNoCreateCaseAccessOnCreatorRole() throws Exception {
-        final String URL =  "/case-types/" + CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS + "/cases";
+        final String URL = "/case-types/" + CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS + "/cases";
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().build();
 
         mockMvc.perform(post(URL)
-            .header(EXPERIMENTAL_HEADER, "experimental")
-            .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsString(caseDetailsToSave))
-        ).andExpect(status().is(404))
+                .header(EXPERIMENTAL_HEADER, "experimental")
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsString(caseDetailsToSave))
+            ).andExpect(status().is(404))
             .andReturn();
     }
 
@@ -528,7 +585,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldSetSupplementaryData() throws Exception {
         String caseId = "1504259907353529";
-        final String URL =  "/cases/" + caseId + "/supplementary-data";
+        final String URL = "/cases/" + caseId + "/supplementary-data";
         SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequestOrgB();
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -554,7 +611,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldSetSupplementaryDataMultipleUpdate() throws Exception {
         String caseId = "1504259907353529";
-        final String URL =  "/cases/" + caseId + "/supplementary-data";
+        final String URL = "/cases/" + caseId + "/supplementary-data";
         SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequestMultiple();
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -583,7 +640,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldIncrementSupplementaryData() throws Exception {
         String caseId = "1504259907353529";
-        final String URL =  "/cases/" + caseId + "/supplementary-data";
+        final String URL = "/cases/" + caseId + "/supplementary-data";
         SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataIncrementRequest();
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -604,7 +661,7 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldCreateSupplementaryDataWhenNotExists() throws Exception {
         String caseId = "1504259907353545";
-        final String URL =  "/cases/" + caseId + "/supplementary-data";
+        final String URL = "/cases/" + caseId + "/supplementary-data";
         SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequest();
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -627,13 +684,13 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldThrowExceptionWhenCaseNotFound() throws Exception {
         String caseId = "1504259907353586";
-        final String URL =  "/cases/" + caseId + "/supplementary-data";
+        final String URL = "/cases/" + caseId + "/supplementary-data";
         SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequest();
 
         final String message = mockMvc.perform(post(URL)
-            .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsString(supplementaryDataUpdateRequest))
-        ).andExpect(status().is(404))
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsString(supplementaryDataUpdateRequest))
+            ).andExpect(status().is(404))
             .andReturn().getResolvedException().getMessage();
 
         assertTrue(StringUtils.contains(message, CASE_NOT_FOUND));
@@ -644,13 +701,13 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
     public void shouldThrowExceptionWhenCaseIsNotValid() throws Exception {
         String caseId = "12233";
-        final String URL =  "/cases/" + caseId + "/supplementary-data";
+        final String URL = "/cases/" + caseId + "/supplementary-data";
         SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequest();
 
         final String message = mockMvc.perform(post(URL)
-            .contentType(JSON_CONTENT_TYPE)
-            .content(mapper.writeValueAsString(supplementaryDataUpdateRequest))
-        ).andExpect(status().is(400))
+                .contentType(JSON_CONTENT_TYPE)
+                .content(mapper.writeValueAsString(supplementaryDataUpdateRequest))
+            ).andExpect(status().is(400))
             .andReturn().getResolvedException().getMessage();
 
         assertTrue(StringUtils.contains(message, CASE_ID_INVALID));
@@ -658,10 +715,10 @@ public class CaseControllerTestIT extends WireMockBaseTest {
 
     @Nested
     @DisplayName("GET /cases/{caseId}/supplementary-data")
-    private class UserRoleValidation {
+    class UserRoleValidation {
 
         @BeforeEach
-        public void setup() {
+        void setup() {
             String userJson = "{\n"
                 + "          \"sub\": \"Cloud.Strife@test.com\",\n"
                 + "          \"uid\": \"1234\",\n"
@@ -678,17 +735,17 @@ public class CaseControllerTestIT extends WireMockBaseTest {
         @Test
         @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
             scripts = {"classpath:sql/insert_cases_supplementary_data.sql"})
-        public void shouldThrowExceptionWhenSolicitorRoleWithNoCasesAssignedToTheUser() throws Exception {
+        void shouldThrowExceptionWhenSolicitorRoleWithNoCasesAssignedToTheUser() throws Exception {
 
             MockUtils.setSecurityAuthorities(authentication, ROLE_PROBATE_SOLICITOR);
             String caseId = "1504259907353545";
-            final String URL =  "/cases/" + caseId + "/supplementary-data";
+            final String URL = "/cases/" + caseId + "/supplementary-data";
             SupplementaryDataUpdateRequest supplementaryDataUpdateRequest = createSupplementaryDataSetRequest();
 
             final String message = mockMvc.perform(post(URL)
-                .contentType(JSON_CONTENT_TYPE)
-                .content(mapper.writeValueAsString(supplementaryDataUpdateRequest))
-            ).andExpect(status().is(403))
+                    .contentType(JSON_CONTENT_TYPE)
+                    .content(mapper.writeValueAsString(supplementaryDataUpdateRequest))
+                ).andExpect(status().is(403))
                 .andReturn().getResolvedException().getMessage();
 
             assertTrue(StringUtils.contains(message, NOT_AUTHORISED_UPDATE_SUPPLEMENTARY_DATA));

@@ -62,6 +62,7 @@
             "OPTION1"
           ],
           "YesOrNoField": "Yes",
+          "EmailField" : "fuctional@test.com",
           "TextField": "text",
           "DateField": "1989-09-19",
           "TextAreaField": "text area",

@@ -16,8 +16,10 @@ import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceReferenceData;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -136,7 +138,7 @@ public abstract class TestFixtures {
     }
 
     protected static Map<String, JsonNode> fromFileAsMap(final String filename) throws IOException {
-        final InputStream inputStream = getInputStream(filename);
+        final InputStream inputStream = getTestsInputStream(filename);
         final TypeReference<Map<String, JsonNode>> typeReference = new TypeReference<>() {
         };
         return OBJECT_MAPPER.readValue(inputStream, typeReference);
@@ -144,15 +146,34 @@ public abstract class TestFixtures {
 
     @SuppressWarnings("SameParameterValue")
     protected static List<JsonNode> fromFileAsList(final String filename) throws IOException {
-        final InputStream inputStream = getInputStream(filename);
+        final InputStream inputStream = getTestsInputStream(filename);
         final TypeReference<List<JsonNode>> typeReference = new TypeReference<>() {
         };
         return OBJECT_MAPPER.readValue(inputStream, typeReference);
     }
 
+    @SuppressWarnings("SameParameterValue")
+    public static String fromFileAsString(final String filePath) {
+        StringBuilder json = new StringBuilder();
+        try (final InputStreamReader inputStreamReader = new InputStreamReader(getInputStream(filePath));
+             final BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+            String str;
+            while ((str = bufferedReader.readLine()) != null) {
+                json.append(str);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Caught exception reading resource " + filePath, e);
+        }
+        return json.toString();
+    }
+
     private static InputStream getInputStream(final String filename) {
         return TestFixtures.class.getClassLoader()
-            .getResourceAsStream("tests/".concat(filename));
+            .getResourceAsStream(filename);
+    }
+
+    private static InputStream getTestsInputStream(final String filename) {
+        return getInputStream("tests/".concat(filename));
     }
 
     protected CaseDetails buildCaseDetails(final Map<String, JsonNode> data) {

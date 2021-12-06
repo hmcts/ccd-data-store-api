@@ -25,6 +25,7 @@ public class DocumentSanitiser implements Sanitiser {
     public static final String DOCUMENT_URL = "document_url";
     public static final String DOCUMENT_BINARY_URL = "document_binary_url";
     public static final String DOCUMENT_FILENAME = "document_filename";
+    public static final String DOCUMENT_HASH = "document_hash";
 
     public static final String TYPE = "Document";
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
@@ -62,6 +63,12 @@ public class DocumentSanitiser implements Sanitiser {
             Binary binary = document.get_links().getBinary();
             validateBinaryLink(fieldTypeDefinition, binary);
             sanitisedData.put(DOCUMENT_BINARY_URL, binary.getHref());
+
+            final JsonNode documentHashNode = fieldData.get(DOCUMENT_HASH);
+            if (documentHashNode != null) {
+                sanitisedData.put(DOCUMENT_HASH, documentHashNode.textValue());
+            }
+
             validateDocumentFilename(fieldTypeDefinition, document);
             sanitisedData.put(DOCUMENT_FILENAME, document.getOriginalDocumentName());
             return sanitisedData;

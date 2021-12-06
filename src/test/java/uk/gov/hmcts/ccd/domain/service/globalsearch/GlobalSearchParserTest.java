@@ -31,6 +31,7 @@ import static com.google.common.collect.Sets.newHashSet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
@@ -65,7 +66,6 @@ class GlobalSearchParserTest {
     private  CaseTypeDefinition caseTypeDefinition1;
     private  CaseTypeDefinition caseTypeDefinition2;
     private  CaseTypeDefinition caseTypeDefinition3;
-
 
     @Mock
     private UserRepository userRepository;
@@ -280,16 +280,20 @@ class GlobalSearchParserTest {
 
         doReturn(false)
             .when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(JURISDICTION, SecurityClassification.RESTRICTED);
+            .userHasEnoughSecurityClassificationForField(any(CaseTypeDefinition.class),
+                eq(SecurityClassification.RESTRICTED));
         doReturn(true)
             .when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(JURISDICTION, SecurityClassification.PUBLIC);
+            .userHasEnoughSecurityClassificationForField(any(CaseTypeDefinition.class),
+                eq(SecurityClassification.PUBLIC));
         doReturn(true)
             .when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(JURISDICTION, SecurityClassification.PUBLIC);
+            .userHasEnoughSecurityClassificationForField(any(CaseTypeDefinition.class),
+                eq(SecurityClassification.PUBLIC));
         doReturn(true)
             .when(securityClassificationService)
-            .userHasEnoughSecurityClassificationForField(JURISDICTION, SecurityClassification.PUBLIC);
+            .userHasEnoughSecurityClassificationForField(any(CaseTypeDefinition.class),
+                eq(SecurityClassification.PUBLIC));
 
 
         ObjectMapper mapper = new ObjectMapper();

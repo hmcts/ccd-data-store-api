@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
@@ -40,10 +41,13 @@ public class AccessControlServiceImpl implements AccessControlService {
     private static final Logger LOG = LoggerFactory.getLogger(AccessControlServiceImpl.class);
     private static final JsonNodeFactory JSON_NODE_FACTORY = new JsonNodeFactory(false);
 
+    private final ApplicationParams applicationParams;
 
     private final CompoundAccessControlService compoundAccessControlService;
 
-    public AccessControlServiceImpl(final CompoundAccessControlService compoundAccessControlService) {
+    public AccessControlServiceImpl(final ApplicationParams applicationParams,
+                                    final CompoundAccessControlService compoundAccessControlService) {
+        this.applicationParams = applicationParams;
         this.compoundAccessControlService = compoundAccessControlService;
     }
 
@@ -73,7 +77,7 @@ public class AccessControlServiceImpl implements AccessControlService {
         List<AccessControlList> stateACLs = caseType.getStates()
             .stream()
             .filter(cState -> cState.getId().equalsIgnoreCase(caseState))
-            .map(cState -> cState.getAccessControlLists())
+            .map(CaseStateDefinition::getAccessControlLists)
             .flatMap(Collection::stream)
             .collect(toList());
 
@@ -189,28 +193,50 @@ public class AccessControlServiceImpl implements AccessControlService {
     }
 
     @Override
-    public CaseUpdateViewEvent setReadOnlyOnCaseViewFieldsIfNoAccess(
-        final CaseUpdateViewEvent caseEventTrigger,
-        final List<CaseFieldDefinition> caseFieldDefinitions,
-        final Set<AccessProfile> accessProfiles,
+    public CaseUpdateViewEvent setReadOnlyOnCaseViewFieldsIfNoAccess(final String caseTypeId,
+        final String caseReference, final String eventId, final CaseUpdateViewEvent caseEventTrigger,
+        final List<CaseFieldDefinition> caseFieldDefinitions, final Set<AccessProfile> accessProfiles,
         final Predicate<AccessControlList> access) {
-        caseEventTrigger.getCaseFields().stream()
+
+        List<String> filteredCaseFieldIds = new ArrayList<>();
+
+        boolean isMultipartyFixEnabled = applicationParams.isMultipartyFixEnabled();
+        List<String> multipartyCaseTypes = applicationParams.getMultipartyCaseTypes();
+        List<String> multipartyEvents = applicationParams.getMultipartyEvents();
+
+        caseEventTrigger.getCaseFields()
             .forEach(caseViewField -> {
-                Optional<CaseFieldDefinition> caseFieldOpt = findCaseField(caseFieldDefinitions, caseViewField.getId());
+                String caseViewFieldId = caseViewField.getId();
+                Optional<CaseFieldDefinition> caseFieldOpt = findCaseField(caseFieldDefinitions, caseViewFieldId);
 
                 if (caseFieldOpt.isPresent()) {
                     CaseFieldDefinition field = caseFieldOpt.get();
                     if (!hasAccessControlList(accessProfiles, access, field.getAccessControlLists())) {
                         caseViewField.setDisplayContext(READONLY);
+                        if (shouldRemoveCaseViewFieldIfNoReadAccess(caseTypeId, caseReference, eventId,
+                            isMultipartyFixEnabled, multipartyCaseTypes, multipartyEvents, caseViewFieldId,
+                            field, accessProfiles)) {
+                            filteredCaseFieldIds.add(caseViewField.getId());
+                            return;
+                        }
                     }
+
                     if (field.isCompoundFieldType()) {
-                        setChildrenAsReadOnlyIfNoAccess(caseEventTrigger.getWizardPages(), field.getId(), field,
-                            access, accessProfiles, caseViewField);
+                        setChildrenAsReadOnlyIfNoAccess(caseTypeId, caseReference, eventId, isMultipartyFixEnabled,
+                            multipartyCaseTypes, multipartyEvents, caseEventTrigger.getWizardPages(), field.getId(),
+                            field, access, accessProfiles, caseViewField);
                     }
                 } else {
                     caseViewField.setDisplayContext(READONLY);
+                    if (shouldRemoveCaseViewFieldIfNoReadAccess(caseTypeId, caseReference, eventId,
+                        isMultipartyFixEnabled, multipartyCaseTypes, multipartyEvents, caseViewFieldId,
+                        null, accessProfiles)) {
+                        filteredCaseFieldIds.add(caseViewField.getId());
+                    }
                 }
             });
+
+        removeCaseViewFieldIfNoReadAccess(caseEventTrigger, filteredCaseFieldIds);
         return caseEventTrigger;
     }
 
@@ -247,7 +273,7 @@ public class AccessControlServiceImpl implements AccessControlService {
                         return false;
                     }
                     if (!isEmpty(cf.getComplexACLs())) {
-                        cf.getFieldTypeDefinition().getChildren().stream().forEach(caseField ->
+                        cf.getFieldTypeDefinition().getChildren().forEach(caseField ->
                             filterChildren(caseField, caseViewField, accessProfiles, access));
                     }
                 } else {
@@ -289,6 +315,18 @@ public class AccessControlServiceImpl implements AccessControlService {
     }
 
     @Override
+    public List<CaseStateDefinition> filterCaseStatesByAccess(List<CaseStateDefinition> caseStates,
+                                                       Set<AccessProfile> accessProfiles,
+                                                       Predicate<AccessControlList> access) {
+        return caseStates
+            .stream()
+            .filter(caseState -> hasAccessControlList(accessProfiles,
+                access,
+                caseState.getAccessControlLists()))
+            .collect(toList());
+    }
+
+    @Override
     public List<CaseEventDefinition> filterCaseEventsByAccess(CaseTypeDefinition caseTypeDefinition,
                                                               final Set<AccessProfile> accessProfiles,
                                                               final Predicate<AccessControlList> access) {
@@ -309,10 +347,18 @@ public class AccessControlServiceImpl implements AccessControlService {
             .filter(caseViewTrigger -> hasAccessControlList(accessProfiles,
                 CAN_CREATE,
                 getCaseEventById(caseEventDefinitions, caseViewTrigger)
-                    .map(eventDef -> eventDef.getAccessControlLists())
+                    .map(CaseEventDefinition::getAccessControlLists)
                     .orElse(newArrayList()))
             )
             .toArray(CaseViewActionableEvent[]::new);
+    }
+
+    private void removeCaseViewFieldIfNoReadAccess(CaseUpdateViewEvent caseEventTrigger,
+                                                   List<String> filteredCaseFieldIds) {
+        caseEventTrigger.getCaseFields()
+            .removeIf(caseViewField -> filteredCaseFieldIds.contains(caseViewField.getId()));
+        caseEventTrigger.setWizardPages(
+            filterWizardPageFields(caseEventTrigger, filteredCaseFieldIds));
     }
 
     private boolean hasCaseFieldAccess(List<CaseFieldDefinition> caseFieldDefinitions,

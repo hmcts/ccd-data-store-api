@@ -13,10 +13,12 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignmentAttributes;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
+import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.EXCLUDED;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.SPECIFIC;
 import static uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType.STANDARD;
 import static uk.gov.hmcts.ccd.domain.service.AccessControl.IDAM_PREFIX;
@@ -45,8 +47,10 @@ public class PseudoRoleAssignmentsGenerator {
         List<RoleAssignment> pseudoRoleAssignments = new ArrayList<>();
 
         if (!isCreationProfile && caseAccessService.userCanOnlyAccessExplicitlyGrantedCases()) {
-            if (atLeastOneCaseRoleExists(filteredRoleAssignments)) {
-                pseudoRoleAssignments.addAll(createPseudoRoleAssignmentsForGrantedOnlyAccess(idamUserRoles));
+            List<RoleAssignment> nonExcludedCaseRoleAssignments = getNonExcludedCaseRoles(filteredRoleAssignments);
+            if (!nonExcludedCaseRoleAssignments.isEmpty()) {
+                pseudoRoleAssignments.addAll(createPseudoRoleAssignmentsForGrantedOnlyAccess(idamUserRoles,
+                    nonExcludedCaseRoleAssignments));
             }
         } else {
             pseudoRoleAssignments.addAll(createPseudoRoleAssignmentsByIdamRoles(idamUserRoles));
@@ -73,19 +77,30 @@ public class PseudoRoleAssignmentsGenerator {
             .collect(Collectors.toList());
     }
 
-    private List<RoleAssignment> createPseudoRoleAssignmentsForGrantedOnlyAccess(List<String> idamRoles) {
-        return idamRoles.stream()
-            .map(role -> RoleAssignment.builder()
-                .roleName(IDAM_PREFIX + role)
-                .grantType(SPECIFIC.name())
-                .classification(RESTRICTED.name())
-                .build())
-            .collect(Collectors.toList());
+    private List<RoleAssignment> createPseudoRoleAssignmentsForGrantedOnlyAccess(List<String> idamRoles,
+                                                                                 List<RoleAssignment> caseRoles) {
+        return caseRoles.stream().map(roleAssignment ->
+            idamRoles.stream()
+                .map(role -> RoleAssignment.builder()
+                    .roleName(IDAM_PREFIX + role)
+                    .grantType(SPECIFIC.name())
+                    .classification(RESTRICTED.name())
+                    .attributes(RoleAssignmentAttributes.builder()
+                        .jurisdiction(roleAssignment.getAttributes().getJurisdiction())
+                        .caseType(roleAssignment.getAttributes().getCaseType())
+                        .caseId(roleAssignment.getAttributes().getCaseId())
+                        .build())
+                    .build())
+            .collect(Collectors.toList()))
+        .flatMap(List::stream)
+        .collect(Collectors.toList());
     }
 
-    public boolean atLeastOneCaseRoleExists(List<RoleAssignment> roleAssignments) {
+    private List<RoleAssignment> getNonExcludedCaseRoles(List<RoleAssignment> roleAssignments) {
         return roleAssignments
             .stream()
-            .anyMatch(RoleAssignment::isCaseRoleAssignment);
+            .filter(RoleAssignment::isCaseRoleAssignment)
+            .filter(roleAssignment -> !roleAssignment.isGrantType(EXCLUDED))
+            .collect(Collectors.toList());
     }
 }

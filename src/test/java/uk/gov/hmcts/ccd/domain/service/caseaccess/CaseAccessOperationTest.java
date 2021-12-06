@@ -13,6 +13,8 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.mockito.stubbing.OngoingStubbing;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
@@ -62,6 +64,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class CaseAccessOperationTest {
 
     private static final String JURISDICTION = "CMC";
@@ -109,6 +112,7 @@ class CaseAccessOperationTest {
     @BeforeEach
     void setUp() {
         configureCaseRepository(JURISDICTION);
+        when(applicationParams.getEnableCaseUsersDbSync()).thenReturn(true);
     }
 
 
@@ -193,6 +197,58 @@ class CaseAccessOperationTest {
                         () -> assertTrue(roles.contains(CREATOR.getRole()))
                     );
                 },
+                () -> verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CREATOR.getRole())
+            );
+        }
+
+        @Test
+        @DisplayName("RA set to true, db sync false, should grant access to user, if [CREATOR] not already granted")
+        void shouldGrantAccessForRAWithoutDbSync_IfNotAlreadyGranted() {
+
+            // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+            when(applicationParams.getEnableCaseUsersDbSync()).thenReturn(false);
+            when(roleAssignmentService.findRoleAssignmentsByCasesAndUsers(any(), any())).thenReturn(new ArrayList<>());
+
+            // ACT
+            caseAccessOperation.grantAccess(JURISDICTION, CASE_REFERENCE.toString(), USER_ID);
+
+            // ASSERT
+            assertAll(
+                () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_REFERENCE),
+                () -> {
+                    verify(roleAssignmentService)
+                        .findRoleAssignmentsByCasesAndUsers(caseReferencesCaptor.capture(), userIdsCaptor.capture());
+                    List<String> caseReferences = caseReferencesCaptor.getValue();
+                    List<String> userIds = userIdsCaptor.getValue();
+
+                    assertAll(
+                        () -> assertEquals(1, caseReferences.size()),
+                        () -> assertEquals(1, userIds.size()),
+                        () -> assertEquals(CASE_REFERENCE.toString(), caseReferences.get(0)),
+                        () -> assertEquals(USER_ID, userIds.get(0))
+                    );
+                },
+                () -> {
+                    verify(roleAssignmentService).createCaseRoleAssignments(
+                        caseDetailsCaptor.capture(),
+                        eq(USER_ID),
+                        rolesCaptor.capture(),
+                        eq(false)
+                    );
+
+                    CaseDetails caseDetails = caseDetailsCaptor.getValue();
+                    assertAll(
+                        () -> assertEquals(CASE_ID.toString(), caseDetails.getId()),
+                        () -> assertEquals(CASE_REFERENCE, caseDetails.getReference())
+                    );
+
+                    Set<String> roles = rolesCaptor.getValue();
+                    assertAll(
+                        () -> assertEquals(1, roles.size()),
+                        () -> assertTrue(roles.contains(CREATOR.getRole()))
+                    );
+                },
                 () -> verifyNoInteractions(caseUserRepository)
             );
         }
@@ -233,7 +289,7 @@ class CaseAccessOperationTest {
                     any(),
                     anyBoolean()
                 ),
-                () -> verifyNoInteractions(caseUserRepository)
+                () -> verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CREATOR.getRole())
             );
         }
 
@@ -293,7 +349,7 @@ class CaseAccessOperationTest {
         @DisplayName("should reject update when it contains an unknown case role")
         void shouldRejectWhenUnknownCaseRoles() {
             final Executable execAccessUpdate = () -> caseAccessOperation.updateUserAccess(caseDetails,
-                                                                                           caseUser(NOT_CASE_ROLE));
+                caseUser(NOT_CASE_ROLE));
             assertThrows(InvalidCaseRoleException.class, execAccessUpdate);
             verifyNoInteractions(caseUserRepository);
             verifyNoInteractions(roleAssignmentService);
@@ -330,6 +386,7 @@ class CaseAccessOperationTest {
                 rolesCaptor.capture(),
                 eq(true)
             );
+            verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
 
             // :: verify roles submitted
             Set<String> roles = rolesCaptor.getValue();
@@ -337,9 +394,34 @@ class CaseAccessOperationTest {
                 () -> assertEquals(1, roles.size()),
                 () -> assertTrue(roles.contains(CASE_ROLE))
             );
+        }
 
-            // :: verify legacy service not called
+        @Test
+        @DisplayName("RA set to true, db sync false, should grant access when added case role valid")
+        void shouldGrantAccessForCaseRoleForRAWithDbSyncFalse() {
+
+            // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+            when(applicationParams.getEnableCaseUsersDbSync()).thenReturn(false);
+
+            // ACT
+            caseAccessOperation.updateUserAccess(caseDetails, caseUser(CASE_ROLE));
+
+            // ASSERT
+            verify(roleAssignmentService).createCaseRoleAssignments(
+                eq(caseDetails),
+                eq(USER_ID),
+                rolesCaptor.capture(),
+                eq(true)
+            );
             verifyNoInteractions(caseUserRepository);
+
+            // :: verify roles submitted
+            Set<String> roles = rolesCaptor.getValue();
+            assertAll(
+                () -> assertEquals(1, roles.size()),
+                () -> assertTrue(roles.contains(CASE_ROLE))
+            );
         }
 
         @Test
@@ -377,6 +459,8 @@ class CaseAccessOperationTest {
                 rolesCaptor.capture(),
                 eq(true)
             );
+            verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
+            verify(caseUserRepository).grantAccess(CASE_ID, USER_ID, CREATOR.getRole());
 
             // :: verify roles submitted
             Set<String> roles = rolesCaptor.getValue();
@@ -385,9 +469,6 @@ class CaseAccessOperationTest {
                 () -> assertTrue(roles.contains(CASE_ROLE)),
                 () -> assertTrue(roles.contains(CREATOR.getRole()))
             );
-
-            // :: verify legacy service not called
-            verifyNoInteractions(caseUserRepository);
         }
 
         @Test
@@ -463,6 +544,36 @@ class CaseAccessOperationTest {
 
             // ARRANGE
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+
+            // ACT
+            caseAccessOperation.revokeAccess(JURISDICTION, CASE_REFERENCE.toString(), USER_ID);
+
+            // ASSERT
+            assertAll(
+                () -> verify(caseDetailsRepository).findByReference(JURISDICTION, CASE_REFERENCE),
+                () -> {
+                    verify(roleAssignmentService).deleteRoleAssignments(deleteRequestsCaptor.capture());
+
+                    List<RoleAssignmentsDeleteRequest> deleteRequests = deleteRequestsCaptor.getValue();
+                    assertAll(
+                        () -> assertEquals(1, deleteRequests.size()),
+                        () -> assertCorrectlyPopulatedRoleAssignmentsDeleteRequest(
+                            CASE_REFERENCE.toString(), USER_ID, List.of(CREATOR.getRole()),
+                            deleteRequests.get(0)
+                        )
+                    );
+                },
+                () -> verify(caseUserRepository).revokeAccess(CASE_ID, USER_ID, CREATOR.getRole())
+            );
+        }
+
+        @Test
+        @DisplayName("RA set to true, db sync false, should revoke access to user")
+        void shouldRevokeAccessForRAWithDbSyncFalse() {
+
+            // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+            when(applicationParams.getEnableCaseUsersDbSync()).thenReturn(false);
 
             // ACT
             caseAccessOperation.revokeAccess(JURISDICTION, CASE_REFERENCE.toString(), USER_ID);
@@ -668,6 +779,7 @@ class CaseAccessOperationTest {
                 rolesCaptor.capture(),
                 eq(false)
             );
+            verify(caseUserRepository, times(1)).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
 
             CaseDetails caseDetails = caseDetailsCaptor.getValue();
             assertAll(
@@ -680,8 +792,45 @@ class CaseAccessOperationTest {
                 () -> assertEquals(1, roles.size()),
                 () -> assertTrue(roles.contains(CASE_ROLE))
             );
+        }
 
+        @Test
+        @DisplayName("RA set to true, db sync false, should add single case user role")
+        void shouldAddSingleCaseUserRoleForRAWithDbSyncFalse() {
+
+            // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+            when(applicationParams.getEnableCaseUsersDbSync()).thenReturn(false);
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE)
+            );
+            // behave as no existing case roles
+            mockExistingCaseUserRolesForRA(new ArrayList<>());
+
+            // ACT
+            caseAccessOperation.addCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(roleAssignmentService).createCaseRoleAssignments(
+                caseDetailsCaptor.capture(),
+                eq(USER_ID),
+                rolesCaptor.capture(),
+                eq(false)
+            );
             verifyNoInteractions(caseUserRepository);
+
+            CaseDetails caseDetails = caseDetailsCaptor.getValue();
+            assertAll(
+                () -> assertEquals(CASE_ID.toString(), caseDetails.getId()),
+                () -> assertEquals(CASE_REFERENCE, caseDetails.getReference())
+            );
+
+            Set<String> roles = rolesCaptor.getValue();
+            assertAll(
+                () -> assertEquals(1, roles.size()),
+                () -> assertTrue(roles.contains(CASE_ROLE))
+            );
         }
 
         @Test
@@ -799,6 +948,8 @@ class CaseAccessOperationTest {
                 rolesCaptor.capture(),
                 eq(false)
             );
+            verify(caseUserRepository, times(1)).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
+            verify(caseUserRepository, times(1)).grantAccess(CASE_ID_OTHER, USER_ID, CASE_ROLE);
 
             // :: create map of captor value indexes
             List<CaseDetails> caseDetailsList = caseDetailsCaptor.getAllValues();
@@ -838,8 +989,6 @@ class CaseAccessOperationTest {
                 () -> assertEquals(1, roles2.size()),
                 () -> assertTrue(roles2.contains(CASE_ROLE))
             );
-
-            verifyNoInteractions(caseUserRepository);
         }
 
         @Test
@@ -898,6 +1047,9 @@ class CaseAccessOperationTest {
                 rolesCaptor.capture(),
                 eq(false)
             );
+            // standard grant access check for all case user roles
+            verify(caseUserRepository, times(1)).grantAccess(CASE_ID, USER_ID, CASE_ROLE);
+            verify(caseUserRepository, times(1)).grantAccess(CASE_ID, USER_ID, CASE_ROLE_OTHER);
 
             CaseDetails caseDetails = caseDetailsCaptor.getValue();
             assertAll(
@@ -911,8 +1063,6 @@ class CaseAccessOperationTest {
                 () -> assertTrue(roles.contains(CASE_ROLE)),
                 () -> assertTrue(roles.contains(CASE_ROLE_OTHER))
             );
-
-            verifyNoInteractions(caseUserRepository);
         }
 
         @Test
@@ -957,8 +1107,6 @@ class CaseAccessOperationTest {
             // ASSERT
             verify(supplementaryDataRepository, times(1))
                 .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), 1L);
-
-            verifyNoInteractions(caseUserRepository);
         }
 
         @Test
@@ -1007,8 +1155,6 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(supplementaryDataRepository, never()).incrementSupplementaryData(anyString(), anyString(), any());
-
-            verifyNoInteractions(caseUserRepository);
         }
 
         @Test
@@ -1107,8 +1253,6 @@ class CaseAccessOperationTest {
             // ASSERT
             verify(supplementaryDataRepository, times(1))
                 .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), 1L);
-
-            verifyNoInteractions(caseUserRepository);
         }
 
         @Test
@@ -1160,8 +1304,6 @@ class CaseAccessOperationTest {
             // ASSERT
             verify(supplementaryDataRepository, times(1))
                 .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION),1L);
-
-            verifyNoInteractions(caseUserRepository);
         }
 
         @Test
@@ -1213,8 +1355,6 @@ class CaseAccessOperationTest {
             // ASSERT
             verify(supplementaryDataRepository, times(1))
                 .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION),1L);
-
-            verifyNoInteractions(caseUserRepository);
         }
 
         @Test
@@ -1265,8 +1405,6 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(supplementaryDataRepository, never()).incrementSupplementaryData(anyString(), anyString(), any());
-
-            verifyNoInteractions(caseUserRepository);
         }
 
         @Test
@@ -1291,7 +1429,7 @@ class CaseAccessOperationTest {
                 // (2 orgs with 1 user each with multiple roles >> 2 org counts incremented by 1)
                 // (however 2nd org count will not be required as existing relationship added below **)
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE,
-                        ORGANISATION),
+                    ORGANISATION),
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE_OTHER,
                     ORGANISATION),
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID_OTHER, CASE_ROLE,
@@ -1391,8 +1529,6 @@ class CaseAccessOperationTest {
                     eq(getOrgUserCountSupDataKey(ORGANISATION_OTHER)),
                     anyLong()
                 );
-
-            verifyNoInteractions(caseUserRepository);
         }
 
     }
@@ -1462,6 +1598,7 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(roleAssignmentService).deleteRoleAssignments(deleteRequestsCaptor.capture());
+            verify(caseUserRepository, times(1)).revokeAccess(CASE_ID, USER_ID, CASE_ROLE);
 
             List<RoleAssignmentsDeleteRequest> deleteRequests = deleteRequestsCaptor.getValue();
             assertAll(
@@ -1471,8 +1608,43 @@ class CaseAccessOperationTest {
                     deleteRequests.get(0)
                 )
             );
+        }
 
+        @Test
+        @DisplayName("RA set to true, db sync false, should remove single case user role")
+        void shouldRemoveSingleCaseUserRoleForRAWithDbSyncFalse() {
+
+            // ARRANGE
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+            when(applicationParams.getEnableCaseUsersDbSync()).thenReturn(false);
+
+            List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE)
+            );
+
+            // for an existing relation and then after removal
+            mockExistingCaseUserRolesForRA(
+                // before
+                List.of(new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE)),
+                // after
+                new ArrayList<>()
+            );
+
+            // ACT
+            caseAccessOperation.removeCaseUserRoles(caseUserRoles);
+
+            // ASSERT
+            verify(roleAssignmentService).deleteRoleAssignments(deleteRequestsCaptor.capture());
             verifyNoInteractions(caseUserRepository);
+
+            List<RoleAssignmentsDeleteRequest> deleteRequests = deleteRequestsCaptor.getValue();
+            assertAll(
+                () -> assertEquals(1, deleteRequests.size()),
+                () -> assertCorrectlyPopulatedRoleAssignmentsDeleteRequest(
+                    CASE_REFERENCE.toString(), USER_ID, List.of(CASE_ROLE),
+                    deleteRequests.get(0)
+                )
+            );
         }
 
         @Test
@@ -1527,6 +1699,7 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(roleAssignmentService).deleteRoleAssignments(deleteRequestsCaptor.capture());
+            verify(caseUserRepository, times(1)).revokeAccess(CASE_ID, USER_ID, CASE_ROLE_CREATOR);
 
             List<RoleAssignmentsDeleteRequest> deleteRequests = deleteRequestsCaptor.getValue();
             assertAll(
@@ -1536,8 +1709,6 @@ class CaseAccessOperationTest {
                     deleteRequests.get(0)
                 )
             );
-
-            verifyNoInteractions(caseUserRepository);
         }
 
         @Test
@@ -1614,6 +1785,8 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(roleAssignmentService).deleteRoleAssignments(deleteRequestsCaptor.capture());
+            verify(caseUserRepository, times(1)).revokeAccess(CASE_ID, USER_ID, CASE_ROLE);
+            verify(caseUserRepository, times(1)).revokeAccess(CASE_ID_OTHER, USER_ID, CASE_ROLE);
 
             Map<String, RoleAssignmentsDeleteRequest> deleteRequestsMapByCaseId =
                 deleteRequestsCaptor.getValue().stream()
@@ -1632,8 +1805,6 @@ class CaseAccessOperationTest {
                     deleteRequestsMapByCaseId.get(CASE_REFERENCE_OTHER.toString())
                 )
             );
-
-            verifyNoInteractions(caseUserRepository);
         }
 
         @Test
@@ -1706,8 +1877,6 @@ class CaseAccessOperationTest {
             // ASSERT
             verify(supplementaryDataRepository, times(1))
                 .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), -1L);
-
-            verifyNoInteractions(caseUserRepository);
         }
 
         @Test
@@ -1814,8 +1983,6 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(supplementaryDataRepository, never()).incrementSupplementaryData(anyString(), anyString(), any());
-
-            verifyNoInteractions(caseUserRepository);
         }
 
         @Test
@@ -1877,8 +2044,6 @@ class CaseAccessOperationTest {
             // ASSERT
             verify(supplementaryDataRepository, times(1))
                 .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), -1L);
-
-            verifyNoInteractions(caseUserRepository);
         }
 
         @Test
@@ -1947,8 +2112,6 @@ class CaseAccessOperationTest {
             // ASSERT
             verify(supplementaryDataRepository, times(1))
                 .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), -1L);
-
-            verifyNoInteractions(caseUserRepository);
         }
 
         @Test
@@ -2018,8 +2181,6 @@ class CaseAccessOperationTest {
             // ASSERT
             verify(supplementaryDataRepository, times(1))
                 .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION), -1L);
-
-            verifyNoInteractions(caseUserRepository);
         }
 
         @Test
@@ -2086,8 +2247,6 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(supplementaryDataRepository, never()).incrementSupplementaryData(anyString(), anyString(), any());
-
-            verifyNoInteractions(caseUserRepository);
         }
 
         @Test
@@ -2155,8 +2314,6 @@ class CaseAccessOperationTest {
 
             // ASSERT
             verify(supplementaryDataRepository, never()).incrementSupplementaryData(anyString(), anyString(), any());
-
-            verifyNoInteractions(caseUserRepository);
         }
 
         @Test
@@ -2247,8 +2404,6 @@ class CaseAccessOperationTest {
             verify(supplementaryDataRepository, times(1))
                 .incrementSupplementaryData(CASE_REFERENCE.toString(), getOrgUserCountSupDataKey(ORGANISATION_OTHER),
                     -1L);
-
-            verifyNoInteractions(caseUserRepository);
         }
 
     }
@@ -2364,13 +2519,13 @@ class CaseAccessOperationTest {
         caseDetailsOther.setReference(CASE_REFERENCE_OTHER);
 
         doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)
-                                          .findByReference(jurisdiction, CASE_REFERENCE);
+            .findByReference(jurisdiction, CASE_REFERENCE);
         doReturn(Optional.of(caseDetailsOther)).when(caseDetailsRepository)
-                                               .findByReference(jurisdiction, CASE_REFERENCE_OTHER);
+            .findByReference(jurisdiction, CASE_REFERENCE_OTHER);
         doReturn(Optional.empty()).when(caseDetailsRepository)
-                                  .findByReference(jurisdiction, CASE_NOT_FOUND);
+            .findByReference(jurisdiction, CASE_NOT_FOUND);
         doReturn(Optional.empty()).when(caseDetailsRepository)
-                                  .findByReference(WRONG_JURISDICTION, CASE_REFERENCE);
+            .findByReference(WRONG_JURISDICTION, CASE_REFERENCE);
     }
 
     private CaseUserEntity createCaseUserEntity(Long caseDataId, String caseRole, String userId) {

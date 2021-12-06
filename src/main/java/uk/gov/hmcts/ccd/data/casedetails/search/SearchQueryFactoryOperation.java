@@ -10,15 +10,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.data.casedetails.search.builder.AccessControlGrantTypeQueryBuilder;
-import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
@@ -44,9 +42,9 @@ public class SearchQueryFactoryOperation {
     private final UserAuthorisation userAuthorisation;
     private final SortOrderQueryBuilder sortOrderQueryBuilder;
     private final AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
-    private final RoleAssignmentService roleAssignmentService;
-    private final CaseDefinitionRepository caseDefinitionRepository;
     private final AccessControlGrantTypeQueryBuilder accessControlGrantTypeQueryBuilder;
+    private final CaseDataAccessControl caseDataAccessControl;
+    private final CaseTypeService caseTypeService;
 
     public SearchQueryFactoryOperation(CriterionFactory criterionFactory,
                                        EntityManager entityManager,
@@ -54,19 +52,18 @@ public class SearchQueryFactoryOperation {
                                        UserAuthorisation userAuthorisation,
                                        SortOrderQueryBuilder sortOrderQueryBuilder,
                                        AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService,
-                                       RoleAssignmentService roleAssignmentService,
-                                       @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                       CaseDefinitionRepository caseDefinitionRepository,
-                                       AccessControlGrantTypeQueryBuilder accessControlGrantTypeQueryBuilder) {
+                                       AccessControlGrantTypeQueryBuilder accessControlGrantTypeQueryBuilder,
+                                       CaseDataAccessControl caseDataAccessControl,
+                                       CaseTypeService caseTypeService) {
         this.criterionFactory = criterionFactory;
         this.entityManager = entityManager;
         this.applicationParam = applicationParam;
         this.userAuthorisation = userAuthorisation;
         this.sortOrderQueryBuilder = sortOrderQueryBuilder;
         this.authorisedCaseDefinitionDataService = authorisedCaseDefinitionDataService;
-        this.roleAssignmentService = roleAssignmentService;
-        this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlGrantTypeQueryBuilder = accessControlGrantTypeQueryBuilder;
+        this.caseDataAccessControl = caseDataAccessControl;
+        this.caseTypeService = caseTypeService;
     }
 
     public Query build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
@@ -97,12 +94,11 @@ public class SearchQueryFactoryOperation {
 
     private String addUserCaseAccessClause(Map<String, Object> params, MetaData metadata) {
         if (applicationParam.getEnableAttributeBasedAccessControl()) {
+            CaseTypeDefinition caseTypeDefinition = caseTypeService
+                .getCaseTypeForJurisdiction(metadata.getCaseTypeId(), metadata.getJurisdiction());
+            List<RoleAssignment> roleAssignments = caseDataAccessControl.generateRoleAssignments(caseTypeDefinition);
 
-            CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(metadata.getCaseTypeId());
-            List<RoleAssignment> roleAssignments = roleAssignmentService
-                .getRoleAssignments(userAuthorisation.getUserId(), caseTypeDefinition);
-
-            return accessControlGrantTypeQueryBuilder.createQuery(roleAssignments, params);
+            return accessControlGrantTypeQueryBuilder.createQuery(roleAssignments, params, caseTypeDefinition);
 
         } else if (UserAuthorisation.AccessLevel.GRANTED.equals(userAuthorisation.getAccessLevel())) {
             params.put("user_id", userAuthorisation.getUserId());
@@ -112,16 +108,17 @@ public class SearchQueryFactoryOperation {
     }
 
     private String addUserCaseStateAccessClause(MetaData metadata, Map<String, Object> params) {
-        // restrict cases to the case states the user has access to
-        List<String> caseStateIds =
-            authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(metadata.getJurisdiction(),
-                                                                              metadata.getCaseTypeId(),
-                                                                              CAN_READ);
-        if (!caseStateIds.isEmpty()) {
-            params.put("states", caseStateIds);
-            return " AND state IN (:states)";
+        if (!applicationParam.getEnableAttributeBasedAccessControl()) {
+            // restrict cases to the case states the user has access to
+            List<String> caseStateIds =
+                authorisedCaseDefinitionDataService.getUserAuthorisedCaseStateIds(metadata.getJurisdiction(),
+                    metadata.getCaseTypeId(),
+                    CAN_READ);
+            if (!caseStateIds.isEmpty()) {
+                params.put("states", caseStateIds);
+                return " AND state IN (:states)";
+            }
         }
-
         return "";
     }
 

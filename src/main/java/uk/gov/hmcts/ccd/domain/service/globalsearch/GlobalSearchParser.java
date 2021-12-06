@@ -58,7 +58,7 @@ public class GlobalSearchParser {
                 .hasAccess(userRepository.getUserRoles(), CAN_READ,
                     caseFieldDefinition.get().getAccessControlLists()))
                 || !securityClassificationService
-                .userHasEnoughSecurityClassificationForField(caseTypeDefinition.getJurisdictionId(),
+                .userHasEnoughSecurityClassificationForField(caseTypeDefinition,
                     SecurityClassification.valueOf(caseFieldDefinition.get().getSecurityLabel())))) {
                 isAuthorised = false;
                 break;

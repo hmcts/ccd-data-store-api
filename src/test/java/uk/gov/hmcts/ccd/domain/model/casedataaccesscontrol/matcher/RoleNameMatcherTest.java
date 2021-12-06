@@ -9,6 +9,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.accessprofile.filter.BaseFilter;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -46,6 +47,24 @@ class RoleNameMatcherTest extends BaseFilter {
                 .roleName(ROLE_NAME2)
                 .build()
         ));
+        assertTrue(classUnderTest.matchAttribute(roleAssignment, caseTypeDefinition));
+    }
+
+    @Test
+    void shouldMatchWhenAccessProfilesNull() {
+        RoleAssignment roleAssignment = createRoleAssignmentWithRoleName(ROLE_NAME1);
+
+        CaseTypeDefinition caseTypeDefinition = mockCaseTypeDefinition();
+        when(caseTypeDefinition.getRoleToAccessProfiles()).thenReturn(null);
+        assertTrue(classUnderTest.matchAttribute(roleAssignment, caseTypeDefinition));
+    }
+
+    @Test
+    void shouldMatchWhenAccessProfilesIsEmpty() {
+        RoleAssignment roleAssignment = createRoleAssignmentWithRoleName(ROLE_NAME1);
+
+        CaseTypeDefinition caseTypeDefinition = mockCaseTypeDefinition();
+        when(caseTypeDefinition.getRoleToAccessProfiles()).thenReturn(emptyList());
         assertTrue(classUnderTest.matchAttribute(roleAssignment, caseTypeDefinition));
     }
 
