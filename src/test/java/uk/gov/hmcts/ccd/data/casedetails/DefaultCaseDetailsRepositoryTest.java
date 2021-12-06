@@ -31,6 +31,8 @@ import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseTypeDefinitionVersion;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -90,6 +92,8 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     @MockBean
     private AccessControlService accessControlService;
 
+    @MockBean
+    private CaseDefinitionRepository caseDefinitionRepository;
 
     @Inject
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
@@ -286,6 +290,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void findByWildcardReturnCorrectRecords() {
         ReflectionTestUtils.setField(applicationParams, "wildcardSearchAllowed", true);
+        when(caseDefinitionRepository.getLatestVersion("TestAddressBookCase")).thenReturn(new CaseTypeDefinitionVersion());
         MetaData metadata = new MetaData("TestAddressBookCase", "PROBATE");
 
         Map<String, String> params = Maps.newHashMap();
