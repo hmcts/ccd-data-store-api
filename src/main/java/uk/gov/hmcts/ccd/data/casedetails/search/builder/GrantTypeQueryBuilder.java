@@ -1,60 +1,97 @@
 package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 
+import com.google.common.collect.Lists;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchRoleAssignment;
 
-public interface GrantTypeQueryBuilder {
+import static com.google.common.collect.Lists.newArrayList;
+import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 
-    String QUERY_WRAPPER = "( %s )";
+@Slf4j
+public abstract class GrantTypeQueryBuilder {
 
-    String QUERY = "%s in (:%s)";
+    private final AccessControlService accessControlService;
+    private final CaseDataAccessControl caseDataAccessControl;
 
-    String EMPTY = "";
-
-    String SECURITY_CLASSIFICATION = "security_classification";
-
-    String JURISDICTION = "jurisdiction";
-
-    String REFERENCE = "reference";
-
-    String CASE_TYPE_ID = "case_type_id";
-
-    String LOCATION = "data" + " #>> '{caseManagementLocation,baseLocation}'";
-
-    String REGION = "data" + " #>> '{caseManagementLocation,region}'";
-
-    String AND = " AND ";
-
-    String OR = " OR ";
-
-    String AND_NOT = " AND NOT ";
-
-    String createQuery(List<RoleAssignment> roleAssignments, Map<String, Object> params);
-
-    default String createClassification(Map<String, Object> params, String paramName,
-                                        Stream<RoleAssignment> roleAssignmentStream) {
-        Set<String> classifications = roleAssignmentStream
-            .map(roleAssignment -> roleAssignment.getClassification())
-            .filter(classification -> StringUtils.isNotBlank(classification))
-            .collect(Collectors.toSet());
-
-        if (classifications.size() > 0) {
-            params.put(paramName, classifications);
-            return String.format(QUERY, SECURITY_CLASSIFICATION, paramName);
-        }
-
-        return EMPTY;
+    protected GrantTypeQueryBuilder(AccessControlService accessControlService,
+                                      CaseDataAccessControl caseDataAccessControl) {
+        this.accessControlService = accessControlService;
+        this.caseDataAccessControl = caseDataAccessControl;
     }
 
-    default String getOperator(String query, String operator) {
-        if (StringUtils.isNotBlank(query)) {
-            return operator;
+    protected abstract GrantType getGrantType();
+
+    protected Supplier<Stream<RoleAssignment>> filterGrantTypeRoleAssignments(List<RoleAssignment> roleAssignments) {
+        return () -> roleAssignments.stream()
+            .filter(roleAssignment -> getGrantType().name().equals(roleAssignment.getGrantType()));
+    }
+
+    /**
+     * Groups role assignments by those which are "similar" in the context of building a search query
+     * i.e. *most* of the relevant values to search match in each group.
+     * @param roleAssignments Role assignments to group
+     * @return Grouped role assignments for search. Note that case reference is ignored in the grouping, so
+     *      SearchRoleAssignments in the same group can have different case reference values.
+     */
+    protected Map<Integer, List<SearchRoleAssignment>> getGroupedSearchRoleAssignments(
+        List<RoleAssignment> roleAssignments) {
+        return filterGrantTypeRoleAssignments(roleAssignments).get()
+            .map(SearchRoleAssignment::new)
+            .collect(Collectors.groupingBy(SearchRoleAssignment::hashCode));
+    }
+
+    protected List<CaseStateDefinition> getStatesForCaseType(CaseTypeDefinition caseType) {
+        return caseType == null ? newArrayList() : caseType.getStates();
+    }
+
+    protected List<String> getClassifications(SearchRoleAssignment searchRoleAssignment) {
+        String classification = searchRoleAssignment.getSecurityClassification();
+        if (StringUtils.isNotBlank(classification)) {
+            try {
+                return SecurityClassification
+                    .valueOf(classification).getClassificationsLowerOrEqualTo();
+            } catch (IllegalArgumentException ex) {
+                log.warn("Found unknown classification '{}' in role assignment; ignored", classification);
+            }
         }
-        return EMPTY;
+        return Lists.newArrayList();
+    }
+
+    protected boolean allRoleAssignmentsHaveCaseReference(List<SearchRoleAssignment> searchRoleAssignments) {
+        return searchRoleAssignments.stream().allMatch(SearchRoleAssignment::hasCaseReference);
+    }
+
+    protected Set<String> getReadableCaseStates(SearchRoleAssignment searchRoleAssignment,
+                                                List<CaseStateDefinition> allCaseStates,
+                                                CaseTypeDefinition caseType) {
+        Set<AccessProfile> accessProfiles = getAccessProfiles(searchRoleAssignment.getRoleAssignment(), caseType);
+        return accessControlService
+            .filterCaseStatesByAccess(allCaseStates, accessProfiles, CAN_READ)
+            .stream()
+            .map(CaseStateDefinition::getId)
+            .collect(Collectors.toCollection(TreeSet::new));
+    }
+
+    private Set<AccessProfile> getAccessProfiles(RoleAssignment roleAssignment,
+                                                 CaseTypeDefinition caseTypeDefinition) {
+        return caseDataAccessControl.filteredAccessProfiles(List.of(roleAssignment), caseTypeDefinition, false);
     }
 }

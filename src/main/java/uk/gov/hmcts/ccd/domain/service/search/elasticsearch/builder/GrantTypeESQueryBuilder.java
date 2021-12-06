@@ -1,66 +1,96 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermsQueryBuilder;
+import uk.gov.hmcts.ccd.data.casedetails.search.builder.GrantTypeQueryBuilder;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchRoleAssignment;
 
-import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.JURISDICTION_FIELD_KEYWORD_COL;
+import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.JURISDICTION_FIELD_COL;
+import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.LOCATION;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REFERENCE_FIELD_COL;
+import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REGION;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.SECURITY_CLASSIFICATION_FIELD_COL;
+import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.STATE_FIELD_COL;
 
-public interface GrantTypeESQueryBuilder {
+@Slf4j
+public abstract class GrantTypeESQueryBuilder extends GrantTypeQueryBuilder {
 
-    BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments);
+    protected static final String KEYWORD = ".keyword";
 
-    default Optional<TermsQueryBuilder>  createClassification(Stream<RoleAssignment> roleAssignmentStream) {
-        Set<String> classifications = roleAssignmentStream
-            .map(roleAssignment -> roleAssignment.getClassification())
-            .filter(classification -> StringUtils.isNotBlank(classification))
-            .collect(Collectors.toSet());
-
-        if (classifications.size() > 0) {
-            return Optional.of(QueryBuilders.termsQuery(SECURITY_CLASSIFICATION_FIELD_COL, classifications));
-        }
-        return Optional.empty();
+    protected GrantTypeESQueryBuilder(AccessControlService accessControlService,
+                                      CaseDataAccessControl caseDataAccessControl) {
+        super(accessControlService, caseDataAccessControl);
     }
 
-    @SuppressWarnings("java:S2789")
-    default Optional<TermsQueryBuilder> getJurisdictions(Supplier<Stream<RoleAssignment>> streamSupplier) {
-        Set<String> jurisdictions = streamSupplier.get()
-            .filter(roleAssignment -> roleAssignment.getAttributes() != null)
-            .map(roleAssignment -> roleAssignment.getAttributes().getJurisdiction())
-            .filter(jurisdictionOptional -> jurisdictionOptional != null)
-            .map(jurisdictionOptional -> jurisdictionOptional.get())
-            .filter(jurisdiction -> StringUtils.isNotBlank(jurisdiction))
-            .collect(Collectors.toSet());
+    public BoolQueryBuilder createQuery(List<RoleAssignment> roleAssignments,
+                                        CaseTypeDefinition caseType) {
+        List<CaseStateDefinition> caseStates = getStatesForCaseType(caseType);
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
 
-        if (jurisdictions.size() > 0) {
-            return Optional.of(QueryBuilders.termsQuery(JURISDICTION_FIELD_KEYWORD_COL, jurisdictions));
-        }
-        return Optional.empty();
+        getGroupedSearchRoleAssignments(roleAssignments)
+            .forEach((hash, groupedSearchRoleAssignments) -> {
+                BoolQueryBuilder innerQuery = QueryBuilders.boolQuery();
+                SearchRoleAssignment representative = groupedSearchRoleAssignments.get(0);
+                Set<String> readableCaseStates = getReadableCaseStates(representative, caseStates, caseType);
+                if (readableCaseStates.isEmpty()) {
+                    return;
+                }
+
+                addTermQueryForOptionalAttribute(representative.getJurisdiction(), innerQuery, JURISDICTION_FIELD_COL);
+                addTermQueryForOptionalAttribute(representative.getRegion(), innerQuery, REGION);
+                addTermQueryForOptionalAttribute(representative.getLocation(), innerQuery, LOCATION);
+                addTermsQueryForReference(groupedSearchRoleAssignments, innerQuery);
+                addTermsQueryForState(readableCaseStates, caseStates, innerQuery);
+                addTermsQueryForClassification(representative, innerQuery);
+
+                query.should(innerQuery);
+            });
+
+        return query;
     }
 
-    @SuppressWarnings("java:S2789")
-    default Optional<TermsQueryBuilder> getCaseReferences(Supplier<Stream<RoleAssignment>> streamSupplier) {
-        Set<String> caseReferences = streamSupplier.get()
-            .filter(roleAssignment -> roleAssignment.getAttributes() != null)
-            .map(roleAssignment -> roleAssignment.getAttributes().getCaseId())
-            .filter(caseReferenceOptional -> caseReferenceOptional != null)
-            .map(caseReferenceOptional -> caseReferenceOptional.get())
-            .filter(caseReference -> StringUtils.isNotBlank(caseReference))
-            .collect(Collectors.toSet());
-
-        if (caseReferences.size() > 0) {
-            return Optional.of(QueryBuilders.termsQuery(REFERENCE_FIELD_COL, caseReferences));
+    private void addTermsQueryForState(Set<String> readableCaseStates,
+                                       List<CaseStateDefinition> allCaseStates,
+                                       BoolQueryBuilder parentQuery) {
+        if (readableCaseStates.size() != allCaseStates.size()) {
+            parentQuery.must(QueryBuilders.termsQuery(STATE_FIELD_COL + KEYWORD, readableCaseStates));
         }
-        return Optional.empty();
+    }
+
+    private void addTermsQueryForReference(List<SearchRoleAssignment> searchRoleAssignments,
+                                           BoolQueryBuilder parentQuery) {
+        if (allRoleAssignmentsHaveCaseReference(searchRoleAssignments)) {
+            parentQuery.must(QueryBuilders.termsQuery(REFERENCE_FIELD_COL + KEYWORD,
+                searchRoleAssignments.stream()
+                    .map(SearchRoleAssignment::getCaseReference)
+                    .collect(Collectors.toList())));
+        }
+    }
+
+    private void addTermQueryForOptionalAttribute(String attribute,
+                                                  BoolQueryBuilder parentQuery,
+                                                  String matchName) {
+        if (StringUtils.isNotBlank(attribute)) {
+            parentQuery.must(QueryBuilders.termQuery(matchName + KEYWORD, attribute));
+        }
+    }
+
+    private void addTermsQueryForClassification(SearchRoleAssignment searchRoleAssignment,
+                                                BoolQueryBuilder parentQuery) {
+        List<String> classifications = getClassifications(searchRoleAssignment);
+        if (!classifications.isEmpty()) {
+            parentQuery.must(QueryBuilders.termsQuery(SECURITY_CLASSIFICATION_FIELD_COL, classifications));
+        }
     }
 }

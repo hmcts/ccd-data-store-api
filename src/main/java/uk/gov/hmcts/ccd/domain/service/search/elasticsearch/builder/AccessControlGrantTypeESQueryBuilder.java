@@ -10,8 +10,7 @@ import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
-import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
-import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 
 @Component
 public class AccessControlGrantTypeESQueryBuilder {
@@ -22,8 +21,7 @@ public class AccessControlGrantTypeESQueryBuilder {
     private final ChallengedGrantTypeESQueryBuilder challengedGrantTypeQueryBuilder;
     private final ExcludedGrantTypeESQueryBuilder excludedGrantTypeQueryBuilder;
     private final CaseDefinitionRepository caseDefinitionRepository;
-    private final RoleAssignmentService roleAssignmentService;
-    private final UserAuthorisation userAuthorisation;
+    private final CaseDataAccessControl caseDataAccessControl;
 
     @Autowired
     public AccessControlGrantTypeESQueryBuilder(BasicGrantTypeESQueryBuilder basicGrantTypeQueryBuilder,
@@ -33,29 +31,38 @@ public class AccessControlGrantTypeESQueryBuilder {
                                                 ExcludedGrantTypeESQueryBuilder excludedGrantTypeQueryBuilder,
                                                 @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                                 CaseDefinitionRepository caseDefinitionRepository,
-                                                RoleAssignmentService roleAssignmentService,
-                                                UserAuthorisation userAuthorisation) {
+                                                CaseDataAccessControl caseDataAccessControl) {
         this.basicGrantTypeQueryBuilder = basicGrantTypeQueryBuilder;
         this.specificGrantTypeQueryBuilder = specificGrantTypeQueryBuilder;
         this.standardGrantTypeQueryBuilder = standardGrantTypeQueryBuilder;
         this.challengedGrantTypeQueryBuilder = challengedGrantTypeQueryBuilder;
         this.excludedGrantTypeQueryBuilder = excludedGrantTypeQueryBuilder;
         this.caseDefinitionRepository = caseDefinitionRepository;
-        this.roleAssignmentService = roleAssignmentService;
-        this.userAuthorisation = userAuthorisation;
+        this.caseDataAccessControl = caseDataAccessControl;
     }
 
     public void createQuery(String caseTypeId, BoolQueryBuilder mainQuery) {
-        List<RoleAssignment> roleAssignments = getRoleAssignments(caseTypeId);
-        BoolQueryBuilder standardQuery = standardGrantTypeQueryBuilder.createQuery(roleAssignments);
-        BoolQueryBuilder challengedQuery = challengedGrantTypeQueryBuilder.createQuery(roleAssignments);
+        CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
+        List<RoleAssignment> roleAssignments = getRoleAssignments(caseTypeDefinition);
+
+        BoolQueryBuilder standardQuery = standardGrantTypeQueryBuilder
+            .createQuery(roleAssignments, caseTypeDefinition);
+
+        BoolQueryBuilder challengedQuery = challengedGrantTypeQueryBuilder
+            .createQuery(roleAssignments, caseTypeDefinition);
+
         BoolQueryBuilder orgQuery = prepareQuery(standardQuery, challengedQuery);
 
-        BoolQueryBuilder basicQuery = basicGrantTypeQueryBuilder.createQuery(roleAssignments);
-        BoolQueryBuilder specificQuery = specificGrantTypeQueryBuilder.createQuery(roleAssignments);
+        BoolQueryBuilder basicQuery = basicGrantTypeQueryBuilder
+            .createQuery(roleAssignments, caseTypeDefinition);
+
+        BoolQueryBuilder specificQuery = specificGrantTypeQueryBuilder
+            .createQuery(roleAssignments, caseTypeDefinition);
+
         BoolQueryBuilder nonOrgQuery = prepareQuery(basicQuery, specificQuery);
 
-        BoolQueryBuilder excludedQuery = excludedGrantTypeQueryBuilder.createQuery(roleAssignments);
+        BoolQueryBuilder excludedQuery = excludedGrantTypeQueryBuilder
+            .createQuery(roleAssignments, caseTypeDefinition);
 
         if (!nonOrgQuery.hasClauses()
             && !orgQuery.hasClauses()
@@ -105,9 +112,8 @@ public class AccessControlGrantTypeESQueryBuilder {
         }
     }
 
-    private List<RoleAssignment> getRoleAssignments(String caseTypeId) {
-        CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
-        return roleAssignmentService.getRoleAssignments(userAuthorisation.getUserId(), caseTypeDefinition);
+    private List<RoleAssignment> getRoleAssignments(CaseTypeDefinition caseTypeDefinition) {
+        return caseDataAccessControl.generateRoleAssignments(caseTypeDefinition);
     }
 
     private BoolQueryBuilder prepareQuery(BoolQueryBuilder queryOne, BoolQueryBuilder queryTwo) {

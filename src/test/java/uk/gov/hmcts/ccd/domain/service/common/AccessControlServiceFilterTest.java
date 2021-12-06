@@ -4,7 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewActionableEvent;
@@ -62,11 +64,13 @@ class AccessControlServiceFilterTest {
     final CaseViewActionableEvent[] caseViewTriggers = {CASE_VIEW_TRIGGER_1, CASE_VIEW_TRIGGER_2, CASE_VIEW_TRIGGER_3};
     AccessControlService accessControlService;
 
+    @Mock
+    private ApplicationParams applicationParams;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
-
-        accessControlService = new AccessControlServiceImpl(new CompoundAccessControlService());
+        MockitoAnnotations.openMocks(this);
+        accessControlService = new AccessControlServiceImpl(applicationParams, new CompoundAccessControlService());
     }
 
     @Nested

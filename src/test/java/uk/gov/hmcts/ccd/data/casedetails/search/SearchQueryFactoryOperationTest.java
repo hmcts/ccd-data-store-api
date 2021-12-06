@@ -10,16 +10,15 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.casedetails.search.builder.AccessControlGrantTypeQueryBuilder;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.RoleAssignmentService;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,31 +43,33 @@ class SearchQueryFactoryOperationTest {
     private AuthorisedCaseDefinitionDataService authorisedCaseDefinitionDataService;
 
     @Mock
-    private RoleAssignmentService roleAssignmentService;
-
-    @Mock
     private EntityManager entityManager;
 
     @Mock
-    private CaseDefinitionRepository caseDefinitionRepository;
+    private CaseTypeService caseTypeService;
 
     @Mock
     private AccessControlGrantTypeQueryBuilder accessControlGrantTypeQueryBuilder;
+
+    @Mock
+    private CaseDataAccessControl caseDataAccessControl;
 
     private SearchQueryFactoryOperation classUnderTest;
 
     @BeforeEach
     public void initMock() throws IOException {
         MockitoAnnotations.initMocks(this);
+        CaseTypeDefinition caseTypeDefinition = mock(CaseTypeDefinition.class);
+        when(caseTypeService.getCaseTypeForJurisdiction(anyString(), anyString())).thenReturn(caseTypeDefinition);
         classUnderTest = new SearchQueryFactoryOperation(criterionFactory,
             entityManager,
             applicationParam,
             userAuthorisation,
             sortOrderQueryBuilder,
             authorisedCaseDefinitionDataService,
-            roleAssignmentService,
-            caseDefinitionRepository,
-            accessControlGrantTypeQueryBuilder);
+            accessControlGrantTypeQueryBuilder,
+            caseDataAccessControl,
+            caseTypeService);
     }
 
     @Test
@@ -108,8 +109,7 @@ class SearchQueryFactoryOperationTest {
         classUnderTest.build(metadata, Maps.newHashMap(), false);
 
         verify(sortOrderQueryBuilder).buildSortOrderClause(metadata);
-        verify(userAuthorisation, times(1)).getUserId();
-        verify(roleAssignmentService).getRoleAssignments(anyString(), anyObject());
+        verify(caseDataAccessControl).generateRoleAssignments(any(CaseTypeDefinition.class));
         verify(entityManager).createNativeQuery(anyString(), any(Class.class));
     }
 
@@ -125,7 +125,6 @@ class SearchQueryFactoryOperationTest {
 
         verify(sortOrderQueryBuilder).buildSortOrderClause(metadata);
         verify(userAuthorisation).getUserId();
-        verify(roleAssignmentService, times(0)).getCaseReferencesForAGivenUser(anyString());
         verify(entityManager).createNativeQuery(anyString(), any(Class.class));
     }
 }
