@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ccd.v2.external.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -8,6 +11,8 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ExampleProperty;
 import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -48,6 +53,7 @@ import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CREATE_CASE;
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.UPDATE_CASE;
 
 @RestController
+@Slf4j
 @RequestMapping(path = "/")
 public class CaseController {
     private final GetCaseOperation getCaseOperation;
@@ -229,6 +235,15 @@ public class CaseController {
                                                         + "}"
                                                         + "\n```", required = true)
                                                     @RequestBody final CaseDataContent content) {
+        log.info("Event Request Payload: {}", content.toString());
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        try {
+            String json = ow.writeValueAsString(content);
+            log.info("Event Request Payload in Json: {}", json);
+        } catch (JsonProcessingException e) {
+            log.error("EX:", e);
+        }
+
         return createCaseEvent(caseId, content);
     }
 

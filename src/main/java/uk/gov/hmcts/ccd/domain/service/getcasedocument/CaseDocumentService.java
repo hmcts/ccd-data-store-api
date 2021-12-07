@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.extern.slf4j.Slf4j;
 import org.jooq.lambda.tuple.Tuple2;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
@@ -20,6 +21,7 @@ import java.util.Set;
 import static java.util.Collections.emptyMap;
 import static uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentUtils.DOCUMENT_HASH;
 
+@Slf4j
 @Named
 public class CaseDocumentService {
     private final CaseService caseService;
@@ -51,6 +53,10 @@ public class CaseDocumentService {
     public List<DocumentHashToken> extractDocumentHashToken(final Map<String, JsonNode> databaseCaseData,
                                                             final Map<String, JsonNode> preCallbackCaseData,
                                                             final Map<String, JsonNode> postCallbackCaseData) {
+
+        log.info("Enter extractDocumentHashToken -> databaseCaseData:{}; preCallbackCaseData:{};"
+            + " postCallbackCaseData:{}", databaseCaseData.toString(), preCallbackCaseData.toString(),
+            postCallbackCaseData.toString());
 
         final List<Tuple2<String, String>> dbDocs = caseDocumentUtils.findDocumentsHashes(
             databaseCaseData
@@ -130,6 +136,9 @@ public class CaseDocumentService {
 
     private void verifyNoTamper(final List<Tuple2<String, String>> preCallbackHashes,
                                 final List<Tuple2<String, String>> postCallbackHashes) {
+        log.info("In verifyNoTamper -> preCallbackHashes:{}; postCallbackHashes:{}",
+            preCallbackHashes.toString(), postCallbackHashes.toString());
+
         final Set<String> tamperedHashes = caseDocumentUtils.getTamperedHashes(preCallbackHashes, postCallbackHashes);
 
         if (!tamperedHashes.isEmpty()) {

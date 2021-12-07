@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.getcasedocument;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.jooq.lambda.tuple.Tuple2;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.external.domain.DocumentHashToken;
@@ -16,6 +17,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Named
 public class CaseDocumentUtils {
     private static final Function<List<Tuple2<String, String>>,
@@ -87,12 +89,17 @@ public class CaseDocumentUtils {
             .map(pair -> pair.v1)
             .collect(Collectors.toUnmodifiableSet());
 
-        return postCallbackHashes.stream()
+        Set<String> result = postCallbackHashes.stream()
             .distinct()
             .filter(distinctPair -> preCallbackIds.contains(distinctPair.v1))
             .filter(preCallbackPair -> Objects.nonNull(preCallbackPair.v2))
             .map(tamperedPair -> tamperedPair.v1)
             .collect(Collectors.toUnmodifiableSet());
+
+        log.info("In getTamperedHashes -> preCallbackIds:{}; result:{}",
+            preCallbackIds, result);
+
+        return result;
     }
 
     public List<DocumentHashToken> buildDocumentHashToken(
