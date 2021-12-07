@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Named
-@Singleton
 public class CaseLinkMapper {
 
     public CaseLink entityToModel(final CaseLinkEntity caseLinkEntity) {

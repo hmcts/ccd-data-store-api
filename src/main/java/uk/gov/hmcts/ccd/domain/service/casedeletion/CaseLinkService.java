@@ -12,6 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
 
 @Slf4j
 @Service
@@ -21,7 +22,7 @@ public class CaseLinkService {
     private final CaseLinkRepository caseLinkRepository;
     private final CaseLinkMapper caseLinkMapper;
 
-    @Autowired
+    @Inject
     public CaseLinkService(CaseLinkRepository caseLinkRepository,
                            CaseLinkMapper caseLinkMapper,
                            @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)

@@ -3,6 +3,10 @@
 	"_guid_": "F-1008_VerifyLinkedCaseLinksUnchanged",
   "_extends_": "F-1008_VerifyCaseLinksBase",
 
+  "specs": [
+    "to verify that the Case Links in the CASE_LINK table are unchanged"
+  ],
+
 	"request": {
 		"pathVariables": {
 			"cid": "${[scenarioContext][parentContext][childContexts][F-1008_CreateLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"

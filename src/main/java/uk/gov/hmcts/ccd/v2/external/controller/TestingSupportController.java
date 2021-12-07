@@ -11,6 +11,8 @@ import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLinksResource;
 import uk.gov.hmcts.ccd.domain.service.casedeletion.CaseLinkService;
 import uk.gov.hmcts.ccd.v2.V2;
 
+import javax.inject.Inject;
+
 @RestController
 @RequestMapping(path = "/testing-support")
 @ConditionalOnProperty(value = "testing.support.endpoint.enabled", havingValue = "true")
@@ -18,7 +20,7 @@ public class TestingSupportController {
 
     private CaseLinkService caseLinkService;
 
-    @Autowired
+    @Inject
     public TestingSupportController(CaseLinkService caseLinkService) {
         this.caseLinkService = caseLinkService;
     }

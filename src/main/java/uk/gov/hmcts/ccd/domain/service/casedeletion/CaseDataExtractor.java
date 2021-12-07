@@ -22,7 +22,6 @@ import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COLLE
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.COMPLEX;
 
 @Named
-@Singleton
 @Slf4j
 public class CaseDataExtractor {
     private static final String EMPTY_STRING = "";
@@ -45,7 +44,7 @@ public class CaseDataExtractor {
                                               List<String> paths,
                                               final String fieldType) {
         return (data == null)
-            ? new ArrayList<>()
+            ? Collections.emptyList()
             : data.entrySet().stream()
                 .map(caseDataPair -> caseFieldDefinitions.stream()
                     .filter(caseField -> caseField.getId().equalsIgnoreCase(caseDataPair.getKey()))

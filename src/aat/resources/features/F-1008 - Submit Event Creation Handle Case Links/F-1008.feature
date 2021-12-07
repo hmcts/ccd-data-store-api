@@ -66,7 +66,7 @@ Feature: F-1008: Submit Event Creation Handle Case Links
       And   it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
       Then  a positive response is received
       And   the response has all other details as expected
-      And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1008_VerifyLinkedCaseLinksUnchanged]
+      And   a successful call [to verify that the Case Links in the CASE_LINK table are unchanged] as in [F-1008_VerifyLinkedCaseLinksUnchanged]
 
     @S-1008.5 @AC-5
     Scenario: CaseLink in database Does NOT exist and CaseLink field in the Request is blank and
@@ -112,7 +112,7 @@ Feature: F-1008: Submit Event Creation Handle Case Links
       And   it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
       Then  a negative response is received
       And   the response has all other details as expected
-      And   a successful call [to verify that no Case Links exist in the CASE_LINK table] as in [F-1008_VerifyLinkedCaseLinksUnchanged]
+      And   a successful call [to verify that the Case Links in the CASE_LINK table are unchanged] as in [F-1008_VerifyLinkedCaseLinksUnchanged]
 
     @Ignore
     @S-1008.8 @AC-8
@@ -129,7 +129,7 @@ Feature: F-1008: Submit Event Creation Handle Case Links
       And   it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
       Then  a negative response is received
       And   the response has all other details as expected
-      And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1008_VerifyLinkedCaseLinksUnchanged]
+      And   a successful call [to verify that the Case Links in the CASE_LINK table are unchanged] as in [F-1008_VerifyLinkedCaseLinksUnchanged]
 
     @S-1008.9 @AC-9
     Scenario: Case Link does not exist at present and CaseLink field in the Request contains CaseReference value but Invalid Case data
@@ -163,7 +163,7 @@ Feature: F-1008: Submit Event Creation Handle Case Links
       And   it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
       Then  a negative response is received
       And   the response has all other details as expected
-      And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1008_VerifyLinkedCaseLinksUnchanged]
+      And   a successful call [to verify that the Case Links in the CASE_LINK table are unchanged] as in [F-1008_VerifyLinkedCaseLinksUnchanged]
 
     @S-1008.11 @AC-11
     Scenario: Case Link does not exist at present and CaseLink field in the Request is a collection and contains CaseReference value
@@ -280,7 +280,7 @@ Feature: F-1008: Submit Event Creation Handle Case Links
       And   it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
       Then  a negative response is received
       And   the response has all other details as expected
-      And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1008_VerifyMultipleLinkedCaseLinksUnchanged]
+      And   a successful call [to verify that the Case Links in the CASE_LINK table are unchanged] as in [F-1008_VerifyMultipleLinkedCaseLinksUnchanged]
 
     @Ignore
     @S-1008.18 @AC-18
@@ -442,7 +442,7 @@ Feature: F-1008: Submit Event Creation Handle Case Links
       And   it is submitted to call the [Submit event creation as Citizen] operation of [CCD Data Store]
       Then  a negative response is received
       And   the response has all other details as expected
-      And   a successful call [to verify that no Case Links exist in the CASE_LINK table] as in [F-1008_VerifyCitizenLinkedCaseLinksUnchanged]
+      And   a successful call [to verify that the Case Links in the CASE_LINK table are unchanged] as in [F-1008_VerifyCitizenLinkedCaseLinksUnchanged]
 
     @Ignore
     @S-1008.28 @AC-28
@@ -556,7 +556,7 @@ Feature: F-1008: Submit Event Creation Handle Case Links
       And   it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
       Then  a positive response is received
       And   the response has all other details as expected
-      And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1008_VerifyLinkedCaseLinksUnchanged]
+      And   a successful call [to verify that the Case Links in the CASE_LINK table are unchanged] as in [F-1008_VerifyLinkedCaseLinksUnchanged]
 
     @S-1008.35 @AC-35
     Scenario: CaseLink in database Does NOT exist and CaseLink field in the Request is blank and
@@ -602,7 +602,7 @@ Feature: F-1008: Submit Event Creation Handle Case Links
       And   it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
       Then  a negative response is received
       And   the response has all other details as expected
-      And   a successful call [to verify that no Case Links exist in the CASE_LINK table] as in [F-1008_VerifyLinkedCaseLinksUnchanged]
+      And   a successful call [to verify that the Case Links in the CASE_LINK table are unchanged] as in [F-1008_VerifyLinkedCaseLinksUnchanged]
 
     @Ignore
     @S-1008.38 @AC-38
@@ -619,7 +619,7 @@ Feature: F-1008: Submit Event Creation Handle Case Links
       And   it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
       Then  a negative response is received
       And   the response has all other details as expected
-      And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1008_VerifyLinkedCaseLinksUnchanged]
+      And   a successful call [to verify that the Case Links in the CASE_LINK table are unchanged] as in [F-1008_VerifyLinkedCaseLinksUnchanged]
 
     @S-1008.39 @AC-39
     Scenario: Case Link does not exist at present and CaseLink field in the Request contains CaseReference value but Invalid Case data
@@ -653,4 +653,4 @@ Feature: F-1008: Submit Event Creation Handle Case Links
       And   it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
       Then  a negative response is received
       And   the response has all other details as expected
-      And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1008_VerifyLinkedCaseLinksUnchanged]
+      And   a successful call [to verify that the Case Links in the CASE_LINK table are unchanged] as in [F-1008_VerifyLinkedCaseLinksUnchanged]
