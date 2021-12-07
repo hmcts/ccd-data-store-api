@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.startevent;
 
 import com.google.common.collect.Sets;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
@@ -20,8 +22,6 @@ import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.util.Set;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -94,11 +94,12 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
         return caseTypeDefinition;
     }
 
-    private Set<String> getCaseRoles(CaseDetails caseDetails) {
+    private Set<AccessProfile> getCaseRoles(CaseDetails caseDetails, CaseTypeDefinition caseTypeDefinition) {
         if (caseDetails == null || caseDetails.getId() == null || Draft.isDraft(caseDetails.getId())) {
-            return caseAccessService.getCaseCreationCaseRoles();
+            return Sets.union(caseAccessService.getCreationAccessProfiles(caseTypeDefinition.getId()),
+                caseAccessService.getCaseCreationCaseRoles());
         } else {
-            return caseAccessService.getCaseRoles(caseDetails.getId());
+            return caseAccessService.getAccessProfilesByCaseReference(caseDetails.getReferenceAsString());
         }
     }
 
@@ -106,14 +107,12 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
 
         final CaseTypeDefinition caseTypeDefinition = getCaseType(caseTypeId);
 
-        Set<String> userRoles =
-            Sets.union(caseAccessService.getUserRoles(), getCaseRoles(startEventResult.getCaseDetails()));
-
         CaseDetails caseDetails = startEventResult.getCaseDetails();
+        Set<AccessProfile> caseAccessProfiles = getCaseRoles(caseDetails, caseTypeDefinition);
 
         if (!accessControlService.canAccessCaseTypeWithCriteria(
             caseTypeDefinition,
-            userRoles,
+            caseAccessProfiles,
             CAN_READ)) {
             caseDetails.setData(newHashMap());
             caseDetails.setDataClassification(newHashMap());
@@ -125,14 +124,14 @@ public class AuthorisedStartEventOperation implements StartEventOperation {
                 accessControlService.filterCaseFieldsByAccess(
                     JacksonUtils.convertValueJsonNode(caseDetails.getData()),
                     caseTypeDefinition.getCaseFieldDefinitions(),
-                    userRoles,
+                    caseAccessProfiles,
                     CAN_READ,
                     false)));
             caseDetails.setDataClassification(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
                     caseTypeDefinition.getCaseFieldDefinitions(),
-                    userRoles,
+                    caseAccessProfiles,
                     CAN_READ,
                     true)));
         }

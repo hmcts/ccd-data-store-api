@@ -10,6 +10,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -20,17 +21,23 @@ public class ElasticsearchSecurityClassificationFilter implements CaseSearchFilt
 
     private final UserRepository userRepository;
     private final CaseTypeService caseTypeService;
+    private final ApplicationParams applicationParams;
 
     @Autowired
     public ElasticsearchSecurityClassificationFilter(@Qualifier(CachedUserRepository.QUALIFIER)
                                                              UserRepository userRepository,
-                                                     CaseTypeService caseTypeService) {
+                                                     CaseTypeService caseTypeService,
+                                                     ApplicationParams applicationParams) {
         this.userRepository = userRepository;
         this.caseTypeService = caseTypeService;
+        this.applicationParams = applicationParams;
     }
 
     @Override
     public Optional<QueryBuilder> getFilter(String caseTypeId) {
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            return Optional.empty();
+        }
         return Optional.of(QueryBuilders.termsQuery(SECURITY_CLASSIFICATION_FIELD_COL,
             getSecurityClassifications(caseTypeId)));
     }
