@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseRoleRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseTypeDefinitionVersion;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldComplexDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventFieldDefinition;
@@ -48,6 +49,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.types.PredefinedFieldsIDs.ORG_POLICY_CASE_ASSIGNED_ROLE;
 
@@ -81,6 +83,8 @@ class DefaultValidateCaseFieldsOperationTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
+        when(caseDefinitionRepository.getLatestVersion(anyString()))
+            .thenReturn(new CaseTypeDefinitionVersion());
         doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(Stream.of("[DEFAULT_ROLE1]", "[DEFAULT_ROLE2]").collect(Collectors.toSet()))
             .when(caseRoleRepository).getCaseRoles(CASE_TYPE_ID);
