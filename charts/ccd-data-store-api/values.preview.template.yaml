@@ -3,6 +3,8 @@ java:
   ingressHost: ${SERVICE_FQDN}
   devmemoryRequests: '1524Mi'
   devmemoryLimits: '2048Mi'
+  memoryRequests: '1524Mi'
+  memoryLimits: '2048Mi'
   keyVaults:
     ccd:
       resourceGroup: ccd-shared
