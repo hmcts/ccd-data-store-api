@@ -118,7 +118,6 @@ withPipeline(type, product, component) {
         after('checkout') {
             sh 'env'
             def githubApi = new GithubAPI(this)
-            githubApi.addLabelsToCurrentPR(["pr-values:ccd"])
             echo 'Getting labels...'
             def labels = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values")
             for (label in labels) {
