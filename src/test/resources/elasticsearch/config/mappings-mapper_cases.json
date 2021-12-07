@@ -423,6 +423,13 @@
       },
       "reference": {
         "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256,
+            "normalizer": "lowercase_normalizer"
+          }
+        },
         "analyzer": "standard",
         "search_analyzer": "case_id_analyzer"
       },

@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/api/data/jurisdictions?ids=DIVORCE"
+    "url": "/api/data/jurisdictions?ids=divorce"
   },
   "response": {
     "status": 200,
