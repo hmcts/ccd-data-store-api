@@ -25,7 +25,7 @@ public class CaseLinkValidator {
     private List<FieldValidator> validators;
 
     public void validate(final ValidationContext validationContext) {
-         validate(
+        validate(
             validationContext.getData(),
             validationContext.getCaseTypeDefinition().getCaseFieldDefinitions(),
             CaseLinkValidator.EMPTY_STRING, validationContext);
@@ -149,7 +149,7 @@ public class CaseLinkValidator {
                 validationContext
             );
         } else if (itemValue.isObject()) {
-             validate(
+            validate(
                 JacksonUtils.convertValue(itemValue),
                 fieldTypeDefinition.getComplexFields(),
                 itemFieldId + FIELD_SEPARATOR, validationContext);
