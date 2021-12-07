@@ -5,6 +5,7 @@ import java.util.List;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
@@ -13,6 +14,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
@@ -31,6 +33,9 @@ public class CaseDetailsEndpointPostStateIT extends WireMockBaseTest {
     private static final String HAS_PRE_STATES_EVENT = "HAS_PRE_STATES_EVENT";
     private static final String UID = "123";
     private static final String CASE_TYPE_POST_STATE = "TestAddressBookPostState";
+
+    @MockBean
+    private CaseDefinitionRepository caseDefinitionRepository;
 
     @Inject
     private WebApplicationContext wac;

@@ -351,7 +351,7 @@ class DefaultValidateCaseFieldsOperationTest {
             assertThrows(ValidationException.class, () -> validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID,
                 caseDataContent));
         assertThat(exception.getMessage(),
-            startsWith("Cannot validate case fiel   d because of event is not specified"));
+            startsWith("Cannot validate case field because of event is not specified"));
         verify(caseDefinitionRepository, never()).getCaseType(anyString());
         verify(caseTypeService, never()).validateData(anyMap(), any());
     }
