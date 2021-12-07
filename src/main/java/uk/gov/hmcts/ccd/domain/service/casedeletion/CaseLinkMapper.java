@@ -3,11 +3,10 @@ package uk.gov.hmcts.ccd.domain.service.casedeletion;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.inject.Named;
 
 @Named
 public class CaseLinkMapper {
