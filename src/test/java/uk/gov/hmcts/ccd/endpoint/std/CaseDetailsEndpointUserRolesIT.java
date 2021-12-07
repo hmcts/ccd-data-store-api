@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.endpoint.std;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
@@ -12,6 +13,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -42,6 +44,9 @@ public class CaseDetailsEndpointUserRolesIT extends WireMockBaseTest {
     private static final String UID = "123";
     private static final String CASE_TYPE_CREATOR_ROLE = "TestAddressBookCreatorCase";
     private static final String CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS = "TestAddressBookCreatorNoCreateAccessCase";
+
+    @Mock
+    private CaseDefinitionRepository caseDefinitionRepository;
 
     @Inject
     private WebApplicationContext wac;
