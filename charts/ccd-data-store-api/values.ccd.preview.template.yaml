@@ -48,6 +48,8 @@ ccd:
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
       image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
       imagePullPolicy: Always
+      devmemoryRequests: "1024Mi"
+      devmemoryLimits: "2048Mi"
       keyVaults:
         ccd:
           secrets:
