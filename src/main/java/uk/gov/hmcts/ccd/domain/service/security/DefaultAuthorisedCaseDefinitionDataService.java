@@ -18,8 +18,6 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import static java.util.stream.Collectors.toList;
 
-import static java.util.stream.Collectors.toList;
-
 /**
  * Service to return authorised case definition data as per user authority.
  */

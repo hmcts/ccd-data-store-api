@@ -540,7 +540,7 @@ public interface AccessControlService {
             .stream()
             .filter(caseEventDef ->
                 nonNull(caseEventDef.getAccessControlLists()) && caseEventDef.getId().equals(eventId))
-            .map(caseEventDef -> caseEventDef.getAccessControlLists())
+            .map(CaseEventDefinition::getAccessControlLists)
             .findAny().orElse(newArrayList());
     }
 
@@ -585,7 +585,7 @@ public interface AccessControlService {
         return caseFieldDefinitions
             .stream()
             .filter(caseField -> nonNull(caseField.getAccessControlLists()) && caseField.getId().equals(fieldName))
-            .map(caseField -> caseField.getAccessControlLists())
+            .map(CaseFieldDefinition::getAccessControlLists)
             .findAny().orElse(newArrayList());
     }
 

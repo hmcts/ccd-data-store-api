@@ -42,7 +42,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
 
     private static final Logger LOG = LoggerFactory.getLogger(SecurityClassificationServiceImpl.class);
 
-    protected final CaseDataAccessControl caseDataAccessControl;
+    private final CaseDataAccessControl caseDataAccessControl;
     private final CaseDefinitionRepository caseDefinitionRepository;
 
     @Autowired
