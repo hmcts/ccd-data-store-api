@@ -443,6 +443,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
         GlobalSearchTestFixture.assertGlobalSearchData(savedCaseResource.getData());
     }
 
+    @Test
     @DisplayName("Submit case creation event without any documents but "
         + "upload a document with 'document_hash' field via about_to_submit callback")
     public void shouldReturn201WhenPostCreateCaseAndAboutToSubmitCallbackWithDocument() throws Exception {
