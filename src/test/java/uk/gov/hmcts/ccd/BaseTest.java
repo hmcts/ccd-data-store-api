@@ -33,7 +33,6 @@ import uk.gov.hmcts.ccd.data.caseaccess.DefaultCaseRoleRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.definition.CaseTypeDefinitionVersion;
 import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway;
 import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
@@ -139,12 +138,10 @@ public abstract class BaseTest {
     @Mock
     protected SecurityContext securityContext;
 
-
     @Before
     @BeforeEach
     public void initMock() throws IOException {
         MockitoAnnotations.initMocks(this);
-
         ReflectionTestUtils.setField(caseRoleRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(caseDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(roleAssignmentRepository, "securityUtils", securityUtils);
@@ -157,8 +154,7 @@ public abstract class BaseTest {
 
         // Reset static field `caseDefinitionRepository`
         ReflectionTestUtils.setField(BaseType.class, "caseDefinitionRepository", caseDefinitionRepository);
-        when(caseDefinitionRepository.getLatestVersion(anyString()))
-            .thenReturn(new CaseTypeDefinitionVersion());
+
         setupUIDService();
 
         doReturn(authentication).when(securityContext).getAuthentication();
