@@ -6,6 +6,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
@@ -19,6 +21,8 @@ import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseTypeDefinitionVersion;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseHistoryView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseView;
@@ -56,7 +60,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -152,6 +158,10 @@ public class QueryEndpointIT extends WireMockBaseTest {
         + "/0/jurisdictions/PROBATE/case-types/"
         + "TestAddressBookCaseEventEnablingCondition/cases/1504259907353529";
 
+
+    @Mock
+    private CaseDefinitionRepository caseDefinitionRepository;
+
     @Inject
     private WebApplicationContext wac;
 
@@ -162,9 +172,13 @@ public class QueryEndpointIT extends WireMockBaseTest {
 
     @Before
     public void setUp() {
+        MockitoAnnotations.initMocks(this);
+        when(caseDefinitionRepository.getLatestVersion(anyString()))
+            .thenReturn(new CaseTypeDefinitionVersion());
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_CASEWORKER_PUBLIC);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         template = new JdbcTemplate(db);
+
     }
 
     @Test
