@@ -140,7 +140,7 @@ public final class JacksonUtils {
         return jsonValue[0];
     }
 
-    private static String findValueFromTruncatedKey(Map.Entry<String, JsonNode> entry, String truncatedKey){
+    private static String findValueFromTruncatedKey(Map.Entry<String, JsonNode> entry, String truncatedKey) {
         if (entry.getValue().isArray()) {
             return getValueFromArray(entry, truncatedKey);
         } else {
