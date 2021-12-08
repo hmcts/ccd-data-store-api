@@ -22,8 +22,6 @@ public class CaseLinkValidator {
     private static final String FIELD_SEPARATOR = ".";
     private static final String CASE_LINK = "CaseLink";
 
-    private List<FieldValidator> validators;
-
     public void validate(final ValidationContext validationContext) {
         validate(
             validationContext.getData(),
