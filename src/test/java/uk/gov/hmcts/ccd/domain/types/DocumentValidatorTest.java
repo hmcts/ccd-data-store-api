@@ -1,10 +1,10 @@
 package uk.gov.hmcts.ccd.domain.types;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -44,6 +44,9 @@ public class DocumentValidatorTest implements IVallidatorTest {
     private static final String VALID_EM_HRS_API_DOCUMENT_URL_2 =
         "https://em-hrs-api-pr-155.service.core-compute-preview.internal/hearing-recordings/"
             + "e5b96e94-4010-43b3-9196-44d8539f32b8/segments/0";
+    private static final String VALID_EM_HRS_API_DOCUMENT_URL_3 =
+        "https://em-hrs-api-aat.service.core-compute-aat.internal/hearing-recordings/"
+            + "b10ea9c4-a116-11eb-bcbc-0242ac130002/segments/330";
     private static final String INVALID_RECORD_ID_EM_HRS_API_DOCUMENT_URL =
         "https://em-hrs-api.service.core-compute-aat.internal/hearing-recordings/"
             + "123456789012/segments/3";
@@ -156,6 +159,18 @@ public class DocumentValidatorTest implements IVallidatorTest {
         assertEquals(validDocumentUrlResult.toString(), 0, validDocumentUrlResult.size());
     }
 
+    @Test
+    public void shouldValidateDocumentWithMultipleDigitEmHrsUrlAndDomain() {
+        validator = setUpEmHrsApiValidator();
+
+        ObjectNode data = createDoc(VALID_EM_HRS_API_DOCUMENT_URL_3);
+        List<ValidationResult> validDocumentUrlResult =
+            validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
+        assertEquals(validDocumentUrlResult.toString(), 0, validDocumentUrlResult.size());
+        data = createDoc(VALID_EM_HRS_API_DOCUMENT_URL_2);
+        validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
+        assertEquals(validDocumentUrlResult.toString(), 0, validDocumentUrlResult.size());
+    }
     @Test
     public void shouldNotValidateDocumentWithInValidEmHrsRecordId() {
         validator = setUpEmHrsApiValidator();
@@ -331,7 +346,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     @Test
     public void shouldFail_whenValidatingBooleanDocumentUrl() {
         ObjectNode data = MAPPER.createObjectNode();
-        data.put(DOCUMENT_URL, NODE_FACTORY.booleanNode(true));
+        data.set(DOCUMENT_URL, NODE_FACTORY.booleanNode(true));
         final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
@@ -340,7 +355,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     @Test
     public void shouldFail_whenValidatingObjectDocumentUrl() {
         ObjectNode data = MAPPER.createObjectNode();
-        data.put(DOCUMENT_URL, NODE_FACTORY.objectNode());
+        data.set(DOCUMENT_URL, NODE_FACTORY.objectNode());
         final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
@@ -349,7 +364,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     @Test
     public void shouldFail_whenValidatingArrayDocumentUrl() {
         ObjectNode data = MAPPER.createObjectNode();
-        data.put(DOCUMENT_URL, NODE_FACTORY.arrayNode());
+        data.set(DOCUMENT_URL, NODE_FACTORY.arrayNode());
         final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
@@ -358,7 +373,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     @Test
     public void shouldFail_whenValidatingNumberDocumentUrl() {
         ObjectNode data = MAPPER.createObjectNode();
-        data.put(DOCUMENT_URL, NODE_FACTORY.numberNode(1));
+        data.set(DOCUMENT_URL, NODE_FACTORY.numberNode(1));
         final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
@@ -367,7 +382,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     @Test
     public void shouldFail_whenValidatingPojoDocumentUrl() {
         ObjectNode data = MAPPER.createObjectNode();
-        data.put(DOCUMENT_URL, NODE_FACTORY.pojoNode("text"));
+        data.set(DOCUMENT_URL, NODE_FACTORY.pojoNode("text"));
         final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
@@ -376,7 +391,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     @Test
     public void shouldFail_whenValidatingBinaryDocumentUrl() {
         ObjectNode data = MAPPER.createObjectNode();
-        data.put(DOCUMENT_URL, NODE_FACTORY.binaryNode("n".getBytes()));
+        data.set(DOCUMENT_URL, NODE_FACTORY.binaryNode("n".getBytes()));
         final List<ValidationResult> result = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
@@ -400,7 +415,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
         when(applicationParams.getDocumentURLPattern()).thenReturn("https://(em-hrs-api-aat.service.core-compute-aat|"
                 + "em-hrs-api-(pr-[0-9]+|preview).service.core-compute-preview).internal(?::d+)?/"
                 + "hearing-recordings/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
-                + "[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/segments/[0-9]");
+                + "[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/segments/[0-9]+");
         validator = new DocumentValidator(applicationParams);
         return validator;
     }
