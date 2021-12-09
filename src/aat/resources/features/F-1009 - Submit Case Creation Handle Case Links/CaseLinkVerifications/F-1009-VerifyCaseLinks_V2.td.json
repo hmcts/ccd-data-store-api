@@ -1,6 +1,6 @@
 {
 	"title": "should retrieve case links for a specified case reference",
-	"_guid_": "F-1009-VerifyCaseLinks",
+	"_guid_": "F-1009-VerifyCaseLinks_V2",
 
 	"productName": "CCD Data Store",
 	"operationName": "Retrieve case links for an existing case reference",
@@ -29,15 +29,11 @@
 	},
 
 	"expectedResponse": {
-		"_extends_": "Common_200_Response",
-		"headers": {
-			"Content-Encoding": "gzip",
-			"Content-Length": "[[ANYTHING_PRESENT]]"
-		},
+    "_extends_": "Common_200_Response",
 		"body": {
       "CaseLinks" : [ {
         "CaseId" : "[[ANYTHING_PRESENT]]",
-        "LinkedCaseId" : "[[ANYTHING_PRESENT]]",
+        "LinkedCaseId" : "${[scenarioContext][parentContext][childContexts][F-1009_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
         "CaseTypeId" : "FT_MasterCaseType"
       }]
 		}
