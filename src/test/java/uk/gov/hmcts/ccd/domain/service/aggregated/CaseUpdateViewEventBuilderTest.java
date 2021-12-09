@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import java.util.List;
 import org.assertj.core.util.Lists;
+import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -139,6 +141,7 @@ class CaseUpdateViewEventBuilderTest {
             () -> assertThat(caseUpdateViewEvent, hasProperty("caseFields", equalTo(viewFields))),
             () -> assertThat(caseUpdateViewEvent, hasProperty("wizardPages", equalTo(wizardPageCollection))),
             () -> assertThat(caseUpdateViewEvent, hasProperty("titleDisplay", is(TITLE_DISPLAY))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("supplementaryData", nullValue())),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
             () -> inOrder.verify(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_TRIGGER_ID),
             () -> inOrder.verify(caseViewFieldBuilder).build(caseFieldDefinitions, eventFields,
