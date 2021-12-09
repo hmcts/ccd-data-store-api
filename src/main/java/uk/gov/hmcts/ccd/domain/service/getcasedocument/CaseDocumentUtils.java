@@ -96,7 +96,7 @@ public class CaseDocumentUtils {
             .map(tamperedPair -> tamperedPair.v1)
             .collect(Collectors.toUnmodifiableSet());
 
-        log.info("In getTamperedHashes -> preCallbackIds:{}; result:{}",
+        log.debug("In getTamperedHashes -> preCallbackIds:{}; result:{}",
             preCallbackIds, result);
 
         return result;

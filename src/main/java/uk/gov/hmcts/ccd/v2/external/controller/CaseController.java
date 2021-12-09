@@ -235,11 +235,11 @@ public class CaseController {
                                                         + "}"
                                                         + "\n```", required = true)
                                                     @RequestBody final CaseDataContent content) {
-        log.info("Event Request Payload: {}", content.toString());
+        log.debug("Event Request Payload: {}", content.toString());
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         try {
             String json = ow.writeValueAsString(content);
-            log.info("Event Request Payload in Json: {}", json);
+            log.debug("Event Request Payload in Json: {}", json);
         } catch (JsonProcessingException e) {
             log.error("EX:", e);
         }

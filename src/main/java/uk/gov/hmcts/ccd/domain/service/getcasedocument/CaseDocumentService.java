@@ -54,7 +54,7 @@ public class CaseDocumentService {
                                                             final Map<String, JsonNode> preCallbackCaseData,
                                                             final Map<String, JsonNode> postCallbackCaseData) {
 
-        log.info("Enter extractDocumentHashToken -> databaseCaseData:{}; preCallbackCaseData:{};"
+        log.debug("Enter extractDocumentHashToken -> databaseCaseData:{}; preCallbackCaseData:{};"
             + " postCallbackCaseData:{}", databaseCaseData.toString(), preCallbackCaseData.toString(),
             postCallbackCaseData.toString());
 
@@ -136,7 +136,7 @@ public class CaseDocumentService {
 
     private void verifyNoTamper(final List<Tuple2<String, String>> preCallbackHashes,
                                 final List<Tuple2<String, String>> postCallbackHashes) {
-        log.info("In verifyNoTamper -> preCallbackHashes:{}; postCallbackHashes:{}",
+        log.debug("In verifyNoTamper -> preCallbackHashes:{}; postCallbackHashes:{}",
             preCallbackHashes.toString(), postCallbackHashes.toString());
 
         final Set<String> tamperedHashes = caseDocumentUtils.getTamperedHashes(preCallbackHashes, postCallbackHashes);
