@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.stdapi;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.ccd.domain.service.validate.ValidateSignificantDocument.validateSignificantItem;
 
+@Slf4j
 @Service
 public class CallbackInvoker {
 
@@ -207,6 +209,7 @@ public class CallbackInvoker {
                                                                                   final CallbackResponse
                                                                                       callbackResponse) {
 
+        log.debug("validateAndSetFromAboutToSubmitCallback -> caseDetails: {} ; callbackResponse: {}", caseDetails, callbackResponse);
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
 
         validateSignificantItem(aboutToSubmitCallbackResponse, callbackResponse);

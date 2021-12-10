@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
+@Slf4j
 @Service
 public class CreateCaseEventService {
 
@@ -162,6 +164,8 @@ public class CreateCaseEventService {
         );
         final CaseDetails updatedCaseDetailsWithoutHashes = caseDocumentService.stripDocumentHashes(updatedCaseDetails);
 
+        log.debug("updatedCaseDetailsWithoutHashes: {}", updatedCaseDetailsWithoutHashes);
+
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = callbackInvoker.invokeAboutToSubmitCallback(
             caseEventDefinition,
             caseDetailsInDatabase,
@@ -174,6 +178,9 @@ public class CreateCaseEventService {
 
         @SuppressWarnings("UnnecessaryLocalVariable")
         final CaseDetails caseDetailsAfterCallback = updatedCaseDetailsWithoutHashes;
+
+        log.debug("caseDetailsAfterCallback: {} , updatedCaseDetailsWithoutHashes: {}; isSameFile: {}", caseDetailsAfterCallback,
+            updatedCaseDetailsWithoutHashes, caseDetailsAfterCallback.equals(updatedCaseDetailsWithoutHashes));
 
         validateCaseFieldsOperation.validateData(caseDetailsAfterCallback.getData(), caseTypeDefinition, content);
         final LocalDateTime timeNow = now();
