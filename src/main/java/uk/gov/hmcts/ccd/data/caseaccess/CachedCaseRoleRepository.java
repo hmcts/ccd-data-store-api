@@ -31,12 +31,12 @@ public class CachedCaseRoleRepository implements CaseRoleRepository {
     }
 
     @Override
-    public Set<String> getRoles(String caseTypeId) {
-        return roles.computeIfAbsent(caseTypeId, caseRoleRepository::getRoles);
+    public Set<String> getCaseRoles(String userId, String jurisdictionId, String caseTypeId) {
+        return getCaseRoles(caseTypeId);
     }
 
     @Override
-    public Set<String> getCaseRoles(String userId, String jurisdictionId, String caseTypeId) {
-        return getCaseRoles(caseTypeId);
+    public Set<String> getRoles(String caseTypeId) {
+        return roles.computeIfAbsent(caseTypeId, caseRoleRepository::getRoles);
     }
 }

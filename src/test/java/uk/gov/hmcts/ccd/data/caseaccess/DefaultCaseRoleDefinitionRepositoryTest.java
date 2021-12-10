@@ -17,8 +17,8 @@ import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -70,12 +70,34 @@ class DefaultCaseRoleDefinitionRepositoryTest {
 
     @Test
     @DisplayName("return case roles when case type has case roles")
-    void returnCaseRolesForCaseType() {
+    void returnCaseRolesByCaseTypeId() {
+        when(responseEntity.getBody()).thenReturn(caseRoleDefinitions);
 
-        when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
-        when(applicationParams.caseRolesURL()).thenReturn("someURL");
-        doReturn(responseEntity).when(restTemplate).exchange(eq("someURL/caseTypeId/roles"), eq(GET), any(),
-            eq(CaseRoleDefinition[].class));
+        Set<String> caseRoleSet = caseRoleRepository.getCaseRoles(caseTypeId);
+        assertThat(caseRoleSet.size(), is(2));
+    }
+
+    @Test
+    @DisplayName("return NO case roles when case type has NO case roles")
+    void returnNoCaseRolesByCaseTypeIdWhenCaseTypeDoesNotHaveAny() {
+        when(responseEntity.getBody()).thenReturn(new CaseRoleDefinition[0]);
+
+        Set<String> caseRoleSet = caseRoleRepository.getCaseRoles(caseTypeId);
+        assertThat(caseRoleSet.size(), is(0));
+    }
+
+    @Test
+    @DisplayName("return NO case roles when case type has NO case roles")
+    void returnNoCaseRolesByCaseTypeIdWhenCaseTypeReturnsNull() {
+        when(responseEntity.getBody()).thenReturn(null);
+
+        Set<String> caseRoleSet = caseRoleRepository.getCaseRoles(caseTypeId);
+        assertThat(caseRoleSet.size(), is(0));
+    }
+
+    @Test
+    @DisplayName("return case roles when case type has case roles")
+    void returnCaseRolesForCaseType() {
         when(responseEntity.getBody()).thenReturn(caseRoleDefinitions);
 
         Set<String> caseRoleSet = caseRoleRepository.getCaseRoles(DefaultCaseRoleRepository.DEFAULT_USER_ID,
@@ -86,11 +108,6 @@ class DefaultCaseRoleDefinitionRepositoryTest {
     @Test
     @DisplayName("return NO case roles when case type has NO case roles")
     void returnNoCaseRolesWhenCaseTypeDoesNotHaveAny() {
-
-        when(securityUtils.userAuthorizationHeaders()).thenReturn(new HttpHeaders());
-        when(applicationParams.caseRolesURL()).thenReturn("someURL");
-        doReturn(responseEntity).when(restTemplate).exchange(eq("someURL/caseTypeId/roles"), eq(GET), any(),
-            eq(CaseRoleDefinition[].class));
         when(responseEntity.getBody()).thenReturn(new CaseRoleDefinition[0]);
 
         Set<String> caseRoleSet = caseRoleRepository.getCaseRoles(DefaultCaseRoleRepository.DEFAULT_USER_ID,
@@ -113,7 +130,7 @@ class DefaultCaseRoleDefinitionRepositoryTest {
     void returnCaseRolesForCaseTypeAndRoleAssignment() {
 
         when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
-        when(applicationParams.accessProfileRolesURL("caseTypeId")).thenReturn("someURL");
+        when(applicationParams.accessProfileRolesURL(caseTypeId)).thenReturn("someURL");
         when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
         doReturn(responseEntity).when(restTemplate).exchange(
             eq("someURL"), eq(GET), any(),
@@ -132,26 +149,21 @@ class DefaultCaseRoleDefinitionRepositoryTest {
     void returnCaseRolesForCaseTypeAndRoleAssignmentIsFalse() {
 
         when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
-        when(applicationParams.caseRolesURL()).thenReturn("someURL");
         when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
-        doReturn(responseEntity).when(restTemplate).exchange(eq("someURL/caseTypeId/roles"), eq(GET), any(),
-            eq(CaseRoleDefinition[].class));
         when(responseEntity.getBody()).thenReturn(caseRoleDefinitions);
-        Set<String> caseRoleSet = caseRoleRepository.getRoles("caseTypeId");
+        Set<String> caseRoleSet = caseRoleRepository.getRoles(caseTypeId);
 
         assertThat(caseRoleSet.size(), is(2));
         assertThat(caseRoleSet.toArray()[0], is(ROLE1));
         assertThat(caseRoleSet.toArray()[1], is(ROLE2));
     }
 
-
     @Test
     @DisplayName("return case roles when case type has case roles and role assignment is true")
     void returnCaseRolesForCaseTypeAndRoleAssignmentIsTrueAndThereAreNotRoles() {
 
         when(securityUtils.authorizationHeaders()).thenReturn(new HttpHeaders());
-        when(applicationParams.accessProfileRolesURL("caseTypeId")).thenReturn("someURL");
-        when(applicationParams.caseRolesURL()).thenReturn("someURL");
+        when(applicationParams.accessProfileRolesURL(caseTypeId)).thenReturn("someURL");
         when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
 
         doReturn(responseEntity).when(restTemplate).exchange(
@@ -161,15 +173,14 @@ class DefaultCaseRoleDefinitionRepositoryTest {
             eq(CaseRoleDefinition[].class)
         );
 
-        doReturn(responseEntity).when(restTemplate).exchange(eq("someURL/caseTypeId/roles"), eq(GET), any(),
-            eq(CaseRoleDefinition[].class));
-
         when(responseEntity.getBody()).thenReturn(new CaseRoleDefinition[]{});
-        Set<String> caseRoleSet = caseRoleRepository.getRoles("caseTypeId");
+        Set<String> caseRoleSet = caseRoleRepository.getRoles(caseTypeId);
 
         verify(restTemplate, times(2)).exchange(
             anyString(), eq(GET), any(), eq(CaseRoleDefinition[].class)
         );
         verify(responseEntity, times(2)).getBody();
+
+        assertThat(caseRoleSet.size(), is(0));
     }
 }
