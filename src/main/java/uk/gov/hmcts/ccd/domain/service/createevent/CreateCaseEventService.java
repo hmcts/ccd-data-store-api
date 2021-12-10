@@ -179,8 +179,8 @@ public class CreateCaseEventService {
         @SuppressWarnings("UnnecessaryLocalVariable")
         final CaseDetails caseDetailsAfterCallback = updatedCaseDetailsWithoutHashes;
 
-        log.debug("caseDetailsAfterCallback: {} , updatedCaseDetailsWithoutHashes: {};" +
-                " isSameFile: {}", caseDetailsAfterCallback,
+        log.debug("caseDetailsAfterCallback: {} , updatedCaseDetailsWithoutHashes: {};"
+                + " isSameFile: {}", caseDetailsAfterCallback,
             updatedCaseDetailsWithoutHashes, caseDetailsAfterCallback.equals(updatedCaseDetailsWithoutHashes));
 
         validateCaseFieldsOperation.validateData(caseDetailsAfterCallback.getData(), caseTypeDefinition, content);
