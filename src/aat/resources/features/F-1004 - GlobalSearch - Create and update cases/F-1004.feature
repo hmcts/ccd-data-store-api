@@ -66,3 +66,4 @@ Feature: F-1004: Global Search - Create and update cases
     And it is submitted to call the [Submit case update event creation as a Caseworker (V2)] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
+
