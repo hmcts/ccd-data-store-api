@@ -209,7 +209,8 @@ public class CallbackInvoker {
                                                                                   final CallbackResponse
                                                                                       callbackResponse) {
 
-        log.debug("validateAndSetFromAboutToSubmitCallback -> caseDetails: {} ; callbackResponse: {}", caseDetails, callbackResponse);
+        log.debug("validateAndSetFromAboutToSubmitCallback -> caseDetails: {} ;" +
+            " callbackResponse: {}", caseDetails, callbackResponse);
         final AboutToSubmitCallbackResponse aboutToSubmitCallbackResponse = new AboutToSubmitCallbackResponse();
 
         validateSignificantItem(aboutToSubmitCallbackResponse, callbackResponse);
