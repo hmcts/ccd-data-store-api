@@ -14,7 +14,7 @@ public interface CaseDefinitionRepository {
 
     CaseTypeDefinition getCaseType(int version, String caseTypeId);
 
-    List<CaseTypeDefinition> getCaseType(final List<String> caseTypeIds);
+    List<CaseTypeDefinition> getCaseTypes(final List<String> caseTypeIds);
 
     List<FieldTypeDefinition> getBaseTypes();
 

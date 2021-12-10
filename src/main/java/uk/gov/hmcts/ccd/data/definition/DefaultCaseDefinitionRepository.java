@@ -92,7 +92,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     }
 
     @Override
-    public List<CaseTypeDefinition> getCaseType(final List<String> caseTypeIds) {
+    public List<CaseTypeDefinition> getCaseTypes(final List<String> caseTypeIds) {
         LOG.debug("retrieving case type definition for case type: {}", caseTypeIds);
 
         try {

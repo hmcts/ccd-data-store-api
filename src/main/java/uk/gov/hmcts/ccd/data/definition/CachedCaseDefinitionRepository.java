@@ -58,8 +58,8 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
-    public List<CaseTypeDefinition> getCaseType(List<String> caseTypeIds) {
-        return caseDefinitionRepository.getCaseType(caseTypeIds);
+    public List<CaseTypeDefinition> getCaseTypes(List<String> caseTypeIds) {
+        return caseDefinitionRepository.getCaseTypes(caseTypeIds);
     }
 
     @Override

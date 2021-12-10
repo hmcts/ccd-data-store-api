@@ -21,6 +21,7 @@ import java.util.Arrays;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -119,6 +120,7 @@ class TestConfiguration extends ContextCleanupListener {
         when(caseDefinitionRepository.getJurisdiction(anyString())).thenCallRealMethod();
         when(caseDefinitionRepository.getJurisdictionFromDefinitionStore(anyString())).thenCallRealMethod();
         when(caseDefinitionRepository.getLatestVersion(anyString())).thenCallRealMethod();
+        when(caseDefinitionRepository.getCaseTypes(anyList())).thenCallRealMethod();
         return caseDefinitionRepository;
     }
 
