@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/api/data/jurisdictions?ids=PROBATE"
+    "url": "/api/data/jurisdictions?ids=probate"
   },
   "response": {
     "status": 200,

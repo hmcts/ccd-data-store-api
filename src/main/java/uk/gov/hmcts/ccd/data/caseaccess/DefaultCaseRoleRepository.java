@@ -17,7 +17,12 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseRoleDefinition;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
+
+import static org.springframework.http.HttpMethod.GET;
 
 @Service
 @Qualifier(DefaultCaseRoleRepository.QUALIFIER)
@@ -59,5 +64,22 @@ public class DefaultCaseRoleRepository implements CaseRoleRepository {
         return (caseRoleDefinitions == null)
             ? new HashSet<>()
             : Arrays.stream(caseRoleDefinitions).map(CaseRoleDefinition::getId).collect(Collectors.toSet());
+    }
+
+    private Set<String> getAccessProfilesRoles(String caseTypeId) {
+        final HttpEntity requestEntity = new HttpEntity(securityUtils.authorizationHeaders());
+        final var caseRolesUrl = applicationParams.accessProfileRolesURL(caseTypeId);
+        CaseRoleDefinition[] caseRoleDefinitions =
+            restTemplate.exchange(caseRolesUrl, GET, requestEntity, CaseRoleDefinition[].class).getBody();
+        return Arrays.stream(caseRoleDefinitions).map(CaseRoleDefinition::getName).collect(Collectors.toSet());
+    }
+
+    public Set<String> getRoles(String caseTypeId) {
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            final var accessProfilesRoles = this.getAccessProfilesRoles(caseTypeId);
+            return accessProfilesRoles.isEmpty() ? this.getCaseRoles(caseTypeId) : accessProfilesRoles;
+        } else {
+            return this.getCaseRoles(caseTypeId);
+        }
     }
 }

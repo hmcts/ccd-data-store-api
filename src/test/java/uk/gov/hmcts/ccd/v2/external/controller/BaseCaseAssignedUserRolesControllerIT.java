@@ -89,6 +89,9 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
     protected static final String PARAM_CASE_IDS = "case_ids";
     protected static final String PARAM_USER_IDS = "user_ids";
 
+    protected static final String ASSIGNMENT_1 = "assignment1";
+    protected static final String ASSIGNMENT_2 = "assignment2";
+
     @Inject
     protected ApplicationParams applicationParams;
 
@@ -262,5 +265,4 @@ class BaseCaseAssignedUserRolesControllerIT extends WireMockBaseTest {
             return 0L;
         }
     }
-
 }

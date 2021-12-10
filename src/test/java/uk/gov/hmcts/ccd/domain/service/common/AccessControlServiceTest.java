@@ -9,6 +9,12 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -22,6 +28,7 @@ import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -29,13 +36,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
@@ -54,6 +54,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.MANDATORY;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.OPTIONAL;
 import static uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField.READONLY;
@@ -97,11 +98,12 @@ public class AccessControlServiceTest {
     static final String ROLE_NOT_IN_USER_ROLES_2 = "caseworker-divorce-loa5";
     private static final String FIRST_CHILD_ID = "46f98326-6c88-426d-82be-d362f0246b7a";
     private static final String SECOND_CHILD_ID = "7c7cfd2a-b5d7-420a-8420-3ac3019cfdc7";
-    static final Set<String> USER_ROLES = Sets.newHashSet(ROLE_IN_USER_ROLES,
+    static final Set<AccessProfile> ACCESS_PROFILES = createAccessProfiles(Sets.newHashSet(ROLE_IN_USER_ROLES,
         ROLE_IN_USER_ROLES_3,
-        ROLE_IN_USER_ROLES_2);
+        ROLE_IN_USER_ROLES_2));
 
     private AccessControlService accessControlService;
+    private static final String CASE_TYPE_ID = "CASE_TYPE_ID";
     private static final String CASE_REFERENCE = "CASE_REFERENCE";
     private static final String EVENT_ID = "EVENT_ID";
     private static final String EVENT_ID_LOWER_CASE = "event_id";
@@ -242,7 +244,7 @@ public class AccessControlServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        accessControlService = new AccessControlService(applicationParams, new CompoundAccessControlService());
+        accessControlService = new AccessControlServiceImpl(applicationParams, new CompoundAccessControlService());
     }
 
     @Nested
@@ -264,9 +266,11 @@ public class AccessControlServiceTest {
                 .build();
 
             assertAll(
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES,
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType,
+                    ACCESS_PROFILES,
                     CAN_CREATE), is(false)),
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2, caseType, USER_ROLES,
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2, caseType,
+                    ACCESS_PROFILES,
                     CAN_CREATE), is(false))
             );
         }
@@ -286,9 +290,11 @@ public class AccessControlServiceTest {
                 .build();
 
             assertAll(
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES,
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1,
+                    caseType, ACCESS_PROFILES,
                     CAN_CREATE), is(false)),
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2, caseType, USER_ROLES,
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2,
+                    caseType, ACCESS_PROFILES,
                     CAN_CREATE), is(false))
             );
         }
@@ -308,9 +314,11 @@ public class AccessControlServiceTest {
                 .build();
 
             assertAll(
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES,
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1,
+                    caseType, ACCESS_PROFILES,
                     CAN_CREATE), is(true)),
-                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2, caseType, USER_ROLES,
+                () -> assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID2,
+                    caseType, ACCESS_PROFILES,
                     CAN_CREATE), is(true))
             );
         }
@@ -320,7 +328,7 @@ public class AccessControlServiceTest {
         void shouldNotGrantAccessToStateIfStateIsNotPresentInDefinition() {
             CaseTypeDefinition caseType = newCaseType().build();
 
-            assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, USER_ROLES,
+            assertThat(accessControlService.canAccessCaseStateWithCriteria(STATE_ID1, caseType, ACCESS_PROFILES,
                 CAN_CREATE), is(false));
         }
 
@@ -340,9 +348,12 @@ public class AccessControlServiceTest {
                     .withRole(ROLE_IN_USER_ROLES)
                     .build())
                 .build();
-            List<CaseStateDefinition> caseStates = new ArrayList<>(asList(caseState1, caseState2));
-            final List<CaseStateDefinition> states = accessControlService.filterCaseStatesByAccess(caseStates,
-                USER_ROLES, CAN_READ);
+            CaseTypeDefinition caseTypeDefinition = newCaseType()
+                .withState(caseState1)
+                .withState(caseState2)
+                .build();
+            final List<CaseStateDefinition> states = accessControlService.filterCaseStatesByAccess(caseTypeDefinition,
+                ACCESS_PROFILES, CAN_READ);
 
             assertAll(
                 () -> assertThat(states.size(), is(1)),
@@ -372,9 +383,13 @@ public class AccessControlServiceTest {
                     .withRole(ROLE_IN_USER_ROLES)
                     .build())
                 .build();
-            List<CaseStateDefinition> caseStates = new ArrayList<>(asList(caseState1, caseState2, caseState3));
+            CaseTypeDefinition caseTypeDefinition = newCaseType()
+                .withState(caseState1)
+                .withState(caseState2)
+                .withState(caseState3)
+                .build();
             final List<CaseStateDefinition> states =
-                accessControlService.filterCaseStatesByAccess(caseStates, USER_ROLES, CAN_READ);
+                accessControlService.filterCaseStatesByAccess(caseTypeDefinition, ACCESS_PROFILES, CAN_READ);
 
             assertAll(
                 () -> assertThat(states.size(), is(0)),
@@ -406,7 +421,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -433,7 +448,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -472,7 +487,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -500,7 +515,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -540,7 +555,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(true));
         }
@@ -559,7 +574,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(true));
         }
@@ -590,7 +605,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(true));
         }
@@ -615,7 +630,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -668,7 +683,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(true));
         }
@@ -693,7 +708,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -727,7 +742,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(true));
         }
@@ -752,7 +767,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseFieldsWithCriteria(
                     dataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -1216,13 +1231,13 @@ public class AccessControlServiceTest {
             final CaseTypeDefinition caseType = new CaseTypeDefinition();
             CaseEventDefinition eventDefinition = new CaseEventDefinition();
             eventDefinition.setId(EVENT_ID);
-            caseType.setEvents(Collections.singletonList(eventDefinition));
+            caseType.setEvents(singletonList(eventDefinition));
 
             assertThat(
                 accessControlService.canAccessCaseEventWithCriteria(
                     EVENT_ID,
                     caseType.getEvents(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -1234,17 +1249,17 @@ public class AccessControlServiceTest {
             CaseEventDefinition eventDefinition = new CaseEventDefinition();
             eventDefinition.setId(EVENT_ID);
             AccessControlList accessControlList = new AccessControlList();
-            accessControlList.setRole(ROLE_NOT_IN_USER_ROLES);
+            accessControlList.setAccessProfile(ROLE_NOT_IN_USER_ROLES);
             accessControlList.setCreate(true);
             List<AccessControlList> accessControlLists = newArrayList(accessControlList);
             eventDefinition.setAccessControlLists(accessControlLists);
-            caseType.setEvents(Collections.singletonList(eventDefinition));
+            caseType.setEvents(singletonList(eventDefinition));
 
             assertThat(
                 accessControlService.canAccessCaseEventWithCriteria(
                     EVENT_ID,
                     caseType.getEvents(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -1265,7 +1280,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseEventWithCriteria(
                     EVENT_ID,
                     caseType.getEvents(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -1286,7 +1301,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseEventWithCriteria(
                     null,
                     caseType.getEvents(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     AccessControlList::isCreate),
                 is(false));
         }
@@ -1308,7 +1323,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseEventWithCriteria(
                     EVENT_ID_LOWER_CASE,
                     caseType.getEvents(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     AccessControlList::isCreate),
                 is(false));
         }
@@ -1334,7 +1349,7 @@ public class AccessControlServiceTest {
                 accessControlService.canAccessCaseEventWithCriteria(
                     EVENT_ID,
                     caseType.getEvents(),
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(true));
         }
@@ -1352,7 +1367,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseTypeWithCriteria(
                     caseType,
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -1373,7 +1388,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseTypeWithCriteria(
                     caseType,
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -1392,7 +1407,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseTypeWithCriteria(
                     caseType,
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(false));
         }
@@ -1413,7 +1428,7 @@ public class AccessControlServiceTest {
             assertThat(
                 accessControlService.canAccessCaseTypeWithCriteria(
                     caseType,
-                    USER_ROLES,
+                    ACCESS_PROFILES,
                     CAN_CREATE),
                 is(true));
         }
@@ -1439,7 +1454,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1466,7 +1481,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1492,7 +1507,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1521,7 +1536,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1551,7 +1566,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1581,7 +1596,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1611,7 +1626,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1641,7 +1656,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1672,7 +1687,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1707,7 +1722,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1767,7 +1782,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1778,7 +1793,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should return data if field and children have ACLs")
         void shouldGrantAccessToCollectionTypeChildren() throws IOException {
             final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(Collections.singletonList(anAcl()
+            people.setAccessControlLists(singletonList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withRead(true)
                 .build()));
@@ -1813,7 +1828,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1837,7 +1852,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should filter data when child doesnot have ACLs")
         void shouldfilterDataWhenChildDoesnotHaveACL() throws IOException {
             final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(Collections.singletonList(anAcl()
+            people.setAccessControlLists(singletonList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withRead(true)
                 .build()));
@@ -1907,7 +1922,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -1944,7 +1959,7 @@ public class AccessControlServiceTest {
             logger.addAppender(listAppender);
 
             final CaseFieldDefinition people = getPeopleCollectionFieldDefinition();
-            people.setAccessControlLists(Collections.singletonList(anAcl()
+            people.setAccessControlLists(singletonList(anAcl()
                 .withRole(ROLE_IN_USER_ROLES)
                 .withRead(true)
                 .build()));
@@ -2016,7 +2031,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -2026,7 +2041,7 @@ public class AccessControlServiceTest {
 
             List<ILoggingEvent> logsList = listAppender.list;
             assertEquals("Can not find field with caseFieldId=BirthInfo, "
-                + "accessControlList=[ACL{role='caseworker-probate-loa1', crud=R}]",
+                    + "accessControlList=[ACL{accessProfile='caseworker-probate-loa1', crud=R}]",
                 logsList.get(0).getFormattedMessage());
 
             logger.detachAndStopAllAppenders();
@@ -2091,7 +2106,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -2137,7 +2152,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -2172,7 +2187,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -2210,7 +2225,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -2240,7 +2255,7 @@ public class AccessControlServiceTest {
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_READ,
                 false);
 
@@ -2263,7 +2278,7 @@ public class AccessControlServiceTest {
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(null,
                 caseType.getEvents(),
-                USER_ROLES),
+                ACCESS_PROFILES),
                 is(emptyCollectionOf(AuditEvent.class)));
         }
     }
@@ -2283,7 +2298,7 @@ public class AccessControlServiceTest {
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(null,
                 caseType.getEvents(),
-                USER_ROLES),
+                ACCESS_PROFILES),
                 is(emptyCollectionOf(AuditEvent.class)));
         }
 
@@ -2301,7 +2316,7 @@ public class AccessControlServiceTest {
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
                 caseType.getEvents(),
-                USER_ROLES),
+                ACCESS_PROFILES),
                 is(emptyCollectionOf(AuditEvent.class)));
         }
 
@@ -2323,7 +2338,7 @@ public class AccessControlServiceTest {
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
                 caseType.getEvents(),
-                USER_ROLES),
+                ACCESS_PROFILES),
                 is(emptyCollectionOf(AuditEvent.class)));
         }
 
@@ -2344,7 +2359,7 @@ public class AccessControlServiceTest {
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
                 caseType.getEvents(),
-                USER_ROLES),
+                ACCESS_PROFILES),
                 is(emptyCollectionOf(AuditEvent.class)));
         }
 
@@ -2366,7 +2381,7 @@ public class AccessControlServiceTest {
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
                 caseType.getEvents(),
-                USER_ROLES),
+                ACCESS_PROFILES),
                 is(emptyCollectionOf(AuditEvent.class)));
         }
 
@@ -2389,7 +2404,7 @@ public class AccessControlServiceTest {
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(
                 auditEvents,
                 caseType.getEvents(),
-                USER_ROLES),
+                ACCESS_PROFILES),
                 is(auditEvents));
         }
 
@@ -2419,7 +2434,7 @@ public class AccessControlServiceTest {
 
             assertThat(accessControlService.filterCaseAuditEventsByReadAccess(auditEvents,
                 caseType.getEvents(),
-                USER_ROLES),
+                ACCESS_PROFILES),
                 is(auditEvents));
         }
 
@@ -2474,7 +2489,7 @@ public class AccessControlServiceTest {
             List<AuditEvent> actual = accessControlService.filterCaseAuditEventsByReadAccess(
                 auditEvents,
                 caseType.getEvents(),
-                USER_ROLES);
+                ACCESS_PROFILES);
             assertThat(actual, containsInAnyOrder(hasProperty("eventId", is("EVENT_ID_WITH_ACCESS")),
                 hasProperty("eventId", is("EVENT_ID_WITH_ACCESS_2"))));
         }
@@ -2509,26 +2524,26 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
+            assertEquals(1, caseEventTrigger.getCaseFields().size());
+
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
                 CASE_REFERENCE,
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
+            assertEquals(1, eventTrigger.getCaseFields().size());
             assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
                 is(READONLY))));
-            assertThat(eventTrigger.getCaseFields(), everyItem(not(hasProperty("showCondition",
-                is("Addresses=\"DO NOT SHOW IN UI\"")))));
-            assertThat(eventTrigger.getCaseFields(), everyItem(not(hasProperty("retainHiddenValue",
-                is(false)))));
         }
 
         @Test
-        @DisplayName("Should set readonly flag if relevant acl missing with multiparty fix")
-        void shouldSetReadonlyFlagIfRelevantAclMissingWithMultipartyFix() {
-            Mockito.when(applicationParams.isMultipartyFixEnabled()).thenReturn(true);
+        @DisplayName("Should remove field if relevant acl missing with multiparty fix")
+        void shouldRemoveFieldIfRelevantAclMissingWithMultipartyFix() {
+            setApplicationParamsForTest();
 
             final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
@@ -2551,20 +2566,308 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
+            assertEquals(1, caseEventTrigger.getCaseFields().size());
+
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
                 CASE_REFERENCE,
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
+            assertEquals(0, eventTrigger.getCaseFields().size());
+        }
+
+        @Test
+        @DisplayName("Should remove field if relevant acl missing with multiparty fix for all events")
+        void shouldRemoveFieldIfRelevantAclMissingWithMultipartyFixForAllEvents() {
+            Mockito.when(applicationParams.isMultipartyFixEnabled()).thenReturn(true);
+            Mockito.when(applicationParams.getMultipartyCaseTypes()).thenReturn(singletonList(CASE_TYPE_ID));
+            Mockito.when(applicationParams.getMultipartyEvents()).thenReturn(singletonList("*"));
+
+            final CaseTypeDefinition caseType = newCaseType()
+                .withField(newCaseField()
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(true)
+                        .withRead(true)
+                        .build())
+                    .build())
+                .build();
+
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
+                .withField(
+                    aViewField()
+                        .withFieldType(aFieldType().withType("Text").build())
+                        .withId("Addresses")
+                        .build())
+                .build();
+
+            assertEquals(1, caseEventTrigger.getCaseFields().size());
+
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
+                CASE_REFERENCE,
+                EVENT_ID,
+                caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
+                ACCESS_PROFILES,
+                CAN_UPDATE);
+
+            assertEquals(0, eventTrigger.getCaseFields().size());
+        }
+
+        @Test
+        @DisplayName("Should remove field if relevant acl missing with multiparty fix for multiple events")
+        void shouldRemoveFieldIfRelevantAclMissingWithMultipartyFixForMultipleEvents() {
+            Mockito.when(applicationParams.isMultipartyFixEnabled()).thenReturn(true);
+            Mockito.when(applicationParams.getMultipartyCaseTypes()).thenReturn(singletonList(CASE_TYPE_ID));
+            Mockito.when(applicationParams.getMultipartyEvents()).thenReturn(asList(EVENT_ID, "VALID_EVENT"));
+
+            final CaseTypeDefinition caseType = newCaseType()
+                .withField(newCaseField()
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(true)
+                        .withRead(true)
+                        .build())
+                    .build())
+                .build();
+
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
+                .withField(
+                    aViewField()
+                        .withFieldType(aFieldType().withType("Text").build())
+                        .withId("Addresses")
+                        .build())
+                .build();
+
+            assertEquals(1, caseEventTrigger.getCaseFields().size());
+
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
+                CASE_REFERENCE,
+                EVENT_ID,
+                caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
+                ACCESS_PROFILES,
+                CAN_UPDATE);
+
+            assertEquals(0, eventTrigger.getCaseFields().size());
+        }
+
+        @Test
+        @DisplayName("Should remove field if relevant acl missing with multiparty fix for invalid event")
+        void shouldRemoveFieldIfRelevantAclMissingWithMultipartyFixForInvalidEvent() {
+            Mockito.when(applicationParams.isMultipartyFixEnabled()).thenReturn(true);
+            Mockito.when(applicationParams.getMultipartyCaseTypes()).thenReturn(singletonList(CASE_TYPE_ID));
+            Mockito.when(applicationParams.getMultipartyEvents()).thenReturn(singletonList("INVALID_EVENT"));
+
+            final CaseTypeDefinition caseType = newCaseType()
+                .withField(newCaseField()
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(true)
+                        .withRead(true)
+                        .build())
+                    .build())
+                .build();
+
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
+                .withField(
+                    aViewField()
+                        .withFieldType(aFieldType().withType("Text").build())
+                        .withId("Addresses")
+                        .build())
+                .build();
+
+            assertEquals(1, caseEventTrigger.getCaseFields().size());
+
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
+                CASE_REFERENCE,
+                EVENT_ID,
+                caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
+                ACCESS_PROFILES,
+                CAN_UPDATE);
+
+            assertEquals(1, eventTrigger.getCaseFields().size());
+        }
+
+        @Test
+        @DisplayName("Should remove field if relevant acl missing with multiparty fix for invalid case type")
+        void shouldRemoveFieldIfRelevantAclMissingWithMultipartyFixForInvalidCaseType() {
+            Mockito.when(applicationParams.isMultipartyFixEnabled()).thenReturn(true);
+            Mockito.when(applicationParams.getMultipartyCaseTypes()).thenReturn(singletonList("INVALID_CASE_TYPE"));
+            Mockito.when(applicationParams.getMultipartyEvents()).thenReturn(singletonList("*"));
+
+            final CaseTypeDefinition caseType = newCaseType()
+                .withField(newCaseField()
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_NOT_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(true)
+                        .withRead(true)
+                        .build())
+                    .build())
+                .build();
+
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
+                .withField(
+                    aViewField()
+                        .withFieldType(aFieldType().withType("Text").build())
+                        .withId("Addresses")
+                        .build())
+                .build();
+
+            assertEquals(1, caseEventTrigger.getCaseFields().size());
+
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
+                CASE_REFERENCE,
+                EVENT_ID,
+                caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
+                ACCESS_PROFILES,
+                CAN_UPDATE);
+
+            assertEquals(1, eventTrigger.getCaseFields().size());
+        }
+
+        @Test
+        @DisplayName("Should set readonly flag if relevant acl missing but has read access with multiparty fix")
+        void shouldSetReadonlyFlagIfRelevantAclMissingButHasReadAccessWithMultipartyFix() {
+            setApplicationParamsForTest();
+
+            final CaseTypeDefinition caseType = newCaseType()
+                .withField(newCaseField()
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(false)
+                        .withRead(true)
+                        .build())
+                    .build())
+                .build();
+
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
+                .withField(
+                    aViewField()
+                        .withFieldType(aFieldType().withType("Text").build())
+                        .withId("Addresses")
+                        .build())
+                .build();
+
+            assertEquals(1, caseEventTrigger.getCaseFields().size());
+
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
+                CASE_REFERENCE,
+                EVENT_ID,
+                caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
+                ACCESS_PROFILES,
+                CAN_UPDATE);
+
+            assertEquals(1, eventTrigger.getCaseFields().size());
             assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
                 is(READONLY))));
-            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("showCondition",
-                is("Addresses=\"DO NOT SHOW IN UI\""))));
-            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("retainHiddenValue",
-                is(false))));
+        }
+
+        @Test
+        @DisplayName("Should set readonly flag if relevant field acl missing")
+        void shouldSetReadonlyFlagIfRelevantFieldACLMissing() {
+            final CaseTypeDefinition caseType = newCaseType()
+                .withField(newCaseField()
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(true)
+                        .withRead(true)
+                        .build())
+                    .build())
+                .build();
+
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
+                .withField(
+                    aViewField()
+                        .withFieldType(aFieldType().withType("Text").build())
+                        .withId("test")
+                        .build())
+                .build();
+
+            assertEquals(1, caseEventTrigger.getCaseFields().size());
+
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
+                CASE_REFERENCE,
+                EVENT_ID,
+                caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
+                ACCESS_PROFILES,
+                CAN_UPDATE);
+
+            assertEquals(1, eventTrigger.getCaseFields().size());
+            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
+                is(READONLY))));
+        }
+
+        @Test
+        @DisplayName("Should remove field if relevant field acl missing with multiparty fix")
+        void shouldRemoveFieldIfRelevantFieldACLMissingWithMultipartyFix() {
+            setApplicationParamsForTest();
+
+            final CaseTypeDefinition caseType = newCaseType()
+                .withField(newCaseField()
+                    .withFieldType(aFieldType().withType("Text").build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(true)
+                        .withRead(true)
+                        .build())
+                    .build())
+                .build();
+
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
+                .withField(
+                    aViewField()
+                        .withFieldType(aFieldType().withType("Text").build())
+                        .withId("test")
+                        .build())
+                .build();
+
+            assertEquals(1, caseEventTrigger.getCaseFields().size());
+
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
+                CASE_REFERENCE,
+                EVENT_ID,
+                caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
+                ACCESS_PROFILES,
+                CAN_UPDATE);
+
+            assertEquals(0, eventTrigger.getCaseFields().size());
         }
 
         @Test
@@ -2598,7 +2901,7 @@ public class AccessControlServiceTest {
                         .withRole(ROLE_IN_USER_ROLES)
                         .withCreate(true)
                         .withUpdate(false)
-                        .withRead(false)
+                        .withRead(true)
                         .build())
                     .withComplexACL(
                         aComplexACL()
@@ -2606,12 +2909,14 @@ public class AccessControlServiceTest {
                             .withRole(ROLE_IN_USER_ROLES)
                             .withCreate(false)
                             .withUpdate(false)
+                            .withRead(true)
                             .build())
                     .withComplexACL(
                         aComplexACL()
                             .withListElementCode("Line2")
                             .withRole(ROLE_IN_USER_ROLES)
                             .withCreate(true)
+                            .withRead(true)
                             .build())
                     .build())
                 .build();
@@ -2646,41 +2951,255 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
                 CASE_REFERENCE,
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertAll(
                 () -> assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
                     is(READONLY)))),
-                () -> assertThat(eventTrigger.getCaseFields(), everyItem(not(hasProperty("showCondition",
-                    is("Addresses=\"DO NOT SHOW IN UI\""))))),
-                () -> assertThat(eventTrigger.getCaseFields(), everyItem(not(hasProperty("retainHiddenValue",
-                    is(false))))),
-
                 () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line1"),
                     hasProperty("displayContext", is(READONLY))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line1"),
-                    not(hasProperty("showCondition", is("Line1=\"DO NOT SHOW IN UI\"")))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line1"),
-                    not(hasProperty("retainHiddenValue", is(false)))),
-
                 () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line2"),
-                    hasProperty("displayContext", is(READONLY))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line2"),
-                    not(hasProperty("showCondition", is("Line2=\"DO NOT SHOW IN UI\"")))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line2"),
-                    not(hasProperty("retainHiddenValue", is(false))))
+                    hasProperty("displayContext", is(READONLY)))
             );
         }
 
         @Test
         @DisplayName("Should set readonly flag for complex children if relevant acl missing with multiparty fix")
         void shouldSetReadonlyFlagForComplexChildrenIfRelevantAclMissingWithMultipartyFix() {
-            Mockito.when(applicationParams.isMultipartyFixEnabled()).thenReturn(true);
+            setApplicationParamsForTest();
+
+            final CaseTypeDefinition caseType = newCaseType()
+                .withField(newCaseField()
+                    .withFieldType(aFieldType()
+                        .withType(COMPLEX)
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType("Text")
+                                        .withId("Text")
+                                        .build())
+                                .withId("Line1")
+                                .build())
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType("Text")
+                                        .withId("Text")
+                                        .build())
+                                .withId("Line2")
+                                .build())
+                        .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(false)
+                        .withRead(true)
+                        .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Line1")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withCreate(false)
+                            .withUpdate(false)
+                            .withRead(true)
+                            .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Line2")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withCreate(true)
+                            .withRead(true)
+                            .build())
+                    .build())
+                .build();
+            caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
+
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
+                .withField(
+                    aViewField()
+                        .withFieldType(aFieldType()
+                            .withType(COMPLEX)
+                            .withComplexField(
+                                newCaseField()
+                                    .withFieldType(
+                                        aFieldType()
+                                            .withType("Text")
+                                            .withId("Text")
+                                            .build())
+                                    .withId("Line1")
+                                    .build())
+                            .withComplexField(
+                                newCaseField()
+                                    .withFieldType(
+                                        aFieldType()
+                                            .withType("Text")
+                                            .withId("Text")
+                                            .build())
+                                    .withId("Line2")
+                                    .build())
+                            .build())
+                        .withId("Addresses")
+                        .build())
+                .build();
+
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
+                CASE_REFERENCE,
+                EVENT_ID,
+                caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
+                ACCESS_PROFILES,
+                CAN_UPDATE);
+
+            assertAll(
+                () -> assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
+                    is(READONLY)))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line1"),
+                    hasProperty("displayContext", is(READONLY))),
+                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line2"),
+                    hasProperty("displayContext", is(READONLY)))
+            );
+        }
+
+        @Test
+        @DisplayName("Should remove complex children if relevant acl missing with multiparty fix")
+        void shouldRemoveComplexChildrenIfRelevantAclMissingWithMultipartyFix() {
+            setApplicationParamsForTest();
+
+            final CaseTypeDefinition caseType = newCaseType()
+                .withField(newCaseField()
+                    .withFieldType(aFieldType()
+                        .withType(COMPLEX)
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType("Text")
+                                        .withId("Text")
+                                        .build())
+                                .withId("Line1")
+                                .build())
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType("Text")
+                                        .withId("Text")
+                                        .build())
+                                .withId("Line2")
+                                .build())
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType("Text")
+                                        .withId("Text")
+                                        .build())
+                                .withId("Line3")
+                                .build())
+                        .build())
+                    .withId("Addresses")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(true)
+                        .withRead(true)
+                        .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Line1")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withCreate(true)
+                            .withUpdate(true)
+                            .withRead(true)
+                            .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Line2")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withCreate(true)
+                            .withUpdate(false)
+                            .withRead(false)
+                            .build())
+                    .build())
+                .build();
+            caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
+
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
+                .withField(
+                    aViewField()
+                        .withFieldType(aFieldType()
+                            .withType(COMPLEX)
+                            .withComplexField(
+                                newCaseField()
+                                    .withFieldType(
+                                        aFieldType()
+                                            .withType("Text")
+                                            .withId("Text")
+                                            .build())
+                                    .withId("Line1")
+                                    .build())
+                            .withComplexField(
+                                newCaseField()
+                                    .withFieldType(
+                                        aFieldType()
+                                            .withType("Text")
+                                            .withId("Text")
+                                            .build())
+                                    .withId("Line2")
+                                    .build())
+                            .withComplexField(
+                                newCaseField()
+                                    .withFieldType(
+                                        aFieldType()
+                                            .withType("Text")
+                                            .withId("Text")
+                                            .build())
+                                    .withId("Line3")
+                                    .build())
+                            .build())
+                        .withId("Addresses")
+                        .build())
+                .build();
+
+            assertEquals(1, caseEventTrigger.getCaseFields().size());
+
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
+                CASE_REFERENCE,
+                EVENT_ID,
+                caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
+                ACCESS_PROFILES,
+                CAN_UPDATE);
+
+            assertAll(
+                () -> assertEquals(1, eventTrigger.getCaseFields().size()),
+                () -> assertThat(
+                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line1").isPresent(),
+                    is(true)),
+                () -> assertThat(
+                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line2").isPresent(),
+                    is(false)),
+                () -> assertThat(
+                    eventTrigger.getCaseFields().get(0).getComplexFieldNestedField("Line3").isPresent(),
+                    is(false))
+            );
+        }
+
+        @Test
+        @DisplayName("Should remove complex parent with children if relevant acl missing with multiparty fix")
+        void shouldRemoveComplexParentWithChildrenIfRelevantAclMissingWithMultipartyFix() {
+            setApplicationParamsForTest();
 
             final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
@@ -2757,36 +3276,180 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
+            assertEquals(1, caseEventTrigger.getCaseFields().size());
+
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
                 CASE_REFERENCE,
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
-            assertAll(
-                () -> assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
-                    is(READONLY)))),
-                () -> assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("showCondition",
-                    is("Addresses=\"DO NOT SHOW IN UI\"")))),
-                () -> assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("retainHiddenValue",
-                    is(false)))),
+            assertEquals(0, eventTrigger.getCaseFields().size());
+        }
 
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line1"),
-                    hasProperty("displayContext", is(READONLY))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line1"),
-                    hasProperty("showCondition", is("Line1=\"DO NOT SHOW IN UI\""))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line1"),
-                    hasProperty("retainHiddenValue", is(false))),
+        @Test
+        @DisplayName("Should remove multiple complex parent with children if relevant acl missing with multiparty fix")
+        void shouldRemoveMultipleComplexParentWithChildrenIfRelevantAclMissingWithMultipartyFix() {
+            setApplicationParamsForTest();
 
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line2"),
-                    hasProperty("displayContext", is(READONLY))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line2"),
-                    hasProperty("showCondition", is("Line2=\"DO NOT SHOW IN UI\""))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Line2"),
-                    hasProperty("retainHiddenValue", is(false)))
-            );
+            final CaseTypeDefinition caseType = newCaseType()
+                .withField(newCaseField()
+                    .withFieldType(aFieldType()
+                        .withType(COMPLEX)
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType("Text")
+                                        .withId("Text")
+                                        .build())
+                                .withId("Line1")
+                                .build())
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType("Text")
+                                        .withId("Text")
+                                        .build())
+                                .withId("Line2")
+                                .build())
+                        .build())
+                    .withId("ResidenceAddress")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(false)
+                        .withRead(false)
+                        .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Line1")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withCreate(false)
+                            .withUpdate(false)
+                            .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Line2")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withCreate(true)
+                            .build())
+                    .build())
+                .withField(newCaseField()
+                    .withFieldType(aFieldType()
+                        .withType(COMPLEX)
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType("Text")
+                                        .withId("Text")
+                                        .build())
+                                .withId("Line1")
+                                .build())
+                        .withComplexField(
+                            newCaseField()
+                                .withFieldType(
+                                    aFieldType()
+                                        .withType("Text")
+                                        .withId("Text")
+                                        .build())
+                                .withId("Line2")
+                                .build())
+                        .build())
+                    .withId("OfficeAddress")
+                    .withAcl(anAcl()
+                        .withRole(ROLE_IN_USER_ROLES)
+                        .withCreate(true)
+                        .withUpdate(false)
+                        .withRead(false)
+                        .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Line1")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withCreate(false)
+                            .withUpdate(false)
+                            .build())
+                    .withComplexACL(
+                        aComplexACL()
+                            .withListElementCode("Line2")
+                            .withRole(ROLE_IN_USER_ROLES)
+                            .withCreate(true)
+                            .build())
+                    .build())
+                .build();
+            caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
+
+            CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
+                .withField(
+                    aViewField()
+                        .withFieldType(aFieldType()
+                            .withType(COMPLEX)
+                            .withComplexField(
+                                newCaseField()
+                                    .withFieldType(
+                                        aFieldType()
+                                            .withType("Text")
+                                            .withId("Text")
+                                            .build())
+                                    .withId("Line1")
+                                    .build())
+                            .withComplexField(
+                                newCaseField()
+                                    .withFieldType(
+                                        aFieldType()
+                                            .withType("Text")
+                                            .withId("Text")
+                                            .build())
+                                    .withId("Line2")
+                                    .build())
+                            .build())
+                        .withId("ResidenceAddress")
+                        .build())
+                .withField(
+                    aViewField()
+                        .withFieldType(aFieldType()
+                            .withType(COMPLEX)
+                            .withComplexField(
+                                newCaseField()
+                                    .withFieldType(
+                                        aFieldType()
+                                            .withType("Text")
+                                            .withId("Text")
+                                            .build())
+                                    .withId("Line1")
+                                    .build())
+                            .withComplexField(
+                                newCaseField()
+                                    .withFieldType(
+                                        aFieldType()
+                                            .withType("Text")
+                                            .withId("Text")
+                                            .build())
+                                    .withId("Line2")
+                                    .build())
+                            .build())
+                        .withId("OfficeAddress")
+                        .build())
+                .build();
+
+            assertEquals(2, caseEventTrigger.getCaseFields().size());
+
+            CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
+                CASE_REFERENCE,
+                EVENT_ID,
+                caseEventTrigger,
+                caseType.getCaseFieldDefinitions(),
+                ACCESS_PROFILES,
+                CAN_UPDATE);
+
+            assertEquals(0, eventTrigger.getCaseFields().size());
         }
 
         @Test
@@ -2867,11 +3530,12 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
                 CASE_REFERENCE,
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertAll(
@@ -2975,11 +3639,12 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
                 CASE_REFERENCE,
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertAll(
@@ -3093,11 +3758,12 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
                 CASE_REFERENCE,
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertAll(
@@ -3115,7 +3781,7 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should set readonly flag for collection children if relevant acl missing with multiparty fix")
         void shouldSetReadonlyFlagForCollectionChildrenIfRelevantAclMissingWithMultiPartyFix() {
-            Mockito.when(applicationParams.isMultipartyFixEnabled()).thenReturn(true);
+            setApplicationParamsForTest();
 
             final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
@@ -3145,13 +3811,13 @@ public class AccessControlServiceTest {
                         .build())
                     .withAcl(anAcl()
                         .withRole(ROLE_IN_USER_ROLES)
-                        .withUpdate(true)
+                        .withUpdate(false)
                         .build())
                     .withComplexACL(
                         aComplexACL()
                             .withListElementCode("Addresses")
                             .withRole(ROLE_IN_USER_ROLES)
-                            .withUpdate(true)
+                            .withUpdate(false)
                             .build())
                     .withComplexACL(
                         aComplexACL()
@@ -3167,6 +3833,7 @@ public class AccessControlServiceTest {
                             .build())
                     .build())
                 .build();
+
             caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
             CaseUpdateViewEvent caseEventTrigger = newCaseUpdateViewEvent()
@@ -3199,32 +3866,18 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
+            assertEquals(1, caseEventTrigger.getCaseFields().size());
+
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
                 CASE_REFERENCE,
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
-            assertAll(
-                () -> assertThat(eventTrigger.getCaseFields().get(0), not(hasProperty("displayContext",
-                    is(READONLY)))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses"),
-                    not(hasProperty("displayContext", is(READONLY)))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line1"),
-                    hasProperty("displayContext", is(READONLY))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line2"),
-                    hasProperty("displayContext", is(READONLY))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line1"),
-                    hasProperty("showCondition", is("Line1=\"DO NOT SHOW IN UI\""))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line2"),
-                    hasProperty("showCondition", is("Line2=\"DO NOT SHOW IN UI\""))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line1"),
-                    hasProperty("retainHiddenValue", is(false))),
-                () -> assertThat(findNestedField(eventTrigger.getCaseFields().get(0), "Addresses.Line2"),
-                    hasProperty("retainHiddenValue", is(false)))
-            );
+            assertEquals(0, eventTrigger.getCaseFields().size());
         }
 
         @Test
@@ -3313,11 +3966,12 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
                 CASE_REFERENCE,
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertAll(
@@ -3359,11 +4013,12 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
                 CASE_REFERENCE,
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
@@ -3373,7 +4028,8 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should set readonly flag if relevant acl not granting access with multiparty fix")
         void shouldSetReadonlyFlagIfRelevantAclNotGrantingAccessWithMultiPartyFix() {
-            Mockito.when(applicationParams.isMultipartyFixEnabled()).thenReturn(true);
+            setApplicationParamsForTest();
+
             final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withFieldType(aFieldType().withType("Text").build())
@@ -3391,20 +4047,18 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
+            assertEquals(1, caseEventTrigger.getCaseFields().size());
+
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
                 CASE_REFERENCE,
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
-            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
-                is(READONLY))));
-            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("showCondition",
-                is("Addresses=\"DO NOT SHOW IN UI\""))));
-            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("retainHiddenValue",
-                is(false))));
+            assertEquals(0, eventTrigger.getCaseFields().size());
         }
 
         @Test
@@ -3427,11 +4081,12 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
                 CASE_REFERENCE,
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
@@ -3441,7 +4096,8 @@ public class AccessControlServiceTest {
         @Test
         @DisplayName("Should set readonly flag if ACL true and event name not matching with multiparty fix")
         void shouldSetReadonlyFlagIfRelevantAclGrantingAccessAndEventNameNotMatchingWithMultiPartyFix() {
-            Mockito.when(applicationParams.isMultipartyFixEnabled()).thenReturn(true);
+            setApplicationParamsForTest();
+
             final CaseTypeDefinition caseType = newCaseType()
                 .withField(newCaseField()
                     .withId("Addresses")
@@ -3458,20 +4114,18 @@ public class AccessControlServiceTest {
                         .build())
                 .build();
 
+            assertEquals(1, caseEventTrigger.getCaseFields().size());
+
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
                 CASE_REFERENCE,
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
-            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("displayContext",
-                is(READONLY))));
-            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("showCondition",
-                is("DifferentAddresses=\"DO NOT SHOW IN UI\""))));
-            assertThat(eventTrigger.getCaseFields(), everyItem(hasProperty("retainHiddenValue",
-                is(false))));
+            assertEquals(0, eventTrigger.getCaseFields().size());
         }
 
         @Test
@@ -3496,11 +4150,12 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
                 CASE_REFERENCE,
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertThat(eventTrigger.getCaseFields(), everyItem(not(hasProperty("displayContext",
@@ -3537,11 +4192,12 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent eventTrigger = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
                 CASE_REFERENCE,
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
 
             assertThat(eventTrigger.getCaseFields(), everyItem(not(hasProperty("displayContext",
@@ -3612,11 +4268,12 @@ public class AccessControlServiceTest {
                 .build();
 
             CaseUpdateViewEvent actual = accessControlService.setReadOnlyOnCaseViewFieldsIfNoAccess(
+                CASE_TYPE_ID,
                 CASE_REFERENCE,
                 EVENT_ID,
                 caseEventTrigger,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES,
+                ACCESS_PROFILES,
                 CAN_UPDATE);
             assertAll(
                 () -> assertThat(actual.getCaseFields(), hasSize(4)),
@@ -3653,8 +4310,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            assertThat(accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE),
                 is(emptyCollectionOf(CaseEventDefinition.class)));
         }
@@ -3674,8 +4331,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            assertThat(accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE),
                 is(emptyCollectionOf(CaseEventDefinition.class)));
         }
@@ -3693,8 +4350,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE);
 
             assertAll(
@@ -3724,8 +4381,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE);
             assertAll(
                 () -> assertThat(result, hasSize(1)),
@@ -3768,8 +4425,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE);
             assertAll(
                 () -> assertThat(result, hasSize(2)),
@@ -3798,8 +4455,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            assertThat(accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE),
                 is(emptyCollectionOf(CaseEventDefinition.class)));
         }
@@ -3819,8 +4476,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            assertThat(accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            assertThat(accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE),
                 is(emptyCollectionOf(CaseEventDefinition.class)));
         }
@@ -3838,8 +4495,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE);
 
             assertAll(
@@ -3869,8 +4526,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE);
             assertAll(
                 () -> assertThat(result, hasSize(1)),
@@ -3913,8 +4570,8 @@ public class AccessControlServiceTest {
                     .build())
                 .build();
 
-            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(caseType.getEvents(),
-                USER_ROLES,
+            List<CaseEventDefinition> result = accessControlService.filterCaseEventsByAccess(
+                caseType, ACCESS_PROFILES,
                 CAN_CREATE);
             assertAll(
                 () -> assertThat(result, hasSize(2)),
@@ -4053,7 +4710,7 @@ public class AccessControlServiceTest {
                     getJsonNode(collStart + child1 + comma + child2 + comma + newChild + collEnd),
                     existingDataNode,
                     Collections.emptyList(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(false));
         }
 
@@ -4067,7 +4724,7 @@ public class AccessControlServiceTest {
                     getJsonNode(collStart + child1 + comma + child2 + comma + newChild + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(true));
         }
 
@@ -4081,7 +4738,7 @@ public class AccessControlServiceTest {
                     getJsonNode(collStart + child1 + comma + child2 + comma + newChildWithNoIdTag + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(true));
         }
 
@@ -4089,7 +4746,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not allow creation of new items on collection")
         void shouldNotGrantCreateAccessToCollectionType() throws IOException {
             addressField.setAccessControlLists(
-                Collections.singletonList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(false).build()));
+                singletonList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(false).build()));
             caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
             assertThat(
@@ -4097,7 +4754,7 @@ public class AccessControlServiceTest {
                     getJsonNode(collStart + child1 + comma + child2 + comma + newChild + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(false));
         }
 
@@ -4106,7 +4763,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should allow update of items on collection")
         void shouldGrantUpdateAccessToCollectionType() throws IOException {
             addressField.setAccessControlLists(
-                Collections.singletonList(anAcl().withRole(ROLE_IN_USER_ROLES).withUpdate(true).build()));
+                singletonList(anAcl().withRole(ROLE_IN_USER_ROLES).withUpdate(true).build()));
             caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
             assertThat(
@@ -4114,7 +4771,7 @@ public class AccessControlServiceTest {
                     getJsonNode(collStart + child1Updated + comma + child2 + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(true));
         }
 
@@ -4122,8 +4779,8 @@ public class AccessControlServiceTest {
         @DisplayName("Should allow update of items on collection along with creation")
         void shouldGrantUpdateAndCreateAccessToCollectionType() throws IOException {
             addressField.setAccessControlLists(
-                Collections.singletonList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true)
-                .withUpdate(true).build()));
+                singletonList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true)
+                    .withUpdate(true).build()));
             caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
             assertThat(
@@ -4132,7 +4789,7 @@ public class AccessControlServiceTest {
                         + comma + newChild + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(true));
         }
 
@@ -4140,7 +4797,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not allow update of items on collection")
         void shouldNotGrantUpdateAccessToCollectionType() throws IOException {
             addressField.setAccessControlLists(
-                Collections.singletonList(anAcl().withRole(ROLE_IN_USER_ROLES).withUpdate(false).build()));
+                singletonList(anAcl().withRole(ROLE_IN_USER_ROLES).withUpdate(false).build()));
             caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
             assertThat(
@@ -4148,7 +4805,7 @@ public class AccessControlServiceTest {
                     getJsonNode(collStart + child1Updated + comma + child2 + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(false));
         }
 
@@ -4156,7 +4813,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should allow deletion of items on collection")
         void shouldGrantDeleteAccessToCollectionType() throws IOException {
             addressField.setAccessControlLists(
-                Collections.singletonList(anAcl().withRole(ROLE_IN_USER_ROLES).withDelete(true).build()));
+                singletonList(anAcl().withRole(ROLE_IN_USER_ROLES).withDelete(true).build()));
             caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
             assertThat(
@@ -4164,7 +4821,7 @@ public class AccessControlServiceTest {
                     getJsonNode(collStart + child1 + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(true));
         }
 
@@ -4172,8 +4829,8 @@ public class AccessControlServiceTest {
         @DisplayName("Should allow deletion of items on collection along with creation")
         void shouldGrantDeleteAndCreateAccessToCollectionType() throws IOException {
             addressField.setAccessControlLists(
-                Collections.singletonList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true)
-                .withDelete(true).build()));
+                singletonList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true)
+                    .withDelete(true).build()));
             caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
             assertThat(
@@ -4181,7 +4838,7 @@ public class AccessControlServiceTest {
                     getJsonNode(collStart + child1 + comma + newChildWithNoIdTag + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(true));
         }
 
@@ -4189,7 +4846,7 @@ public class AccessControlServiceTest {
         @DisplayName("Should not allow deletion of items on collection")
         void shouldNotGrantDeleteAccessToCollectionType() throws IOException {
             addressField.setAccessControlLists(
-                Collections.singletonList(anAcl().withRole(ROLE_IN_USER_ROLES).withDelete(false).build()));
+                singletonList(anAcl().withRole(ROLE_IN_USER_ROLES).withDelete(false).build()));
             caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
             assertThat(
@@ -4197,7 +4854,7 @@ public class AccessControlServiceTest {
                     getJsonNode(collStart + child1 + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(false));
         }
 
@@ -4206,8 +4863,8 @@ public class AccessControlServiceTest {
         @DisplayName("Should allow creation, updating and deletion of items on collection")
         void shouldGrantUpdateDeleteAndCreateAccessToCollectionType() throws IOException {
             addressField.setAccessControlLists(
-                Collections.singletonList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true)
-                .withUpdate(true).withDelete(true).build()));
+                singletonList(anAcl().withRole(ROLE_IN_USER_ROLES).withCreate(true)
+                    .withUpdate(true).withDelete(true).build()));
             caseType.getCaseFieldDefinitions().forEach(CaseFieldDefinition::propagateACLsToNestedFields);
 
             assertThat(
@@ -4216,7 +4873,7 @@ public class AccessControlServiceTest {
                         + newChildWithNoIdTag + collEnd),
                     existingDataNode,
                     caseType.getCaseFieldDefinitions(),
-                    USER_ROLES),
+                    ACCESS_PROFILES),
                 is(true));
         }
     }
@@ -4233,7 +4890,7 @@ public class AccessControlServiceTest {
                 newDataNode,
                 existingDataNode,
                 caseType.getCaseFieldDefinitions(),
-                USER_ROLES),
+                ACCESS_PROFILES),
             is(hasFieldAccess));
     }
 
@@ -4434,5 +5091,19 @@ public class AccessControlServiceTest {
         ));
 
         return JacksonUtils.convertValueJsonNode(data);
+    }
+
+    private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+        return userRoles.stream()
+            .map(userRole -> AccessProfile.builder().readOnly(false)
+                .accessProfile(userRole)
+                .build())
+            .collect(Collectors.toSet());
+    }
+
+    private void setApplicationParamsForTest() {
+        Mockito.when(applicationParams.isMultipartyFixEnabled()).thenReturn(true);
+        Mockito.when(applicationParams.getMultipartyCaseTypes()).thenReturn(singletonList(CASE_TYPE_ID));
+        Mockito.when(applicationParams.getMultipartyEvents()).thenReturn(singletonList(EVENT_ID));
     }
 }

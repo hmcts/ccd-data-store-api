@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.getcase;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 
@@ -17,10 +18,14 @@ public class CreatorGetCaseOperation implements GetCaseOperation {
 
     private CaseAccessService caseAccessService;
 
+    private ApplicationParams applicationParams;
+
     public CreatorGetCaseOperation(@Qualifier("authorised") GetCaseOperation getCaseOperation,
-                                   CaseAccessService caseAccessService) {
+                                   CaseAccessService caseAccessService,
+                                   ApplicationParams applicationParams) {
         this.getCaseOperation = getCaseOperation;
         this.caseAccessService = caseAccessService;
+        this.applicationParams = applicationParams;
     }
 
     @Override
@@ -36,6 +41,9 @@ public class CreatorGetCaseOperation implements GetCaseOperation {
     }
 
     private Optional<CaseDetails> checkVisibility(CaseDetails caseDetails) {
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            return Optional.of(caseDetails);
+        }
         return this.caseAccessService.canUserAccess(caseDetails)
             ? Optional.of(caseDetails) : Optional.empty();
     }
