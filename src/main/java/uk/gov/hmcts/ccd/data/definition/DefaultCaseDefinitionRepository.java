@@ -85,6 +85,33 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         }
     }
 
+    public CaseTypeDefinition getCaseType(final String caseTypeId) {
+        LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
+        try {
+            final HttpEntity<CaseTypeDefinition> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
+            final CaseTypeDefinition caseTypeDefinition = restTemplate
+                .exchange(applicationParams.caseTypesDefURL(caseTypeId), HttpMethod.GET, requestEntity,
+                    CaseTypeDefinition.class)
+                .getBody();
+            if (caseTypeDefinition != null) {
+                caseTypeDefinition.getCaseFieldDefinitions().stream()
+                    .forEach(CaseFieldDefinition::propagateACLsToNestedFields);
+            }
+            return caseTypeDefinition;
+
+        } catch (Exception e) {
+            LOG.warn("Error while retrieving case type", e);
+            if (e instanceof HttpClientErrorException
+                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
+                throw new ResourceNotFoundException("Resource not found when getting case type definition for "
+                    + caseTypeId + " because of " + e.getMessage());
+            } else {
+                throw new ServiceException(
+                    "Problem getting case type definition for " + caseTypeId + " because of " + e.getMessage());
+            }
+        }
+    }
+
     @Override
     @Cacheable("caseTypeDefinitionsCache")
     public CaseTypeDefinition getCaseType(int version, String caseTypeId) {
@@ -125,33 +152,6 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             } else {
                 throw new ServiceException(
                         "Problem getting case type definition for " + caseTypeIds + " because of " + e.getMessage());
-            }
-        }
-    }
-
-    public CaseTypeDefinition getCaseType(final String caseTypeId) {
-        LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
-        try {
-            final HttpEntity<CaseTypeDefinition> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
-            final CaseTypeDefinition caseTypeDefinition = restTemplate
-                .exchange(applicationParams.caseTypesDefURL(caseTypeId), HttpMethod.GET, requestEntity,
-                    CaseTypeDefinition.class)
-                .getBody();
-            if (caseTypeDefinition != null) {
-                caseTypeDefinition.getCaseFieldDefinitions().stream()
-                    .forEach(CaseFieldDefinition::propagateACLsToNestedFields);
-            }
-            return caseTypeDefinition;
-
-        } catch (Exception e) {
-            LOG.warn("Error while retrieving case type", e);
-            if (e instanceof HttpClientErrorException
-                && ((HttpClientErrorException) e).getRawStatusCode() == RESOURCE_NOT_FOUND) {
-                throw new ResourceNotFoundException("Resource not found when getting case type definition for "
-                    + caseTypeId + " because of " + e.getMessage());
-            } else {
-                throw new ServiceException(
-                    "Problem getting case type definition for " + caseTypeId + " because of " + e.getMessage());
             }
         }
     }
