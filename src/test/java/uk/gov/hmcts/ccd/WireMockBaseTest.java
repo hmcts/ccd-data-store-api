@@ -13,7 +13,6 @@ import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import org.apache.http.HttpHeaders;
 import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
-import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +21,6 @@ import org.springframework.cloud.contract.wiremock.WireMockConfigurationCustomiz
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -43,9 +41,6 @@ public abstract class WireMockBaseTest extends BaseTest {
     protected Integer wiremockPort;
 
     protected String hostUrl;
-
-    @Mock
-    protected CaseDefinitionRepository caseDefinitionRepository;
 
     @Inject
     protected ApplicationParams applicationParams;

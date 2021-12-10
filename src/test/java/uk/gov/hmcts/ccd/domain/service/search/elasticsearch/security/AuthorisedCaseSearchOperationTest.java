@@ -149,7 +149,8 @@ class AuthorisedCaseSearchOperationTest {
                 () -> assertThat(result, is(searchResult)),
                 () -> assertThat(caseDetails.getData(), Matchers.is(filteredData)),
                 () -> assertThat(result.getTotal(), is(1L)),
-                () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(Arrays.asList(CASE_TYPE_ID_1), CAN_READ),
+                () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(
+                    Arrays.asList(CASE_TYPE_ID_1), CAN_READ),
                 () -> verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class), anyBoolean()),
                 () -> verify(caseDataAccessControl).generateAccessProfilesByCaseDetails(any(CaseDetails.class)),
                 () -> verify(objectMapperService).convertObjectToJsonNode(unFilteredData),
@@ -175,7 +176,8 @@ class AuthorisedCaseSearchOperationTest {
             assertAll(
                 () -> assertThat(result.getCases(), hasSize(0)),
                 () -> assertThat(result.getTotal(), is(0L)),
-                () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(Arrays.asList(CASE_TYPE_ID_1), CAN_READ),
+                () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(
+                    Arrays.asList(CASE_TYPE_ID_1), CAN_READ),
                 () -> verifyZeroInteractions(caseSearchOperation),
                 () -> verifyZeroInteractions(accessControlService),
                 () -> verifyZeroInteractions(userRepository)
