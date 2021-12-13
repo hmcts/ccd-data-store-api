@@ -819,7 +819,7 @@ task functional() {
             main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
             args = [
-                    '--threads', '10',
+                    '--threads', '1',
                     '--plugin', "json:${rootDir}/target/cucumber.json",
                     '--tags', 'not @Ignore',
                     '--glue', 'uk.gov.hmcts.befta.player',
