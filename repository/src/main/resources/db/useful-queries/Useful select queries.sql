@@ -92,3 +92,4 @@ SELECT cd.id, cd.case_type_id, cd.version FROM case_data cd INNER JOIN
             and ce.created_date between '1970-01-01' and '1970-01-01')
     ) ce
     where ce.id = cd.id;
+    
