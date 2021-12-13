@@ -1,6 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
@@ -19,7 +23,20 @@ public class PseudoRoleToAccessProfileGenerator {
 
     private static final String CASE_ROLE_ID_REGEX = "^(\\[[A-Za-z]+\\])$";
 
-    public List<RoleToAccessProfileDefinition> generate(CaseTypeDefinition caseTypeDefinition) {
+    private final CaseDefinitionRepository caseDefinitionRepository;
+
+    public PseudoRoleToAccessProfileGenerator(
+        @Qualifier(CachedCaseDefinitionRepository.QUALIFIER) CaseDefinitionRepository caseDefinitionRepository) {
+        this.caseDefinitionRepository = caseDefinitionRepository;
+    }
+
+    @Cacheable("caseTypePseudoRoleToAccessProfileCache")
+    public List<RoleToAccessProfileDefinition> generate(int version, String caseTypeId) {
+        CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(version, caseTypeId);
+        return generate(caseTypeDefinition);
+    }
+
+    private List<RoleToAccessProfileDefinition> generate(CaseTypeDefinition caseTypeDefinition) {
 
         Set<String> caseRoles = extractCaseRoles(caseTypeDefinition);
         Set<String> idamRoles = extractIdamRoles(caseTypeDefinition);
