@@ -88,8 +88,8 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
     public CaseTypeDefinition getCaseType(final String caseTypeId) {
         LOG.debug("retrieving case type definition for case type: {}", caseTypeId);
         try {
-            final HttpEntity<CaseTypeDefinition> requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
-            final CaseTypeDefinition caseTypeDefinition = restTemplate
+            val requestEntity = new HttpEntity<>(securityUtils.authorizationHeaders());
+            val caseTypeDefinition = restTemplate
                 .exchange(applicationParams.caseTypesDefURL(caseTypeId), HttpMethod.GET, requestEntity,
                     CaseTypeDefinition.class)
                 .getBody();
