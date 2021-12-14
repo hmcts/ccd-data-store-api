@@ -446,7 +446,7 @@ class DefaultCaseDataAccessControlTest {
                 .roleName(CREATOR.name())
                 .build()
         );
-        doReturn(generatedPseudoAP).when(pseudoRoleToAccessProfileGenerator).generate(any());
+        doReturn(generatedPseudoAP).when(pseudoRoleToAccessProfileGenerator).generate(anyInt(), anyString());
 
         Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
             .generateAccessProfilesByCaseTypeId(CASE_TYPE_1);
