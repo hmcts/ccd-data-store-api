@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Maps.newHashMap;
+import static java.lang.String.format;
 
 @Service
 @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
@@ -27,12 +28,14 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     private static final Logger LOGGER = LoggerFactory.getLogger(CachedCaseDefinitionRepository.class);
 
     public static final String QUALIFIER = "cached";
+    private static final String CASE_TYPE_KEY_FORMAT = "%s___%d";
 
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final Map<String, List<CaseTypeDefinition>> caseTypesForJurisdictions = newHashMap();
     private final Map<String, CaseTypeDefinitionVersion> versions = newHashMap();
     private final Map<String, UserRole> userRoleClassifications = newHashMap();
     private final Map<String, List<FieldTypeDefinition>> baseTypes = newHashMap();
+    private final Map<String, CaseTypeDefinition> caseTypes = newHashMap();
 
     @Autowired
     public CachedCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
@@ -49,12 +52,13 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     @Override
     public CaseTypeDefinition getCaseType(final String caseTypeId) {
         CaseTypeDefinitionVersion latestVersion = this.getLatestVersion(caseTypeId);
-        return caseDefinitionRepository.getCaseType(latestVersion.getVersion(), caseTypeId);
+        return this.getCaseType(latestVersion.getVersion(), caseTypeId);
     }
 
     @Override
     public CaseTypeDefinition getCaseType(int version, String caseTypeId) {
-        return caseDefinitionRepository.getCaseType(version, caseTypeId);
+        return caseTypes.computeIfAbsent(format(CASE_TYPE_KEY_FORMAT, caseTypeId, version),
+            e -> caseDefinitionRepository.getCaseType(version, caseTypeId));
     }
 
     @Override
