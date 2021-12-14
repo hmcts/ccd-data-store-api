@@ -35,15 +35,18 @@
 			"Content-Length": "[[ANYTHING_PRESENT]]"
 		},
 		"body": {
-      "CaseLinks" : [ {
+      "CaseLinks" : [{
+        "__elementId__": "LinkedCaseId"
+      },
+      {
         "CaseId" : "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
         "LinkedCaseId" : "${[scenarioContext][parentContext][childContexts][F-1009_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
         "CaseTypeId" : "FT_MasterCaseType"
       },
       {
-          "CaseId" : "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
-          "LinkedCaseId" : "${[scenarioContext][parentContext][childContexts][F-1009_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
-          "CaseTypeId" : "FT_MasterCaseType"
+        "CaseId" : "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
+        "LinkedCaseId" : "${[scenarioContext][parentContext][childContexts][F-1009_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
+        "CaseTypeId" : "FT_MasterCaseType"
       }]
 		}
 	}

@@ -35,7 +35,10 @@
 			"Content-Length": "[[ANYTHING_PRESENT]]"
 		},
 		"body": {
-      "CaseLinks" : [ {
+      "CaseLinks" : [{
+        "__elementId__": "LinkedCaseId"
+      },
+      {
         "CaseId" : "[[ANYTHING_PRESENT]]",
         "LinkedCaseId" : "${[scenarioContext][parentContext][childContexts][F-1009_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
         "CaseTypeId" : "FT_MasterCaseType"
