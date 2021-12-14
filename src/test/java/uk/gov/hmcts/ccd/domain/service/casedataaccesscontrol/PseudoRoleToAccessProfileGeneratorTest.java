@@ -5,9 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -25,7 +23,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 @DisplayName("PseudoRoleToAccessProfilesGeneratorTest")
@@ -42,20 +39,17 @@ class PseudoRoleToAccessProfileGeneratorTest {
     public static final String CASE_ROLE3 = "[DefendantEvent]";
     public static final String CASE_ROLE4 = "[ClaimantCaseField]";
     public static final String CASE_ROLE5 = "[ClaimantComplexCaseField]";
-    private static final String CASE_TYPE_ID = "CaseType";
-    private static final int VERSION = 1;
 
     CaseTypeDefinition caseTypeDefinition;
 
     @InjectMocks
     private PseudoRoleToAccessProfileGenerator instance;
 
-    @Mock
-    private CaseDefinitionRepository caseDefinitionRepository;
-
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        MockitoAnnotations.initMocks(this);
+
+        instance = new PseudoRoleToAccessProfileGenerator();
 
         caseTypeDefinition = new CaseTypeDefinition();
 
@@ -64,7 +58,6 @@ class PseudoRoleToAccessProfileGeneratorTest {
         addEventAcls(caseTypeDefinition);
         addCaseFieldAcls(caseTypeDefinition);
 
-        when(caseDefinitionRepository.getCaseType(VERSION, CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
     }
 
     @Nested
@@ -74,7 +67,7 @@ class PseudoRoleToAccessProfileGeneratorTest {
         @Test
         public void shouldGenerateAccessProfilesMappings() {
 
-            List<RoleToAccessProfileDefinition> generated = instance.generate(VERSION, CASE_TYPE_ID);
+            List<RoleToAccessProfileDefinition> generated = instance.generate(caseTypeDefinition);
 
             assertAll(
                 () -> assertThat("Invalid expected number of access profiles", generated, hasSize(12)),

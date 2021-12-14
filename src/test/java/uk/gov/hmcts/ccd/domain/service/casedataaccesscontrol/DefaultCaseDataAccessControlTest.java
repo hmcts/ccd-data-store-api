@@ -25,7 +25,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
-import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.AuthorisationMapper;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
@@ -48,7 +47,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -446,7 +444,7 @@ class DefaultCaseDataAccessControlTest {
                 .roleName(CREATOR.name())
                 .build()
         );
-        doReturn(generatedPseudoAP).when(pseudoRoleToAccessProfileGenerator).generate(anyInt(), anyString());
+        doReturn(generatedPseudoAP).when(pseudoRoleToAccessProfileGenerator).generate(any(CaseTypeDefinition.class));
 
         Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
             .generateAccessProfilesByCaseTypeId(CASE_TYPE_1);
@@ -457,12 +455,8 @@ class DefaultCaseDataAccessControlTest {
 
     private CaseTypeDefinition createCaseTypeDefinition(String... roleNames) {
         CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-        caseTypeDefinition.setId(CASE_TYPE_1);
         caseTypeDefinition.setAccessControlLists(createAccessControlList());
         caseTypeDefinition.setRoleToAccessProfiles(createRoleToAccessProfileDefinitions(roleNames));
-        Version version = new Version();
-        version.setNumber(1);
-        caseTypeDefinition.setVersion(version);
         return caseTypeDefinition;
     }
 

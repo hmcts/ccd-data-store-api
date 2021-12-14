@@ -272,11 +272,7 @@
                 "update": false,
                 "delete": false
               }
-            ],
-            "version": {
-              "number": 1,
-              "live_from": "2017-01-01"
-            }
+            ]
           }
         ]
       }
