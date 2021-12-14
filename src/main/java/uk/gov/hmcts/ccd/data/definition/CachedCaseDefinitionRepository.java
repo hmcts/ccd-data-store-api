@@ -28,7 +28,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     private static final Logger LOGGER = LoggerFactory.getLogger(CachedCaseDefinitionRepository.class);
 
     public static final String QUALIFIER = "cached";
-    private static final String CASE_TYPE_KEY_FORMAT = "%s___%d";
+    private static final String CASE_TYPE_KEY_FORMAT = "%s_%d";
 
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final Map<String, List<CaseTypeDefinition>> caseTypesForJurisdictions = newHashMap();
