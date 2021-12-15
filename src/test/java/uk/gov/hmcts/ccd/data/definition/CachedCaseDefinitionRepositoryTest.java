@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
@@ -36,14 +37,18 @@ class CachedCaseDefinitionRepositoryTest {
     private static final String MISSING_USER_ROLE = "[MISSING_ONE]";
 
     @Mock
+    private ApplicationParams appParams;
+    @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
     private CachedCaseDefinitionRepository cachedCaseDefinitionRepository;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-
-        cachedCaseDefinitionRepository = new CachedCaseDefinitionRepository(caseDefinitionRepository);
+        doReturn(1).when(appParams).getRequestScopeCachedCaseTypesFromHour();
+        doReturn(5).when(appParams).getRequestScopeCachedCaseTypesTillHour();
+        doReturn(Arrays.asList("Dummy Case Type")).when(appParams).getRequestScopeCachedCaseTypes();
+        cachedCaseDefinitionRepository = new CachedCaseDefinitionRepository(caseDefinitionRepository, appParams);
     }
 
     @Nested
