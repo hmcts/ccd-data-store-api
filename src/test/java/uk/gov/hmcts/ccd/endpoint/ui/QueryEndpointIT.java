@@ -252,7 +252,6 @@ public class QueryEndpointIT extends WireMockBaseTest {
         assertThat(captor.getValue().getCaseId(), is("DRAFT4444333322221111,1504259907353529,1504259907353545"));
     }
 
-    @Ignore
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturnResultsWithFilteredOutFieldsWhenRelevantCaseFieldAccessNotGranted() throws Exception {
