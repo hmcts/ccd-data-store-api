@@ -527,7 +527,7 @@ public class ApplicationParams {
     }
 
     public String getCasesIdByjurisdictionDefURL() {
-        return caseDefinitionHost + "/api/data/jurisdictions/case-type-ids";
+        return caseDefinitionHost + "/api/data/case-type-ids";
     }
 
 

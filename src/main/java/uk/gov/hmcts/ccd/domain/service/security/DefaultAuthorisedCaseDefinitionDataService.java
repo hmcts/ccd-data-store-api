@@ -52,8 +52,8 @@ public class DefaultAuthorisedCaseDefinitionDataService implements AuthorisedCas
     }
 
     @Override
-    public List<CaseTypeDefinition> getAuthorisedCaseType(List<String> caseTypeIds,
-                                                          Predicate<AccessControlList> access) {
+    public List<CaseTypeDefinition> getAuthorisedCaseTypes(List<String> caseTypeIds,
+                                                           Predicate<AccessControlList> access) {
 
         val caseTypeDefinitions = caseTypeService.getCaseTypeByIds(caseTypeIds).stream().filter(caseTypeDefinition ->
             (verifyAclOnCaseType(caseTypeDefinition, access)

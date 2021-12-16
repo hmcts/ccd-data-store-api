@@ -73,7 +73,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     }
 
     private List<CaseTypeDefinition> getAuthorisedCaseTypes(CrossCaseTypeSearchRequest searchRequest) {
-        return authorisedCaseDefinitionDataService.getAuthorisedCaseType(searchRequest.getCaseTypeIds(), CAN_READ);
+        return authorisedCaseDefinitionDataService.getAuthorisedCaseTypes(searchRequest.getCaseTypeIds(), CAN_READ);
     }
 
     private CrossCaseTypeSearchRequest createAuthorisedSearchRequest(List<CaseTypeDefinition> authorisedCaseTypes,

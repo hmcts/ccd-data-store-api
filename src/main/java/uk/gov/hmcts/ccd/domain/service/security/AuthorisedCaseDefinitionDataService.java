@@ -12,7 +12,7 @@ public interface AuthorisedCaseDefinitionDataService {
 
     Optional<CaseTypeDefinition> getAuthorisedCaseType(String caseTypeId, Predicate<AccessControlList> access);
 
-    List<CaseTypeDefinition> getAuthorisedCaseType(List<String> caseTypeIds, Predicate<AccessControlList> access);
+    List<CaseTypeDefinition> getAuthorisedCaseTypes(List<String> caseTypeIds, Predicate<AccessControlList> access);
 
     List<CaseStateDefinition> getUserAuthorisedCaseStates(String jurisdiction, String caseTypeId,
                                                           Predicate<AccessControlList> access);

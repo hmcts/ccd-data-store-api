@@ -96,14 +96,14 @@ class AuthorisedCaseSearchOperationTest {
         when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(CASE_TYPE_ID_2, CAN_READ))
             .thenReturn(Optional.empty());
 
-        when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(Arrays.asList(CASE_TYPE_ID_1), CAN_READ))
+        when(authorisedCaseDefinitionDataService.getAuthorisedCaseTypes(Arrays.asList(CASE_TYPE_ID_1), CAN_READ))
             .thenReturn(Arrays.asList(caseTypeDefinition));
 
-        when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(
+        when(authorisedCaseDefinitionDataService.getAuthorisedCaseTypes(
             Arrays.asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2), CAN_READ)
         )
             .thenReturn(Arrays.asList(caseTypeDefinition));
-        when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(Arrays.asList(CASE_TYPE_ID_2), CAN_READ))
+        when(authorisedCaseDefinitionDataService.getAuthorisedCaseTypes(Arrays.asList(CASE_TYPE_ID_2), CAN_READ))
             .thenReturn(Arrays.asList());
     }
 
@@ -149,7 +149,7 @@ class AuthorisedCaseSearchOperationTest {
                 () -> assertThat(result, is(searchResult)),
                 () -> assertThat(caseDetails.getData(), Matchers.is(filteredData)),
                 () -> assertThat(result.getTotal(), is(1L)),
-                () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(
+                () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseTypes(
                     Arrays.asList(CASE_TYPE_ID_1), CAN_READ),
                 () -> verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class), anyBoolean()),
                 () -> verify(caseDataAccessControl).generateAccessProfilesByCaseDetails(any(CaseDetails.class)),
@@ -168,7 +168,7 @@ class AuthorisedCaseSearchOperationTest {
                 .withSearchRequest(elasticsearchRequest)
                 .build();
 
-            when(authorisedCaseDefinitionDataService.getAuthorisedCaseType(asList(CASE_TYPE_ID_1), CAN_READ))
+            when(authorisedCaseDefinitionDataService.getAuthorisedCaseTypes(asList(CASE_TYPE_ID_1), CAN_READ))
                 .thenReturn(asList());
 
             CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(searchRequest, true);
@@ -176,7 +176,7 @@ class AuthorisedCaseSearchOperationTest {
             assertAll(
                 () -> assertThat(result.getCases(), hasSize(0)),
                 () -> assertThat(result.getTotal(), is(0L)),
-                () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(
+                () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseTypes(
                     Arrays.asList(CASE_TYPE_ID_1), CAN_READ),
                 () -> verifyZeroInteractions(caseSearchOperation),
                 () -> verifyZeroInteractions(accessControlService),
