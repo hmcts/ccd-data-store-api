@@ -4,7 +4,7 @@ Feature: F-126: Get Case Events On Behalf Of User
     Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
-  @S-1261 @Ignore
+  @S-1261
   Scenario: must successfully update userid with on behalf of user and proxied by user details
     Given a user with [an active profile in CCD]
       And a case [C1, which has just been] created as in [F126_Case_Data_Create_C1]
