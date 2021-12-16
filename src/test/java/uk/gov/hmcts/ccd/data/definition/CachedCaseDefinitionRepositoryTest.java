@@ -6,7 +6,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
@@ -36,14 +38,18 @@ class CachedCaseDefinitionRepositoryTest {
     private static final String MISSING_USER_ROLE = "[MISSING_ONE]";
 
     @Mock
+    private ApplicationParams appParams;
+    @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
     private CachedCaseDefinitionRepository cachedCaseDefinitionRepository;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-
-        cachedCaseDefinitionRepository = new CachedCaseDefinitionRepository(caseDefinitionRepository);
+        doReturn(0).when(appParams).getRequestScopeCachedCaseTypesFromHour();
+        doReturn(24).when(appParams).getRequestScopeCachedCaseTypesTillHour();
+        doReturn(Arrays.asList("GrantOfRepresentation")).when(appParams).getRequestScopeCachedCaseTypes();
+        cachedCaseDefinitionRepository = new CachedCaseDefinitionRepository(caseDefinitionRepository, appParams);
     }
 
     @Nested
@@ -152,6 +158,39 @@ class CachedCaseDefinitionRepositoryTest {
                 () -> assertThat(caseTypesIDs, is(expectedBaseTypes))
             );
         }
+    }
+
+    @Nested
+    @DisplayName("getCaseType()")
+    class GetCaseType {
+
+        @Test
+        @DisplayName("should retrieve latest version of case type hit at request scope cache")
+        void shouldRetrieveLatestVersionCaseTypeByCaseTypeIdWithoutAndWithRequestScopeCacheForAnEnabledCaseType() {
+            CaseTypeDefinition expected = new CaseTypeDefinition();
+            expected.setId("GrantOfRepresentation");
+            testCachingOfCaseType(expected, 1, 0);
+        }
+
+        @Test
+        @DisplayName("should retrieve latest version of case type missed at request scope cache")
+        void shouldRetrieveLatestVersionCaseTypeByCaseTypeIdWithoutRequestScopeCacheForAnExcludedCaseType() {
+            CaseTypeDefinition expected = new CaseTypeDefinition();
+            expected.setId("DummyCaseType_1");
+            testCachingOfCaseType(expected, 1, 1);
+        }
+
+        void testCachingOfCaseType(CaseTypeDefinition expected, int cacheMissCountBefore, int cacheMissCountAfter) {
+            doReturn(expected).when(caseDefinitionRepository).getCaseType(99,expected.getId());
+            CaseTypeDefinition actual = cachedCaseDefinitionRepository.getCaseType(99, expected.getId());
+            assertThat(expected, is(actual));
+            verify(caseDefinitionRepository, times(cacheMissCountBefore)).getCaseType(99,expected.getId());
+            Mockito.clearInvocations(caseDefinitionRepository);
+            actual = cachedCaseDefinitionRepository.getCaseType(99, expected.getId());
+            assertThat(expected, is(actual));
+            verify(caseDefinitionRepository, times(cacheMissCountAfter)).getCaseType(99,expected.getId());
+        }
+
     }
 
     @Nested
