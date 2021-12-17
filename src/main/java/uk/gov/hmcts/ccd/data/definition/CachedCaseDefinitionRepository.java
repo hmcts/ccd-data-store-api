@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,7 +31,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
 
     public static final String QUALIFIER = "cached";
     private static final String CASE_TYPE_KEY_FORMAT = "%s___%d";
-
+    private final ApplicationParams applicationParams;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final Map<String, List<CaseTypeDefinition>> caseTypesForJurisdictions = newHashMap();
     private final Map<String, CaseTypeDefinitionVersion> versions = newHashMap();
@@ -39,8 +41,10 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
 
     @Autowired
     public CachedCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
-                                                  CaseDefinitionRepository caseDefinitionRepository) {
+                                                  CaseDefinitionRepository caseDefinitionRepository,
+                                          ApplicationParams applicationParams) {
         this.caseDefinitionRepository = caseDefinitionRepository;
+        this.applicationParams = applicationParams;
     }
 
     @Override
@@ -56,9 +60,19 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
-    public CaseTypeDefinition getCaseType(int version, String caseTypeId) {
-        return caseTypes.computeIfAbsent(format(CASE_TYPE_KEY_FORMAT, caseTypeId, version),
-            e -> caseDefinitionRepository.getCaseType(version, caseTypeId));
+    public CaseTypeDefinition getCaseType(final int version, final String caseTypeId) {
+        final int fromHour = applicationParams.getRequestScopeCachedCaseTypesFromHour();
+        final int tillHour = applicationParams.getRequestScopeCachedCaseTypesTillHour();
+        final int currentHour = LocalDateTime.now().getHour();
+        final boolean withinTimeInterval = currentHour >= fromHour  && currentHour < tillHour;
+        final boolean cacheSwitchOnForCaseType = applicationParams.getRequestScopeCachedCaseTypes().stream()
+            .anyMatch(ct -> ct.equalsIgnoreCase(caseTypeId));
+        if (withinTimeInterval && cacheSwitchOnForCaseType) {
+            return caseTypes.computeIfAbsent(format(CASE_TYPE_KEY_FORMAT, caseTypeId, version),
+                e -> caseDefinitionRepository.getCaseType(version, caseTypeId));
+        } else {
+            return caseDefinitionRepository.getCaseType(version, caseTypeId);
+        }
     }
 
     @Override
