@@ -96,6 +96,15 @@ public class ApplicationParams {
     @Value("${definition.cache.jurisdiction-ttl}")
     private Integer jurisdictionTTL;
 
+    @Value("#{'${definition.cache.request-scope.case-types}'.split(',')}")
+    private List<String> requestScopeCachedCaseTypes;
+
+    @Value("${definition.cache.request-scope.case-types.from-hour}")
+    private Integer requestScopeCachedCaseTypesFromHour;
+
+    @Value("${definition.cache.request-scope.case-types.till-hour}")
+    private Integer requestScopeCachedCaseTypesTillHour;
+
     @Value("${user.cache.ttl.secs}")
     private Integer userCacheTTLSecs;
 
@@ -559,5 +568,17 @@ public class ApplicationParams {
 
     public List<String> getMultipartyCaseTypes() {
         return multipartyCaseTypes;
+    }
+
+    public List<String>  getRequestScopeCachedCaseTypes() {
+        return requestScopeCachedCaseTypes;
+    }
+
+    public Integer getRequestScopeCachedCaseTypesFromHour() {
+        return requestScopeCachedCaseTypesFromHour;
+    }
+
+    public Integer getRequestScopeCachedCaseTypesTillHour() {
+        return requestScopeCachedCaseTypesTillHour;
     }
 }
