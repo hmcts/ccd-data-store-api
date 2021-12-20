@@ -133,7 +133,6 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
         return baseTypes.computeIfAbsent("baseTypes", e -> caseDefinitionRepository.getBaseTypes());
     }
 
-
     public CaseDefinitionRepository getCaseDefinitionRepository() {
         return caseDefinitionRepository;
     }
