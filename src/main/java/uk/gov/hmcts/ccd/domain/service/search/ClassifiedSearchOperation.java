@@ -6,22 +6,22 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 
 @Service
 @Qualifier("classified")
 public class ClassifiedSearchOperation implements SearchOperation {
     private final SearchOperation searchOperation;
-    private final SecurityClassificationService classificationService;
+    private final SecurityClassificationServiceImpl classificationService;
 
     @Autowired
     public ClassifiedSearchOperation(@Qualifier("default") SearchOperation searchOperation,
-                                     SecurityClassificationService classificationService) {
+                                     SecurityClassificationServiceImpl classificationService) {
 
         this.searchOperation = searchOperation;
         this.classificationService = classificationService;

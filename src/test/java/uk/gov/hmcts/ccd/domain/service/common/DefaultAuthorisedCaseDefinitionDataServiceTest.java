@@ -1,6 +1,12 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
-import com.google.common.collect.Sets;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -8,27 +14,21 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.security.DefaultAuthorisedCaseDefinitionDataService;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
@@ -43,10 +43,9 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
     private CaseTypeService caseTypeService;
     @Mock
     private AccessControlService accessControlService;
+
     @Mock
-    private UserRepository userRepository;
-    @Mock
-    private CaseUserRepository caseUserRepository;
+    private CaseDataAccessControl caseDataAccessControl;
 
     @InjectMocks
     private DefaultAuthorisedCaseDefinitionDataService authorisedCaseDataService;
@@ -67,15 +66,16 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         private static final String STATE2 = "state2";
         private static final String USERID = "userId";
         private final Set<String> userRoles = new HashSet<>();
-        private final Set<String> caseUserRoles = Sets.newHashSet("[CREATOR]", "[CLAIMANT]");
+        Set<AccessProfile> accessProfiles = createAccessProfiles(userRoles);
 
         @BeforeEach
         void setUp() {
+            when(caseTypeDefinition.getId()).thenReturn(CASE_TYPE);
             when(caseTypeService.getCaseTypeForJurisdiction(CASE_TYPE, JURISDICTION)).thenReturn(caseTypeDefinition);
             when(caseTypeService.getCaseType(CASE_TYPE)).thenReturn(caseTypeDefinition);
-            when(userRepository.getUserRoles()).thenReturn(userRoles);
-            when(caseUserRepository.getCaseUserRolesByUserId(USERID)).thenReturn(caseUserRoles);
-            when(accessControlService.filterCaseStatesByAccess(caseTypeDefinition.getStates(), userRoles, CAN_READ))
+            when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+                .thenReturn(accessProfiles);
+            when(accessControlService.filterCaseStatesByAccess(caseTypeDefinition, accessProfiles, CAN_READ))
                 .thenReturn(getCaseStates());
         }
 
@@ -119,8 +119,8 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         private void verifyResult(List<String> result) {
             assertAll(
                 () -> assertThat(result, containsInAnyOrder(STATE1, STATE2)),
-                () -> verify(userRepository).getUserRoles(),
-                () -> verify(accessControlService).filterCaseStatesByAccess(caseTypeDefinition.getStates(), userRoles,
+                () -> verify(caseDataAccessControl).generateAccessProfilesByCaseTypeId(anyString()),
+                () -> verify(accessControlService).filterCaseStatesByAccess(caseTypeDefinition, accessProfiles,
                     CAN_READ)
             );
         }
@@ -130,11 +130,14 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
     @DisplayName("Get user authorised case type")
     class GetUserAuthorisedCaseTypeDefinition {
         private final Set<String> userRoles = new HashSet<>();
+        Set<AccessProfile> accessProfiles = createAccessProfiles(userRoles);
 
         @BeforeEach
         void setUp() {
+            when(caseTypeDefinition.getId()).thenReturn(CASE_TYPE);
             when(caseTypeService.getCaseType(CASE_TYPE)).thenReturn(caseTypeDefinition);
-            when(userRepository.getUserRoles()).thenReturn(userRoles);
+            when(caseDataAccessControl.generateAccessProfilesByCaseTypeId(anyString()))
+                .thenReturn(accessProfiles);
             when(caseTypeDefinition.getSecurityClassification()).thenReturn(SecurityClassification.PRIVATE);
         }
 
@@ -142,50 +145,74 @@ class DefaultAuthorisedCaseDefinitionDataServiceTest {
         @DisplayName("should return case type when user has read access and user classification is higher or euqal to"
             + " case type classification")
         void shouldGetAuthorisedCaseType() {
-            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ))
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ))
                 .thenReturn(true);
-            when(userRepository.getHighestUserClassification(anyString())).thenReturn(SecurityClassification.PRIVATE);
+            when(caseDataAccessControl.getHighestUserClassification(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(SecurityClassification.PRIVATE);
 
             Optional<CaseTypeDefinition> result = authorisedCaseDataService.getAuthorisedCaseType(CASE_TYPE, CAN_READ);
 
             assertThat(result.isPresent(), is(true));
             assertThat(result.get(), is(caseTypeDefinition));
-            verify(userRepository).getHighestUserClassification(anyString());
             verifyCalls();
         }
 
         @Test
         @DisplayName("should not return case type when user has no read access to the case type")
         void shouldNotReturnCaseTypeWhenNoAccess() {
-            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ))
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ))
                 .thenReturn(false);
-            when(userRepository.getHighestUserClassification(anyString())).thenReturn(SecurityClassification.PRIVATE);
+            when(caseDataAccessControl.getHighestUserClassification(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(SecurityClassification.PRIVATE);
 
             Optional<CaseTypeDefinition> result = authorisedCaseDataService.getAuthorisedCaseType(CASE_TYPE, CAN_READ);
 
             assertThat(result.isPresent(), is(false));
-            verify(userRepository, never()).getHighestUserClassification(anyString());
             verifyCalls();
         }
 
         @Test
         @DisplayName("should not return case type when user classification is lower than case type classification")
         void shouldNotReturnCaseTypeWhenClassificationNotMatched() {
-            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ))
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ))
                 .thenReturn(true);
-            when(userRepository.getHighestUserClassification(anyString())).thenReturn(SecurityClassification.PUBLIC);
+            when(caseDataAccessControl.getHighestUserClassification(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(SecurityClassification.PUBLIC);
 
             Optional<CaseTypeDefinition> result = authorisedCaseDataService.getAuthorisedCaseType(CASE_TYPE, CAN_READ);
 
             assertThat(result.isPresent(), is(false));
-            verify(userRepository).getHighestUserClassification(anyString());
             verifyCalls();
+        }
+
+        @Test
+        @DisplayName("should not return case type when user classification is not defined for caseType jurisdiction")
+        void shouldNotReturnCaseTypeWhenUserHasNoClassificationForJurisdiction() {
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ))
+                .thenReturn(true);
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(Collections.emptySet());
+            when(caseDataAccessControl.getHighestUserClassification(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(SecurityClassification.PUBLIC);
+
+            Optional<CaseTypeDefinition> result = authorisedCaseDataService.getAuthorisedCaseType(CASE_TYPE, CAN_READ);
+
+            assertThat(result.isPresent(), is(false));
         }
 
         void verifyCalls() {
             verify(caseTypeService).getCaseType(CASE_TYPE);
-            verify(userRepository).getUserRoles();
-            verify(accessControlService).canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ);
+            verify(caseDataAccessControl).generateAccessProfilesByCaseTypeId(anyString());
+            verify(accessControlService).canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ);
         }
+    }
+
+
+    private Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+        return userRoles.stream()
+            .map(userRole -> AccessProfile.builder().readOnly(false)
+                .accessProfile(userRole)
+                .build())
+            .collect(Collectors.toSet());
     }
 }

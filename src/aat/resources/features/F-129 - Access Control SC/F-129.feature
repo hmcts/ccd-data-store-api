@@ -1,6 +1,6 @@
 #===========================================
 @F-129 @access-control
-Feature: F-129 Access Control tests covering Security Classification feature
+Feature: F-129: Access Control tests covering Security Classification feature
 #===========================================
 
   Background: Load test data for the scenario
@@ -57,7 +57,7 @@ Feature: F-129 Access Control tests covering Security Classification feature
     And the response [shows fields with a SC of PUBLIC, PRIVATE or RESTRICTED]
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  @S-129.4
+  @S-129.4 @Ignore
   Scenario: User with PUBLIC SC role access cannot access cases with a Security Classification of PRIVATE or RESTRICTED
 
 

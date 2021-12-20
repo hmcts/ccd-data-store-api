@@ -95,15 +95,10 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
 
         List<Integer> disabledRetries = Lists.newArrayList(0);
         caseEventDefinition.setRetriesTimeoutAboutToStartEvent(disabledRetries);
-        Instant start = Instant.now();
 
         CallbackException callbackException = assertThrows(CallbackException.class, () ->
             callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, false));
         assertEquals("Callback to service has been unsuccessful for event Test", callbackException.getMessage());
-
-        final Duration between = Duration.between(start, Instant.now());
-        // 0s retryInterval + 0.5s readTimeout + 1s bufferTimeToAvoidIntermittentBuildFails and no follow up retries
-        assertTrue((int) between.toMillis() < 2500);
         verify(exactly(1), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
     }
 
