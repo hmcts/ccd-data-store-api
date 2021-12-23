@@ -66,8 +66,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_MultiplePages",
           "description" : "Test case creation with multiple pages",
@@ -80,8 +79,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_ComplexCollectionComplex",
           "description" : "Test complex type containing a collection of complex types",
@@ -94,8 +92,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_Tabs",
           "description" : "Case for testing functionality of the tabs on the case details page",
@@ -108,8 +105,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_CaseProgression",
           "description" : "Case for testing Case Progression (using events to move a case through states)",
@@ -122,8 +118,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_Regex",
           "description" : "Case for testing Regex",
@@ -136,8 +131,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_Conditionals",
           "description" : "Case for testing Conditionals and show/hide",
@@ -150,8 +144,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_ComplexCRUD",
           "description" : "Case for testing CRUD on Complex",
@@ -164,8 +157,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_NoCases",
           "description" : "CaseType with no cases to verify what happens without any cases",
@@ -178,8 +170,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_WBSortOrder",
           "description" : "CaseType for testing WB / Search Results sort order",
@@ -192,8 +183,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_CaseViewCallbackMessages",
           "description" : "CaseType for testing callback warnings or errors triggered on CaseView screen",
@@ -206,8 +196,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_DateTimeFormats",
           "description" : "CaseType for testing DateTime formats",
@@ -220,8 +209,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_ComplexOrganisation",
           "description" : "CaseType for testing Organisation base complex type",
@@ -234,8 +222,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_ComplexFieldsOrdering",
           "description" : "CaseType for testing complex type ordering",
@@ -248,8 +235,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_ConditionalPostState",
           "description" : "CaseType for testing Conditional event post state",
@@ -262,8 +248,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_NoCCaseType",
           "description" : "CaseType for testing Notice of Change",
@@ -276,8 +261,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_NoCAutoApprovalCaseType",
           "description" : "CaseType for testing Notice of Change with Auto Approval",
@@ -290,8 +274,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_NoCWithoutEventsCaseType",
           "description" : "CaseType for testing Notice of Change with bad config (i.e. missing NoC events)",
@@ -304,8 +287,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_RetainHiddenValue",
           "description" : "Case Type for testing RetainHiddenValue",
@@ -318,8 +300,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_DynamicFieldCaseType",
           "description" : "CaseType for Dynamic Radio List and Dynamic Multi Select List",
@@ -332,8 +313,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_CRUD",
           "description" : "Case Type for testing CRUD",
@@ -521,8 +501,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_CRUD_3",
           "description" : "Case Type with no U CRUD access",
@@ -535,8 +514,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_CRUD_4",
           "description" : "Case Type with no C CRUD access",
@@ -549,8 +527,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" : "[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" : "[[ANYTHING_PRESENT]]"
         }, {
           "id" : "FT_CRUD_5",
           "description" : "Case Type with a case Event Createcase without C access",
@@ -563,8 +540,7 @@
           "security_classification" : null,
           "case_fields" : [ ],
           "printable_document_url" : null,
-          "acls" :"[[ANYTHING_PRESENT]]",
-          "roleToAccessProfiles" : [ ]
+          "acls" :"[[ANYTHING_PRESENT]]"
         } ]
       } ],
       "_links" : {
