@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -36,6 +37,8 @@ import uk.gov.hmcts.ccd.data.definition.DefaultCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.HttpUIDefinitionGateway;
 import uk.gov.hmcts.ccd.data.draft.DefaultDraftGateway;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.DefaultRoleAssignmentRepository;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentRepository;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -101,6 +104,9 @@ public abstract class BaseTest {
     @Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
     private CaseDefinitionRepository caseDefinitionRepository;
     @Inject
+    @Qualifier(DefaultRoleAssignmentRepository.QUALIFIER)
+    protected RoleAssignmentRepository roleAssignmentRepository;
+    @Inject
     @Qualifier(DefaultCaseRoleRepository.QUALIFIER)
     private CaseRoleRepository caseRoleRepository;
     @Inject
@@ -123,6 +129,9 @@ public abstract class BaseTest {
     private DocumentsOperation documentsOperation;
     @Inject
     protected SecurityUtils securityUtils;
+    @Inject
+    @Qualifier("DefaultObjectMapper")
+    protected ObjectMapper defaultObjectMapper;
 
     @Mock
     protected Authentication authentication;
@@ -135,6 +144,7 @@ public abstract class BaseTest {
         MockitoAnnotations.initMocks(this);
         ReflectionTestUtils.setField(caseRoleRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(caseDefinitionRepository, "securityUtils", securityUtils);
+        ReflectionTestUtils.setField(roleAssignmentRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(uiDefinitionRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(userRepository, "securityUtils", securityUtils);
         ReflectionTestUtils.setField(callbackService, "securityUtils", securityUtils);
@@ -372,5 +382,19 @@ public abstract class BaseTest {
     public static List<CaseFieldDefinition> getCaseFieldsFromJson(String json) throws IOException {
         return mapper.readValue(json, TypeFactory.defaultInstance().constructCollectionType(List.class,
             CaseFieldDefinition.class));
+    }
+
+    public static CaseTypeDefinition loadCaseTypeDefinition(String caseTypeJsonLocation) {
+        String resourceAsString = BaseTest.getResourceAsString(caseTypeJsonLocation);
+        String jsonPathExpression = "$.response.jsonBody";
+        return JsonPath.parse(resourceAsString)
+            .read(jsonPathExpression, CaseTypeDefinition.class);
+    }
+
+    public static CaseTypeDefinition loadCaseTypeDefinitionFromJsonBodyFile(String caseTypeJsonLocation) {
+        String resourceAsString = BaseTest.getResourceAsString(caseTypeJsonLocation);
+        String jsonPathExpression = "$";
+        return JsonPath.parse(resourceAsString)
+            .read(jsonPathExpression, CaseTypeDefinition.class);
     }
 }

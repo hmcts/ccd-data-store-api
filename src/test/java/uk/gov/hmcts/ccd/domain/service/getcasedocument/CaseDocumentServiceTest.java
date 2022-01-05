@@ -90,6 +90,7 @@ class CaseDocumentServiceTest extends TestFixtures {
         final Map<String, JsonNode> data = fromFileAsMap("text-type-case-field.json");
         final CaseDetails caseDetails = buildCaseDetails(data);
 
+        doReturn(true).when(applicationParams).isDocumentHashCloneEnabled();
         doReturn(caseDetails).when(caseService).clone(caseDetails);
         doCallRealMethod().when(documentUtils).findDocumentNodes(anyMap());
 

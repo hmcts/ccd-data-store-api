@@ -5,6 +5,11 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +24,7 @@ import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.DraftGateway;
 import uk.gov.hmcts.ccd.domain.model.callbacks.StartEventResult;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -26,11 +32,6 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -61,6 +62,11 @@ class AuthorisedStartEventOperationTest {
     private static final String CASEWORKER_PROBATE_LOA1 = "caseworker-probate-loa1";
     private static final String CASEWORKER_PROBATE_LOA3 = "caseworker-probate-loa3";
     private static final String CASEWORKER_DIVORCE = "caseworker-divorce-loa3";
+
+    private static final String CREATE_CASEWORKER_PROBATE_LOA2 = "caseworker-probate-loa2";
+    private static final String CREATE_CASEWORKER_PROBATE_LOA3 = "caseworker-probate-loa3";
+    private static final String CREATE_CASEWORKER_DIVORCE_LOA1 = "caseworker-divorce-loa1";
+
     private static final Map<String, JsonNode> EMPTY_MAP = Maps.newHashMap();
 
 
@@ -92,10 +98,15 @@ class AuthorisedStartEventOperationTest {
     private StartEventResult classifiedStartEvent;
     private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
     private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList();
-    private final Set<String> userRoles = Sets.newHashSet(CASEWORKER_DIVORCE,
+    private final Set<AccessProfile> accessProfiles = createAccessProfiles(Sets.newHashSet(CASEWORKER_DIVORCE,
         CASEWORKER_PROBATE_LOA1,
         CASEWORKER_PROBATE_LOA3,
-        GlobalCaseRole.CREATOR.getRole());
+        GlobalCaseRole.CREATOR.getRole()));
+    private final Set<AccessProfile> creationAccessProfiles =
+        createAccessProfiles(Sets.newHashSet(CREATE_CASEWORKER_DIVORCE_LOA1,
+        CREATE_CASEWORKER_PROBATE_LOA2,
+        CREATE_CASEWORKER_PROBATE_LOA3,
+        GlobalCaseRole.CREATOR.getRole()));
 
     @BeforeEach
     void setUp() {
@@ -117,6 +128,8 @@ class AuthorisedStartEventOperationTest {
             "classificationTestValue");
 
         classifiedCaseDetails = new CaseDetails();
+        classifiedCaseDetails.setId(CASE_REFERENCE);
+        classifiedCaseDetails.setReference(Long.valueOf(CASE_REFERENCE));
         classifiedCaseDetails.setData(JacksonUtils.convertValue(classifiedCaseDetailsNode));
         classifiedCaseDetails.setDataClassification(JacksonUtils.convertValue(
             classifiedCaseDetailsClassificationNode));
@@ -133,21 +146,34 @@ class AuthorisedStartEventOperationTest {
             draftGateway,
             caseAccessService);
         caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
+        caseTypeDefinition.setId(CASE_TYPE_ID);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
-        when(caseAccessService.getUserRoles()).thenReturn(userRoles);
-        when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ))
+        when(caseAccessService.getAccessProfiles(anyString())).thenReturn(accessProfiles);
+        when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(accessProfiles);
+        when(caseAccessService.getCreationAccessProfiles(anyString())).thenReturn(creationAccessProfiles);
+        when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ))
+            .thenReturn(true);
+        when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, creationAccessProfiles, CAN_READ))
             .thenReturn(true);
         when(accessControlService.filterCaseFieldsByAccess(eq(classifiedCaseDetailsNode),
             eq(caseFieldDefinitions),
-            eq(userRoles),
+            eq(accessProfiles),
             eq(CAN_READ),
             anyBoolean())).thenReturn(authorisedCaseDetailsNode);
         when(accessControlService.filterCaseFieldsByAccess(eq(classifiedCaseDetailsClassificationNode),
             eq(caseFieldDefinitions),
-            eq(userRoles),
+            eq(accessProfiles),
             eq(CAN_READ), anyBoolean())).thenReturn(
             authorisedCaseDetailsClassificationNode);
         when(uidService.validateUID(anyString())).thenReturn(true);
+    }
+
+    private Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+        return userRoles.stream()
+            .map(userRole -> AccessProfile.builder().readOnly(false)
+                .accessProfile(userRole)
+                .build())
+            .collect(Collectors.toSet());
     }
 
     @Nested
@@ -160,7 +186,7 @@ class AuthorisedStartEventOperationTest {
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING);
             when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition,
-                userRoles,
+                accessProfiles,
                 CAN_CREATE)).thenReturn(true);
         }
 
@@ -185,7 +211,7 @@ class AuthorisedStartEventOperationTest {
         @DisplayName("should filter out data when no case type read access")
         void shouldFilterOutDataWhenNoCaseTypeReadAccess() {
 
-            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ))
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ))
                 .thenReturn(false);
 
             final StartEventResult output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
@@ -213,7 +239,7 @@ class AuthorisedStartEventOperationTest {
                 EVENT_TRIGGER_ID,
                 IGNORE_WARNING);
             when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition,
-                userRoles,
+                accessProfiles,
                 CAN_CREATE)).thenReturn(true);
         }
 
@@ -238,7 +264,7 @@ class AuthorisedStartEventOperationTest {
         @DisplayName("should filter out data when no case type read access")
         void shouldFilterOutDataWhenNoCaseTypeReadAccess() {
 
-            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ))
+            when(accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ))
                 .thenReturn(false);
 
             final StartEventResult output = authorisedStartEventOperation.triggerStartForCaseType(CASE_TYPE_ID,
@@ -327,19 +353,19 @@ class AuthorisedStartEventOperationTest {
                     EVENT_TRIGGER_ID,
                     IGNORE_WARNING),
                 () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
-                () -> inOrder.verify(caseAccessService).getUserRoles(),
+                () -> inOrder.verify(caseAccessService).getAccessProfilesByCaseReference(CASE_REFERENCE),
                 () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
-                    eq(userRoles),
+                    eq(accessProfiles),
                     eq(CAN_READ)),
                 () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(classifiedCaseDetailsNode),
                     eq(caseFieldDefinitions),
-                    eq(userRoles),
+                    eq(accessProfiles),
                     eq(CAN_READ),
                     anyBoolean()),
                 () -> inOrder.verify(accessControlService).filterCaseFieldsByAccess(eq(
                     classifiedCaseDetailsClassificationNode),
                     eq(caseFieldDefinitions),
-                    eq(userRoles),
+                    eq(accessProfiles),
                     eq(CAN_READ),
                     anyBoolean())
             );

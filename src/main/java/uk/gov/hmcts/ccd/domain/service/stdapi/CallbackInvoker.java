@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.domain.model.callbacks.AfterSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
+import uk.gov.hmcts.ccd.domain.model.callbacks.GetCaseCallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -27,6 +28,7 @@ import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.GET_CASE;
 import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.ccd.domain.service.callbacks.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.ccd.domain.service.validate.ValidateSignificantDocument.validateSignificantItem;
@@ -124,6 +126,33 @@ public class CallbackInvoker {
                 AfterSubmitCallbackResponse.class);
         }
         return afterSubmitCallbackResponseEntity;
+    }
+
+    public ResponseEntity<GetCaseCallbackResponse> invokeGetCaseCallback(final CaseTypeDefinition caseTypeDefinition,
+                                                                         final CaseDetails caseDetails) {
+        String url = caseTypeDefinition.getCallbackGetCaseUrl();
+        List<Integer> retries = caseTypeDefinition.getRetriesGetCaseUrl();
+
+        CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
+        caseEventDefinition.setId("GetCaseCallback");
+        caseEventDefinition.setName("GetCaseCallback");
+
+        ResponseEntity<GetCaseCallbackResponse> getCaseCallbackResponseEntity;
+        if (isRetriesDisabled(retries)) {
+            getCaseCallbackResponseEntity =
+                callbackService.sendSingleRequest(url,
+                    GET_CASE, caseEventDefinition,
+                    null,
+                    caseDetails,
+                    GetCaseCallbackResponse.class);
+        } else {
+            getCaseCallbackResponseEntity = callbackService.send(url,
+                GET_CASE, caseEventDefinition,
+                null,
+                caseDetails,
+                GetCaseCallbackResponse.class);
+        }
+        return getCaseCallbackResponseEntity;
     }
 
     public CaseDetails invokeMidEventCallback(final WizardPage wizardPage,

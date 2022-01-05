@@ -7,9 +7,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 
 import java.util.Optional;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -32,7 +32,7 @@ class ClassifiedCreateCaseOperationTest {
     private CreateCaseOperation createCaseOperation;
 
     @Mock
-    private SecurityClassificationService classificationService;
+    private SecurityClassificationServiceImpl classificationService;
 
     private ClassifiedCreateCaseOperation classifiedCreateCaseOperation;
     private CaseDetails caseDetails;
@@ -48,7 +48,7 @@ class ClassifiedCreateCaseOperationTest {
                                                                           IGNORE);
 
         classifiedCase = new CaseDetails();
-        doReturn(Optional.of(classifiedCase)).when(classificationService).applyClassification(caseDetails);
+        doReturn(Optional.of(classifiedCase)).when(classificationService).applyClassification(caseDetails, true);
 
         classifiedCreateCaseOperation = new ClassifiedCreateCaseOperation(createCaseOperation, classificationService);
     }
@@ -85,7 +85,7 @@ class ClassifiedCreateCaseOperationTest {
 
         assertAll(
             () -> assertThat(output, sameInstance(classifiedCase)),
-            () -> verify(classificationService).applyClassification(caseDetails)
+            () -> verify(classificationService).applyClassification(caseDetails, true)
         );
     }
 
@@ -93,7 +93,7 @@ class ClassifiedCreateCaseOperationTest {
     @DisplayName("should return null when case has higher classification")
     void shouldReturnNullCaseDetailsWhenHigherClassification() {
 
-        doReturn(Optional.empty()).when(classificationService).applyClassification(caseDetails);
+        doReturn(Optional.empty()).when(classificationService).applyClassification(caseDetails, true);
 
         final CaseDetails output = classifiedCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
                                                                                    EVENT_DATA,

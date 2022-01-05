@@ -1,0 +1,24 @@
+{
+	"_guid_": "F-046_Verify_Granted_Case_Role_for_Case",
+	"_extends_": "F-046_Get_Case_Roles_for_Case__Base",
+
+	"specs": [
+	  "to verify testUser has been granted a case role for the case"
+	],
+
+	"expectedResponse": {
+		"body": {
+			"case_users": [
+				{
+					"__ordering__": "UNORDERED",
+					"__elementId__": "case_id,user_id,case_role"
+				},
+				{
+					"case_id": "${}${[scenarioContext][siblingContexts][Standard_Full_Case_Creation_Data][testData][actualResponse][body][id]}",
+					"user_id": "${[scenarioContext][parentContext][testData][users][testUser][id]}",
+					"case_role": "[CREATOR]"
+				}
+			]
+		}
+	}
+}

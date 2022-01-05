@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ccd.data.casedetails;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import uk.gov.hmcts.ccd.data.JsonDataConverter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -15,8 +16,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Version;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import uk.gov.hmcts.ccd.data.JsonDataConverter;
 
 @SuppressWarnings("checkstyle:OperatorWrap")
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
@@ -69,6 +69,7 @@ public class CaseDetailsEntity {
     public static final String ID_FIELD_COL = "id";
     public static final String STATE_FIELD_COL = "state";
     public static final String JURISDICTION_FIELD_COL = "jurisdiction";
+    public static final String JURISDICTION_FIELD_KEYWORD_COL = "jurisdiction.keyword";
     public static final String CASE_TYPE_ID_FIELD_COL = "case_type_id";
     public static final String REFERENCE_FIELD_COL = "reference";
     public static final String CREATED_DATE_FIELD_COL = "created_date";
@@ -81,6 +82,8 @@ public class CaseDetailsEntity {
     public static final String RESOLVED_TTL_COL = "resolved_ttl";
 
 
+    public static final String LOCATION = "data.caseManagementLocation.baseLocation";
+    public static final String REGION = "data.caseManagementLocation.region";
 
     @Id
     @Column(name = ID_FIELD_COL)
