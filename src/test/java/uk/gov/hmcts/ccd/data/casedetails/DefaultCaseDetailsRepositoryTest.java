@@ -2,18 +2,6 @@ package uk.gov.hmcts.ccd.data.casedetails;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Maps;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
-import javax.inject.Inject;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRequestEvent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +15,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextListener;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
@@ -41,10 +28,23 @@ import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataServ
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
+import javax.inject.Inject;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRequestEvent;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -59,7 +59,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_READ;
 import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.GET_ROLE_ASSIGNMENTS_PREFIX;
@@ -464,7 +463,8 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     })
     public void searchWithParams_withAccessLevelGranted() throws Exception {
         String userId = "123";
-        CaseTypeDefinition caseTypeDefinition = loadCaseTypeDefinitionFromJsonBodyFile("/__files/test-addressbook-case.json");
+        CaseTypeDefinition caseTypeDefinition =
+            loadCaseTypeDefinitionFromJsonBodyFile("/__files/test-addressbook-case.json");
         caseTypeDefinition.setRoleToAccessProfiles(asList(roleToAccessProfileDefinition("[CREATOR]")));
 
         stubFor(WireMock.get(urlMatching("/api/data/case-type/TestAddressBookCase"))
