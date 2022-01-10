@@ -262,7 +262,7 @@
             }
           },
           "formatted_value": null,
-          "display_context_parameter": "#COLLECTION(allowInsert)",
+          "display_context_parameter": "#COLLECTION(allowInsert,allowUpdate)",
           "show_summary_change_option": false,
           "acls": [
             {
@@ -453,7 +453,7 @@
                       ],
                       "complexACLs": [],
                       "display_context": null,
-                      "display_context_parameter": "#COLLECTION(allowInsert)",
+                      "display_context_parameter": "#COLLECTION(allowInsert,allowUpdate)",
                       "retain_hidden_value": null,
                       "formatted_value": null
                     }
@@ -812,6 +812,8 @@
       "show_event_notes": null,
       "end_button_label": null,
       "can_save_draft": null,
+      "access_granted" : "STANDARD",
+      "access_process" : "NONE",
       "title_display": null
     }
   }

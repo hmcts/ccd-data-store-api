@@ -61,13 +61,13 @@ public class CaseRolesIT extends WireMockBaseTest {
         final CaseViewField field1 = caseUpdateViewEvent.getCaseFields().get(0);
         assertThat(field1.getId(), equalTo("PersonFirstName"));
 
-        assertThat(field1.getAccessControlLists().get(0).getRole(), equalTo("caseworker-probate-public"));
+        assertThat(field1.getAccessControlLists().get(0).getAccessProfile(), equalTo("caseworker-probate-public"));
         assertThat(field1.getAccessControlLists().get(0).isCreate(), is(false));
         assertThat(field1.getAccessControlLists().get(0).isRead(), is(false));
         assertThat(field1.getAccessControlLists().get(0).isUpdate(), is(false));
         assertThat(field1.getAccessControlLists().get(0).isDelete(), is(false));
 
-        assertThat(field1.getAccessControlLists().get(1).getRole(), equalTo("[CREATOR]"));
+        assertThat(field1.getAccessControlLists().get(1).getAccessProfile(), equalTo("[CREATOR]"));
         assertThat(field1.getAccessControlLists().get(1).isCreate(), is(true));
         assertThat(field1.getAccessControlLists().get(1).isRead(), is(true));
         assertThat(field1.getAccessControlLists().get(1).isUpdate(), is(true));

@@ -47,6 +47,9 @@ public class ApplicationParams {
     @Value("${ccd.case-definition.host}")
     private String caseDefinitionHost;
 
+    @Value("${role.assignment.api.host}")
+    private String roleAssignmentServiceHost;
+
     @Value("${ccd.draft.host}")
     private String draftHost;
 
@@ -91,6 +94,15 @@ public class ApplicationParams {
 
     @Value("${definition.cache.jurisdiction-ttl}")
     private Integer jurisdictionTTL;
+
+    @Value("#{'${definition.cache.request-scope.case-types}'.split(',')}")
+    private List<String> requestScopeCachedCaseTypes;
+
+    @Value("${definition.cache.request-scope.case-types.from-hour}")
+    private Integer requestScopeCachedCaseTypesFromHour;
+
+    @Value("${definition.cache.request-scope.case-types.till-hour}")
+    private Integer requestScopeCachedCaseTypesTillHour;
 
     @Value("${user.cache.ttl.secs}")
     private Integer userCacheTTLSecs;
@@ -146,14 +158,38 @@ public class ApplicationParams {
     @Value("${ccd.access-control.caseworker.role.regex}")
     private String ccdAccessControlCaseworkerRoleRegex;
 
+    @Value("${enable-attribute-based-access-control}")
+    private boolean enableAttributeBasedAccessControl;
+
+    @Value("${enable-pseudo-role-assignments-generation}")
+    private boolean enablePseudoRoleAssignmentsGeneration;
+
+    @Value("${enable-pseudo-access-profiles-generation}")
+    private boolean enablePseudoAccessProfilesGeneration;
+
+    @Value("${enable-case-users-db-sync}")
+    private boolean enableCaseUsersDbSync;
+
     @Value("${audit.log.enabled:true}")
     private boolean auditLogEnabled;
 
     @Value("${document.hash.check.enabled}")
     private boolean enableDocumentHashCheck;
 
+    @Value("${ccd.multiparty.fix.enabled}")
+    private boolean multipartyFixEnabled;
+
+    @Value("#{'${ccd.multiparty.events}'.split(',')}")
+    private List<String> multipartyEvents;
+
+    @Value("#{'${ccd.multiparty.case-types}'.split(',')}")
+    private List<String> multipartyCaseTypes;
+
     @Value("${ccd.case-document-am-api.attachDocumentEnabled:true}")
     private boolean attachDocumentEnabled;
+
+    @Value("${ccd.documentHashCloneEnabled:true}")
+    private boolean documentHashCloneEnabled;
 
     @Value("${idam.data-store.system-user.username}")
     private String dataStoreSystemUserId;
@@ -272,6 +308,29 @@ public class ApplicationParams {
 
     public String caseRolesURL() {
         return caseDefinitionHost + "/api/data/caseworkers/uid/jurisdictions/jid/case-types";
+    }
+
+    public String accessProfileRolesURL(String caseTypeId) {
+        return String.format(
+            "%s/api/data/caseworkers/uid/jurisdictions/jid/case-types/%s/access/profile/roles", caseDefinitionHost,
+            encode(caseTypeId)
+        );
+    }
+
+    public String roleAssignmentBaseURL() {
+        return roleAssignmentServiceHost + "/am/role-assignments";
+    }
+
+    public String amDeleteByQueryRoleAssignmentsURL() {
+        return roleAssignmentBaseURL() + "/query/delete";
+    }
+
+    public String amGetRoleAssignmentsURL() {
+        return roleAssignmentBaseURL() + "/actors/{uid}";
+    }
+
+    public String amQueryRoleAssignmentsURL() {
+        return roleAssignmentBaseURL() + "/query";
     }
 
     public String userDefaultSettingsURL() {
@@ -410,6 +469,22 @@ public class ApplicationParams {
         return ccdAccessControlCaseworkerRoleRegex;
     }
 
+    public boolean getEnableAttributeBasedAccessControl() {
+        return enableAttributeBasedAccessControl;
+    }
+
+    public boolean getEnablePseudoRoleAssignmentsGeneration() {
+        return enablePseudoRoleAssignmentsGeneration;
+    }
+
+    public boolean getEnablePseudoAccessProfilesGeneration() {
+        return enablePseudoAccessProfilesGeneration;
+    }
+
+    public boolean getEnableCaseUsersDbSync() {
+        return enableCaseUsersDbSync;
+    }
+
     public List<String> getCcdAccessControlCitizenRoles() {
         return ccdAccessControlCitizenRoles;
     }
@@ -448,5 +523,33 @@ public class ApplicationParams {
 
     public List<String> getCaseDataIssueLoggingJurisdictions() {
         return caseDataIssueLoggingJurisdictions;
+    }
+
+    public boolean isDocumentHashCloneEnabled() {
+        return this.documentHashCloneEnabled;
+    }
+
+    public boolean isMultipartyFixEnabled() {
+        return multipartyFixEnabled;
+    }
+
+    public List<String> getMultipartyEvents() {
+        return multipartyEvents;
+    }
+
+    public List<String> getMultipartyCaseTypes() {
+        return multipartyCaseTypes;
+    }
+
+    public List<String>  getRequestScopeCachedCaseTypes() {
+        return requestScopeCachedCaseTypes;
+    }
+
+    public Integer getRequestScopeCachedCaseTypesFromHour() {
+        return requestScopeCachedCaseTypesFromHour;
+    }
+
+    public Integer getRequestScopeCachedCaseTypesTillHour() {
+        return requestScopeCachedCaseTypesTillHour;
     }
 }

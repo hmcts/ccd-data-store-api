@@ -1,0 +1,14 @@
+{
+	"_guid_": "F-045_Verify_Granted_No_Case_Roles_for_Case",
+	"_extends_": "F-045_Get_Case_Roles_for_Case__Base",
+
+	"specs": [
+	  "to verify testUser has been granted no case roles for the case"
+	],
+
+	"expectedResponse": {
+		"body": {
+			"case_users": []
+		}
+	}
+}
