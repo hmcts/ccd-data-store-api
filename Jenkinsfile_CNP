@@ -63,11 +63,12 @@ def secrets = [
 
 
     ],
-    's2s-${env}': [
+    's2s-${env}'      : [
+        secret('microservicekey-ccd-data', 'ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_KEY'),
         secret('microservicekey-ccd-gw', 'BEFTA_S2S_CLIENT_SECRET'),
-        secret('microservicekey-aac-manage-case-assignment', 'BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT'),
         secret('microservicekey-ccd-data', 'ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_KEY')
-    ]
+
+    ],
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
