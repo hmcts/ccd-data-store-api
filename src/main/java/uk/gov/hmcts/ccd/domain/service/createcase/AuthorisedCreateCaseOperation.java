@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
@@ -57,7 +58,7 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
 
-        Set<String> userRoles = caseAccessService.getCaseCreationRoles();
+        Set<AccessProfile> userRoles = caseAccessService.getCaseCreationRoles(caseTypeId);
 
         Event event = caseDataContent.getEvent();
         Map<String, JsonNode> data = caseDataContent.getData();
@@ -69,13 +70,13 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
         return verifyReadAccess(caseTypeDefinition, userRoles, caseDetails);
     }
 
-    private CaseDetails verifyReadAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles,
+    private CaseDetails verifyReadAccess(CaseTypeDefinition caseTypeDefinition, Set<AccessProfile> accessProfiles,
                                          CaseDetails caseDetails) {
 
         if (caseDetails != null) {
             if (!accessControlService.canAccessCaseTypeWithCriteria(
                 caseTypeDefinition,
-                userRoles,
+                accessProfiles,
                 CAN_READ)) {
                 return null;
             }
@@ -84,13 +85,13 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
                 accessControlService.filterCaseFieldsByAccess(
                     JacksonUtils.convertValueJsonNode(caseDetails.getData()),
                     caseTypeDefinition.getCaseFieldDefinitions(),
-                    userRoles,
+                    accessProfiles,
                     CAN_READ, false)));
             caseDetails.setDataClassification(JacksonUtils.convertValue(
                 accessControlService.filterCaseFieldsByAccess(
                     JacksonUtils.convertValueJsonNode(caseDetails.getDataClassification()),
                     caseTypeDefinition.getCaseFieldDefinitions(),
-                    userRoles,
+                    accessProfiles,
                     CAN_READ,
                     true)
             ));
@@ -99,10 +100,10 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
     }
 
     private void verifyCreateAccess(Event event, Map<String, JsonNode> data, CaseTypeDefinition caseTypeDefinition,
-                                    Set<String> userRoles) {
+                                    Set<AccessProfile> accessProfiles) {
         if (!accessControlService.canAccessCaseTypeWithCriteria(
             caseTypeDefinition,
-            userRoles,
+            accessProfiles,
             CAN_CREATE)) {
             throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
         }
@@ -110,7 +111,7 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
         if (event == null || !accessControlService.canAccessCaseEventWithCriteria(
             event.getEventId(),
             caseTypeDefinition.getEvents(),
-            userRoles,
+            accessProfiles,
             CAN_CREATE)) {
             throw new ResourceNotFoundException(NO_EVENT_FOUND);
         }
@@ -118,7 +119,7 @@ public class AuthorisedCreateCaseOperation implements CreateCaseOperation {
         if (!accessControlService.canAccessCaseFieldsWithCriteria(
             JacksonUtils.convertValueJsonNode(data),
             caseTypeDefinition.getCaseFieldDefinitions(),
-            userRoles,
+            accessProfiles,
             CAN_CREATE)) {
             throw new ResourceNotFoundException(NO_FIELD_FOUND);
         }

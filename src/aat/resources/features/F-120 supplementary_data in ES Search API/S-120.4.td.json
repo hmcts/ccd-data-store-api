@@ -120,7 +120,9 @@
             "[STATE]": "TODO",
             "[SECURITY_CLASSIFICATION]": "PRIVATE",
             "[CASE_TYPE]": "AAT_PRIVATE",
-            "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
+            "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
+            "[ACCESS_PROCESS]" : "NONE",
+            "[ACCESS_GRANTED]" : "STANDARD"
           },
           "case_id": "${[scenarioContext][customValues][caseIdAsStringFrom_Private_Case_Creation_Autotest1_Data]}",
           "fields_formatted": {
@@ -132,7 +134,9 @@
             "[STATE]": "TODO",
             "[SECURITY_CLASSIFICATION]": "PRIVATE",
             "[CASE_TYPE]": "AAT_PRIVATE",
-            "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]"
+            "[LAST_MODIFIED_DATE]": "[[ANYTHING_PRESENT]]",
+            "[ACCESS_PROCESS]" : "NONE",
+            "[ACCESS_GRANTED]" : "STANDARD"
           },
           "supplementary_data" : {
             "orgs_assigned_users" : {

@@ -9,14 +9,14 @@
       "Content-Type": "application/json"
     },
     "jsonBody": {
-      "id": "MAPPER",
-      "description": "Demonstrate Mapper's capability",
+      "id": "MessagePublishing",
+      "description": "Demonstrate Message Publishing capability",
       "version": {
         "number": 9,
         "live_from": "2017-01-01T00:00:00.000+0000",
         "live_until": null
       },
-      "name": "Case type for Mapper",
+      "name": "Case type for Message Publishing",
       "jurisdiction": {
         "id": "PROBATE",
         "name": "Auto Test 1",
