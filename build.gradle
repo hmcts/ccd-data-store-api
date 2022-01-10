@@ -266,7 +266,7 @@ dependencies {
     compile 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
     testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.8.1'
-    testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.4.3-pre-release'
+    testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.0'
 
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
