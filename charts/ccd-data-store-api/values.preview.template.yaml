@@ -43,8 +43,8 @@ elasticsearch:
   minimumMasterNodes: 1
   antiAffinity: "soft"
   esJavaOpts: "-Xmx512m -Xms512m"
-  environment:
-    - cluster.initial_master_nodes: "{{ .Release.Name }}-es-master"
+  extraEnvs:
+    - cluster.initial_master_nodes: "{{ .Release.Name }}-es-master-0"
   persistence:
     enabled: false
   ingress:
