@@ -44,7 +44,10 @@ elasticsearch:
   antiAffinity: "soft"
   esJavaOpts: "-Xmx512m -Xms512m"
   extraEnvs:
-    - cluster.initial_master_nodes: "{{ .Release.Name }}-es-master-0"
+    - name: discovery.type
+      value: single-node
+    - name: cluster.initial_master_nodes
+      value: ""
   persistence:
     enabled: false
   ingress:
