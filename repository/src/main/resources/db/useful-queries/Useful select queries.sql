@@ -12,25 +12,25 @@
 -- Queries below return data from the various tables within ccd-data-store
 -- The select queries are ordered such that they can be used to delete ALL data by a
 -- given Jurisdiction. 
--- I.E to perform a delete replace 'SELECT *' with 'DELETE'. Replace 'EMPLOYMENT' 
--- with your Jurisdiction.
+-- I.E to perform a delete replace 'SELECT *' with 'DELETE'. Replace 'YOUR_JURISDICTION' 
+-- with the name of your Jurisdiction (i.e. 'EMPLOYMENT').
 
     SELECT * FROM case_users_audit WHERE case_data_id IN (
-        SELECT id FROM case_data WHERE jurisdiction = 'EMPLOYMENT'
+        SELECT id FROM case_data WHERE jurisdiction = 'YOUR_JURISDICTION'
     );
 
     SELECT * FROM case_users WHERE case_data_id IN (
-        SELECT id FROM case_data WHERE jurisdiction = 'EMPLOYMENT'
+        SELECT id FROM case_data WHERE jurisdiction = 'YOUR_JURISDICTION'
     );
 
     SELECT * FROM case_event_significant_items WHERE case_event_id IN (
         SELECT id FROM case_event WHERE case_data_id IN (
-            SELECT id FROM case_data WHERE jurisdiction = 'EMPLOYMENT'
+            SELECT id FROM case_data WHERE jurisdiction = 'YOUR_JURISDICTION'
         )
     );
 
     SELECT *  FROM case_event WHERE case_data_id IN (
-        SELECT id FROM case_data WHERE jurisdiction = 'EMPLOYMENT'
+        SELECT id FROM case_data WHERE jurisdiction = 'YOUR_JURISDICTION'
     );
 
     SELECT id FROM case_event WHERE case_data_id IN (
@@ -38,16 +38,16 @@
     );
 
     SELECT * FROM all_events WHERE case_id IN (
-        SELECT id FROM case_data WHERE jurisdiction = 'EMPLOYMENT'
+        SELECT id FROM case_data WHERE jurisdiction = 'YOUR_JURISDICTION'
     ) AND case_event_id in (
         SELECT id  FROM case_event WHERE case_data_id IN (
-            SELECT id FROM case_data WHERE jurisdiction = 'EMPLOYMENT'
+            SELECT id FROM case_data WHERE jurisdiction = 'YOUR_JURISDICTION'
         )
     );
 
-    SELECT * FROM case_data WHERE jurisdiction = 'EMPLOYMENT';
+    SELECT * FROM case_data WHERE jurisdiction = 'YOUR_JURISDICTION';
 
-    SELECT COUNT(*) FROM case_data WHERE jurisdiction = 'EMPLOYMENT';
+    SELECT COUNT(*) FROM case_data WHERE jurisdiction = 'YOUR_JURISDICTION';
 -- =================================================================================
 
 -- List cases older than 3 Months, retaining highest version
@@ -93,3 +93,4 @@ SELECT cd.id, cd.case_type_id, cd.version FROM case_data cd INNER JOIN
     ) ce
     where ce.id = cd.id;
     
+
