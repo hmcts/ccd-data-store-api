@@ -134,7 +134,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             if (response.searchResult != null) {
                 buildCaseTypesResults(response, caseTypeResults, crossCaseTypeSearchRequest);
                 caseDetails.addAll(searchResultToCaseList(response.searchResult));
-                totalHits += response.searchResult.getTotal();
+                totalHits += new JestSearchResult(response.searchResult).getTotal();
             }
         }
 

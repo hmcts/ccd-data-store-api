@@ -38,11 +38,13 @@ elastic:
 
 elasticsearch:
   clusterName: "es"
-  imageTag: "6.4.2"
+  imageTag: "7.11.1"
   replicas: 1
   minimumMasterNodes: 1
   antiAffinity: "soft"
   esJavaOpts: "-Xmx512m -Xms512m"
+  environment:
+    - cluster.initial_master_nodes: "{{ .Release.Name }}-es-master"
   persistence:
     enabled: false
   ingress:
