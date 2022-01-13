@@ -66,22 +66,18 @@
         and ce.event_id = 'initiateCase'
         and ce.created_date between '1970-01-01' and '1970-01-01')
 
--- Update case_data based on selection criterea    
-    update public.case_data cd
-    set data= ce.new_data
-    from (
-        select
-            cd.id,
-            jsonb_set(cd.data,'{claimServedDate}'::text[],to_jsonb(concat_ws('',ce.created_date::date)), true 
-            ) as new_data
-        from 
-            public.case_data cd
-        join public.case_event ce on cd.id = (
-            select id from case_data 
-            where case_data.reference =0000000009000009
-            and ce.event_id = 'initiateCase'
-            and ce.created_date between '1970-01-01' and '1970-01-01')
-    ) ce
-    where ce.id = cd.id;
+-- UPDATE case_data based on selection criterea
+UPDATE public.case_data cd
+set data = jsonb_set(cd.data,'{claimServedDate}'::text[],to_jsonb(concat_ws('',ce.created_date::date)), true ),
+    data_classification = jsonb_set(cast(cd.data_classification as jsonb), '{claimServedDate}', '"PUBLIC"', true)
+from case_event ce
+where cd.id = ce.case_data_id 
+	and ce.created_date between '1970-01-01' and '1970-01-01'
+	and cd.case_type_id in ('Bristol', 'Leeds', 'LondonCentral', 'LondonEast', 
+                     'LondonSouth', 'Manchester', 'MidlandsEast', 'MidlandsWest', 
+                     'Newcastle', 'Scotland', 'Wales', 'Watford')
+	and ce.event_id = 'generateCorrespondence'
+
+
     
 
