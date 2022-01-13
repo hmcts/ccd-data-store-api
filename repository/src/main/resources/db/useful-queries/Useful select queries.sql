@@ -50,15 +50,6 @@
     SELECT COUNT(*) FROM case_data WHERE jurisdiction = 'YOUR_JURISDICTION';
 -- =================================================================================
 
--- List cases older than 3 Months, retaining highest version
-SELECT cd.id, cd.case_type_id, cd.version FROM case_data cd INNER JOIN
-        (SELECT reference, MAX("version") AS MaxVersion
-            FROM case_data
-            GROUP BY reference) grouped_cd
-    ON cd.reference = grouped_cd.reference
-    AND (cd.version != grouped_cd.MaxVersion AND 
-		 cd.created_date <= 'now'::timestamp - '3 MONTHS'::INterval)
-
 -- List cases by case_data.jurisdiction and case_data.[data] containing specific information
     SELECT * FROM case_data WHERE Jurisdiction = 'HRS' AND data->>'recordingReference' LIKE 'FUNCTEST%' 
 
