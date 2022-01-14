@@ -30,6 +30,8 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.CaseField.STATE;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.CASE_PAYMENT_HISTORY_VIEWER;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.FLAG_LAUNCHER;
 import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.LABEL;
+import static uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition.WAYS_TO_PAY;
+
 
 // partial javadoc attributes added prior to checkstyle implementation in module
 @SuppressWarnings("checkstyle:SummaryJavadoc")
@@ -269,6 +271,8 @@ public class CaseDetails implements Cloneable {
             .getFieldTypeDefinition().getType().equals(LABEL)
             || caseTypeTabField.getCaseFieldDefinition()
             .getFieldTypeDefinition().getType().equals(CASE_PAYMENT_HISTORY_VIEWER)
+            || caseTypeTabField.getCaseFieldDefinition()
+            .getFieldTypeDefinition().getType().equals(WAYS_TO_PAY)
             || caseTypeTabField.getCaseFieldDefinition().getFieldTypeDefinition().getType().equals(FLAG_LAUNCHER);
     }
 
