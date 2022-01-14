@@ -86,6 +86,18 @@ class JexlEnablingConditionParserTest {
     }
 
     @Test
+    void evaluateEnablingConditionWhenDataForThatFieldIsNull() {
+        String enablingCondition = "FieldC.subField != \"Option1\")";
+        Boolean isValid = enablingConditionParser.evaluate(enablingCondition, createCaseData(
+            "Test",
+            "I'm innocent"
+        ));
+
+        assertNotNull(isValid);
+        assertEquals(true, isValid);
+    }
+
+    @Test
     void shouldReturnFalseWhenConditionHasUnKnownField() {
         String enablingCondition = "FieldC=\"\" AND FieldB=\"I'm innocent\")";
         Boolean isValid = enablingConditionParser.evaluate(enablingCondition, createCaseData(

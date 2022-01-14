@@ -82,7 +82,7 @@
             }],
           "show_event_notes": false,
           "can_save_draft": false,
-          "event_enabling_condition" : "PersonLastName=\"Test Last\" AND PersonFirstName=\"Test First\""
+          "event_enabling_condition" : "PersonLastName!=\"Test Last\" AND PersonFirstName!=\"Test First\""
         },
         {
           "id": "NO_PRE_STATES_EVENT",
