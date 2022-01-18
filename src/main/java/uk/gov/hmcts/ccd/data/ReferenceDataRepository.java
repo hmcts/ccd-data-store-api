@@ -95,12 +95,14 @@ public class ReferenceDataRepository {
     public void updateBuildingLocationCache() {
         final List<BuildingLocation> buildingLocations = getBuildingLocations();
         updateCache(BUILDING_LOCATIONS_CACHE, BUILDING_LOCATIONS_CACHE_KEY, buildingLocations);
+        log.info("Scheduled update of {} cache with {} records.", BUILDING_LOCATIONS_CACHE, buildingLocations.size());
     }
 
     @Scheduled(cron = "${reference.data.cache.refresh.rate.cron}")
     public void updateServicesCache() {
         final List<ServiceReferenceData> services = getServices();
         updateCache(SERVICES_CACHE, SERVICES_CACHE_KEY, services);
+        log.info("Scheduled update of {} cache with {} records.", SERVICES_CACHE, services.size());
     }
 
     private <T> void updateCache(final String cacheName, final String cacheKey, final List<T> newValue) {
