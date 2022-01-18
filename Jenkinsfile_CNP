@@ -18,8 +18,9 @@ def component = "data-store-api"
 def branchesToSync = ['demo', 'ithc', 'perftest']
 
 // Variables to switch pipeline logic and wiring per type of build
-def definitionStoreDevelopPr = "PR-575"  // This doesn't change frequently, but when it does, only change this value.
-def dataStoreApiDevelopPr    = "PR-1260" // This doesn't change frequently, but when it does, only change this value.
+
+def definitionStoreDevelopPr = "PR-1073" // This doesn't change frequently, but when it does, only change this value.
+def dataStoreApiDevelopPr    = "PR-1652" // This doesn't change frequently, but when it does, only change this value.
 def prsToUseAat              = ""        // Set this value to a PR number, or add it as a comma-separated value, if it's to follow CI/CD.
 
 def secrets = [
@@ -92,6 +93,7 @@ env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
 env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
 env.MAX_NUM_PARALLEL_THREADS=6
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
+env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-pr-1073.service.core-compute-preview.internal"
 env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal"
 env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
 

@@ -2,9 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.createcase;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
-import java.util.HashMap;
-import java.util.Map;
-import javax.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +29,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
@@ -39,6 +37,10 @@ import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
+
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -59,6 +61,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     private final DraftGateway draftGateway;
     private final CasePostStateService casePostStateService;
     private final CaseDataIssueLogger caseDataIssueLogger;
+    private final GlobalSearchProcessorService globalSearchProcessorService;
     private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
     private SupplementaryDataUpdateRequestValidator supplementaryDataValidator;
 
@@ -77,6 +80,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
                                       final CasePostStateService casePostStateService,
                                       @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
                                       final CaseDataIssueLogger caseDataIssueLogger,
+                                      final GlobalSearchProcessorService globalSearchProcessorService,
                                       @Qualifier("default")
                                               SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
                                       SupplementaryDataUpdateRequestValidator supplementaryDataValidator) {
@@ -93,6 +97,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         this.casePostStateService = casePostStateService;
         this.draftGateway = draftGateway;
         this.caseDataIssueLogger = caseDataIssueLogger;
+        this.globalSearchProcessorService = globalSearchProcessorService;
         this.supplementaryDataUpdateOperation = supplementaryDataUpdateOperation;
         this.supplementaryDataValidator = supplementaryDataValidator;
     }
@@ -136,8 +141,11 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         newCaseDetails.setCaseTypeId(caseTypeId);
         newCaseDetails.setJurisdiction(caseTypeDefinition.getJurisdictionId());
         newCaseDetails.setSecurityClassification(caseTypeDefinition.getSecurityClassification());
-        Map<String, JsonNode> data = caseDataContent.getData();
-        newCaseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition, data));
+
+
+        newCaseDetails.setData(caseSanitiser.sanitise(caseTypeDefinition,
+            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseDataContent.getData())));
+
         newCaseDetails.setDataClassification(caseDataService.getDefaultSecurityClassifications(
             caseTypeDefinition,
             newCaseDetails.getData(),
