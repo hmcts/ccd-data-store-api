@@ -12,6 +12,7 @@ import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
+import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.ccd.domain.service.createcase.DefaultCreateCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.createcase.SubmitCaseTransaction;
 import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
@@ -50,10 +52,14 @@ public class ContractTestCreateCaseOperation extends DefaultCreateCaseOperation 
                                            @Qualifier(DefaultDraftGateway.QUALIFIER) DraftGateway draftGateway,
                                            ContractTestSecurityUtils contractTestSecurityUtils,
                                            CaseDataIssueLogger caseDataIssueLogger,
-                                           GlobalSearchProcessorService globalSearchProcessorService) {
+                                           GlobalSearchProcessorService globalSearchProcessorService,
+                                           @Qualifier("default")
+                                               SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
+                                           SupplementaryDataUpdateRequestValidator supplementaryDataValidator) {
         super(userRepository, caseDefinitionRepository, eventTriggerService, eventTokenService, caseDataService,
             submitCaseTransaction, caseSanitiser, caseTypeService, callbackInvoker, validateCaseFieldsOperation,
-            casePostStateService, draftGateway, caseDataIssueLogger, globalSearchProcessorService);
+            casePostStateService, draftGateway, caseDataIssueLogger, globalSearchProcessorService,
+            supplementaryDataUpdateOperation, supplementaryDataValidator);
         this.contractTestSecurityUtils = contractTestSecurityUtils;
     }
 

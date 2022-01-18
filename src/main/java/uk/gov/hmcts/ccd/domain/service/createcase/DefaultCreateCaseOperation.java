@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.draft.CachedDraftGateway;
@@ -20,6 +21,9 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.draft.Draft;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
+import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
@@ -27,6 +31,7 @@ import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
 import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
@@ -35,6 +40,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import javax.inject.Inject;
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -56,6 +62,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
     private final CasePostStateService casePostStateService;
     private final CaseDataIssueLogger caseDataIssueLogger;
     private final GlobalSearchProcessorService globalSearchProcessorService;
+    private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
+    private SupplementaryDataUpdateRequestValidator supplementaryDataValidator;
 
     @Inject
     public DefaultCreateCaseOperation(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -72,7 +80,10 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
                                       final CasePostStateService casePostStateService,
                                       @Qualifier(CachedDraftGateway.QUALIFIER) final DraftGateway draftGateway,
                                       final CaseDataIssueLogger caseDataIssueLogger,
-                                      final GlobalSearchProcessorService globalSearchProcessorService) {
+                                      final GlobalSearchProcessorService globalSearchProcessorService,
+                                      @Qualifier("default")
+                                              SupplementaryDataUpdateOperation supplementaryDataUpdateOperation,
+                                      SupplementaryDataUpdateRequestValidator supplementaryDataValidator) {
         this.userRepository = userRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.eventTriggerService = eventTriggerService;
@@ -87,6 +98,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         this.draftGateway = draftGateway;
         this.caseDataIssueLogger = caseDataIssueLogger;
         this.globalSearchProcessorService = globalSearchProcessorService;
+        this.supplementaryDataUpdateOperation = supplementaryDataUpdateOperation;
+        this.supplementaryDataValidator = supplementaryDataValidator;
     }
 
     @Override
@@ -152,6 +165,8 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
 
         deleteDraft(caseDataContent, savedCaseDetails);
 
+        createSupplementaryData(caseDataContent, savedCaseDetails);
+
         return savedCaseDetails;
     }
 
@@ -184,6 +199,19 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
                 // Exception occurred, e.g. call back service is unavailable
                 savedCaseDetails.setIncompleteCallbackResponse();
             }
+        }
+    }
+
+    private void createSupplementaryData(CaseDataContent caseDataContent, CaseDetails caseDetails) {
+        Map<String, Map<String, Object>>  supplementaryDataUpdateRequest = caseDataContent
+            .getSupplementaryDataRequest();
+        if (supplementaryDataUpdateRequest != null) {
+            SupplementaryDataUpdateRequest request = new SupplementaryDataUpdateRequest(supplementaryDataUpdateRequest);
+            supplementaryDataValidator.validate(request);
+            SupplementaryData supplementaryData = supplementaryDataUpdateOperation.updateSupplementaryData(
+                caseDetails.getReferenceAsString(), request
+            );
+            caseDetails.setSupplementaryData(JacksonUtils.convertValue(supplementaryData.getResponse()));
         }
     }
 }
