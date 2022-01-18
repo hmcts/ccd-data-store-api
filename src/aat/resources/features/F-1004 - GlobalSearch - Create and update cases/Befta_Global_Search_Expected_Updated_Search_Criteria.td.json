@@ -1,0 +1,51 @@
+{
+  "_guid_": "Befta_Global_Search_Updated_Expected_Search_Criteria",
+
+  "DateOfBirth": "2012-04-21",
+  "DateOfDeath": "2020-04-21",
+  "Email": "e@mail.com",
+  "Address": {
+    "AddressLine1": "updated Address"
+  },
+  "FirstName": "FirstNameValue",
+  "LastName": "LastNameValue",
+  "PostCode": "SE1 4EE",
+  "caseManagementCategory" : {
+    "value" : {
+      "code" : "987",
+      "label" : "Category label"
+    },
+    "list_items" : [ {
+      "code" : "987",
+      "label" : "Category label"
+    } ]
+  },
+  "caseManagementLocation" : {
+    "baseLocation" : "123",
+    "region" : "1"
+  },
+  "caseNameHmctsInternal" : "Name Internal",
+  "SearchCriteria" : {
+    "OtherCaseReferences" : [ {
+      "value" : "FirstNameValue",
+      "id" : "[[ANYTHING_PRESENT]]"
+    } ],
+    "SearchParties" : [
+      {
+        "__ordering__": "UNORDERED",
+        "__elementId__": "value"
+      },
+      {
+        "value" : {
+          "Name" : "FirstNameValue LastNameValue",
+          "EmailAddress" : "e@mail.com",
+          "AddressLine1" : "updated Address",
+          "PostCode" : "SE1 4EE",
+          "DateOfBirth" : "2012-04-21",
+          "DateOfDeath" : "2020-04-21"
+        },
+        "id" : "[[ANYTHING_PRESENT]]"
+      }
+    ]
+  }
+}
