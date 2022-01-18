@@ -1,4 +1,4 @@
-@F-1005 @elasticsearch
+@F-1005 @elasticsearch @Ignore
 Feature: F-1005: Global Search - Search cases
 
   Background: Load test data for the scenario
