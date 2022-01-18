@@ -265,7 +265,7 @@ dependencies {
     compile 'org.jooq:jool-java-8:0.9.14'
     compile 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
-    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.8.1'
+    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.9.1'
     testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.6.0'
 
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
@@ -581,7 +581,7 @@ jsonSchema2Pojo {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "build/generated-sources/**/*.java,**/AuditRepository.java,**/CaseDetailsEndpoint.java,**/MidEventCallback.java,**/UIDefinitionRepository.java,**/CachedUIDefinitionGateway.java,**/CaseAccessEndpoint.java,**/UICaseSearchController.java,**/CaseSearchResultViewGenerator.java,**/CaseTypeService.java,**/DefaultCaseDefinitionRepository.java"
+        property "sonar.exclusions", "build/generated-sources/**/*.java,**/AuditRepository.java,**/CaseDetailsEndpoint.java,**/MidEventCallback.java,**/UIDefinitionRepository.java,**/CachedUIDefinitionGateway.java,**/CaseAccessEndpoint.java,**/UICaseSearchController.java,**/CaseSearchResultViewGenerator.java,**/CaseTypeService.java,**/DefaultCaseDefinitionRepository.java, **/SearchCriteriaResponseTEMP.java"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"

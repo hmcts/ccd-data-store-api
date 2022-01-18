@@ -43,7 +43,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     private static final Logger LOG = LoggerFactory.getLogger(SecurityClassificationServiceImpl.class);
 
     private final CaseDataAccessControl caseDataAccessControl;
-    private CaseDefinitionRepository caseDefinitionRepository;
+    private final CaseDefinitionRepository caseDefinitionRepository;
 
     @Autowired
     public SecurityClassificationServiceImpl(CaseDataAccessControl caseDataAccessControl,
@@ -115,6 +115,14 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
             getUserClassification(caseTypeDefinition, false);
         return userClassification.map(securityClassification ->
             securityClassification.higherOrEqualTo(caseTypeDefinition.getClassificationForField(fieldId)))
+            .orElse(false);
+    }
+
+    public boolean userHasEnoughSecurityClassificationForField(CaseTypeDefinition caseTypeDefinition,
+                                                               SecurityClassification otherClassification) {
+        final Optional<SecurityClassification> userClassification = getUserClassification(caseTypeDefinition, false);
+        return userClassification.map(securityClassification ->
+            securityClassification.higherOrEqualTo(otherClassification))
             .orElse(false);
     }
 

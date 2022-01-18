@@ -1,0 +1,32 @@
+{
+  "title": "Unsuccessful search for case with none of the new global search parameters",
+  "_guid_": "S-1005.3",
+  "_extends_": "F-1005_SearchCaseBase",
+  "specs": [
+    "an active profile in CCD",
+    "contains none of the fields from new global search screen",
+    "contains all the mandatory parameters",
+    "has 400 return code",
+    "contains the error message 'Must have at least one search criteria'"
+  ],
+  "request": {
+    "body": {
+      "searchCriteria": {
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_400_Response",
+    "body" : {
+      "exception" : "org.springframework.web.bind.MethodArgumentNotValidException",
+      "status" : 400,
+      "error" : "Bad Request",
+      "message" : "Input not valid",
+      "path" : "/globalSearch",
+      "details" : [ "Must have at least one search criteria" ],
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}
+

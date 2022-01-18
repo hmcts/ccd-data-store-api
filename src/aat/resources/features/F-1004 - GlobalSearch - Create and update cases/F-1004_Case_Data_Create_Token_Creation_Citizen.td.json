@@ -1,0 +1,23 @@
+{
+  "_guid_": "F-1004_Case_Data_Create_Token_Creation_Citizen",
+  "_extends_": "Citizen_Token_Creation_Data_For_Case_Creation",
+  "specs": [
+    "As a prerequisite"
+  ],
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_GlobalSearch"
+    }
+  },
+  "expectedResponse": {
+    "body": {
+      "token": "[[ANY_STRING_NOT_NULLABLE]]",
+      "case_details": {
+        "jurisdiction": "BEFTA_MASTER",
+        "case_type_id": "FT_GlobalSearch"
+      }
+    }
+  }
+}
