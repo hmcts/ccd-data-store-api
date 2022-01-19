@@ -147,9 +147,11 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: reformLogging
 
     compile 'uk.gov.hmcts.reform:properties-volume-spring-boot-starter:0.0.4'
-    implementation 'org.mapstruct:mapstruct-jdk8:1.3.0.Final'
-    annotationProcessor 'org.projectlombok:lombok:1.18.12', 'org.mapstruct:mapstruct-processor:1.2.0.Final'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.12', 'org.mapstruct:mapstruct-processor:1.2.0.Final'
+
+    implementation 'org.mapstruct:mapstruct-jdk8:1.3.1.Final'
+    implementation 'org.projectlombok:lombok:1.18.16'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final', 'org.projectlombok:lombok:1.18.16', 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final', 'org.projectlombok:lombok:1.18.16', 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
     compile('org.springframework.boot:spring-boot-starter-actuator')
 
@@ -167,7 +169,7 @@ dependencies {
 
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.2'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
 
@@ -227,6 +229,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
+    testCompile ('com.opentable.components:otj-pg-embedded:0.12.0')
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.19.0'
     testImplementation("org.testcontainers:postgresql:1.15.2")
     testCompile ('com.github.tomakehurst:wiremock-jre8:2.25.1')
@@ -262,8 +265,8 @@ dependencies {
     compile 'org.jooq:jool-java-8:0.9.14'
     compile 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
-    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.7.0'
-    testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.2.0'
+    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.9.1'
+    testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.6.0'
 
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
@@ -294,7 +297,7 @@ dependencyManagement {
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
         }
-         // CVE-2019-10086
+        // CVE-2019-10086
         dependencySet(group: 'commons-beanutils', version: '1.9.4') {
             entry 'commons-beanutils'
         }
@@ -578,7 +581,7 @@ jsonSchema2Pojo {
 
 sonarqube {
     properties {
-        property "sonar.exclusions", "build/generated-sources/**/*.java,**/AuditRepository.java,**/CaseDetailsEndpoint.java,**/MidEventCallback.java,**/UIDefinitionRepository.java,**/CachedUIDefinitionGateway.java,**/CaseAccessEndpoint.java,**/UICaseSearchController.java,**/CaseSearchResultViewGenerator.java,**/CaseTypeService.java,**/DefaultCaseDefinitionRepository.java"
+        property "sonar.exclusions", "build/generated-sources/**/*.java,**/AuditRepository.java,**/CaseDetailsEndpoint.java,**/MidEventCallback.java,**/UIDefinitionRepository.java,**/CachedUIDefinitionGateway.java,**/CaseAccessEndpoint.java,**/UICaseSearchController.java,**/CaseSearchResultViewGenerator.java,**/CaseTypeService.java,**/DefaultCaseDefinitionRepository.java, **/SearchCriteriaResponseTEMP.java"
         property "sonar.projectName", "ccd-data-store-api"
         property "sonar.projectKey", "ccd-data-store-api"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
@@ -706,13 +709,13 @@ test {
     }
 
     jvmArgs = [
-        '--add-modules', 'java.se',
-        '--add-exports', 'java.base/jdk.internal.ref=ALL-UNNAMED',
-        '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
-        '--add-opens', 'java.base/java.nio=ALL-UNNAMED',
-        '--add-opens', 'java.base/sun.nio.ch=ALL-UNNAMED',
-        '--add-opens', 'java.management/sun.management=ALL-UNNAMED',
-        '--add-opens', 'jdk.management/com.sun.management.internal=ALL-UNNAMED'
+            '--add-modules', 'java.se',
+            '--add-exports', 'java.base/jdk.internal.ref=ALL-UNNAMED',
+            '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
+            '--add-opens', 'java.base/java.nio=ALL-UNNAMED',
+            '--add-opens', 'java.base/sun.nio.ch=ALL-UNNAMED',
+            '--add-opens', 'java.management/sun.management=ALL-UNNAMED',
+            '--add-opens', 'jdk.management/com.sun.management.internal=ALL-UNNAMED'
     ]
 }
 
@@ -746,6 +749,16 @@ task fortifyScan(type: JavaExec)  {
     main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
     classpath += sourceSets.test.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+}
+
+idea {
+  module {
+    // config to allow Intelij to mark test source and resource files correctly to help linting tools
+    testSourceDirs += project.sourceSets.aat.java.srcDirs
+    testSourceDirs += project.sourceSets.contractTest.java.srcDirs
+    testResourceDirs += project.sourceSets.aat.resources.srcDirs
+    testResourceDirs += project.sourceSets.contractTest.resources.srcDirs
+  }
 }
 
 task highLevelDataSetup(type: JavaExec) {
@@ -806,12 +819,12 @@ task functional() {
             main = "uk.gov.hmcts.ccd.datastore.befta.DataStoreBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.aat.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
             args = [
-                     '--threads', '10',
-                     '--plugin', "json:${rootDir}/target/cucumber.json",
-                     '--tags', 'not @Ignore',
-                     '--glue', 'uk.gov.hmcts.befta.player',
-                     '--glue', 'uk.gov.hmcts.ccd.datastore.befta', 'src/aat/resources/features'
-                   ]
+                    '--threads', '1',
+                    '--plugin', "json:${rootDir}/target/cucumber.json",
+                    '--tags', 'not @Ignore',
+                    '--glue', 'uk.gov.hmcts.befta.player',
+                    '--glue', 'uk.gov.hmcts.ccd.datastore.befta', 'src/aat/resources/features'
+            ]
             jvmArgs = [ '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' ]
         }
 

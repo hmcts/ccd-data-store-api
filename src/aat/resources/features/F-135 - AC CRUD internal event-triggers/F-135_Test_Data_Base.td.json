@@ -1,0 +1,25 @@
+{
+  "_guid_": "F-135_Test_Data_Base",
+  "productName": "CCD Data Store",
+  "operationName": "Retrieve a start event trigger by Event ID",
+  "method": "GET",
+  "uri": "/internal/cases/{caseId}/event-triggers/{etid}",
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "Experimental": "true"
+    },
+    "pathVariables": {
+    }
+  },
+  "expectedResponse": {
+    "headers": {
+      "Content-Type": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

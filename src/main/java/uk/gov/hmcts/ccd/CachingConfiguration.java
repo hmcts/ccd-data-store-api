@@ -9,11 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.BUILDING_LOCATIONS_CACHE;
+import static uk.gov.hmcts.ccd.data.ReferenceDataRepository.SERVICES_CACHE;
 
 @Configuration
 @EnableCaching
-@Profile("!test")
+@EnableScheduling
 public class CachingConfiguration {
 
     @Autowired
@@ -42,12 +45,18 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithMaxIdle("workbasketInputDefinitionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("caseTabCollectionCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("wizardPageCollectionCache", definitionCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("allJurisdictionsCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("userRolesCache", definitionCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("caseTypePseudoRoleToAccessProfileCache", definitionCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("userInfoCache", applicationParams.getUserCacheTTLSecs()));
+        config.addMapConfig(newMapConfigWithMaxIdle("idamUserRoleCache",
+            applicationParams.getUserCacheTTLSecs()));
         config.addMapConfig(newMapConfigWithMaxIdle("bannersCache", latestVersionTTL));
         config.addMapConfig(newMapConfigWithMaxIdle("jurisdictionUiConfigsCache", latestVersionTTL));
         config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", latestVersionTTL));
         config.addMapConfig(newMapConfigWithTtl("jurisdictionCache", applicationParams.getJurisdictionTTLSecs()));
+        config.addMapConfig(newMapConfigWithTtl(BUILDING_LOCATIONS_CACHE, applicationParams.getRefDataCacheTtlInSec()));
+        config.addMapConfig(newMapConfigWithTtl(SERVICES_CACHE, applicationParams.getRefDataCacheTtlInSec()));
     }
 
     private MapConfig newMapConfigWithMaxIdle(final String name, final Integer maxIdle) {
@@ -59,13 +68,12 @@ public class CachingConfiguration {
     }
 
     private MapConfig newMapConfig(final String name) {
-        EvictionConfig evictionConfig = new EvictionConfig()
+        final EvictionConfig evictionConfig = new EvictionConfig()
                 .setEvictionPolicy(applicationParams.getDefinitionCacheEvictionPolicy())
                 .setMaxSizePolicy(MaxSizePolicy.PER_NODE)
                 .setSize(applicationParams.getDefinitionCacheMaxSize());
-        MapConfig mapConfig = new MapConfig().setName(name)
+        return new MapConfig().setName(name)
                 .setEvictionConfig(evictionConfig);
-        return mapConfig;
     }
 
 }

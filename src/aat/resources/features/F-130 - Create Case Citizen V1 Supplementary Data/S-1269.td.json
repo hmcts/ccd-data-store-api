@@ -1,6 +1,6 @@
 {
 	"_guid_": "S-1269",
-	"_extends_": "F-130_Test_Data_Base",
+	"_extends_": "F-130_Test_Data_Base_SD",
 	"title": "must create case successfully and return positive response HTTP-201 for correct inputs",
 
 	"specs": [

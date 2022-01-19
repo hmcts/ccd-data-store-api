@@ -2,14 +2,20 @@ package uk.gov.hmcts.ccd;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Lists;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -39,16 +45,28 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewHeaderGroup;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.SearchResultViewItem;
+import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
+import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
+import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortByCategory;
+import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchSortDirection;
+import uk.gov.hmcts.ccd.domain.model.search.global.Party;
+import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
+import uk.gov.hmcts.ccd.domain.model.search.global.SortCriteria;
+import uk.gov.hmcts.ccd.endpoint.std.GlobalSearchEndpoint;
 import uk.gov.hmcts.ccd.test.ElasticsearchTestHelper;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseSearchResultViewResource;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
@@ -144,6 +162,15 @@ import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.alias;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.caseData;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.caseTypesParam;
 import static uk.gov.hmcts.ccd.test.ElasticsearchTestHelper.createPostRequest;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.GET_ROLE_ASSIGNMENTS_PREFIX;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.aatCTSpecificPublicUserRoleAssignmentJson;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.emptyRoleAssignmentResponseJson;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.mapperCTSpecificPublicUserRoleAssignmentJson;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.restrictedSecurityCTSpecificPublicUserRoleAssignmentJson;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.roleAssignmentResponseJson;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.securityCTSpecificPrivateUserRoleAssignmentJson;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.securityCTSpecificPublicUserRoleAssignmentJson;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.securityCTSpecificRestrictedUserRoleAssignmentJson;
 
 @RunWith(Enclosed.class)
 public class ElasticsearchIT extends ElasticsearchBaseTest {
@@ -151,6 +178,11 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchIT.class);
 
     private static final String DATA_DIR = "elasticsearch/data";
+
+    private static final String REFERENCE_GLOBAL_SEARCH_01 = "1111222233334444";
+    private static final String REFERENCE_GLOBAL_SEARCH_02 = "2222333344441111";
+    private static final String REFERENCE_GLOBAL_SEARCH_03 = "3333444411112222";
+    private static final String REFERENCE_GLOBAL_SEARCH_04 = "4444111122223333";
 
     @Inject
     private WebApplicationContext wac;
@@ -205,7 +237,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
         @BeforeEach
         void setUp() {
-            MockitoAnnotations.initMocks(this);
+            MockitoAnnotations.openMocks(this);
 
             doReturn(authentication).when(securityContext).getAuthentication();
             SecurityContextHolder.setContext(securityContext);
@@ -330,6 +362,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
         @Test
         void shouldReturnAllHeaderInfoForDefaultUseCaseWhenUserRoleColumnIsPopulated() throws Exception {
+            stubCaseTypeRoleAssignments("AAT");
             ElasticsearchTestRequest searchRequest = caseReferenceRequest(DEFAULT_CASE_REFERENCE);
 
             CaseSearchResultViewResource caseSearchResultViewResource = executeRequest(searchRequest, CASE_TYPE_A,
@@ -390,7 +423,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getCases().get(0),
                     is(DEFAULT_CASE_REFERENCE)),
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(0)),
-                () -> assertThat(caseDetails.getFields().size(), is(8)),
+                () -> assertThat(caseDetails.getFields().size(), is(10)),
                 () -> assertExampleCaseMetadata(caseDetails.getFields(), false)
             );
         }
@@ -450,12 +483,12 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     is(nestedFieldId)),
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(2).getCaseFieldId(),
                     is(MetaData.CaseField.CASE_REFERENCE.getReference())),
-                () -> assertThat(caseDetails.getFields().size(), is(11)),
+                () -> assertThat(caseDetails.getFields().size(), is(13)),
                 () -> assertExampleCaseMetadata(caseDetails.getFields(), false),
                 () -> assertThat(caseDetails.getFields().get(TEXT_FIELD), is(TEXT_VALUE)),
                 () -> assertThat(caseDetails.getFields().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
                 () -> assertThat(caseDetails.getFields().containsKey(COMPLEX_FIELD), is(true)),
-                () -> assertThat(caseDetails.getFieldsFormatted().size(), is(11)),
+                () -> assertThat(caseDetails.getFieldsFormatted().size(), is(13)),
                 () -> assertExampleCaseMetadata(caseDetails.getFieldsFormatted(), false),
                 () -> assertThat(caseDetails.getFieldsFormatted().get(TEXT_FIELD), is(TEXT_VALUE)),
                 () -> assertThat(caseDetails.getFieldsFormatted().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
@@ -487,12 +520,12 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     is(nestedFieldId)),
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().get(2).getCaseFieldId(),
                     is(MetaData.CaseField.CASE_REFERENCE.getReference())),
-                () -> assertThat(caseDetails.getFields().size(), is(11)),
+                () -> assertThat(caseDetails.getFields().size(), is(13)),
                 () -> assertExampleCaseMetadata(caseDetails.getFields(), false),
                 () -> assertThat(caseDetails.getFields().get(TEXT_FIELD), is(TEXT_VALUE)),
                 () -> assertThat(caseDetails.getFields().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
                 () -> assertThat(caseDetails.getFields().containsKey(COMPLEX_FIELD), is(true)),
-                () -> assertThat(caseDetails.getFieldsFormatted().size(), is(11)),
+                () -> assertThat(caseDetails.getFieldsFormatted().size(), is(13)),
                 () -> assertExampleCaseMetadata(caseDetails.getFieldsFormatted(), false),
                 () -> assertThat(caseDetails.getFieldsFormatted().get(TEXT_FIELD), is(TEXT_VALUE)),
                 () -> assertThat(caseDetails.getFieldsFormatted().get(nestedFieldId), is(NESTED_NUMBER_FIELD_VALUE)),
@@ -513,7 +546,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             assertAll(
                 () -> assertThat(caseSearchResultViewResource.getTotal(), is(1L)),
                 () -> assertThat(caseSearchResultViewResource.getHeaders().get(0).getFields().size(), is(10)),
-                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getFields().size(), is(16)),
+                () -> assertThat(caseSearchResultViewResource.getCases().get(0).getFields().size(), is(18)),
                 () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().size(),
                     is(2)),
                 () -> assertThat(caseSearchResultViewResource.getCases().get(0).getSupplementaryData().get("SDField2")
@@ -799,7 +832,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
         @BeforeEach
         void setUp() {
-            MockitoAnnotations.initMocks(this);
+            MockitoAnnotations.openMocks(this);
 
             doReturn(authentication).when(securityContext).getAuthentication();
             SecurityContextHolder.setContext(securityContext);
@@ -809,7 +842,12 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
         @Nested
         class CrudTest {
-
+            @BeforeEach
+            void beforeEach() {
+                LOG.info("CrudTest BeforeEach test method");
+                stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "123"))
+                    .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200)));
+            }
             // AuthorisationCaseField
 
             @Test
@@ -867,6 +905,16 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             @Test
             void shouldNotReturnCasesWithStateCrudWithoutRead() throws Exception {
+                if (applicationParams.getEnableAttributeBasedAccessControl()) {
+                    String userId = "123";
+                    String roleAssignmentResponseJson = roleAssignmentResponseJson(
+                        mapperCTSpecificPublicUserRoleAssignmentJson(userId, "idam:" + AUTOTEST1_SOLICITOR,
+                            "1588870615652827")
+                    );
+
+                    stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + userId))
+                        .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
+                }
                 ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                     .query(matchQuery(STATE, IN_PROGRESS_STATE))
                     .build();
@@ -880,6 +928,16 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             @Test
             void shouldNotReturnCasesWithoutStateCrud() throws Exception {
+                if (applicationParams.getEnableAttributeBasedAccessControl()) {
+                    String userId = "123";
+                    String roleAssignmentResponseJson = roleAssignmentResponseJson(
+                        securityCTSpecificPublicUserRoleAssignmentJson(userId, "idam:" + AUTOTEST1_PRIVATE,
+                            "1589460099608690")
+                    );
+
+                    stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + userId))
+                        .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
+                }
                 ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                     .query(matchQuery(STATE, IN_PROGRESS_STATE))
                     .build();
@@ -946,6 +1004,16 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             @Test
             void shouldNotReturnComplexNestedFieldsWithCrudWithoutRead() throws Exception {
+                if (applicationParams.getEnableAttributeBasedAccessControl()) {
+                    String userId = "123";
+                    String roleAssignmentResponseJson = roleAssignmentResponseJson(
+                        securityCTSpecificPublicUserRoleAssignmentJson(userId, "idam:" + AUTOTEST1_SOLICITOR,
+                            SECURITY_CASE_2)
+                    );
+
+                    stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + userId))
+                        .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
+                }
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_RESTRICTED);
@@ -958,6 +1026,16 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             @Test
             void shouldReturnComplexNestedFieldsWithoutCrud() throws Exception {
+                if (applicationParams.getEnableAttributeBasedAccessControl()) {
+                    String userId = "123";
+                    String roleAssignmentResponseJson = roleAssignmentResponseJson(
+                        securityCTSpecificPublicUserRoleAssignmentJson(userId, "idam:" + AUTOTEST1_SOLICITOR,
+                            SECURITY_CASE_2)
+                    );
+
+                    stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + userId))
+                        .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
+                }
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PRIVATE);
@@ -982,26 +1060,36 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     .build();
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_RESTRICTED);
-
+                CaseDetails case1 = getCase(caseSearchResult, 1588870649839697L);
+                CaseDetails case2 = getCase(caseSearchResult, 1589460125872336L);
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(2L)),
-                    () -> assertThat(caseSearchResult.getCases().get(0).getSecurityClassification(),
-                        is(SecurityClassification.PRIVATE)),
-                    () -> assertThat(caseSearchResult.getCases().get(1).getSecurityClassification(),
-                        is(SecurityClassification.PUBLIC))
+                    () -> Assertions.assertThat(caseSearchResult.getCases()).extracting("reference")
+                        .contains(1588870649839697L, 1589460125872336L),
+                    () -> assertThat(case1.getSecurityClassification(), is(SecurityClassification.PRIVATE)),
+                    () -> assertThat(case2.getSecurityClassification(), is(SecurityClassification.PUBLIC))
                 );
             }
 
             @Test
             void shouldNotReturnCasesWithHigherCaseSC() throws Exception {
+                if (applicationParams.getEnableAttributeBasedAccessControl()) {
+                    String userId = "123";
+                    String roleAssignmentResponseJson = roleAssignmentResponseJson(
+                        securityCTSpecificPublicUserRoleAssignmentJson(userId, "idam:" + AUTOTEST1_PUBLIC,
+                            SECURITY_CASE_2)
+                    );
+
+                    stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + userId))
+                        .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
+                }
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC);
-
+                CaseDetails case1 = getCase(caseSearchResult, 1589460125872336L);
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
-                    () -> assertThat(caseSearchResult.getCases().get(0).getSecurityClassification(),
-                        is(SecurityClassification.PUBLIC))
+                    () -> assertThat(case1.getSecurityClassification(), is(SecurityClassification.PUBLIC))
                 );
             }
 
@@ -1013,8 +1101,9 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_RESTRICTED);
 
-                Map<String, JsonNode> data = getFirstCaseData(caseSearchResult);
+                Map<String, JsonNode> data = getCaseData(caseSearchResult, 1589460125872336L);
                 assertAll(
+                    () -> assertThat(caseSearchResult.getTotal(), is(1L)),
                     () -> assertThat(data.containsKey(MULTI_SELECT_LIST_FIELD), is(true)), // RESTRICTED
                     () -> assertThat(data.containsKey(PHONE_FIELD), is(true)), // PRIVATE
                     () -> assertThat(data.containsKey(DATE_FIELD), is(true)) // PUBLIC
@@ -1027,8 +1116,9 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC);
 
-                Map<String, JsonNode> data = getFirstCaseData(caseSearchResult);
+                Map<String, JsonNode> data = getCaseData(caseSearchResult, 1589460125872336L);
                 assertAll(
+                    () -> assertThat(caseSearchResult.getTotal(), is(1L)),
                     () -> assertThat(data.containsKey(MULTI_SELECT_LIST_FIELD), is(false)), // RESTRICTED
                     () -> assertThat(data.containsKey(PHONE_FIELD), is(false)), // PRIVATE
                     () -> assertThat(data.containsKey(COLLECTION_FIELD), is(true)) // PUBLIC
@@ -1039,27 +1129,46 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             @Test
             void shouldReturnCasesWithLowerCaseTypeSC() throws Exception {
+                stubCaseTypeRoleAssignments(CASE_TYPE_C, CASE_TYPE_D);
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
 
                 CaseSearchResult caseSearchResult =
                     executeRequest(searchRequest, caseTypesParam(CASE_TYPE_C, CASE_TYPE_D), AUTOTEST1_RESTRICTED);
-
+                CaseDetails case1 = getCase(caseSearchResult, 1589460099608690L);
+                CaseDetails case2 = getCase(caseSearchResult, 1589460125872336L);
+                CaseDetails case3 = getCase(caseSearchResult, 1588870649839697L);
+                CaseDetails case4 = getCase(caseSearchResult, 1589781123682092L);
                 assertAll(
-                    () -> assertThat(caseSearchResult.getCases().get(0).getCaseTypeId(), is(CASE_TYPE_C)), // PUBLIC
-                    () -> assertThat(caseSearchResult.getCases().get(3).getCaseTypeId(), is(CASE_TYPE_D)) // RESTRICTED
+                    () -> assertThat(caseSearchResult.getTotal(), is(4L)),
+                    () -> Assertions.assertThat(caseSearchResult.getCases()).extracting("reference")
+                        .contains(1588870649839697L, 1589460125872336L, 1589460099608690L, 1589781123682092L),
+                    () -> assertThat(case1.getCaseTypeId(), is(CASE_TYPE_C)), // PUBLIC
+                    () -> assertThat(case2.getCaseTypeId(), is(CASE_TYPE_C)), // PUBLIC
+                    () -> assertThat(case3.getCaseTypeId(), is(CASE_TYPE_C)), // PUBLIC
+                    () -> assertThat(case4.getCaseTypeId(), is(CASE_TYPE_D)) // RESTRICTED
                 );
             }
 
             @Test
             void shouldNotReturnCasesWithHigherCaseTypeSC() throws Exception {
+                if (applicationParams.getEnableAttributeBasedAccessControl()) {
+                    String userId = "123";
+                    String roleAssignmentResponseJson = roleAssignmentResponseJson(
+                        securityCTSpecificPublicUserRoleAssignmentJson(userId, "idam:" + AUTOTEST1_PUBLIC,
+                            SECURITY_CASE_2)
+                    );
+
+                    stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + userId))
+                        .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
+                }
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
 
                 CaseSearchResult caseSearchResult =
                     executeRequest(searchRequest, caseTypesParam(CASE_TYPE_C, CASE_TYPE_D), AUTOTEST1_PUBLIC);
-
+                CaseDetails case1 = getCase(caseSearchResult, 1589460125872336L);
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(1L)),
-                    () -> assertThat(caseSearchResult.getCases().get(0).getCaseTypeId(), is(CASE_TYPE_C)) // PUBLIC
+                    () -> assertThat(case1.getCaseTypeId(), is(CASE_TYPE_C)) // PUBLIC
                 );
             }
 
@@ -1071,8 +1180,9 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_RESTRICTED);
 
-                Map<String, JsonNode> data = getFirstCaseData(caseSearchResult);
+                Map<String, JsonNode> data = getCaseData(caseSearchResult, 1589460125872336L);
                 assertAll(
+                    () -> assertThat(caseSearchResult.getTotal(), is(1L)),
                     () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD)
                         .has(NESTED_COLLECTION_TEXT_FIELD), is(true)), // RESTRICTED
                     () -> assertThat(data.get(ADDRESS_FIELD).has(POST_CODE_FIELD), is(true)), // PRIVATE
@@ -1082,12 +1192,23 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             @Test
             void shouldNotReturnComplexNestedFieldsWithHigherSC() throws Exception {
+                if (applicationParams.getEnableAttributeBasedAccessControl()) {
+                    String userId = "123";
+                    String roleAssignmentResponseJson = roleAssignmentResponseJson(
+                        securityCTSpecificPublicUserRoleAssignmentJson(userId, "idam:" + AUTOTEST1_PUBLIC,
+                            SECURITY_CASE_2)
+                    );
+
+                    stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + userId))
+                        .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
+                }
                 ElasticsearchTestRequest searchRequest = caseReferenceRequest(SECURITY_CASE_2);
 
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC);
 
-                Map<String, JsonNode> data = getFirstCaseData(caseSearchResult);
+                Map<String, JsonNode> data = getCaseData(caseSearchResult, 1589460125872336L);
                 assertAll(
+                    () -> assertThat(caseSearchResult.getTotal(), is(1L)),
                     () -> assertThat(data.get(COMPLEX_FIELD).get(COMPLEX_NESTED_FIELD)
                         .has(NESTED_COLLECTION_TEXT_FIELD), is(false)), // RESTRICTED
                     () -> assertThat(data.get(COMPLEX_FIELD).has(POST_CODE_FIELD), is(false)), // PRIVATE
@@ -1098,6 +1219,12 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
         @Nested
         class GeneralAccessTest {
+            @BeforeEach
+            void beforeEach() {
+                LOG.info("GeneralAccessTest BeforeEach test method");
+                stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "123"))
+                    .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200)));
+            }
 
             @Test
             void shouldOnlyReturnCasesFromCaseTypesWithJurisdictionRole() throws Exception {
@@ -1115,6 +1242,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             @Test
             void shouldMergePermissionsOfMultipleRolesForCaseData() throws Exception {
+                stubCaseTypeRoleAssignments("SECURITY");
                 ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                     .query(matchAllQuery())
                     .sort(CREATED_DATE)
@@ -1124,15 +1252,19 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                     executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_PUBLIC, AUTOTEST1_PRIVATE,
                         AUTOTEST1_RESTRICTED);
 
-                Map<String, JsonNode> data = getFirstCaseData(caseSearchResult);
+                Map<String, JsonNode> data = getCaseData(caseSearchResult, 1589460125872336L);
+                CaseDetails case1 = getCase(caseSearchResult, 1588870649839697L);
+                CaseDetails case2 = getCase(caseSearchResult, 1589460099608690L);
                 // Comments for assertions below describe some example scenarios for which a given role would usually
                 // NOT allow data/cases to be returned if a user conducting the search ONLY had that role - expressed in
                 // the form "<Scenario> (<role>)"
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(3L)),
-                    () -> assertThat(caseSearchResult.getCases().get(0).getSecurityClassification(),
+                    () -> Assertions.assertThat(caseSearchResult.getCases()).extracting("reference")
+                        .contains(1588870649839697L, 1589460125872336L, 1589460099608690L),
+                    () -> assertThat(case1.getSecurityClassification(),
                         is(SecurityClassification.PRIVATE)), // Case SC (caseworker-autotest1)
-                    () -> assertThat(caseSearchResult.getCases().get(2).getState(),
+                    () -> assertThat(case2.getState(),
                         is(IN_PROGRESS_STATE)), // State CRUD (caseworker-autotest1)
                     () -> assertThat(data.get(COMPLEX_FIELD).has(COMPLEX_TEXT_FIELD),
                         is(true)), // Complex nested field CRUD (caseworker-autotest1-restricted)
@@ -1147,6 +1279,17 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             @Test
             void shouldMergePermissionsOfMultipleRolesForCases() throws Exception {
+                if (applicationParams.getEnableAttributeBasedAccessControl()) {
+                    String roleAssignmentResponseJson = roleAssignmentResponseJson(
+                        securityCTSpecificPublicUserRoleAssignmentJson("123","idam:caseworker-autotest1-solicitor",
+                            "1588870615652827"),
+                        securityCTSpecificPublicUserRoleAssignmentJson("123","idam:caseworker-autotest1-solicitor",
+                            "1589460125872336")
+                    );
+
+                    stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "123"))
+                        .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
+                }
                 ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                     .query(matchAllQuery())
                     .sort(CREATED_DATE)
@@ -1155,13 +1298,16 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
                 CaseSearchResult caseSearchResult = executeRequest(searchRequest, caseTypesParam(CASE_TYPE_B,
                     CASE_TYPE_C),
                     AUTOTEST1_PUBLIC, AUTOTEST2_PUBLIC);
-
+                CaseDetails case1 = getCase(caseSearchResult, 1588870615652827L);
+                CaseDetails case2 = getCase(caseSearchResult, 1589460125872336L);
                 assertAll(
                     () -> assertThat(caseSearchResult.getTotal(), is(2L)),
-                    () -> assertThat(caseSearchResult.getCases().get(0).getJurisdiction(), is(AUTOTEST_2)),
-                    () -> assertThat(caseSearchResult.getCases().get(0).getCaseTypeId(), is(CASE_TYPE_B)),
-                    () -> assertThat(caseSearchResult.getCases().get(1).getJurisdiction(), is(AUTOTEST_1)),
-                    () -> assertThat(caseSearchResult.getCases().get(1).getCaseTypeId(), is(CASE_TYPE_C))
+                    () -> Assertions.assertThat(caseSearchResult.getCases()).extracting("reference")
+                        .contains(1588870615652827L, 1589460125872336L),
+                    () -> assertThat(case1.getJurisdiction(), is(AUTOTEST_2)),
+                    () -> assertThat(case1.getCaseTypeId(), is(CASE_TYPE_B)),
+                    () -> assertThat(case2.getJurisdiction(), is(AUTOTEST_1)),
+                    () -> assertThat(case2.getCaseTypeId(), is(CASE_TYPE_C))
                 );
             }
         }
@@ -1174,8 +1320,18 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         */
         @Test
         @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-            scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
+            scripts = {"classpath:sql/insert_elasticsearch_cases.sql",
+                "classpath:sql/insert_elasticsearch_case_users.sql"})
         void shouldOnlyReturnCasesSolicitorHasBeenGrantedAccessTo() throws Exception {
+            if (applicationParams.getEnableAttributeBasedAccessControl()) {
+                String roleAssignmentResponseJson = roleAssignmentResponseJson(
+                    securityCTSpecificPublicUserRoleAssignmentJson("123","[CREATOR]", "1589460125872336"),
+                    securityCTSpecificPublicUserRoleAssignmentJson("123","[DEFENDANT]", "1589460099608691")
+                );
+
+                stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "123"))
+                    .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
+            }
             ElasticsearchTestRequest searchRequest = matchAllRequest();
 
             CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_SOLICITOR);
@@ -1189,16 +1345,23 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
         @Test
         @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-            scripts = {"classpath:sql/insert_elasticsearch_cases.sql"})
+            scripts = {"classpath:sql/insert_elasticsearch_cases.sql",
+                "classpath:sql/insert_elasticsearch_case_users.sql"})
         void shouldReturnAllCasesForCaseworker() throws Exception {
+            if (applicationParams.getEnableAttributeBasedAccessControl()) {
+                stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + "123"))
+                    .willReturn(okJson(roleAssignmentResponseJson()).withStatus(200)));
+            }
+
             ElasticsearchTestRequest searchRequest = matchAllRequest();
 
             CaseSearchResult caseSearchResult = executeRequest(searchRequest, CASE_TYPE_C, AUTOTEST1_RESTRICTED);
 
             assertAll(
-                () -> assertThat(caseSearchResult.getTotal(), is(4L))
+                () -> assertThat(caseSearchResult.getTotal(), is(3L))
             );
         }
+
 
         private CaseSearchResult executeRequest(ElasticsearchTestRequest searchRequest,
                                                 String caseTypeParam, String... roles) throws Exception {
@@ -1213,6 +1376,17 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
         private Map<String, JsonNode> getFirstCaseData(CaseSearchResult caseSearchResult) {
             return caseSearchResult.getCases().get(0).getData();
         }
+
+        private CaseDetails getCase(CaseSearchResult caseSearchResult, Long reference) {
+            return caseSearchResult.getCases().stream()
+                .filter(e -> e.getReference().equals(reference))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError(String.format("Case with reference %s not found", reference)));
+        }
+
+        private Map<String, JsonNode> getCaseData(CaseSearchResult caseSearchResult, Long reference) {
+            return getCase(caseSearchResult, reference).getData();
+        }
     }
 
     @Nested
@@ -1222,7 +1396,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
         @BeforeEach
         void setUp() {
-            MockitoAnnotations.initMocks(this);
+            MockitoAnnotations.openMocks(this);
 
             doReturn(authentication).when(securityContext).getAuthentication();
             SecurityContextHolder.setContext(securityContext);
@@ -1317,6 +1491,7 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             @Test
             void shouldReturnAllCaseDetails() throws Exception {
+
                 ElasticsearchTestRequest searchRequest = ElasticsearchTestRequest.builder()
                     .query(boolQuery()
                         .must(matchQuery(caseData(NUMBER_FIELD), NUMBER_VALUE)) // ES Double
@@ -1475,6 +1650,537 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
 
             return ElasticsearchTestHelper.executeRequest(postRequest, expectedErrorCode, mapper, mockMvc,
                 JsonNode.class);
+        }
+    }
+
+
+    @Nested
+    class GlobalSearchEndpointESIT {
+
+        private static final String CASE_TYPE_GLOBAL_SEARCH = "GlobalSearch";
+        private static final String JURISDICTION_GLOBAL_SEARCH = "AUTOTEST1";
+        private static final String STATE_GLOBAL_SEARCH = "CaseCreated";
+        private static final String CASE_MANAGEMENT_REGION_GLOBAL_SEARCH = "1";
+        private static final String CASE_MANAGEMENT_BASE_LOCATION_GLOBAL_SEARCH = "123";
+        private static final String OTHER_REFERENCE_GLOBAL_SEARCH = "123456789";
+
+        @BeforeEach
+        void setUp() {
+            MockitoAnnotations.openMocks(this);
+
+            doReturn(authentication).when(securityContext).getAuthentication();
+            SecurityContextHolder.setContext(securityContext);
+
+            mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        }
+
+        @DisplayName("Criteria: should return case with lookup and ref-data populated")
+        @Test
+        void shouldReturnCaseWithLookupAndRefDataPopulated() throws Exception {
+
+            // ARRANGE
+            SearchCriteria searchCriteria = new SearchCriteria();
+            // NB: search on all parameters to find: /resources/elasticsearch/data/global_search/global-search-01.json`
+            //     except parties (see other test)
+            searchCriteria.setCaseReferences(List.of(REFERENCE_GLOBAL_SEARCH_01));
+            searchCriteria.setCcdJurisdictionIds(List.of(JURISDICTION_GLOBAL_SEARCH));
+            searchCriteria.setCcdCaseTypeIds(List.of(CASE_TYPE_GLOBAL_SEARCH));
+            searchCriteria.setStateIds(List.of(STATE_GLOBAL_SEARCH));
+            searchCriteria.setCaseManagementRegionIds(List.of(CASE_MANAGEMENT_REGION_GLOBAL_SEARCH));
+            searchCriteria.setCaseManagementBaseLocationIds(List.of(CASE_MANAGEMENT_BASE_LOCATION_GLOBAL_SEARCH));
+            searchCriteria.setOtherReferences(List.of(OTHER_REFERENCE_GLOBAL_SEARCH));
+
+            GlobalSearchRequestPayload globalSearchRequest = new GlobalSearchRequestPayload();
+            globalSearchRequest.setSearchCriteria(searchCriteria);
+
+            // ACT
+            GlobalSearchResponsePayload result = executeRequest(globalSearchRequest,
+                AUTOTEST1_PUBLIC, AUTOTEST1_RESTRICTED);
+
+            // ASSERT
+            assertAll(
+                () -> assertThat(result.getResultInfo().getCasesReturned(), is(1)),
+                () -> assertThat(result.getResults().size(), is(1))
+            );
+            GlobalSearchResponsePayload.Result result1 = result.getResults().get(0);
+            assertAll(
+                // verify case data from: `/resources/elasticsearch/data/global_search/global-search-01.json`
+                () -> assertThat(result1.getStateId(), is(STATE_GLOBAL_SEARCH)),
+                () -> assertThat(result1.getCaseReference(), is(REFERENCE_GLOBAL_SEARCH_01)),
+                () -> assertThat(result1.getCaseManagementCategoryId(), is("987")),
+                () -> assertThat(result1.getCaseManagementCategoryName(), is("Category label Order-02")),
+                () -> assertThat(result1.getCaseNameHmctsInternal(), is("Name Internal 01")),
+                () -> assertThat(result1.getOtherReferences().size(), is(1)),
+                () -> assertThat(result1.getOtherReferences().get(0), is(OTHER_REFERENCE_GLOBAL_SEARCH)),
+                // verify ref-data from: `/resources/mappings/refdata/get_building_locations.json`
+                () -> assertThat(result1.getBaseLocationId(), is(CASE_MANAGEMENT_BASE_LOCATION_GLOBAL_SEARCH)),
+                () -> assertThat(result1.getBaseLocationName(), is("54 TEST ROAD")),
+                () -> assertThat(result1.getRegionId(), is(CASE_MANAGEMENT_REGION_GLOBAL_SEARCH)),
+                () -> assertThat(result1.getRegionName(), is("Midlands")),
+                // verify ref-data from: `/resources/mappings/refdata/get_org_services.json`
+                () -> assertThat(result1.getHmctsServiceId(), is("AAA1")),
+                () -> assertThat(result1.getHmctsServiceShortDescription(), is("test_service_short_description")),
+                // verify lookup data from: `/resources/mappings/globalsearch-case-type.json`
+                () -> assertThat(result1.getCcdCaseTypeId(), is(CASE_TYPE_GLOBAL_SEARCH)),
+                () -> assertThat(result1.getCcdCaseTypeName(), is("Global Search")),
+                // verify lookup data from: `/resources/mappings/jurisdiction_autotest1.json`
+                () -> assertThat(result1.getCcdJurisdictionId(), is(JURISDICTION_GLOBAL_SEARCH)),
+                () -> assertThat(result1.getCcdJurisdictionName(), is("Auto Test 1"))
+            );
+        }
+
+        @DisplayName("Criteria: should return correct case when using party search criteria")
+        @Test
+        void shouldReturnCorrectCaseWhenUsingPartySearchCriteria() throws Exception {
+
+            // ARRANGE
+            SearchCriteria searchCriteria = new SearchCriteria();
+            searchCriteria.setCaseReferences(List.of(REFERENCE_GLOBAL_SEARCH_01, REFERENCE_GLOBAL_SEARCH_02));
+            searchCriteria.setCcdCaseTypeIds(List.of(CASE_TYPE_GLOBAL_SEARCH));
+
+            // NB: should only return test case 2 as case 1 has matching criteria but across different parties
+            Party party = new Party();
+            party.setDateOfBirth("2000-01-01");
+            party.setDateOfDeath("2000-02-02");
+            party.setAddressLine1("AddressLine1");
+            party.setPostCode("PostCode");
+            party.setEmailAddress("test@example.com");
+            party.setPartyName("PartyName");
+
+            searchCriteria.setParties(List.of(party));
+
+            GlobalSearchRequestPayload globalSearchRequest = new GlobalSearchRequestPayload();
+            globalSearchRequest.setSearchCriteria(searchCriteria);
+
+            // ACT
+            GlobalSearchResponsePayload result = executeRequest(globalSearchRequest,
+                AUTOTEST1_PUBLIC, AUTOTEST1_RESTRICTED);
+
+            // ASSERT
+            assertAll(
+                () -> assertThat(result.getResultInfo().getCasesReturned(), is(1)),
+                () -> assertThat(result.getResults().size(), is(1))
+            );
+            assertThat(result.getResults().get(0).getCaseReference(), is(REFERENCE_GLOBAL_SEARCH_02));
+        }
+
+        @DisplayName("ES Filters: should not return cases filtered by pre security filters")
+        @Test
+        void shouldNotReturnCasesFilteredByPreSecurityFilters() throws Exception {
+
+            // NB: not testing all pre security filters, as GlobalSearch re-uses standard ElasticSearch behaviour:
+            //     so just proving that at least one is applied. i.e. should only return test case 1 as case 2 should
+            //     be filtered by ElasticsearchCaseStateFilter.
+
+            // ARRANGE
+            SearchCriteria searchCriteria = new SearchCriteria();
+            searchCriteria.setCaseReferences(List.of(REFERENCE_GLOBAL_SEARCH_01, REFERENCE_GLOBAL_SEARCH_02));
+            searchCriteria.setCcdCaseTypeIds(List.of(CASE_TYPE_GLOBAL_SEARCH));
+
+            GlobalSearchRequestPayload globalSearchRequest = new GlobalSearchRequestPayload();
+            globalSearchRequest.setSearchCriteria(searchCriteria);
+
+            // ACT
+            GlobalSearchResponsePayload result = executeRequest(globalSearchRequest,
+                AUTOTEST1_PUBLIC); // NB: missing `AUTOTEST1_RESTRICTED` so cannot see case 2 because of state filter
+
+            // ASSERT
+            assertAll(
+                () -> assertThat(result.getResultInfo().getCasesReturned(), is(1)),
+                () -> assertThat(result.getResults().size(), is(1))
+            );
+            assertThat(result.getResults().get(0).getCaseReference(), is(REFERENCE_GLOBAL_SEARCH_01));
+        }
+
+        @DisplayName("ES Filters: should not return case fields filtered by post filtering authorisation rules")
+        @Test
+        void shouldNotReturnCaseFieldsFilteredByPostFilteringAuthRules() throws Exception {
+
+            // NB: not testing all post filtering authorisation rules, as GlobalSearch re-uses standard ElasticSearch
+            //     behaviour: so just proving that at least one is applied, i.e. should not return case data fields
+            //     with no ACL/CRUD for user's roles
+
+            // ARRANGE
+            SearchCriteria searchCriteria = new SearchCriteria();
+            searchCriteria.setCaseReferences(List.of(REFERENCE_GLOBAL_SEARCH_01));
+            searchCriteria.setCcdCaseTypeIds(List.of(CASE_TYPE_GLOBAL_SEARCH));
+
+            GlobalSearchRequestPayload globalSearchRequest = new GlobalSearchRequestPayload();
+            globalSearchRequest.setSearchCriteria(searchCriteria);
+
+            // ACT
+            GlobalSearchResponsePayload result = executeRequest(globalSearchRequest,
+                AUTOTEST1_PUBLIC);
+
+            // ASSERT
+            assertAll(
+                () -> assertThat(result.getResultInfo().getCasesReturned(), is(1)),
+                () -> assertThat(result.getResults().size(), is(1))
+            );
+            GlobalSearchResponsePayload.Result result1 = result.getResults().get(0);
+            assertAll(
+                () -> assertThat(result1.getCaseReference(), is(REFERENCE_GLOBAL_SEARCH_01)),
+
+                // verify case data with invalid ACL/CRUD for user are null or empty
+                () -> assertThat(result1.getCaseManagementCategoryId(), is(nullValue())),
+                () -> assertThat(result1.getCaseManagementCategoryName(), is(nullValue())),
+                () -> assertThat(result1.getCaseNameHmctsInternal(), is(nullValue())),
+                () -> assertThat(result1.getOtherReferences().size(), is(0)), // i.e. empty
+                () -> assertThat(result1.getBaseLocationId(), is(nullValue())),
+                () -> assertThat(result1.getBaseLocationName(), is(nullValue())),
+                () -> assertThat(result1.getRegionId(), is(nullValue())),
+                () -> assertThat(result1.getRegionName(), is(nullValue()))
+            );
+        }
+
+        @ParameterizedTest(name = "Pagination: should apply Pagination: {0}")
+        @MethodSource("uk.gov.hmcts.ccd.ElasticsearchIT#providePaginationTestArguments")
+        @SuppressWarnings("unused")
+        void shouldApplyPagination(String name,
+                                   int startRecordNumber,
+                                   int maxReturnRecordCount,
+                                   boolean expectedMoreResultsToGo,
+                                   List<String> expectedCaseReferenceOrder) throws Exception {
+
+            // ARRANGE
+            SearchCriteria searchCriteria = new SearchCriteria();
+            searchCriteria.setCaseReferences(
+                List.of(
+                    REFERENCE_GLOBAL_SEARCH_01,
+                    REFERENCE_GLOBAL_SEARCH_02,
+                    REFERENCE_GLOBAL_SEARCH_03,
+                    REFERENCE_GLOBAL_SEARCH_04
+                )
+            );
+            searchCriteria.setCcdCaseTypeIds(List.of(CASE_TYPE_GLOBAL_SEARCH));
+
+            GlobalSearchRequestPayload globalSearchRequest = new GlobalSearchRequestPayload();
+            globalSearchRequest.setSearchCriteria(searchCriteria);
+            // NB: same as sort test: "caseName.ASCENDING and createdDate.DESCENDING"
+            globalSearchRequest.setSortCriteria(List.of(
+                createSortCriteria(
+                    GlobalSearchSortByCategory.CASE_NAME,
+                    GlobalSearchSortDirection.ASCENDING
+                ),
+                createSortCriteria(
+                    GlobalSearchSortByCategory.CREATED_DATE,
+                    GlobalSearchSortDirection.DESCENDING
+                )
+            ));
+
+            // set pagination
+            globalSearchRequest.setStartRecordNumber(startRecordNumber);
+            globalSearchRequest.setMaxReturnRecordCount(maxReturnRecordCount);
+
+            // ACT
+            GlobalSearchResponsePayload result = executeRequest(globalSearchRequest,
+                AUTOTEST1_PUBLIC, AUTOTEST1_RESTRICTED);
+
+            // ASSERT
+            assertAll(
+                () -> assertThat(result.getResultInfo().getCaseStartRecord(), is(startRecordNumber)),
+                () -> assertThat(result.getResultInfo().isMoreResultsToGo(), is(expectedMoreResultsToGo)),
+                () -> assertThat(result.getResultInfo().getCasesReturned(), is(expectedCaseReferenceOrder.size())),
+                () -> assertCaseReturnOrder(expectedCaseReferenceOrder, result.getResults())
+            );
+        }
+
+        @ParameterizedTest(name = "Sort: should apply sort: {0}")
+        @MethodSource("uk.gov.hmcts.ccd.ElasticsearchIT#provideSortCriteriaTestArguments")
+        @SuppressWarnings("unused")
+        void shouldApplySort(String name,
+                             List<SortCriteria> sortCriteria,
+                             List<String> expectedCaseReferenceOrder) throws Exception {
+
+            // ARRANGE
+            SearchCriteria searchCriteria = new SearchCriteria();
+            if (expectedCaseReferenceOrder.size() == 4) {
+                searchCriteria.setCaseReferences(List.of(
+                    REFERENCE_GLOBAL_SEARCH_01,
+                    REFERENCE_GLOBAL_SEARCH_02,
+                    REFERENCE_GLOBAL_SEARCH_03,
+                    REFERENCE_GLOBAL_SEARCH_04 // extra value for multiple sort criteria test
+                ));
+            } else {
+                searchCriteria.setCaseReferences(List.of(
+                    REFERENCE_GLOBAL_SEARCH_01,
+                    REFERENCE_GLOBAL_SEARCH_02,
+                    REFERENCE_GLOBAL_SEARCH_03
+                ));
+            }
+            searchCriteria.setCcdCaseTypeIds(List.of(CASE_TYPE_GLOBAL_SEARCH));
+
+            GlobalSearchRequestPayload globalSearchRequest = new GlobalSearchRequestPayload();
+            globalSearchRequest.setSearchCriteria(searchCriteria);
+            globalSearchRequest.setSortCriteria(sortCriteria);
+
+            // ACT
+            GlobalSearchResponsePayload result = executeRequest(globalSearchRequest,
+                AUTOTEST1_PUBLIC, AUTOTEST1_RESTRICTED);
+
+            // ASSERT
+            assertAll(
+                () -> assertThat(result.getResultInfo().getCasesReturned(), is(expectedCaseReferenceOrder.size())),
+                () -> assertCaseReturnOrder(expectedCaseReferenceOrder, result.getResults())
+            );
+        }
+
+        private void assertCaseReturnOrder(List<String> expectedCaseReferenceOrder,
+                                           List<GlobalSearchResponsePayload.Result> results) {
+
+            assertThat(results.size(), is(expectedCaseReferenceOrder.size()));
+
+            for (int i = 0; i < results.size(); i++) {
+                assertThat(results.get(i).getCaseReference(), is(expectedCaseReferenceOrder.get(i)));
+            }
+        }
+
+        private GlobalSearchResponsePayload executeRequest(GlobalSearchRequestPayload globalSearchRequest,
+                                                           String... roles) throws Exception {
+
+            MockUtils.setSecurityAuthorities(authentication, roles);
+
+            MockHttpServletRequestBuilder postRequest = post(GlobalSearchEndpoint.GLOBAL_SEARCH_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsBytes(globalSearchRequest));
+
+            return ElasticsearchTestHelper.executeRequest(
+                postRequest,
+                200,
+                mapper,
+                mockMvc,
+                GlobalSearchResponsePayload.class
+            );
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> providePaginationTestArguments() {
+        // NB: sort order for test data same as sort test: "caseName.ASCENDING and createdDate.DESCENDING"
+        List<String> defaultSortOrder = List.of(
+            REFERENCE_GLOBAL_SEARCH_01,
+            REFERENCE_GLOBAL_SEARCH_04,
+            REFERENCE_GLOBAL_SEARCH_02,
+            REFERENCE_GLOBAL_SEARCH_03
+        );
+
+        return Stream.of(
+            Arguments.of(
+                "All (i.e. max return > results available)",
+                1,
+                100,
+                false, // i.e. 4 < 100
+                defaultSortOrder
+            ),
+
+            Arguments.of(
+                "1 -> 3  (i.e. some at start)",
+                1,
+                3,
+                true,
+                List.of(
+                    defaultSortOrder.get(0),
+                    defaultSortOrder.get(1),
+                    defaultSortOrder.get(2)
+                )
+            ),
+
+            Arguments.of(
+                "2 -> 3  (i.e. some in middle)",
+                2,
+                2,
+                true,
+                List.of(
+                    defaultSortOrder.get(1),
+                    defaultSortOrder.get(2)
+                )
+            ),
+
+            Arguments.of(
+                "3 -> 4  (i.e. some at end)",
+                3,
+                2,
+                false,
+                List.of(
+                    defaultSortOrder.get(2),
+                    defaultSortOrder.get(3)
+                )
+            ),
+
+            Arguments.of(
+                "4 -> 4  (i.e. end and look beyond)",
+                4,
+                100,
+                false,
+                List.of(
+                    defaultSortOrder.get(3)
+                )
+            ),
+
+            Arguments.of(
+                "None (i.e. start after end)",
+                5,
+                100,
+                false,
+                List.of() // i.e. empty
+            )
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> provideSortCriteriaTestArguments() {
+        return Stream.of(
+            Arguments.of(
+                "DEFAULT",
+                null,
+                // NB: default is same order as CreatedDate.ASCENDING
+                getSortCriteriaArguments(
+                    GlobalSearchSortByCategory.CREATED_DATE,
+                    GlobalSearchSortDirection.ASCENDING
+                ).get()[2]
+            ),
+
+            getSortCriteriaArguments(
+                GlobalSearchSortByCategory.CASE_NAME,
+                GlobalSearchSortDirection.ASCENDING
+            ),
+            getSortCriteriaArguments(
+                GlobalSearchSortByCategory.CASE_NAME,
+                GlobalSearchSortDirection.DESCENDING
+            ),
+
+            getSortCriteriaArguments(
+                GlobalSearchSortByCategory.CASE_MANAGEMENT_CATEGORY_NAME,
+                GlobalSearchSortDirection.ASCENDING
+            ),
+            getSortCriteriaArguments(
+                GlobalSearchSortByCategory.CASE_MANAGEMENT_CATEGORY_NAME,
+                GlobalSearchSortDirection.DESCENDING
+            ),
+
+            getSortCriteriaArguments(
+                GlobalSearchSortByCategory.CREATED_DATE,
+                GlobalSearchSortDirection.ASCENDING
+            ),
+            getSortCriteriaArguments(
+                GlobalSearchSortByCategory.CREATED_DATE,
+                GlobalSearchSortDirection.DESCENDING
+            ),
+
+            Arguments.of(
+                "caseName.ASCENDING and createdDate.DESCENDING",
+                List.of(
+                    createSortCriteria(
+                        GlobalSearchSortByCategory.CASE_NAME,
+                        GlobalSearchSortDirection.ASCENDING
+                    ),
+                    createSortCriteria(
+                        GlobalSearchSortByCategory.CREATED_DATE,
+                        GlobalSearchSortDirection.DESCENDING
+                    )
+                ),
+                List.of(
+                    REFERENCE_GLOBAL_SEARCH_01,
+                    REFERENCE_GLOBAL_SEARCH_04,
+                    REFERENCE_GLOBAL_SEARCH_02,
+                    REFERENCE_GLOBAL_SEARCH_03
+                )
+            )
+        );
+    }
+
+    private static Arguments getSortCriteriaArguments(GlobalSearchSortByCategory category,
+                                                      GlobalSearchSortDirection direction) {
+        String name = category.getCategoryName() + "." + direction.name();
+        SortCriteria sortCriteria = createSortCriteria(category, direction);
+
+        List<String> expectedCaseReferenceOrder = null;
+
+        switch (category) {
+            case CASE_NAME:
+                expectedCaseReferenceOrder = List.of(
+                    REFERENCE_GLOBAL_SEARCH_01,
+                    REFERENCE_GLOBAL_SEARCH_02,
+                    REFERENCE_GLOBAL_SEARCH_03
+                );
+                break;
+
+            case CASE_MANAGEMENT_CATEGORY_NAME:
+                expectedCaseReferenceOrder = List.of(
+                    REFERENCE_GLOBAL_SEARCH_03,
+                    REFERENCE_GLOBAL_SEARCH_01,
+                    REFERENCE_GLOBAL_SEARCH_02
+                );
+                break;
+
+            case CREATED_DATE:
+                expectedCaseReferenceOrder = List.of(
+                    REFERENCE_GLOBAL_SEARCH_02,
+                    REFERENCE_GLOBAL_SEARCH_03,
+                    REFERENCE_GLOBAL_SEARCH_01
+                );
+                break;
+        }
+
+        if (direction == GlobalSearchSortDirection.DESCENDING) {
+            expectedCaseReferenceOrder = Lists.reverse(expectedCaseReferenceOrder);
+        }
+
+        return Arguments.of(name, List.of(sortCriteria), expectedCaseReferenceOrder);
+    }
+
+    private static SortCriteria createSortCriteria(GlobalSearchSortByCategory category,
+                                                   GlobalSearchSortDirection direction) {
+        SortCriteria sortCriteria = new SortCriteria();
+
+        sortCriteria.setSortBy(category.getCategoryName());
+        sortCriteria.setSortDirection(direction.name());
+
+        return sortCriteria;
+    }
+
+    private void stubCaseTypeRoleAssignments(String... caseTypes) {
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            String userId = "123";
+            List<String> roleAssignments = new ArrayList<>();
+            if (Arrays.asList(caseTypes).contains("SECURITY")) {
+                roleAssignments.add(securityCTSpecificPublicUserRoleAssignmentJson(userId,
+                    "idam:caseworker-autotest1",
+                    "1589460099608690"));
+                roleAssignments.add(securityCTSpecificPrivateUserRoleAssignmentJson(userId,
+                    "idam:caseworker-autotest1-private",
+                    "1588870649839697"));
+                roleAssignments.add(securityCTSpecificRestrictedUserRoleAssignmentJson(userId,
+                    "idam:caseworker-autotest1-restricted",
+                    "1589460125872336"));
+                roleAssignments.add(securityCTSpecificPrivateUserRoleAssignmentJson(userId,
+                    "idam:caseworker-autotest1",
+                    "1589460099608691"));
+            }
+
+            if (Arrays.asList(caseTypes).contains("AAT")) {
+                roleAssignments.add(aatCTSpecificPublicUserRoleAssignmentJson(userId, "idam:caseworker-autotest1",
+                    "1588866820969121"));
+                roleAssignments.add(aatCTSpecificPublicUserRoleAssignmentJson(userId, "idam:caseworker-autotest1",
+                    "1589460056217857"));
+            }
+
+            if (Arrays.asList(caseTypes).contains("MAPPER")) {
+                roleAssignments.add(mapperCTSpecificPublicUserRoleAssignmentJson(userId, "idam:caseworker-autotest1",
+                    "1588870615652827"));
+            }
+
+            if (Arrays.asList(caseTypes).contains("RESTRICTED_SECURITY")) {
+                roleAssignments.add(restrictedSecurityCTSpecificPublicUserRoleAssignmentJson(userId,
+                    "idam:caseworker-autotest1",
+                    "1589781123682092"));
+            }
+
+            String[] roleAssignmentsArray = roleAssignments.toArray(String[]::new);
+            String roleAssignmentResponseJson = roleAssignmentResponseJson(roleAssignmentsArray);
+
+            stubFor(WireMock.get(urlMatching(GET_ROLE_ASSIGNMENTS_PREFIX + userId))
+                .willReturn(okJson(roleAssignmentResponseJson).withStatus(200)));
         }
     }
 }
