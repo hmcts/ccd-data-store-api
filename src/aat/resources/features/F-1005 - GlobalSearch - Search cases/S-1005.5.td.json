@@ -1,5 +1,5 @@
 {
-  "title": "Unsuccessful search for case with invalid schema",
+  "title": "Unsuccessful search for case with invalid global search parameters with an invalid user",
   "_guid_": "S-1005.5",
   "_extends_": "F-1005_SearchCaseBase",
   "specs": [
@@ -12,7 +12,7 @@
   ],
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaCaseworkerCaa"
+      "_extends_": "RestrictedCaseworker"
     }
   },
   "request": {
