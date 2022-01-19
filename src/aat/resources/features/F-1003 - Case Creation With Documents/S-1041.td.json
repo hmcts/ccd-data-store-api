@@ -62,11 +62,16 @@
           "document_filename" : "${[scenarioContext][childContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][originalDocumentName]}",
           "document_binary_url" : "${[scenarioContext][childContexts][Default_Document_Upload_Data_07][testData][actualResponse][body][documents][0][_links][binary][href]}"
         },
-        "TextField" : "Test1"
+        "TextField" : "Test1",
+        "SearchCriteria" : { }
       },
       "data_classification" : {
         "DocumentField" : "PUBLIC",
-        "TextField" : "PUBLIC"
+        "TextField" : "PUBLIC",
+        "SearchCriteria" : {
+          "classification" : "PUBLIC",
+          "value" : { }
+        }
       },
       "after_submit_callback_response" : null,
       "callback_response_status_code" : null,

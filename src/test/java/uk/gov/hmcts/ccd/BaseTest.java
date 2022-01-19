@@ -132,6 +132,8 @@ public abstract class BaseTest {
     @Inject
     protected SecurityUtils securityUtils;
     @Inject
+    protected CacheManager cacheManager;
+    @Inject
     @Qualifier("DefaultObjectMapper")
     protected ObjectMapper defaultObjectMapper;
     @Inject
