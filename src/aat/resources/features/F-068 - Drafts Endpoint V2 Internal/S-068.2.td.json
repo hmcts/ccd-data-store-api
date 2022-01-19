@@ -14,9 +14,7 @@
       "_extends_": "Common_Request_Headers"
     },
     "pathVariables": {
-      "ctid": "FT_CRUD"
-    },
-    "pathVariables": {
+      "ctid": "FT_CRUD",
       "did": "${[scenarioContext][childContexts][S-068.1][testData][actualResponse][body][id]}"
     },
     "body": {
