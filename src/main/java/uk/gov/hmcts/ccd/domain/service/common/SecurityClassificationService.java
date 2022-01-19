@@ -21,6 +21,9 @@ public interface SecurityClassificationService {
                                                         CaseTypeDefinition caseTypeDefinition,
                                                         String fieldId);
 
+    boolean userHasEnoughSecurityClassificationForField(CaseTypeDefinition caseTypeDefinition,
+                                                        SecurityClassification otherClassification);
+
     Optional<SecurityClassification> getUserClassification(CaseTypeDefinition caseTypeDefinition,
                                                            boolean isCreateProfile);
 

@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
@@ -66,6 +67,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -129,6 +131,8 @@ public abstract class BaseTest {
     private DocumentsOperation documentsOperation;
     @Inject
     protected SecurityUtils securityUtils;
+    @Inject
+    protected CacheManager cacheManager;
     @Inject
     @Qualifier("DefaultObjectMapper")
     protected ObjectMapper defaultObjectMapper;
@@ -196,6 +200,9 @@ public abstract class BaseTest {
         jdbcTemplate.execute(truncateTablesQuery);
 
         sequences.forEach(sequence -> jdbcTemplate.execute("ALTER SEQUENCE " + sequence + " RESTART WITH 1"));
+
+        cacheManager.getCacheNames().forEach(
+            cacheName -> Objects.requireNonNull(cacheManager.getCache(cacheName)).clear());
     }
 
     private List<String> determineTables(JdbcTemplate jdbcTemplate) {

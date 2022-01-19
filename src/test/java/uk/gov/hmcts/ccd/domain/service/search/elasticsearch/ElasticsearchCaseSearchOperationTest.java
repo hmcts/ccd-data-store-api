@@ -31,14 +31,17 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -330,12 +333,57 @@ class ElasticsearchCaseSearchOperationTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         when(applicationParams.getCasesIndexNameFormat()).thenReturn(INDEX_NAME_FORMAT);
         when(applicationParams.getCasesIndexNameCaseTypeIdGroup()).thenReturn("(.+)(_cases.*)");
         when(applicationParams.getCasesIndexNameCaseTypeIdGroupPosition()).thenReturn(1);
         when(applicationParams.getCasesIndexType()).thenReturn(INDEX_TYPE);
         searchRequestJsonNode.set(QUERY, new TextNode("queryVal"));
+    }
+
+    @Nested
+    @DisplayName("Named index search")
+    class NamedIndexSearch {
+
+        @Test
+        @DisplayName("should execute search on Elasticsearch for a named index and return results")
+        void testSearchNamedIndex() throws IOException {
+            // GIVEN
+            final CrossCaseTypeSearchRequest crossCaseTypeSearchRequest = buildCrossCaseTypeSearchRequest();
+            final MultiSearchResult multiSearchResult = mockMultiSearchResult();
+            doReturn(crossCaseTypeSearchRequest)
+                .when(caseSearchRequestSecurity).createSecuredSearchRequest(any(CrossCaseTypeSearchRequest.class));
+            doReturn(multiSearchResult).when(jestClient).execute(any(MultiSearch.class));
+
+            // WHEN
+            final CaseSearchResult caseSearchResult = searchOperation.execute(crossCaseTypeSearchRequest, true);
+
+            // THEN
+            assertAll(
+                () -> assertThat(caseSearchResult.getCases(), equalTo(emptyList())),
+                () -> assertThat(caseSearchResult.getTotal(), equalTo(0L)),
+                () -> verify(jestClient).execute(any(MultiSearch.class)),
+                () -> verify(caseSearchRequestSecurity)
+                    .createSecuredSearchRequest(any(CrossCaseTypeSearchRequest.class)));
+        }
+
+        private CrossCaseTypeSearchRequest buildCrossCaseTypeSearchRequest() {
+            return new CrossCaseTypeSearchRequest.Builder()
+                .withCaseTypes(List.of(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
+                .withSearchRequest(elasticsearchRequest)
+                .withSearchIndex(new SearchIndex("global_search", "_doc"))
+                .build();
+        }
+
+        private MultiSearchResult mockMultiSearchResult() {
+            final MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
+            final SearchResult searchResult = mock(SearchResult.class);
+            doReturn(true).when(multiSearchResult).isSucceeded();
+            doReturn(0L).when(searchResult).getTotal();
+            doReturn(emptyList()).when(multiSearchResult).getResponses();
+
+            return multiSearchResult;
+        }
     }
 
     @Nested
