@@ -6,17 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Maps.newHashMap;
+import static java.lang.String.format;
 
 @Service
 @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
@@ -27,17 +30,21 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     private static final Logger LOGGER = LoggerFactory.getLogger(CachedCaseDefinitionRepository.class);
 
     public static final String QUALIFIER = "cached";
-
+    private static final String CASE_TYPE_KEY_FORMAT = "%s___%d";
+    private final ApplicationParams applicationParams;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final Map<String, List<CaseTypeDefinition>> caseTypesForJurisdictions = newHashMap();
     private final Map<String, CaseTypeDefinitionVersion> versions = newHashMap();
     private final Map<String, UserRole> userRoleClassifications = newHashMap();
     private final Map<String, List<FieldTypeDefinition>> baseTypes = newHashMap();
+    private final Map<String, CaseTypeDefinition> caseTypes = newHashMap();
 
     @Autowired
     public CachedCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
-                                              CaseDefinitionRepository caseDefinitionRepository) {
+                                                  CaseDefinitionRepository caseDefinitionRepository,
+                                          ApplicationParams applicationParams) {
         this.caseDefinitionRepository = caseDefinitionRepository;
+        this.applicationParams = applicationParams;
     }
 
     @Override

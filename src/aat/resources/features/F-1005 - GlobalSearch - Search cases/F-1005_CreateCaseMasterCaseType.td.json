@@ -1,0 +1,91 @@
+{
+	"_guid_": "F-1005_CreateCaseMasterCaseType",
+	"_extends_": "Case_Creation_Base",
+
+  "specs": [
+    "to create a case"
+  ],
+  "prerequisites" : [ {
+    "Token_Creation": "F-1005_GetCreateCaseMasterCaseTypeToken"
+    }
+   ],
+  "users": {
+		"invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+		}
+	},
+  "request": {
+		"pathVariables": {
+			"jid": "BEFTA_MASTER",
+			"ctid": "FT_MasterCaseType"
+		},
+		"body": {
+      "data": {
+        "caseManagementLocation": {
+          "baseLocation": "123",
+          "region": "1"
+        }
+      },
+      "event": {
+        "id": "createCase",
+        "summary": "",
+        "description": ""
+      },
+			"event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+	"expectedResponse": {
+		"body": {
+			"id": "[[ANYTHING_PRESENT]]",
+			"jurisdiction": "BEFTA_MASTER",
+			"state": "CaseCreated",
+			"version": 0,
+			"case_type_id": "FT_MasterCaseType",
+			"created_date": "[[ANYTHING_PRESENT]]",
+			"last_modified": "[[ANYTHING_PRESENT]]",
+			"last_state_modified_date": "[[ANYTHING_PRESENT]]",
+			"security_classification": "PUBLIC",
+			"case_data": {
+        "caseManagementLocation": {
+          "baseLocation": "123",
+          "region": "1"
+        },
+        "SearchCriteria" : {}
+      },
+
+			"data_classification": {
+        "caseManagementLocation" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "baseLocation" : "PUBLIC",
+            "region" : "PUBLIC"
+          }
+        },
+        "SearchCriteria" : {
+          "classification" : "PUBLIC",
+          "value" : { }
+        }
+      },
+			"supplementary_data": null,
+			"after_submit_callback_response": null,
+			"callback_response_status_code": null,
+			"callback_response_status": null,
+			"delete_draft_response_status_code": null,
+			"delete_draft_response_status": null,
+			"security_classifications": {
+        "caseManagementLocation" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "baseLocation" : "PUBLIC",
+            "region" : "PUBLIC"
+          }
+        },
+        "SearchCriteria" : {
+          "classification" : "PUBLIC",
+          "value" : { }
+        }
+      }
+		}
+	}
+}

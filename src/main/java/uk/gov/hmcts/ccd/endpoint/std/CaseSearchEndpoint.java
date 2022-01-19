@@ -127,7 +127,7 @@ public class CaseSearchEndpoint {
 
     private List<String> getCaseTypeIds(List<String> caseTypeIds) {
         if (isAllCaseTypesRequest(caseTypeIds)) {
-            return getCaseTypes();
+            return elasticsearchQueryHelper.getCaseTypesAvailableToUser();
         }
         return caseTypeIds;
     }
@@ -146,7 +146,7 @@ public class CaseSearchEndpoint {
     }
 
     private void validateCtid(List<String> caseTypeIds) {
-        if (caseTypeIds == null || caseTypeIds.size() == 0) {
+        if (caseTypeIds == null || caseTypeIds.isEmpty()) {
             throw new BadRequestException("Missing required case type. Please provide a case type or list of case types"
                 + " to search.");
         }

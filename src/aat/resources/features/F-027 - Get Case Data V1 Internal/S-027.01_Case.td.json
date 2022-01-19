@@ -2,9 +2,11 @@
 	"_guid_": "S-027.01_Case",
 	"_extends_": "Case_Creation_Data_Base",
 
-	"user": {
-    "_extends_": "BeftaCaseworker3"
-	},
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker3"
+    }
+  },
 
 	"request": {
 		"pathVariables": {
@@ -13,7 +15,7 @@
 			"ctid": "BEFTA_CASETYPE_3_4"
 		},
 		"body": {
-			"event_token": "${[scenarioContext][parentContext][childContexts][S-027.01_GetToken][testData][actualResponse][body][token]}"
+			"event_token": "${[scenarioContext][parentContext][childContexts][S-027.01_Case_Token_Creation][testData][actualResponse][body][token]}"
 		}
 	},
 

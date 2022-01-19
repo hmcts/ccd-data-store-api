@@ -4,12 +4,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -28,16 +36,15 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
+import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchIndex;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -79,7 +86,7 @@ class AuthorisedCaseSearchOperationTest {
 
     private final ObjectNode searchRequestJsonNode = JsonNodeFactory.instance.objectNode();
 
-    private ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(searchRequestJsonNode);
+    private final ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(searchRequestJsonNode);
 
     @InjectMocks
     private AuthorisedCaseSearchOperation authorisedCaseDetailsSearchOperation;
@@ -208,6 +215,50 @@ class AuthorisedCaseSearchOperationTest {
         }
 
         @Test
+        @DisplayName("should preserve search index property in execute call if set")
+        void shouldPreserveSearchIndexPropertyInExecuteCall() {
+
+            // ARRANGE
+            when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class),
+                anyBoolean())).thenReturn(searchResult);
+
+            ObjectNode dataNode = JsonNodeFactory.instance.objectNode();
+            dataNode.set("firstName", JsonNodeFactory.instance.textNode("Baker"));
+            ObjectNode complexNode = JsonNodeFactory.instance.objectNode();
+            complexNode.set("postcode", JsonNodeFactory.instance.textNode("W4"));
+            dataNode.set("personAddress", complexNode);
+            when(objectMapperService.convertObjectToJsonNode(anyMapOf(String.class, JsonNode.class)))
+                .thenReturn(dataNode);
+
+            SearchIndex searchIndex = new SearchIndex(
+                "my_index_name",
+                "my_index_type"
+            );
+
+            CrossCaseTypeSearchRequest searchRequest = new CrossCaseTypeSearchRequest.Builder()
+                .withCaseTypes(asList(CASE_TYPE_ID_1, CASE_TYPE_ID_2))
+                .withSearchRequest(elasticsearchRequest)
+                .withMultiCaseTypeSearch(true)
+                .withSearchIndex(searchIndex)
+                .build();
+
+            // ACT
+            CaseSearchResult result = authorisedCaseDetailsSearchOperation.execute(searchRequest, true);
+
+            // ASSERT
+            verifyResult(result);
+
+            // ::verify search index has been preserved
+            ArgumentCaptor<CrossCaseTypeSearchRequest> searchRequestCaptor
+                = ArgumentCaptor.forClass(CrossCaseTypeSearchRequest.class);
+            verify(caseSearchOperation).execute(searchRequestCaptor.capture(), anyBoolean());
+
+            CrossCaseTypeSearchRequest actualSearchRequest = searchRequestCaptor.getValue();
+            assertThat(actualSearchRequest.getSearchIndex().isPresent(), is(true));
+            assertThat(actualSearchRequest.getSearchIndex().get(), is(searchIndex));
+        }
+
+        @Test
         @DisplayName("should transform search results to alias names defined in source filter")
         void shouldTransformMultiCaseTypeSearchResults() {
             when(caseSearchOperation.execute(any(CrossCaseTypeSearchRequest.class),
@@ -268,6 +319,8 @@ class AuthorisedCaseSearchOperationTest {
                 () -> assertThat(result, is(searchResult)),
                 () -> assertThat(caseDetails.getData(), Matchers.is(transformedData)),
                 () -> assertThat(result.getTotal(), is(1L)),
+                () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ),
+                () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_2, CAN_READ),
                 () -> verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class), anyBoolean()),
                 () -> verify(caseDataAccessControl).generateAccessProfilesByCaseDetails(any(CaseDetails.class)),
                 () -> verify(caseDataAccessControl).generateAccessProfilesByCaseDetails(any(CaseDetails.class))

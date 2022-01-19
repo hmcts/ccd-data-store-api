@@ -59,6 +59,16 @@ public interface AccessControlService {
     String NO_EVENT_FOUND = "No event found";
     String NO_FIELD_FOUND = "No field found";
     String VALUE = "value";
+    String ALL_EVENTS = "*";
+
+    static boolean hasAccess(Set<String> userRoles,
+                             Predicate<AccessControlList> criteria,
+                             List<AccessControlList> accessControlLists) {
+        return accessControlLists != null && accessControlLists
+            .stream()
+            .filter(acls -> userRoles.contains(acls.getAccessProfile()))
+            .anyMatch(criteria);
+    }
 
     boolean canAccessCaseTypeWithCriteria(CaseTypeDefinition caseType,
                                           Set<AccessProfile> accessProfiles,
@@ -88,7 +98,7 @@ public interface AccessControlService {
                                          List<CaseFieldDefinition> caseFieldDefinitions,
                                          Set<AccessProfile> accessProfiles);
 
-    CaseUpdateViewEvent setReadOnlyOnCaseViewFieldsIfNoAccess(String caseReference, String eventId,
+    CaseUpdateViewEvent setReadOnlyOnCaseViewFieldsIfNoAccess(String caseTypeId, String caseReference, String eventId,
                                                               CaseUpdateViewEvent caseEventTrigger,
                                                               List<CaseFieldDefinition> caseFieldDefinitions,
                                                               Set<AccessProfile> accessProfiles,
@@ -252,20 +262,37 @@ public interface AccessControlService {
             collectionAccess);
     }
 
-    default void hideOnCaseViewFieldsIfNoReadAccess(String caseReference, String eventId,
-                                                    boolean isMultipartyFixEnabled, CommonField caseViewField,
-                                                    Set<AccessProfile> accessProfiles) {
+    default boolean shouldRemoveCaseViewFieldIfNoReadAccess(final String caseTypeId,
+                                                            String caseReference,
+                                                            String eventId,
+                                                            boolean isMultipartyFixEnabled,
+                                                            List<String> multipartyCaseTypes,
+                                                            List<String> multipartyEvents,
+                                                            String caseViewFieldId,
+                                                            CaseFieldDefinition field,
+                                                            Set<AccessProfile> accessProfiles) {
+        boolean isMultipartyCaseTypePresent = multipartyCaseTypes
+            .stream().anyMatch(caseType -> caseType.equals(caseTypeId));
+        boolean isMultipartyEventPresent = multipartyEvents
+            .stream().anyMatch(event -> event.equals(ALL_EVENTS) || event.equals(eventId));
+
         if (isMultipartyFixEnabled
-            && !hasAccessControlList(accessProfiles, CAN_READ, caseViewField.getAccessControlLists())) {
-            caseViewField.setShowCondition(caseViewField.getId() + "=\"DO NOT SHOW IN UI\"");
-            caseViewField.setRetainHiddenValue(false);
-            LOG.debug("Case view field {} has been hidden for case {} and event {} as part of mutliparty fix",
-                caseViewField.getId(), caseReference, eventId);
+            && isMultipartyCaseTypePresent && isMultipartyEventPresent
+            && (field == null || !hasAccessControlList(accessProfiles, CAN_READ, field.getAccessControlLists()))) {
+            LOG.debug("Case view field {} has been removed for case {} and event {} as part of multiparty fix",
+                caseViewFieldId, caseReference, eventId);
+            return true;
         }
+
+        return false;
     }
 
-    default void setChildrenAsReadOnlyIfNoAccess(final String caseReference, final String eventId,
+    default void setChildrenAsReadOnlyIfNoAccess(final String caseTypeId,
+                                                 final String caseReference,
+                                                 final String eventId,
                                                  boolean isMultipartyFixEnabled,
+                                                 List<String> multipartyCaseTypes,
+                                                 List<String> multipartyEvents,
                                                  List<WizardPage> wizardPages,
                                                  String rootFieldId,
                                                  CaseFieldDefinition caseField,
@@ -275,10 +302,14 @@ public interface AccessControlService {
         if (caseField.isCompoundFieldType()) {
             caseField.getFieldTypeDefinition().getChildren().forEach(childField -> {
                 if (!hasAccessControlList(accessProfiles, access, childField.getAccessControlLists())) {
-                    CommonField childViewField = findNestedField(caseViewField, childField.getId());
-                    childViewField.setDisplayContext(READONLY);
-                    hideOnCaseViewFieldsIfNoReadAccess(caseReference, eventId, isMultipartyFixEnabled,
-                        childViewField, accessProfiles);
+                    CommonField childCaseViewField = findNestedField(caseViewField, childField.getId());
+                    childCaseViewField.setDisplayContext(READONLY);
+
+                    if (shouldRemoveCaseViewFieldIfNoReadAccess(caseTypeId, caseReference, eventId,
+                        isMultipartyFixEnabled, multipartyCaseTypes, multipartyEvents,
+                        caseViewField.getId(), childField, accessProfiles)) {
+                        caseViewField.getFieldTypeDefinition().getChildren().remove(childCaseViewField);
+                    }
 
                     Optional<WizardPageField> optionalWizardPageField = getWizardPageField(wizardPages, rootFieldId);
                     optionalWizardPageField.ifPresent(wizardPageField ->
@@ -286,9 +317,12 @@ public interface AccessControlService {
                 }
                 if (childField.isCompoundFieldType()) {
                     setChildrenAsReadOnlyIfNoAccess(
+                        caseTypeId,
                         caseReference,
                         eventId,
                         isMultipartyFixEnabled,
+                        multipartyCaseTypes,
+                        multipartyEvents,
                         wizardPages,
                         rootFieldId,
                         childField,

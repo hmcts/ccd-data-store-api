@@ -8,6 +8,7 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -81,11 +82,11 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
         List<String> authorisedCaseTypeIds =
             authorisedCaseTypes.stream().map(CaseTypeDefinition::getId).collect(Collectors.toList());
 
-        return new CrossCaseTypeSearchRequest.Builder()
+        // clone CCT search request object :: then replace case type list
+        return new CrossCaseTypeSearchRequest.Builder(originalSearchRequest)
             .withCaseTypes(authorisedCaseTypeIds)
-            .withSearchRequest(originalSearchRequest.getElasticSearchRequest())
+            // NB: preserve original MultiCaseType processing instruction
             .withMultiCaseTypeSearch(originalSearchRequest.isMultiCaseTypeSearch())
-            .withSourceFilterAliasFields(originalSearchRequest.getAliasFields())
             .build();
     }
 
@@ -160,7 +161,10 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     private void filterCaseDataForMultiCaseTypeSearch(CrossCaseTypeSearchRequest searchRequest,
                                                       CaseTypeDefinition authorisedCaseType,
                                                       CaseDetails caseDetails) {
-        if (searchRequest.isMultiCaseTypeSearch() && caseDetails.getData() != null) {
+        if (searchRequest.isMultiCaseTypeSearch() && caseDetails.getData() != null
+            // NB: bypass MultiCaseType CaseData filters if using a single search index (required for GlobalSearch)
+            && searchRequest.getSearchIndex().isEmpty()) {
+
             JsonNode caseData = caseDataToJsonNode(caseDetails);
             String caseDataJson = caseData.toString();
             JsonNode filteredMultiCaseTypeSearchData = objectMapperService.createEmptyJsonNode();

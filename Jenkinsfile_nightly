@@ -2,7 +2,7 @@
 
 properties([
     // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
-    pipelineTriggers([cron('H 05 * * *')])
+    pipelineTriggers([cron('H 07 * * *')])
 ])
 
 @Library("Infrastructure")
@@ -93,11 +93,12 @@ withNightlyPipeline(type, product, component) {
     enableDbMigration('ccd')
     disableLegacyDeployment()
     enableHighLevelDataSetup()
-    enableFortifyScan()
+    // Temporarily disable fortify scan stage until fortify access re-enabled
+    //enableFortifyScan()
 
-    after('fortify-scan') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-    }
+    //after('fortify-scan') {
+    //    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+    //}
     after('test') {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
