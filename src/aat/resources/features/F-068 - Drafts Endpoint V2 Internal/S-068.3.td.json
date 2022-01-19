@@ -1,6 +1,6 @@
 {
   "_guid_": "S-068.3",
-  "operationName": "Update draft as a caseworker",
+  "operationName": "Fetch a draft for display",
   "_extends_": "F-068_Test_Data_Base",
   "specs": [
     "an active profile in CCD",

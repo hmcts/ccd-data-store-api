@@ -14,9 +14,6 @@
 			"_extends_": "Common_Request_Headers",
 			"experimental": "true",
 			"Content-Type": "application/json"
-		},
-		"pathVariables": {
-			"ctid": "FT_CRUD"
 		}
 	},
 

@@ -13,6 +13,9 @@
     "headers": {
       "_extends_": "Common_Request_Headers"
     },
+    "pathVariables": {
+      "ctid": "FT_CRUD"
+    },
     "body": {
       "data": {
         "TextField": "field1",
