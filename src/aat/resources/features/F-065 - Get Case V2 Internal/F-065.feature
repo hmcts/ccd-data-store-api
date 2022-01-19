@@ -7,7 +7,7 @@ Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-@S-165
+@S-165 @Ignore
 Scenario: must return case view when the case reference exists
 
     Given a case that has just been created as in [Standard_Full_Case_Creation_Data],

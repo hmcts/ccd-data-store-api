@@ -7,10 +7,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.AuditCaseRemoteConfiguration;
 import uk.gov.hmcts.ccd.auditlog.aop.AuditContext;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
+import uk.gov.hmcts.ccd.domain.service.lau.AuditCaseRemoteOperation;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -22,8 +24,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @DisplayName("audit log specific calls")
 class AuditServiceTest {
@@ -37,7 +41,9 @@ class AuditServiceTest {
     private static final String CASE_ID = "123456";
     private static final String JURISDICTION = "AUTOTEST1";
     private static final String CASE_TYPE = "CaseType1";
-    private static final String EVENT_NAME = "CreateCase";
+    private static final String CREATE_EVENT_NAME = "CreateCase";
+    private static final String UPDATE_EVENT_NAME = "UpdateCase";
+    private static final String ACCESSED_EVENT_NAME = "CaseAccessed";
     private static final List<String> TARGET_CASE_ROLES = Arrays.asList("CaseRole1", "CaseRole2");
 
     @Mock
@@ -46,6 +52,10 @@ class AuditServiceTest {
     private UserRepository userRepository;
     @Mock
     private AuditRepository auditRepository;
+    @Mock
+    private AuditCaseRemoteConfiguration auditCaseRemoteConfiguration;
+    @Mock
+    private AuditCaseRemoteOperation auditCaseRemoteOperation;
 
     @Captor
     ArgumentCaptor<AuditEntry> captor;
@@ -57,11 +67,13 @@ class AuditServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        auditService = new AuditService(fixedClock, userRepository, securityUtils, auditRepository);
+        auditService = new AuditService(fixedClock, userRepository, securityUtils, auditRepository,
+            auditCaseRemoteConfiguration, auditCaseRemoteOperation);
         IdamUser user = new IdamUser();
         user.setId(IDAM_ID);
 
         doReturn(user).when(userRepository).getUser();
+        doReturn(true).when(auditCaseRemoteConfiguration).isEnabled();
         doReturn(SERVICE_NAME).when(securityUtils).getServiceName();
     }
 
@@ -73,7 +85,7 @@ class AuditServiceTest {
             .auditOperationType(AuditOperationType.CREATE_CASE)
             .jurisdiction(JURISDICTION)
             .caseType(CASE_TYPE)
-            .eventName(EVENT_NAME)
+            .eventName(CREATE_EVENT_NAME)
             .targetIdamId(TARGET_IDAM_ID)
             .targetCaseRoles(TARGET_CASE_ROLES)
             .httpMethod(HTTP_METHOD)
@@ -85,6 +97,7 @@ class AuditServiceTest {
         auditService.audit(auditContext);
 
         verify(auditRepository).save(captor.capture());
+        verify(auditCaseRemoteOperation).postCaseAction(any(),any());
 
         assertThat(captor.getValue().getDateTime(), is(equalTo("2018-08-19T16:02:42.01")));
         assertThat(captor.getValue().getHttpStatus(), is(equalTo(200)));
@@ -98,7 +111,7 @@ class AuditServiceTest {
         assertThat(captor.getValue().getJurisdiction(), is(equalTo(JURISDICTION)));
         assertThat(captor.getValue().getCaseId(), is(equalTo(CASE_ID)));
         assertThat(captor.getValue().getCaseType(), is(equalTo(CASE_TYPE)));
-        assertThat(captor.getValue().getEventSelected(), is(equalTo(EVENT_NAME)));
+        assertThat(captor.getValue().getEventSelected(), is(equalTo(CREATE_EVENT_NAME)));
         assertThat(captor.getValue().getTargetIdamId(), is(equalTo(TARGET_IDAM_ID)));
         assertThat(captor.getValue().getTargetCaseRoles().size(), is(equalTo(2)));
         assertTrue(captor.getValue().getTargetCaseRoles().contains("CaseRole1"));
@@ -106,7 +119,77 @@ class AuditServiceTest {
     }
 
     @Test
-    @DisplayName("should save to audit repository")
+    @DisplayName("should save to audit repository and remote audit if updating")
+    void shouldSaveToAuditRepositoryWhenUpdatingCase() {
+        AuditContext auditContext = AuditContext.auditContextWith()
+            .caseId(CASE_ID)
+            .auditOperationType(AuditOperationType.UPDATE_CASE)
+            .jurisdiction(JURISDICTION)
+            .caseType(CASE_TYPE)
+            .eventName(UPDATE_EVENT_NAME)
+            .httpStatus(200)
+            .build();
+
+        auditService.audit(auditContext);
+
+        verify(auditRepository).save(captor.capture());
+        verify(auditCaseRemoteOperation).postCaseAction(any(),any());
+
+        assertThat(captor.getValue().getOperationType(), is(equalTo(AuditOperationType.UPDATE_CASE.getLabel())));
+        assertThat(captor.getValue().getJurisdiction(), is(equalTo(JURISDICTION)));
+        assertThat(captor.getValue().getCaseId(), is(equalTo(CASE_ID)));
+        assertThat(captor.getValue().getCaseType(), is(equalTo(CASE_TYPE)));
+        assertThat(captor.getValue().getEventSelected(), is(equalTo(UPDATE_EVENT_NAME)));
+    }
+
+    @Test
+    @DisplayName("should save to audit repository and remote audit if accessing")
+    void shouldSaveToAuditRepositoryWhenCreatingCase() {
+        AuditContext auditContext = AuditContext.auditContextWith()
+            .caseId(CASE_ID)
+            .auditOperationType(AuditOperationType.CASE_ACCESSED)
+            .jurisdiction(JURISDICTION)
+            .caseType(CASE_TYPE)
+            .eventName(ACCESSED_EVENT_NAME)
+            .httpStatus(200)
+            .build();
+
+        auditService.audit(auditContext);
+
+        verify(auditRepository).save(captor.capture());
+        verify(auditCaseRemoteOperation).postCaseAction(any(),any());
+
+        assertThat(captor.getValue().getOperationType(), is(equalTo(AuditOperationType.CASE_ACCESSED.getLabel())));
+        assertThat(captor.getValue().getJurisdiction(), is(equalTo(JURISDICTION)));
+        assertThat(captor.getValue().getCaseId(), is(equalTo(CASE_ID)));
+        assertThat(captor.getValue().getCaseType(), is(equalTo(CASE_TYPE)));
+        assertThat(captor.getValue().getEventSelected(), is(equalTo(ACCESSED_EVENT_NAME)));
+    }
+
+    @Test
+    @DisplayName("should save to audit repository and remote audit if searching")
+    void shouldSaveToAuditRepositoryWhenSearching() {
+        AuditContext auditContext = AuditContext.auditContextWith()
+            .caseId(CASE_ID)
+            .auditOperationType(AuditOperationType.SEARCH_CASE)
+            .jurisdiction(JURISDICTION)
+            .caseType(CASE_TYPE)
+            .httpStatus(200)
+            .build();
+
+        auditService.audit(auditContext);
+
+        verify(auditRepository).save(captor.capture());
+        verify(auditCaseRemoteOperation).postCaseSearch(any(),any());
+
+        assertThat(captor.getValue().getOperationType(), is(equalTo(AuditOperationType.SEARCH_CASE.getLabel())));
+        assertThat(captor.getValue().getJurisdiction(), is(equalTo(JURISDICTION)));
+        assertThat(captor.getValue().getCaseId(), is(equalTo(CASE_ID)));
+        assertThat(captor.getValue().getCaseType(), is(equalTo(CASE_TYPE)));
+    }
+
+    @Test
+    @DisplayName("should save to audit repository but remote audit ignored if operational type missing")
     void shouldSaveToAuditRepositoryWithNullOperationType() {
         AuditContext auditContext = AuditContext.auditContextWith()
             .auditOperationType(null)
@@ -116,8 +199,35 @@ class AuditServiceTest {
         auditService.audit(auditContext);
 
         verify(auditRepository).save(captor.capture());
+        verifyNoInteractions(auditCaseRemoteOperation);
 
         assertThat(captor.getValue().getHttpStatus(), is(equalTo(403)));
         assertThat(captor.getValue().getOperationType(), is(equalTo(null)));
+    }
+
+    @Test
+    @DisplayName("should not call remote logging if disabled")
+    void shouldNotCallRemoteLoggingIfDisabled() {
+        AuditContext auditContext = AuditContext.auditContextWith()
+            .caseId(CASE_ID)
+            .auditOperationType(AuditOperationType.CREATE_CASE)
+            .jurisdiction(JURISDICTION)
+            .caseType(CASE_TYPE)
+            .eventName(CREATE_EVENT_NAME)
+            .httpStatus(200)
+            .build();
+
+        doReturn(false).when(auditCaseRemoteConfiguration).isEnabled();
+
+        auditService.audit(auditContext);
+
+        verify(auditRepository).save(captor.capture());
+        verifyNoInteractions(auditCaseRemoteOperation);
+
+        assertThat(captor.getValue().getOperationType(), is(equalTo(AuditOperationType.CREATE_CASE.getLabel())));
+        assertThat(captor.getValue().getJurisdiction(), is(equalTo(JURISDICTION)));
+        assertThat(captor.getValue().getCaseId(), is(equalTo(CASE_ID)));
+        assertThat(captor.getValue().getCaseType(), is(equalTo(CASE_TYPE)));
+        assertThat(captor.getValue().getEventSelected(), is(equalTo(CREATE_EVENT_NAME)));
     }
 }
