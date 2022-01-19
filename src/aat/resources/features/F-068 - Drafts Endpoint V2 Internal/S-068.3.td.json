@@ -1,0 +1,35 @@
+{
+  "_guid_": "S-068.3",
+  "operationName": "Update draft as a caseworker",
+  "_extends_": "F-068_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "Fetch a draft for display",
+    "contains HTTP 200"
+  ],
+  "method": "GET",
+  "uri": "/internal/drafts/{did}",
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "did": "${[scenarioContext][childContexts][S-068.1][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "document": null,
+      "type": null,
+      "created": null,
+      "updated": null,
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      }
+    }
+  }
+}
