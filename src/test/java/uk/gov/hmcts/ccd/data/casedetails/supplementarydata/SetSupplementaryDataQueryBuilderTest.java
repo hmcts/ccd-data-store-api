@@ -46,6 +46,19 @@ class SetSupplementaryDataQueryBuilderTest extends WireMockBaseTest {
     }
 
     @Test
+    void shouldReturnQueryStringListWhenRequestDataPassed() {
+        Query query = supplementaryDataQueryBuilder.build(em,
+            CASE_REFERENCE,
+            "orgs_assigned_users.organisationA",
+            "ABC");
+        assertNotNull(query);
+        assertEquals(CASE_REFERENCE, query.getParameterValue("reference"));
+        assertEquals("{orgs_assigned_users,organisationA}", query.getParameterValue("leaf_node_key"));
+        assertEquals("ABC", query.getParameterValue("value"));
+        assertEquals("{orgs_assigned_users}", query.getParameterValue("parent_key"));
+    }
+
+    @Test
     void shouldReturnMoreThanOneQueryInTheListWhenRequestDataPassedWithMultipleValues() {
         Query query = supplementaryDataQueryBuilder.build(em,
             CASE_REFERENCE,

@@ -1,0 +1,45 @@
+{
+	"title": "should create an event token for correct inputs",
+	"_guid_": "F-130-Prerequisite",
+
+	"productName": "CCD Data Store",
+	"operationName": "Create event token",
+
+	"method": "GET",
+	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token",
+
+	"specs": [
+		"to create an event token"
+	],
+
+	"users": {
+		"invokingUser": {
+      "_extends_": "BeftaCitizen3"
+		}
+	},
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers"
+		},
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]",
+			"jid": "BEFTA_JURISDICTION_3",
+			"ctid": "BEFTA_CASETYPE_3_2",
+			"etid": "CREATE"
+		}
+	},
+
+	"expectedResponse": {
+		"_extends_": "Common_200_Response",
+		"headers": {
+			"Content-Length" : "[[ANYTHING_PRESENT]]",
+			"Content-Encoding" : "gzip"
+		},
+		"body" : {
+			"token" : "[[ANYTHING_PRESENT]]",
+			"case_details" : "[[ANYTHING_PRESENT]]",
+			"event_id" : "CREATE"
+		}
+	}
+}
