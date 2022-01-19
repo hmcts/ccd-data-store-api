@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 
 import java.util.List;
 import org.assertj.core.util.Lists;
-import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
