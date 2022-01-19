@@ -2,9 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.createcase;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,22 +24,33 @@ import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Version;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
+import uk.gov.hmcts.ccd.domain.model.std.SupplementaryDataUpdateRequest;
+import uk.gov.hmcts.ccd.domain.model.std.validator.SupplementaryDataUpdateRequestValidator;
 import uk.gov.hmcts.ccd.domain.service.callbacks.EventTokenService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CasePostStateService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.EventTriggerService;
+import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
+import uk.gov.hmcts.ccd.domain.service.supplementarydata.SupplementaryDataUpdateOperation;
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
 import uk.gov.hmcts.ccd.domain.service.validate.ValidateCaseFieldsOperation;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.any;
@@ -55,6 +63,7 @@ import static org.mockito.Mockito.same;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
@@ -93,9 +102,17 @@ class DefaultCreateCaseOperationTest {
     private DraftGateway draftGateway;
     @Mock
     private CaseDataIssueLogger caseDataIssueLogger;
+    @Mock
+    private GlobalSearchProcessorService globalSearchProcessorService;
 
     @Mock
     private CasePostStateService casePostStateService;
+
+    @Mock
+    private SupplementaryDataUpdateOperation supplementaryDataUpdateOperation;
+
+    @Mock
+    private SupplementaryDataUpdateRequestValidator validator;
 
     private DefaultCreateCaseOperation defaultCreateCaseOperation;
 
@@ -130,12 +147,19 @@ class DefaultCreateCaseOperationTest {
                                                                     validateCaseFieldsOperation,
                                                                     casePostStateService,
                                                                     draftGateway,
-                                                                    caseDataIssueLogger);
+                                                                    caseDataIssueLogger,
+                                                                    globalSearchProcessorService,
+                                                                    supplementaryDataUpdateOperation,
+                                                                    validator);
         data = buildJsonNodeData();
         given(userRepository.getUser()).willReturn(IDAM_USER);
         given(userRepository.getUserId()).willReturn(UID);
         eventTrigger = newCaseEvent().withId("eventId").withName("event Name").build();
         eventData = newCaseDataContent().withEvent(event).withToken(TOKEN).withData(data).withDraftId(DRAFT_ID).build();
+
+        SupplementaryData supplementaryData = new SupplementaryData();
+        when(supplementaryDataUpdateOperation.updateSupplementaryData(anyString(), anyObject()))
+            .thenReturn(supplementaryData);
     }
 
     @Test
@@ -255,6 +279,67 @@ class DefaultCreateCaseOperationTest {
     }
 
     @Test
+    @DisplayName("Should call update supplementary data")
+    void shouldCallSaveSupplementaryDataWhenValidDataPassed() {
+        final String caseEventStateId = "Some state";
+        eventData = newCaseDataContent().withEvent(event).withToken(TOKEN).withData(data).withDraftId(null).build();
+        eventData.setSupplementaryDataRequest(createSupplementaryDataRequest());
+        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
+        given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.TRUE);
+        given(eventTriggerService.findCaseEvent(CASE_TYPE, "eid")).willReturn(eventTrigger);
+        given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
+        given(savedCaseType.getState()).willReturn(caseEventStateId);
+        given(savedCaseType.getReferenceAsString()).willReturn("1234567");
+        given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
+        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData)).willReturn(data);
+        given(submitCaseTransaction.submitCase(same(event),
+            same(CASE_TYPE),
+            same(IDAM_USER),
+            same(eventTrigger),
+            any(CaseDetails.class),
+            same(IGNORE_WARNING)))
+            .willReturn(savedCaseType);
+
+        defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
+            eventData,
+            IGNORE_WARNING);
+
+        verify(draftGateway, never()).delete(DRAFT_ID);
+        verify(supplementaryDataUpdateOperation)
+            .updateSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class));
+    }
+
+    @Test
+    @DisplayName("Should not call update supplementary data")
+    void shouldNotCallSaveSupplementaryDataWhenValidDataPassed() {
+        final String caseEventStateId = "Some state";
+        eventData = newCaseDataContent().withEvent(event).withToken(TOKEN).withData(data).withDraftId(null).build();
+        eventData.setSupplementaryDataRequest(null);
+        given(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).willReturn(CASE_TYPE);
+        given(caseTypeService.isJurisdictionValid(JURISDICTION_ID, CASE_TYPE)).willReturn(Boolean.TRUE);
+        given(eventTriggerService.findCaseEvent(CASE_TYPE, "eid")).willReturn(eventTrigger);
+        given(eventTriggerService.isPreStateValid(null, eventTrigger)).willReturn(Boolean.TRUE);
+        given(savedCaseType.getState()).willReturn(caseEventStateId);
+        given(caseTypeService.findState(CASE_TYPE, caseEventStateId)).willReturn(caseEventState);
+        given(validateCaseFieldsOperation.validateCaseDetails(CASE_TYPE_ID, eventData)).willReturn(data);
+        given(submitCaseTransaction.submitCase(same(event),
+            same(CASE_TYPE),
+            same(IDAM_USER),
+            same(eventTrigger),
+            any(CaseDetails.class),
+            same(IGNORE_WARNING)))
+            .willReturn(savedCaseType);
+
+        defaultCreateCaseOperation.createCaseDetails(CASE_TYPE_ID,
+            eventData,
+            IGNORE_WARNING);
+
+        verify(draftGateway, never()).delete(DRAFT_ID);
+        verify(supplementaryDataUpdateOperation, never())
+            .updateSupplementaryData(anyString(), any(SupplementaryDataUpdateRequest.class));
+    }
+
+    @Test
     @DisplayName("Should set incomplete_delete_draft when exception thrown during draft delete")
     void shouldSetIncompleteDeleteDraftWhenDeleteDraftThrowsException() {
         final String caseEventStateId = "Some state";
@@ -308,6 +393,7 @@ class DefaultCreateCaseOperationTest {
 
         final InOrder order = inOrder(eventTokenService,
                                       caseTypeService,
+                                      globalSearchProcessorService,
                                       validateCaseFieldsOperation,
                                       submitCaseTransaction,
                                       draftGateway);
@@ -319,6 +405,7 @@ class DefaultCreateCaseOperationTest {
             () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger,
                 CASE_TYPE.getJurisdictionDefinition(), CASE_TYPE),
             () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+            () -> order.verify(globalSearchProcessorService).populateGlobalSearchData(CASE_TYPE, eventData.getData()),
             () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                  same(CASE_TYPE),
                                                                  same(IDAM_USER),
@@ -365,6 +452,7 @@ class DefaultCreateCaseOperationTest {
         final InOrder order = inOrder(
             eventTokenService,
             caseTypeService,
+            globalSearchProcessorService,
             validateCaseFieldsOperation,
             submitCaseTransaction,
             callbackInvoker,
@@ -375,6 +463,7 @@ class DefaultCreateCaseOperationTest {
             () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger,
                 CASE_TYPE.getJurisdictionDefinition(), CASE_TYPE),
             () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+            () -> order.verify(globalSearchProcessorService).populateGlobalSearchData(CASE_TYPE, eventData.getData()),
             () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                  same(CASE_TYPE),
                                                                  same(IDAM_USER),
@@ -425,6 +514,7 @@ class DefaultCreateCaseOperationTest {
         final InOrder order = inOrder(eventTokenService,
                                       caseTypeService,
                                       validateCaseFieldsOperation,
+                                      globalSearchProcessorService,
                                       submitCaseTransaction,
                                       callbackInvoker,
                                       savedCaseType,
@@ -435,6 +525,7 @@ class DefaultCreateCaseOperationTest {
             () -> order.verify(eventTokenService).validateToken(TOKEN, UID, eventTrigger,
                 CASE_TYPE.getJurisdictionDefinition(), CASE_TYPE),
             () -> order.verify(validateCaseFieldsOperation).validateCaseDetails(CASE_TYPE_ID, eventData),
+            () -> order.verify(globalSearchProcessorService).populateGlobalSearchData(CASE_TYPE, eventData.getData()),
             () -> order.verify(submitCaseTransaction).submitCase(same(event),
                                                                  same(CASE_TYPE),
                                                                  same(IDAM_USER),
@@ -500,6 +591,16 @@ class DefaultCreateCaseOperationTest {
         final JurisdictionDefinition j = new JurisdictionDefinition();
         j.setId(JURISDICTION_ID);
         return j;
+    }
+
+    private Map<String, Map<String, Object>> createSupplementaryDataRequest() {
+        Map<String, Map<String, Object>> requestData = new HashMap<>();
+        Map<String, Object> setOperationData = new HashMap<>();
+        requestData.put("$set", setOperationData);
+        setOperationData.put("orgs_assigned_users.organisationC", 32);
+        setOperationData.put("orgs_assigned_users.organisationA", 54);
+
+        return requestData;
     }
 
 }

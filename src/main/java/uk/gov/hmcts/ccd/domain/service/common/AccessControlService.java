@@ -61,6 +61,15 @@ public interface AccessControlService {
     String VALUE = "value";
     String ALL_EVENTS = "*";
 
+    static boolean hasAccess(Set<String> userRoles,
+                             Predicate<AccessControlList> criteria,
+                             List<AccessControlList> accessControlLists) {
+        return accessControlLists != null && accessControlLists
+            .stream()
+            .filter(acls -> userRoles.contains(acls.getAccessProfile()))
+            .anyMatch(criteria);
+    }
+
     boolean canAccessCaseTypeWithCriteria(CaseTypeDefinition caseType,
                                           Set<AccessProfile> accessProfiles,
                                           Predicate<AccessControlList> criteria);

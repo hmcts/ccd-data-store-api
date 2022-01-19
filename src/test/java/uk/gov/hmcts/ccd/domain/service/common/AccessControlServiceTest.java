@@ -2026,7 +2026,7 @@ public class AccessControlServiceTest {
 
             JsonNode dataNode = generatePeopleData();
 
-            ((ObjectNode) dataNode.get("People").get(0).get(VALUE)).replace("BirthInfo", MissingNode.getInstance());
+            ((  ObjectNode) dataNode.get("People").get(0).get(VALUE)).replace("BirthInfo", MissingNode.getInstance());
 
             JsonNode jsonNode = accessControlService.filterCaseFieldsByAccess(
                 dataNode,

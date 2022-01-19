@@ -28,6 +28,7 @@ import uk.gov.hmcts.ccd.domain.service.callbacks.CallbackService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseDataService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityValidationService;
+import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CaseSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ApiException;
 
@@ -91,6 +92,9 @@ class CallbackInvokerTest {
     @Mock
     private SecurityValidationService securityValidationService;
 
+    @Mock
+    private GlobalSearchProcessorService globalSearchProcessorService;
+
     @InjectMocks
     private CallbackInvoker callbackInvoker;
 
@@ -125,6 +129,7 @@ class CallbackInvokerTest {
 
         inOrder = inOrder(callbackService,
             caseTypeService,
+            globalSearchProcessorService,
             caseDataService,
             securityValidationService,
             caseSanitiser);
@@ -516,6 +521,9 @@ class CallbackInvokerTest {
                 assertAll(
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
                     () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
+                    () -> inOrder.verify(globalSearchProcessorService, never())
+                        .populateGlobalSearchData(caseTypeDefinition,
+                        callbackResponse.getData()),
                     () -> inOrder.verify(caseSanitiser).sanitise(caseTypeDefinition, callbackResponse.getData()),
                     () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseTypeDefinition,
                         caseDetails.getData(),
@@ -688,13 +696,18 @@ class CallbackInvokerTest {
                 data.put("state", null);
                 callbackResponse.setState(null);
                 caseDetails.setState("caseDetailsState");
+                when(globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition,
+                    data)).thenReturn(callbackResponse.getData());
                 callbackInvoker.invokeAboutToSubmitCallback(caseEventDefinition, caseDetailsBefore, caseDetails,
                     caseTypeDefinition, TRUE);
+
 
                 assertAll(
                     () -> assertThat(caseDetails.getState(), is("caseDetailsState")),
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, TRUE),
                     () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
+                    () -> inOrder.verify(globalSearchProcessorService).populateGlobalSearchData(caseTypeDefinition,
+                        callbackResponse.getData()),
                     () -> inOrder.verify(caseSanitiser).sanitise(caseTypeDefinition, callbackResponse.getData()),
                     () -> inOrder.verify(caseDataService, times(1))
                         .getDefaultSecurityClassifications(eq(caseTypeDefinition),
@@ -823,6 +836,9 @@ class CallbackInvokerTest {
                 assertAll(
                     () -> inOrder.verify(callbackService).validateCallbackErrorsAndWarnings(callbackResponse, FALSE),
                     () -> inOrder.verify(caseTypeService).validateData(callbackResponse.getData(), caseTypeDefinition),
+                    () -> inOrder.verify(globalSearchProcessorService, never())
+                        .populateGlobalSearchData(caseTypeDefinition,
+                        callbackResponse.getData()),
                     () -> inOrder.verify(caseSanitiser).sanitise(caseTypeDefinition, callbackResponse.getData()),
                     () -> inOrder.verify(caseDataService).getDefaultSecurityClassifications(caseTypeDefinition,
                         caseDetails.getData(),
