@@ -1,22 +1,25 @@
 {
-  "_guid_": "S-068.1",
-  "operationName": "Save draft as a caseworker",
+  "_guid_": "S-068.2",
+  "operationName": "Update draft as a caseworker",
   "_extends_": "F-068_Test_Data_Base",
   "specs": [
     "an active profile in CCD",
-    "Save draft as a caseworker",
-    "contains HTTP 201 Created"
+    "Update draft as a caseworker",
+    "contains HTTP 200"
   ],
-  "method": "POST",
-  "uri": "/internal/case-types/{ctid}/drafts",
+  "method": "PUT",
+  "uri": "/internal/case-types/{ctid}/drafts/{did}",
   "request": {
     "headers": {
       "_extends_": "Common_Request_Headers"
     },
+    "pathVariables": {
+      "did": "${[scenarioContext][childContexts][S-068.1][testData][actualResponse][body][id]}"
+    },
     "body": {
       "data": {
-        "TextField": "field1",
-        "TextField2": "field2"
+        "TextField": "updated field1",
+        "TextField2": "updated field2"
       },
       "event": {
         "id": "createCase",
@@ -27,7 +30,7 @@
     }
   },
   "expectedResponse": {
-    "_extends_": "Common_201_Response",
+    "_extends_": "Common_200_Response",
     "body": {
       "id": "[[ANYTHING_PRESENT]]",
       "document": null,

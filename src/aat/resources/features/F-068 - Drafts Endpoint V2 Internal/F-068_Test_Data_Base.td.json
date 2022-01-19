@@ -2,10 +2,6 @@
 	"_guid_": "F-068_Test_Data_Base",
 
 	"productName": "CCD Data Store",
-	"operationName": "Save draft as a caseworker",
-
-	"method": "POST",
-	"uri": "/internal/case-types/{ctid}/drafts",
 
 	"users": {
 		"invokingUser": {
