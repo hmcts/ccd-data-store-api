@@ -1,0 +1,15 @@
+{
+  "_guid_" : "F-068_Create_Draft",
+  "_extends_" : "S-068.1",
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-068_Get_Event_Token"
+  }
+  ],
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  }
+}

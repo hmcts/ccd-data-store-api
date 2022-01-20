@@ -14,7 +14,7 @@
       "_extends_": "Common_Request_Headers"
     },
     "pathVariables": {
-      "did": "${[scenarioContext][childContexts][S-068.1][testData][actualResponse][body][id]}"
+      "did": "${[scenarioContext][childContexts][F-068_Create_Draft][testData][actualResponse][body][id]}"
     }
   },
   "expectedResponse": {

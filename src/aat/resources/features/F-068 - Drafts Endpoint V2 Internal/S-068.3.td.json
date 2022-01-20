@@ -14,7 +14,7 @@
       "_extends_": "Common_Request_Headers"
     },
     "pathVariables": {
-      "did": "${[scenarioContext][childContexts][S-068.1][testData][actualResponse][body][id]}"
+      "did": "${[scenarioContext][childContexts][F-068_Create_Draft][testData][actualResponse][body][id]}"
     }
   },
   "expectedResponse": {
@@ -25,7 +25,7 @@
           "href" : "[[ANYTHING_PRESENT]]"
         }
       },
-      "case_id" : "DRAFT${[scenarioContext][childContexts][S-068.1][testData][actualResponse][body][id]}",
+      "case_id" : "DRAFT${[scenarioContext][childContexts][F-068_Create_Draft][testData][actualResponse][body][id]}",
       "case_type" : {
         "id" : "FT_CRUD",
         "name" : "FT- CRUD",

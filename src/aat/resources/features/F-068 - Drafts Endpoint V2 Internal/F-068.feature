@@ -11,7 +11,7 @@ Feature: F-068: Validate calls for the Drafts Endpoint
   Scenario: Save draft as a caseworker
 
     Given a user with [an active profile in CCD],
-    And a successful call [to create a token for case creation] as in [S-068.1_Get_Event_Trigger],
+    And a successful call [to create a token for case creation] as in [F-068_Get_Event_Token],
 
     When a request is prepared with appropriate values,
     And it is submitted to call the [Save draft as a caseworker] operation of [CCD Data Store],
@@ -25,8 +25,7 @@ Feature: F-068: Validate calls for the Drafts Endpoint
   Scenario: Update draft as a caseworker
 
     Given a user with [an active profile in CCD],
-    And a successful call [to create a token for case creation] as in [S-068.1_Get_Event_Trigger],
-    And a successful call [Save draft as a caseworker] as in [S-068.1],
+    And a successful call [Save draft as a caseworker] as in [F-068_Create_Draft],
 
     When a request is prepared with appropriate values,
     And it is submitted to call the [Update draft as a caseworker] operation of [CCD Data Store],
@@ -40,8 +39,7 @@ Feature: F-068: Validate calls for the Drafts Endpoint
   Scenario: Fetch a draft for display
 
     Given a user with [an active profile in CCD],
-    And a successful call [to create a token for case creation] as in [S-068.1_Get_Event_Trigger],
-    And a successful call [Save draft as a caseworker] as in [S-068.1],
+    And a successful call [Save draft as a caseworker] as in [F-068_Create_Draft],
 
     When a request is prepared with appropriate values,
     And it is submitted to call the [Fetch a draft for display] operation of [CCD Data Store],
@@ -55,8 +53,7 @@ Feature: F-068: Validate calls for the Drafts Endpoint
   Scenario: Delete a given draft
 
     Given a user with [an active profile in CCD],
-    And a successful call [to create a token for case creation] as in [S-068.1_Get_Event_Trigger],
-    And a successful call [Save draft as a caseworker] as in [S-068.1],
+    And a successful call [Save draft as a caseworker] as in [F-068_Create_Draft],
 
     When a request is prepared with appropriate values,
     And it is submitted to call the [Delete a given draft] operation of [CCD Data Store],

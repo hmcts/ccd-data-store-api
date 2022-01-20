@@ -27,7 +27,7 @@
         "summary": "",
         "description": ""
       },
-      "event_token": "${[scenarioContext][childContexts][S-068.1_Get_Event_Trigger][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][childContexts][F-068_Get_Event_Token][testData][actualResponse][body][token]}"
     }
   },
   "expectedResponse": {

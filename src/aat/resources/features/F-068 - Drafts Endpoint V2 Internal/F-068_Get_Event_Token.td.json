@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-068_Get_Event_Token_Base",
+  "_guid_": "F-068_Get_Event_Token",
 
   "productName": "CCD Data Store",
   "operationName": "Start event creation as Case worker",
@@ -8,7 +8,8 @@
   "uri": "/case-types/FT_CRUD/event-triggers/{etid}",
 
   "specs": [
-    "to create a token for case creation"
+    "to create a token for case creation",
+    "As a prerequisite"
   ],
 
   "users": {
