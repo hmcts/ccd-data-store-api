@@ -40,6 +40,7 @@ class SecurityUtilsTest {
     private static final String SERVICE_JWT = "7gf364fg367f67";
     private static final String USER_ID = "123";
     private static final String USER_JWT = "Bearer 8gf364fg367f67";
+    private static final String SYSTEM_USER_TOKEN = "eyAidGVzdCI6InRlc3QiIH0";
 
     @Mock
     private Authentication authentication;
@@ -99,11 +100,28 @@ class SecurityUtilsTest {
     }
 
     @Test
+    @DisplayName("authorizationHeadersForDataStoreSystemUser")
+    void authorizationHeadersForDataStoreSystemUser() {
+
+        // GIVEN
+        doReturn(SYSTEM_USER_TOKEN).when(idamRepository).getDataStoreSystemUserAccessToken();
+
+        // WHEN
+        final HttpHeaders headers = securityUtils.authorizationHeadersForDataStoreSystemUser();
+
+        // THEN
+        assertAll(
+            () -> assertHeader(headers, SecurityUtils.SERVICE_AUTHORIZATION, SERVICE_JWT),
+            () -> assertHeader(headers, HttpHeaders.AUTHORIZATION, "Bearer " + SYSTEM_USER_TOKEN)
+        );
+    }
+
+    @Test
     @DisplayName("Get user token")
     void shouldReturnUserToken() {
         assertThat(securityUtils.getUserToken(), is(USER_JWT));
     }
-    
+
     @Test
     @DisplayName("Get service name")
     void shouldGetServiceName() {

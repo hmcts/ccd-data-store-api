@@ -15,6 +15,21 @@
         "filter":[
           "hyphen_remove"
         ]
+      },
+      "alphanumeric_string_analyzer": {
+        "tokenizer": "standard",
+        "filter": "lowercase",
+        "type": "custom",
+        "char_filter": [
+          "alphanumeric_char_filter"
+        ]
+      }
+    },
+    "char_filter": {
+      "alphanumeric_char_filter": {
+        "type": "pattern_replace",
+        "pattern": "[^A-Za-z0-9]",
+        "replacement": ""
       }
     },
     "filter":{

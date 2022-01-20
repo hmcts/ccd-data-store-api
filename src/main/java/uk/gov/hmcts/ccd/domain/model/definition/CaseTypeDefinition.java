@@ -43,6 +43,8 @@ public class CaseTypeDefinition implements Serializable {
     @JsonProperty("retries_get_case_url")
     private List<Integer> retriesGetCaseUrl;
     private final List<SearchAliasField> searchAliasFields = new ArrayList<>();
+    private final List<SearchParty> searchParties = new ArrayList<>();
+    private final List<SearchCriteria> searchCriterias = new ArrayList<>();
     @JsonProperty("roleToAccessProfiles")
     private List<RoleToAccessProfileDefinition> roleToAccessProfiles = new ArrayList<>();
 
@@ -222,5 +224,25 @@ public class CaseTypeDefinition implements Serializable {
 
     public void setRoleToAccessProfiles(List<RoleToAccessProfileDefinition> roleToAccessProfiles) {
         this.roleToAccessProfiles = roleToAccessProfiles;
+    }
+
+    public List<SearchParty> getSearchParties() {
+        return searchParties;
+    }
+
+    public void setSearchParties(List<SearchParty> searchParties) {
+        if (searchParties != null) {
+            this.searchParties.addAll(searchParties);
+        }
+    }
+
+    public List<SearchCriteria> getSearchCriterias() {
+        return searchCriterias;
+    }
+
+    public void setSearchCriterias(List<SearchCriteria> searchCriterias) {
+        if (searchCriterias != null) {
+            this.searchCriterias.addAll(searchCriterias);
+        }
     }
 }
