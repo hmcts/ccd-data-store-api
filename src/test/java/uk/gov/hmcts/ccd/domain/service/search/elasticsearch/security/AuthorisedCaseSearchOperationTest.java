@@ -41,12 +41,6 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchR
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchIndex;
 import uk.gov.hmcts.ccd.domain.service.security.AuthorisedCaseDefinitionDataService;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -88,7 +82,7 @@ class AuthorisedCaseSearchOperationTest {
 
     private final ObjectNode searchRequestJsonNode = JsonNodeFactory.instance.objectNode();
 
-    private final ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(searchRequestJsonNode);
+    private ElasticsearchRequest elasticsearchRequest = new ElasticsearchRequest(searchRequestJsonNode);
 
     @InjectMocks
     private AuthorisedCaseSearchOperation authorisedCaseDetailsSearchOperation;
@@ -321,8 +315,6 @@ class AuthorisedCaseSearchOperationTest {
                 () -> assertThat(result, is(searchResult)),
                 () -> assertThat(caseDetails.getData(), Matchers.is(transformedData)),
                 () -> assertThat(result.getTotal(), is(1L)),
-                () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_1, CAN_READ),
-                () -> verify(authorisedCaseDefinitionDataService).getAuthorisedCaseType(CASE_TYPE_ID_2, CAN_READ),
                 () -> verify(caseSearchOperation).execute(any(CrossCaseTypeSearchRequest.class), anyBoolean()),
                 () -> verify(caseDataAccessControl).generateAccessProfilesByCaseDetails(any(CaseDetails.class)),
                 () -> verify(caseDataAccessControl).generateAccessProfilesByCaseDetails(any(CaseDetails.class))
