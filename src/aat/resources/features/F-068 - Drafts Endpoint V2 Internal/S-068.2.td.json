@@ -15,7 +15,7 @@
     },
     "pathVariables": {
       "ctid": "FT_CRUD",
-      "did": "${[scenarioContext][childContexts][S-068.1][testData][actualResponse][body][id]}"
+      "did": "${[scenarioContext][childContexts][F-068_Create_Draft][testData][actualResponse][body][id]}"
     },
     "body": {
       "data": {
