@@ -152,7 +152,7 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
         mockMvc.perform(post(GLOBAL_SEARCH_PATH)
             .contentType(JSON_CONTENT_TYPE)
             .content(mapper.writeValueAsBytes(payload)))
-            .andExpect(status().is(200))
+                    .andExpect(status().is(200))
             .andReturn();
     }
 
