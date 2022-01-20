@@ -22,10 +22,10 @@
     "body" : {
       "_links" : {
         "self" : {
-          "href" : "https://ccd-data-store-api-pr-1670.service.core-compute-preview.internal/internal/cases/DRAFT1289748"
+          "href" : "[[ANYTHING_PRESENT]]"
         }
       },
-      "case_id" : "${[scenarioContext][childContexts][S-068.1][testData][actualResponse][body][id]}",
+      "case_id" : "DRAFT${[scenarioContext][childContexts][S-068.1][testData][actualResponse][body][id]}",
       "case_type" : {
         "id" : "FT_CRUD",
         "name" : "FT- CRUD",
