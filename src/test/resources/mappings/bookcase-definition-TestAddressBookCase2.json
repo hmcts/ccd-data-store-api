@@ -143,9 +143,9 @@
       "acls": [
         {
           "role": "caseworker-probate-public",
-          "create": false,
-          "read": false,
-          "update": false,
+          "create": true,
+          "read": true,
+          "update": true,
           "delete": false
         }
       ]
