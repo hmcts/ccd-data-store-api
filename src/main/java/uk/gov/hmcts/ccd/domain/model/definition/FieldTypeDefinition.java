@@ -42,6 +42,7 @@ public class FieldTypeDefinition implements Serializable {
     public static final String DATE = "Date";
     public static final String DOCUMENT = "Document";
     public static final String TEXT = "Text";
+    public static final String WAYS_TO_PAY = "WaysToPay";
 
     private String id = null;
     private String type = null;
