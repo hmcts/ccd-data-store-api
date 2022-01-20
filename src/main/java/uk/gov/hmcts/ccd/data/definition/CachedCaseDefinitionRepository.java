@@ -12,14 +12,12 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import static com.google.common.collect.Maps.newHashMap;
-import static java.lang.String.format;
+
 
 @Service
 @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
