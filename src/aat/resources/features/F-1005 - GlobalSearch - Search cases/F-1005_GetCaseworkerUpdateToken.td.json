@@ -1,0 +1,11 @@
+{
+  "_guid_": "F-1005_GetCaseworkerUpdateToken",
+  "_extends_": "F-1004_GetCaseworkerUpdateToken",
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    }
+  }
+}
+

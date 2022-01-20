@@ -1,0 +1,72 @@
+{
+  "title": "Successfully searches across different Case Types",
+  "_guid_": "S-1005.9",
+  "_extends_": "F-1005_SearchCaseBase",
+  "specs": [
+    "an active profile in CCD",
+    "contains two different Case Types",
+    "contains all the mandatory parameters",
+    "has 200 return code",
+    "contains both cases"
+  ],
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "CCDCaseTypeIds": [
+          "FT_GlobalSearch",
+          "FT_MasterCaseType"
+        ],
+        "caseReferences": [
+          "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+          "${[scenarioContext][childContexts][F-1005_CreateCaseMasterCaseType][testData][actualResponse][body][id]}"
+        ]
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "resultInfo": {
+        "casesReturned": 2,
+        "caseStartRecord": 1,
+        "moreResultsToGo": false
+      },
+      "results": [
+        {
+          "stateId": "CaseCreated",
+          "processForAccess" : "NONE",
+          "caseReference": "${}${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+          "otherReferences": [
+            "FirstNameValue"
+          ],
+          "caseNameHmctsInternal": "Name Internal",
+          "baseLocationId": "123",
+          "baseLocationName": "[[ANY_NULLABLE]]",
+          "caseManagementCategoryId": "987",
+          "caseManagementCategoryName": "Category label",
+          "regionId": "1",
+          "regionName": "[[ANY_NULLABLE]]",
+          "CCDJurisdictionId": "BEFTA_MASTER",
+          "CCDJurisdictionName": "BEFTA Master",
+          "CCDCaseTypeId": "FT_GlobalSearch",
+          "CCDCaseTypeName": "FT_GlobalSearch"
+        },
+        {
+          "stateId": "CaseCreated",
+          "processForAccess" : "NONE",
+          "caseReference": "${}${[scenarioContext][childContexts][F-1005_CreateCaseMasterCaseType][testData][actualResponse][body][id]}",
+          "otherReferences" : [ ],
+          "baseLocationId" : "123",
+          "baseLocationName" : "[[ANY_NULLABLE]]",
+          "regionId" : "1",
+          "regionName" : "[[ANY_NULLABLE]]",
+          "CCDJurisdictionId" : "BEFTA_MASTER",
+          "CCDJurisdictionName" : "BEFTA Master",
+          "CCDCaseTypeId" : "FT_MasterCaseType",
+          "CCDCaseTypeName" : "FT-All Field Data Types"
+        }
+      ]
+    }
+  }
+}
+
