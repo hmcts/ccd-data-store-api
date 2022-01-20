@@ -50,7 +50,6 @@ class RoleBasedCaseDataAccessControlTest {
     @InjectMocks
     private RoleBasedCaseDataAccessControl instance;
 
-
     @BeforeEach
     void setup() {
         MockitoAnnotations.initMocks(this);
