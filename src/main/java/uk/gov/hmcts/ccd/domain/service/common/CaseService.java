@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,6 +27,7 @@ import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 
 // TODO CaseService and CaseDataService could probably be merged together.
+@Slf4j
 @Service
 @SuppressWarnings("checkstyle:SummaryJavadoc")
 // partal javadoc attributes added prior to checkstyle implementation in module
@@ -33,6 +36,7 @@ public class CaseService {
     private final CaseDataService caseDataService;
     private final CaseDetailsRepository caseDetailsRepository;
     private final UIDService uidService;
+    private static ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     public CaseService(CaseDataService caseDataService,
@@ -120,6 +124,16 @@ public class CaseService {
 
         caseEventDefinition.forEach(
             caseField -> {
+
+                String defaultValue = caseField.getDefaultValue();
+                if (defaultValue != null) {
+                    try {
+                        data.put(caseField.getCaseFieldId(), mapper.readTree("\"" + defaultValue + "\""));
+                    } catch (Exception exception) {
+                        log.error("Unable to parse default value " + defaultValue + " for case field "
+                            + caseField.getCaseFieldId());
+                    }
+                }
 
                 List<JsonNode> collect = caseField.getCaseEventFieldComplexDefinitions().stream()
                     .filter(e -> e.getDefaultValue() != null)

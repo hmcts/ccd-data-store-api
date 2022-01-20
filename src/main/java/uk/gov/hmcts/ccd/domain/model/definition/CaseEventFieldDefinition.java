@@ -27,6 +27,7 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
     private Boolean publish;
     private String publishAs;
     private List<CaseEventFieldComplexDefinition> caseEventFieldComplexDefinitions = new ArrayList<>();
+    private String defaultValue = null;
 
     @ApiModelProperty(required = true, value = "Foreign key to CaseField.id")
     @JsonProperty("case_field_id")
@@ -161,4 +162,13 @@ public class CaseEventFieldDefinition implements Serializable, CommonDCPModel {
         this.publishAs = publishAs;
     }
 
+    @ApiModelProperty(value = "")
+    @JsonProperty("default_value")
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
 }

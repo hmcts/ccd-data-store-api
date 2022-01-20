@@ -100,6 +100,9 @@ public class DefaultStartEventOperationTest {
                                                                  + "  \"OrgPolicyCaseAssignedRole\": \"[Claimant]\""
                                                                  + "}");
             data.put("OrganisationPolicyField", orgPolicyDefaultValue);
+
+            JsonNode textFieldDefaultValue = MAPPER.readTree("{ \"TextField0\": \"Default text\" }");
+            data.put("TextField0", textFieldDefaultValue);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -128,6 +131,9 @@ public class DefaultStartEventOperationTest {
                                                      + "}");
             data.put("OrganisationPolicyField", orgPolicy);
 
+            JsonNode textFieldDefaultValue = MAPPER.readTree("{ \"TextField0\": null }");
+            data.put("TextField0", textFieldDefaultValue);
+
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -155,6 +161,9 @@ public class DefaultStartEventOperationTest {
                                                      + "  \"OrgPolicyCaseAssignedRole\": \"[Claimant]\""
                                                      + "}");
             data.put("OrganisationPolicyField", orgPolicy);
+
+            JsonNode textFieldDefaultValue = MAPPER.readTree("{ \"TextField0\": \"Default text\" }");
+            data.put("TextField0", textFieldDefaultValue);
 
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -227,6 +236,10 @@ public class DefaultStartEventOperationTest {
                                                                    .reference("OrgPolicyCaseAssignedRole")
                                                                    .defaultValue("[Claimant]")
                                                                    .build())
+                          .build(),
+                      newCaseEventField()
+                          .withCaseFieldId("TextField0")
+                          .withDefaultValue("Default text")
                           .build()
         )
     ).build();
