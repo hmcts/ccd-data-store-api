@@ -158,6 +158,22 @@ class DynamicListValidatorTest {
             + "          ]\n"
             + "        }");
 
+        final List<ValidationResult> result01 = validator.validate(TEST_FIELD_ID,
+            dataValue,
+            caseFieldDefinition);
+        assertEquals(0, result01.size(), result01.toString());
+    }
+
+    @Test
+    public void emptyListItems() throws Exception {
+        JsonNode dataValue = new ObjectMapper().readTree("{\n" + "          \"default\": {\n"
+            + "            \"code\": \"FixedList1\",\n"
+            + "            \"label\": \"Fixed List 1\"\n"
+            + "          },\n"
+            + "          \"list_items\": [{\n"
+            + "          }\n"
+            + "          ]\n"
+            + "        }");
 
         final List<ValidationResult> result01 = validator.validate(TEST_FIELD_ID,
             dataValue,

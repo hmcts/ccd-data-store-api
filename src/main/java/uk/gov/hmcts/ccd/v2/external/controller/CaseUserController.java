@@ -92,7 +92,7 @@ public class CaseUserController {
             throw new BadRequestException(V2.Error.CASE_ID_INVALID);
         }
 
-        if (null == caseUser) {
+        if (null == caseUser || null == caseUser.getCaseRoles() || caseUser.getCaseRoles().isEmpty()) {
             throw new BadRequestException(V2.Error.CASE_ROLE_REQUIRED);
         }
 
