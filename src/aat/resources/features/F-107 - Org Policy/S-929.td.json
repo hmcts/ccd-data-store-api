@@ -52,7 +52,8 @@
             "OrganisationID": "[[ANYTHING_PRESENT]]",
             "OrganisationName": "[[ANYTHING_PRESENT]]"
           }
-        }
+        },
+        "SearchCriteria" : { }
       },
       "data_classification": {
         "AddressField": {
@@ -93,6 +94,10 @@
               }
             }
           }
+        },
+        "SearchCriteria" : {
+          "classification" : "PUBLIC",
+          "value" : { }
         }
       },
       "supplementary_data": null,
