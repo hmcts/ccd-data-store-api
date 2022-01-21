@@ -57,7 +57,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     @Override
     public CaseTypeDefinition getCaseType(final String caseTypeId) {
         CaseTypeDefinitionVersion latestVersion = this.getLatestVersion(caseTypeId);
-        return caseDefinitionRepository.getCaseType(latestVersion.getVersion(), caseTypeId);
+        return this.getCaseType(latestVersion.getVersion(), caseTypeId);
     }
 
     @Override
