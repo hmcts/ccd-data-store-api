@@ -39,6 +39,13 @@ class ApplicationParamsTest {
         assertEquals(1, value.get(0));
     }
 
+    @Test
+    public void shouldPrepareGetElasticSearchHosts() {
+        ReflectionTestUtils.setField(applicationParams, "elasticSearchHosts",  Arrays.asList("hhh"));
+
+        List<String> value = applicationParams.getElasticSearchHosts();
+        assertEquals("hhh", value.get(0));
+    }
 
     @Test
     public void shouldPrepareRoleAssignments() {
