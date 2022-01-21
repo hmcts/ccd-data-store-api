@@ -472,7 +472,7 @@ class DefaultCaseDataAccessControlTest {
             roleToAccessProfileDefinitions.add(
                 new RoleToAccessProfileDefinition(
                     CASE_TYPE_1, false, false, AUTHORISATION_1,
-                    roleName, null, null, roleName
+                    roleName, null, null, roleName, null
                 ));
         });
 

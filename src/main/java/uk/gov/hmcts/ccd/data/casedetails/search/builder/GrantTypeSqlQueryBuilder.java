@@ -1,5 +1,10 @@
 package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
@@ -7,12 +12,6 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchRoleAssignment;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
 
@@ -45,6 +44,8 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
     public static final String CLASSIFICATIONS_PARAM = "classifications_%s_%s";
 
     public static final String REFERENCES_PARAM = "references_%s_%s";
+
+    public static final String CASE_ACCESS_CATEGORY = "CaseAccessCategory";
 
     protected GrantTypeSqlQueryBuilder(AccessControlService accessControlService,
                                        CaseDataAccessControl caseDataAccessControl) {
@@ -79,6 +80,7 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
                     groupedSearchRoleAssignments, count);
                 innerQuery = addInQueryForState(params, paramName, readableCaseStates, caseStates, innerQuery, count);
                 innerQuery = addInQueryForClassification(params, paramName, innerQuery, representative, count);
+                innerQuery = addInQueryForCaseAccessCategory(caseType, innerQuery);
 
                 return StringUtils.isNotBlank(innerQuery) ? String.format(QUERY_WRAPPER, innerQuery) : innerQuery;
             }).filter(strQuery -> !StringUtils.isEmpty(strQuery)).collect(Collectors.joining(OR));
@@ -145,5 +147,20 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
             return operator;
         }
         return EMPTY;
+    }
+
+    private String addInQueryForCaseAccessCategory(CaseTypeDefinition caseType, String parentQuery) {
+        String caseAccessCategoriesQuery = getCaseAccessCategoriesQuery(caseType);
+        if (StringUtils.isNotBlank(caseAccessCategoriesQuery)) {
+            parentQuery = parentQuery + getOperator(parentQuery, AND) + caseAccessCategoriesQuery;
+        }
+        return parentQuery;
+    }
+
+    private String getCaseAccessCategoriesQuery(CaseTypeDefinition caseType) {
+        return caseType.getRoleToAccessProfiles().stream()
+            .filter(rap -> rap.getCaseAccessCategories() != null)
+            .map(cac -> CASE_ACCESS_CATEGORY + " LIKE " + cac + "%")
+            .collect(Collectors.joining(" OR "));
     }
 }
