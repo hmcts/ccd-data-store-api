@@ -127,12 +127,7 @@ public class CaseService {
 
                 String defaultValue = caseField.getDefaultValue();
                 if (defaultValue != null) {
-                    try {
-                        data.put(caseField.getCaseFieldId(), mapper.readTree("\"" + defaultValue + "\""));
-                    } catch (Exception exception) {
-                        log.error("Unable to parse default value " + defaultValue + " for case field "
-                            + caseField.getCaseFieldId());
-                    }
+                    data.put(caseField.getCaseFieldId(), MAPPER.getNodeFactory().textNode(defaultValue));
                 }
 
                 List<JsonNode> collect = caseField.getCaseEventFieldComplexDefinitions().stream()
