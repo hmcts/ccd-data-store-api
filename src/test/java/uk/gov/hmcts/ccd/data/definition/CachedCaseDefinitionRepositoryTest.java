@@ -169,7 +169,7 @@ class CachedCaseDefinitionRepositoryTest {
         void shouldRetrieveLatestVersionCaseTypeByCaseTypeIdWithoutAndWithRequestScopeCacheForAnEnabledCaseType() {
             CaseTypeDefinition expected = new CaseTypeDefinition();
             expected.setId("GrantOfRepresentation");
-            testCachingOfCaseType(expected, 1, 1);
+            testCachingOfCaseType(expected, 1, 0);
         }
 
         @Test
