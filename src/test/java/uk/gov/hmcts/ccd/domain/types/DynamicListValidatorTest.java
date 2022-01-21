@@ -170,7 +170,7 @@ class DynamicListValidatorTest {
             + "            \"code\": \"FixedList1\",\n"
             + "            \"label\": \"Fixed List 1\"\n"
             + "          },\n"
-            + "          \"list_items\": [{\n"
+            + "          \"\": [{\n"
             + "          }\n"
             + "          ]\n"
             + "        }");
