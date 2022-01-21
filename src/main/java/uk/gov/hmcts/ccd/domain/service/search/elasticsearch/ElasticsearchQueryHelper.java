@@ -3,13 +3,16 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.user.DefaultJurisdictionsResolver;
 import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
+import uk.gov.hmcts.ccd.data.user.JurisdictionsResolver;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
@@ -33,17 +36,21 @@ public class ElasticsearchQueryHelper {
     private final ObjectMapperService objectMapperService;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final UserRepository userRepository;
+    private final JurisdictionsResolver jurisdictionsResolver;
 
     @Autowired
     public ElasticsearchQueryHelper(ApplicationParams applicationParams,
                                     ObjectMapperService objectMapperService,
                                     @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                             CaseDefinitionRepository caseDefinitionRepository,
-                                    @Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository) {
+                                    @Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository,
+                                    @Qualifier(DefaultJurisdictionsResolver.QUALIFIER)
+                                            JurisdictionsResolver jurisdictionsResolver) {
         this.applicationParams = applicationParams;
         this.objectMapperService = objectMapperService;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.userRepository = userRepository;
+            this.jurisdictionsResolver = jurisdictionsResolver;
     }
 
     public List<String> getCaseTypesAvailableToUser() {
@@ -55,7 +62,7 @@ public class ElasticsearchQueryHelper {
     }
 
     private List<String> getCaseTypesFromIdamRoles() {
-        List<String> jurisdictions = userRepository.getCaseworkerUserRolesJurisdictions();
+        val jurisdictions = jurisdictionsResolver.getJurisdictions();
         return caseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictions);
     }
 
