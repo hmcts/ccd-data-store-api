@@ -50,7 +50,7 @@ public class ElasticsearchQueryHelper {
         this.objectMapperService = objectMapperService;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.userRepository = userRepository;
-            this.jurisdictionsResolver = jurisdictionsResolver;
+        this.jurisdictionsResolver = jurisdictionsResolver;
     }
 
     public List<String> getCaseTypesAvailableToUser() {
