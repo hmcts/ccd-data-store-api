@@ -96,6 +96,21 @@ env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal"
 env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
 
+
+env.ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_ID = "ccd_data"
+env.ROLE_ASSIGNMENT_HOST="https://am-role-assignment-service-pr-1096.service.core-compute-preview.internal"
+env.ROLE_ASSIGNMENT_USER_EMAIL="ccd.ac.solicitor1@gmail.com"
+env.ROLE_ASSIGNMENT_USER_PASSWORD="Pa55word11"
+env.ROLE_ASSIGNMENT_SOLICITOR_USER="ccd.ac.solicitor1@gmail.com"
+env.ROLE_ASSIGNMENT_SOLICITOR_USER_PWD="Pa55word11"
+
+env.ROLE_ASSIGNMENT_STAFF1_USER="ccd.ac.staff+1@gmail.com"
+env.ROLE_ASSIGNMENT_STAFF1_USER_PWD="Pa55word11"
+env.ROLE_ASSIGNMENT_STAFF2_USER="ccd.ac.staff+2@gmail.com"
+env.ROLE_ASSIGNMENT_STAFF2_USER_PWD="Pa55word11"
+env.ROLE_ASSIGNMENT_SUPER_USER="ccd.ac.superuser@gmail.com"
+env.ROLE_ASSIGNMENT_SUPER_USER_PWD="Pa55word11"
+
 withPipeline(type, product, component) {
     onMaster {
         enableSlackNotifications('#ccd-master-builds')
