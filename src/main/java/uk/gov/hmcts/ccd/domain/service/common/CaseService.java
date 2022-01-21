@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +35,6 @@ public class CaseService {
     private final CaseDataService caseDataService;
     private final CaseDetailsRepository caseDetailsRepository;
     private final UIDService uidService;
-    private static ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     public CaseService(CaseDataService caseDataService,
