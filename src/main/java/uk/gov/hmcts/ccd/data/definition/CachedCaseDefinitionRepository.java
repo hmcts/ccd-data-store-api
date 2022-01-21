@@ -12,12 +12,14 @@ import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.JurisdictionDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.UserRole;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import static com.google.common.collect.Maps.newHashMap;
 
+import static com.google.common.collect.Maps.newHashMap;
+import static java.lang.String.format;
 
 @Service
 @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
@@ -59,8 +61,19 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     }
 
     @Override
-    public CaseTypeDefinition getCaseType(int version, String caseTypeId) {
-        return caseDefinitionRepository.getCaseType(version, caseTypeId);
+    public CaseTypeDefinition getCaseType(final int version, final String caseTypeId) {
+        final int fromHour = applicationParams.getRequestScopeCachedCaseTypesFromHour();
+        final int tillHour = applicationParams.getRequestScopeCachedCaseTypesTillHour();
+        final int currentHour = LocalDateTime.now().getHour();
+        final boolean withinTimeInterval = currentHour >= fromHour  && currentHour < tillHour;
+        final boolean cacheSwitchOnForCaseType = applicationParams.getRequestScopeCachedCaseTypes().stream()
+            .anyMatch(ct -> ct.equalsIgnoreCase(caseTypeId));
+        if (withinTimeInterval && cacheSwitchOnForCaseType) {
+            return caseTypes.computeIfAbsent(format(CASE_TYPE_KEY_FORMAT, caseTypeId, version),
+                e -> caseDefinitionRepository.getCaseType(version, caseTypeId));
+        } else {
+            return caseDefinitionRepository.getCaseType(version, caseTypeId);
+        }
     }
 
     @Override
