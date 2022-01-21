@@ -132,14 +132,6 @@ public class CaseSearchEndpoint {
         return caseTypeIds;
     }
 
-    private List<String> getCaseTypes() {
-        if (userRepository.anyRoleEqualsAnyOf(applicationParams.getCcdAccessControlCrossJurisdictionRoles())) {
-            return caseDefinitionRepository.getAllCaseTypesIDs();
-        } else {
-            return getCaseTypesFromIdamRoles();
-        }
-    }
-
     private List<String> getCaseTypesFromIdamRoles() {
         val jurisdictions = jurisdictionsResolver.getJurisdictions();
         return caseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictions);
