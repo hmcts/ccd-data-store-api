@@ -9,16 +9,14 @@ import uk.gov.hmcts.ccd.domain.model.globalsearch.OtherCaseReference;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchParty;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchPartyValue;
+import uk.gov.hmcts.ccd.domain.types.ValidationResult;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataFields.SEARCH_CRITERIA;
 
 @Service
@@ -61,7 +59,7 @@ public class GlobalSearchProcessorService {
     }
 
     private SearchCriteria populateSearchCriteria(Map<String, JsonNode> data,
-                                       List<uk.gov.hmcts.ccd.domain.model.definition.SearchCriteria> searchCriterias) {
+                                                  List<uk.gov.hmcts.ccd.domain.model.definition.SearchCriteria> searchCriterias) {
         List<OtherCaseReference> otherCaseReferences = new ArrayList<>();
         SearchCriteria returnValue = new SearchCriteria();
 
@@ -87,7 +85,7 @@ public class GlobalSearchProcessorService {
     }
 
     private List<SearchParty> populateSearchParties(Map<String, JsonNode> data,
-                                             List<uk.gov.hmcts.ccd.domain.model.definition.SearchParty> searchParties) {
+                                                    List<uk.gov.hmcts.ccd.domain.model.definition.SearchParty> searchParties) {
         List<SearchParty> searchPartyList = new ArrayList<>();
 
         searchParties.forEach(searchParty -> {
@@ -149,8 +147,8 @@ public class GlobalSearchProcessorService {
         searchPartyValue.setAddressLine1(findValueInMap(searchPartyDefinition.getSearchPartyAddressLine1(), data));
         searchPartyValue.setEmailAddress(findValueInMap(searchPartyDefinition.getSearchPartyEmailAddress(), data));
         searchPartyValue.setPostCode(findValueInMap(searchPartyDefinition.getSearchPartyPostCode(), data));
-        searchPartyValue.setDateOfBirth(findValueInMap(searchPartyDefinition.getSearchPartyDob(), data));
-        searchPartyValue.setDateOfDeath(findValueInMap(searchPartyDefinition.getSearchPartyDod(), data));
+        searchPartyValue.setDateOfBirth(findDateValueInMap(searchPartyDefinition.getSearchPartyDob(), data));
+        searchPartyValue.setDateOfDeath(findDateValueInMap(searchPartyDefinition.getSearchPartyDod(), data));
 
         return searchPartyValue;
     }
@@ -178,6 +176,18 @@ public class GlobalSearchProcessorService {
         }
 
         return returnValue;
+    }
+
+    private String findDateValueInMap(String valueToFind, Map<String, JsonNode> mapToSearch) {
+        String value = findValueInMap(valueToFind, mapToSearch);
+        if(value != null) {
+            try {
+                LocalDate.parse(value, ISO_DATE);
+            } catch (DateTimeParseException e) {
+                return null;
+            }
+        }
+        return value;
     }
 
 }
