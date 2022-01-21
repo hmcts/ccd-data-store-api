@@ -9,11 +9,16 @@ import uk.gov.hmcts.ccd.domain.model.globalsearch.OtherCaseReference;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchParty;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchPartyValue;
-import uk.gov.hmcts.ccd.domain.types.ValidationResult;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE;
@@ -174,13 +179,12 @@ public class GlobalSearchProcessorService {
                 }
             }
         }
-
         return returnValue;
     }
 
     private String findDateValueInMap(String valueToFind, Map<String, JsonNode> mapToSearch) {
         String value = findValueInMap(valueToFind, mapToSearch);
-        if(value != null) {
+        if(value!=null) {
             try {
                 LocalDate.parse(value, ISO_DATE);
             } catch (DateTimeParseException e) {
@@ -189,5 +193,4 @@ public class GlobalSearchProcessorService {
         }
         return value;
     }
-
 }
