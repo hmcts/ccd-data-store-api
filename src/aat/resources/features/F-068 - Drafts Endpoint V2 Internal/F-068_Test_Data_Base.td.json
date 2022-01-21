@@ -1,14 +1,11 @@
 {
 	"_guid_": "F-068_Test_Data_Base",
-
 	"productName": "CCD Data Store",
-
 	"users": {
 		"invokingUser": {
       "_extends_": "BeftaMasterCaseworker"
 		}
 	},
-
 	"request": {
 		"headers": {
 			"_extends_": "Common_Request_Headers",
@@ -16,7 +13,6 @@
 			"Content-Type": "application/json"
 		}
 	},
-
 	"expectedResponse": {
 		"headers": {
 			"Content-Encoding": "gzip",
