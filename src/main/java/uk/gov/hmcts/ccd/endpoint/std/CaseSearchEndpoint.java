@@ -8,7 +8,6 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.SwaggerDefinition;
 import io.swagger.annotations.Tag;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
@@ -130,11 +129,6 @@ public class CaseSearchEndpoint {
             return elasticsearchQueryHelper.getCaseTypesAvailableToUser();
         }
         return caseTypeIds;
-    }
-
-    private List<String> getCaseTypesFromIdamRoles() {
-        val jurisdictions = jurisdictionsResolver.getJurisdictions();
-        return caseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictions);
     }
 
     private void validateCtid(List<String> caseTypeIds) {
