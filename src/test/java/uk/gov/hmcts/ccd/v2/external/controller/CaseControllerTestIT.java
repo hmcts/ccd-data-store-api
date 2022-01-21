@@ -293,6 +293,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
         final String postCode = "SW1H 9AJ";
 
         Map<String, JsonNode> caseData = new HashMap<>();
+        caseData.put("TextField1", JacksonUtils.MAPPER.readTree("\"" + testFieldValue + "\""));
         caseData.put("PersonFirstName", JacksonUtils.MAPPER.readTree("\"" + firstNameValue + "\""));
         caseData.put("PersonLastName", JacksonUtils.MAPPER.readTree("\"" + lastNameValue + "\""));
         caseData.put("PersonAddress", JacksonUtils.MAPPER.readTree("{\n"
@@ -302,11 +303,11 @@ class CaseControllerTestIT extends WireMockBaseTest {
 
         final CaseDataContent caseDetailsToSave = newCaseDataContent().withData(caseData).build();
         final Event triggeringEvent = anEvent().build();
-        triggeringEvent.setEventId(TEST_EVENT_ID_2);
+        triggeringEvent.setEventId(TEST_EVENT_ID);
         triggeringEvent.setDescription(description);
         triggeringEvent.setSummary(summary);
         caseDetailsToSave.setEvent(triggeringEvent);
-        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_WITH_SEARCH_PARTY, TEST_EVENT_ID_2);
+        final String token = generateEventTokenNewCase(UID, JURISDICTION, CASE_TYPE_WITH_SEARCH_PARTY, TEST_EVENT_ID);
         caseDetailsToSave.setToken(token);
 
         final MvcResult mvcResult = mockMvc.perform(post(URL)
