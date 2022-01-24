@@ -38,7 +38,7 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
     private CaseTypeDefinition caseTypeDefinition;
 
     protected static final String CASE_TYPE_ID_1 = "CASE_TYPE_ID_1";
-    protected static final String ROLE_NAME_1 = "RoleName1";
+    protected static final String ROLE_NAME_1 = "ROLE1";
 
     @BeforeEach
     void setUp() {
@@ -152,7 +152,7 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             1,
             false,
             null,
-            "");
+            "Civil/Standard");
         when(caseTypeDefinition.getRoleToAccessProfiles()).thenReturn(roleToAccessProfileDefinitions);
 
         String query = basicGrantTypeQueryBuilder.createQuery(
@@ -161,8 +161,45 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
         assertNotNull(query);
         String expectedValue =  "( state in (:states_1_basic) "
-            + "AND security_classification in (:classifications_1_basic) )"
-            + " OR ( state in (:states_2_basic) AND security_classification in (:classifications_2_basic) )";
+            + "AND security_classification in (:classifications_1_basic) ) "
+            + "OR ( state in (:states_2_basic) "
+            + "AND security_classification in (:classifications_2_basic) "
+            + "AND ( CaseAccessCategory LIKE 'Civil/Standard%' ) )";
+
+        assertEquals(expectedValue, query);
+    }
+
+    @Test
+    void shouldReturnQueryWhenCaseAccessCategoryWithMultipleEntriesExistsForCaseTypeDefinition() {
+        RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC,
+            "CASE",
+            "ROLE1", "PUBLIC", "", "",
+            Lists.newArrayList("auth1"));
+
+        RoleAssignment roleAssignment2 = createRoleAssignment(GrantType.BASIC,
+            "CASE",
+            "ROLE2", "PRIVATE", "", "",
+            Lists.newArrayList());
+
+        List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions = mockRoleToAccessProfileDefinitions(
+            ROLE_NAME_1,
+            CASE_TYPE_ID_1,
+            1,
+            false,
+            null,
+            "Civil/Standard,Crime/Standard");
+        when(caseTypeDefinition.getRoleToAccessProfiles()).thenReturn(roleToAccessProfileDefinitions);
+
+        String query = basicGrantTypeQueryBuilder.createQuery(
+            Lists.newArrayList(roleAssignment, roleAssignment2),
+            Maps.newHashMap(), caseTypeDefinition);
+
+        assertNotNull(query);
+        String expectedValue =  "( state in (:states_1_basic) "
+            + "AND security_classification in (:classifications_1_basic) ) "
+            + "OR ( state in (:states_2_basic) AND security_classification in (:classifications_2_basic) "
+            + "AND ( CaseAccessCategory LIKE 'Civil/Standard%' OR CaseAccessCategory LIKE 'Crime/Standard%' ) )";
+
         assertEquals(expectedValue, query);
     }
 }

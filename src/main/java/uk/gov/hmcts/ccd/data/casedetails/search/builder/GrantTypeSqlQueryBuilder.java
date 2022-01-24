@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -80,7 +81,7 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
                     groupedSearchRoleAssignments, count);
                 innerQuery = addInQueryForState(params, paramName, readableCaseStates, caseStates, innerQuery, count);
                 innerQuery = addInQueryForClassification(params, paramName, innerQuery, representative, count);
-                innerQuery = addInQueryForCaseAccessCategory(caseType, innerQuery);
+                innerQuery = addInQueryForCaseAccessCategory(caseType, representative, innerQuery);
 
                 return StringUtils.isNotBlank(innerQuery) ? String.format(QUERY_WRAPPER, innerQuery) : innerQuery;
             }).filter(strQuery -> !StringUtils.isEmpty(strQuery)).collect(Collectors.joining(OR));
@@ -149,18 +150,27 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
         return EMPTY;
     }
 
-    private String addInQueryForCaseAccessCategory(CaseTypeDefinition caseType, String parentQuery) {
-        String caseAccessCategoriesQuery = getCaseAccessCategoriesQuery(caseType);
+    private String addInQueryForCaseAccessCategory(CaseTypeDefinition caseType,
+                                                   SearchRoleAssignment representative,
+                                                   String parentQuery) {
+        String caseAccessCategoriesQuery = getCaseAccessCategoriesQuery(caseType, representative);
         if (StringUtils.isNotBlank(caseAccessCategoriesQuery)) {
-            parentQuery = parentQuery + getOperator(parentQuery, AND) + caseAccessCategoriesQuery;
+            parentQuery = parentQuery + getOperator(parentQuery, AND)
+                + String.format(QUERY_WRAPPER, caseAccessCategoriesQuery);
         }
         return parentQuery;
     }
 
-    private String getCaseAccessCategoriesQuery(CaseTypeDefinition caseType) {
-        return caseType.getRoleToAccessProfiles().stream()
+    private String getCaseAccessCategoriesQuery(CaseTypeDefinition caseType,
+                                                SearchRoleAssignment representative) {
+        List<String> caseAccessCategories = caseType.getRoleToAccessProfiles().stream()
+            .filter(rap -> rap.getRoleName().equalsIgnoreCase(representative.getRoleName()))
             .filter(rap -> rap.getCaseAccessCategories() != null)
-            .map(cac -> CASE_ACCESS_CATEGORY + " LIKE " + cac + "%")
+            .flatMap(rap -> Arrays.stream(rap.getCaseAccessCategories().split(",")))
+            .collect(Collectors.toList());
+
+        return caseAccessCategories.stream()
+            .map(cac -> CASE_ACCESS_CATEGORY + " LIKE '" + cac + "%'")
             .collect(Collectors.joining(" OR "));
     }
 }
