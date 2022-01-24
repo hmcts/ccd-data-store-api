@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,7 +25,6 @@ import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ccd.config.JacksonUtils.MAPPER;
 
 // TODO CaseService and CaseDataService could probably be merged together.
-@Slf4j
 @Service
 @SuppressWarnings("checkstyle:SummaryJavadoc")
 // partal javadoc attributes added prior to checkstyle implementation in module

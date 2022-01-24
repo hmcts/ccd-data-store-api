@@ -101,8 +101,10 @@ public class DefaultStartEventOperationTest {
                                                                  + "}");
             data.put("OrganisationPolicyField", orgPolicyDefaultValue);
 
-            JsonNode textFieldDefaultValue = MAPPER.readTree("{ \"TextField0\": \"Default text\" }");
-            data.put("TextField0", textFieldDefaultValue);
+            data.put("TextField0",  MAPPER.getNodeFactory().textNode("Default text"));
+
+            data.put("TextField1",  MAPPER.getNodeFactory().textNode("Should not replace existing text"));
+
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -131,8 +133,7 @@ public class DefaultStartEventOperationTest {
                                                      + "}");
             data.put("OrganisationPolicyField", orgPolicy);
 
-            JsonNode textFieldDefaultValue = MAPPER.readTree("{ \"TextField0\": null }");
-            data.put("TextField0", textFieldDefaultValue);
+            data.put("TextField1",  MAPPER.getNodeFactory().textNode("Existing text"));
 
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -162,8 +163,9 @@ public class DefaultStartEventOperationTest {
                                                      + "}");
             data.put("OrganisationPolicyField", orgPolicy);
 
-            JsonNode textFieldDefaultValue = MAPPER.readTree("{ \"TextField0\": \"Default text\" }");
-            data.put("TextField0", textFieldDefaultValue);
+            data.put("TextField0",  MAPPER.getNodeFactory().textNode("Default text"));
+
+            data.put("TextField1",  MAPPER.getNodeFactory().textNode("Existing text"));
 
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -240,6 +242,10 @@ public class DefaultStartEventOperationTest {
                       newCaseEventField()
                           .withCaseFieldId("TextField0")
                           .withDefaultValue("Default text")
+                          .build(),
+                      newCaseEventField()
+                          .withCaseFieldId("TextField1")
+                          .withDefaultValue("Existing text")
                           .build()
         )
     ).build();
