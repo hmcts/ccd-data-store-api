@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
+import java.util.Map;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,16 +30,19 @@ import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.model.callbacks.EventTokenProperties.CASE_TYPE_ID;
+import static uk.gov.hmcts.ccd.domain.service.aggregated.SearchResultUtil.buildData;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseEventBuilder.newCaseEvent;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseFieldBuilder.newCaseField;
@@ -76,6 +81,9 @@ class CaseUpdateViewEventBuilderTest {
     private static final String STATE_ID = "STATE_ID";
     private static final String TITLE_DISPLAY = "titleDisplay";
     private final CaseStateDefinition caseStateDefinition = newState().withId(STATE_ID).build();
+
+    private static final String SUPPLEMENTARY_DATA_FIELD_1 = "Supplementary data field 1";
+    private static final String SUPPLEMENTARY_DATA_FIELD_2 = "Supplementary data field 2";
 
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
@@ -141,6 +149,45 @@ class CaseUpdateViewEventBuilderTest {
             () -> assertThat(caseUpdateViewEvent, hasProperty("wizardPages", equalTo(wizardPageCollection))),
             () -> assertThat(caseUpdateViewEvent, hasProperty("titleDisplay", is(TITLE_DISPLAY))),
             () -> assertThat(caseUpdateViewEvent, hasProperty("supplementaryData", nullValue())),
+            () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
+            () -> inOrder.verify(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_TRIGGER_ID),
+            () -> inOrder.verify(caseViewFieldBuilder).build(caseFieldDefinitions, eventFields,
+                caseDetails.getCaseDataAndMetadata()),
+            () -> inOrder.verify(uiDefinitionRepository).getWizardPageCollection(CASE_TYPE_ID, EVENT_TRIGGER_ID)
+
+        );
+
+    }
+
+    @Test
+    @DisplayName("should build trigger supplementary data")
+    void shouldBuildTriggerWithSupplementaryData() {
+
+        Map<String, JsonNode> supplementaryData = buildData(SUPPLEMENTARY_DATA_FIELD_1, SUPPLEMENTARY_DATA_FIELD_2);
+        caseDetails.setSupplementaryData(supplementaryData);
+        final CaseUpdateViewEvent caseUpdateViewEvent = caseUpdateViewEventBuilder.build(startEventResult,
+            CASE_TYPE_ID,
+            EVENT_TRIGGER_ID,
+            CASE_REFERENCE);
+        InOrder inOrder = inOrder(caseDefinitionRepository,
+            uiDefinitionRepository,
+            eventTriggerService,
+            caseViewFieldBuilder);
+        assertAll(
+            () -> assertThat(caseUpdateViewEvent, hasProperty("id", equalTo(EVENT_TRIGGER_ID))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("name", equalTo(EVENT_TRIGGER_NAME))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("description", equalTo(EVENT_TRIGGER_DESCRIPTION))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("showSummary", equalTo(EVENT_TRIGGER_SHOW_SUMMARY))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("showEventNotes",
+                equalTo(EVENT_TRIGGER_SHOW_EVENT_NOTES))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("eventToken", equalTo(TOKEN))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("caseId", equalTo(CASE_REFERENCE))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("caseFields", equalTo(viewFields))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("wizardPages", equalTo(wizardPageCollection))),
+            () -> assertThat(caseUpdateViewEvent, hasProperty("titleDisplay", is(TITLE_DISPLAY))),
+            () -> assertThat(caseUpdateViewEvent.getSupplementaryData(), notNullValue()),
+            () -> assertTrue(caseUpdateViewEvent.getSupplementaryData().containsKey(SUPPLEMENTARY_DATA_FIELD_1)),
+            () -> assertTrue(caseUpdateViewEvent.getSupplementaryData().containsKey(SUPPLEMENTARY_DATA_FIELD_2)),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
             () -> inOrder.verify(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_TRIGGER_ID),
             () -> inOrder.verify(caseViewFieldBuilder).build(caseFieldDefinitions, eventFields,
