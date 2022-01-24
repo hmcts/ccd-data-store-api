@@ -56,7 +56,8 @@
             "OrganisationID": "orgID1",
             "OrganisationName": "orgName1"
           }
-        }
+        },
+        "SearchCriteria" : { }
       },
       "data_classification": "[[ANYTHING_PRESENT]]",
       "after_submit_callback_response": null,
