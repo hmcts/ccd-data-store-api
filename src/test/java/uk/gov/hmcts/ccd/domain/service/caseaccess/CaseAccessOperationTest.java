@@ -349,7 +349,7 @@ class CaseAccessOperationTest {
         @DisplayName("should reject update when it contains an unknown case role")
         void shouldRejectWhenUnknownCaseRoles() {
             final Executable execAccessUpdate = () -> caseAccessOperation.updateUserAccess(caseDetails,
-                                                                                           caseUser(NOT_CASE_ROLE));
+                caseUser(NOT_CASE_ROLE));
             assertThrows(InvalidCaseRoleException.class, execAccessUpdate);
             verifyNoInteractions(caseUserRepository);
             verifyNoInteractions(roleAssignmentService);
@@ -1429,7 +1429,7 @@ class CaseAccessOperationTest {
                 // (2 orgs with 1 user each with multiple roles >> 2 org counts incremented by 1)
                 // (however 2nd org count will not be required as existing relationship added below **)
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE,
-                        ORGANISATION),
+                    ORGANISATION),
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID, CASE_ROLE_OTHER,
                     ORGANISATION),
                 new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE_OTHER.toString(), USER_ID_OTHER, CASE_ROLE,
@@ -2519,13 +2519,13 @@ class CaseAccessOperationTest {
         caseDetailsOther.setReference(CASE_REFERENCE_OTHER);
 
         doReturn(Optional.of(caseDetails)).when(caseDetailsRepository)
-                                          .findByReference(jurisdiction, CASE_REFERENCE);
+            .findByReference(jurisdiction, CASE_REFERENCE);
         doReturn(Optional.of(caseDetailsOther)).when(caseDetailsRepository)
-                                               .findByReference(jurisdiction, CASE_REFERENCE_OTHER);
+            .findByReference(jurisdiction, CASE_REFERENCE_OTHER);
         doReturn(Optional.empty()).when(caseDetailsRepository)
-                                  .findByReference(jurisdiction, CASE_NOT_FOUND);
+            .findByReference(jurisdiction, CASE_NOT_FOUND);
         doReturn(Optional.empty()).when(caseDetailsRepository)
-                                  .findByReference(WRONG_JURISDICTION, CASE_REFERENCE);
+            .findByReference(WRONG_JURISDICTION, CASE_REFERENCE);
     }
 
     private CaseUserEntity createCaseUserEntity(Long caseDataId, String caseRole, String userId) {
