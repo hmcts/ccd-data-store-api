@@ -25,9 +25,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CallbackResponseBuilder.aCallbackResponse;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetailsBuilder.newCaseDetails;
@@ -37,6 +36,7 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDetail
         "http.client.read.timeout=500"
     })
 public class CallbackInvokerWireMockTest extends WireMockBaseTest {
+
     private static final ObjectMapper mapper = JacksonUtils.MAPPER;
 
     @Inject
@@ -81,7 +81,7 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
         final Duration between = Duration.between(start, Instant.now());
         // 0s retryInterval + 0.5s readTimeout + 1s retryInterval + 0.5s readTimeout + 3s retryInterval + 0.49s
         // readTimeout
-        assertThat((int) between.toMillis(), greaterThan(5500));
+        assertTrue((int) between.toMillis() > 5500);
         verify(exactly(3), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
     }
 
@@ -95,11 +95,15 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
 
         List<Integer> disabledRetries = Lists.newArrayList(0);
         caseEventDefinition.setRetriesTimeoutAboutToStartEvent(disabledRetries);
+        Instant start = Instant.now();
 
         CallbackException callbackException = assertThrows(CallbackException.class, () ->
             callbackInvoker.invokeAboutToStartCallback(caseEventDefinition, caseTypeDefinition, caseDetails, false));
-        assertThat(callbackException.getMessage(), is("Callback to service has been unsuccessful for "
-            + "event Test"));
+        assertEquals("Callback to service has been unsuccessful for event Test", callbackException.getMessage());
+
+        final Duration between = Duration.between(start, Instant.now());
+        // 0s retryInterval + 0.5s readTimeout + 1s bufferTimeToAvoidIntermittentBuildFails and no followup retries
+        assertTrue((int) between.toMillis() < 2500);
         verify(exactly(1), postRequestedFor(urlMatching("/test-callbackGrrrr.*")));
     }
 
