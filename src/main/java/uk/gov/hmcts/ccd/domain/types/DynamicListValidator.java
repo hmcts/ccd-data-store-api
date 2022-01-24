@@ -54,7 +54,8 @@ public class DynamicListValidator implements BaseTypeValidator {
         String code = null;
         String value = null;
 
-        //If the node is not an object (or it does not have a value for specified field name), or if there is no field with such name,
+        //If the node is not an object (or it does not have a value for specified field name),
+        //or if there is no field with such name,
         //null is returned
 
         //For non-string values textValue() will return null
