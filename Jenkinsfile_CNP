@@ -82,6 +82,7 @@ def vaultOverrides = [
     'preview' : 'aat',
     'spreview': 'saat'
 ]
+
 // vars needed for functional tests
 // Other env variables needed for BEFTA.
 env.DM_STORE_BASE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
