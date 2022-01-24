@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import java.util.List;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.enums.GrantType;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
@@ -34,6 +36,9 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
     @Mock
     private CaseTypeDefinition caseTypeDefinition;
+
+    protected static final String CASE_TYPE_ID_1 = "CASE_TYPE_ID_1";
+    protected static final String ROLE_NAME_1 = "RoleName1";
 
     @BeforeEach
     void setUp() {
@@ -117,6 +122,38 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
             "CASE",
             "ROLE2", "PRIVATE", "", "",
             Lists.newArrayList());
+
+        String query = basicGrantTypeQueryBuilder.createQuery(
+            Lists.newArrayList(roleAssignment, roleAssignment2),
+            Maps.newHashMap(), caseTypeDefinition);
+
+        assertNotNull(query);
+        String expectedValue =  "( state in (:states_1_basic) "
+            + "AND security_classification in (:classifications_1_basic) )"
+            + " OR ( state in (:states_2_basic) AND security_classification in (:classifications_2_basic) )";
+        assertEquals(expectedValue, query);
+    }
+
+    @Test
+    void shouldReturnQueryWhenCaseAccessCategoryExistsForCaseTypeDefinition() {
+        RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC,
+            "CASE",
+            "ROLE1", "PUBLIC", "", "",
+            Lists.newArrayList("auth1"));
+
+        RoleAssignment roleAssignment2 = createRoleAssignment(GrantType.BASIC,
+            "CASE",
+            "ROLE2", "PRIVATE", "", "",
+            Lists.newArrayList());
+
+        List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions = mockRoleToAccessProfileDefinitions(
+            ROLE_NAME_1,
+            CASE_TYPE_ID_1,
+            1,
+            false,
+            null,
+            "");
+        when(caseTypeDefinition.getRoleToAccessProfiles()).thenReturn(roleToAccessProfileDefinitions);
 
         String query = basicGrantTypeQueryBuilder.createQuery(
             Lists.newArrayList(roleAssignment, roleAssignment2),
