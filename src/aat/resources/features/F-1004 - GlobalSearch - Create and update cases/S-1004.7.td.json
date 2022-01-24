@@ -33,18 +33,14 @@
       "case_data": {
         "DateOfBirthText" : "date-of-birth-text",
         "DateOfDeathText" : "date-of-death-text",
-        "SearchCriteria" : {
-          "SearchParties" : []
-        }
+        "SearchCriteria" : {}
       },
       "data_classification": {
         "DateOfBirthText" : "PUBLIC",
         "DateOfDeathText" : "PUBLIC",
         "SearchCriteria" : {
           "classification" : "PUBLIC",
-          "value" : {
-            "SearchParties" : "[[ANYTHING_PRESENT]]"
-          }
+          "value" : {}
         }
       },
       "security_classifications": {
@@ -52,9 +48,7 @@
         "DateOfDeathText" : "PUBLIC",
         "SearchCriteria" : {
           "classification": "PUBLIC",
-          "value": {
-            "SearchParties": "[[ANYTHING_PRESENT]]"
-          }
+          "value": {}
         }
       }
     }

@@ -34,7 +34,25 @@
       "state": "CaseUpdated",
       "case_type_id": "FT_GlobalSearch",
       "case_data": {
-        "_extends_": "Befta_Global_Search_Updated_Expected_Search_Criteria"
+        "DateOfBirthText" : "date-of-birth-text",
+        "DateOfDeathText" : "date-of-death-text",
+        "SearchCriteria" : { }
+      },
+      "data_classification" : {
+        "DateOfBirthText" : "PUBLIC",
+        "DateOfDeathText" : "PUBLIC",
+        "SearchCriteria" : {
+          "classification" : "PUBLIC",
+          "value" : { }
+        }
+      },
+      "security_classifications" : {
+        "DateOfBirthText" : "PUBLIC",
+        "DateOfDeathText" : "PUBLIC",
+        "SearchCriteria" : {
+          "classification" : "PUBLIC",
+          "value" : { }
+        }
       }
     }
   }
