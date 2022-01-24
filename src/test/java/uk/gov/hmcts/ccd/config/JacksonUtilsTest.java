@@ -78,6 +78,43 @@ class JacksonUtilsTest {
 
     }
 
+    @Test
+    public void shouldMergeNullTopLevelValue() {
+        Map<String, JsonNode> mergeFrom = new HashMap<>();
+        mergeFrom.put("TextField0", MAPPER.getNodeFactory().textNode("Default text"));
+        Map<String, JsonNode> mergeInto = new HashMap<>();
+        mergeInto.put("TextField0", MAPPER.getNodeFactory().nullNode());
+
+        JacksonUtils.merge(mergeFrom, mergeInto);
+
+        assertEquals("Default text", mergeInto.get("TextField0").asText());
+    }
+
+    @Test
+    public void shouldNotUseDefaultValueWhenTopLevelValueExists() {
+        Map<String, JsonNode> mergeFrom = new HashMap<>();
+        mergeFrom.put("TextField0", MAPPER.getNodeFactory().textNode("Default text"));
+        Map<String, JsonNode> mergeInto = new HashMap<>();
+        mergeInto.put("TextField0", MAPPER.getNodeFactory().textNode("Existing text"));
+
+        JacksonUtils.merge(mergeFrom, mergeInto);
+
+        assertEquals("Existing text", mergeInto.get("TextField0").asText());
+    }
+
+    @Test
+    public void shouldOnlyUseDefaultValueWhenTopLevelKeyNotPresent() {
+        Map<String, JsonNode> mergeFrom = new HashMap<>();
+        mergeFrom.put("TextField0", MAPPER.getNodeFactory().textNode("Default text"));
+        Map<String, JsonNode> mergeInto = new HashMap<>();
+        mergeInto.put("TextField1", MAPPER.getNodeFactory().textNode("Existing text"));
+
+        JacksonUtils.merge(mergeFrom, mergeInto);
+
+        assertEquals("Default text", mergeInto.get("TextField0").asText());
+        assertEquals("Existing text", mergeInto.get("TextField1").asText());
+    }
+
     static Map<String, JsonNode> mySchoolDataWithNestedCollection(String name, String className1, String className2)
         throws JsonProcessingException {
 

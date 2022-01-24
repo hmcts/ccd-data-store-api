@@ -135,6 +135,9 @@ public class DefaultStartEventOperationTest {
 
             data.put("TextField1",  MAPPER.getNodeFactory().textNode("Existing text"));
 
+            data.put("TextField0",  MAPPER.getNodeFactory().nullNode());
+
+
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -245,7 +248,7 @@ public class DefaultStartEventOperationTest {
                           .build(),
                       newCaseEventField()
                           .withCaseFieldId("TextField1")
-                          .withDefaultValue("Existing text")
+                          .withDefaultValue("Should not replace existing text")
                           .build()
         )
     ).build();
