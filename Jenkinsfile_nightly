@@ -2,7 +2,7 @@
 
 properties([
     // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
-    pipelineTriggers([cron('H 05 * * *')])
+    pipelineTriggers([cron('H 07 * * *')])
 ])
 
 @Library("Infrastructure")
@@ -85,6 +85,7 @@ env.BEFTA_RESPONSE_HEADER_CHECK_POLICY="JUST_WARN" // Temporary workaround for p
 env.ELASTIC_SEARCH_FTA_ENABLED = "true"
 env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
 env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-aat.service.core-compute-aat.internal"
+env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
 
 withNightlyPipeline(type, product, component) {
     overrideVaultEnvironments(vaultOverrides)
@@ -93,11 +94,12 @@ withNightlyPipeline(type, product, component) {
     enableDbMigration('ccd')
     disableLegacyDeployment()
     enableHighLevelDataSetup()
-    enableFortifyScan()
+    // Temporarily disable fortify scan stage until fortify access re-enabled
+    //enableFortifyScan()
 
-    after('fortify-scan') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-    }
+    //after('fortify-scan') {
+    //    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+    //}
     after('test') {
         // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'

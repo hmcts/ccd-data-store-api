@@ -47,9 +47,7 @@ class PseudoRoleToAccessProfileGeneratorTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
-
-        instance = new PseudoRoleToAccessProfileGenerator();
+        MockitoAnnotations.openMocks(this);
 
         caseTypeDefinition = new CaseTypeDefinition();
 
@@ -57,7 +55,6 @@ class PseudoRoleToAccessProfileGeneratorTest {
         addStateAcls(caseTypeDefinition);
         addEventAcls(caseTypeDefinition);
         addCaseFieldAcls(caseTypeDefinition);
-
     }
 
     @Nested

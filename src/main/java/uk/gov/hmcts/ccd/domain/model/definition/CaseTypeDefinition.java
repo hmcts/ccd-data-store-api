@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,7 +38,13 @@ public class CaseTypeDefinition implements Serializable {
     private String printableDocumentsUrl;
     @JsonProperty("acls")
     private List<AccessControlList> accessControlLists;
+    @JsonProperty("callback_get_case_url")
+    private String callbackGetCaseUrl;
+    @JsonProperty("retries_get_case_url")
+    private List<Integer> retriesGetCaseUrl;
     private final List<SearchAliasField> searchAliasFields = new ArrayList<>();
+    private final List<SearchParty> searchParties = new ArrayList<>();
+    private final List<SearchCriteria> searchCriterias = new ArrayList<>();
     @JsonProperty("roleToAccessProfiles")
     private List<RoleToAccessProfileDefinition> roleToAccessProfiles = new ArrayList<>();
 
@@ -160,6 +167,22 @@ public class CaseTypeDefinition implements Serializable {
             .findFirst();
     }
 
+    public String getCallbackGetCaseUrl() {
+        return callbackGetCaseUrl;
+    }
+
+    public void setCallbackGetCaseUrl(String callbackGetCaseUrl) {
+        this.callbackGetCaseUrl = callbackGetCaseUrl;
+    }
+
+    public List<Integer> getRetriesGetCaseUrl() {
+        return retriesGetCaseUrl == null ? Collections.emptyList() : retriesGetCaseUrl;
+    }
+
+    public void setRetriesGetCaseUrl(List<Integer> retriesGetCaseUrl) {
+        this.retriesGetCaseUrl = retriesGetCaseUrl;
+    }
+
     public List<SearchAliasField> getSearchAliasFields() {
         return searchAliasFields;
     }
@@ -201,5 +224,25 @@ public class CaseTypeDefinition implements Serializable {
 
     public void setRoleToAccessProfiles(List<RoleToAccessProfileDefinition> roleToAccessProfiles) {
         this.roleToAccessProfiles = roleToAccessProfiles;
+    }
+
+    public List<SearchParty> getSearchParties() {
+        return searchParties;
+    }
+
+    public void setSearchParties(List<SearchParty> searchParties) {
+        if (searchParties != null) {
+            this.searchParties.addAll(searchParties);
+        }
+    }
+
+    public List<SearchCriteria> getSearchCriterias() {
+        return searchCriterias;
+    }
+
+    public void setSearchCriterias(List<SearchCriteria> searchCriterias) {
+        if (searchCriterias != null) {
+            this.searchCriterias.addAll(searchCriterias);
+        }
     }
 }

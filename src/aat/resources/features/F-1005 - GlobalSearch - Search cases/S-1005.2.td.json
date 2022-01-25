@@ -1,0 +1,96 @@
+{
+  "title": "Successfully search for case with all of the new global search parameters",
+  "_guid_": "S-1005.2",
+  "_extends_": "F-1005_SearchCaseBase",
+  "specs": [
+    "an active profile in CCD",
+    "contains all of the fields from new global search screen",
+    "contains all the mandatory parameters",
+    "has 200 return code"
+  ],
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "stateIds": [
+          "CaseCreated",
+          "CaseUpdated"
+        ],
+        "caseReferences": [
+          "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+        ],
+        "CCDCaseTypeIds": [
+          "FT_GlobalSearch"
+        ],
+        "CCDJurisdictionIds": [
+          "BEFTA_MASTER"
+        ],
+        "caseManagementBaseLocationIds": [
+          "123"
+        ],
+        "caseManagementRegionIds": [
+          "1"
+        ],
+        "parties": [
+          {
+            "addressLine1": "Address Value",
+            "dateOfBirth": "2012-04-21",
+            "emailAddress": "e@mail.com",
+            "partyName": "FirstNameValue LastNameValue",
+            "postCode": "SE1 4EE"
+          }
+        ],
+        "otherReferences": [
+          "FirstNameValue"
+        ]
+      },
+      "sortCriteria": [
+        {
+          "sortBy": "caseName",
+          "sortDirection": "descending"
+        },
+        {
+          "sortBy": "caseManagementCategoryName",
+          "sortDirection": "ascending"
+        },
+        {
+          "sortBy": "createdDate",
+          "sortDirection": "ascending"
+        }
+      ],
+      "maxReturnRecordCount": 500,
+      "startRecordNumber": 1
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "resultInfo": {
+        "casesReturned": 1,
+        "caseStartRecord": 1,
+        "moreResultsToGo": false
+      },
+      "results": [
+        {
+          "stateId": "CaseCreated",
+          "processForAccess" : "NONE",
+          "caseReference": "${}${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+          "otherReferences": [
+            "FirstNameValue"
+          ],
+          "caseNameHmctsInternal": "Name Internal",
+          "baseLocationId": "123",
+          "baseLocationName": "[[ANY_NULLABLE]]",
+          "caseManagementCategoryId": "987",
+          "caseManagementCategoryName": "Category label",
+          "regionId": "1",
+          "regionName": "[[ANY_NULLABLE]]",
+          "CCDJurisdictionId": "BEFTA_MASTER",
+          "CCDJurisdictionName": "BEFTA Master",
+          "CCDCaseTypeId": "FT_GlobalSearch",
+          "CCDCaseTypeName": "FT_GlobalSearch"
+        }
+      ]
+    }
+  }
+}
+

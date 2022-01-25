@@ -8,6 +8,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
 
@@ -95,6 +96,15 @@ public class ApplicationParams {
     @Value("${definition.cache.jurisdiction-ttl}")
     private Integer jurisdictionTTL;
 
+    @Value("#{'${definition.cache.request-scope.case-types}'.split(',')}")
+    private List<String> requestScopeCachedCaseTypes;
+
+    @Value("${definition.cache.request-scope.case-types.from-hour}")
+    private Integer requestScopeCachedCaseTypesFromHour;
+
+    @Value("${definition.cache.request-scope.case-types.till-hour}")
+    private Integer requestScopeCachedCaseTypesTillHour;
+
     @Value("${user.cache.ttl.secs}")
     private Integer userCacheTTLSecs;
 
@@ -137,6 +147,12 @@ public class ApplicationParams {
     @Value("${search.elastic.nodes.discovery.filter}")
     private String elasticsearchNodeDiscoveryFilter;
 
+    @Value("${search.global.index.name}")
+    private String globalSearchIndexName;
+
+    @Value("${search.global.index.type}")
+    private String globalSearchIndexType;
+
     @Value("#{'${audit.log.ignore.statues}'.split(',')}")
     private List<Integer> auditLogIgnoreStatuses;
 
@@ -170,6 +186,12 @@ public class ApplicationParams {
     @Value("${ccd.multiparty.fix.enabled}")
     private boolean multipartyFixEnabled;
 
+    @Value("#{'${ccd.multiparty.events}'.split(',')}")
+    private List<String> multipartyEvents;
+
+    @Value("#{'${ccd.multiparty.case-types}'.split(',')}")
+    private List<String> multipartyCaseTypes;
+
     @Value("${ccd.case-document-am-api.attachDocumentEnabled:true}")
     private boolean attachDocumentEnabled;
 
@@ -184,6 +206,12 @@ public class ApplicationParams {
 
     @Value("#{'${case.data.issue.logging.jurisdictions}'.split(',')}")
     private List<String> caseDataIssueLoggingJurisdictions;
+
+    @Value("${reference.data.api.url}")
+    private String referenceDataApiUrl;
+
+    @Value("${reference.data.cache.ttl.in.days}")
+    private String referenceDataCacheTtlInDays;
 
     public static String encode(final String stringToEncode) {
         try {
@@ -410,6 +438,14 @@ public class ApplicationParams {
         return elasticsearchNodeDiscoveryFilter;
     }
 
+    public String getGlobalSearchIndexName() {
+        return globalSearchIndexName;
+    }
+
+    public String getGlobalSearchIndexType() {
+        return globalSearchIndexType;
+    }
+
     public List<String> getWriteToCCDCaseTypesOnly() {
         return writeToCCDCaseTypesOnly;
     }
@@ -510,11 +546,39 @@ public class ApplicationParams {
         return caseDataIssueLoggingJurisdictions;
     }
 
+    public String getReferenceDataApiUrl() {
+        return referenceDataApiUrl;
+    }
+
+    public int getRefDataCacheTtlInSec() {
+        return Math.toIntExact(Duration.ofDays(Long.parseLong(referenceDataCacheTtlInDays)).toSeconds());
+    }
+
     public boolean isDocumentHashCloneEnabled() {
         return this.documentHashCloneEnabled;
     }
 
     public boolean isMultipartyFixEnabled() {
         return multipartyFixEnabled;
+    }
+
+    public List<String> getMultipartyEvents() {
+        return multipartyEvents;
+    }
+
+    public List<String> getMultipartyCaseTypes() {
+        return multipartyCaseTypes;
+    }
+
+    public List<String>  getRequestScopeCachedCaseTypes() {
+        return requestScopeCachedCaseTypes;
+    }
+
+    public Integer getRequestScopeCachedCaseTypesFromHour() {
+        return requestScopeCachedCaseTypesFromHour;
+    }
+
+    public Integer getRequestScopeCachedCaseTypesTillHour() {
+        return requestScopeCachedCaseTypesTillHour;
     }
 }
