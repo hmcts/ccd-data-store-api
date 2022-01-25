@@ -37,6 +37,9 @@ public class CaseDataContent {
     @JsonProperty("on_behalf_of_token")
     private String onBehalfOfUserToken;
 
+    @JsonProperty("supplementary_data_request")
+    private Map<String, Map<String, Object>> supplementaryDataRequest;
+
     public Event getEvent() {
         return event;
     }
@@ -120,5 +123,13 @@ public class CaseDataContent {
 
     public void setOnBehalfOfUserToken(String onBehalfOfUserToken) {
         this.onBehalfOfUserToken = onBehalfOfUserToken;
+    }
+
+    public Map<String, Map<String, Object>> getSupplementaryDataRequest() {
+        return supplementaryDataRequest;
+    }
+
+    public void setSupplementaryDataRequest(Map<String, Map<String, Object>> supplementaryDataRequest) {
+        this.supplementaryDataRequest = supplementaryDataRequest;
     }
 }

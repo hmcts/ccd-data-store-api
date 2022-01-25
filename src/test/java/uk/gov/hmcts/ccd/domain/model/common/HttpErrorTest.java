@@ -149,6 +149,64 @@ public class HttpErrorTest {
         assertThat(error.getDetails(), is(equalTo(DETAILS)));
     }
 
+    @Test
+    public void shouldGetStatusFromPassedHttpStatus() {
+        final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
+            new uk.gov.hmcts.ccd.domain.model.common.HttpError(new NullPointerException(), PATH,
+                HttpStatus.BAD_REQUEST);
+
+        assertThat(error.getStatus(), is(HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @Test
+    public void shouldReturnDefaultStatusWhenStatusAndDerivedStatusNull() {
+        final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
+            new uk.gov.hmcts.ccd.domain.model.common.HttpError(new NullPointerException(), PATH, null);
+
+        assertThat(error.getStatus(), is(equalTo(uk.gov.hmcts.ccd.domain.model.common.HttpError.DEFAULT_STATUS)));
+    }
+
+    @Test
+    public void shouldDeriveStatusFromResponseStatus() {
+        final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
+            new uk.gov.hmcts.ccd.domain.model.common.HttpError(new TestCodeStatusException(), PATH, null);
+
+        assertThat(error.getStatus(), is(equalTo(415)));
+    }
+
+    @Test
+    public void shouldReturnErrorFromResponseStatusReason() {
+        final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
+            new uk.gov.hmcts.ccd.domain.model.common.HttpError(new TestReasonException(), PATH, null);
+
+        assertThat(error.getError(), is(equalTo("Some error reason")));
+    }
+
+    @Test
+    public void shouldDeriveErrorFromResponseStatusHttpStatus() {
+        final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
+            new uk.gov.hmcts.ccd.domain.model.common.HttpError(new TestCodeStatusException(), PATH, null);
+
+        assertThat(error.getError(), is(equalTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE.getReasonPhrase())));
+    }
+
+    @Test
+    public void shouldReturnDefaultErrorWhenReasonPhraseIsNull() {
+        final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
+            new uk.gov.hmcts.ccd.domain.model.common.HttpError(new IllegalArgumentException(), PATH, null);
+
+        assertThat(error.getError(), is(equalTo(uk.gov.hmcts.ccd.domain.model.common.HttpError.DEFAULT_ERROR)));
+    }
+
+    @Test
+    public void shouldDeriveReasonPhraseFromPassedHttpStatus() {
+        final uk.gov.hmcts.ccd.domain.model.common.HttpError error =
+            new uk.gov.hmcts.ccd.domain.model.common.HttpError(new NullPointerException(), PATH,
+                HttpStatus.BAD_REQUEST);
+
+        assertThat(error.getError(), is(equalTo(HttpStatus.BAD_REQUEST.getReasonPhrase())));
+    }
+
     @ResponseStatus(code = HttpStatus.UNSUPPORTED_MEDIA_TYPE)
     class TestCodeStatusException extends RuntimeException {
 
