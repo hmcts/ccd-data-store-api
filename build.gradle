@@ -27,7 +27,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.4.0'
     id "io.freefair.lombok" version "5.3.0"
     id 'uk.gov.hmcts.java' version '0.12.0'
-    id 'au.com.dius.pact' version '4.1.0'
+    id 'au.com.dius.pact' version '4.2.14'
 
 }
 
