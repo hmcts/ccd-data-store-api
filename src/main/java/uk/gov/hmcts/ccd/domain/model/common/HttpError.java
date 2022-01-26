@@ -27,12 +27,12 @@ public class HttpError<T extends Serializable> implements Serializable {
     private List<String> callbackErrors;
     private List<String> callbackWarnings;
 
-    public HttpError(HttpStatus httpStatus, Exception exception, HttpServletRequest request) {
+    public HttpError(HttpStatus upstreamPreferredHttpStatus, Exception exception, HttpServletRequest request) {
         final ResponseStatus responseStatus = exception.getClass().getAnnotation(ResponseStatus.class);
 
         this.exception = exception.getClass().getName();
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
-        this.status = httpStatus != null ? httpStatus.value() : getStatusFromResponseStatus(responseStatus);
+        this.status = upstreamPreferredHttpStatus != null ? upstreamPreferredHttpStatus.value() : getStatusFromResponseStatus(responseStatus);
         this.error = getErrorReason(responseStatus);
         this.message = exception.getMessage();
         this.path = UriUtils.encodePath(request.getRequestURI(), StandardCharsets.UTF_8);
@@ -172,7 +172,7 @@ public class HttpError<T extends Serializable> implements Serializable {
     }
 
     public HttpError(Exception exception, WebRequest request, HttpStatus status) {
-        this(exception, ((ServletWebRequest)request).getRequest().getRequestURI(), status);
+        this(exception, ((ServletWebRequest) request).getRequest().getRequestURI(), status);
     }
 
     public HttpError<T> withMessage(String message) {

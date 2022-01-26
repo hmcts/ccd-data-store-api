@@ -61,8 +61,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         appInsights.trackException(exception);
         final HttpError<Serializable> error = new HttpError<>(exception, request);
         return ResponseEntity
-                .status(error.getStatus())
-                .body(error);
+            .status(error.getStatus())
+            .body(error);
     }
 
     @ExceptionHandler(CaseValidationException.class)
@@ -102,15 +102,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         LOG.error(exception.getMessage(), exception);
         appInsights.trackException(exception);
         HttpStatus httpStatus = null;
-        Throwable routeException = exception.getCause();
+        Throwable causeOfException = exception.getCause();
 
-        if (routeException instanceof HttpServerErrorException) {
-            httpStatus = ((HttpServerErrorException) routeException).getStatusCode();
+        if (causeOfException instanceof HttpServerErrorException) {
+            httpStatus = ((HttpServerErrorException) causeOfException).getStatusCode();
             if (httpStatus == HttpStatus.INTERNAL_SERVER_ERROR) {
                 httpStatus = HttpStatus.BAD_GATEWAY;
             }
-        } else if (routeException instanceof FeignException.FeignServerException) {
-            httpStatus = HttpStatus.valueOf(((FeignException) routeException).status());
+        } else if (causeOfException instanceof FeignException.FeignServerException) {
+            httpStatus = HttpStatus.valueOf(((FeignException) causeOfException).status());
             if (httpStatus == HttpStatus.INTERNAL_SERVER_ERROR) {
                 httpStatus = HttpStatus.BAD_GATEWAY;
             }
