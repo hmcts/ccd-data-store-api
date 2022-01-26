@@ -64,7 +64,8 @@ public class GlobalSearchProcessorService {
     }
 
     private SearchCriteria populateSearchCriteria(Map<String, JsonNode> data,
-                                                  List<uk.gov.hmcts.ccd.domain.model.definition.SearchCriteria> searchCriterias) {
+                                                  List<uk.gov.hmcts.ccd.domain.model.definition.SearchCriteria>
+                                                      searchCriterias) {
         List<OtherCaseReference> otherCaseReferences = new ArrayList<>();
         SearchCriteria returnValue = new SearchCriteria();
 
@@ -90,7 +91,8 @@ public class GlobalSearchProcessorService {
     }
 
     private List<SearchParty> populateSearchParties(Map<String, JsonNode> data,
-                                                    List<uk.gov.hmcts.ccd.domain.model.definition.SearchParty> searchParties) {
+                                                    List<uk.gov.hmcts.ccd.domain.model.definition.SearchParty>
+                                                        searchParties) {
         List<SearchParty> searchPartyList = new ArrayList<>();
 
         searchParties.forEach(searchParty -> {
@@ -184,7 +186,7 @@ public class GlobalSearchProcessorService {
 
     private String findDateValueInMap(String valueToFind, Map<String, JsonNode> mapToSearch) {
         String value = findValueInMap(valueToFind, mapToSearch);
-        if(value!=null) {
+        if (value != null) {
             try {
                 LocalDate.parse(value, ISO_DATE);
             } catch (DateTimeParseException e) {
