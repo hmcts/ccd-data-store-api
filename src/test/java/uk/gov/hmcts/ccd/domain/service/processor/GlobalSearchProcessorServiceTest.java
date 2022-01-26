@@ -460,7 +460,8 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchCriteriaContainingASearchPartyContainingBotFieldsTwoDateFieldsAreWrong() throws JsonProcessingException {
+    void checkSearchCriteriaContainingASearchPartyContainingBotFieldsTwoDateFieldsAreWrong()
+        throws JsonProcessingException {
 
         searchParty.setSearchPartyDob("spDob");
         searchParty.setSearchPartyDod("spDod");
@@ -515,7 +516,8 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchCriteriaContainingASearchPartyContainingAllFieldsTwoDateFieldsAreWrong() throws JsonProcessingException {
+    void checkSearchCriteriaContainingASearchPartyContainingAllFieldsTwoDateFieldsAreWrong()
+        throws JsonProcessingException {
 
         searchParty.setSearchPartyName("spName");
         searchParty.setSearchPartyDob("spDob");
