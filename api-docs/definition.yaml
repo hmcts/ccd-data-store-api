@@ -42,7 +42,7 @@ paths:
             required: true
             type: string
         responses:
-          200: 
+          200:
             description: Work Basket Result
             schema:
               $ref: '#/definitions/WorkBasketResult'
