@@ -8,6 +8,8 @@ import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -17,6 +19,8 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseTypeDefinitionVersion;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseUpdateViewEvent;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewField;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
@@ -38,6 +42,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 
@@ -84,6 +90,9 @@ public class CallbackTest extends WireMockBaseTest {
         "  }\n" +
         "}\n";
 
+    @MockBean
+    private CaseDefinitionRepository caseDefinitionRepository;
+
     @Inject
     private WebApplicationContext wac;
 
@@ -112,6 +121,7 @@ public class CallbackTest extends WireMockBaseTest {
     @Before
     public void setUp() throws JsonProcessingException {
 
+        MockitoAnnotations.initMocks(this);
         CALLBACK_DATA = mapper.readTree(CALLBACK_DATA_JSON_STRING);
         CALLBACK_DATA_CLASSIFICATION = mapper.readTree(CALLBACK_DATA_CLASSIFICATION_JSON_STRING);
         INVALID_CALLBACK_DATA = mapper.readTree(INVALID_CALLBACK_DATA_JSON_STRING);
@@ -124,6 +134,9 @@ public class CallbackTest extends WireMockBaseTest {
             .willReturn(okJson(CallbackTestData.getTestDefinition(super.wiremockPort)).withStatus(200)));
         stubFor(WireMock.get(urlMatching("/api/display/wizard-page-structure.*"))
             .willReturn(okJson(mapper.writeValueAsString(wizardStructureResponse)).withStatus(200)));
+
+        when(caseDefinitionRepository.getLatestVersion(anyString()))
+            .thenReturn(new CaseTypeDefinitionVersion());
     }
 
     @Test

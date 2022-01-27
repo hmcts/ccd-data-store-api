@@ -38,6 +38,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     private final Map<String, UserRole> userRoleClassifications = newHashMap();
     private final Map<String, List<FieldTypeDefinition>> baseTypes = newHashMap();
     private final Map<String, CaseTypeDefinition> caseTypes = newHashMap();
+    private final Map<String, JurisdictionDefinition> jurisdictions = newHashMap();
 
     @Autowired
     public CachedCaseDefinitionRepository(@Qualifier(DefaultCaseDefinitionRepository.QUALIFIER)
@@ -50,7 +51,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     @Override
     public List<CaseTypeDefinition> getCaseTypesForJurisdiction(final String jurisdictionId) {
         return caseTypesForJurisdictions.computeIfAbsent(jurisdictionId,
-                                                         caseDefinitionRepository::getCaseTypesForJurisdiction);
+            caseDefinitionRepository::getCaseTypesForJurisdiction);
     }
 
     @Override
@@ -73,6 +74,11 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
         } else {
             return caseDefinitionRepository.getCaseType(version, caseTypeId);
         }
+    }
+
+    @Override
+    public List<CaseTypeDefinition> getCaseTypes(List<String> caseTypeIds) {
+        return caseDefinitionRepository.getCaseTypes(caseTypeIds);
     }
 
     @Override
@@ -109,7 +115,7 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     @Override
     public JurisdictionDefinition getJurisdiction(String jurisdictionId) {
         LOGGER.debug("Will get jurisdiction '{}' from repository.", jurisdictionId);
-        return caseDefinitionRepository.getJurisdiction(jurisdictionId);
+        return jurisdictions.computeIfAbsent(jurisdictionId, caseDefinitionRepository::getJurisdiction);
     }
 
     @Override
@@ -131,7 +137,6 @@ public class CachedCaseDefinitionRepository implements CaseDefinitionRepository 
     public List<FieldTypeDefinition> getBaseTypes() {
         return baseTypes.computeIfAbsent("baseTypes", e -> caseDefinitionRepository.getBaseTypes());
     }
-
 
     public CaseDefinitionRepository getCaseDefinitionRepository() {
         return caseDefinitionRepository;

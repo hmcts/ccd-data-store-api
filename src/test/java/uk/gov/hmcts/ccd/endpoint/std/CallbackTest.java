@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
@@ -21,6 +22,8 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseTypeDefinitionVersion;
 import uk.gov.hmcts.ccd.domain.model.callbacks.CallbackResponse;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItem;
 import uk.gov.hmcts.ccd.domain.model.callbacks.SignificantItemType;
@@ -50,6 +53,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.domain.model.std.EventBuilder.anEvent;
@@ -60,6 +65,9 @@ import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataCo
 public class CallbackTest extends WireMockBaseTest {
 
     private static final String URL_BEFORE_COMMIT = "/before-commit.*";
+
+    @MockBean
+    private CaseDefinitionRepository caseDefinitionRepository;
 
     private static JsonNode DATA = null;
     private static final String DATA_JSON_STRING =
@@ -258,6 +266,8 @@ public class CallbackTest extends WireMockBaseTest {
 
         MockitoAnnotations.initMocks(this);
         MockUtils.setSecurityAuthorities(authentication, MockUtils.ROLE_TEST_PUBLIC);
+        when(caseDefinitionRepository.getLatestVersion(anyString()))
+            .thenReturn(new CaseTypeDefinitionVersion());
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         jdbcTemplate = new JdbcTemplate(db);

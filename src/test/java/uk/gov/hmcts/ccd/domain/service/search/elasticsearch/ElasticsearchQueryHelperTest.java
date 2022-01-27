@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.user.JurisdictionsResolver;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CommonField;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -78,6 +79,9 @@ class ElasticsearchQueryHelperTest {
     private ElasticsearchQueryHelper elasticsearchQueryHelper;
 
     @Mock
+    private JurisdictionsResolver jurisdictionsResolver;
+
+    @Mock
     private ApplicationParams applicationParams;
 
     @Mock
@@ -139,6 +143,7 @@ class ElasticsearchQueryHelperTest {
 
             // ARRANGE
             when(userRepository.anyRoleEqualsAnyOf(anyList())).thenReturn(false);
+            when(jurisdictionsResolver.getJurisdictions()).thenReturn(newArrayList(JURISDICTION_1, JURISDICTION_2));
             when(userRepository.getCaseworkerUserRolesJurisdictions()).thenReturn(
                 newArrayList(JURISDICTION_1, JURISDICTION_2));
             when(caseDefinitionRepository.getCaseTypesIDsByJurisdictions(anyList())).thenReturn(
@@ -152,7 +157,6 @@ class ElasticsearchQueryHelperTest {
                 () -> verify(userRepository).anyRoleEqualsAnyOf(
                     newArrayList(ROLE_CROSS_JURISDICTION_1, ROLE_CROSS_JURISDICTION_2)
                 ),
-                () -> verify(userRepository).getCaseworkerUserRolesJurisdictions(),
                 () -> verify(caseDefinitionRepository).getCaseTypesIDsByJurisdictions(
                     newArrayList(JURISDICTION_1, JURISDICTION_2)
                 ),

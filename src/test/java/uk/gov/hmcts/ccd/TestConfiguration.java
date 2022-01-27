@@ -21,6 +21,7 @@ import java.util.Arrays;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -109,8 +110,7 @@ class TestConfiguration extends ContextCleanupListener {
         ReflectionTestUtils.setField(caseDefinitionRepository, "applicationParams", applicationParams);
         ReflectionTestUtils.setField(caseDefinitionRepository, "restTemplate", new RestTemplate());
 
-        when(caseDefinitionRepository.getCaseType(any())).thenCallRealMethod();
-        when(caseDefinitionRepository.getLatestVersion(anyString())).thenCallRealMethod();
+        when(caseDefinitionRepository.getCaseType(anyString())).thenCallRealMethod();
         when(caseDefinitionRepository.getLatestVersionFromDefinitionStore(anyString())).thenCallRealMethod();
         when(caseDefinitionRepository.getCaseType(anyInt(), anyString())).thenCallRealMethod();
         when(caseDefinitionRepository.getCaseTypesForJurisdiction(any())).thenCallRealMethod();
@@ -119,6 +119,8 @@ class TestConfiguration extends ContextCleanupListener {
         when(caseDefinitionRepository.getClassificationsForUserRoleList(any())).thenCallRealMethod();
         when(caseDefinitionRepository.getJurisdiction(anyString())).thenCallRealMethod();
         when(caseDefinitionRepository.getJurisdictionFromDefinitionStore(anyString())).thenCallRealMethod();
+        when(caseDefinitionRepository.getLatestVersion(anyString())).thenCallRealMethod();
+        when(caseDefinitionRepository.getCaseTypes(anyList())).thenCallRealMethod();
         return caseDefinitionRepository;
     }
 

@@ -241,8 +241,12 @@ public class ApplicationParams {
         return caseDefinitionHost + "/api/data/jurisdictions/" + encode(jurisdictionId) + "/case-type";
     }
 
-    public String caseTypeDefURL(final String caseTypeId) {
+    public String caseTypesDefURL(final String caseTypeId) {
         return caseDefinitionHost + "/api/data/case-type/" + encode(caseTypeId);
+    }
+
+    public String caseTypesDefURL() {
+        return caseDefinitionHost + "/api/data/case-types";
     }
 
     public String draftBaseURL() {
@@ -570,7 +574,7 @@ public class ApplicationParams {
         return multipartyCaseTypes;
     }
 
-    public List<String>  getRequestScopeCachedCaseTypes() {
+    public List<String> getRequestScopeCachedCaseTypes() {
         return requestScopeCachedCaseTypes;
     }
 
@@ -580,5 +584,13 @@ public class ApplicationParams {
 
     public Integer getRequestScopeCachedCaseTypesTillHour() {
         return requestScopeCachedCaseTypesTillHour;
+    }
+
+    public String getElasticSupportCaseTypes() {
+        return caseDefinitionHost + "/elastic-support/case-types";
+    }
+
+    public String getCasesIdByjurisdictionDefURL() {
+        return caseDefinitionHost + "/api/data/case-type-ids";
     }
 }

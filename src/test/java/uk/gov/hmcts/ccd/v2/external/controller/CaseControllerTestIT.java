@@ -68,6 +68,7 @@ class CaseControllerTestIT extends WireMockBaseTest {
         = "MultipleSearchCriteriaAndSearchParties";
     private static final String JURISDICTION = "PROBATE";
     private static final String TEST_EVENT_ID = "TEST_EVENT";
+    private static final String TEST_EVENT_ID_2 = "TEST_EVENT_2";
     private static final String UID = "123";
     private static final String CASE_TYPE_CREATOR_ROLE = "TestAddressBookCreatorCase";
     private static final String CASE_TYPE_CREATOR_ROLE_NO_CREATE_ACCESS = "TestAddressBookCreatorNoCreateAccessCase";

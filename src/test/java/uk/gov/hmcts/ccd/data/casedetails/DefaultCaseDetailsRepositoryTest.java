@@ -31,6 +31,8 @@ import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.data.casedetails.search.SortOrderField;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseTypeDefinitionVersion;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -90,6 +92,8 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     @MockBean
     private AccessControlService accessControlService;
 
+    @MockBean
+    private CaseDefinitionRepository caseDefinitionRepository;
 
     @Inject
     @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
@@ -104,6 +108,8 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
 
         when(userAuthorisation.getAccessLevel()).thenReturn(AccessLevel.ALL);
         when(userAuthorisation.getUserId()).thenReturn("123");
+        when(caseDefinitionRepository.getLatestVersion("TestAddressBookCase"))
+            .thenReturn(new CaseTypeDefinitionVersion());
 
         request = new MockHttpServletRequest();
 

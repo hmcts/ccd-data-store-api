@@ -2,8 +2,9 @@ package uk.gov.hmcts.ccd;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Lists;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import lombok.val;
+import com.google.common.collect.Lists;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.experimental.runners.Enclosed;
@@ -1570,12 +1571,14 @@ public class ElasticsearchIT extends ElasticsearchBaseTest {
             @Test
             void shouldErrorWhenInvalidCaseTypeIsProvided() throws Exception {
                 ElasticsearchTestRequest searchRequest = matchAllRequest();
-
+                val message =
+                    "Resource not found when getting case type definition for [INVALID] because of 404 Not Found: "
+                        + "[no body]";
                 JsonNode exceptionNode = executeErrorRequest(searchRequest, "INVALID", 404);
 
                 assertAll(
                     () -> assertThat(exceptionNode.get("message").asText(),
-                        startsWith("Resource not found when getting case type definition for INVALID"))
+                        startsWith(message))
                 );
             }
 

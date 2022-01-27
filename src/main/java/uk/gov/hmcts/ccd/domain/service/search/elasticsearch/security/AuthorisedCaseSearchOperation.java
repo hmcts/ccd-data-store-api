@@ -8,7 +8,6 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -74,12 +73,7 @@ public class AuthorisedCaseSearchOperation implements CaseSearchOperation {
     }
 
     private List<CaseTypeDefinition> getAuthorisedCaseTypes(CrossCaseTypeSearchRequest searchRequest) {
-        return searchRequest.getCaseTypeIds()
-            .stream()
-            .map(caseTypeId ->
-                authorisedCaseDefinitionDataService.getAuthorisedCaseType(caseTypeId, CAN_READ).orElse(null))
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+        return authorisedCaseDefinitionDataService.getAuthorisedCaseTypes(searchRequest.getCaseTypeIds(), CAN_READ);
     }
 
     private CrossCaseTypeSearchRequest createAuthorisedSearchRequest(List<CaseTypeDefinition> authorisedCaseTypes,

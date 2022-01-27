@@ -14,6 +14,8 @@ public interface CaseDefinitionRepository {
 
     CaseTypeDefinition getCaseType(int version, String caseTypeId);
 
+    List<CaseTypeDefinition> getCaseTypes(final List<String> caseTypeIds);
+
     List<FieldTypeDefinition> getBaseTypes();
 
     UserRole getUserRoleClassifications(String userRole);
@@ -29,4 +31,5 @@ public interface CaseDefinitionRepository {
     List<JurisdictionDefinition> getAllJurisdictionsFromDefinitionStore();
 
     List<String> getAllCaseTypesIDs();
+
 }

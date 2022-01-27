@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.mediatype.hal.Jackson2HalModule;
@@ -15,6 +16,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ccd.MockUtils;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.Document;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.DocumentsResource;
@@ -43,6 +45,9 @@ public class DocumentControllerITest extends WireMockBaseTest {
     private static final String CASE_ID = "1504259907353529";
     private static final String REQUEST_ID = "request-id";
     private static final String REQUEST_ID_VALUE = "1234567898765432";
+
+    @Mock
+    private CaseDefinitionRepository caseDefinitionRepository;
 
     @SpyBean
     private AuditRepository auditRepository;
