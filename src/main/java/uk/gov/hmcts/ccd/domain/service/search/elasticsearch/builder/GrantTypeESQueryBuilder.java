@@ -99,6 +99,10 @@ public abstract class GrantTypeESQueryBuilder extends GrantTypeQueryBuilder {
     private void addTermsQueryForCaseAccessCategory(CaseTypeDefinition caseType,
                                                       SearchRoleAssignment representative,
                                                       BoolQueryBuilder parentQuery) {
+
+        if (ignoreCaseAccessCategoryQuery(caseType)) {
+            return;
+        }
         List<String> caseAccessCategories = caseType.getRoleToAccessProfiles().stream()
             .filter(rap -> rap.getRoleName().equalsIgnoreCase(representative.getRoleName()))
             .filter(rap -> rap.getCaseAccessCategories() != null)
@@ -109,5 +113,10 @@ public abstract class GrantTypeESQueryBuilder extends GrantTypeQueryBuilder {
         caseAccessCategories.stream()
             .forEach(cac -> caseAccessQuery.should(QueryBuilders.prefixQuery(CASE_ACCESS_CATEGORY, cac)));
         parentQuery.must(caseAccessQuery);
+    }
+
+    private boolean ignoreCaseAccessCategoryQuery(CaseTypeDefinition caseType) {
+        return caseType.getRoleToAccessProfiles().stream()
+            .anyMatch(rap -> rap.getCaseAccessCategories() == null);
     }
 }
