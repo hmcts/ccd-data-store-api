@@ -153,6 +153,9 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
     private String addInQueryForCaseAccessCategory(CaseTypeDefinition caseType,
                                                    SearchRoleAssignment representative,
                                                    String parentQuery) {
+        if (ignoreCaseAccessCategoryQuery(caseType)) {
+            return parentQuery;
+        }
         String caseAccessCategoriesQuery = getCaseAccessCategoriesQuery(caseType, representative);
         if (StringUtils.isNotBlank(caseAccessCategoriesQuery)) {
             parentQuery = parentQuery + getOperator(parentQuery, AND)
@@ -172,5 +175,10 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
         return caseAccessCategories.stream()
             .map(cac -> CASE_ACCESS_CATEGORY + " LIKE '" + cac + "%'")
             .collect(Collectors.joining(" OR "));
+    }
+
+    private boolean ignoreCaseAccessCategoryQuery(CaseTypeDefinition caseType) {
+        return caseType.getRoleToAccessProfiles().stream()
+            .anyMatch(rap -> rap.getCaseAccessCategories() == null);
     }
 }
