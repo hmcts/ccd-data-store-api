@@ -267,7 +267,7 @@ dependencies {
 
     
     testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.9.1'
-    testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.0'
+    testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.6.0'
 
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
