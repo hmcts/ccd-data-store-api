@@ -1,57 +1,92 @@
 {
-  "title": "Successfully updates a case with wrong data type for Date fields using V1: /caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
+  "title": "Successfully creates a case with wrong data type for Date fields using V1: /citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases endpoint",
   "_guid_": "S-1004.8",
-  "_extends_": "F-1004_CaseworkerUpdateCaseEvent",
-
-   "specs": [
-     "an active profile in CCD",
-     "contains a Text value for the Date fields",
-     "contains an empty SearchCriteria"
-    ],
+  "_extends_": "Citizen_Case_Creation_Base",
+  "specs": [
+    "an active profile in CCD",
+    "contains a Text value for the Date fields",
+    "contains a SearchCriteria with SearchParty excluding the Dates",
+    "to create a full case"
+  ],
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1004_CreateCasePreRequisiteCaseworker_InvalidDataFields][testData][actualResponse][body][id]}"
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_GlobalSearch"
     },
     "body": {
       "data": {
         "DateOfBirthText": "date-of-birth-text",
-        "DateOfDeathText": "date-of-death-text"
+        "DateOfDeathText": "date-of-death-text",
+        "OtherName": "other-name"
       },
-      "event_token": "${[scenarioContext][childContexts][F-1004_GetCaseworkerUpdateToken_InvalidFieldsCase][testData][actualResponse][body][token]}"
+      "event_token": "${[scenarioContext][childContexts][F-1004_Case_Data_Create_Token_Creation_Citizen][testData][actualResponse][body][token]}"
     }
   },
 
   "expectedResponse": {
-    "responseCode": 201,
-    "responseMessage": "OK",
-    "headers": {
-      "_extends_": "Common_Response_Headers",
-      "Vary": "Accept-Encoding"
-    },
+    "_extends_": "Common_201_Response",
     "body": {
       "jurisdiction": "BEFTA_MASTER",
-      "state": "CaseUpdated",
+      "state": "CaseCreated",
       "case_type_id": "FT_GlobalSearch",
+      "supplementary_data": null,
       "case_data": {
-        "DateOfBirthText" : "date-of-birth-text",
-        "DateOfDeathText" : "date-of-death-text",
-        "SearchCriteria" : { }
-      },
-      "data_classification" : {
-        "DateOfBirthText" : "PUBLIC",
-        "DateOfDeathText" : "PUBLIC",
-        "SearchCriteria" : {
-          "classification" : "PUBLIC",
-          "value" : { }
+        "DateOfBirthText": "date-of-birth-text",
+        "DateOfDeathText": "date-of-death-text",
+        "OtherName": "other-name",
+        "SearchCriteria": {
+          "SearchParties": [
+            {
+              "value": {
+                "Name": "other-name"
+              },
+              "id": "[[ANYTHING_PRESENT]]"
+            }
+          ]
         }
       },
-      "security_classifications" : {
-        "DateOfBirthText" : "PUBLIC",
-        "DateOfDeathText" : "PUBLIC",
-        "SearchCriteria" : {
-          "classification" : "PUBLIC",
-          "value" : { }
+      "data_classification": {
+        "DateOfBirthText": "PUBLIC",
+        "DateOfDeathText": "PUBLIC",
+        "OtherName": "PUBLIC",
+        "SearchCriteria": {
+          "classification": "PUBLIC",
+          "value": {
+            "SearchParties": {
+              "classification": "PUBLIC",
+              "value": [
+                {
+                  "value": {
+                    "Name": "PUBLIC"
+                  },
+                  "id": "[[ANYTHING_PRESENT]]"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "security_classifications": {
+        "DateOfBirthText": "PUBLIC",
+        "DateOfDeathText": "PUBLIC",
+        "OtherName": "PUBLIC",
+        "SearchCriteria": {
+          "classification": "PUBLIC",
+          "value": {
+            "SearchParties": {
+              "classification": "PUBLIC",
+              "value": [
+                {
+                  "value": {
+                    "Name": "PUBLIC"
+                  },
+                  "id": "[[ANYTHING_PRESENT]]"
+                }
+              ]
+            }
+          }
         }
       }
     }

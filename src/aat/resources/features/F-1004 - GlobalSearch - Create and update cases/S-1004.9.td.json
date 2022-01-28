@@ -1,7 +1,7 @@
 {
-  "title": "Successfully creates a case with wrong data type for Date fields using V1: /caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases endpoint",
-  "_guid_": "S-1004.7",
-  "_extends_": "Case_Creation_Base",
+  "title": "Successfully creates a case with wrong data type for Date fields using V1: /case-types/{caseTypeId}/cases cases endpoint",
+  "_guid_": "S-1004.9",
+  "_extends_": "Case_Creation_V2_Base",
   "specs": [
     "an active profile in CCD",
     "contains a Text value for the Date fields",
@@ -11,8 +11,7 @@
 
   "request": {
     "pathVariables": {
-      "jid": "BEFTA_MASTER",
-      "ctid": "FT_GlobalSearch"
+      "CaseTypeID": "FT_GlobalSearch"
     },
     "body": {
       "data": {
@@ -27,11 +26,15 @@
   "expectedResponse": {
     "_extends_": "Common_201_Response",
     "body": {
+      "_links": {
+        "self": {
+          "href": "{{TEST_URL}}/case-types/FT_GlobalSearch/cases{?ignore-warning}"
+        }
+      },
       "jurisdiction": "BEFTA_MASTER",
       "state": "CaseCreated",
-      "case_type_id": "FT_GlobalSearch",
-      "supplementary_data": null,
-      "case_data": {
+      "case_type": "FT_GlobalSearch",
+      "data": {
         "DateOfBirthText": "date-of-birth-text",
         "DateOfDeathText": "date-of-death-text",
         "OtherName": "other-name",
@@ -47,27 +50,6 @@
         }
       },
       "data_classification": {
-        "DateOfBirthText": "PUBLIC",
-        "DateOfDeathText": "PUBLIC",
-        "OtherName": "PUBLIC",
-        "SearchCriteria": {
-          "classification": "PUBLIC",
-          "value": {
-            "SearchParties": {
-              "classification": "PUBLIC",
-              "value": [
-                {
-                  "value": {
-                    "Name": "PUBLIC"
-                  },
-                  "id": "[[ANYTHING_PRESENT]]"
-                }
-              ]
-            }
-          }
-        }
-      },
-      "security_classifications": {
         "DateOfBirthText": "PUBLIC",
         "DateOfDeathText": "PUBLIC",
         "OtherName": "PUBLIC",
