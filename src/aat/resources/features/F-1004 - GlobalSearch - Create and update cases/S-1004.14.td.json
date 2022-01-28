@@ -37,33 +37,56 @@
         "DateOfBirthText": "2012-01-01",
         "DateOfDeathText": "2022-01-01",
         "OtherName": "other-name",
-        "SearchCriteria": {
-          "DateOfBirth": "2012-01-01",
-          "DateOfDeath": "2022-01-01",
-          "Name": "other-name"
+        "SearchCriteria" : {
+          "SearchParties" : [ {
+            "id" : "[[ANYTHING_PRESENT]]",
+            "value" : {
+              "Name" : "other-name",
+              "DateOfBirth" : "2012-01-01",
+              "DateOfDeath" : "2022-01-01"
+            }
+          } ]
         }
       },
       "data_classification": {
         "DateOfBirthText": "PUBLIC",
         "DateOfDeathText": "PUBLIC",
-        "SearchCriteria": {
-          "classification": "PUBLIC",
-          "value": {
-            "DateOfBirth": "PUBLIC",
-            "DateOfDeath": "PUBLIC",
-            "Name": "PUBLIC"
+        "OtherName": "PUBLIC",
+        "SearchCriteria" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "SearchParties" : {
+              "classification" : "PUBLIC",
+              "value" : [ {
+                "id" : "[[ANYTHING_PRESENT]]",
+                "value" : {
+                  "Name" : "PUBLIC",
+                  "DateOfBirth" : "PUBLIC",
+                  "DateOfDeath" : "PUBLIC"
+                }
+              } ]
+            }
           }
         }
       },
       "security_classifications": {
         "DateOfBirthText": "PUBLIC",
         "DateOfDeathText": "PUBLIC",
-        "SearchCriteria": {
-          "classification": "PUBLIC",
-          "value": {
-            "DateOfBirth": "PUBLIC",
-            "DateOfDeath": "PUBLIC",
-            "Name": "PUBLIC"
+        "OtherName": "PUBLIC",
+        "SearchCriteria" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "SearchParties" : {
+              "classification" : "PUBLIC",
+              "value" : [ {
+                "id" : "[[ANYTHING_PRESENT]]",
+                "value" : {
+                  "Name" : "PUBLIC",
+                  "DateOfBirth" : "PUBLIC",
+                  "DateOfDeath" : "PUBLIC"
+                }
+              } ]
+            }
           }
         }
       }

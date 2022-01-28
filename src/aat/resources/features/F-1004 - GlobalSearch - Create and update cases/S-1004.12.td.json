@@ -7,7 +7,6 @@
     "contains a Text value for the Date fields",
     "contains an empty SearchCriteria"
   ],
-
   "request": {
     "pathVariables": {
       "caseId": "${[scenarioContext][childContexts][F-1004_CreateCasePreRequisiteCaseworker_InvalidDataFields][testData][actualResponse][body][id]}"
@@ -21,7 +20,6 @@
       "event_token": "${[scenarioContext][childContexts][F-1004_GetCaseworkerUpdateToken_InvalidFieldsCase][testData][actualResponse][body][token]}"
     }
   },
-
   "expectedResponse": {
     "responseCode": 201,
     "responseMessage": "Created",
@@ -37,7 +35,14 @@
         "DateOfDeathText": "date-of-death-text",
         "OtherName": "other-name",
         "SearchCriteria": {
-          "Name": "other-name"
+          "SearchParties": [
+            {
+              "id": "[[ANYTHING_PRESENT]]",
+              "value": {
+                "Name": "other-name"
+              }
+            }
+          ]
         }
       },
       "data_classification": {
@@ -47,10 +52,21 @@
         "SearchCriteria": {
           "classification": "PUBLIC",
           "value": {
-            "Name": "PUBLIC"
+            "SearchParties": {
+              "classification": "PUBLIC",
+              "value": [
+                {
+                  "id": "[[ANYTHING_PRESENT]]",
+                  "value": {
+                    "Name": "PUBLIC"
+                  }
+                }
+              ]
+            }
           }
         }
       }
     }
   }
 }
+

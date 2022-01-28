@@ -37,18 +37,31 @@
         "DateOfBirthText": "date-of-birth-text",
         "DateOfDeathText": "date-of-death-text",
         "OtherName": "other-name",
-        "SearchCriteria": {
-          "Name": "other-name"
+          "SearchCriteria" : {
+            "SearchParties" : [ {
+              "id" : "[[ANYTHING_PRESENT]]",
+              "value" : {
+                "Name" : "other-name"
+              }
+            } ]
         }
       },
       "data_classification": {
         "DateOfBirthText": "PUBLIC",
         "DateOfDeathText": "PUBLIC",
-        "OtherName": "PUBlIC",
+        "OtherName": "PUBLIC",
         "SearchCriteria": {
           "classification": "PUBLIC",
           "value": {
-            "Name": "PUBLIC"
+            "SearchParties" : {
+              "classification" : "PUBLIC",
+              "value" : [ {
+                "id" : "[[ANYTHING_PRESENT]]",
+                "value" : {
+                  "Name" : "PUBLIC"
+                }
+              } ]
+            }
           }
         }
       },
@@ -59,7 +72,15 @@
         "SearchCriteria": {
           "classification": "PUBLIC",
           "value": {
-            "Name": "PUBLIC"
+            "SearchParties" : {
+              "classification" : "PUBLIC",
+              "value" : [ {
+                "id" : "[[ANYTHING_PRESENT]]",
+                "value" : {
+                  "Name" : "PUBLIC"
+                }
+              } ]
+            }
           }
         }
       }

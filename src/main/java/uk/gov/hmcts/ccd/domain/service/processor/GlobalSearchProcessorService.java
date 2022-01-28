@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ccd.domain.service.processor;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataFields.SEARCH_CRITERIA;
 
+@Slf4j
 @Service
 public class GlobalSearchProcessorService {
 
@@ -154,8 +156,10 @@ public class GlobalSearchProcessorService {
         searchPartyValue.setAddressLine1(findValueInMap(searchPartyDefinition.getSearchPartyAddressLine1(), data));
         searchPartyValue.setEmailAddress(findValueInMap(searchPartyDefinition.getSearchPartyEmailAddress(), data));
         searchPartyValue.setPostCode(findValueInMap(searchPartyDefinition.getSearchPartyPostCode(), data));
-        searchPartyValue.setDateOfBirth(findDateValueInMap(searchPartyDefinition.getSearchPartyDob(), data));
-        searchPartyValue.setDateOfDeath(findDateValueInMap(searchPartyDefinition.getSearchPartyDod(), data));
+        searchPartyValue.setDateOfBirth(
+            findDateValueInMap(searchPartyDefinition.getSearchPartyDob(), data, searchPartyDefinition.getCaseTypeId()));
+        searchPartyValue.setDateOfDeath(
+            findDateValueInMap(searchPartyDefinition.getSearchPartyDod(), data, searchPartyDefinition.getCaseTypeId()));
 
         return searchPartyValue;
     }
@@ -184,12 +188,13 @@ public class GlobalSearchProcessorService {
         return returnValue;
     }
 
-    private String findDateValueInMap(String valueToFind, Map<String, JsonNode> mapToSearch) {
+    private String findDateValueInMap(String valueToFind, Map<String, JsonNode> mapToSearch, String caseTypeID) {
         String value = findValueInMap(valueToFind, mapToSearch);
         if (value != null) {
             try {
                 LocalDate.parse(value, ISO_DATE);
             } catch (DateTimeParseException e) {
+                log.warn("The value: {} for CaseTypeID: {} is not a Date value in the ISO format", value, caseTypeID);
                 return null;
             }
         }

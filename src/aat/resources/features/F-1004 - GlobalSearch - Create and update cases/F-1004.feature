@@ -147,7 +147,7 @@ Feature: F-1004: Global Search - Create and update cases
     And the response [contains a SearchCriteria with SearchParty including the Dates]
     And the response has all other details as expected
 
-  @S-1004.10
+  @S-1004.14
   Scenario:  Successfully updates a case with correct data type for Date fields using V1: /caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events
     Given a user with [an active profile in CCD]
     And a successful call [to create a case] as in [F-1004_CreateCasePreRequisiteCaseworker_InvalidDataFields]
