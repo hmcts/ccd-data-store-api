@@ -1,0 +1,127 @@
+{
+	"_guid_": "F-1006_CreateCasePreRequisiteCaseworker",
+	"_extends_": "Case_Creation_Base",
+
+  "specs": [
+    "to create a case",
+    "As a prerequisite"
+  ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1006_Case_Data_Create_Token_Creation"
+    }
+   ],
+
+  "users": {
+		"invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+		}
+	},
+
+  "request": {
+		"pathVariables": {
+			"jid": "BEFTA_MASTER",
+			"ctid": "FT_GlobalSearch"
+		},
+		"body": {
+      "data": {
+        "caseNameHmctsInternal": "Name Internal",
+        "caseManagementLocation": {
+          "baseLocation": "123",
+          "region": "1"
+        },
+        "caseManagementCategory": {
+          "value": {
+            "code": "987",
+            "label": "Category label"
+          },
+          "list_items": [
+            {
+              "code": "987",
+              "label": "Category label"
+            }
+          ]
+        },
+        "DateOfBirth": "2012-04-21",
+        "DateOfDeath": "2020-04-21",
+        "Email": "${[scenarioContext][customValues][UniqueString]}@mail.com",
+        "Address": {
+          "AddressLine1": "Address Value"
+        },
+        "FirstName": "FirstNameValue",
+        "LastName": "LastNameValue",
+        "PostCode": "BH1 7BP"
+      },
+			"event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+	},
+
+	"expectedResponse": {
+		"body": {
+			"id": "[[ANYTHING_PRESENT]]",
+			"jurisdiction": "BEFTA_MASTER",
+			"state": "CaseCreated",
+			"version": 0,
+			"case_type_id": "FT_GlobalSearch",
+			"created_date": "[[ANYTHING_PRESENT]]",
+			"last_modified": "[[ANYTHING_PRESENT]]",
+			"last_state_modified_date": "[[ANYTHING_PRESENT]]",
+			"security_classification": "PUBLIC",
+			"case_data": {
+        "DateOfBirth" : "2012-04-21",
+        "caseManagementCategory" : {
+          "value" : {
+            "code" : "987",
+            "label" : "Category label"
+          },
+          "list_items" : [ {
+            "code" : "987",
+            "label" : "Category label"
+          } ]
+        },
+        "Email" : "[[ANYTHING_PRESENT]]",
+        "Address" : {
+          "AddressLine1" : "Address Value"
+        },
+        "caseManagementLocation" : {
+          "baseLocation" : "123",
+          "region" : "1"
+        },
+        "FirstName" : "FirstNameValue",
+        "DateOfDeath" : "2020-04-21",
+        "LastName" : "LastNameValue",
+        "PostCode": "BH1 7BP",
+        "caseNameHmctsInternal" : "Name Internal",
+        "SearchCriteria" : {
+          "OtherCaseReferences" : [ {
+            "value" : "FirstNameValue",
+            "id" : "[[ANYTHING_PRESENT]]"
+          } ],
+          "SearchParties" : [ {
+            "value" : {
+              "Name" : "FirstNameValue LastNameValue",
+              "EmailAddress" : "[[ANYTHING_PRESENT]]",
+              "AddressLine1" : "Address Value",
+              "PostCode": "BH1 7BP",
+              "DateOfBirth" : "2012-04-21",
+              "DateOfDeath" : "2020-04-21"
+            },
+            "id" : "[[ANYTHING_PRESENT]]"
+          } ]
+        }
+      },
+			"data_classification": {
+        "_extends_": "Befta_Global_Search_Data_Classifications"
+      },
+			"supplementary_data": null,
+			"after_submit_callback_response": null,
+			"callback_response_status_code": null,
+			"callback_response_status": null,
+			"delete_draft_response_status_code": null,
+			"delete_draft_response_status": null,
+			"security_classifications": {
+        "_extends_": "Befta_Global_Search_Data_Classifications"
+      }
+		}
+	}
+}

@@ -25,10 +25,12 @@
       "security_classification" : "RESTRICTED",
 
       "data": {
-        "RestrictedTextField" : "restricted text"
+        "RestrictedTextField" : "restricted text",
+        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
       },
       "data_classification" : {
-        "RestrictedTextField" : "RESTRICTED"
+        "RestrictedTextField" : "RESTRICTED",
+        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
       }
     }
   }
