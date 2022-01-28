@@ -27,7 +27,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.4.0'
     id "io.freefair.lombok" version "5.3.0"
     id 'uk.gov.hmcts.java' version '0.12.0'
-    id 'au.com.dius.pact' version '4.1.7'
+    id 'au.com.dius.pact' version '4.2.14'
 
 }
 
@@ -267,11 +267,6 @@ dependencies {
 
     testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.9.1'
     testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.6.0'
-
-    contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
-    contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
-    contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
-    contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
 
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
@@ -859,43 +854,15 @@ def getCheckedOutGitCommitHash() {
     'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
 
-task runAndPublishConsumerPactTests(type: Test) {
-    logger.lifecycle("Runs pact Tests")
-    testClassesDirs = sourceSets.contractTest.output.classesDirs
-    classpath = sourceSets.contractTest.runtimeClasspath
-}
-
-runAndPublishConsumerPactTests.finalizedBy pactPublish
-
-pact {
-    broker {
-        pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
-    }
-    publish {
-        pactDirectory = 'pacts'
-        tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
-        version = project.pactVersion
-    }
-}
-
-task contract(type: Test) {
-    description = 'Runs the consumer Pact tests'
-    group = 'Verification'
-    useJUnitPlatform()
-    testClassesDirs = sourceSets.contractTest.output.classesDirs
-    classpath = sourceSets.contractTest.runtimeClasspath
-}
-
 task runProviderPactVerification(type:Test) {
     logger.lifecycle("Runs provider pact Tests")
+    useJUnitPlatform()
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
     systemProperty 'pact.verifier.publishResults', System.getProperty('pact.verifier.publishResults')
     systemProperty 'pact.provider.version', project.pactVersion
     include "uk/gov/hmcts/ccd/v2/external/controller/**"
 }
-
-runProviderPactVerification.dependsOn contract
 
 runProviderPactVerification.finalizedBy pactVerify
 
