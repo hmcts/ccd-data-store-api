@@ -32,7 +32,8 @@ public class HttpError<T extends Serializable> implements Serializable {
 
         this.exception = exception.getClass().getName();
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
-        this.status = upstreamPreferredHttpStatus != null ? upstreamPreferredHttpStatus.value() : getStatusFromResponseStatus(responseStatus);
+        this.status = upstreamPreferredHttpStatus != null ? upstreamPreferredHttpStatus.value()
+            : getStatusFromResponseStatus(responseStatus);
         this.error = getErrorReason(responseStatus);
         this.message = exception.getMessage();
         this.path = UriUtils.encodePath(request.getRequestURI(), StandardCharsets.UTF_8);
