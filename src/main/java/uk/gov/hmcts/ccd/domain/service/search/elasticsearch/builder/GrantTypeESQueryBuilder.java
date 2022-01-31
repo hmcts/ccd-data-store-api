@@ -103,7 +103,7 @@ public abstract class GrantTypeESQueryBuilder extends GrantTypeQueryBuilder {
 
         BoolQueryBuilder caseAccessQuery = QueryBuilders.boolQuery();
 
-        caseAccessCategories.stream()
+        caseAccessCategories
             .forEach(cac -> caseAccessQuery.should(QueryBuilders.prefixQuery(CASE_ACCESS_CATEGORY, cac)));
         parentQuery.must(caseAccessQuery);
     }
