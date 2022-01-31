@@ -161,7 +161,7 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
     }
 
     private String getCaseAccessCategoriesQuery(RoleAssignment roleAssignment, CaseTypeDefinition caseType) {
-        List<String> caseAccessCategories = getCaseAccessCategories(roleAssignmet, caseType);
+        List<String> caseAccessCategories = getCaseAccessCategories(roleAssignment, caseType);
 
         return caseAccessCategories.stream()
             .map(cac -> CASE_ACCESS_CATEGORY + " LIKE '" + cac + "%'")
