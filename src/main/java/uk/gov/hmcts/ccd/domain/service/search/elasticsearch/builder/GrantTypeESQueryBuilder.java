@@ -100,6 +100,9 @@ public abstract class GrantTypeESQueryBuilder extends GrantTypeQueryBuilder {
                                                      BoolQueryBuilder parentQuery) {
 
         List<String> caseAccessCategories = getCaseAccessCategories(representative.getRoleAssignment(), caseType);
+        if (caseAccessCategories.isEmpty()) {
+            return;
+        }
 
         BoolQueryBuilder caseAccessQuery = QueryBuilders.boolQuery();
 
