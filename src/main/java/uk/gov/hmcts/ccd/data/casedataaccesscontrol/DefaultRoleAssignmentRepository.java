@@ -226,7 +226,7 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
                 String.format(ROLE_ASSIGNMENTS_CLIENT_ERROR, processDescription, exception.getMessage()));
         } else {
             return new ServiceException(
-                String.format(ROLE_ASSIGNMENT_SERVICE_ERROR, processDescription, exception.getMessage()));
+                String.format(ROLE_ASSIGNMENT_SERVICE_ERROR, processDescription, exception.getMessage()), exception);
         }
     }
 
