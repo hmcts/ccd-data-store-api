@@ -154,10 +154,10 @@ public class DefaultUserRepository implements UserRepository {
             if (message != null) {
                 throw new BadRequestException(message);
             }
-            throw new ServiceException("Problem getting user default settings for " + userId);
+            throw new ServiceException("Problem getting user default settings for " + userId, e);
         } catch (ResourceAccessException e) {
             LOG.error("Failed to retrieve user profile - I/O error", e);
-            throw new ServiceException("Problem getting user default settings for " + userId);
+            throw new ServiceException("Problem getting user default settings for " + userId, e);
         } catch (URISyntaxException e) {
             throw new BadRequestException(e.getMessage());
         }
