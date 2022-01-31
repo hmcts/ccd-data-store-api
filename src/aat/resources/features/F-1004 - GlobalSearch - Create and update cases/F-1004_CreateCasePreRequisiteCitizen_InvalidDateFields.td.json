@@ -21,8 +21,8 @@
     },
     "body": {
       "data": {
-        "DateOfBirthText": "2012-04-21",
-        "DateOfDeathText": "2020-04-21"
+        "dateOfBirthText": "2012-04-21",
+        "dateOfDeathText": "2020-04-21"
       },
       "event_token": "${[scenarioContext][childContexts][Token_Creation_Citizen][testData][actualResponse][body][token]}"
     }
@@ -39,8 +39,8 @@
       "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "case_data": {
-        "DateOfBirthText": "2012-04-21",
-        "DateOfDeathText": "2020-04-21",
+        "dateOfBirthText": "2012-04-21",
+        "dateOfDeathText": "2020-04-21",
         "SearchCriteria": {
           "SearchParties": [
             {
@@ -54,8 +54,8 @@
         }
       },
       "data_classification": {
-        "DateOfBirthText": "PUBLIC",
-        "DateOfDeathText": "PUBLIC",
+        "dateOfBirthText": "PUBLIC",
+        "dateOfDeathText": "PUBLIC",
         "SearchCriteria": {
           "classification": "PUBLIC",
           "value": {
@@ -81,8 +81,8 @@
       "delete_draft_response_status_code": null,
       "delete_draft_response_status": null,
       "security_classifications": {
-        "DateOfBirthText": "PUBLIC",
-        "DateOfDeathText": "PUBLIC",
+        "dateOfBirthText": "PUBLIC",
+        "dateOfDeathText": "PUBLIC",
         "SearchCriteria": {
           "classification": "PUBLIC",
           "value": {

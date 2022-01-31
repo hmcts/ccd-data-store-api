@@ -14,8 +14,8 @@
     },
     "body": {
       "data": {
-        "DateOfBirthText": "2012-01-01",
-        "DateOfDeathText": "2022-01-01",
+        "dateOfBirthText": "2012-01-01",
+        "dateOfDeathText": "2022-01-01",
         "OtherName": "other-name"
       },
       "event_token": "${[scenarioContext][childContexts][F-1004_GetCaseworkerUpdateToken_InvalidFieldsCase][testData][actualResponse][body][token]}"
@@ -34,8 +34,8 @@
       "state": "CaseUpdated",
       "case_type_id": "FT_GlobalSearch",
       "case_data": {
-        "DateOfBirthText": "2012-01-01",
-        "DateOfDeathText": "2022-01-01",
+        "dateOfBirthText": "2012-01-01",
+        "dateOfDeathText": "2022-01-01",
         "OtherName": "other-name",
         "SearchCriteria" : {
           "SearchParties" : [ {
@@ -49,8 +49,8 @@
         }
       },
       "data_classification": {
-        "DateOfBirthText": "PUBLIC",
-        "DateOfDeathText": "PUBLIC",
+        "dateOfBirthText": "PUBLIC",
+        "dateOfDeathText": "PUBLIC",
         "OtherName": "PUBLIC",
         "SearchCriteria" : {
           "classification" : "PUBLIC",
@@ -70,8 +70,8 @@
         }
       },
       "security_classifications": {
-        "DateOfBirthText": "PUBLIC",
-        "DateOfDeathText": "PUBLIC",
+        "dateOfBirthText": "PUBLIC",
+        "dateOfDeathText": "PUBLIC",
         "OtherName": "PUBLIC",
         "SearchCriteria" : {
           "classification" : "PUBLIC",

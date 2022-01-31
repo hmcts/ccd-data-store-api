@@ -16,8 +16,8 @@
     },
     "body": {
       "data": {
-        "DateOfBirthText": "date-of-birth-text",
-        "DateOfDeathText": "date-of-death-text",
+        "dateOfBirthText": "date-of-birth-text",
+        "dateOfDeathText": "date-of-death-text",
         "OtherName": "other-name"
       },
       "event_token": "${[scenarioContext][childContexts][F-1004_Case_Data_Create_Token_Creation][testData][actualResponse][body][token]}"
@@ -32,8 +32,8 @@
       "case_type_id": "FT_GlobalSearch",
       "supplementary_data": null,
       "case_data": {
-        "DateOfBirthText": "date-of-birth-text",
-        "DateOfDeathText": "date-of-death-text",
+        "dateOfBirthText": "date-of-birth-text",
+        "dateOfDeathText": "date-of-death-text",
         "OtherName": "other-name",
         "SearchCriteria": {
           "SearchParties": [
@@ -47,8 +47,8 @@
         }
       },
       "data_classification": {
-        "DateOfBirthText": "PUBLIC",
-        "DateOfDeathText": "PUBLIC",
+        "dateOfBirthText": "PUBLIC",
+        "dateOfDeathText": "PUBLIC",
         "OtherName": "PUBLIC",
         "SearchCriteria": {
           "classification": "PUBLIC",
@@ -68,8 +68,8 @@
         }
       },
       "security_classifications": {
-        "DateOfBirthText": "PUBLIC",
-        "DateOfDeathText": "PUBLIC",
+        "dateOfBirthText": "PUBLIC",
+        "dateOfDeathText": "PUBLIC",
         "OtherName": "PUBLIC",
         "SearchCriteria": {
           "classification": "PUBLIC",
