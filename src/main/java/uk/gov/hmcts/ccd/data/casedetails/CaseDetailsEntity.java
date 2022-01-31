@@ -79,7 +79,7 @@ public class CaseDetailsEntity {
     public static final String SUPPLEMENTARY_DATA_COL = "supplementary_data";
     public static final String LOCATION = "data.caseManagementLocation.baseLocation";
     public static final String REGION = "data.caseManagementLocation.region";
-    public static final String CASE_ACCESS_CATEGORY = "CaseAccessCategory";
+    public static final String CASE_ACCESS_CATEGORY = "data.CaseAccessCategory";
 
     @Id
     @Column(name = ID_FIELD_COL)

@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
-import com.google.common.collect.Lists;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -10,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import uk.gov.hmcts.ccd.data.casedetails.search.builder.GrantTypeQueryBuilder;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -56,7 +53,7 @@ public abstract class GrantTypeESQueryBuilder extends GrantTypeQueryBuilder {
                 addTermsQueryForReference(groupedSearchRoleAssignments, innerQuery);
                 addTermsQueryForState(readableCaseStates, caseStates, innerQuery);
                 addTermsQueryForClassification(representative, innerQuery);
-                addTermsQueryForCaseAccessCategory(caseType, representative, innerQuery);
+                addPrefixQueryForCaseAccessCategory(caseType, representative, innerQuery);
 
                 query.should(innerQuery);
             });
@@ -98,9 +95,9 @@ public abstract class GrantTypeESQueryBuilder extends GrantTypeQueryBuilder {
         }
     }
 
-    private void addTermsQueryForCaseAccessCategory(CaseTypeDefinition caseType,
-                                                      SearchRoleAssignment representative,
-                                                      BoolQueryBuilder parentQuery) {
+    private void addPrefixQueryForCaseAccessCategory(CaseTypeDefinition caseType,
+                                                     SearchRoleAssignment representative,
+                                                     BoolQueryBuilder parentQuery) {
 
         List<String> caseAccessCategories = getCaseAccessCategories(representative.getRoleAssignment(), caseType);
 
