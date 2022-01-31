@@ -160,7 +160,7 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
         return parentQuery;
     }
 
-    private String getCaseAccessCategoriesQuery(RoleAssignment roleAssignmet, CaseTypeDefinition caseType) {
+    private String getCaseAccessCategoriesQuery(RoleAssignment roleAssignment, CaseTypeDefinition caseType) {
         List<String> caseAccessCategories = getCaseAccessCategories(roleAssignmet, caseType);
 
         return caseAccessCategories.stream()
