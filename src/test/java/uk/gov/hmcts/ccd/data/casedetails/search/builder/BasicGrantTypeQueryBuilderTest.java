@@ -168,7 +168,8 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
         assertNotNull(query);
         String expectedValue =  "( state in (:states_1_basic) "
             + "AND security_classification in (:classifications_1_basic) "
-            + "AND ( CaseAccessCategory LIKE 'Civil/Standard%' ) )";
+            + "AND ( data #>> '{CaseAccessCategory}' LIKE 'Civil/Standard%' ) )";
+
 
         assertEquals(expectedValue, query);
     }
@@ -213,9 +214,11 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
 
         assertNotNull(query);
         String expectedValue =  "( state in (:states_1_basic) "
-            + "AND security_classification in (:classifications_1_basic)"
-            + " AND ( CaseAccessCategory LIKE 'Civil/Standard%' OR CaseAccessCategory LIKE 'Crime/Standard%' ) )"
-            + " OR ( state in (:states_2_basic) AND security_classification in (:classifications_2_basic) )";
+            + "AND security_classification in (:classifications_1_basic) "
+            + "AND ( data #>> '{CaseAccessCategory}' LIKE 'Civil/Standard%' "
+            + "OR data #>> '{CaseAccessCategory}' LIKE 'Crime/Standard%' ) ) "
+            + "OR ( state in (:states_2_basic) AND security_classification in (:classifications_2_basic) )";
+
 
         assertEquals(expectedValue, query);
     }

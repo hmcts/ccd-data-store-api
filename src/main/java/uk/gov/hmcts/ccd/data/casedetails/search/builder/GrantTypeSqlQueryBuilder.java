@@ -47,7 +47,7 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
 
     public static final String REFERENCES_PARAM = "references_%s_%s";
 
-    public static final String CASE_ACCESS_CATEGORY = "CaseAccessCategory";
+    public static final String CASE_ACCESS_CATEGORY = "data" + " #>> '{CaseAccessCategory}'";
 
     protected GrantTypeSqlQueryBuilder(AccessControlService accessControlService,
                                        CaseDataAccessControl caseDataAccessControl) {
