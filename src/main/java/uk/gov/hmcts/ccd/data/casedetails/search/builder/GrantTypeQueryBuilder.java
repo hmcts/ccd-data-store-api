@@ -90,8 +90,13 @@ public abstract class GrantTypeQueryBuilder {
             .collect(Collectors.toCollection(TreeSet::new));
     }
 
-    private Set<AccessProfile> getAccessProfiles(RoleAssignment roleAssignment,
+    protected Set<AccessProfile> getAccessProfiles(RoleAssignment roleAssignment,
                                                  CaseTypeDefinition caseTypeDefinition) {
         return caseDataAccessControl.filteredAccessProfiles(List.of(roleAssignment), caseTypeDefinition, false);
+    }
+
+    protected boolean ignoreCaseAccessCategoryQuery(Set<AccessProfile> accessProfiles) {
+        return accessProfiles.stream()
+            .anyMatch(ap -> ap.getCaseAccessCategories() == null);
     }
 }
