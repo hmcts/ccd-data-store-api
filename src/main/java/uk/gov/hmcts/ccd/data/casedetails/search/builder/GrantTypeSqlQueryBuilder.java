@@ -1,13 +1,11 @@
 package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -154,11 +152,7 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
     private String addInQueryForCaseAccessCategory(CaseTypeDefinition caseType,
                                                    SearchRoleAssignment representative,
                                                    String parentQuery) {
-        Set<AccessProfile> accessProfiles = getAccessProfiles(representative.getRoleAssignment(), caseType);
-        if (ignoreCaseAccessCategoryQuery(accessProfiles)) {
-            return parentQuery;
-        }
-        String caseAccessCategoriesQuery = getCaseAccessCategoriesQuery(accessProfiles);
+        String caseAccessCategoriesQuery = getCaseAccessCategoriesQuery(representative.getRoleAssignment(), caseType);
         if (StringUtils.isNotBlank(caseAccessCategoriesQuery)) {
             parentQuery = parentQuery + getOperator(parentQuery, AND)
                 + String.format(QUERY_WRAPPER, caseAccessCategoriesQuery);
@@ -166,11 +160,8 @@ public abstract class GrantTypeSqlQueryBuilder extends GrantTypeQueryBuilder {
         return parentQuery;
     }
 
-    private String getCaseAccessCategoriesQuery(Set<AccessProfile> accessProfiles) {
-        List<String> caseAccessCategories = accessProfiles.stream()
-            .filter(ap -> ap.getCaseAccessCategories() != null)
-            .flatMap(ap -> Arrays.stream(ap.getCaseAccessCategories().split(",")))
-            .collect(Collectors.toList());
+    private String getCaseAccessCategoriesQuery(RoleAssignment roleAssignmet, CaseTypeDefinition caseType) {
+        List<String> caseAccessCategories = getCaseAccessCategories(roleAssignmet, caseType);
 
         return caseAccessCategories.stream()
             .map(cac -> CASE_ACCESS_CATEGORY + " LIKE '" + cac + "%'")

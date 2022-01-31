@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 
+import com.google.common.collect.Lists;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -9,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import uk.gov.hmcts.ccd.data.casedetails.search.builder.GrantTypeQueryBuilder;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.RoleAssignment;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseStateDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -100,23 +102,12 @@ public abstract class GrantTypeESQueryBuilder extends GrantTypeQueryBuilder {
                                                       SearchRoleAssignment representative,
                                                       BoolQueryBuilder parentQuery) {
 
-        if (ignoreCaseAccessCategoryQuery(caseType)) {
-            return;
-        }
-        List<String> caseAccessCategories = caseType.getRoleToAccessProfiles().stream()
-            .filter(rap -> rap.getRoleName().equalsIgnoreCase(representative.getRoleName()))
-            .filter(rap -> rap.getCaseAccessCategories() != null)
-            .flatMap(rap -> Arrays.stream(rap.getCaseAccessCategories().split(",")))
-            .collect(Collectors.toList());
+        List<String> caseAccessCategories = getCaseAccessCategories(representative.getRoleAssignment(), caseType);
+
         BoolQueryBuilder caseAccessQuery = QueryBuilders.boolQuery();
 
         caseAccessCategories.stream()
             .forEach(cac -> caseAccessQuery.should(QueryBuilders.prefixQuery(CASE_ACCESS_CATEGORY, cac)));
         parentQuery.must(caseAccessQuery);
-    }
-
-    private boolean ignoreCaseAccessCategoryQuery(CaseTypeDefinition caseType) {
-        return caseType.getRoleToAccessProfiles().stream()
-            .anyMatch(rap -> rap.getCaseAccessCategories() == null);
     }
 }
