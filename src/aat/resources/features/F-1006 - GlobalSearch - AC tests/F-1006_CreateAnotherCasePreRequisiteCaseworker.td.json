@@ -42,8 +42,8 @@
             }
           ]
         },
-        "DateOfBirth": "2012-04-21",
-        "DateOfDeath": "2020-04-21",
+        "dateOfBirth": "2012-04-21",
+        "dateOfDeath": "2020-04-21",
         "Email": "${[scenarioContext][parentContext][siblingContexts][F-1006_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][case_data][Email]}",
         "Address": {
           "AddressLine1": "Address Value"
@@ -68,7 +68,7 @@
 			"last_state_modified_date": "[[ANYTHING_PRESENT]]",
 			"security_classification": "PUBLIC",
 			"case_data": {
-        "DateOfBirth" : "2012-04-21",
+        "dateOfBirth" : "2012-04-21",
         "caseManagementCategory" : {
           "value" : {
             "code" : "987",
@@ -88,7 +88,7 @@
           "region" : "1"
         },
         "FirstName" : "FirstNameValue",
-        "DateOfDeath" : "2020-04-21",
+        "dateOfDeath" : "2020-04-21",
         "LastName" : "LastNameValue",
         "PostCode": "BH1 7BP",
         "caseNameHmctsInternal" : "Name Internal",
