@@ -70,6 +70,14 @@ class CaseDetailsTest {
     }
 
     @Test
+    void testExistsInDataIsAlwaysTrueForComponentLauncher() {
+        uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField tabField =
+            createCaseTypeTabField("someId", "ComponentLauncher");
+
+        assertThat(caseDetails.existsInData(tabField), equalTo(true));
+    }
+
+    @Test
     void testExistsInDataIsFalseIfTabFieldDoesNotBelongToCase() {
         uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField tabField =
                 createCaseTypeTabField("someId2", "YesOrNo");
