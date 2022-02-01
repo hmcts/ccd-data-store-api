@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ccd.domain.service.processor;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.common.CaseFieldPathUtils;
@@ -9,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.globalsearch.OtherCaseReference;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchParty;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchPartyValue;
+import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +25,17 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataFields.SEARCH_CRITERIA;
 
 @Service
+@Slf4j
 public class GlobalSearchProcessorService {
+
+    private static final String JSON_NODE_VALUE_KEY_NAME = "value";
+
+    private ObjectMapperService objectMapperService;
+
+    @Autowired
+    public GlobalSearchProcessorService(ObjectMapperService objectMapperService) {
+        this.objectMapperService = objectMapperService;
+    }
 
     public Map<String, JsonNode> populateGlobalSearchData(CaseTypeDefinition caseTypeDefinition,
                                                           Map<String, JsonNode> data) {
@@ -71,7 +84,7 @@ public class GlobalSearchProcessorService {
                     && key.equals(currentSearchCriteria.getOtherCaseReference().split("\\.")[0])) {
                     otherCaseReferences.add(OtherCaseReference.builder()
                         .id(UUID.randomUUID().toString())
-                        .value(getNestedValue(jsonNode, currentSearchCriteria.getOtherCaseReference()))
+                        .value(getNestedValue(jsonNode, currentSearchCriteria.getOtherCaseReference()).textValue())
                         .build());
                 } else if (key.equals(currentSearchCriteria.getOtherCaseReference())) {
                     otherCaseReferences.add(OtherCaseReference.builder()
@@ -91,15 +104,17 @@ public class GlobalSearchProcessorService {
         List<SearchParty> searchPartyList = new ArrayList<>();
 
         searchParties.forEach(searchParty -> {
-            SearchPartyValue valueToPopulate = populateSearchParty(searchParty, data);
+            List<SearchPartyValue> valuesToPopulate = populateSearchParty(searchParty, data);
 
-            if (!valueToPopulate.isEmpty()) {
-                searchPartyList.add(SearchParty
-                    .builder()
-                    .id(UUID.randomUUID().toString())
-                    .value(valueToPopulate)
-                    .build());
-            }
+            valuesToPopulate.forEach(valueToPopulate -> {
+                if (!valueToPopulate.isEmpty()) {
+                    searchPartyList.add(SearchParty
+                        .builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(valueToPopulate)
+                        .build());
+                }
+            });
         });
 
         return searchPartyList;
@@ -109,13 +124,46 @@ public class GlobalSearchProcessorService {
         return field.contains(".") && key.equals(field.split("\\.")[0]);
     }
 
-    private String getNestedValue(JsonNode jsonNode, String field) {
-        JsonNode nestedCaseFieldByPath =
-            CaseFieldPathUtils.getNestedCaseFieldByPath(jsonNode, field.substring(field.indexOf(".") + 1));
-        return nestedCaseFieldByPath != null ? nestedCaseFieldByPath.textValue() : null;
+    private JsonNode getNestedValue(JsonNode jsonNode, String field) {
+        return CaseFieldPathUtils.getNestedCaseFieldByPath(jsonNode, field.substring(field.indexOf(".") + 1));
     }
 
-    private SearchPartyValue populateSearchParty(
+    private List<SearchPartyValue> populateSearchParty(
+        uk.gov.hmcts.ccd.domain.model.definition.SearchParty searchPartyDefinition,
+        Map<String, JsonNode> data) {
+
+        List<SearchPartyValue> searchPartyValues = new ArrayList<>();
+
+        String spCollectionFieldName = searchPartyDefinition.getSearchPartyCollectionFieldName();
+        if (spCollectionFieldName != null && !spCollectionFieldName.isEmpty()) {
+            searchPartyValues = populateSearchPartyFromCollection(searchPartyDefinition, data);
+        } else {
+            searchPartyValues.add(populateSearchPartyWithoutCollection(searchPartyDefinition, data));
+        }
+
+        return searchPartyValues;
+    }
+
+    private List<SearchPartyValue> populateSearchPartyFromCollection(
+        uk.gov.hmcts.ccd.domain.model.definition.SearchParty searchPartyDefinition,
+                                     Map<String, JsonNode> data) {
+
+        List<JsonNode> collectionValueInMap = findCollectionValueInMap(
+            searchPartyDefinition, data);
+
+        List<SearchPartyValue> searchPartyValues = new ArrayList<>();
+
+        for (JsonNode node : collectionValueInMap) {
+            Map<String, JsonNode> rawValue = getRawValueFromJsonNode(node);
+
+            SearchPartyValue searchPartyValue = populateSearchPartyWithoutCollection(searchPartyDefinition, rawValue);
+            searchPartyValues.add(searchPartyValue);
+        }
+
+        return searchPartyValues;
+    }
+
+    private SearchPartyValue populateSearchPartyWithoutCollection(
         uk.gov.hmcts.ccd.domain.model.definition.SearchParty searchPartyDefinition,
         Map<String, JsonNode> data) {
 
@@ -128,7 +176,7 @@ public class GlobalSearchProcessorService {
             searchPartyNames.forEach(searchPartyName -> namesToValuesMap.putIfAbsent(searchPartyName, ""));
 
             searchPartyNames.forEach(currentSearchPartyName -> {
-                String searchPartyName = findValueInMap(currentSearchPartyName, data);
+                String searchPartyName = findTextValueInMap(currentSearchPartyName, data);
 
                 if (searchPartyName != null) {
                     namesToValuesMap.replace(currentSearchPartyName, searchPartyName);
@@ -146,17 +194,42 @@ public class GlobalSearchProcessorService {
             }
         }
 
-        searchPartyValue.setAddressLine1(findValueInMap(searchPartyDefinition.getSearchPartyAddressLine1(), data));
-        searchPartyValue.setEmailAddress(findValueInMap(searchPartyDefinition.getSearchPartyEmailAddress(), data));
-        searchPartyValue.setPostCode(findValueInMap(searchPartyDefinition.getSearchPartyPostCode(), data));
-        searchPartyValue.setDateOfBirth(findValueInMap(searchPartyDefinition.getSearchPartyDob(), data));
-        searchPartyValue.setDateOfDeath(findValueInMap(searchPartyDefinition.getSearchPartyDod(), data));
+        searchPartyValue.setAddressLine1(findTextValueInMap(searchPartyDefinition.getSearchPartyAddressLine1(), data));
+        searchPartyValue.setEmailAddress(findTextValueInMap(searchPartyDefinition.getSearchPartyEmailAddress(), data));
+        searchPartyValue.setPostCode(findTextValueInMap(searchPartyDefinition.getSearchPartyPostCode(), data));
+        searchPartyValue.setDateOfBirth(findTextValueInMap(searchPartyDefinition.getSearchPartyDob(), data));
+        searchPartyValue.setDateOfDeath(findTextValueInMap(searchPartyDefinition.getSearchPartyDod(), data));
 
         return searchPartyValue;
     }
 
-    private String findValueInMap(String valueToFind, Map<String, JsonNode> mapToSearch) {
-        String returnValue = null;
+    private String findTextValueInMap(String valueToFind, Map<String, JsonNode> mapToSearch) {
+        JsonNode value = findValueInMap(valueToFind, mapToSearch);
+        return value != null ? value.textValue() : null;
+    }
+
+    private List<JsonNode> findCollectionValueInMap(uk.gov.hmcts.ccd.domain.model.definition.SearchParty searchParty,
+                                                    Map<String, JsonNode> mapToSearch) {
+        JsonNode valueInMap = findValueInMap(searchParty.getSearchPartyCollectionFieldName(), mapToSearch);
+
+        List<JsonNode> listOfNodes = new ArrayList<>();
+
+        if (valueInMap != null) {
+            if (!valueInMap.isArray()) {
+                log.warn("GlobalSearch: This is not a collection in "
+                    + "the SearchParty tab and it should be. CaseTypeId: {}", searchParty.getCaseTypeId());
+            }
+
+            for (JsonNode objNode : valueInMap) {
+                listOfNodes.add(objNode);
+            }
+        }
+
+        return listOfNodes;
+    }
+
+    private JsonNode findValueInMap(String valueToFind, Map<String, JsonNode> mapToSearch) {
+        JsonNode returnValue = null;
 
         if (valueToFind != null && mapToSearch != null) {
             for (Map.Entry<String, JsonNode> entry : mapToSearch.entrySet()) {
@@ -167,7 +240,7 @@ public class GlobalSearchProcessorService {
                     processedValue = true; // i.e. processed as a nested value
 
                 } else if (entry.getKey().equals(valueToFind)) {
-                    returnValue = entry.getValue().textValue();
+                    returnValue = entry.getValue();
                     processedValue = true;
                 }
 
@@ -178,6 +251,14 @@ public class GlobalSearchProcessorService {
         }
 
         return returnValue;
+    }
+
+    /**
+     * Splits out the id from the value from the JsonNode.
+     */
+    private Map<String, JsonNode> getRawValueFromJsonNode(JsonNode jsonNode) {
+        return jsonNode != null
+            ? objectMapperService.convertJsonNodeToMap(jsonNode.get(JSON_NODE_VALUE_KEY_NAME)) : null;
     }
 
 }
