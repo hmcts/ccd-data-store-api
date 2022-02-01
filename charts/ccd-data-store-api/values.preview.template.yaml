@@ -53,9 +53,12 @@ elasticsearch:
     path: /
     hosts:
       - es-${SERVICE_FQDN}
+
 logstash:
-  image: "logstash:7.16.3"
-  pullPolicy: IfNotPresent
+  image:
+    repository: hmctspublic.azurecr.io/imported/logstash/logstash
+    tag: 7.16.1
+    pullPolicy: IfNotPresent
   logstashJavaOpts: -Xmx1g -Xms512M
   environment:
     - XPACK_MONITORING_ENABLED=false
