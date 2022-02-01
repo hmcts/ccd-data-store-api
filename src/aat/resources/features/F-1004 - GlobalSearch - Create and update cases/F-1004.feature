@@ -112,22 +112,24 @@ Feature: F-1004: Global Search - Create and update cases
   @S-1004.19
   Scenario:  Update the Data Store for "case update" when valid data has been entered correctly in the CollectionFieldName using V1: /citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events
     Given a user with [an active profile in CCD]
-    And a successful call [to create a case as a citizen] as in [F-1004_CreateCasePreRequisiteCitizen]
-    And another successful call [to get a citizen event token to update the case just created] as in [F-1004_GetCitizenUpdateToken]
+    And a successful call [to create a case as a citizen] as in [F-1004_CreateCasePreRequisiteCitizen_Collection]
+    And another successful call [to get a citizen event token to update the case just created] as in [F-1004_GetCitizenUpdateToken_Collection]
     When a request is prepared with appropriate values
     And the request [contains additional data fields that will be used to populate SearchCriteria]
     And it is submitted to call the [Submit case update event creation as a Citizen (V1)] operation of [CCD Data Store]
-    Then a positive response is received
+    Then a positive response is received,
+    And the response [contains updated data including the search party fields in the collection fields as specified by the CollectionFieldName],
     And the response has all other details as expected
 
   @S-1004.20
   Scenario:  Update the Data Store for "case update" when valid data has been entered correctly in the CollectionFieldName using V2: /cases/{caseId}/events endpoint
     Given a user with [an active profile in CCD]
-    And a successful call [to create a case] as in [F-1004_CreateCasePreRequisiteCaseworker]
-    And another successful call [to get a caseworker event token to update the case just created] as in [F-1004_GetCaseworkerUpdateToken]
+    And a successful call [to create a case] as in [F-1004_CreateCasePreRequisiteCaseworker_Collection]
+    And another successful call [to get a caseworker event token to update the case just created] as in [F-1004_GetCaseworkerUpdateToken_Collection]
     When a request is prepared with appropriate values
     And the request [contains additional data fields that will be used to populate SearchCriteria]
     And it is submitted to call the [Submit case update event creation as a Caseworker (V2)] operation of [CCD Data Store]
-    Then a positive response is received
+    Then a positive response is received,
+    And the response [contains updated data including the search party fields in the collection fields as specified by the CollectionFieldName],
     And the response has all other details as expected
 
