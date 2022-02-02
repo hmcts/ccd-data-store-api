@@ -54,6 +54,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/loggers/**",
         "/",
         "/status/health",
+            "/status/caches",
+            "/status/beans",
+            "/status/metrics",
+            "/status/startup",
         "/swagger-resources/**",
         "/swagger-ui/**",
         "/webjars/**"

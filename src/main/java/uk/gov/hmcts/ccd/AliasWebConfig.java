@@ -14,6 +14,10 @@ public class AliasWebConfig implements WebMvcConfigurer {
          * this alias can be removed.
          */
         registry.addViewController("/status/health").setViewName("forward:/health");
+        registry.addViewController("/status/caches").setViewName("forward:/caches");
+        registry.addViewController("/status/beans").setViewName("forward:/beans");
+        registry.addViewController("/status/metrics").setViewName("forward:/metrics");
+        registry.addViewController("/status/startup").setViewName("forward:/startup");
         registry.addViewController("/").setViewName("forward:/health");
     }
 }
