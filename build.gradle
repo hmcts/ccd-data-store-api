@@ -166,6 +166,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-cache')
     compile group: 'com.hazelcast', name: 'hazelcast', version: hazelcastVersion
     compile group: 'com.hazelcast', name: 'hazelcast-spring', version: hazelcastVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis'
 
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
