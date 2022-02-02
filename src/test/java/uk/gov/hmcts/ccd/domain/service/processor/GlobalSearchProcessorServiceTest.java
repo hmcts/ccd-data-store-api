@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.processor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,6 +12,8 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.definition.SearchParty;
+import uk.gov.hmcts.ccd.domain.service.common.DefaultObjectMapperService;
+import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,9 +48,12 @@ class GlobalSearchProcessorServiceTest {
     private static final String ID = "id";
     private static final String VALUE = "value";
 
+    private final ObjectMapperService objectMapperService = new DefaultObjectMapperService(new ObjectMapper());
+
     @BeforeEach
     void setup() throws JsonProcessingException {
-        globalSearchProcessorService = new GlobalSearchProcessorService();
+
+        globalSearchProcessorService = new GlobalSearchProcessorService(objectMapperService);
         caseTypeDefinition = new CaseTypeDefinition();
 
         CaseFieldDefinition caseFieldDefinition = new CaseFieldDefinition();
@@ -94,6 +100,58 @@ class GlobalSearchProcessorServiceTest {
         assertNotNull(globalSearchData.get(SEARCH_CRITERIA));
         assertTrue(globalSearchData.get(SEARCH_CRITERIA).isEmpty());
 
+    }
+
+    @Test
+    void searchCriteriaCreatedIfEmptyCollection() throws JsonProcessingException {
+        final String collectionName = "myCollection";
+        final String firstName = "FirstName";
+        final String middleName = "MiddleName";
+        final String lastName = "LastName";
+
+        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
+        searchParty.setSearchPartyCollectionFieldName(String.format("%s", collectionName));
+        caseTypeDefinition.setSearchParties(List.of(searchParty));
+
+        caseData.put("myCollection", JacksonUtils.MAPPER.readTree("[]"));
+
+        assertSearchCriteriaCreated();
+    }
+
+    @Test
+    void searchCriteriaCreatedIfNotCollection() throws JsonProcessingException {
+        final String collectionName = "myCollection";
+        final String firstName = "FirstName";
+        final String middleName = "MiddleName";
+        final String lastName = "LastName";
+
+        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
+        searchParty.setSearchPartyCollectionFieldName(String.format("%s", collectionName));
+        caseTypeDefinition.setSearchParties(List.of(searchParty));
+
+        caseData.put("myCollection", JacksonUtils.MAPPER.readTree("{\n"
+            + "         \"id\": null\n"
+            + "      }\n"));
+
+        assertSearchCriteriaCreated();
+    }
+
+    @Test
+    void searchCriteriaCreatedIfCollectionHasBadData() throws JsonProcessingException {
+        final String collectionName = "myCollection";
+        final String firstName = "FirstName";
+        final String middleName = "MiddleName";
+        final String lastName = "LastName";
+
+        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
+        searchParty.setSearchPartyCollectionFieldName(String.format("%s", collectionName));
+        caseTypeDefinition.setSearchParties(List.of(searchParty));
+
+        caseData.put("myCollection", JacksonUtils.MAPPER.readTree("[{\n"
+            + "             \"FirstName\":\"1\"\n"
+            + "      }]\n"));
+
+        assertSearchCriteriaCreated();
     }
 
     @Test
@@ -255,6 +313,246 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
+    void checkSearchPartyValuesPopulatedInSearchCriteriaFromCollection()
+        throws JsonProcessingException {
+        final String searchPartyNameFirstName = "John";
+        final String searchPartyNameMiddleName = "Johnny";
+        final String searchPartyNameLastName = "Johnson";
+        final String searchPartyAddress = "My Address";
+        final String searchPartyPostCode = "AB1 2CD";
+        final String searchPartyEmail = "a@b.com";
+        final String searchPartyDoB = "1979-05-16";
+        final String searchPartyDoD = "1979-05-16";
+
+        final String collectionName = "myCollection";
+        final String firstName = "FirstName";
+        final String middleName = "MiddleName";
+        final String lastName = "LastName";
+        final String dob = "DoB";
+        final String dod = "DoD";
+        final String postCode = "PostCode";
+        final String email = "EmailAddress";
+        final String address = "AddressLine1";
+
+        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
+        searchParty.setSearchPartyAddressLine1(address);
+        searchParty.setSearchPartyPostCode(postCode);
+        searchParty.setSearchPartyEmailAddress(email);
+        searchParty.setSearchPartyDob(dob);
+        searchParty.setSearchPartyDod(dod);
+        searchParty.setSearchPartyCollectionFieldName(String.format("%s", collectionName));
+        caseTypeDefinition.setSearchParties(List.of(searchParty));
+
+        caseData.put("myCollection", JacksonUtils.MAPPER.readTree("[{\n"
+            + "         \"id\": null,\n"
+            + "         \"value\": {\n"
+            + "             \"FirstName\":\"" + searchPartyNameFirstName + "\",\n"
+            + "             \"MiddleName\":\"" + searchPartyNameMiddleName + "\",\n"
+            + "             \"LastName\":\"" + searchPartyNameLastName + "\",\n"
+            + "             \"DoB\":\"" + searchPartyDoB + "\",\n"
+            + "             \"DoD\":\"" + searchPartyDoD + "\",\n"
+            + "             \"AddressLine1\":\"" + searchPartyAddress + "\",\n"
+            + "             \"PostCode\":\"" + searchPartyPostCode + "\",\n"
+            + "             \"EmailAddress\":\"" + searchPartyEmail + "\"\n"
+            + "         }\n"
+            + "      }]\n"));
+
+        Map<String, String> expectedValues = new HashMap<>();
+
+        expectedValues.put(NAME,
+            String.format("%s %s %s", searchPartyNameFirstName, searchPartyNameMiddleName, searchPartyNameLastName));
+        expectedValues.put(DATE_OF_BIRTH, searchPartyDoB);
+        expectedValues.put(DATE_OF_DEATH, searchPartyDoD);
+        expectedValues.put(EMAIL_ADDRESS, searchPartyEmail);
+        expectedValues.put(ADDRESS_LINE_1, searchPartyAddress);
+        expectedValues.put(POSTCODE, searchPartyPostCode);
+
+        assertSearchCriteriaFields(expectedValues);
+    }
+
+    @Test
+    void checkComplexSearchPartyValuesPopulatedInSearchCriteriaFromCollection()
+        throws JsonProcessingException {
+        final String searchPartyNameFirstName = "John";
+        final String searchPartyNameMiddleName = "Johnny";
+        final String searchPartyNameLastName = "Johnson";
+        final String searchPartyAddress = "My Address";
+        final String searchPartyPostCode = "AB1 2CD";
+        final String searchPartyEmail = "a@b.com";
+        final String searchPartyDoB = "1979-05-16";
+        final String searchPartyDoD = "1979-05-16";
+
+        final String collectionName = "myCollection";
+        final String firstName = "Person.FirstName";
+        final String middleName = "Person.MiddleName";
+        final String lastName = "Person.LastName";
+        final String dob = "Person.DoB";
+        final String dod = "Person.DoD";
+        final String postCode = "Person.PostCode";
+        final String email = "Person.EmailAddress";
+        final String address = "Person.AddressLine1";
+
+        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
+        searchParty.setSearchPartyAddressLine1(address);
+        searchParty.setSearchPartyPostCode(postCode);
+        searchParty.setSearchPartyEmailAddress(email);
+        searchParty.setSearchPartyDob(dob);
+        searchParty.setSearchPartyDod(dod);
+        searchParty.setSearchPartyCollectionFieldName(String.format("%s", collectionName));
+        caseTypeDefinition.setSearchParties(List.of(searchParty));
+
+        caseData.put("myCollection", JacksonUtils.MAPPER.readTree("[{\n"
+            + "         \"id\": null,\n"
+            + "         \"value\": {\n"
+            + "             \"Person\": {\n"
+            + "                 \"FirstName\":\"" + searchPartyNameFirstName + "\",\n"
+            + "                 \"MiddleName\":\"" + searchPartyNameMiddleName + "\",\n"
+            + "                 \"LastName\":\"" + searchPartyNameLastName + "\",\n"
+            + "                 \"DoB\":\"" + searchPartyDoB + "\",\n"
+            + "                 \"DoD\":\"" + searchPartyDoD + "\",\n"
+            + "                 \"AddressLine1\":\"" + searchPartyAddress + "\",\n"
+            + "                 \"PostCode\":\"" + searchPartyPostCode + "\",\n"
+            + "                 \"EmailAddress\":\"" + searchPartyEmail + "\"\n"
+            + "             }\n"
+            + "          }\n"
+            + "      }]\n"));
+
+        Map<String, String> expectedValues = new HashMap<>();
+
+        expectedValues.put(NAME,
+            String.format("%s %s %s", searchPartyNameFirstName, searchPartyNameMiddleName, searchPartyNameLastName));
+        expectedValues.put(DATE_OF_BIRTH, searchPartyDoB);
+        expectedValues.put(DATE_OF_DEATH, searchPartyDoD);
+        expectedValues.put(EMAIL_ADDRESS, searchPartyEmail);
+        expectedValues.put(ADDRESS_LINE_1, searchPartyAddress);
+        expectedValues.put(POSTCODE, searchPartyPostCode);
+
+        assertSearchCriteriaFields(expectedValues);
+    }
+
+    @Test
+    void checkComplexSearchPartyValuesPopulatedInSearchCriteriaFromComplexCollection()
+        throws JsonProcessingException {
+        final String searchPartyNameFirstName = "John";
+        final String searchPartyNameMiddleName = "Johnny";
+        final String searchPartyNameLastName = "Johnson";
+        final String searchPartyAddress = "My Address";
+        final String searchPartyPostCode = "AB1 2CD";
+        final String searchPartyEmail = "a@b.com";
+        final String searchPartyDoB = "1979-05-16";
+        final String searchPartyDoD = "1979-05-16";
+
+        final String collectionName = "myComplex.myCollection";
+        final String firstName = "Person.FirstName";
+        final String middleName = "Person.MiddleName";
+        final String lastName = "Person.LastName";
+        final String dob = "Person.DoB";
+        final String dod = "Person.DoD";
+        final String postCode = "Person.PostCode";
+        final String email = "Person.EmailAddress";
+        final String address = "Person.AddressLine1";
+
+        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
+        searchParty.setSearchPartyAddressLine1(address);
+        searchParty.setSearchPartyPostCode(postCode);
+        searchParty.setSearchPartyEmailAddress(email);
+        searchParty.setSearchPartyDob(dob);
+        searchParty.setSearchPartyDod(dod);
+        searchParty.setSearchPartyCollectionFieldName(collectionName);
+        caseTypeDefinition.setSearchParties(List.of(searchParty));
+
+        caseData.put("myComplex", JacksonUtils.MAPPER.readTree("{\n"
+            + "         \"myCollection\": [{\n"
+            + "            \"id\": null,\n"
+            + "             \"value\": {\n"
+            + "                 \"Person\": {\n"
+            + "                     \"FirstName\":\"" + searchPartyNameFirstName + "\",\n"
+            + "                     \"MiddleName\":\"" + searchPartyNameMiddleName + "\",\n"
+            + "                     \"LastName\":\"" + searchPartyNameLastName + "\",\n"
+            + "                     \"DoB\":\"" + searchPartyDoB + "\",\n"
+            + "                     \"DoD\":\"" + searchPartyDoD + "\",\n"
+            + "                     \"AddressLine1\":\"" + searchPartyAddress + "\",\n"
+            + "                     \"PostCode\":\"" + searchPartyPostCode + "\",\n"
+            + "                     \"EmailAddress\":\"" + searchPartyEmail + "\"\n"
+            + "                 }\n"
+            + "             }\n"
+            + "         }]\n"
+            + "     }\n"));
+
+        Map<String, String> expectedValues = new HashMap<>();
+
+        expectedValues.put(NAME,
+            String.format("%s %s %s", searchPartyNameFirstName, searchPartyNameMiddleName, searchPartyNameLastName));
+        expectedValues.put(DATE_OF_BIRTH, searchPartyDoB);
+        expectedValues.put(DATE_OF_DEATH, searchPartyDoD);
+        expectedValues.put(EMAIL_ADDRESS, searchPartyEmail);
+        expectedValues.put(ADDRESS_LINE_1, searchPartyAddress);
+        expectedValues.put(POSTCODE, searchPartyPostCode);
+
+        assertSearchCriteriaFields(expectedValues);
+    }
+
+    @Test
+    void checkSearchPartyValuesPopulatedInSearchCriteriaFromComplexCollection()
+        throws JsonProcessingException {
+        final String searchPartyNameFirstName = "John";
+        final String searchPartyNameMiddleName = "Johnny";
+        final String searchPartyNameLastName = "Johnson";
+        final String searchPartyAddress = "My Address";
+        final String searchPartyPostCode = "AB1 2CD";
+        final String searchPartyEmail = "a@b.com";
+        final String searchPartyDoB = "1979-05-16";
+        final String searchPartyDoD = "1979-05-16";
+
+        final String collectionName = "myComplex.myCollection";
+        final String firstName = "FirstName";
+        final String middleName = "MiddleName";
+        final String lastName = "LastName";
+        final String dob = "DoB";
+        final String dod = "DoD";
+        final String postCode = "PostCode";
+        final String email = "EmailAddress";
+        final String address = "AddressLine1";
+
+        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
+        searchParty.setSearchPartyAddressLine1(address);
+        searchParty.setSearchPartyPostCode(postCode);
+        searchParty.setSearchPartyEmailAddress(email);
+        searchParty.setSearchPartyDob(dob);
+        searchParty.setSearchPartyDod(dod);
+        searchParty.setSearchPartyCollectionFieldName(collectionName);
+        caseTypeDefinition.setSearchParties(List.of(searchParty));
+
+        caseData.put("myComplex", JacksonUtils.MAPPER.readTree("{\n"
+            + "         \"myCollection\": [{\n"
+            + "            \"id\": null,\n"
+            + "            \"value\": {\n"
+            + "                \"FirstName\":\"" + searchPartyNameFirstName + "\",\n"
+            + "                \"MiddleName\":\"" + searchPartyNameMiddleName + "\",\n"
+            + "                \"LastName\":\"" + searchPartyNameLastName + "\",\n"
+            + "                \"DoB\":\"" + searchPartyDoB + "\",\n"
+            + "                \"DoD\":\"" + searchPartyDoD + "\",\n"
+            + "                \"AddressLine1\":\"" + searchPartyAddress + "\",\n"
+            + "                \"PostCode\":\"" + searchPartyPostCode + "\",\n"
+            + "                \"EmailAddress\":\"" + searchPartyEmail + "\"\n"
+            + "            }\n"
+            + "         }]\n"
+            + "     }\n"));
+
+        Map<String, String> expectedValues = new HashMap<>();
+
+        expectedValues.put(NAME,
+            String.format("%s %s %s", searchPartyNameFirstName, searchPartyNameMiddleName, searchPartyNameLastName));
+        expectedValues.put(DATE_OF_BIRTH, searchPartyDoB);
+        expectedValues.put(DATE_OF_DEATH, searchPartyDoD);
+        expectedValues.put(EMAIL_ADDRESS, searchPartyEmail);
+        expectedValues.put(ADDRESS_LINE_1, searchPartyAddress);
+        expectedValues.put(POSTCODE, searchPartyPostCode);
+
+        assertSearchCriteriaFields(expectedValues);
+    }
+
+    @Test
     void checkCommaSeparatedComplexValuesSearchPartyNameWithNullAndMissingValuesPopulatedInSearchCriteria()
         throws JsonProcessingException {
 
@@ -377,7 +675,7 @@ class GlobalSearchProcessorServiceTest {
         searchParty.setSearchPartyDod("SearchPartyDod");
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        final String dod = "16-05-1979";
+        final String dod = "1979-05-16";
         caseData.put("SearchPartyDod", JacksonUtils.MAPPER.readTree("\""  + dod  + "\""));
 
         assertSearchCriteriaField(DATE_OF_DEATH, dod);
@@ -390,7 +688,7 @@ class GlobalSearchProcessorServiceTest {
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        final String dod = "16-05-1979";
+        final String dod = "1979-05-16";
 
         caseData.put("SearchParty", JacksonUtils.MAPPER.readTree("{\n"
             + "      \"PostCode\":{\n"
@@ -407,7 +705,7 @@ class GlobalSearchProcessorServiceTest {
         searchParty.setSearchPartyDob("SearchPartyDoB");
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        final String dob = "16-05-1979";
+        final String dob = "1979-05-16";
         caseData.put("SearchPartyDoB", JacksonUtils.MAPPER.readTree("\""  + dob  + "\""));
 
         assertSearchCriteriaField(DATE_OF_BIRTH, dob);
@@ -420,7 +718,7 @@ class GlobalSearchProcessorServiceTest {
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        final String dob = "16-05-1979";
+        final String dob = "1979-05-16";
 
         caseData.put("SearchParty", JacksonUtils.MAPPER.readTree("{\n"
             + "      \"PostCode\":{\n"
@@ -444,8 +742,8 @@ class GlobalSearchProcessorServiceTest {
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         final String name =  "name";
-        final String dob = "16-05-1979";
-        final String dod = "16-05-1979";
+        final String dob = "1979-05-16";
+        final String dod = "1979-05-16";
         final String postCode = "AB1 2CD";
         final String email = "a@b.com";
         final String address = "My Address";
@@ -470,6 +768,51 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
+    void checkSearchCriteriaContainingASearchPartyContainingAllFieldsFromCollection() throws JsonProcessingException {
+
+        searchParty.setSearchPartyName("spName");
+        searchParty.setSearchPartyDob("spDob");
+        searchParty.setSearchPartyDod("spDod");
+        searchParty.setSearchPartyPostCode("spPostCode");
+        searchParty.setSearchPartyEmailAddress("spEmail");
+        searchParty.setSearchPartyAddressLine1("spAddress");
+        searchParty.setSearchPartyCollectionFieldName("myCollection");
+
+        caseTypeDefinition.setSearchParties(List.of(searchParty));
+
+        final String name =  "name";
+        final String dob = "1979-05-16";
+        final String dod = "1979-05-16";
+        final String postCode = "AB1 2CD";
+        final String email = "a@b.com";
+        final String address = "My Address";
+
+        Map<String, String> expectedFieldValues = new HashMap<>();
+
+        expectedFieldValues.put(NAME, name);
+        expectedFieldValues.put(ADDRESS_LINE_1, address);
+        expectedFieldValues.put(EMAIL_ADDRESS, email);
+        expectedFieldValues.put(POSTCODE, postCode);
+        expectedFieldValues.put(DATE_OF_BIRTH, dob);
+        expectedFieldValues.put(DATE_OF_DEATH, dod);
+
+        caseData.put("myCollection", JacksonUtils.MAPPER.readTree("[{\n"
+            + "         \"id\": null,\n"
+            + "         \"value\": {\n"
+            + "             \"spName\":\"" + name + "\",\n"
+            + "             \"spAddress\":\"" + address + "\",\n"
+            + "             \"spPostCode\":\"" + postCode + "\",\n"
+            + "             \"spEmail\":\"" + email + "\",\n"
+            + "             \"spDob\":\"" + dob + "\",\n"
+            + "             \"spDod\":\"" + dod + "\"\n"
+            + "         }\n"
+            + "      }]\n"
+            + "}"));
+
+        assertSearchCriteriaFields(expectedFieldValues);
+    }
+
+    @Test
     void checkSearchCriteriaContainingMultipleSearchPartiesContainingAllFields() throws JsonProcessingException {
 
         searchParty.setSearchPartyName("spName");
@@ -488,15 +831,15 @@ class GlobalSearchProcessorServiceTest {
         caseTypeDefinition.setSearchParties(List.of(searchParty, searchParty2));
 
         final String name =  "name";
-        final String dob = "16-05-1979";
-        final String dod = "16-05-1979";
+        final String dob = "1979-05-16";
+        final String dod = "1979-05-16";
         final String postCode = "AB1 2CD";
         final String email = "a@b.com";
         final String address = "My Address";
 
         final String name2 =  "another name";
-        final String dob2 = "16-05-1980";
-        final String dod2 = "16-05-1980";
+        final String dob2 = "1980-05-16";
+        final String dod2 = "1980-05-16";
         final String postCode2 = "EF3 4GH";
         final String email2 = "c@d.com";
         final String address2 = "My 2nd Address";
@@ -538,6 +881,73 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
+    void checkSearchCriteriaContainsMultipleSearchPartiesFromCollection()
+        throws JsonProcessingException {
+
+        searchParty.setSearchPartyName("spName");
+        searchParty.setSearchPartyDob("spDob");
+        searchParty.setSearchPartyPostCode("spPostCode");
+        searchParty.setSearchPartyEmailAddress("spEmail");
+        searchParty.setSearchPartyAddressLine1("spAddress");
+        searchParty.setSearchPartyCollectionFieldName("myCollection");
+
+        SearchParty searchParty2 = new SearchParty();
+        searchParty2.setSearchPartyName("sp.Name.value");
+        searchParty2.setSearchPartyDob("sp.Dob.value");
+        searchParty2.setSearchPartyPostCode("sp.PostCode.value");
+        searchParty2.setSearchPartyEmailAddress("sp.Email.value");
+        searchParty2.setSearchPartyAddressLine1("sp.Address.value");
+        searchParty2.setSearchPartyAddressLine1("sp.Collection.value");
+
+        caseTypeDefinition.setSearchParties(List.of(searchParty, searchParty2));
+
+        final String name =  "name";
+        final String dob = "1979-05-16";
+        final String dod = "1979-05-16";
+        final String postCode = "AB1 2CD";
+        final String email = "a@b.com";
+        final String address = "My Address";
+
+        final String name2 =  "another name";
+        final String dob2 = "1980-05-16";
+        final String dod2 = "1980-05-16";
+        final String postCode2 = "EF3 4GH";
+        final String email2 = "c@d.com";
+        final String address2 = "My 2nd Address";
+
+        caseData.put("myCollection", JacksonUtils.MAPPER.readTree("[{\n"
+            + "         \"id\": null,\n"
+            + "         \"value\": {\n"
+            + "             \"spName\":\"" + name + "\",\n"
+            + "             \"spAddress\":\"" + address + "\",\n"
+            + "             \"spPostCode\":\"" + postCode + "\",\n"
+            + "             \"spEmail\":\"" + email + "\",\n"
+            + "             \"spDob\":\"" + dob + "\",\n"
+            + "             \"spDod\":\"" + dod + "\"\n"
+            + "         }\n"
+            + "      },\n"
+            + "      {\n"
+            + "         \"id\": null,\n"
+            + "         \"value\": {\n"
+            + "             \"spName\":\"" + name2 + "\",\n"
+            + "             \"spAddress\":\"" + address2 + "\",\n"
+            + "             \"spPostCode\":\"" + postCode2 + "\",\n"
+            + "             \"spEmail\":\"" + email2 + "\",\n"
+            + "             \"spDob\":\"" + dob2 + "\",\n"
+            + "             \"spDod\":\"" + dod2 + "\"\n"
+            + "         }\n"
+            + "    }]\n"
+            + "}"));
+
+        Map<String, JsonNode> globalSearchData =
+            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+
+        JsonNode searchPartyNodes = globalSearchData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
+
+        assertEquals(2, searchPartyNodes.size());
+    }
+
+    @Test
     void checkSearchCriteriaContainingSingleMatchingSearchPartyContainingAllFields() throws JsonProcessingException {
 
         searchParty.setSearchPartyName("spName");
@@ -558,15 +968,15 @@ class GlobalSearchProcessorServiceTest {
         caseTypeDefinition.setSearchParties(List.of(searchParty, searchParty2));
 
         final String name =  "name";
-        final String dob = "16-05-1979";
-        final String dod = "16-05-1979";
+        final String dob = "1979-05-16";
+        final String dod = "1979-05-16";
         final String postCode = "AB1 2CD";
         final String email = "a@b.com";
         final String address = "My Address";
 
         final String name2 =  "another name";
-        final String dob2 = "16-05-1980";
-        final String dod2 = "16-05-1980";
+        final String dob2 = "1980-05-16";
+        final String dod2 = "1980-05-16";
         final String postCode2 = "EF3 4GH";
         final String email2 = "c@d.com";
         final String address2 = "My 2nd Address";
@@ -647,6 +1057,15 @@ class GlobalSearchProcessorServiceTest {
             assertEquals(value, searchPartyNode.findValue(VALUE).findValue(key).asText())
         );
 
+    }
+
+    private void assertSearchCriteriaCreated() {
+        Map<String, JsonNode> globalSearchData =
+            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+
+        JsonNode searchPartyNode = globalSearchData.get(SEARCH_CRITERIA);
+
+        assertNotNull(searchPartyNode);
     }
 
 }
