@@ -133,3 +133,15 @@ Feature: F-1004: Global Search - Create and update cases
     And the response [contains updated data including the search party fields in the collection fields as specified by the CollectionFieldName],
     And the response has all other details as expected
 
+  @S-1004.21
+  Scenario:  Create and update a case using a collection field within a complex type in the CollectionFieldName column
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1004_CreateCasePreRequisiteCaseworker_ComplexCollection]
+    And another successful call [to get a caseworker event token to update the case just created] as in [F-1004_GetCaseworkerUpdateToken_ComplexCollection]
+    When a request is prepared with appropriate values
+    And the request [contains additional data fields that will be used to populate SearchCriteria]
+    And it is submitted to call the [Submit case update event creation as a Caseworker (V2)] operation of [CCD Data Store]
+    Then a positive response is received,
+    And the response [contains updated data including the search party fields in the collection fields as specified by the CollectionFieldName],
+    And the response has all other details as expected
+
