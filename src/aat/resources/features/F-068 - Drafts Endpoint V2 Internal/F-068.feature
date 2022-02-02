@@ -3,7 +3,7 @@
 Feature: F-068: Validate calls for the Drafts Endpoint
 #=====================================================
 
-  Background:
+  Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
