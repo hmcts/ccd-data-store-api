@@ -268,7 +268,7 @@ dependencies {
 
     testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.9.1'
 //    testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.0'
-    testCompile('com.github.hmcts:befta-fw:8.7.0') {
+    testCompile('com.github.hmcts:befta-fw:8.7.1') {
         exclude group: 'org.json', module: 'json'
     }
 
