@@ -13,7 +13,10 @@
   "request": {
     "body": {
       "data": {
-        "Email": "${[scenarioContext][parentContext][childContexts][F-1006_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][case_data][Email]}"
+        "Email": "${[scenarioContext][parentContext][childContexts][F-1006_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][case_data][Email]}",
+        "Address": {
+          "AddressLine1": "${[scenarioContext][parentContext][childContexts][F-1006_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][case_data][Address][AddressLine1]}"
+        }
       }
     }
   }
