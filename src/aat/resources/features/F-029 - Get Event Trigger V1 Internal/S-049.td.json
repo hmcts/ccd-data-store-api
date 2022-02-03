@@ -814,7 +814,8 @@
       "can_save_draft": null,
       "access_granted" : "STANDARD",
       "access_process" : "NONE",
-      "title_display": null
+      "title_display": null,
+      "supplementary_data" : null
     }
   }
 }

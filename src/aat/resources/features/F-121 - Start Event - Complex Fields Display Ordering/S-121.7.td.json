@@ -759,6 +759,7 @@
       "access_granted" : "STANDARD",
       "access_process" : "NONE",
       "title_display": null,
+      "supplementary_data" : null,
       "_links": {
         "self": {
           "href": "[[ANYTHING_PRESENT]]"
