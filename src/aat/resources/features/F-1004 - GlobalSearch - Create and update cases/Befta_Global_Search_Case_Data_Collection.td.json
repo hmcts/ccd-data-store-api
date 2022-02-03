@@ -1,0 +1,37 @@
+{
+  "_guid_": "Befta_Global_Search_Case_Data_Collection",
+
+  "caseNameHmctsInternal": "Name Internal",
+  "caseManagementLocation": {
+    "baseLocation": "123",
+    "region": "1"
+  },
+  "caseManagementCategory": {
+    "value": {
+      "code": "987",
+      "label": "Category label"
+    },
+    "list_items": [
+      {
+        "code": "987",
+        "label": "Category label"
+      }
+    ]
+  },
+  "ListOfPeople": [
+    {
+      "value": {
+        "IndividualFirstName": "FirstNameValue",
+        "IndividualLastName": "LastNameValue",
+        "IndividualEmail": "e@mail.com",
+        "IndividualAddress": {
+          "AddressLine1": "Address Value",
+          "PostCode": "SE1 4EE"
+        },
+        "IndividualDateOfBirth": "2012-04-21",
+        "IndividualDateOfDeath": "2020-04-21"
+      },
+      "id" : "[[ANYTHING_PRESENT]]"
+    }
+  ]
+}
