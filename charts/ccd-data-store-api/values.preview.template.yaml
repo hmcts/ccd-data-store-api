@@ -66,8 +66,6 @@ logstash:
       value: "{{ .Values.postgresql.postgresqlUsername}}"
     - name: DATA_STORE_PASS
       value: "{{ .Values.postgresql.postgresqlPassword}}"
-    - name: LOGSTASH_HOME
-      value: "/usr/share/logstash"
   extraInitContainers: |
     - name: download-postgres-jdbc
       image: hmctspublic.azurecr.io/curl:7.70.0
@@ -225,7 +223,7 @@ logstash:
     dead_letter_indexing_pipeline.conf: |
       input {
         dead_letter_queue {
-          path => "${LOGSTASH_HOME}/data/dead_letter_queue"
+          path => "/usr/share/logstash/data/dead_letter_queue"
           commit_offsets => true
           pipeline_id => "main"
         }
