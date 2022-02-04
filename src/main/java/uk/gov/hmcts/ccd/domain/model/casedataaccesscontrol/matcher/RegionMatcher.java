@@ -18,6 +18,7 @@ public class RegionMatcher implements RoleAttributeMatcher {
 
     @Override
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseDetails caseDetails) {
+
         String caseRegion = getRegion(caseDetails).orElse("");
         log.debug("Match role assignment region {} and case details region {} for role assignment {}",
             roleAssignment.getAttributes().getRegion(),
@@ -33,9 +34,11 @@ public class RegionMatcher implements RoleAttributeMatcher {
     }
 
     private Optional<String> getRegion(CaseDetails caseDetails) {
-        JsonNode caseManagementLocation = caseDetails.getData().get(CASE_MANAGEMENT__LOCATION);
-        if (caseManagementLocation != null && caseManagementLocation.get(REGION) != null) {
-            return Optional.ofNullable(caseManagementLocation.get(REGION).asText());
+        if (caseDetails != null && caseDetails.getData() != null) {
+            JsonNode caseManagementLocation = caseDetails.getData().get(CASE_MANAGEMENT__LOCATION);
+            if (caseManagementLocation != null && caseManagementLocation.get(REGION) != null) {
+                return Optional.ofNullable(caseManagementLocation.get(REGION).asText());
+            }
         }
         return Optional.empty();
     }
