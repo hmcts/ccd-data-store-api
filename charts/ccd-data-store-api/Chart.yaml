@@ -15,6 +15,6 @@ dependencies:
     repository: '@hmctspublic'
     condition: elastic.enabled
   - name: logstash
-    version: 2.4.1
-    repository: '@hmctspublic'
+    version: 6.8.3
+    repository: 'https://helm.elastic.co'
     condition: elastic.enabled
