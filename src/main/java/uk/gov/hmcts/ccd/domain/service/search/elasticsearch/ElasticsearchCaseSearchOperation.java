@@ -146,7 +146,6 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         List<CaseTypeResults> caseTypeResults,
         CrossCaseTypeSearchRequest crossCaseTypeSearchRequest) {
         if (hitsIsNotEmpty(response)) {
-<<<<<<< HEAD
             String caseTypeId = null;
 
             // NB: bypass case type lookup if using a single search index (required for GlobalSearch)
@@ -156,13 +155,6 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             }
 
             caseTypeResults.add(new CaseTypeResults(caseTypeId, response.searchResult.getTotal()));
-=======
-            String indexName = getIndexName(response);
-            caseTypeResults.add(new CaseTypeResults(getCaseTypeIDFromIndex(indexName,
-                crossCaseTypeSearchRequest.getCaseTypeIds()),
-                new JestSearchResult(response.searchResult).getTotal())
-            );
->>>>>>> 7dcc3538360bb2991d5aba38a656c7e18efc816a
         }
     }
 
