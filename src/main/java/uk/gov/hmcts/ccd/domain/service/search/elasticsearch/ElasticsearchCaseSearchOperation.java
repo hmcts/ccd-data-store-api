@@ -146,15 +146,11 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
         List<CaseTypeResults> caseTypeResults,
         CrossCaseTypeSearchRequest crossCaseTypeSearchRequest) {
         if (hitsIsNotEmpty(response)) {
-            String caseTypeId = null;
-
-            // NB: bypass case type lookup if using a single search index (required for GlobalSearch)
-            if (crossCaseTypeSearchRequest.getSearchIndex().isEmpty()) {
-                String indexName = getIndexName(response);
-                caseTypeId = getCaseTypeIDFromIndex(indexName, crossCaseTypeSearchRequest.getCaseTypeIds());
-            }
-
-            caseTypeResults.add(new CaseTypeResults(caseTypeId, response.searchResult.getTotal()));
+            String indexName = getIndexName(response);
+            caseTypeResults.add(new CaseTypeResults(getCaseTypeIDFromIndex(indexName,
+                crossCaseTypeSearchRequest.getCaseTypeIds()),
+                response.searchResult.getTotal())
+            );
         }
     }
 
