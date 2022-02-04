@@ -656,8 +656,13 @@ class ElasticsearchCaseSearchOperationTest {
             searchResult.setJsonObject(convertedObject);
             searchResult.setJsonString(convertedObject.toString());
             searchResult.setPathToResult("hits/hits/_source");
+<<<<<<< HEAD
 
 
+=======
+
+
+>>>>>>> 7dcc3538360bb2991d5aba38a656c7e18efc816a
             MultiSearchResult.MultiSearchResponse response1 = mock(MultiSearchResult.MultiSearchResponse.class);
             Whitebox.setInternalState(response1, "searchResult", searchResult);
             MultiSearchResult.MultiSearchResponse response2 = mock(MultiSearchResult.MultiSearchResponse.class);
