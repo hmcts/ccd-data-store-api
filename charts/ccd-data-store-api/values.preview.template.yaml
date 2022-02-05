@@ -57,15 +57,6 @@ logstash:
   imageTag: "7.16.1"
   imagePullPolicy: "IfNotPresent"
   logstashJavaOpts: "-Xmx1g -Xms512M"
-  extraEnvs:
-    - name: ES_HOSTS
-      value: "http://{{ .Release.Name }}-es-master:9200"
-    - name: DATA_STORE_URL
-      value: "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/{{ .Values.postgresql.postgresqlDatabase}}?stringtype=unspecified"
-    - name: DATA_STORE_USER
-      value: "{{ .Values.postgresql.postgresqlUsername}}"
-    - name: DATA_STORE_PASS
-      value: "{{ .Values.postgresql.postgresqlPassword}}"
   extraInitContainers: |
     - name: download-postgres-jdbc
       image: hmctspublic.azurecr.io/curl:7.70.0
@@ -83,24 +74,20 @@ logstash:
     logstash.yml: |
       http.host: 0.0.0.0
       xpack.monitoring.enabled: false
-      xpack.monitoring.elasticsearch.hosts: ["${ES_HOSTS}"]
+      xpack.monitoring.elasticsearch.hosts: ["http://{{ .Release.Name }}-es-master:9200"]
       queue.type: persisted
       dead_letter_queue.enable: true
     pipelines.yml: |
       - pipeline.id: main
         path.config: "/usr/share/logstash/pipeline/{01_input,02_filter,03_output}.conf"
         queue.type: persisted
-      - pipeline.id: index-dead-letter-to-es
-        path.config: "/usr/share/logstash/pipeline/dead_letter_indexing_pipeline.conf"
-        pipeline.workers: 1
-        dead_letter_queue.enable: false
   logstashPipeline:
     01_input.conf: |
       input  {
         jdbc {
-          jdbc_connection_string => "${DATA_STORE_URL}"
-          jdbc_user => "${DATA_STORE_USER}"
-          jdbc_password => "${DATA_STORE_PASS}"
+          jdbc_connection_string => "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/{{ .Values.postgresql.postgresqlDatabase}}?stringtype=unspecified"
+          jdbc_user => "{{ .Values.postgresql.postgresqlUsername}}"
+          jdbc_password => "{{ .Values.postgresql.postgresqlPassword}}"
           jdbc_validate_connection => true
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
           jdbc_driver_class => "org.postgresql.Driver"
@@ -212,7 +199,7 @@ logstash:
     03_output.conf: |
       output {
           elasticsearch {
-              hosts => ["${ES_HOSTS}"]
+              hosts => ["http://{{ .Release.Name }}-es-master:9200"]
               sniffing => false
               index => "%{[index_id]}"
               document_type => "_doc"
@@ -220,7 +207,6 @@ logstash:
               timeout => 60
           }
       }
-    dead_letter_indexing_pipeline.conf: |
       input {
         dead_letter_queue {
           path => "${LOGSTASH_HOME}/data/dead_letter_queue"
@@ -249,7 +235,7 @@ logstash:
       }
       output {
         elasticsearch {
-          hosts => ["${ES_HOSTS}"]
+          hosts => ["http://{{ .Release.Name }}-es-master:9200"]
           sniffing => false
           index => ".logstash_dead_letter"
         }
