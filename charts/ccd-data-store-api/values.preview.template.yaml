@@ -209,7 +209,7 @@ logstash:
       }
       input {
         dead_letter_queue {
-          path => "${LOGSTASH_HOME}/data/dead_letter_queue"
+          path => "/usr/share/logstash/data/dead_letter_queue"
           commit_offsets => true
           pipeline_id => "main"
         }
