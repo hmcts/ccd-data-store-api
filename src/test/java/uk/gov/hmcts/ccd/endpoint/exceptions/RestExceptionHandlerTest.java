@@ -6,8 +6,6 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.google.common.collect.Lists;
 import com.microsoft.applicationinsights.telemetry.SeverityLevel;
-import feign.FeignException;
-import feign.Request;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,15 +15,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import uk.gov.hmcts.ccd.appinsights.AppInsights;
 import uk.gov.hmcts.ccd.domain.model.common.HttpError;
 import uk.gov.hmcts.ccd.domain.model.std.CaseFieldValidationError;
@@ -35,7 +29,6 @@ import uk.gov.hmcts.ccd.endpoint.ui.UserProfileEndpoint;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
-import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -129,118 +122,6 @@ public class RestExceptionHandlerTest {
         // ASSERT
         assertHttpErrorResponse(result, expectedException);
     }
-
-    @Test
-    public void handleServiceException_shouldReturnHttpServerError_InternalServerError() throws Exception {
-
-        // ARRANGE
-        String myUniqueExceptionMessage = "My unique generic runtime exception message 1";
-
-        ServiceException expectedException = new ServiceException(myUniqueExceptionMessage,
-            createHttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, myUniqueExceptionMessage));
-
-        setupMockServiceToThrowException(expectedException);
-
-        // ACT
-        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
-
-        // ASSERT
-        assertHttpErrorResponse(result, expectedException, HttpStatus.BAD_GATEWAY);
-    }
-
-    @Test
-    public void handleServiceException_shouldReturnHttpServerError_GatewayTimeout() throws Exception {
-
-        // ARRANGE
-        String myUniqueExceptionMessage = "My unique generic runtime exception message 1";
-
-        ServiceException serviceException = new ServiceException(myUniqueExceptionMessage,
-            createHttpServerErrorException(HttpStatus.GATEWAY_TIMEOUT, myUniqueExceptionMessage));
-
-        setupMockServiceToThrowException(serviceException);
-
-        // ACT
-        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
-
-        // ASSERT
-        assertHttpErrorResponse(result, serviceException, HttpStatus.GATEWAY_TIMEOUT);
-    }
-
-    @Test
-    public void handleServiceException_shouldReturnHttpClintError_BadRequest() throws Exception {
-
-        // ARRANGE
-        String myUniqueExceptionMessage = "My unique generic runtime exception message 1";
-
-        ServiceException expectedException = new ServiceException(myUniqueExceptionMessage, HttpClientErrorException
-            .create(HttpStatus.BAD_REQUEST, myUniqueExceptionMessage, HttpHeaders.EMPTY,
-                new byte[0], Charset.defaultCharset()));
-
-        setupMockServiceToThrowException(expectedException);
-
-        // ACT
-        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
-
-        // ASSERT
-        assertHttpErrorResponse(result, expectedException, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @Test
-    public void handleServiceException_shouldReturnFeignServerError_InternalServerError() throws Exception {
-
-        // ARRANGE
-        String myUniqueExceptionMessage = "My unique generic runtime exception message 1";
-
-        ServiceException expectedException = new ServiceException(myUniqueExceptionMessage,
-            createFeignServerException(HttpStatus.INTERNAL_SERVER_ERROR, myUniqueExceptionMessage));
-
-        setupMockServiceToThrowException(expectedException);
-
-        // ACT
-        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
-
-        // ASSERT
-        assertHttpErrorResponse(result, expectedException, HttpStatus.BAD_GATEWAY);
-    }
-
-    @Test
-    public void handleServiceException_shouldReturnFeignServerError_GatewayTimeout() throws Exception {
-
-        // ARRANGE
-        String myUniqueExceptionMessage = "My unique generic runtime exception message 1";
-
-        ServiceException serviceException = new ServiceException(myUniqueExceptionMessage,
-            createFeignServerException(HttpStatus.GATEWAY_TIMEOUT, myUniqueExceptionMessage));
-
-        setupMockServiceToThrowException(serviceException);
-
-        // ACT
-        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
-
-        // ASSERT
-        assertHttpErrorResponse(result, serviceException, HttpStatus.GATEWAY_TIMEOUT);
-    }
-
-    @Test
-    public void handleServiceException_shouldReturnFeignClintError_BadRequest() throws Exception {
-
-        // ARRANGE
-        String myUniqueExceptionMessage = "My unique generic runtime exception message 1";
-
-        ServiceException expectedException = new ServiceException(myUniqueExceptionMessage,
-            new FeignException.FeignClientException(HttpStatus.BAD_REQUEST.value(), myUniqueExceptionMessage,
-                Request.create(Request.HttpMethod.GET, myUniqueExceptionMessage, Map.of(), new byte[0],
-                    Charset.defaultCharset(), null), new byte[0]));
-
-        setupMockServiceToThrowException(expectedException);
-
-        // ACT
-        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get(TEST_URL));
-
-        // ASSERT
-        assertHttpErrorResponse(result, expectedException, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
 
     @Test
     public void handleException_shouldLogExceptionAsError() throws Exception {
@@ -579,23 +460,8 @@ public class RestExceptionHandlerTest {
         result.andExpect(jsonPath("$.message").value(expectedException.getMessage()));
     }
 
-    private void assertHttpErrorResponse(final ResultActions result, final Exception expectedException,
-                                         final HttpStatus httpStatus) throws Exception {
-
-        // NB: as we cannot mock HttpError generate an equivalent and compare to response
-        final HttpError<Serializable> expectedError =
-            new HttpError<>(httpStatus, expectedException, mock(HttpServletRequest.class));
-
-        // check the very basics
-        result.andExpect(status().is(expectedError.getStatus()));
-        result.andExpect(jsonPath("$.exception").value(expectedException.getClass().getName()));
-
-        // check a bit more
-        result.andExpect(jsonPath("$.message").value(expectedException.getMessage()));
-    }
-
     private void assertExtraApiExceptionResponseProperties(ResultActions result, ApiException expectedException)
-        throws Exception {
+                                                                                                    throws Exception {
 
         // load extra properties
         Serializable exceptionDetails = expectedException.getDetails();
@@ -647,17 +513,4 @@ public class RestExceptionHandlerTest {
         when(mockService.execute(AccessControlService.CAN_READ)).thenThrow(expectedException);
     }
 
-    private HttpServerErrorException createHttpServerErrorException(final HttpStatus httpStatus,
-                                                                    final String message) {
-        return HttpServerErrorException
-            .create(httpStatus, message, HttpHeaders.EMPTY,
-                new byte[0], Charset.defaultCharset());
-    }
-
-    private FeignException.FeignServerException createFeignServerException(final HttpStatus httpStatus,
-                                                                           final String message) {
-        return new FeignException.FeignServerException(httpStatus.value(), message,
-            Request.create(Request.HttpMethod.GET, message, Map.of(), new byte[0],
-                Charset.defaultCharset(), null), new byte[0]);
-    }
 }
