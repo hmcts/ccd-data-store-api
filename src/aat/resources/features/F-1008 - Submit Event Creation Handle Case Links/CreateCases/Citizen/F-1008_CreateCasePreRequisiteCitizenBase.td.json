@@ -1,0 +1,47 @@
+{
+  "_guid_": "F-1008_CreateCasePreRequisiteCitizenBase",
+  "_extends_": "Befta_Jurisdiction2_Citizen_Case_Creation_Base_Data",
+
+  "specs": [
+    "to create a case"
+  ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "S-1008_GetCitizenCreateToken"
+  }
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType"
+    },
+    "body": {
+      "data": { },
+      "event": {
+        "id": "createCaseCaseLinks",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "jurisdiction" : "BEFTA_MASTER",
+      "state" : "CaseCreated",
+      "case_type_id" : "FT_MasterCaseType",
+      "case_data" : { },
+      "data_classification" : { },
+      "supplementary_data" : null,
+      "security_classifications" : { }
+    }
+  }
+}

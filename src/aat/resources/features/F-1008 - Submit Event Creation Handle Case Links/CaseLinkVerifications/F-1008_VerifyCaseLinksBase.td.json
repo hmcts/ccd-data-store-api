@@ -1,6 +1,6 @@
 {
 	"title": "should retrieve case links for a specified case reference",
-	"_guid_": "F-1008-VerifyCaseLinks",
+	"_guid_": "F-1008_VerifyCaseLinksBase",
 
 	"productName": "CCD Data Store",
 	"operationName": "Retrieve case links for an existing case reference",
@@ -35,11 +35,7 @@
 			"Content-Length": "[[ANYTHING_PRESENT]]"
 		},
 		"body": {
-      "CaseLinks" : [ {
-        "CaseId" : "[[ANYTHING_PRESENT]]",
-        "LinkedCaseId" : "[[ANYTHING_PRESENT]]",
-        "CaseTypeId" : "FT_MasterCaseType"
-      }]
+      "CaseLinks" : [ ]
 		}
 	}
 }

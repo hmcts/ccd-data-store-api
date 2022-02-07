@@ -1,11 +1,11 @@
 {
-  "_guid_": "F-1008_CreateAnotherCasePreRequisiteCaseworkerBase",
+  "_guid_": "F-1008_CreateThirdCasePreRequisiteCaseworkerBase",
   "_extends_": "F-1008_CreateCasePreRequisiteCaseworkerBase",
 
   "request": {
     "body": {
       "data": {
-        "TextField": "This is the case being updated"
+        "TextField": "This is the case that will be linked to the case being updated"
       }
     }
   },
@@ -13,7 +13,7 @@
   "expectedResponse": {
     "body": {
       "case_data" : {
-        "TextField": "This is the case being updated"
+        "TextField": "This is the case that will be linked to the case being updated"
       },
       "data_classification" : {
         "TextField": "PUBLIC"

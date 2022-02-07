@@ -1,25 +1,25 @@
 {
-  "_guid_": "S-1008.1",
+  "_guid_": "S-1008.2",
   "_extends_": "F-1008_Test_Data_Base",
 
-  "title": "Case Link does not exist at present and CaseLink field in the Request contains CaseReference value and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST",
+  "title": "Case Link value changed and CaseLink field in the Request contains CaseReference value and Submit Event Creation is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST",
 
   "specs": [
     "an active profile in CCD",
     "contains correctly configured CaseLink field with Case Reference created in F-1008_CreateCasePreRequisiteCaseworkerBase",
-    "specifying the case to be updated, as created in F-1008_CreateAnotherCasePreRequisiteCaseworkerBase, does not contain a CaseLink field"
+    "specifying the case to be updated, as created in F-1008_CreateAnotherCasePreRequisiteCaseworkerBase, CaseLink field changed"
   ],
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][F-1008_CreateLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
     },
     "body": {
       "data": {
         "CaseLinkField": {
           "CaseReference": "${}${[scenarioContext][childContexts][F-1008_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
         },
-        "TextField" : "S-1008.1"
+        "TextField" : "S-1008.2"
       },
       "event": {
         "id": "updateCase",
@@ -27,18 +27,18 @@
         "description": ""
       },
       "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][F-1008-GetUpdateEventToken][testData][actualResponse][body][token]}",
+      "event_token" : "${[scenarioContext][childContexts][F-1008-GetLinkedCaseUpdateEventToken][testData][actualResponse][body][token]}",
       "ignore_warning": true
     }
   },
 
   "expectedResponse": {
     "body" : {
-      "id": "${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+      "id": "${[scenarioContext][childContexts][F-1008_CreateLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
       "jurisdiction" : "BEFTA_MASTER",
       "case_type_id" : "FT_MasterCaseType",
       "case_data" : {
-        "TextField" : "S-1008.1",
+        "TextField" : "S-1008.2",
         "CaseLinkField" : {
           "CaseReference" : "${}${[scenarioContext][childContexts][F-1008_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
         }
