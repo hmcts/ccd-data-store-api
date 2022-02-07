@@ -79,7 +79,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                         + jurisdictionId + " because of " + e.getMessage());
             } else {
                 throw new ServiceException("Problem getting case types for the Jurisdiction:" + jurisdictionId
-                        + " because of " + e.getMessage(), e);
+                        + " because of " + e.getMessage());
             }
         }
     }
@@ -113,7 +113,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                         + caseTypeId + " because of " + e.getMessage());
             } else {
                 throw new ServiceException(
-                        "Problem getting case type definition for " + caseTypeId + " because of " + e.getMessage(), e);
+                        "Problem getting case type definition for " + caseTypeId + " because of " + e.getMessage());
             }
         }
     }
@@ -132,7 +132,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                         "Problem getting base types definition from definition store because of " + e.getMessage());
             } else {
                 throw new ServiceException(
-                        "Problem getting base types definition from definition store because of " + e.getMessage(), e);
+                        "Problem getting base types definition from definition store because of " + e.getMessage());
             }
         }
     }
@@ -154,7 +154,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
             } else {
                 LOG.warn("Error while retrieving classification for user role {} because of ", userRole, e);
                 throw new ServiceException("Error while retrieving classification for user role " + userRole
-                        + " because of " + e.getMessage(), e);
+                        + " because of " + e.getMessage());
             }
         }
     }
@@ -173,7 +173,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
         } catch (Exception e) {
             LOG.warn("Error while retrieving classification for user roles {} because of ", userRoles, e);
             throw new ServiceException("Error while retrieving classification for user roles " + userRoles
-                    + " because of " + e.getMessage(), e);
+                    + " because of " + e.getMessage());
         }
     }
 
@@ -281,8 +281,7 @@ public class DefaultCaseDefinitionRepository implements CaseDefinitionRepository
                     jurisdictionIds.orElse(Collections.emptyList()));
                 return new ArrayList<>();
             } else {
-                throw new ServiceException("Problem retrieving jurisdictions definition because of " + e.getMessage(),
-                    e);
+                throw new ServiceException("Problem retrieving jurisdictions definition because of " + e.getMessage());
             }
         }
     }
