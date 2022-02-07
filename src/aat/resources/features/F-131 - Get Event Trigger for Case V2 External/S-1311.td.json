@@ -1,18 +1,12 @@
 {
-  "_guid_": "S-182",
-  "_extends_": "F-066_Test_Data_Base",
+  "_guid_": "S-1311",
+  "_extends_": "F-131_Test_Data_Base_Events",
   "title": "should retrieve trigger when the case and event exists",
 
   "specs": [
     "an active profile in CCD",
     "includes the event start trigger for the case just created, along with a HTTP 200 OK"
   ],
-
-  "request": {
-    "pathVariables": {
-      "cid": "[[DEFAULT_AUTO_VALUE]]"
-    }
-  },
 
   "expectedResponse": {
     "responseCode": 200,
@@ -39,7 +33,12 @@
       "access_granted" : "STANDARD",
       "access_process" : "NONE",
       "title_display": "CUSTOM  TITLE DISPLAY",
-      "supplementary_data": null,
+      "supplementary_data": {
+        "HMCTSServiceId": "AAA1",
+        "orgs_assigned_users": {
+          "OrgA": 22
+        }
+      },
       "_links": {
         "self": {
           "href": "[[ANYTHING_PRESENT]]"
