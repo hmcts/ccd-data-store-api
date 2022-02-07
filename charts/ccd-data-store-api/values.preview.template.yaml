@@ -43,6 +43,9 @@ elasticsearch:
   minimumMasterNodes: 1
   antiAffinity: "soft"
   esJavaOpts: "-Xmx512m -Xms512m"
+  extraEnvs:
+    - name: action.auto_create_index
+      value: .security*,.watches,.triggered_watches,.watcher-history-*,.logstash_dead_letter,.ml*
   persistence:
     enabled: false
   ingress:
