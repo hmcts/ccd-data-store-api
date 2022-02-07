@@ -55,7 +55,7 @@ public class CaseDocumentAmApiClient {
         } else if (feignException instanceof FeignClientException.NotFound) {
             throw new ResourceNotFoundException(feignException.getMessage());
         } else {
-            throw new ServiceException("The downstream CCD AM application has failed");
+            throw new ServiceException("The downstream CCD AM application has failed", feignException);
         }
     }
 
