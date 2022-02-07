@@ -207,36 +207,3 @@ logstash:
               timeout => 60
           }
       }
-      input {
-        dead_letter_queue {
-          path => "/usr/share/logstash/data/dead_letter_queue"
-          commit_offsets => true
-          pipeline_id => "main"
-        }
-      }
-      filter {
-        # capture the entire event, and write it to a new field; we'll call that field `failed_case`
-        ruby {
-          code => "event.set('failed_case', event.to_json())"
-        }
-        # prune every field off the event except for the one we've just created. Note that this does not prune event metadata.
-        prune {
-          whitelist_names => [ "^failed_case$" ]
-        }
-        ruby {
-          code => "event.set('timestamp', event.get('[@metadata][dead_letter_queue][entry_time]'))"
-        }
-        # pull useful information out of the event metadata provided by the dead letter queue, and add it to the new event.
-        mutate {
-          add_field => {
-            "reason" => "%{[@metadata][dead_letter_queue][reason]}"
-          }
-        }
-      }
-      output {
-        elasticsearch {
-          hosts => ["http://{{ .Release.Name }}-es-master:9200"]
-          sniffing => false
-          index => ".logstash_dead_letter"
-        }
-      }
