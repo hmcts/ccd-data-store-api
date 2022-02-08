@@ -194,8 +194,8 @@ public class GlobalSearchProcessorService {
             try {
                 LocalDate.parse(value, ISO_DATE);
             } catch (DateTimeParseException e) {
-                log.warn("A search party date value extracted by GlobalSearchProcessorService for CaseTypeID: {} " +
-                    "is not in the correct format.", caseTypeID);
+                log.warn("A search party date value extracted by GlobalSearchProcessorService for CaseTypeID: {} "
+                    + "is not in the correct format.", caseTypeID);
                 return null;
             }
         }
