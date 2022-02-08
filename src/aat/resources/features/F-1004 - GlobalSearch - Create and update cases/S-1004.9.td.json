@@ -1,5 +1,5 @@
 {
-  "title": "Successfully creates a case with wrong data type for Date fields using V1: /case-types/{caseTypeId}/cases cases endpoint",
+  "title": "Successfully creates a case with wrong data type for Date fields using V2: /case-types/{caseTypeId}/cases endpoint",
   "_guid_": "S-1004.9",
   "_extends_": "Case_Creation_V2_Base",
   "specs": [

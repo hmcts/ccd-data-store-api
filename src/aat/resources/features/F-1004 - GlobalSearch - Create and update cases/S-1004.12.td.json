@@ -5,7 +5,7 @@
   "specs": [
     "an active profile in CCD",
     "contains a Text value for the Date fields",
-    "contains an empty SearchCriteria"
+    "contains a SearchCriteria with SearchParty excluding the Dates"
   ],
   "request": {
     "pathVariables": {

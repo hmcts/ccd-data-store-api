@@ -392,7 +392,7 @@ class GlobalSearchProcessorServiceTest {
         final String dodField = "FirstName";
         caseData.put("SearchPartyDod", JacksonUtils.MAPPER.readTree("\""  + dodField  + "\""));
 
-        assertSearchCriteriaFieldIsNull();
+        assertSearchPartyNodeIsNull();
 
     }
 
@@ -456,11 +456,11 @@ class GlobalSearchProcessorServiceTest {
         final String dobField = "FirstName";
         caseData.put("SearchPartyDob", JacksonUtils.MAPPER.readTree("\""  + dobField  + "\""));
 
-        assertSearchCriteriaFieldIsNull();
+        assertSearchPartyNodeIsNull();
     }
 
     @Test
-    void checkSearchCriteriaContainingASearchPartyContainingBotFieldsTwoDateFieldsAreWrong()
+    void checkSearchCriteriaContainingASearchPartyContainingTwoWrongDateFields()
         throws JsonProcessingException {
 
         searchParty.setSearchPartyDob("spDob");
@@ -474,7 +474,7 @@ class GlobalSearchProcessorServiceTest {
         caseData.put("spDob", JacksonUtils.MAPPER.readTree("\""  + dob  + "\""));
         caseData.put("spDod", JacksonUtils.MAPPER.readTree("\""  + dod  + "\""));
 
-        assertSearchCriteriaFieldIsNull();
+        assertSearchPartyNodeIsNull();
     }
 
     @Test
@@ -739,7 +739,7 @@ class GlobalSearchProcessorServiceTest {
 
     }
 
-    private void assertSearchCriteriaFieldIsNull() {
+    private void assertSearchPartyNodeIsNull() {
         Map<String, JsonNode> globalSearchData =
             globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
 

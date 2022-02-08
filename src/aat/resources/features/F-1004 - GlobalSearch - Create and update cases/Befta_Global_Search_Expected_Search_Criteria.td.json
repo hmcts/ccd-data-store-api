@@ -2,8 +2,6 @@
   "_guid_": "Befta_Global_Search_Expected_Search_Criteria",
 
   "_extends_": "Befta_Global_Search_Case_Data",
-  "dateOfBirth" : "2012-04-21",
-  "dateOfDeath" : "2020-04-21",
   "SearchCriteria" : {
     "OtherCaseReferences" : [ {
       "value" : "FirstNameValue",
