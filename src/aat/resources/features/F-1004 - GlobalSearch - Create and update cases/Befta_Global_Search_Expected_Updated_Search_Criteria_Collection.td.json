@@ -32,6 +32,20 @@
         "IndividualDateOfDeath": "2020-04-21"
       },
       "id": "[[ANYTHING_PRESENT]]"
+    },
+    {
+      "value": {
+        "IndividualFirstName": "FirstNameValue2",
+        "IndividualLastName": "LastNameValue2",
+        "IndividualEmail": "e2@mail.com",
+        "IndividualAddress": {
+          "AddressLine1": "updated Address",
+          "PostCode": "SE2 4EE"
+        },
+        "IndividualDateOfBirth": "1979-04-21",
+        "IndividualDateOfDeath": "1980-04-21"
+      },
+      "id": "[[ANYTHING_PRESENT]]"
     }
   ],
   "SearchCriteria": {
@@ -45,6 +59,17 @@
           "PostCode" : "SE1 4EE",
           "DateOfBirth" : "2012-04-21",
           "DateOfDeath" : "2020-04-21"
+        }
+      },
+      {
+        "id": "[[ANYTHING_PRESENT]]",
+        "value": {
+          "Name" : "FirstNameValue2 LastNameValue2",
+          "EmailAddress" : "e2@mail.com",
+          "AddressLine1": "updated Address",
+          "PostCode" : "SE2 4EE",
+          "DateOfBirth" : "1979-04-21",
+          "DateOfDeath" : "1980-04-21"
         }
       }
     ]

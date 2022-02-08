@@ -29,6 +29,19 @@
               "IndividualDateOfBirth": "2012-04-21",
               "IndividualDateOfDeath": "2020-04-21"
             }
+          },
+          {
+            "value": {
+              "IndividualFirstName": "FirstNameValue2",
+              "IndividualLastName": "LastNameValue2",
+              "IndividualEmail": "e2@mail.com",
+              "IndividualAddress": {
+                "AddressLine1": "updated Address",
+                "PostCode": "SE2 4EE"
+              },
+              "IndividualDateOfBirth": "1979-04-21",
+              "IndividualDateOfDeath": "1980-04-21"
+            }
           }
         ]
       },

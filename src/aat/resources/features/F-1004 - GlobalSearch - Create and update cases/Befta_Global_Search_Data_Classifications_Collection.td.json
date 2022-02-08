@@ -28,7 +28,24 @@
         "IndividualDateOfDeath" : "PUBLIC"
       },
       "id" : "[[ANYTHING_PRESENT]]"
-    } ]
+    },
+    {
+      "value" : {
+        "IndividualFirstName" : "PUBLIC",
+        "IndividualLastName" : "PUBLIC",
+        "IndividualEmail" : "PUBLIC",
+        "IndividualAddress" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "AddressLine1" : "PUBLIC",
+            "PostCode" : "PUBLIC"
+          }
+        },
+        "IndividualDateOfBirth" : "PUBLIC",
+        "IndividualDateOfDeath" : "PUBLIC"
+      },
+      "id" : "[[ANYTHING_PRESENT]]"
+    }]
   },
   "SearchCriteria" : {
     "classification" : "PUBLIC",
@@ -50,7 +67,18 @@
               "DateOfDeath" : "PUBLIC"
             },
             "id" : "[[ANYTHING_PRESENT]]"
-          } ]
+          },
+          {
+            "value" : {
+              "Name" : "PUBLIC",
+              "EmailAddress" : "PUBLIC",
+              "AddressLine1" : "PUBLIC",
+              "PostCode" : "PUBLIC",
+              "DateOfBirth" : "PUBLIC",
+              "DateOfDeath" : "PUBLIC"
+            },
+            "id" : "[[ANYTHING_PRESENT]]"
+          }]
       }
     }
   }

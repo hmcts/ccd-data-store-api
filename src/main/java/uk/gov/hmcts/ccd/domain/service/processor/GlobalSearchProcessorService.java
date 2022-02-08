@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.processor;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.common.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchParty;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchPartyValue;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
+import uk.gov.hmcts.ccd.domain.types.sanitiser.CollectionSanitiser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,9 +30,9 @@ import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.C
 @Slf4j
 public class GlobalSearchProcessorService {
 
-    private static final String JSON_NODE_VALUE_KEY_NAME = "value";
+    private static final String JSON_NODE_VALUE_KEY_NAME = CollectionSanitiser.VALUE;
 
-    private ObjectMapperService objectMapperService;
+    private final ObjectMapperService objectMapperService;
 
     @Autowired
     public GlobalSearchProcessorService(ObjectMapperService objectMapperService) {
@@ -84,7 +86,7 @@ public class GlobalSearchProcessorService {
                     && key.equals(currentSearchCriteria.getOtherCaseReference().split("\\.")[0])) {
                     otherCaseReferences.add(OtherCaseReference.builder()
                         .id(UUID.randomUUID().toString())
-                        .value(getNestedValue(jsonNode, currentSearchCriteria.getOtherCaseReference()).textValue())
+                        .value(getNestedValueAsString(jsonNode, currentSearchCriteria.getOtherCaseReference()))
                         .build());
                 } else if (key.equals(currentSearchCriteria.getOtherCaseReference())) {
                     otherCaseReferences.add(OtherCaseReference.builder()
@@ -104,7 +106,7 @@ public class GlobalSearchProcessorService {
         List<SearchParty> searchPartyList = new ArrayList<>();
 
         searchParties.forEach(searchParty -> {
-            List<SearchPartyValue> valuesToPopulate = populateSearchParty(searchParty, data);
+            List<SearchPartyValue> valuesToPopulate = populateSearchPartyValues(searchParty, data);
 
             valuesToPopulate.forEach(valueToPopulate -> {
                 if (!valueToPopulate.isEmpty()) {
@@ -124,19 +126,24 @@ public class GlobalSearchProcessorService {
         return field.contains(".") && key.equals(field.split("\\.")[0]);
     }
 
-    private JsonNode getNestedValue(JsonNode jsonNode, String field) {
+    private JsonNode getNestedValueAsJsonNode(JsonNode jsonNode, String field) {
         return CaseFieldPathUtils.getNestedCaseFieldByPath(jsonNode, field.substring(field.indexOf(".") + 1));
     }
 
-    private List<SearchPartyValue> populateSearchParty(
+    private String getNestedValueAsString(JsonNode jsonNode, String field) {
+        JsonNode nestedValueAsNode = getNestedValueAsJsonNode(jsonNode, field);
+        return jsonNodeObjectToText(nestedValueAsNode);
+    }
+
+    private List<SearchPartyValue> populateSearchPartyValues(
         uk.gov.hmcts.ccd.domain.model.definition.SearchParty searchPartyDefinition,
         Map<String, JsonNode> data) {
 
         List<SearchPartyValue> searchPartyValues = new ArrayList<>();
 
         String spCollectionFieldName = searchPartyDefinition.getSearchPartyCollectionFieldName();
-        if (spCollectionFieldName != null && !spCollectionFieldName.isEmpty()) {
-            searchPartyValues = populateSearchPartyFromCollection(searchPartyDefinition, data);
+        if (!Strings.isNullOrEmpty(spCollectionFieldName)) {
+            searchPartyValues = populateSearchPartyValuesFromCollection(searchPartyDefinition, data);
         } else {
             searchPartyValues.add(populateSearchPartyWithoutCollection(searchPartyDefinition, data));
         }
@@ -144,7 +151,7 @@ public class GlobalSearchProcessorService {
         return searchPartyValues;
     }
 
-    private List<SearchPartyValue> populateSearchPartyFromCollection(
+    private List<SearchPartyValue> populateSearchPartyValuesFromCollection(
         uk.gov.hmcts.ccd.domain.model.definition.SearchParty searchPartyDefinition,
                                      Map<String, JsonNode> data) {
 
@@ -154,7 +161,7 @@ public class GlobalSearchProcessorService {
         List<SearchPartyValue> searchPartyValues = new ArrayList<>();
 
         for (JsonNode node : collectionValueInMap) {
-            Map<String, JsonNode> rawValue = getRawValueFromJsonNode(node);
+            Map<String, JsonNode> rawValue = getCollectionItemValueFromJsonNode(node);
 
             SearchPartyValue searchPartyValue = populateSearchPartyWithoutCollection(searchPartyDefinition, rawValue);
             searchPartyValues.add(searchPartyValue);
@@ -205,7 +212,7 @@ public class GlobalSearchProcessorService {
 
     private String findTextValueInMap(String valueToFind, Map<String, JsonNode> mapToSearch) {
         JsonNode value = findValueInMap(valueToFind, mapToSearch);
-        return value != null ? value.textValue() : null;
+        return jsonNodeObjectToText(value);
     }
 
     private List<JsonNode> findCollectionValueInMap(uk.gov.hmcts.ccd.domain.model.definition.SearchParty searchParty,
@@ -214,10 +221,11 @@ public class GlobalSearchProcessorService {
 
         List<JsonNode> listOfNodes = new ArrayList<>();
 
-        if (valueInMap != null) {
+        if (valueInMap != null || !valueInMap.isNull()) {
             if (!valueInMap.isArray()) {
                 log.warn("GlobalSearch: This is not a collection in "
-                    + "the SearchParty tab and it should be. CaseTypeId: {}", searchParty.getCaseTypeId());
+                    + "the SearchParty tab and it should be. CaseTypeId: {}, Field: {}",
+                    searchParty.getCaseTypeId(), valueInMap.textValue());
             }
 
             for (JsonNode objNode : valueInMap) {
@@ -236,7 +244,7 @@ public class GlobalSearchProcessorService {
                 boolean processedValue = false;
 
                 if (isComplexField(valueToFind, entry.getKey())) {
-                    returnValue = getNestedValue(entry.getValue(), valueToFind);
+                    returnValue = getNestedValueAsJsonNode(entry.getValue(), valueToFind);
                     processedValue = true; // i.e. processed as a nested value
 
                 } else if (entry.getKey().equals(valueToFind)) {
@@ -256,9 +264,13 @@ public class GlobalSearchProcessorService {
     /**
      * Splits out the id from the value from the JsonNode.
      */
-    private Map<String, JsonNode> getRawValueFromJsonNode(JsonNode jsonNode) {
+    private Map<String, JsonNode> getCollectionItemValueFromJsonNode(JsonNode jsonNode) {
         return jsonNode != null
             ? objectMapperService.convertJsonNodeToMap(jsonNode.get(JSON_NODE_VALUE_KEY_NAME)) : null;
+    }
+
+    private String jsonNodeObjectToText(JsonNode jsonNode) {
+        return jsonNode != null && !jsonNode.isNull() ? jsonNode.textValue() : null;
     }
 
 }

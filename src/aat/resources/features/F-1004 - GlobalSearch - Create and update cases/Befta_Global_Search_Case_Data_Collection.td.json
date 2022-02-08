@@ -31,7 +31,21 @@
         "IndividualDateOfBirth": "2012-04-21",
         "IndividualDateOfDeath": "2020-04-21"
       },
-      "id" : "[[ANYTHING_PRESENT]]"
+      "id" : "4b8f17d9-5e27-4989-8ba5-ca9ce1bbb703"
+    },
+    {
+      "value": {
+        "IndividualFirstName": "FirstNameValue2",
+        "IndividualLastName": "LastNameValue2",
+        "IndividualEmail": "e2@mail.com",
+        "IndividualAddress": {
+          "AddressLine1": "Address Value2",
+          "PostCode": "SE2 4EE"
+        },
+        "IndividualDateOfBirth": "1979-04-21",
+        "IndividualDateOfDeath": "1980-04-21"
+      },
+      "id" : "6a67040f-81f5-4095-bad9-c59a6a116f21"
     }
   ]
 }
