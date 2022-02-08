@@ -121,6 +121,11 @@ public class CaseService {
         caseEventDefinition.forEach(
             caseField -> {
 
+                String defaultValue = caseField.getDefaultValue();
+                if (defaultValue != null) {
+                    data.put(caseField.getCaseFieldId(), MAPPER.getNodeFactory().textNode(defaultValue));
+                }
+
                 List<JsonNode> collect = caseField.getCaseEventFieldComplexDefinitions().stream()
                     .filter(e -> e.getDefaultValue() != null)
                     .filter(e -> !e.getReference().isBlank())
