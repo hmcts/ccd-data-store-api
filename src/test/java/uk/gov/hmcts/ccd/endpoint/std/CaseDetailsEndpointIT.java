@@ -3889,7 +3889,8 @@ public class CaseDetailsEndpointIT extends WireMockBaseTest {
         assertEquals(SUMMARY, caseAuditEvent.getSummary());
         assertEquals(DESCRIPTION, caseAuditEvent.getDescription());
         JSONAssert.assertEquals(expectedClassificationString,
-            JacksonUtils.convertValue(caseAuditEvent.getDataClassification()).toString(), JSONCompareMode.LENIENT);
+                mapper.convertValue(caseAuditEvent.getDataClassification(), JsonNode.class).toString(),
+                JSONCompareMode.LENIENT);
     }
 
     private void shouldReturn201WhenPostCreateCaseEventWithExistingDocumentBinary(String userRole) throws Exception {
