@@ -221,7 +221,7 @@ public class GlobalSearchProcessorService {
 
         List<JsonNode> listOfNodes = new ArrayList<>();
 
-        if (valueInMap != null || !valueInMap.isNull()) {
+        if (valueInMap != null && !valueInMap.isNull()) {
             if (!valueInMap.isArray()) {
                 log.warn("GlobalSearch: This is not a collection in "
                     + "the SearchParty tab and it should be. CaseTypeId: {}, Field: {}",
