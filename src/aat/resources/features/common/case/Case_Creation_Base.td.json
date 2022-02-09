@@ -1,5 +1,5 @@
 {
-  "_guid_": "Case_Creation_Base",
+	"_guid_": "Case_Creation_Base",
 
   "productName": "CCD Data Store",
   "operationName": "Submit case creation as Case worker",
@@ -7,9 +7,9 @@
   "method": "POST",
   "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
 
-  "specs": [
-    "to create a full case"
-  ],
+	"specs": [
+		"to create a full case"
+	],
 
   "users": {
     "invokingUser": {
@@ -17,44 +17,44 @@
     }
   },
 
-  "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers"
-    },
-    "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]"
-    },
-    "body": {
-      "event": {
-        "id": "CREATE",
-        "summary": "",
-        "description": ""
-      },
-      "ignore_warning": false,
-      "draft_id": null
-    }
-  },
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers"
+		},
+		"pathVariables": {
+			"uid": "[[DEFAULT_AUTO_VALUE]]"
+		},
+		"body": {
+			"event": {
+				"id": "CREATE",
+				"summary": "",
+				"description": ""
+			},
+			"ignore_warning": false,
+			"draft_id": null
+		}
+	},
 
-  "expectedResponse": {
-    "_extends_": "Common_201_Response",
-    "headers": {
-      "Content-Encoding": "gzip",
-      "vary": "accept-encoding",
-      "Content-Length": "[[ANYTHING_PRESENT]]"
-    },
-    "body": {
-      "id": "[[ANYTHING_PRESENT]]",
-      "state": "TODO",
-      "version": 0,
-      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
-      "created_date": "[[ANYTHING_PRESENT]]",
-      "last_modified": "[[ANYTHING_PRESENT]]",
-      "security_classification": "PUBLIC",
-      "after_submit_callback_response": null,
-      "callback_response_status_code": null,
-      "callback_response_status": null,
-      "delete_draft_response_status_code": null,
-      "delete_draft_response_status": null
-    }
-  }
+	"expectedResponse": {
+		"_extends_": "Common_201_Response",
+		"headers": {
+			"Content-Encoding": "gzip",
+			"vary": "accept-encoding",
+			"Content-Length": "[[ANYTHING_PRESENT]]"
+		},
+		"body": {
+			"id": "[[ANYTHING_PRESENT]]",
+			"state": "TODO",
+			"version": 0,
+			"last_state_modified_date": "[[ANYTHING_PRESENT]]",
+			"created_date": "[[ANYTHING_PRESENT]]",
+			"last_modified": "[[ANYTHING_PRESENT]]",
+			"security_classification": "PUBLIC",
+			"after_submit_callback_response": null,
+			"callback_response_status_code": null,
+			"callback_response_status": null,
+			"delete_draft_response_status_code": null,
+			"delete_draft_response_status": null
+		}
+	}
 }

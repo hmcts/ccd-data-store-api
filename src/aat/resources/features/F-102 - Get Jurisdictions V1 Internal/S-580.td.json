@@ -313,6 +313,8 @@
 								}
 							],
 							"searchAliasFields": [],
+              "searchParties" : [],
+              "searchCriterias" : [],
               "roleToAccessProfiles": [],
 							"security_classification": null,
 							"case_fields": [],
@@ -563,6 +565,8 @@
 								}
 							],
 							"searchAliasFields": [],
+              "searchParties" : [],
+              "searchCriterias" : [],
               "roleToAccessProfiles": [],
 							"security_classification": null,
 							"case_fields": [],

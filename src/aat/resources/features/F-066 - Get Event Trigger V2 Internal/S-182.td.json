@@ -39,6 +39,7 @@
       "access_granted" : "STANDARD",
       "access_process" : "NONE",
       "title_display": "CUSTOM  TITLE DISPLAY",
+      "supplementary_data": null,
       "_links": {
         "self": {
           "href": "[[ANYTHING_PRESENT]]"

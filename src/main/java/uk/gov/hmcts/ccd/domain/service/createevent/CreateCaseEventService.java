@@ -34,6 +34,7 @@ import uk.gov.hmcts.ccd.domain.service.getcasedocument.CaseDocumentService;
 import uk.gov.hmcts.ccd.domain.service.message.MessageContext;
 import uk.gov.hmcts.ccd.domain.service.message.MessageService;
 import uk.gov.hmcts.ccd.domain.service.processor.FieldProcessorService;
+import uk.gov.hmcts.ccd.domain.service.processor.GlobalSearchProcessorService;
 import uk.gov.hmcts.ccd.domain.service.stdapi.AboutToSubmitCallbackResponse;
 import uk.gov.hmcts.ccd.domain.service.stdapi.CallbackInvoker;
 import uk.gov.hmcts.ccd.domain.service.validate.CaseDataIssueLogger;
@@ -82,6 +83,7 @@ public class CreateCaseEventService {
     private final CaseDocumentService caseDocumentService;
     private final CaseDataIssueLogger caseDataIssueLogger;
     private final TimeToLiveService timeToLiveService;
+    private final GlobalSearchProcessorService globalSearchProcessorService;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -107,6 +109,7 @@ public class CreateCaseEventService {
                                   @Qualifier("caseEventMessageService") final MessageService messageService,
                                   final CaseDocumentService caseDocumentService,
                                   final CaseDataIssueLogger caseDataIssueLogger,
+                                  final GlobalSearchProcessorService globalSearchProcessorService,
                                   final TimeToLiveService timeToLiveService) {
         this.userRepository = userRepository;
         this.caseDetailsRepository = caseDetailsRepository;
@@ -130,6 +133,7 @@ public class CreateCaseEventService {
         this.caseDocumentService = caseDocumentService;
         this.caseDataIssueLogger = caseDataIssueLogger;
         this.timeToLiveService = timeToLiveService;
+        this.globalSearchProcessorService = globalSearchProcessorService;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -303,7 +307,8 @@ public class CreateCaseEventService {
                 final Map<String, JsonNode> caseData = new HashMap<>(Optional.ofNullable(caseDetails.getData())
                     .orElse(emptyMap()));
                 caseData.putAll(sanitisedData);
-                clonedCaseDetails.setData(caseData);
+                clonedCaseDetails.setData(globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition,
+                    caseData));
 
                 final Map<String, JsonNode> dataClassifications = caseDataService.getDefaultSecurityClassifications(
                     caseTypeDefinition,
