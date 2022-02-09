@@ -99,6 +99,7 @@ env.MAX_NUM_PARALLEL_THREADS=6
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
 env.ROLE_ASSIGNMENT_API_GATEWAY_S2S_CLIENT_ID = "ccd_data"
 env.BEFTA_TEST_STUB_SERVICE_BASE_URL = "http://ccd-test-stubs-service-pr-127.service.core-compute-preview.internal"
+env.TEST_STUB_SERVICE_BASE_URL = env.BEFTA_TEST_STUB_SERVICE_BASE_URL
 env.BEFTA_S2S_CLIENT_ID_OF_XUI_WEBAPP = "xui_webapp"
 
 withPipeline(type, product, component) {
