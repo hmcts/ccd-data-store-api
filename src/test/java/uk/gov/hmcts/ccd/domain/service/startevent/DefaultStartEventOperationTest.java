@@ -104,6 +104,11 @@ public class DefaultStartEventOperationTest {
                                                                  + "  \"OrgPolicyCaseAssignedRole\": \"[Claimant]\""
                                                                  + "}");
             data.put("OrganisationPolicyField", orgPolicyDefaultValue);
+
+            data.put("TextField0",  MAPPER.getNodeFactory().textNode("Default text"));
+
+            data.put("TextField1",  MAPPER.getNodeFactory().textNode("Should not replace existing text"));
+
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -131,6 +136,11 @@ public class DefaultStartEventOperationTest {
                                                      + "  \"OrgPolicyCaseAssignedRole\": null"
                                                      + "}");
             data.put("OrganisationPolicyField", orgPolicy);
+
+            data.put("TextField1",  MAPPER.getNodeFactory().textNode("Existing text"));
+
+            data.put("TextField0",  MAPPER.getNodeFactory().nullNode());
+
 
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -177,6 +187,11 @@ public class DefaultStartEventOperationTest {
                                                      + "  \"OrgPolicyCaseAssignedRole\": \"[Claimant]\""
                                                      + "}");
             data.put("OrganisationPolicyField", orgPolicy);
+
+            data.put("TextField0",  MAPPER.getNodeFactory().textNode("Default text"));
+
+            data.put("TextField1",  MAPPER.getNodeFactory().textNode("Existing text"));
+
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -262,6 +277,14 @@ public class DefaultStartEventOperationTest {
                           .addCaseEventFieldComplexDefinitions(CaseEventFieldComplexDefinition.builder()
                                                                     .reference("Suspended")
                                                                     .build())
+                          .build(),
+                      newCaseEventField()
+                          .withCaseFieldId("TextField0")
+                          .withDefaultValue("Default text")
+                          .build(),
+                      newCaseEventField()
+                          .withCaseFieldId("TextField1")
+                          .withDefaultValue("Should not replace existing text")
                           .build()
 
 

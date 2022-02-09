@@ -882,6 +882,11 @@ public class TestBuildersUtil {
             return this;
         }
 
+        public CaseEventFieldDefinitionBuilder withDefaultValue(String defaultValue) {
+            caseField.setDefaultValue(defaultValue);
+            return this;
+        }
+
         public CaseEventFieldDefinition build() {
             caseField.setCaseEventFieldComplexDefinitions(complexFieldDefinitions);
             return caseField;
