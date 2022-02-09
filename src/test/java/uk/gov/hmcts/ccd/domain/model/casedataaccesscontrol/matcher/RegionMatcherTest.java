@@ -54,4 +54,28 @@ class RegionMatcherTest extends BaseFilter {
         assertFalse(classUnderTest.matchAttribute(roleAssignment, caseDetails));
     }
 
+    @Test
+    void shouldMatchWhenRegionIsEmptyOnRoleAssignmentAndEmptyCaseDetailsData() {
+        RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
+            Instant.now().minus(1, ChronoUnit.DAYS),
+            Instant.now().plus(2, ChronoUnit.DAYS),
+            "PRIVATE", Optional.of(""), Optional.of(""));
+
+        CaseDetails caseDetails = mockCaseDetails();
+        caseDetails.setData(null);
+        assertTrue(classUnderTest.matchAttribute(roleAssignment, caseDetails));
+    }
+
+    @Test
+    void shouldNotMatchWhenRegionIsNotEmptyOnRoleAssignmentAndEmptyCaseDetailsData() {
+        RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
+            Instant.now().minus(1, ChronoUnit.DAYS),
+            Instant.now().plus(2, ChronoUnit.DAYS),
+            "PRIVATE", Optional.of("England"), Optional.of(""));
+
+        CaseDetails caseDetails = null;
+        assertFalse(classUnderTest.matchAttribute(roleAssignment, caseDetails));
+    }
+
+
 }
