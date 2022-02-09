@@ -74,8 +74,7 @@ class LocationMatcherTest extends BaseFilter {
             Instant.now().plus(2, ChronoUnit.DAYS),
             "PRIVATE",  Optional.of(""),Optional.of("England"));
 
-        CaseDetails caseDetails = mockCaseDetails();
-        caseDetails.setData(null);
+        CaseDetails caseDetails = null;
         assertFalse(classUnderTest.matchAttribute(roleAssignment, caseDetails));
     }
 }
