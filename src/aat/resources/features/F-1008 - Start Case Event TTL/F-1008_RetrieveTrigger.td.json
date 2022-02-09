@@ -1,0 +1,56 @@
+{
+  "_guid_": "F-1008_RetrieveTrigger",
+
+  "productName": "CCD Data Store",
+  "operationName": "Retrieve an update event trigger for case",
+
+  "method": "GET",
+  "uri": "/cases/{caseId}/event-triggers/{triggerId}",
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker"
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "experimental": "true"
+    },
+    "pathVariables": {
+      "caseId": "OVERRIDE",
+      "triggerId": "OVERRIDE"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.start-event-trigger.v2+json;charset=UTF-8"
+    },
+    "body": {
+      "token": "[[ANY_STRING_NOT_NULLABLE]]",
+      "_links": {
+        "self": {
+          "href": "[[ANY_STRING_NOT_NULLABLE]]"
+        }
+      },
+      "case_details": {
+        "id": "OVERRIDE",
+        "jurisdiction": "OVERRIDE",
+        "state": "CaseCreated",
+        "version": 0,
+        "case_type_id": "OVERRIDE",
+        "created_date": "[[ANY_DATE_NOT_NULLABLE]]",
+        "last_modified":"[[ANY_DATE_NOT_NULLABLE]]",
+        "last_state_modified_date": "[[ANY_DATE_NOT_NULLABLE]]",
+        "security_classification": "PUBLIC",
+        "supplementary_data": null,
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null
+      },
+      "event_id": "OVERRIDE"
+    }
+  }
+}

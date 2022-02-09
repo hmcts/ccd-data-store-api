@@ -1,0 +1,50 @@
+{
+  "_guid_": "F-1008-CreateEventTokenErrorResponse",
+  "title": "should return bad request error when about to start callback has modified TTL",
+
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation process to update a case",
+
+  "method": "GET",
+  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+
+  "specs": [
+    "to get an update event token for the case just created"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker2Solicitor1"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType",
+      "cid": "${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "etid": "OVERRIDE"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 400,
+    "responseMessage": "Bad Request",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Vary": "Accept-Encoding"
+    },
+    "body": {
+      "timestamp" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
+      "path" : "[[ANY_STRING_NOT_NULLABLE]]",
+      "details" : null,
+      "callbackErrors" : null,
+      "callbackWarnings" : null,
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException",
+      "status" : 400,
+      "error" : "Bad Request",
+      "message" : "Time to live content has been modified by callback"
+    }
+  }
+
+}

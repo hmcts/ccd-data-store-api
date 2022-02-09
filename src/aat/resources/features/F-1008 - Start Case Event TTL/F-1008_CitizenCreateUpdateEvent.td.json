@@ -1,0 +1,58 @@
+{
+  "_guid_": "F-1008_CitizenCreateUpdateEvent",
+  "title": "should create an event token for correct inputs",
+
+  "productName": "CCD Data Store",
+  "operationName": "Start event creation process to update a case as Citizen",
+
+  "method": "GET",
+  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+
+  "specs": [
+    "to get an update event token for the case just created"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "OVERRIDE",
+      "ctid": "OVERRIDE",
+      "cid": "OVERRIDE",
+      "etid": "OVERRIDE"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "token": "[[ANYTHING_PRESENT]]",
+      "case_details": {
+        "version": 0,
+        "created_date": "[[ANYTHING_PRESENT]]",
+        "last_modified": "[[ANYTHING_PRESENT]]",
+        "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+        "security_classification": "PUBLIC",
+        "supplementary_data": null,
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null
+      },
+      "event_id": "UPDATE"
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "_guid_": "S-1008.7",
+  "_extends_": "F-1008_CitizenCreateUpdateEvent",
+  "title": "must successfully update a case without modifying the TTL.SystemTTL value when no TTLIncrement is specified",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details",
+    "has a null TTLIncrement configured",
+    "is configured to trigger an About to Start callback",
+    "contains the TTL.SystemTTL for the case, that has not been modified"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}",
+      "etid": "updateCaseNoTTLInc"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_details": {
+        "id": "${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}",
+        "jurisdiction": "BEFTA_MASTER",
+        "state": "CaseCreated",
+        "case_type_id": "FT_MasterCaseType",
+        "case_data": {
+          "_extends_": "TTL_Case_Data"
+        },
+        "data_classification": {
+          "_extends_": "TTL_Case_Data_Classifications"
+        },
+
+        "security_classifications": {
+          "_extends_": "TTL_Case_Data_Classifications"
+        }
+      },
+      "event_id": "updateCaseNoTTLInc"
+    }
+  }
+}

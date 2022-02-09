@@ -1,0 +1,26 @@
+{
+  "_guid_": "S-1008.14",
+  "_extends_": "F-1008_RetrieveTriggerInternalErrorResponse",
+  "title": "must error when updating a case where about to start callback has modified TTL.OverrideTTL",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured event details",
+    "has a TTLIncrement of 20 days configured",
+    "is configured to trigger an About to Start callback that changes TTL.OverrideTTL",
+    "contains the error message indicating unauthorised change to the TTL values"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "triggerId": "updateModifiedOverrideTTL"
+    }
+  }
+}

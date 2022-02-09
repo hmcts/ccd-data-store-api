@@ -1,0 +1,41 @@
+{
+  "_guid_": "F-1008_RetrieveTriggerInternal",
+
+  "productName": "CCD Data Store",
+  "operationName": "Retrieve an start event trigger for case",
+
+  "method": "GET",
+  "uri": "internal/cases/{caseId}/event-triggers/{triggerId}",
+
+  "user": {
+    "_extends_": "BeftaMasterCaseworker"
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "experimental": "true"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.start-event-trigger.v2+json;charset=UTF-8"
+    },
+    "body": {
+      "event_token": "[[ANY_STRING_NOT_NULLABLE]]",
+      "wizard_pages": "[[ANYTHING_PRESENT]]",
+      "show_summary" : true,
+      "show_event_notes" : null,
+      "end_button_label" : null,
+      "can_save_draft" : false,
+      "title_display" : null,
+      "_links": {
+        "self": {
+          "href": "[[ANY_STRING_NOT_NULLABLE]]"
+        }
+      }
+    }
+  }
+}
