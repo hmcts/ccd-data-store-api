@@ -38,6 +38,10 @@
         "SearchCriteria": {
           "SearchParties": [
             {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },
+            {
               "value": {
                 "Name": "other-name",
                 "DateOfBirth": "2012-01-01",
@@ -58,6 +62,10 @@
             "SearchParties": {
               "classification": "PUBLIC",
               "value": [
+                {
+                  "__ordering__": "UNORDERED",
+                  "__elementId__": "value"
+                },
                 {
                   "value": {
                     "Name": "PUBLIC",
@@ -81,6 +89,10 @@
             "SearchParties": {
               "classification": "PUBLIC",
               "value": [
+                {
+                  "__ordering__": "UNORDERED",
+                  "__elementId__": "value"
+                },
                 {
                   "value": {
                     "Name": "PUBLIC",

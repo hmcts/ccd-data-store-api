@@ -37,13 +37,19 @@
         "dateOfBirthText": "date-of-birth-text",
         "dateOfDeathText": "date-of-death-text",
         "OtherName": "other-name",
-          "SearchCriteria" : {
-            "SearchParties" : [ {
-              "id" : "[[ANYTHING_PRESENT]]",
-              "value" : {
-                "Name" : "other-name"
+        "SearchCriteria": {
+          "SearchParties": [
+            {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },
+            {
+              "id": "[[ANYTHING_PRESENT]]",
+              "value": {
+                "Name": "other-name"
               }
-            } ]
+            }
+          ]
         }
       },
       "data_classification": {
@@ -53,14 +59,20 @@
         "SearchCriteria": {
           "classification": "PUBLIC",
           "value": {
-            "SearchParties" : {
-              "classification" : "PUBLIC",
-              "value" : [ {
-                "id" : "[[ANYTHING_PRESENT]]",
-                "value" : {
-                  "Name" : "PUBLIC"
+            "SearchParties": {
+              "classification": "PUBLIC",
+              "value": [
+                {
+                  "__ordering__": "UNORDERED",
+                  "__elementId__": "value"
+                },
+                {
+                  "id": "[[ANYTHING_PRESENT]]",
+                  "value": {
+                    "Name": "PUBLIC"
+                  }
                 }
-              } ]
+              ]
             }
           }
         }
@@ -72,14 +84,20 @@
         "SearchCriteria": {
           "classification": "PUBLIC",
           "value": {
-            "SearchParties" : {
-              "classification" : "PUBLIC",
-              "value" : [ {
-                "id" : "[[ANYTHING_PRESENT]]",
-                "value" : {
-                  "Name" : "PUBLIC"
+            "SearchParties": {
+              "classification": "PUBLIC",
+              "value": [
+                {
+                  "__ordering__": "UNORDERED",
+                  "__elementId__": "value"
+                },
+                {
+                  "id": "[[ANYTHING_PRESENT]]",
+                  "value": {
+                    "Name": "PUBLIC"
+                  }
                 }
-              } ]
+              ]
             }
           }
         }

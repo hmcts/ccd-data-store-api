@@ -37,6 +37,10 @@
         "SearchCriteria": {
           "SearchParties": [
             {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },
+            {
               "id": "[[ANYTHING_PRESENT]]",
               "value": {
                 "Name": "other-name"
@@ -55,6 +59,10 @@
             "SearchParties": {
               "classification": "PUBLIC",
               "value": [
+                {
+                  "__ordering__": "UNORDERED",
+                  "__elementId__": "value"
+                },
                 {
                   "id": "[[ANYTHING_PRESENT]]",
                   "value": {

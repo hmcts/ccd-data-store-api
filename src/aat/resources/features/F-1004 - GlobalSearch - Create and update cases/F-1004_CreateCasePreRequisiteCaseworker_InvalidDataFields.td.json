@@ -46,7 +46,11 @@
         "dateOfBirthText" : "2012-04-21",
         "dateOfDeathText" : "2020-04-21",
         "SearchCriteria" : {
-          "SearchParties" : [ {
+          "SearchParties" : [ 
+            {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },{
             "value" : {
               "DateOfBirth" : "2012-04-21",
               "DateOfDeath" : "2020-04-21"

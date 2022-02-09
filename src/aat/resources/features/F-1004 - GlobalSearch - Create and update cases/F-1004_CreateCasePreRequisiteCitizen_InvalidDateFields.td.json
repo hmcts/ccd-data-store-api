@@ -44,6 +44,10 @@
         "SearchCriteria": {
           "SearchParties": [
             {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },
+            {
               "value": {
                 "DateOfBirth": "2012-04-21",
                 "DateOfDeath": "2020-04-21"
@@ -59,18 +63,7 @@
         "SearchCriteria": {
           "classification": "PUBLIC",
           "value": {
-            "SearchParties": {
-              "classification": "PUBLIC",
-              "value": [
-                {
-                  "value": {
-                    "DateOfBirth": "PUBLIC",
-                    "DateOfDeath": "PUBLIC"
-                  },
-                  "id": "[[ANYTHING_PRESENT]]"
-                }
-              ]
-            }
+            "SearchParties" : "[[ANYTHING_PRESENT]]"
           }
         }
       },
@@ -86,18 +79,7 @@
         "SearchCriteria": {
           "classification": "PUBLIC",
           "value": {
-            "SearchParties": {
-              "classification": "PUBLIC",
-              "value": [
-                {
-                  "value": {
-                    "DateOfBirth": "PUBLIC",
-                    "DateOfDeath": "PUBLIC"
-                  },
-                  "id": "[[ANYTHING_PRESENT]]"
-                }
-              ]
-            }
+            "SearchParties" : "[[ANYTHING_PRESENT]]"
           }
         }
       }

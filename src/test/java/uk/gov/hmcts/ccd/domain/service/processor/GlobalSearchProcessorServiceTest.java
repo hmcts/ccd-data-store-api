@@ -384,7 +384,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchPartyDateOfDeathEmptyInSearchCriteria() throws JsonProcessingException {
+    void checkSearchPartyDateOfDeathEmptyInSearchCriteriaWhenBadDateValue() throws JsonProcessingException {
 
         searchParty.setSearchPartyDod("SearchPartyDod");
         caseTypeDefinition.setSearchParties(List.of(searchParty));
@@ -392,11 +392,8 @@ class GlobalSearchProcessorServiceTest {
         final String dodField = "FirstName";
         caseData.put("SearchPartyDod", JacksonUtils.MAPPER.readTree("\""  + dodField  + "\""));
 
-        assertSearchPartyNodeIsNull();
-
+        assertSearchCriteriaExistsButSearchPartyNodeIsNull();
     }
-
-
 
     @Test
     void checkSearchPartyDateOfDeathPopulatedInSearchCriteriaWithComplexField() throws JsonProcessingException {
@@ -447,7 +444,7 @@ class GlobalSearchProcessorServiceTest {
     }
 
     @Test
-    void checkSearchPartyDateOfBirthEmptyInSearchCriteria() throws JsonProcessingException {
+    void checkSearchPartyDateOfBirthEmptyInSearchCriteriaWhenBadDateValue() throws JsonProcessingException {
 
         searchParty.setSearchPartyDob("SearchPartyDob");
 
@@ -456,11 +453,11 @@ class GlobalSearchProcessorServiceTest {
         final String dobField = "FirstName";
         caseData.put("SearchPartyDob", JacksonUtils.MAPPER.readTree("\""  + dobField  + "\""));
 
-        assertSearchPartyNodeIsNull();
+        assertSearchCriteriaExistsButSearchPartyNodeIsNull();
     }
 
     @Test
-    void checkSearchCriteriaContainingASearchPartyContainingTwoWrongDateFields()
+    void checkSearchCriteriaExistsButSearchPartyNodeIsNullWhenTwoBadDateValues()
         throws JsonProcessingException {
 
         searchParty.setSearchPartyDob("spDob");
@@ -474,7 +471,7 @@ class GlobalSearchProcessorServiceTest {
         caseData.put("spDob", JacksonUtils.MAPPER.readTree("\""  + dob  + "\""));
         caseData.put("spDod", JacksonUtils.MAPPER.readTree("\""  + dod  + "\""));
 
-        assertSearchPartyNodeIsNull();
+        assertSearchCriteriaExistsButSearchPartyNodeIsNull();
     }
 
     @Test
@@ -739,12 +736,14 @@ class GlobalSearchProcessorServiceTest {
 
     }
 
-    private void assertSearchPartyNodeIsNull() {
+    private void assertSearchCriteriaExistsButSearchPartyNodeIsNull() {
         Map<String, JsonNode> globalSearchData =
             globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
 
-        JsonNode searchPartyNode = globalSearchData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
+        JsonNode searchCriteriaNode = globalSearchData.get(SEARCH_CRITERIA);
+        assertNotNull(searchCriteriaNode);
 
+        JsonNode searchPartyNode = searchCriteriaNode.get(SEARCH_PARTIES);
         assertNull(searchPartyNode);
     }
 

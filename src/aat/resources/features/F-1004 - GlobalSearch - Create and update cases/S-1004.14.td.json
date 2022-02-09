@@ -38,14 +38,20 @@
         "dateOfDeathText": "2022-01-01",
         "OtherName": "other-name",
         "SearchCriteria" : {
-          "SearchParties" : [ {
-            "id" : "[[ANYTHING_PRESENT]]",
-            "value" : {
-              "Name" : "other-name",
-              "DateOfBirth" : "2012-01-01",
-              "DateOfDeath" : "2022-01-01"
+          "SearchParties": [
+            {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },
+            {
+              "id": "[[ANYTHING_PRESENT]]",
+              "value": {
+                "Name": "other-name",
+                "DateOfBirth": "2012-01-01",
+                "DateOfDeath": "2022-01-01"
+              }
             }
-          } ]
+          ]
         }
       },
       "data_classification": {
@@ -57,14 +63,20 @@
           "value" : {
             "SearchParties" : {
               "classification" : "PUBLIC",
-              "value" : [ {
-                "id" : "[[ANYTHING_PRESENT]]",
-                "value" : {
-                  "Name" : "PUBLIC",
-                  "DateOfBirth" : "PUBLIC",
-                  "DateOfDeath" : "PUBLIC"
+              "value": [
+                {
+                  "__ordering__": "UNORDERED",
+                  "__elementId__": "value"
+                },
+                {
+                  "id": "[[ANYTHING_PRESENT]]",
+                  "value": {
+                    "Name": "PUBLIC",
+                    "DateOfBirth": "PUBLIC",
+                    "DateOfDeath": "PUBLIC"
+                  }
                 }
-              } ]
+              ]
             }
           }
         }
@@ -76,16 +88,22 @@
         "SearchCriteria" : {
           "classification" : "PUBLIC",
           "value" : {
-            "SearchParties" : {
-              "classification" : "PUBLIC",
-              "value" : [ {
-                "id" : "[[ANYTHING_PRESENT]]",
-                "value" : {
-                  "Name" : "PUBLIC",
-                  "DateOfBirth" : "PUBLIC",
-                  "DateOfDeath" : "PUBLIC"
+            "SearchParties": {
+              "classification": "PUBLIC",
+              "value": [
+                {
+                  "__ordering__": "UNORDERED",
+                  "__elementId__": "value"
+                },
+                {
+                  "id": "[[ANYTHING_PRESENT]]",
+                  "value": {
+                    "Name": "PUBLIC",
+                    "DateOfBirth": "PUBLIC",
+                    "DateOfDeath": "PUBLIC"
+                  }
                 }
-              } ]
+              ]
             }
           }
         }
