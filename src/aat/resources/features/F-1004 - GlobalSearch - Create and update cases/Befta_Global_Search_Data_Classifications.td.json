@@ -1,8 +1,8 @@
 {
   "_guid_": "Befta_Global_Search_Data_Classifications",
 
-    "DateOfBirth": "PUBLIC",
-    "DateOfDeath": "PUBLIC",
+    "dateOfBirth": "PUBLIC",
+    "dateOfDeath": "PUBLIC",
     "Email": "PUBLIC",
     "caseManagementCategory" : "PUBLIC",
     "Address": {
