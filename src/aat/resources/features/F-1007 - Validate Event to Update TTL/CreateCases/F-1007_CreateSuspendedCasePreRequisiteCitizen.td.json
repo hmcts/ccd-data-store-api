@@ -1,6 +1,6 @@
 {
   "_guid_": "F-1007_CreateSuspendedCasePreRequisiteCitizen",
-  "_extends_": "F-1005_CreateCasePreRequisiteCitizen",
+  "_extends_": "F-1008_CreateCasePreRequisiteCitizen",
 
   "request": {
     "body": {
