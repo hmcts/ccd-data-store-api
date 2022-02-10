@@ -14,6 +14,7 @@ import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchParty;
 import uk.gov.hmcts.ccd.domain.model.globalsearch.SearchPartyValue;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CollectionSanitiser;
+import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -221,15 +222,17 @@ public class GlobalSearchProcessorService {
 
         List<JsonNode> listOfNodes = new ArrayList<>();
 
-        if (valueInMap != null && !valueInMap.isNull()) {
-            if (!valueInMap.isArray()) {
-                log.warn("GlobalSearch: This is not a collection in "
-                    + "the SearchParty tab and it should be. CaseTypeId: {}, Field: {}",
-                    searchParty.getCaseTypeId(), valueInMap.textValue());
-            }
+        if (!isNull(valueInMap)) {
+            // can only process collection if it is an array
+            if (valueInMap.isArray()) {
+                for (JsonNode objNode : valueInMap) {
+                    listOfNodes.add(objNode);
+                }
 
-            for (JsonNode objNode : valueInMap) {
-                listOfNodes.add(objNode);
+            } else {
+                log.warn("GlobalSearch: This is not a collection in "
+                        + "the SearchParty tab and it should be. CaseTypeId: {}, Field: {}",
+                    searchParty.getCaseTypeId(), searchParty.getSearchPartyCollectionFieldName());
             }
         }
 
@@ -265,12 +268,19 @@ public class GlobalSearchProcessorService {
      * Splits out the id from the value from the JsonNode.
      */
     private Map<String, JsonNode> getCollectionItemValueFromJsonNode(JsonNode jsonNode) {
-        return jsonNode != null
-            ? objectMapperService.convertJsonNodeToMap(jsonNode.get(JSON_NODE_VALUE_KEY_NAME)) : null;
+        try {
+            return isNull(jsonNode) ? null :
+                objectMapperService.convertJsonNodeToMap(jsonNode.get(JSON_NODE_VALUE_KEY_NAME));
+        } catch (ServiceException ignored) {
+            return null; // malformed collection data so ignore it
+        }
     }
 
     private String jsonNodeObjectToText(JsonNode jsonNode) {
-        return jsonNode != null && !jsonNode.isNull() ? jsonNode.textValue() : null;
+        return isNull(jsonNode) ? null : jsonNode.textValue();
     }
 
+    private boolean isNull(JsonNode jsonNode) {
+        return jsonNode == null || jsonNode.isNull();
+    }
 }

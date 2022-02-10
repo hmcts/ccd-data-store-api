@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -118,8 +119,35 @@ class GlobalSearchProcessorServiceTest {
 
     }
 
-    @Test
-    void searchCriteriaStillCreatedEvenIfEmptyCollection() throws JsonProcessingException {
+    @ParameterizedTest(name = "SearchCriteria is still created even if collection is null, empty or bad: {0}")
+    @ValueSource(strings = {
+        "null",                      // run 1: null
+        "[]",                        // run 2: empty
+        "{ \"FirstName\": \"1\" }",  // run 3: random object
+        "1234",                      // run 4: not an object
+        "[\n"                        // run 5: array of bad items
+            + "  null,\n"            //   - 5.1: item is null
+            + "  1234,\n"            //   - 5.2: item is not an object
+            + "  {\n"                //   - 5.3: item has no value field
+            + "    \"id\": null\n"
+            + "  },\n"
+            + "  {\n"                //   - 5.4: item has value, but it is null
+            + "    \"id\": null,\n"
+            + "    \"value\": null\n"
+            + "  },\n"
+            + "  {\n"               //    - 5.5: item has value, but it is another collection/array
+            + "    \"id\": null,\n"
+            + "    \"value\": []\n"
+            + "  },\n"
+            + "  {\n"              //     - 5.6: item has value, but it is not an object
+            + "    \"id\": null,\n"
+            + "    \"value\": 1234\n"
+            + "  }\n"
+            + "]"
+    })
+    void searchCriteriaStillCreatedEvenIfCollectionIsNullEmptyOrBad(String collectionAsString)
+        throws JsonProcessingException {
+
         final String collectionName = "myCollection";
         final String firstName = "FirstName";
         final String middleName = "MiddleName";
@@ -129,41 +157,7 @@ class GlobalSearchProcessorServiceTest {
         searchParty.setSearchPartyCollectionFieldName(String.format("%s", collectionName));
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        caseData.put("myCollection", JacksonUtils.MAPPER.readTree("[]"));
-
-        assertSearchCriteriaCreated();
-    }
-
-    @Test
-    void searchCriteriaStillCreatedEvenIfNotACollection() throws JsonProcessingException {
-        final String collectionName = "myCollection";
-        final String firstName = "FirstName";
-        final String middleName = "MiddleName";
-        final String lastName = "LastName";
-
-        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
-        searchParty.setSearchPartyCollectionFieldName(String.format("%s", collectionName));
-        caseTypeDefinition.setSearchParties(List.of(searchParty));
-
-        caseData.put("myCollection", JacksonUtils.MAPPER.readTree("null"));
-
-        assertSearchCriteriaCreated();
-    }
-
-    @Test
-    void searchCriteriaStillCreatedEvenIfCollectionHasBadData() throws JsonProcessingException {
-        final String collectionName = "myCollection";
-        final String firstName = "FirstName";
-        final String middleName = "MiddleName";
-        final String lastName = "LastName";
-
-        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
-        searchParty.setSearchPartyCollectionFieldName(String.format("%s", collectionName));
-        caseTypeDefinition.setSearchParties(List.of(searchParty));
-
-        caseData.put("myCollection", JacksonUtils.MAPPER.readTree("[{\n"
-            + "             \"FirstName\":\"1\"\n"
-            + "      }]\n"));
+        caseData.put("myCollection", JacksonUtils.MAPPER.readTree(collectionAsString));
 
         assertSearchCriteriaCreated();
     }
