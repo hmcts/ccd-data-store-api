@@ -12,40 +12,46 @@
   "caseNameHmctsInternal" : "PUBLIC",
   "ListOfPeople" : {
     "classification" : "PUBLIC",
-    "value" : [ {
-      "value" : {
-        "IndividualFirstName" : "PUBLIC",
-        "IndividualLastName" : "PUBLIC",
-        "IndividualEmail" : "PUBLIC",
-        "IndividualAddress" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "AddressLine1" : "PUBLIC",
-            "PostCode" : "PUBLIC"
-          }
-        },
-        "IndividualDateOfBirth" : "PUBLIC",
-        "IndividualDateOfDeath" : "PUBLIC"
+    "value" : [
+      {
+        "__ordering__": "UNORDERED",
+        "__elementId__": "value"
       },
-      "id" : "[[ANYTHING_PRESENT]]"
-    },
-    {
-      "value" : {
-        "IndividualFirstName" : "PUBLIC",
-        "IndividualLastName" : "PUBLIC",
-        "IndividualEmail" : "PUBLIC",
-        "IndividualAddress" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "AddressLine1" : "PUBLIC",
-            "PostCode" : "PUBLIC"
-          }
+      {
+        "value": {
+          "IndividualFirstName": "PUBLIC",
+          "IndividualLastName": "PUBLIC",
+          "IndividualEmail": "PUBLIC",
+          "IndividualAddress": {
+            "classification": "PUBLIC",
+            "value": {
+              "AddressLine1": "PUBLIC",
+              "PostCode": "PUBLIC"
+            }
+          },
+          "IndividualDateOfBirth": "PUBLIC",
+          "IndividualDateOfDeath": "PUBLIC"
         },
-        "IndividualDateOfBirth" : "PUBLIC",
-        "IndividualDateOfDeath" : "PUBLIC"
+        "id": "[[ANYTHING_PRESENT]]"
       },
-      "id" : "[[ANYTHING_PRESENT]]"
-    }]
+      {
+        "value": {
+          "IndividualFirstName": "PUBLIC",
+          "IndividualLastName": "PUBLIC",
+          "IndividualEmail": "PUBLIC",
+          "IndividualAddress": {
+            "classification": "PUBLIC",
+            "value": {
+              "AddressLine1": "PUBLIC",
+              "PostCode": "PUBLIC"
+            }
+          },
+          "IndividualDateOfBirth": "PUBLIC",
+          "IndividualDateOfDeath": "PUBLIC"
+        },
+        "id": "[[ANYTHING_PRESENT]]"
+      }
+    ]
   },
   "SearchCriteria" : {
     "classification" : "PUBLIC",

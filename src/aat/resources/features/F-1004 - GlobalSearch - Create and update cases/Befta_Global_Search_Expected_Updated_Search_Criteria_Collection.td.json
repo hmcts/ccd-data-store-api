@@ -20,6 +20,10 @@
   "caseNameHmctsInternal": "Name Internal",
   "ListOfPeople": [
     {
+      "__ordering__": "UNORDERED",
+      "__elementId__": "value"
+    },
+    {
       "value": {
         "IndividualFirstName": "FirstNameValue",
         "IndividualLastName": "LastNameValue",
@@ -50,6 +54,10 @@
   ],
   "SearchCriteria": {
     "SearchParties": [
+      {
+        "__ordering__": "UNORDERED",
+        "__elementId__": "value"
+      },
       {
         "id": "[[ANYTHING_PRESENT]]",
         "value": {
