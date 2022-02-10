@@ -17,6 +17,7 @@ import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
+import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchParser;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
@@ -48,6 +49,9 @@ class GlobalSearchEndpointTest {
 
     @Mock
     private GlobalSearchService globalSearchService;
+
+    @Mock
+    private GlobalSearchParser globalSearchParser;
 
     @InjectMocks
     private GlobalSearchEndpoint classUnderTest;
