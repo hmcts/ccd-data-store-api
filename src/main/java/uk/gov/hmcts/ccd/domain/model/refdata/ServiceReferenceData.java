@@ -21,9 +21,9 @@ public class ServiceReferenceData implements Serializable {
     String subBusinessArea;
     String jurisdiction;
     String serviceDescription;
-    LocalDateTime lastUpdate;
     String serviceCode;
     String serviceShortDescription;
     String ccdServiceName;
+    LocalDateTime lastUpdate;
     List<String> ccdCaseTypes;
 }

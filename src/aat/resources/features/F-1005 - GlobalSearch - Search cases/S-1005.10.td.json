@@ -26,10 +26,10 @@
           "BEFTA_MASTER"
         ],
         "caseManagementBaseLocationIds": [
-          "123"
+          "1"
         ],
         "caseManagementRegionIds": [
-          "1"
+          "3"
         ],
         "parties": [
           {
@@ -79,12 +79,12 @@
             "FirstNameValue"
           ],
           "caseNameHmctsInternal": "Name Internal",
-          "baseLocationId": "123",
-          "baseLocationName": "[[ANY_NULLABLE]]",
+          "baseLocationId": "1",
+          "baseLocationName": "[[ANY_STRING_NOT_NULLABLE]]",
           "caseManagementCategoryId": "987",
           "caseManagementCategoryName": "Category label",
-          "regionId": "1",
-          "regionName": "[[ANY_NULLABLE]]",
+          "regionId": "3",
+          "regionName": "[[ANY_STRING_NOT_NULLABLE]]",
           "CCDJurisdictionId": "BEFTA_MASTER",
           "CCDJurisdictionName": "BEFTA Master",
           "CCDCaseTypeId": "FT_GlobalSearch",
