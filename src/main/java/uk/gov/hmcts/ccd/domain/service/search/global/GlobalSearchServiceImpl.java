@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.ReferenceDataRepository;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
 import uk.gov.hmcts.ccd.domain.model.refdata.LocationLookup;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceLookup;
@@ -117,13 +118,13 @@ public class GlobalSearchServiceImpl implements GlobalSearchService {
     }
 
     public GlobalSearchResponsePayload transformResponse(final GlobalSearchRequestPayload requestPayload,
-                                                         final CaseSearchResult caseSearchResult) {
+                                                         final List<CaseDetails> filteredCaseList) {
         final List<ServiceReferenceData> services = referenceDataRepository.getServices();
         final List<BuildingLocation> buildingLocations = referenceDataRepository.getBuildingLocations();
         final ServiceLookup serviceLookup = SERVICE_LOOKUP_FUNCTION.apply(services);
         final LocationLookup locationLookup = LOCATION_LOOKUP_FUNCTION.apply(buildingLocations);
 
-        final List<GlobalSearchResponsePayload.Result> results = caseSearchResult.getCases().stream()
+        final List<GlobalSearchResponsePayload.Result> results = filteredCaseList.stream()
             .map(caseDetails ->
                 globalSearchResponseTransformer.transformResult(caseDetails, serviceLookup, locationLookup))
             .collect(Collectors.toUnmodifiableList());
@@ -131,7 +132,7 @@ public class GlobalSearchServiceImpl implements GlobalSearchService {
         final GlobalSearchResponsePayload.ResultInfo resultInfo = globalSearchResponseTransformer.transformResultInfo(
             requestPayload.getMaxReturnRecordCount(),
             requestPayload.getStartRecordNumber(),
-            caseSearchResult.getTotal(),
+            Long.valueOf(filteredCaseList.size()),
             results.size()
         );
 

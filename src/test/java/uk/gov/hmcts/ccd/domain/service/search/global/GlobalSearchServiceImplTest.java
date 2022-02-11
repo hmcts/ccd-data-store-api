@@ -34,6 +34,7 @@ import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
 import uk.gov.hmcts.ccd.domain.service.aggregated.CaseDetailsUtil;
 import uk.gov.hmcts.ccd.domain.service.common.DefaultObjectMapperService;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
+import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchParser;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
 
@@ -74,6 +75,9 @@ class GlobalSearchServiceImplTest extends TestFixtures {
 
     @Mock
     private GlobalSearchQueryBuilder globalSearchQueryBuilder;
+
+    @Mock
+    private GlobalSearchParser globalSearchParser;
 
     @InjectMocks
     private GlobalSearchServiceImpl underTest;
@@ -134,8 +138,11 @@ class GlobalSearchServiceImplTest extends TestFixtures {
                 any(LocationLookup.class)
             );
 
+        List<CaseDetails> filteredCaseList = globalSearchParser.filterCases(caseSearchResult.getCases(),
+                                                                        requestPayload.getSearchCriteria());
+
         // WHEN
-        final GlobalSearchResponsePayload response = underTest.transformResponse(requestPayload, caseSearchResult);
+        final GlobalSearchResponsePayload response = underTest.transformResponse(requestPayload, filteredCaseList);
 
         // THEN
         assertThat(response).isNotNull();

@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchR
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
 import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -89,6 +91,9 @@ class GlobalSearchEndpointTest {
             searchCriteria.setCcdCaseTypeIds(List.of(CASE_TYPE_1));
             doReturn(searchCriteria).when(globalSearchRequestPayload).getSearchCriteria();
 
+            List<CaseDetails> filteredCaseList = globalSearchParser.filterCases(searchResults.getCases(),
+                                                                        globalSearchRequestPayload.getSearchCriteria());
+
             // ACT
             GlobalSearchResponsePayload output = classUnderTest.searchForCases(globalSearchRequestPayload);
 
@@ -102,7 +107,7 @@ class GlobalSearchEndpointTest {
             // :: execute search
             verify(caseSearchOperation).execute(eq(assembledSearchRequest), anyBoolean());
             // :: TransformResponse
-            verify(globalSearchService).transformResponse(globalSearchRequestPayload, searchResults);
+            verify(globalSearchService).transformResponse(globalSearchRequestPayload, filteredCaseList);
 
         }
 

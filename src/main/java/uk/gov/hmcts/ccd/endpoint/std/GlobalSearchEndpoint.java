@@ -122,9 +122,9 @@ public class GlobalSearchEndpoint {
         CaseSearchResult caseSearchResult = caseSearchOperation.execute(searchRequest, true);
 
         List<CaseDetails> filteredCaseList = globalSearchParser.filterCases(caseSearchResult.getCases(),
-            requestPayload.getSearchCriteria());
+                                                                            requestPayload.getSearchCriteria());
 
-        GlobalSearchResponsePayload result = globalSearchService.transformResponse(requestPayload, caseSearchResult);
+        GlobalSearchResponsePayload result = globalSearchService.transformResponse(requestPayload, filteredCaseList);
 
         Duration between = Duration.between(start, Instant.now());
         log.debug("GlobalSearchEndpoint.searchForCases execution completed in {} milliseconds...", between.toMillis());
