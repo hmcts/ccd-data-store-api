@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -156,8 +157,7 @@ public class GlobalSearchProcessorService {
         uk.gov.hmcts.ccd.domain.model.definition.SearchParty searchPartyDefinition,
                                      Map<String, JsonNode> data) {
 
-        List<JsonNode> collectionValueInMap = findCollectionValueInMap(
-            searchPartyDefinition, data);
+        List<JsonNode> collectionValueInMap = findCollectionValueInMap(searchPartyDefinition, data);
 
         List<SearchPartyValue> searchPartyValues = new ArrayList<>();
 
@@ -272,7 +272,8 @@ public class GlobalSearchProcessorService {
             return isNull(jsonNode) ? null :
                 objectMapperService.convertJsonNodeToMap(jsonNode.get(JSON_NODE_VALUE_KEY_NAME));
         } catch (ServiceException ignored) {
-            return null; // malformed collection data so ignore it
+            // malformed collection data so ignore it
+            return Collections.emptyMap();
         }
     }
 

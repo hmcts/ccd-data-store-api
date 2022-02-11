@@ -109,14 +109,27 @@ class GlobalSearchProcessorServiceTest {
         caseTypeDefinition.setSearchCriterias(List.of(searchCriteria));
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        // ACT
-        Map<String, JsonNode> globalSearchData =
-            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, testData);
+        // ACT / ASSERT
+        assertSearchCriteriaCreatedButEmpty(testData);
 
-        // ASSERT
-        assertNotNull(globalSearchData.get(SEARCH_CRITERIA));
-        assertTrue(globalSearchData.get(SEARCH_CRITERIA).isEmpty());
+    }
 
+    @Test
+    void searchCriteriaStillCreatedEvenIfCollectionIsMissing()  {
+
+        final String collectionName = "myCollection";
+        final String firstName = "FirstName";
+        final String middleName = "MiddleName";
+        final String lastName = "LastName";
+
+        searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
+        searchParty.setSearchPartyCollectionFieldName(collectionName);
+        caseTypeDefinition.setSearchParties(List.of(searchParty));
+
+        // NB: not adding `myCollection` field to case data as test requires it to be missing
+
+        // ACT / ASSERT
+        assertSearchCriteriaCreatedButEmpty(caseData);
     }
 
     @ParameterizedTest(name = "SearchCriteria is still created even if collection is null, empty or bad: {0}")
@@ -142,6 +155,17 @@ class GlobalSearchProcessorServiceTest {
             + "  {\n"              //     - 5.6: item has value, but it is not an object
             + "    \"id\": null,\n"
             + "    \"value\": 1234\n"
+            + "  },\n"
+            + "  {\n"              //     - 5.7: item is legal but properties are null, missing or empty
+            + "    \"id\": null,\n"
+            + "    \"value\": {\n"
+            + "      \"FirstName\": null,\n"   // null name part
+            //                                    missing name part (MiddleName)
+            + "      \"LastName\": \"\",\n"    // empty name part
+            + "      \"DoB\": null,\n"         // null other
+            //                                    missing other (DoD)
+            + "      \"AddressLine1\": \"\"\n" // empty other
+            + "    }\n"
             + "  }\n"
             + "]"
     })
@@ -152,14 +176,25 @@ class GlobalSearchProcessorServiceTest {
         final String firstName = "FirstName";
         final String middleName = "MiddleName";
         final String lastName = "LastName";
+        final String dob = "DoB";
+        final String dod = "DoD";
+        final String postCode = "PostCode";
+        final String email = "EmailAddress";
+        final String address = "AddressLine1";
 
         searchParty.setSearchPartyName(String.format("%s,%s,%s", firstName, middleName, lastName));
-        searchParty.setSearchPartyCollectionFieldName(String.format("%s", collectionName));
+        searchParty.setSearchPartyAddressLine1(address);
+        searchParty.setSearchPartyPostCode(postCode);
+        searchParty.setSearchPartyEmailAddress(email);
+        searchParty.setSearchPartyDob(dob);
+        searchParty.setSearchPartyDod(dod);
+        searchParty.setSearchPartyCollectionFieldName(collectionName);
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         caseData.put("myCollection", JacksonUtils.MAPPER.readTree(collectionAsString));
 
-        assertSearchCriteriaCreated();
+        // ACT / ASSERT
+        assertSearchCriteriaCreatedButEmpty(caseData);
     }
 
     @Test
@@ -337,7 +372,7 @@ class GlobalSearchProcessorServiceTest {
         searchParty.setSearchPartyEmailAddress(email);
         searchParty.setSearchPartyDob(dob);
         searchParty.setSearchPartyDod(dod);
-        searchParty.setSearchPartyCollectionFieldName(String.format("%s", collectionName));
+        searchParty.setSearchPartyCollectionFieldName(collectionName);
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         caseData.put("myCollection", JacksonUtils.MAPPER.readTree("[{\n"
@@ -387,7 +422,7 @@ class GlobalSearchProcessorServiceTest {
         searchParty.setSearchPartyEmailAddress(email);
         searchParty.setSearchPartyDob(dob);
         searchParty.setSearchPartyDod(dod);
-        searchParty.setSearchPartyCollectionFieldName(String.format("%s", collectionName));
+        searchParty.setSearchPartyCollectionFieldName(collectionName);
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
         caseData.put("myCollection", JacksonUtils.MAPPER.readTree("[{\n"
@@ -1000,13 +1035,16 @@ class GlobalSearchProcessorServiceTest {
 
     }
 
-    private void assertSearchCriteriaCreated() {
+    private void assertSearchCriteriaCreatedButEmpty(Map<String, JsonNode> testData) {
+
+        // ACT
         Map<String, JsonNode> globalSearchData =
-            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, testData);
 
-        JsonNode searchPartyNode = globalSearchData.get(SEARCH_CRITERIA);
+        // ASSERT
+        assertNotNull(globalSearchData.get(SEARCH_CRITERIA));
+        assertTrue(globalSearchData.get(SEARCH_CRITERIA).isEmpty());
 
-        assertNotNull(searchPartyNode);
     }
 
 }
