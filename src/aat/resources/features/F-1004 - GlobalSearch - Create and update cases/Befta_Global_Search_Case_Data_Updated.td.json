@@ -21,8 +21,8 @@
     } ]
   },
   "caseManagementLocation" : {
-    "baseLocation" : "123",
-    "region" : "1"
+    "baseLocation" : "1",
+    "region" : "3"
   },
   "caseNameHmctsInternal" : "Name Internal"
 }
