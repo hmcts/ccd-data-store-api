@@ -24,7 +24,6 @@ import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchR
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
 import uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -91,7 +90,7 @@ class GlobalSearchEndpointTest {
             searchCriteria.setCcdCaseTypeIds(List.of(CASE_TYPE_1));
             doReturn(searchCriteria).when(globalSearchRequestPayload).getSearchCriteria();
 
-            List<CaseDetails> filteredCaseList = globalSearchParser.filterCases(searchResults.getCases(),
+            final List<CaseDetails> filteredCaseList = globalSearchParser.filterCases(searchResults.getCases(),
                                                                         globalSearchRequestPayload.getSearchCriteria());
 
             // ACT
