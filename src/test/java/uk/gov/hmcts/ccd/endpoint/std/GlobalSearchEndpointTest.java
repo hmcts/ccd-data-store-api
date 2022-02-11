@@ -76,7 +76,7 @@ class GlobalSearchEndpointTest {
 
             doReturn(assembledSearchRequest).when(globalSearchService).assembleSearchQuery(any());
             doReturn(searchResults).when(caseSearchOperation).execute(any(), anyBoolean());
-            doReturn(transformedResult).when(globalSearchService).transformResponse(any(), any());
+            doReturn(transformedResult).when(globalSearchService).transformResponse(any(), any(), any());
         }
 
         @DisplayName("should set defaults, assemble query, execute search and transform response")
@@ -106,7 +106,7 @@ class GlobalSearchEndpointTest {
             // :: execute search
             verify(caseSearchOperation).execute(eq(assembledSearchRequest), anyBoolean());
             // :: TransformResponse
-            verify(globalSearchService).transformResponse(globalSearchRequestPayload, filteredCaseList);
+            verify(globalSearchService).transformResponse(globalSearchRequestPayload, searchResults, filteredCaseList);
 
         }
 

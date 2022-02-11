@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
 import uk.gov.hmcts.ccd.domain.model.refdata.LocationLookup;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceLookup;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceReferenceData;
+import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
@@ -117,6 +118,7 @@ public class GlobalSearchServiceImpl implements GlobalSearchService {
     }
 
     public GlobalSearchResponsePayload transformResponse(final GlobalSearchRequestPayload requestPayload,
+                                                         CaseSearchResult caseSearchResult,
                                                          final List<CaseDetails> filteredCaseList) {
         final List<ServiceReferenceData> services = referenceDataRepository.getServices();
         final List<BuildingLocation> buildingLocations = referenceDataRepository.getBuildingLocations();
@@ -131,7 +133,7 @@ public class GlobalSearchServiceImpl implements GlobalSearchService {
         final GlobalSearchResponsePayload.ResultInfo resultInfo = globalSearchResponseTransformer.transformResultInfo(
             requestPayload.getMaxReturnRecordCount(),
             requestPayload.getStartRecordNumber(),
-            Long.valueOf(filteredCaseList.size()),
+            caseSearchResult.getTotal(),
             results.size()
         );
 

@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -122,6 +123,7 @@ class GlobalSearchServiceImplTest extends TestFixtures {
         // GIVEN
         final GlobalSearchRequestPayload requestPayload = new GlobalSearchRequestPayload();
         final CaseSearchResult caseSearchResult = buildCaseSearchResult();
+        List<CaseDetails> filteredCaseList = caseSearchResult.getCases();
         doReturn(servicesRefData).when(referenceDataRepository).getServices();
         doReturn(locationsRefData).when(referenceDataRepository).getBuildingLocations();
         doReturn(GlobalSearchResponsePayload.ResultInfo.builder().build())
@@ -138,11 +140,13 @@ class GlobalSearchServiceImplTest extends TestFixtures {
                 any(LocationLookup.class)
             );
 
-        List<CaseDetails> filteredCaseList = globalSearchParser.filterCases(caseSearchResult.getCases(),
-                                                                        requestPayload.getSearchCriteria());
+        Mockito.lenient()
+            .when(globalSearchParser.filterCases(caseSearchResult.getCases(), requestPayload.getSearchCriteria()))
+            .thenReturn(filteredCaseList);
 
         // WHEN
-        final GlobalSearchResponsePayload response = underTest.transformResponse(requestPayload, filteredCaseList);
+        final GlobalSearchResponsePayload response = underTest.transformResponse(requestPayload,
+            caseSearchResult, filteredCaseList);
 
         // THEN
         assertThat(response).isNotNull();
