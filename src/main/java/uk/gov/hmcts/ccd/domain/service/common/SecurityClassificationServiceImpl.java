@@ -270,7 +270,10 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     }
 
     private String getCaseAccessCategory(CaseDetails cd) {
-        JsonNode caseAccessCategory = cd.getData().get("CaseAccessCategory");
+        JsonNode caseAccessCategory = null;
+        if (cd.getData() != null) {
+            caseAccessCategory = cd.getData().get("CaseAccessCategory");
+        }
         return caseAccessCategory != null ? caseAccessCategory.asText() : "";
     }
 
