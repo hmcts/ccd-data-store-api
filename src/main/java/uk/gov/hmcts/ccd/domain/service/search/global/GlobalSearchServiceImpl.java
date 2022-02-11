@@ -11,7 +11,6 @@ import uk.gov.hmcts.ccd.domain.model.refdata.BuildingLocation;
 import uk.gov.hmcts.ccd.domain.model.refdata.LocationLookup;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceLookup;
 import uk.gov.hmcts.ccd.domain.model.refdata.ServiceReferenceData;
-import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
