@@ -106,7 +106,8 @@ class GlobalSearchEndpointTest {
             // :: execute search
             verify(caseSearchOperation).execute(eq(assembledSearchRequest), anyBoolean());
             // :: TransformResponse
-            verify(globalSearchService).transformResponse(globalSearchRequestPayload, searchResults, filteredCaseList);
+            verify(globalSearchService).transformResponse(globalSearchRequestPayload,
+                searchResults.getTotal(), filteredCaseList);
 
         }
 

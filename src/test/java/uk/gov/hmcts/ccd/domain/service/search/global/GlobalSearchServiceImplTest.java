@@ -146,7 +146,7 @@ class GlobalSearchServiceImplTest extends TestFixtures {
 
         // WHEN
         final GlobalSearchResponsePayload response = underTest.transformResponse(requestPayload,
-            caseSearchResult, filteredCaseList);
+            caseSearchResult.getTotal(), filteredCaseList);
 
         // THEN
         assertThat(response).isNotNull();

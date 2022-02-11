@@ -118,7 +118,7 @@ public class GlobalSearchServiceImpl implements GlobalSearchService {
     }
 
     public GlobalSearchResponsePayload transformResponse(final GlobalSearchRequestPayload requestPayload,
-                                                         CaseSearchResult caseSearchResult,
+                                                         Long caseSearchResultTotal,
                                                          final List<CaseDetails> filteredCaseList) {
         final List<ServiceReferenceData> services = referenceDataRepository.getServices();
         final List<BuildingLocation> buildingLocations = referenceDataRepository.getBuildingLocations();
@@ -133,7 +133,7 @@ public class GlobalSearchServiceImpl implements GlobalSearchService {
         final GlobalSearchResponsePayload.ResultInfo resultInfo = globalSearchResponseTransformer.transformResultInfo(
             requestPayload.getMaxReturnRecordCount(),
             requestPayload.getStartRecordNumber(),
-            caseSearchResult.getTotal(),
+            caseSearchResultTotal,
             results.size()
         );
 

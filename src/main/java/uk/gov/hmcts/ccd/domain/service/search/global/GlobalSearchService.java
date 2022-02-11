@@ -15,6 +15,6 @@ public interface GlobalSearchService {
     CrossCaseTypeSearchRequest assembleSearchQuery(GlobalSearchRequestPayload payload);
 
     GlobalSearchResponsePayload transformResponse(GlobalSearchRequestPayload requestPayload,
-                                                  CaseSearchResult caseSearchResult,
+                                                  Long caseSearchResultTotal,
                                                   List<CaseDetails> filteredCaseList);
 }
