@@ -1,0 +1,21 @@
+{
+	"_guid_": "Event_Creation_Citizen_Base",
+
+  "productName": "CCD Data Store",
+  "operationName": "submit event creation as citizen",
+
+  "method": "POST",
+  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
+
+	"specs": [
+		"to get an update event token for the case just created"
+	],
+
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType"
+    }
+  }
+}

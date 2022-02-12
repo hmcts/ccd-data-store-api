@@ -340,11 +340,11 @@ Feature: F-1008: Submit Event Creation Handle Case Links
     Given   a user with [an active profile in CCD]
       And   a successful call [to create a case] as in [F-1008_CreateCasePreRequisiteCitizenBase]
       And   another successful call [to create a case] as in [F-1008_CreateAnotherCasePreRequisiteCitizenBase]
-      And   a successful call [to get an event token for the case just created] as in [F-1008-GetCitizenUpdateEventToken]
+      And   a successful call [to get an update event token for the case just created as a Citizen] as in [F-1008-GetCitizenUpdateEventToken]
       When  a request is prepared with appropriate values
       And   the request [contains correctly configured CaseLink field with Case Reference created in F-1008_CreateCasePreRequisiteCaseworkerBase]
       And   the request [specifying the case to be updated, as created in F-1008_CreateAnotherCasePreRequisiteCaseworkerBase, does not contain a CaseLink field]
-      And   it is submitted to call the [Submit event creation as Citizen] operation of [CCD Data Store]
+      And   it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
       Then  a positive response is received
       And   the response has all other details as expected
       And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1008.21-VerifyCaseLinks]
@@ -404,11 +404,11 @@ Feature: F-1008: Submit Event Creation Handle Case Links
     Given   a user with [an active profile in CCD]
       And   a successful call [to create a case] as in [F-1008_CreateCasePreRequisiteCitizenBase]
       And   another successful call [to create a case] as in [F-1008_CreateAnotherCasePreRequisiteCitizenBase]
-      And   a successful call [to get an event token for the case just created] as in [F-1008-GetCitizenUpdateEventToken]
+      And   a successful call [to get an update event token for the case just created as a Citizen] as in [F-1008-GetCitizenUpdateEventToken]
       When  a request is prepared with appropriate values
       And   the request [contains correctly configured CaseLink field with Case Reference created in F-1008_CreateCasePreRequisiteCaseworkerBase]
       And   the request [specifying the case to be updated, as created in F-1008_CreateLinkedCasePreRequisiteCaseworkerBase, CaseLink field not changed]
-      And   it is submitted to call the [Submit event creation as Citizen] operation of [CCD Data Store]
+      And   it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
       Then  a positive response is received
       And   the response has all other details as expected
       And   a successful call [to verify that no Case Links exist in the CASE_LINK table] as in [F-1008_VerifyBlankCitizenCaseLinks]
@@ -419,11 +419,11 @@ Feature: F-1008: Submit Event Creation Handle Case Links
     Given   a user with [an active profile in CCD]
       And   a successful call [to create a case] as in [F-1008_CreateCasePreRequisiteCitizenBase]
       And   another successful call [to create a case] as in [F-1008_CreateAnotherCasePreRequisiteCitizenBase]
-      And   a successful call [to get an event token for the case just created] as in [F-1008-GetCitizenUpdateEventToken]
+      And   a successful call [to get an update event token for the case just created as a Citizen] as in [F-1008-GetCitizenUpdateEventToken]
       When  a request is prepared with appropriate values
       And   the request [contains correctly configured CaseLink field with Case Reference created in F-1008_CreateCasePreRequisiteCaseworkerBase]
       And   the request [CaseLink field has an invalid reference]
-      And   it is submitted to call the [Submit event creation as Citizen] operation of [CCD Data Store]
+      And   it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
       Then  a negative response is received
       And   the response has all other details as expected
       And   a successful call [to verify that no Case Links exist in the CASE_LINK table] as in [F-1008_VerifyBlankCitizenCaseLinks]
@@ -467,12 +467,12 @@ Feature: F-1008: Submit Event Creation Handle Case Links
     Given   a user with [an active profile in CCD]
       And   a successful call [to create a case] as in [F-1008_CreateCasePreRequisiteCitizenBase]
       And   another successful call [to create a case] as in [F-1008_CreateAnotherCasePreRequisiteCitizenBase]
-      And   a successful call [to get an event token for the case just created] as in [F-1008-GetCitizenUpdateEventToken]
+      And   a successful call [to get an update event token for the case just created as a Citizen] as in [F-1008-GetCitizenUpdateEventToken]
       When  a request is prepared with appropriate values
       And   the request [contains correctly configured CaseLink field with Case Reference created in F-1008_CreateAnotherCasePreRequisiteCaseworkerBase]
       And   the request [CaseLink field has a valid reference]
       And   the request [Case data is invalid]
-      And   it is submitted to call the [Submit event creation as Citizen] operation of [CCD Data Store]
+      And   it is submitted to call the [submit event creation as citizen] operation of [CCD Data Store]
       Then  a negative response is received
       And   the response has all other details as expected
       And   a successful call [to verify that no Case Links exist in the CASE_LINK table] as in [F-1008_VerifyBlankCitizenCaseLinks]

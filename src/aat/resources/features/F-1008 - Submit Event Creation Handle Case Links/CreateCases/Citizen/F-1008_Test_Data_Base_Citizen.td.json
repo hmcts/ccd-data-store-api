@@ -1,11 +1,6 @@
 {
 	"_guid_": "F-1008_Test_Data_Base_Citizen",
-
-	"productName": "CCD Data Store",
-	"operationName": "Submit event creation as Citizen",
-
-	"method": "POST",
-	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
+  "_extends_": "Event_Creation_Citizen_Base",
 
   "users": {
     "invokingUser": {
@@ -16,12 +11,7 @@
 	"request": {
     "headers": {
       "_extends_": "Common_Request_Headers"
-    },
-		"pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_MASTER",
-      "ctid": "FT_MasterCaseType"
-		}
+    }
 	},
 
   "expectedResponse": {

@@ -1,16 +1,7 @@
 {
   "_guid_": "F-1005-CreateEventTokenErrorResponse",
   "title": "should return bad request error when about to start callback has modified TTL",
-
-  "productName": "CCD Data Store",
-  "operationName": "Start event creation process to update a case",
-
-  "method": "GET",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
-
-  "specs": [
-    "to get an update event token for the case just created"
-  ],
+  "_extends_": "Token_Creation_Data_For_Master_Caseworker_Case_Creation",
 
   "users": {
     "invokingUser": {
@@ -20,9 +11,6 @@
 
   "request": {
     "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_MASTER",
-      "ctid": "FT_MasterCaseType",
       "cid": "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "etid": "OVERRIDE"
     }
@@ -46,5 +34,4 @@
       "message" : "Time to live content has been modified by callback"
     }
   }
-
 }

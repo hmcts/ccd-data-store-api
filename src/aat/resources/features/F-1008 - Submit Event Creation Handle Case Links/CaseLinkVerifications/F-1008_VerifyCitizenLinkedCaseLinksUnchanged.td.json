@@ -16,8 +16,8 @@
 	"expectedResponse": {
 		"body": {
       "CaseLinks" : [ {
-        "CaseId" : "${[scenarioContext][parentContext][childContexts][F-1008_CreateLinkedCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
-        "LinkedCaseId" : "${[scenarioContext][parentContext][childContexts][F-1008_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
+        "CaseReference" : "${[scenarioContext][parentContext][childContexts][F-1008_CreateLinkedCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
+        "LinkedCaseReference" : "${[scenarioContext][parentContext][childContexts][F-1008_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
         "CaseTypeId" : "FT_MasterCaseType"
       }]
 		}

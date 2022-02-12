@@ -1,0 +1,21 @@
+{
+	"title": "should retrieve case links for a specified case reference",
+	"_guid_": "Verify_Case_Links_Base",
+
+	"productName": "CCD Data Store",
+	"operationName": "Retrieve case links for an existing case reference",
+
+	"method": "GET",
+	"uri": "/testing-support/case-link/{cid}",
+
+	"specs": [
+		"to verify that the Case Link has been created in the CASE_LINK table with correct value"
+	],
+
+	"request": {
+		"headers": {
+			"_extends_": "Common_Request_Headers",
+      "experimental": "true"
+		}
+	}
+}

@@ -1,11 +1,6 @@
 {
   "_guid_": "S-1007_GetUpdateSuspendedCaseToken",
-
-  "productName": "CCD Data Store",
-  "operationName": "Retrieve a create token",
-
-  "method": "GET",
-  "uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
+  "_extends_": "Token_Creation_Data_For_Master_Caseworker_Case_Creation",
 
   "specs": [
     "to create a token for case creation",
@@ -19,47 +14,20 @@
   },
 
   "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers"
-    },
     "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_MASTER",
-      "ctid": "FT_MasterCaseType",
-      "cid": "${[scenarioContext][parentContext][childContexts][F-1007_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
-      "etid": "updateCase"
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1007_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
     }
   },
-
 
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "headers": {
       "Content-Encoding": "gzip",
-      "Content-Length": "[[ANY_INTEGER_NOT_NULLABLE]]"
+      "Content-Length": "[[ANYTHING_PRESENT]]"
     },
     "body": {
-      "token": "[[ANY_STRING_NOT_NULLABLE]]",
-      "case_details": {
-        "id": "[[ANYTHING_PRESENT]]",
-        "jurisdiction": "[[ANYTHING_PRESENT]]",
-        "state": "[[ANYTHING_PRESENT]]",
-        "version": "[[ANYTHING_PRESENT]]",
-        "case_type_id": "[[ANYTHING_PRESENT]]",
-        "created_date": "[[ANYTHING_PRESENT]]",
-        "last_modified": "[[ANYTHING_PRESENT]]",
-        "last_state_modified_date": "[[ANYTHING_PRESENT]]",
-        "security_classification": "[[ANYTHING_PRESENT]]",
-        "case_data": "[[ANYTHING_PRESENT]]",
-        "data_classification": "[[ANYTHING_PRESENT]]",
-        "supplementary_data": null,
-        "after_submit_callback_response": null,
-        "callback_response_status_code": null,
-        "callback_response_status": null,
-        "delete_draft_response_status_code": null,
-        "delete_draft_response_status": null,
-        "security_classifications": "[[ANYTHING_PRESENT]]"
-      },
+      "token": "[[ANYTHING_PRESENT]]",
+      "case_details": "[[ANYTHING_PRESENT]]",
       "event_id": "updateCase"
     }
   }
