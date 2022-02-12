@@ -41,4 +41,17 @@
 		<cve>CVE-2007-1652</cve>
 	</suppress>
 
+	<!-- Suppress temporarily -->
+	<suppress>
+		<cve>CVE-2021-22147</cve>
+		<cve>CVE-2021-42340</cve>
+		<cve>CVE-2021-22096</cve>
+		<cve>CVE-2021-44832</cve>
+		<cve>CVE-2021-44228</cve>
+		<cve>CVE-2021-45105</cve>
+		<cve>CVE-2021-45046</cve>
+		<cve>CVE-2021-42550</cve>
+		<cve>CVE-2021-22060</cve>
+		<cve>CVE-2022-23181</cve>
+	</suppress>
 </suppressions>
