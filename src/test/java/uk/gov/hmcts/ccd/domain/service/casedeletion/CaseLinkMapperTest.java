@@ -66,9 +66,21 @@ class CaseLinkMapperTest {
                                                         new CaseLinkEntity(15L, 25L, CASE_TYPE_ID),
                                                         new CaseLinkEntity(20L, 30L, CASE_TYPE_ID));
 
-        List<CaseLink> expectedCaseLinkModels = List.of(CaseLink.builder().caseId(10L).linkedCaseId(20L).caseTypeId(CASE_TYPE_ID).build(),
-                                                        CaseLink.builder().caseId(15L).linkedCaseId(25L).caseTypeId(CASE_TYPE_ID).build(),
-                                                        CaseLink.builder().caseId(20L).linkedCaseId(30L).caseTypeId(CASE_TYPE_ID).build());
+        List<CaseLink> expectedCaseLinkModels = List.of(CaseLink.builder()
+                                                            .caseId(10L)
+                                                            .linkedCaseId(20L)
+                                                            .caseTypeId(CASE_TYPE_ID)
+                                                            .build(),
+                                                        CaseLink.builder()
+                                                            .caseId(15L)
+                                                            .linkedCaseId(25L)
+                                                            .caseTypeId(CASE_TYPE_ID)
+                                                            .build(),
+                                                        CaseLink.builder()
+                                                            .caseId(20L)
+                                                            .linkedCaseId(30L)
+                                                            .caseTypeId(CASE_TYPE_ID)
+                                                            .build());
 
         final List<CaseLink> caseLinks = caseLinkMapper.entitiesToModels(caseLinkEntities);
         assertEquals(caseLinkEntities.size(), caseLinks.size());

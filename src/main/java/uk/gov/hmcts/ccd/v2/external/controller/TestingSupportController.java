@@ -31,6 +31,8 @@ public class TestingSupportController {
         }
     )
     public ResponseEntity<CaseLinksResource> getCaseLink(@PathVariable("caseReference") String caseReference) {
-        return ResponseEntity.ok(CaseLinksResource.builder().caseLinks(caseLinkService.findCaseLinks(caseReference)).build());
+        return ResponseEntity.ok(CaseLinksResource.builder()
+                                    .caseLinks(caseLinkService.findCaseLinks(caseReference))
+                                    .build());
     }
 }
