@@ -61,6 +61,7 @@ public class DefaultUpsertDraftOperation implements UpsertDraftOperation {
         return draftResponse;
     }
 
+    @Transactional
     @Override
     public DraftResponse executeUpdate(final String caseTypeId, final String draftId,
                                        final CaseDataContent caseDataContent) {
