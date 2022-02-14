@@ -6,9 +6,7 @@
     "body": {
       "event_token": "${[scenarioContext][parentContext][childContexts][F-13010_CreateCase_Token_Creation][testData][actualResponse][body][token]}",
       "data": {
-        "CaseLinkField": {
-          "CaseAccessCategory": "Civil/Standard/Legal"
-        }
+        "CaseAccessCategoryId": "Civil/Standard/Legal"
       }
     }
   }
