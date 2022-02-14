@@ -168,7 +168,7 @@ class ElasticsearchQueryHelperTest {
 
         @BeforeEach
         void setUp() {
-            when(applicationParams.getSearchBlackList()).thenReturn(newArrayList("query_string"));
+            when(applicationParams.getSearchBlackList()).thenReturn(newArrayList("query_string", "runtime_mappings"));
             doAnswer(invocation -> objectMapperES.readValue((String) invocation.getArgument(0), ObjectNode.class))
                 .when(objectMapperService).convertStringToObject(anyString(), any());
             when(caseTypeDefinition.getId()).thenReturn(CASE_TYPE_A);
@@ -214,14 +214,26 @@ class ElasticsearchQueryHelperTest {
         }
 
         @Test
-        void shouldRejectBlacklistedSearchQueries() {
-            String searchRequest = blacklistedQuery();
+        void shouldRejectBlacklistedSearchQueriesWithQueryString() {
+            String searchRequest = blacklistedQueryWithQueryString();
 
             BadSearchRequest exception = assertThrows(BadSearchRequest.class,
                 () -> elasticsearchQueryHelper.validateAndConvertRequest(searchRequest));
 
             assertAll(
                 () -> assertThat(exception.getMessage(), is("Query of type 'query_string' is not allowed"))
+            );
+        }
+
+        @Test
+        void shouldRejectBlacklistedSearchQueriesWithRuntimeMappings() {
+            String searchRequest = blacklistedQueryWithRuntimeMappings();
+
+            BadSearchRequest exception = assertThrows(BadSearchRequest.class,
+                () -> elasticsearchQueryHelper.validateAndConvertRequest(searchRequest));
+
+            assertAll(
+                () -> assertThat(exception.getMessage(), is("Query of type 'runtime_mappings' is not allowed"))
             );
         }
 
@@ -269,7 +281,7 @@ class ElasticsearchQueryHelperTest {
         }
 
 
-        private String blacklistedQuery() {
+        private String blacklistedQueryWithQueryString() {
             return "{  \n"
                 + "   \"query\":{  \n"
                 + "      \"bool\":{  \n"
@@ -294,6 +306,26 @@ class ElasticsearchQueryHelperTest {
                 + "         ]\n"
                 + "      }\n"
                 + "   }\n"
+                + "}";
+        }
+
+        private String blacklistedQueryWithRuntimeMappings() {
+            return "{\n"
+                + "  \"runtime_mappings\": {\n"
+                + "    \"day_of_week\": {\n"
+                + "      \"type\": \"keyword\",\n"
+                + "      \"script\": {\n"
+                + "        \"source\": \"emit(doc['@timestamp'].value.dayOfWeekEnum\"\n"
+                + "      }\n"
+                + "    }\n"
+                + "  },\n"
+                + "  \"aggs\": {\n"
+                + "    \"day_of_week\": {\n"
+                + "      \"terms\": {\n"
+                + "        \"field\": \"day_of_week\"\n"
+                + "      }\n"
+                + "    }\n"
+                + "  }\n"
                 + "}";
         }
 
