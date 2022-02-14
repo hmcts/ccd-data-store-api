@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -78,7 +77,6 @@ public class UIDefinitionController {
         accessMap.put("read", CAN_READ);
     }
 
-    @Transactional
     @GetMapping(
         path = "/case-types/{caseTypeId}/work-basket-inputs",
         headers = {
@@ -112,7 +110,6 @@ public class UIDefinitionController {
         return ResponseEntity.ok(new WorkbasketInputsViewResource(workbasketInputs, caseTypeId));
     }
 
-    @Transactional
     @GetMapping(
         path = "/case-types/{caseTypeId}/search-inputs",
         headers = {
@@ -201,7 +198,6 @@ public class UIDefinitionController {
         return ResponseEntity.ok(new JurisdictionConfigViewResource(listOfConfigs));
     }
 
-    @Transactional
     @GetMapping(
         path = "/jurisdictions",
         headers = {
