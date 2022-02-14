@@ -10,12 +10,14 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
     }
 
     public static void main(String[] args) throws Throwable {
-        main(HighLevelDataSetupApp.class, args);
+        if (!args[0].toString().toLowerCase().equals("prod")) {
+            main(HighLevelDataSetupApp.class, args);
+        }
     }
 
     @Override
     protected boolean shouldTolerateDataSetupFailure() {
         return true;
-    }   
+    }
 
 }
