@@ -48,4 +48,12 @@
 		<cve>CVE-2021-44832</cve>
   	</suppress>
 
+	<!-- Temporary suppression before fix -->
+	<suppress>
+		<cve>CVE-2021-44832</cve>
+		<cve>CVE-2021-42550</cve>
+		<cve>CVE-2021-22060</cve>
+		<cve>CVE-2022-23181</cve>
+	</suppress>
+
 </suppressions>
