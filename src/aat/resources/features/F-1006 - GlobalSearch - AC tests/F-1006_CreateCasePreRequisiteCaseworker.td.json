@@ -27,8 +27,8 @@
       "data": {
         "caseNameHmctsInternal": "Name Internal",
         "caseManagementLocation": {
-          "baseLocation": "123",
-          "region": "1"
+          "baseLocation": "1",
+          "region": "3"
         },
         "caseManagementCategory": {
           "value": {
@@ -84,8 +84,8 @@
           "AddressLine1" : "[[ANYTHING_PRESENT]]"
         },
         "caseManagementLocation" : {
-          "baseLocation" : "123",
-          "region" : "1"
+          "baseLocation" : "1",
+          "region" : "3"
         },
         "FirstName" : "FirstNameValue",
         "dateOfDeath" : "2020-04-21",
