@@ -213,6 +213,15 @@ public class ApplicationParams {
     @Value("${reference.data.cache.ttl.in.days}")
     private String referenceDataCacheTtlInDays;
 
+    @Value("${am.role-assignment.pagination.enabled}")
+    private boolean amRoleAssignmentPaginationEnabled;
+
+    @Value("${am.role-assignment.starting.page.number}")
+    private String amRoleAssignmentStartingPageNumber;
+
+    @Value("${am.role-assignment.page.size}")
+    private String amRoleAssignmentPageSize;
+
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -580,5 +589,17 @@ public class ApplicationParams {
 
     public Integer getRequestScopeCachedCaseTypesTillHour() {
         return requestScopeCachedCaseTypesTillHour;
+    }
+
+    public boolean isAmRoleAssignmentPaginationEnabled() {
+        return amRoleAssignmentPaginationEnabled;
+    }
+
+    public String getAmRoleAssignmentStartingPageNumber() {
+        return amRoleAssignmentStartingPageNumber;
+    }
+
+    public String getAmRoleAssignmentPageSize() {
+        return amRoleAssignmentPageSize;
     }
 }

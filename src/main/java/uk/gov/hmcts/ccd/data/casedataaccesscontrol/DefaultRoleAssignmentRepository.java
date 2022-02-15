@@ -24,6 +24,8 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.ArrayList;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static org.springframework.http.HttpHeaders.ETAG;
@@ -47,6 +49,10 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
     public static final String ROLE_ASSIGNMENT_SERVICE_ERROR =
         "Problem %s Role Assignments from Role Assignment Service because of %s";
     private static final String GZIP_POSTFIX = "--gzip";
+
+    public static final String AM_PAGE_NUMBER_HEADER = "pageNumber";
+    public static final String AM_PAGE_SIZE_HEADER = "size";
+    public static final String AM_TOTAL_RECORDS = "Total-Records";
 
     private final ApplicationParams applicationParams;
     private final SecurityUtils securityUtils;
@@ -193,19 +199,55 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
     public RoleAssignmentResponse findRoleAssignmentsByCasesAndUsers(List<String> caseIds, List<String> userIds) {
         try {
             final var roleAssignmentQuery = new RoleAssignmentQuery(caseIds, userIds);
-            final var requestEntity = new HttpEntity(roleAssignmentQuery, securityUtils.authorizationHeaders());
-            return restTemplate.exchange(
-                applicationParams.amQueryRoleAssignmentsURL(),
-                HttpMethod.POST,
-                requestEntity,
-                RoleAssignmentResponse.class).getBody();
 
+            if (applicationParams.isAmRoleAssignmentPaginationEnabled()) {
+                return findRoleAssignmentsByCasesAndUsers(roleAssignmentQuery);
+            } else {
+                final var requestEntity = new HttpEntity(roleAssignmentQuery, securityUtils.authorizationHeaders());
+                return restTemplate.exchange(
+                    applicationParams.amQueryRoleAssignmentsURL(),
+                    HttpMethod.POST,
+                    requestEntity,
+                    RoleAssignmentResponse.class).getBody();
+            }
         } catch (Exception exception) {
             final ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(
                 String.format(R_A_NOT_FOUND_FOR_CASE_AND_USER, userIds, caseIds, exception.getMessage())
             );
             throw mapException(exception, resourceNotFoundException);
         }
+    }
+
+    private RoleAssignmentResponse findRoleAssignmentsByCasesAndUsers(RoleAssignmentQuery roleAssignmentQuery) {
+        RoleAssignmentResponse roleAssignmentResponse = new RoleAssignmentResponse();
+        roleAssignmentResponse.setRoleAssignments(new ArrayList<>());
+        final HttpHeaders headers = securityUtils.authorizationHeaders();
+
+        int pageNumber = Integer.parseInt(applicationParams.getAmRoleAssignmentStartingPageNumber());
+        int pageSize = Integer.parseInt(applicationParams.getAmRoleAssignmentPageSize());
+        int totalRecords = 0;
+
+        do {
+            headers.add(AM_PAGE_NUMBER_HEADER, Integer.toString(pageNumber));
+            headers.add(AM_PAGE_SIZE_HEADER, Integer.toString(pageSize));
+            final var requestEntity = new HttpEntity(roleAssignmentQuery, headers);
+            ResponseEntity<RoleAssignmentResponse> responseEntity = restTemplate.exchange(
+                applicationParams.amQueryRoleAssignmentsURL(),
+                HttpMethod.POST,
+                requestEntity,
+                RoleAssignmentResponse.class);
+
+            if (responseEntity.getStatusCode().is2xxSuccessful()) {
+                totalRecords = Integer.parseInt(Objects.requireNonNull(
+                    Objects.requireNonNull(responseEntity.getHeaders().get(AM_TOTAL_RECORDS)).get(0)));
+                List<RoleAssignmentResource> roleAssignments = roleAssignmentResponse.getRoleAssignments();
+                roleAssignments.addAll(Objects.requireNonNull(responseEntity.getBody()).getRoleAssignments());
+            }
+
+            pageNumber++;
+        } while ((pageNumber * pageSize) < totalRecords);
+
+        return roleAssignmentResponse;
     }
 
     private RuntimeException mapException(Exception exception, ResourceNotFoundException resourceNotFoundException) {
