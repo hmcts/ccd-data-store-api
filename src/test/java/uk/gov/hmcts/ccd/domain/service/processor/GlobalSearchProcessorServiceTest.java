@@ -250,10 +250,9 @@ class GlobalSearchProcessorServiceTest {
         searchParty.setSearchPartyName("SearchPartyFirstName");
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        final String firstName = "MyFirstNameValue";
-        caseData.put("SearchPartyFirstName", JacksonUtils.MAPPER.readTree("\""  + firstName  + "\""));
+        caseData.put("SearchPartyFirstName", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_FIRST_NAME_1  + "\""));
 
-        assertSearchCriteriaField(NAME, firstName);
+        assertSearchCriteriaField(NAME, SEARCH_PARTY_FIRST_NAME_1);
     }
 
     @Test
@@ -263,10 +262,10 @@ class GlobalSearchProcessorServiceTest {
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        final String firstName = "firstNameValue";
-        caseData.put("SearchParty", JacksonUtils.MAPPER.readTree("{\"FirstName\": \"" + firstName  + "\"}"));
+        caseData.put("SearchParty",
+            JacksonUtils.MAPPER.readTree("{\"FirstName\": \"" + SEARCH_PARTY_FIRST_NAME_1  + "\"}"));
 
-        assertSearchCriteriaField(NAME, firstName);
+        assertSearchCriteriaField(NAME, SEARCH_PARTY_FIRST_NAME_1);
     }
 
     @Test
@@ -604,10 +603,9 @@ class GlobalSearchProcessorServiceTest {
         searchParty.setSearchPartyAddressLine1("SearchPartyAddress");
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        final String address = SEARCH_PARTY_ADDRESS_1;
-        caseData.put("SearchPartyAddress", JacksonUtils.MAPPER.readTree("\""  + address  + "\""));
+        caseData.put("SearchPartyAddress", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_ADDRESS_1  + "\""));
 
-        assertSearchCriteriaField(ADDRESS_LINE_1, address);
+        assertSearchCriteriaField(ADDRESS_LINE_1, SEARCH_PARTY_ADDRESS_1);
     }
 
     @Test
@@ -617,10 +615,9 @@ class GlobalSearchProcessorServiceTest {
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        final String address = "MyAddress";
-        caseData.put("SearchParty", JacksonUtils.MAPPER.readTree("{\"Address\": \"" + address  + "\"}"));
+        caseData.put("SearchParty", JacksonUtils.MAPPER.readTree("{\"Address\":\"" + SEARCH_PARTY_ADDRESS_1  + "\"}"));
 
-        assertSearchCriteriaField(ADDRESS_LINE_1, address);
+        assertSearchCriteriaField(ADDRESS_LINE_1, SEARCH_PARTY_ADDRESS_1);
     }
 
     @Test
@@ -629,10 +626,9 @@ class GlobalSearchProcessorServiceTest {
         searchParty.setSearchPartyEmailAddress("SearchPartyEmailAddress");
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        final String email = SEARCH_PARTY_EMAIL_1;
-        caseData.put("SearchPartyEmailAddress", JacksonUtils.MAPPER.readTree("\""  + email  + "\""));
+        caseData.put("SearchPartyEmailAddress", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_EMAIL_1  + "\""));
 
-        assertSearchCriteriaField(EMAIL_ADDRESS, email);
+        assertSearchCriteriaField(EMAIL_ADDRESS, SEARCH_PARTY_EMAIL_1);
     }
 
     @Test
@@ -642,10 +638,10 @@ class GlobalSearchProcessorServiceTest {
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        final String email = SEARCH_PARTY_EMAIL_1;
-        caseData.put("SearchParty", JacksonUtils.MAPPER.readTree("{\"EmailAddress\": \"" + email  + "\"}"));
+        caseData.put("SearchParty",
+            JacksonUtils.MAPPER.readTree("{\"EmailAddress\": \"" + SEARCH_PARTY_EMAIL_1  + "\"}"));
 
-        assertSearchCriteriaField(EMAIL_ADDRESS, email);
+        assertSearchCriteriaField(EMAIL_ADDRESS, SEARCH_PARTY_EMAIL_1);
     }
 
     @Test
@@ -654,10 +650,9 @@ class GlobalSearchProcessorServiceTest {
         searchParty.setSearchPartyPostCode("SearchPartyPostCode");
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        final String postCode = SEARCH_PARTY_POSTCODE_1;
-        caseData.put("SearchPartyPostCode", JacksonUtils.MAPPER.readTree("\""  + postCode  + "\""));
+        caseData.put("SearchPartyPostCode", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_POSTCODE_1  + "\""));
 
-        assertSearchCriteriaField(POSTCODE, postCode);
+        assertSearchCriteriaField(POSTCODE, SEARCH_PARTY_POSTCODE_1);
     }
 
     @Test
@@ -667,17 +662,15 @@ class GlobalSearchProcessorServiceTest {
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        final String postCode = SEARCH_PARTY_POSTCODE_1;
-
         caseData.put("MySearchParty", JacksonUtils.MAPPER.readTree("{\n"
             + "   \"SearchParty\":{\n"
             + "      \"PostCode\":{\n"
-            + "         \"name\":\"" + postCode + "\"\n"
+            + "         \"name\":\"" + SEARCH_PARTY_POSTCODE_1 + "\"\n"
             + "      }\n"
             + "   }\n"
             + "}"));
 
-        assertSearchCriteriaField(POSTCODE, postCode);
+        assertSearchCriteriaField(POSTCODE, SEARCH_PARTY_POSTCODE_1);
     }
 
     @Test
@@ -686,10 +679,21 @@ class GlobalSearchProcessorServiceTest {
         searchParty.setSearchPartyDod("SearchPartyDod");
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        final String dod = SEARCH_PARTY_DOD_1;
-        caseData.put("SearchPartyDod", JacksonUtils.MAPPER.readTree("\""  + dod  + "\""));
+        caseData.put("SearchPartyDod", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_DOD_1  + "\""));
 
-        assertSearchCriteriaField(DATE_OF_DEATH, dod);
+        assertSearchCriteriaField(DATE_OF_DEATH, SEARCH_PARTY_DOD_1);
+    }
+
+    @Test
+    void checkSearchPartyDateOfDeathEmptyInSearchCriteriaWhenBadDateValue() throws JsonProcessingException {
+
+        searchParty.setSearchPartyDod("SearchPartyDod");
+        caseTypeDefinition.setSearchParties(List.of(searchParty));
+
+        final String dodField = "bad-dob";
+        caseData.put("SearchPartyDod", JacksonUtils.MAPPER.readTree("\""  + dodField  + "\""));
+
+        assertSearchCriteriaCreatedButEmpty(caseData);
     }
 
     @Test
@@ -699,15 +703,13 @@ class GlobalSearchProcessorServiceTest {
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        final String dod = SEARCH_PARTY_DOD_1;
-
         caseData.put("SearchParty", JacksonUtils.MAPPER.readTree("{\n"
             + "      \"PostCode\":{\n"
-            + "         \"name\":\"" + dod + "\"\n"
+            + "         \"name\":\"" + SEARCH_PARTY_DOD_1 + "\"\n"
             + "      }\n"
             + "}"));
 
-        assertSearchCriteriaField(DATE_OF_DEATH, dod);
+        assertSearchCriteriaField(DATE_OF_DEATH, SEARCH_PARTY_DOD_1);
     }
 
     @Test
@@ -716,10 +718,9 @@ class GlobalSearchProcessorServiceTest {
         searchParty.setSearchPartyDob("SearchPartyDoB");
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        final String dob = SEARCH_PARTY_DOB_1;
-        caseData.put("SearchPartyDoB", JacksonUtils.MAPPER.readTree("\""  + dob  + "\""));
+        caseData.put("SearchPartyDoB", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_DOB_1  + "\""));
 
-        assertSearchCriteriaField(DATE_OF_BIRTH, dob);
+        assertSearchCriteriaField(DATE_OF_BIRTH, SEARCH_PARTY_DOB_1);
     }
 
     @Test
@@ -729,15 +730,44 @@ class GlobalSearchProcessorServiceTest {
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        final String dob = SEARCH_PARTY_DOB_1;
-
         caseData.put("SearchParty", JacksonUtils.MAPPER.readTree("{\n"
             + "      \"PostCode\":{\n"
-            + "         \"name\":\"" + dob + "\"\n"
+            + "         \"name\":\"" + SEARCH_PARTY_DOB_1 + "\"\n"
             + "      }\n"
             + "}"));
 
-        assertSearchCriteriaField(DATE_OF_BIRTH, dob);
+        assertSearchCriteriaField(DATE_OF_BIRTH, SEARCH_PARTY_DOB_1);
+    }
+
+    @Test
+    void checkSearchPartyDateOfBirthEmptyInSearchCriteriaWhenBadDateValue() throws JsonProcessingException {
+
+        searchParty.setSearchPartyDob("SearchPartyDob");
+
+        caseTypeDefinition.setSearchParties(List.of(searchParty));
+
+        final String dobField = "bad-dob";
+        caseData.put("SearchPartyDob", JacksonUtils.MAPPER.readTree("\""  + dobField  + "\""));
+
+        assertSearchCriteriaCreatedButEmpty(caseData);
+    }
+
+    @Test
+    void checkSearchCriteriaExistsButSearchPartyNodeIsNullWhenTwoBadDateValues()
+        throws JsonProcessingException {
+
+        searchParty.setSearchPartyDob("spDob");
+        searchParty.setSearchPartyDod("spDod");
+
+        caseTypeDefinition.setSearchParties(List.of(searchParty));
+
+        final String dob = "bad-dob";
+        final String dod = "bad-dod";
+
+        caseData.put("spDob", JacksonUtils.MAPPER.readTree("\""  + dob  + "\""));
+        caseData.put("spDod", JacksonUtils.MAPPER.readTree("\""  + dod  + "\""));
+
+        assertSearchCriteriaCreatedButEmpty(caseData);
     }
 
     @Test
@@ -752,28 +782,21 @@ class GlobalSearchProcessorServiceTest {
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        final String name =  "name";
-        final String dob = SEARCH_PARTY_DOB_1;
-        final String dod = SEARCH_PARTY_DOD_1;
-        final String postCode = SEARCH_PARTY_POSTCODE_1;
-        final String email = SEARCH_PARTY_EMAIL_1;
-        final String address = SEARCH_PARTY_ADDRESS_1;
-
         Map<String, String> expectedFieldValues = new HashMap<>();
 
-        expectedFieldValues.put(NAME, name);
-        expectedFieldValues.put(ADDRESS_LINE_1, address);
-        expectedFieldValues.put(EMAIL_ADDRESS, email);
-        expectedFieldValues.put(POSTCODE, postCode);
-        expectedFieldValues.put(DATE_OF_BIRTH, dob);
-        expectedFieldValues.put(DATE_OF_DEATH, dod);
+        expectedFieldValues.put(NAME, SEARCH_PARTY_FIRST_NAME_1);
+        expectedFieldValues.put(ADDRESS_LINE_1, SEARCH_PARTY_ADDRESS_1);
+        expectedFieldValues.put(EMAIL_ADDRESS, SEARCH_PARTY_EMAIL_1);
+        expectedFieldValues.put(POSTCODE, SEARCH_PARTY_POSTCODE_1);
+        expectedFieldValues.put(DATE_OF_BIRTH, SEARCH_PARTY_DOB_1);
+        expectedFieldValues.put(DATE_OF_DEATH, SEARCH_PARTY_DOD_1);
 
-        caseData.put("spName", JacksonUtils.MAPPER.readTree("\""  + name  + "\""));
-        caseData.put("spAddress", JacksonUtils.MAPPER.readTree("\""  + address  + "\""));
-        caseData.put("spPostCode", JacksonUtils.MAPPER.readTree("\""  + postCode  + "\""));
-        caseData.put("spEmail", JacksonUtils.MAPPER.readTree("\""  + email  + "\""));
-        caseData.put("spDob", JacksonUtils.MAPPER.readTree("\""  + dob  + "\""));
-        caseData.put("spDod", JacksonUtils.MAPPER.readTree("\""  + dod  + "\""));
+        caseData.put("spName", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_FIRST_NAME_1  + "\""));
+        caseData.put("spAddress", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_ADDRESS_1  + "\""));
+        caseData.put("spPostCode", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_POSTCODE_1  + "\""));
+        caseData.put("spEmail", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_EMAIL_1  + "\""));
+        caseData.put("spDob", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_DOB_1  + "\""));
+        caseData.put("spDod", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_DOD_1  + "\""));
 
         assertSearchCriteriaFields(expectedFieldValues);
     }
@@ -791,34 +814,65 @@ class GlobalSearchProcessorServiceTest {
 
         caseTypeDefinition.setSearchParties(List.of(searchParty));
 
-        final String name =  "name";
-        final String dob = SEARCH_PARTY_DOB_1;
-        final String dod = SEARCH_PARTY_DOD_1;
-        final String postCode = SEARCH_PARTY_POSTCODE_1;
-        final String email = SEARCH_PARTY_EMAIL_1;
-        final String address = SEARCH_PARTY_ADDRESS_1;
-
         Map<String, String> expectedFieldValues = new HashMap<>();
 
-        expectedFieldValues.put(NAME, name);
-        expectedFieldValues.put(ADDRESS_LINE_1, address);
-        expectedFieldValues.put(EMAIL_ADDRESS, email);
-        expectedFieldValues.put(POSTCODE, postCode);
-        expectedFieldValues.put(DATE_OF_BIRTH, dob);
-        expectedFieldValues.put(DATE_OF_DEATH, dod);
+        expectedFieldValues.put(NAME, SEARCH_PARTY_FIRST_NAME_1);
+        expectedFieldValues.put(ADDRESS_LINE_1, SEARCH_PARTY_ADDRESS_1);
+        expectedFieldValues.put(EMAIL_ADDRESS, SEARCH_PARTY_EMAIL_1);
+        expectedFieldValues.put(POSTCODE, SEARCH_PARTY_POSTCODE_1);
+        expectedFieldValues.put(DATE_OF_BIRTH, SEARCH_PARTY_DOB_1);
+        expectedFieldValues.put(DATE_OF_DEATH, SEARCH_PARTY_DOD_1);
 
         caseData.put("myCollection", JacksonUtils.MAPPER.readTree("[{\n"
             + "         \"id\": null,\n"
             + "         \"value\": {\n"
-            + "             \"spName\":\"" + name + "\",\n"
-            + "             \"spAddress\":\"" + address + "\",\n"
-            + "             \"spPostCode\":\"" + postCode + "\",\n"
-            + "             \"spEmail\":\"" + email + "\",\n"
-            + "             \"spDob\":\"" + dob + "\",\n"
-            + "             \"spDod\":\"" + dod + "\"\n"
+            + "             \"spName\":\"" + SEARCH_PARTY_FIRST_NAME_1 + "\",\n"
+            + "             \"spAddress\":\"" + SEARCH_PARTY_ADDRESS_1 + "\",\n"
+            + "             \"spPostCode\":\"" + SEARCH_PARTY_POSTCODE_1 + "\",\n"
+            + "             \"spEmail\":\"" + SEARCH_PARTY_EMAIL_1 + "\",\n"
+            + "             \"spDob\":\"" + SEARCH_PARTY_DOB_1 + "\",\n"
+            + "             \"spDod\":\"" + SEARCH_PARTY_DOD_1 + "\"\n"
             + "         }\n"
             + "      }]\n"
             + "}"));
+
+        assertSearchCriteriaFields(expectedFieldValues);
+    }
+
+    @Test
+    void checkSearchCriteriaContainingASearchPartyContainingAllFieldsTwoDateFieldsAreWrong()
+        throws JsonProcessingException {
+
+        searchParty.setSearchPartyName("spName");
+        searchParty.setSearchPartyDob("spDob");
+        searchParty.setSearchPartyDod("spDod");
+        searchParty.setSearchPartyPostCode("spPostCode");
+        searchParty.setSearchPartyEmailAddress("spEmail");
+        searchParty.setSearchPartyAddressLine1("spAddress");
+
+        caseTypeDefinition.setSearchParties(List.of(searchParty));
+
+        Map<String, String> expectedFieldValues = new HashMap<>();
+
+        expectedFieldValues.put(NAME, SEARCH_PARTY_FIRST_NAME_1);
+        expectedFieldValues.put(ADDRESS_LINE_1, SEARCH_PARTY_ADDRESS_1);
+        expectedFieldValues.put(EMAIL_ADDRESS, SEARCH_PARTY_EMAIL_1);
+        expectedFieldValues.put(POSTCODE, SEARCH_PARTY_POSTCODE_1);
+
+        caseData.put("spName", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_FIRST_NAME_1  + "\""));
+        caseData.put("spAddress", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_ADDRESS_1  + "\""));
+        caseData.put("spPostCode", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_POSTCODE_1  + "\""));
+        caseData.put("spEmail", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_EMAIL_1  + "\""));
+        caseData.put("spDob", JacksonUtils.MAPPER.readTree("\"bad-dob\""));
+        caseData.put("spDod", JacksonUtils.MAPPER.readTree("\"bad-dod\""));
+
+        Map<String, JsonNode> globalSearchData =
+            globalSearchProcessorService.populateGlobalSearchData(caseTypeDefinition, caseData);
+
+        JsonNode searchPartyNodes = globalSearchData.get(SEARCH_CRITERIA).get(SEARCH_PARTIES);
+
+        // verify only fields returned (i.e. 6 minus the 2 dates: dataOfBirth and dateOfDeath)
+        assertEquals(4, searchPartyNodes.findValue(VALUE).size());
 
         assertSearchCriteriaFields(expectedFieldValues);
     }
@@ -950,28 +1004,21 @@ class GlobalSearchProcessorServiceTest {
 
         caseTypeDefinition.setSearchParties(List.of(searchParty, searchParty2));
 
-        final String name =  SEARCH_PARTY_FIRST_NAME_1;
-        final String dob = SEARCH_PARTY_DOB_1;
-        final String dod = SEARCH_PARTY_DOD_1;
-        final String postCode = SEARCH_PARTY_POSTCODE_1;
-        final String email = SEARCH_PARTY_EMAIL_1;
-        final String address = SEARCH_PARTY_ADDRESS_1;
-
         Map<String, String> expectedFieldValues = new HashMap<>();
 
-        expectedFieldValues.put(NAME, name);
-        expectedFieldValues.put(ADDRESS_LINE_1, address);
-        expectedFieldValues.put(EMAIL_ADDRESS, email);
-        expectedFieldValues.put(POSTCODE, postCode);
-        expectedFieldValues.put(DATE_OF_BIRTH, dob);
-        expectedFieldValues.put(DATE_OF_DEATH, dod);
+        expectedFieldValues.put(NAME, SEARCH_PARTY_FIRST_NAME_1);
+        expectedFieldValues.put(ADDRESS_LINE_1, SEARCH_PARTY_ADDRESS_1);
+        expectedFieldValues.put(EMAIL_ADDRESS, SEARCH_PARTY_EMAIL_1);
+        expectedFieldValues.put(POSTCODE, SEARCH_PARTY_POSTCODE_1);
+        expectedFieldValues.put(DATE_OF_BIRTH, SEARCH_PARTY_DOB_1);
+        expectedFieldValues.put(DATE_OF_DEATH, SEARCH_PARTY_DOD_1);
 
-        caseData.put("spName", JacksonUtils.MAPPER.readTree("\""  + name  + "\""));
-        caseData.put("spAddress", JacksonUtils.MAPPER.readTree("\""  + address  + "\""));
-        caseData.put("spPostCode", JacksonUtils.MAPPER.readTree("\""  + postCode  + "\""));
-        caseData.put("spEmail", JacksonUtils.MAPPER.readTree("\""  + email  + "\""));
-        caseData.put("spDob", JacksonUtils.MAPPER.readTree("\""  + dob  + "\""));
-        caseData.put("spDod", JacksonUtils.MAPPER.readTree("\""  + dod  + "\""));
+        caseData.put("spName", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_FIRST_NAME_1  + "\""));
+        caseData.put("spAddress", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_ADDRESS_1  + "\""));
+        caseData.put("spPostCode", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_POSTCODE_1  + "\""));
+        caseData.put("spEmail", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_EMAIL_1  + "\""));
+        caseData.put("spDob", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_DOB_1  + "\""));
+        caseData.put("spDod", JacksonUtils.MAPPER.readTree("\""  + SEARCH_PARTY_DOD_1  + "\""));
 
         caseData.put("sp", JacksonUtils.MAPPER.readTree("{\n"
             + "      \"Name\":{\n"

@@ -16,6 +16,8 @@ import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.domain.types.sanitiser.CollectionSanitiser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,6 +28,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataFields.SEARCH_CRITERIA;
 
 @Service
@@ -78,7 +81,8 @@ public class GlobalSearchProcessorService {
     }
 
     private SearchCriteria populateSearchCriteria(Map<String, JsonNode> data,
-                                       List<uk.gov.hmcts.ccd.domain.model.definition.SearchCriteria> searchCriterias) {
+                                                  List<uk.gov.hmcts.ccd.domain.model.definition.SearchCriteria>
+                                                      searchCriterias) {
         List<OtherCaseReference> otherCaseReferences = new ArrayList<>();
         SearchCriteria returnValue = new SearchCriteria();
 
@@ -104,7 +108,8 @@ public class GlobalSearchProcessorService {
     }
 
     private List<SearchParty> populateSearchParties(Map<String, JsonNode> data,
-                                             List<uk.gov.hmcts.ccd.domain.model.definition.SearchParty> searchParties) {
+                                                    List<uk.gov.hmcts.ccd.domain.model.definition.SearchParty>
+                                                        searchParties) {
         List<SearchParty> searchPartyList = new ArrayList<>();
 
         searchParties.forEach(searchParty -> {
@@ -205,8 +210,11 @@ public class GlobalSearchProcessorService {
         searchPartyValue.setAddressLine1(findTextValueInMap(searchPartyDefinition.getSearchPartyAddressLine1(), data));
         searchPartyValue.setEmailAddress(findTextValueInMap(searchPartyDefinition.getSearchPartyEmailAddress(), data));
         searchPartyValue.setPostCode(findTextValueInMap(searchPartyDefinition.getSearchPartyPostCode(), data));
-        searchPartyValue.setDateOfBirth(findTextValueInMap(searchPartyDefinition.getSearchPartyDob(), data));
-        searchPartyValue.setDateOfDeath(findTextValueInMap(searchPartyDefinition.getSearchPartyDod(), data));
+
+        // NB: use a different find function for dates to allow check of format
+        String caseType = searchPartyDefinition.getCaseTypeId();
+        searchPartyValue.setDateOfBirth(findDateValueInMap(searchPartyDefinition.getSearchPartyDob(), data, caseType));
+        searchPartyValue.setDateOfDeath(findDateValueInMap(searchPartyDefinition.getSearchPartyDod(), data, caseType));
 
         return searchPartyValue;
     }
@@ -214,6 +222,20 @@ public class GlobalSearchProcessorService {
     private String findTextValueInMap(String valueToFind, Map<String, JsonNode> mapToSearch) {
         JsonNode value = findValueInMap(valueToFind, mapToSearch);
         return jsonNodeObjectToText(value);
+    }
+
+    private String findDateValueInMap(String valueToFind, Map<String, JsonNode> mapToSearch, String caseTypeID) {
+        String value = findTextValueInMap(valueToFind, mapToSearch);
+        if (value != null) {
+            try {
+                LocalDate.parse(value, ISO_DATE);
+            } catch (DateTimeParseException e) {
+                log.warn("A search party date value extracted by GlobalSearchProcessorService for CaseTypeID: {} "
+                    + "is not in the correct format.", caseTypeID);
+                return null;
+            }
+        }
+        return value;
     }
 
     private List<JsonNode> findCollectionValueInMap(uk.gov.hmcts.ccd.domain.model.definition.SearchParty searchParty,

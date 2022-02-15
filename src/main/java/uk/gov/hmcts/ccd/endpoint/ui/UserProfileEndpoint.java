@@ -1,11 +1,8 @@
 package uk.gov.hmcts.ccd.endpoint.ui;
 
-import javax.inject.Inject;
-
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,6 +10,8 @@ import uk.gov.hmcts.ccd.domain.model.aggregated.UserProfile;
 import uk.gov.hmcts.ccd.domain.service.aggregated.AuthorisedGetUserProfileOperation;
 import uk.gov.hmcts.ccd.domain.service.aggregated.GetUserProfileOperation;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+
+import javax.inject.Inject;
 
 @RestController
 public class UserProfileEndpoint {
@@ -24,7 +23,6 @@ public class UserProfileEndpoint {
         this.getUserProfileOperation = getUserProfileOperation;
     }
 
-    @Transactional
     @RequestMapping(value = "/caseworkers/{uid}/profile", method = RequestMethod.GET)
     @ApiOperation(value = "Get default setting for user")
     @ApiResponse(code = 200, message = "User default settings")

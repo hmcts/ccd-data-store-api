@@ -16,7 +16,7 @@ import java.util.List;
 public class BuildingLocation implements Serializable {
     String buildingLocationId;
     String buildingLocationName;
-    String epimsId;
+    String epimmsId;
     String buildingLocationStatus;
     String area;
     String region;
