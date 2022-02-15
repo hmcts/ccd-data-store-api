@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,7 +55,6 @@ public class UIDraftsController {
         this.draftGateway = draftGateway;
     }
 
-    @Transactional
     @PostMapping(
         path = "/case-types/{ctid}/drafts",
         headers = {
@@ -86,7 +84,6 @@ public class UIDraftsController {
             caseTypeId));
     }
 
-    @Transactional
     @PutMapping(
         path = "/case-types/{ctid}/drafts/{did}",
         headers = {
@@ -115,7 +112,6 @@ public class UIDraftsController {
             caseDataContent), caseTypeId));
     }
 
-    @Transactional
     @GetMapping(
         path = "/drafts/{did}",
         headers = {
@@ -138,7 +134,6 @@ public class UIDraftsController {
         return ResponseEntity.ok(new CaseViewResource(caseView));
     }
 
-    @Transactional
     @DeleteMapping(path = "/drafts/{did}",
         headers = {
             V2.EXPERIMENTAL_HEADER
