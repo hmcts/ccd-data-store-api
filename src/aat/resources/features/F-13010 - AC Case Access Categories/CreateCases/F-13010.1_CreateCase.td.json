@@ -9,5 +9,13 @@
         "CaseAccessCategoryId": "Civil/Standard/Legal"
       }
     }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "data": {
+        "CaseAccessCategoryId": "Civil/Standard/Legal"
+      }
+    }
   }
 }

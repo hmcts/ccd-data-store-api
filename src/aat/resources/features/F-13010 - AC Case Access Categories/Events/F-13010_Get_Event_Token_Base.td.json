@@ -5,7 +5,7 @@
   "operationName": "Start event creation as Case worker",
 
   "method": "GET",
-  "uri": "/case-types/FT_CaseAccessCategories/event-triggers/{etid}",
+  "uri": "/case-types/{caseTypeId}/event-triggers/{etid}",
 
   "specs": [
     "to create a token for case creation"
@@ -23,7 +23,8 @@
       "Experimental" : "true"
     },
     "pathVariables": {
-      "etid": "CREATE"
+      "etid": "CREATE",
+      "caseTypeId": "FT_CaseAccessCategories"
     }
   },
 

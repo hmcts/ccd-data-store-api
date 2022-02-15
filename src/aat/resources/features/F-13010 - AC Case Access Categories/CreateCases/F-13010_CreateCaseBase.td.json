@@ -28,7 +28,7 @@
     "body": {
       "data": {
         "TextField": "value1",
-        "CaseAccessCategoryId": ""
+        "CaseAccessCategoryId": null
       },
       "event": {
         "id": "CREATE",
@@ -38,7 +38,7 @@
       "event_token": "${[scenarioContext][parentContext][childContexts][F-13010_CreateCase_Token_Creation][testData][actualResponse][body][token]}",
       "event_data": {
         "TextField": "value1",
-        "TextField2": "value2"
+        "CaseAccessCategoryId": null
       },
       "ignore_warning": false
     }
@@ -70,10 +70,12 @@
       "state": "CaseCreated",
       "security_classification": "PUBLIC",
       "data": {
-        "TextField": "value1"
+        "TextField": "value1",
+        "CaseAccessCategoryId": null
       },
       "data_classification": {
-        "TextField": "PUBLIC"
+        "TextField": "PUBLIC",
+        "CaseAccessCategoryId": "PUBLIC"
       },
       "after_submit_callback_response": null,
       "callback_response_status_code": null,

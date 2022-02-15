@@ -1,10 +1,10 @@
 {
-  "_guid_": "F-13010.2_CreateCase",
+  "_guid_": "F-13010.3_CreateCase",
   "_extends_" : "F-13010_CreateCaseBase",
 
   "request": {
     "body": {
-      "event_token": "${[scenarioContext][parentContext][childContexts][F-13010_CreateCase_Token_Creation][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][parentContext][childContexts][F-13010_CreateCase_Token_Creation_1][testData][actualResponse][body][token]}",
       "data": {
         "CaseAccessCategoryId": "FamilyLaw/Standard"
       }
