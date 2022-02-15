@@ -70,6 +70,7 @@ public class AuthorisationMapper {
             .stream()
             .map(accessProfileValue -> AccessProfile.builder()
                 .accessProfile(accessProfileValue)
+                .caseAccessCategories(roleToAccessProfileDefinition.getCaseAccessCategories())
                 .securityClassification(roleAssignment.getClassification())
                 .readOnly(readOnly(roleAssignment, roleToAccessProfileDefinition))
                 .build()).collect(Collectors.toList());
