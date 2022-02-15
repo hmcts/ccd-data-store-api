@@ -95,7 +95,7 @@ public class IdamRepositoryCachingIT {
 
         // Pause long enough so that cache time limit expires - see system.user.token.cache.ttl.secs in test.properties
         try {
-            TimeUnit.SECONDS.sleep(3);
+            TimeUnit.SECONDS.sleep(5);
         } catch (InterruptedException e) {
             fail("Exception occurred whilst pausing to expire cache time limit: " + e.getMessage());
         }
