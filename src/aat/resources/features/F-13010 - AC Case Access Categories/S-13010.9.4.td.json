@@ -26,7 +26,7 @@
       "experimental": true
     },
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-13010.2_CreateCase][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][F-13010.3_CreateCase][testData][actualResponse][body][id]}"
     }
   },
 
