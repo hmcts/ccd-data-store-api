@@ -15,7 +15,12 @@
 
 	"expectedResponse": {
 		"body": {
-      "CaseLinks" : [ {
+      "CaseLinks" : [
+      {
+        "__ordering__": "UNORDERED",
+        "__elementId__": "LinkedCaseReference"
+      },
+      {
         "CaseReference" : "${[scenarioContext][parentContext][childContexts][F-1008_CreateMultipleLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
         "LinkedCaseReference" : "${[scenarioContext][parentContext][childContexts][F-1008_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
         "CaseTypeId" : "FT_MasterCaseType"
