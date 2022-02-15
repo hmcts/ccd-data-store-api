@@ -1,5 +1,5 @@
 @F-13010 @crud
-Feature: F-13010: Get Case External API CRUD Tests
+Feature: F-13010: Case Access Category Tests
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
