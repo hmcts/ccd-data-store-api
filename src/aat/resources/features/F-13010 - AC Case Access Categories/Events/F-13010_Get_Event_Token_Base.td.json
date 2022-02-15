@@ -2,7 +2,7 @@
   "_guid_": "F-13010_Get_Event_Token_Base",
 
   "productName": "CCD Data Store",
-  "operationName": "Start event creation as Case worker",
+  "operationName": "Start event creation as Case worker for Case Access Categories",
 
   "method": "GET",
   "uri": "/case-types/{caseTypeId}/event-triggers/{etid}",

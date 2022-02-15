@@ -4,7 +4,7 @@
 
   "request": {
     "body": {
-      "event_token": "${[scenarioContext][parentContext][childContexts][F-13010_CreateCase_Token_Creation][testData][actualResponse][body][token]}",
+      "event_token": "${[scenarioContext][parentContext][childContexts][F-13010.2_CreateCase_Token_Creation][testData][actualResponse][body][token]}",
       "data": {
         "CaseAccessCategoryId": "FamilyLaw/Standard"
       }
