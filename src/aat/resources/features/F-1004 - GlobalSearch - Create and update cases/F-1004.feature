@@ -67,3 +67,94 @@ Feature: F-1004: Global Search - Create and update cases
     Then a positive response is received
     And the response has all other details as expected
 
+  @S-1004.7
+  Scenario:  Successfully creates a case with wrong data type for Date fields using V1: /caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases endpoint
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a token for case creation as a caseworker] as in [F-1004_Case_Data_Create_Token_Creation]
+    When a request is prepared with appropriate values
+    And the request [contains a Text value for the Date fields]
+    And it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response [contains a SearchCriteria with SearchParty excluding the Dates]
+    And the response has all other details as expected
+
+  @S-1004.8
+  Scenario:  Successfully creates a case with wrong data type for Date fields using V1: /citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases endpoint
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a token for case creation as a citizen] as in [F-1004_Case_Data_Create_Token_Creation_Citizen]
+    When a request is prepared with appropriate values
+    And the request [contains a Text value for the Date fields]
+    And it is submitted to call the [Submit case creation as Citizen] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response [contains a SearchCriteria with SearchParty excluding the Dates]
+    And the response has all other details as expected
+
+  @S-1004.9
+  Scenario:  "Successfully creates a case with wrong data type for Date fields using V2: /case-types/{caseTypeId}/cases endpoint",
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a token for case creation as a caseworker] as in [F-1004_Case_Data_Create_Token_Creation]
+    When a request is prepared with appropriate values
+    And the request [contains a Text value for the Date fields]
+    And it is submitted to call the [Submit case creation as Case worker (V2)] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response [contains a SearchCriteria with SearchParty excluding the Dates]
+    And the response has all other details as expected
+
+  @S-1004.10
+  Scenario:  Successfully updates a case with wrong data type for Date fields using V1: /caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1004_CreateCasePreRequisiteCaseworker_InvalidDataFields]
+    And another successful call [to get a caseworker event token to update the case just created] as in [F-1004_GetCaseworkerUpdateToken_InvalidFieldsCase]
+    When a request is prepared with appropriate values
+    And the request [contains a Text value for the Date fields]
+    And it is submitted to call the [Submit case update event creation as a Caseworker (V1)] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response [contains a SearchCriteria with SearchParty excluding the Dates]
+    And the response has all other details as expected
+
+  @S-1004.11
+  Scenario:  Successfully updates a case with wrong data type for Date fields using V1: /citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case as a citizen] as in [F-1004_CreateCasePreRequisiteCitizen_InvalidDateFields]
+    And another successful call [to get a citizen event token to update the case just created] as in [F-1004_GetCitizenUpdateToken_InvalidFieldsCase]
+    When a request is prepared with appropriate values
+    And the request [contains a Text value for the Date fields]
+    And it is submitted to call the [Submit case update event creation as a Citizen (V1)] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response [contains a SearchCriteria with SearchParty excluding the Dates]
+    And the response has all other details as expected
+
+  @S-1004.12
+  Scenario:  Successfully updates a case with wrong data type for Date fields using V2: /cases/{caseId}/events
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1004_CreateCasePreRequisiteCaseworker_InvalidDataFields]
+    And another successful call [to get a caseworker event token to update the case just created] as in [F-1004_GetCaseworkerUpdateToken_InvalidFieldsCase]
+    When a request is prepared with appropriate values
+    And the request [contains a Text value for the Date fields]
+    And it is submitted to call the [Submit case update event creation as a Caseworker (V2)] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response [contains a SearchCriteria with SearchParty excluding the Dates]
+    And the response has all other details as expected
+
+  @S-1004.13
+  Scenario:  Successfully creates a case with correct data type for Date fields using V1: /caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases endpoint
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a token for case creation as a caseworker] as in [F-1004_Case_Data_Create_Token_Creation]
+    When a request is prepared with appropriate values
+    And the request [contains a Text value for the Date fields]
+    And it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response [contains a SearchCriteria with SearchParty including the Dates]
+    And the response has all other details as expected
+
+  @S-1004.14
+  Scenario:  Successfully updates a case with correct data type for Date fields using V1: /caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1004_CreateCasePreRequisiteCaseworker_InvalidDataFields]
+    And another successful call [to get a caseworker event token to update the case just created] as in [F-1004_GetCaseworkerUpdateToken_InvalidFieldsCase]
+    When a request is prepared with appropriate values
+    And the request [contains a Text value for the Date fields]
+    And it is submitted to call the [Submit case update event creation as a Caseworker (V1)] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response [contains a SearchCriteria with SearchParty including the Dates]
+    And the response has all other details as expected
