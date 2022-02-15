@@ -42,7 +42,7 @@
           ]
         },
         "GroupOfPeople": {
-          "ListOfPeople": [
+          "Members": [
             {
               "value": {
                 "IndividualFirstName": "FirstNameValue",
@@ -90,7 +90,7 @@
           "region" : "1"
         },
         "GroupOfPeople" : {
-          "ListOfPeople" : [
+          "Members" : [
             {
               "__ordering__": "UNORDERED",
               "__elementId__": "value"
