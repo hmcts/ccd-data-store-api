@@ -3,6 +3,9 @@
   "_extends_" : "F-13010_CreateCaseBase",
 
   "request": {
+    "pathVariables": {
+      "ctid": "FT_CaseAccessCategories_2"
+    },
     "body": {
       "event_token": "${[scenarioContext][parentContext][childContexts][F-13010_CreateCase_Token_Creation_2][testData][actualResponse][body][token]}",
       "data": {
