@@ -19,7 +19,7 @@ public class IdamRepository {
     private final IdamClient idamClient;
     private final ApplicationParams applicationParams;
 
-    @Resource(name="idamRepository")
+    @Resource(name = "idamRepository")
     private IdamRepository selfInstance;
 
     @Autowired
