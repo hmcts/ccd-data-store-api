@@ -45,6 +45,7 @@ public class IdamRepository {
         return idamClient.getUserByUserId(bearerToken, userId);
     }
 
+    @Cacheable("systemUserTokenCache")
     public String getDataStoreSystemUserAccessToken() {
         return idamClient.getAccessToken(applicationParams.getDataStoreSystemUserId(),
             applicationParams.getDataStoreSystemUserPassword());
