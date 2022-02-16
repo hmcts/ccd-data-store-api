@@ -54,6 +54,22 @@ class CaseDetailsTest {
     }
 
     @Test
+    void testExistsInDataIsAlwaysTrueForWaysToPay() {
+        uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField tabField =
+                createCaseTypeTabField("someId", "WaysToPay");
+
+        assertThat(caseDetails.existsInData(tabField), equalTo(true));
+    }
+
+    @Test
+    void testExistsInDataIsAlwaysTrueForFlagLauncher() {
+        uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField tabField =
+            createCaseTypeTabField("someId", "FlagLauncher");
+
+        assertThat(caseDetails.existsInData(tabField), equalTo(true));
+    }
+
+    @Test
     void testExistsInDataIsFalseIfTabFieldDoesNotBelongToCase() {
         uk.gov.hmcts.ccd.domain.model.definition.CaseTypeTabField tabField =
                 createCaseTypeTabField("someId2", "YesOrNo");
