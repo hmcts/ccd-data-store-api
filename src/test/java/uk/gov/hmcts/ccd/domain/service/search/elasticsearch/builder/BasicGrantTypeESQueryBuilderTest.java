@@ -19,6 +19,7 @@ import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
@@ -90,7 +91,7 @@ class BasicGrantTypeESQueryBuilderTest extends GrantTypeESQueryBuilderTest {
             caseTypeDefinition);
 
         assertNotNull(query);
-        assertNotNull(query.hasClauses());
+        assertTrue(query.hasClauses());
         assertEquals(1, (query.should().size()));
     }
 }
