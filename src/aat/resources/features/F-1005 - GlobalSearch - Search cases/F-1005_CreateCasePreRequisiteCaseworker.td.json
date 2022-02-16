@@ -1,4 +1,24 @@
 {
 	"_guid_": "F-1005_CreateCasePreRequisiteCaseworker",
-	"_extends_": "F-1004_CreateCasePreRequisiteCaseworker"
+	"_extends_": "F-1004_CreateCasePreRequisiteCaseworker",
+
+	"request": {
+		"body": {
+			"data": {
+				"caseManagementLocation": {
+					"_extends_": "CaseManagementLocation_FromRefData_SiblingContext"
+				}
+			}
+		}
+	},
+
+	"expectedResponse": {
+		"body": {
+			"case_data": {
+				"caseManagementLocation": {
+					"_extends_": "CaseManagementLocation_FromRequest"
+				}
+			}
+		}
+	}
 }

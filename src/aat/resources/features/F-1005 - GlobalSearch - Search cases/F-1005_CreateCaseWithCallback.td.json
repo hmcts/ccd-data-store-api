@@ -5,15 +5,17 @@
   "specs": [
     "to create a case"
   ],
-  "prerequisites" : [ {
-    "Token_Creation": "F-1005_GetCreateCaseCallbackToken"
-  }
+
+  "prerequisites" : [
+    { "Token_Creation": "F-1005_GetCreateCaseCallbackToken" }
   ],
+
   "users": {
     "invokingUser": {
       "_extends_": "BeftaMasterCaseworker"
     }
   },
+
   "request": {
     "pathVariables": {
       "jid": "BEFTA_MASTER",
@@ -29,6 +31,7 @@
       "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
   },
+
   "expectedResponse": {
     "body": {
       "id": "[[ANYTHING_PRESENT]]",
@@ -41,7 +44,10 @@
       "last_state_modified_date": "[[ANYTHING_PRESENT]]",
       "security_classification": "PUBLIC",
       "case_data": {
-        "_extends_": "Befta_Global_Search_Expected_Search_Criteria"
+        "_extends_": "Befta_Global_Search_Expected_Search_Criteria",
+        "caseManagementLocation": {
+          "_extends_": "CaseManagementLocation_AnyValues"
+        }
       },
       "data_classification": {
         "_extends_": "Befta_Global_Search_Data_Classifications"

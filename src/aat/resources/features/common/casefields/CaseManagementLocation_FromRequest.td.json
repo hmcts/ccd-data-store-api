@@ -1,0 +1,6 @@
+{
+  "_guid_": "CaseManagementLocation_FromRequest",
+
+  "baseLocation": "${[scenarioContext][testData][request][body][data][caseManagementLocation][baseLocation]}",
+  "region": "${[scenarioContext][testData][request][body][data][caseManagementLocation][region]}"
+}

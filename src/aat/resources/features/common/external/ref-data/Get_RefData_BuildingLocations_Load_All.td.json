@@ -1,0 +1,21 @@
+{
+  "_guid_": "Get_RefData_BuildingLocations_Load_All",
+  "_extends_": "Get_RefData_BuildingLocations__Base",
+
+  "specs": [
+    "to load all ref-data locations"
+  ],
+
+  "users": {
+		"invokingUser": {
+      "_extends_": "BeftaCaseworkerCaa"
+		}
+	},
+
+  "expectedResponse": {
+    "body" : {
+      "arrayInMap" :  "[[ANY_NULLABLE]]"
+    }
+  }
+
+}

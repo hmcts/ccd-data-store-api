@@ -1,0 +1,26 @@
+{
+  "_guid_": "Get_RefData_BuildingLocations__Base",
+
+  "title": "Retrieve users in invoker's organisation (+ organisationIdentifier)",
+
+  "productName": "Location Reference Data API",
+  "operationName": "Retrieves the the Building Location details",
+
+  "method": "GET",
+  "uri": "{{RD_LOCATION_REF_API_BASE_URL}}/refdata/location/building-locations",
+
+  "s2sClientId": "ccd_data",
+
+  "request": {
+    "_extends_": "Common_Request",
+		"queryParams": {}
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Content-Type": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}
