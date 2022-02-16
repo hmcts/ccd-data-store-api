@@ -18,6 +18,9 @@ public class IdamRepository {
     private final IdamClient idamClient;
     private final ApplicationParams applicationParams;
 
+    @Resource
+    private IdamRepository selfInstance;
+    
     @Autowired
     public IdamRepository(IdamClient idamClient, ApplicationParams applicationParams) {
         this.idamClient = idamClient;
@@ -35,7 +38,7 @@ public class IdamRepository {
 
     @Cacheable("idamUserRoleCache")
     public List<String> getUserRoles(String userId) {
-        String dataStoreSystemUserToken = getDataStoreSystemUserAccessToken();
+        String dataStoreSystemUserToken = selfInstance.getDataStoreSystemUserAccessToken();
         List<String> roles = getUserByUserId(userId, dataStoreSystemUserToken).getRoles();
         log.debug("System user queried user info from IDAM API. User Id={}. Roles={}.", userId, roles);
         return roles;
