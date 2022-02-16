@@ -225,7 +225,7 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
 
         int pageNumber = ROLE_ASSIGNMENT_STARTING_PAGE_NUMBER;
         int pageSize = Integer.parseInt(applicationParams.getRoleAssignmentPageSize());
-        int totalRecords = 0;
+        int totalRecords;
 
         do {
             headers.add(ROLE_ASSIGNMENT_PAGE_NUMBER_HEADER, Integer.toString(pageNumber));
@@ -238,12 +238,10 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
                 requestEntity,
                 RoleAssignmentResponse.class);
 
-            if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                totalRecords = Integer.parseInt(Objects.requireNonNull(Objects.requireNonNull(
-                    responseEntity.getHeaders().get(ROLE_ASSIGNMENT_TOTAL_RECORDS_HEADER)).get(0)));
-                List<RoleAssignmentResource> roleAssignments = roleAssignmentResponse.getRoleAssignments();
-                roleAssignments.addAll(Objects.requireNonNull(responseEntity.getBody()).getRoleAssignments());
-            }
+            totalRecords = Integer.parseInt(Objects.requireNonNull(Objects.requireNonNull(
+                responseEntity.getHeaders().get(ROLE_ASSIGNMENT_TOTAL_RECORDS_HEADER)).get(0)));
+            List<RoleAssignmentResource> roleAssignments = roleAssignmentResponse.getRoleAssignments();
+            roleAssignments.addAll(Objects.requireNonNull(responseEntity.getBody()).getRoleAssignments());
 
             pageNumber++;
         } while ((pageNumber * pageSize) < totalRecords);
