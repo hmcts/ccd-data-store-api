@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 @Component
@@ -20,7 +21,7 @@ public class IdamRepository {
 
     @Resource
     private IdamRepository selfInstance;
-    
+
     @Autowired
     public IdamRepository(IdamClient idamClient, ApplicationParams applicationParams) {
         this.idamClient = idamClient;
