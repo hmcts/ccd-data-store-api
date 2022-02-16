@@ -30,6 +30,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
 import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Comparator.comparingInt;
@@ -66,6 +67,10 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, create);
         Optional<CaseDetails> result = Optional.of(caseDetails).filter(caseHasMatchingCaseAccessCategories(
             caseDataAccessControl.generateAccessProfilesByCaseDetails(caseDetails)));
+
+        if (result.isEmpty()) {
+            throw new CaseNotFoundException(caseDetails.getReferenceAsString());
+        }
 
         return userClassificationOpt
             .flatMap(securityClassification ->
