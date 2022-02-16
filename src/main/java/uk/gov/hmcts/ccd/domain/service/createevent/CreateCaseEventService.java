@@ -132,7 +132,7 @@ public class CreateCaseEventService {
         this.globalSearchProcessorService = globalSearchProcessorService;
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public CreateCaseEventResult createCaseEvent(final String caseReference, final CaseDataContent content) {
 
         final CaseDetails caseDetails = getCaseDetails(caseReference);
