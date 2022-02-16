@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.internal.util.reflection.Whitebox;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -34,6 +35,7 @@ class IdamRepositoryTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
+        Whitebox.setInternalState(idamRepository, "selfInstance", idamRepository);
     }
 
     @Test
