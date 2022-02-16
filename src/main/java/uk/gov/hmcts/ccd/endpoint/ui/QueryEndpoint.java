@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -126,7 +125,6 @@ public class QueryEndpoint {
      * @deprecated see https://tools.hmcts.net/jira/browse/RDM-1421
      */
     @Deprecated
-    @Transactional
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types", method = RequestMethod.GET)
     @ApiOperation(value = "Get case types")
     @ApiResponses(value = {
@@ -139,7 +137,6 @@ public class QueryEndpoint {
             .orElseThrow(() -> new ResourceNotFoundException("No case types found")));
     }
 
-    @Transactional
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions")
     @ApiOperation(value = "Get jurisdictions available to the user")
     @ApiResponses(value = {
@@ -158,7 +155,6 @@ public class QueryEndpoint {
         }
     }
 
-    @Transactional
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
         method = RequestMethod.GET)
     @ApiOperation(value = "Get case data with UI layout")
@@ -195,7 +191,6 @@ public class QueryEndpoint {
         return Optional.ofNullable(queryParameters.get(param));
     }
 
-    @Transactional
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/inputs",
         method = RequestMethod.GET)
     @ApiOperation(value = "Get Search Input details")
@@ -212,7 +207,6 @@ public class QueryEndpoint {
             .toArray(new SearchInput[0]);
     }
 
-    @Transactional
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/"
         + "work-basket-inputs",
         method = RequestMethod.GET)
@@ -234,7 +228,6 @@ public class QueryEndpoint {
         return workbasketInputs;
     }
 
-    @Transactional
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}",
         method = RequestMethod.GET)
     @ApiOperation(value = "Fetch a case for display")
@@ -253,7 +246,6 @@ public class QueryEndpoint {
         return caseView;
     }
 
-    @Transactional
     @RequestMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/"
         + "event-triggers/{etid}",
         method = RequestMethod.GET)
@@ -272,7 +264,6 @@ public class QueryEndpoint {
         return getEventTriggerOperation.executeForCaseType(validCaseTypeId, eventTriggerId, ignoreWarning);
     }
 
-    @Transactional
     @RequestMapping(
         value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/"
             + "event-triggers/{etid}",
@@ -292,7 +283,6 @@ public class QueryEndpoint {
         return getEventTriggerOperation.executeForCase(caseId, eventId, ignoreWarning);
     }
 
-    @Transactional
     @RequestMapping(
         value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/drafts/{did}/"
             + "event-triggers/{etid}",
@@ -311,7 +301,6 @@ public class QueryEndpoint {
         return getEventTriggerOperation.executeForDraft(draftId, ignoreWarning);
     }
 
-    @Transactional
     @RequestMapping(
         value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events/"
             + "{eventId}/case-history",
