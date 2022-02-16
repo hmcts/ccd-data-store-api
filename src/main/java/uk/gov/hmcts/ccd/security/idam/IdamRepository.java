@@ -51,6 +51,7 @@ public class IdamRepository {
 
     @Cacheable("systemUserTokenCache")
     public String getDataStoreSystemUserAccessToken() {
+        log.info("Getting a fresh token for system account.");
         return idamClient.getAccessToken(applicationParams.getDataStoreSystemUserId(),
             applicationParams.getDataStoreSystemUserPassword());
     }
