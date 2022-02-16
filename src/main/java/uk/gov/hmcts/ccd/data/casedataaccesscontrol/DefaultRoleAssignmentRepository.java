@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static org.springframework.http.HttpHeaders.ETAG;
@@ -219,30 +220,32 @@ public class DefaultRoleAssignmentRepository implements RoleAssignmentRepository
     }
 
     private RoleAssignmentResponse findRoleAssignmentsByCasesAndUsers(RoleAssignmentQuery roleAssignmentQuery) {
-        RoleAssignmentResponse roleAssignmentResponse = new RoleAssignmentResponse();
-        roleAssignmentResponse.setRoleAssignments(new ArrayList<>());
-        final HttpHeaders headers = securityUtils.authorizationHeaders();
-
         int pageNumber = ROLE_ASSIGNMENT_STARTING_PAGE_NUMBER;
         int pageSize = Integer.parseInt(applicationParams.getRoleAssignmentPageSize());
-        int totalRecords;
+        int totalRecords = 0;
+
+        HttpHeaders headers = securityUtils.authorizationHeaders();
+        headers.add(ROLE_ASSIGNMENT_PAGE_SIZE_HEADER, Integer.toString(pageSize));
+        RoleAssignmentResponse roleAssignmentResponse = new RoleAssignmentResponse();
 
         do {
-            headers.add(ROLE_ASSIGNMENT_PAGE_NUMBER_HEADER, Integer.toString(pageNumber));
-            headers.add(ROLE_ASSIGNMENT_PAGE_SIZE_HEADER, Integer.toString(pageSize));
+            headers.put(ROLE_ASSIGNMENT_PAGE_NUMBER_HEADER, Collections.singletonList(Integer.toString(pageNumber)));
             final var requestEntity = new HttpEntity(roleAssignmentQuery, headers);
 
-            ResponseEntity<RoleAssignmentResponse> responseEntity = restTemplate.exchange(
+            final ResponseEntity<RoleAssignmentResponse> responseEntity = restTemplate.exchange(
                 applicationParams.amQueryRoleAssignmentsURL(),
                 HttpMethod.POST,
                 requestEntity,
                 RoleAssignmentResponse.class);
 
-            totalRecords = Integer.parseInt(Objects.requireNonNull(Objects.requireNonNull(
-                responseEntity.getHeaders().get(ROLE_ASSIGNMENT_TOTAL_RECORDS_HEADER)).get(0)));
+            if (pageNumber == ROLE_ASSIGNMENT_STARTING_PAGE_NUMBER) {
+                totalRecords = Integer.parseInt(Objects.requireNonNull(
+                    responseEntity.getHeaders().get(ROLE_ASSIGNMENT_TOTAL_RECORDS_HEADER)).get(0));
+                roleAssignmentResponse.setRoleAssignments(new ArrayList<>(totalRecords));
+            }
+
             List<RoleAssignmentResource> roleAssignments = roleAssignmentResponse.getRoleAssignments();
             roleAssignments.addAll(Objects.requireNonNull(responseEntity.getBody()).getRoleAssignments());
-
             pageNumber++;
         } while ((pageNumber * pageSize) < totalRecords);
 
