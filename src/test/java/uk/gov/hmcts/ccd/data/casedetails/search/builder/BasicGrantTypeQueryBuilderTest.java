@@ -224,7 +224,7 @@ class BasicGrantTypeQueryBuilderTest extends GrantTypeQueryBuilderTest {
     }
 
     @Test
-    void shouldNotReturnQueryWithCaseAccessCategoryWhenRtapDHasNullCaseAccessCategory () {
+    void shouldNotReturnQueryWithCaseAccessCategoryWhenRtapDHasNullCaseAccessCategory() {
         RoleAssignment roleAssignment = createRoleAssignment(GrantType.BASIC,
             "CASE",
             "ROLE1", "PUBLIC", "", "",

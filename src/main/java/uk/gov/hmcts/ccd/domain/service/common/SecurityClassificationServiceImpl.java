@@ -5,12 +5,16 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +24,7 @@ import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -59,7 +64,8 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
 
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create) {
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, create);
-        Optional<CaseDetails> result = Optional.of(caseDetails);
+        Optional<CaseDetails> result = Optional.of(caseDetails).filter(caseHasMatchingCaseAccessCategories(
+            caseDataAccessControl.generateAccessProfilesByCaseDetails(caseDetails)));
 
         return userClassificationOpt
             .flatMap(securityClassification ->
@@ -251,5 +257,30 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
 
     private boolean isAnyNull(JsonNode... jsonNodes) {
         return newArrayList(jsonNodes).stream().anyMatch(Objects::isNull);
+    }
+
+    private Predicate<CaseDetails> caseHasMatchingCaseAccessCategories(Set<AccessProfile> accessProfiles) {
+        Set<String> caseAccessCategories = getCaseAccessCategories(accessProfiles);
+        return cd -> {
+            String value = getCaseAccessCategory(cd);
+            return caseAccessCategories.isEmpty()
+                || caseAccessCategories.stream()
+                .anyMatch(cac -> StringUtils.isEmpty(value) || value.startsWith(cac));
+        };
+    }
+
+    private String getCaseAccessCategory(CaseDetails cd) {
+        JsonNode caseAccessCategory = null;
+        if (cd.getData() != null) {
+            caseAccessCategory = cd.getData().get("CaseAccessCategory");
+        }
+        return caseAccessCategory != null ? caseAccessCategory.asText() : "";
+    }
+
+    private Set<String> getCaseAccessCategories(Set<AccessProfile> accessProfiles) {
+        return accessProfiles.stream()
+            .filter(ap -> ap.getCaseAccessCategories() != null)
+            .flatMap(ap -> Arrays.stream(ap.getCaseAccessCategories().split(",")))
+            .collect(Collectors.toSet());
     }
 }
