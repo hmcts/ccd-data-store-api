@@ -68,14 +68,20 @@
       "data_classification": {
         "ListOfPeople" : {
           "classification" : "PUBLIC",
-          "value" : [ {
-            "value" : {
-              "IndividualOtherName" : "PUBLIC",
-              "IndividualDateOfBirthText" : "PUBLIC",
-              "IndividualDateOfDeathText" : "PUBLIC"
+          "value" : [ 
+            {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
             },
-            "id" : "[[ANYTHING_PRESENT]]"
-          } ]
+            {
+              "value" : {
+                "IndividualOtherName" : "PUBLIC",
+                "IndividualDateOfBirthText" : "PUBLIC",
+                "IndividualDateOfDeathText" : "PUBLIC"
+              },
+              "id" : "[[ANYTHING_PRESENT]]"
+            }
+          ]
         },
         "SearchCriteria": {
           "classification": "PUBLIC",
