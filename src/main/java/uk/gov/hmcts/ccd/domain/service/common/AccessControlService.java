@@ -59,7 +59,7 @@ public interface AccessControlService {
     String NO_EVENT_FOUND = "No event found";
     String NO_FIELD_FOUND = "No field found";
     String VALUE = "value";
-    String ALL = "*";
+    String ALL_EVENTS = "*";
 
     static boolean hasAccess(Set<String> userRoles,
                              Predicate<AccessControlList> criteria,
@@ -272,9 +272,9 @@ public interface AccessControlService {
                                                             CaseFieldDefinition field,
                                                             Set<AccessProfile> accessProfiles) {
         boolean isMultipartyCaseTypePresent = multipartyCaseTypes
-            .stream().anyMatch(caseType -> caseType.equals(ALL) || caseType.equalsIgnoreCase(caseTypeId));
+            .stream().anyMatch(caseType -> caseType.equals(caseTypeId));
         boolean isMultipartyEventPresent = multipartyEvents
-            .stream().anyMatch(event -> event.equals(ALL) || event.equalsIgnoreCase(eventId));
+            .stream().anyMatch(event -> event.equals(ALL_EVENTS) || event.equals(eventId));
 
         if (isMultipartyFixEnabled
             && isMultipartyCaseTypePresent && isMultipartyEventPresent
