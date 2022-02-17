@@ -8,6 +8,11 @@
 				"caseManagementLocation": {
 					"_extends_": "CaseManagementLocation_FromRefData_SiblingContext"
 				}
+			},
+			"supplementary_data_request": {
+				"$set": {
+					"HMCTSServiceId": "${[scenarioContext][siblingContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_code]}"
+				}
 			}
 		}
 	},
@@ -18,6 +23,9 @@
 				"caseManagementLocation": {
 					"_extends_": "CaseManagementLocation_FromRequest"
 				}
+			},
+			"supplementary_data": {
+				"HMCTSServiceId": "${[scenarioContext][siblingContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_code]}"
 			}
 		}
 	}

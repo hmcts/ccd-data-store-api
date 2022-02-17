@@ -1,0 +1,28 @@
+{
+  "_guid_": "Get_RefData_OrgServices__Base",
+
+  "productName": "Location Reference Data API",
+  "operationName": "Retrieves service code details association with ccd case type",
+
+  "method": "GET",
+  "uri": "{{RD_LOCATION_REF_API_BASE_URL}}/refdata/location/orgServices",
+
+  "s2sClientId": "ccd_data",
+
+  "request": {
+    "_extends_": "Common_Request",
+		"queryParams": {
+      "ccdCaseType": null,
+      "ccdServiceNames": null,
+      "serviceCode": null
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Content-Type": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}
