@@ -236,3 +236,26 @@ Feature: F-1004: Global Search - Create and update cases
     Then a positive response is received,
     And the response [contains updated data including the search party fields in the collection fields as specified by the CollectionFieldName],
     And the response has all other details as expected
+
+  @S-1004.22
+  Scenario:  Successfully creates a case with wrong data type for Date fields in a collection
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a token for case creation as a caseworker] as in [F-1004_Case_Data_Create_Token_Creation]
+    When a request is prepared with appropriate values
+    And the request [contains a Text value for the Date fields in a collection]
+    And it is submitted to call the [Submit case creation as Case worker (V2)] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response [contains a SearchCriteria with SearchParty excluding the Dates]
+    And the response has all other details as expected
+
+  @S-1004.23
+  Scenario:  Successfully updates a case with wrong data type for Date fields in a collection
+    Given a user with [an active profile in CCD]
+    And a successful call [to create a case] as in [F-1004_CreateCasePreRequisiteCaseworker_InvalidDataFieldsCollection]
+    And another successful call [to get a caseworker event token to update the case just created] as in [F-1004_GetCaseworkerUpdateToken_InvalidFieldsCaseCollection]
+    When a request is prepared with appropriate values
+    And the request [contains a Text value for the Date fields in a collection]
+    And it is submitted to call the [Submit case update event creation as a Caseworker (V2)] operation of [CCD Data Store]
+    Then a positive response is received
+    And the response [contains a SearchCriteria with SearchParty excluding the Dates]
+    And the response has all other details as expected
