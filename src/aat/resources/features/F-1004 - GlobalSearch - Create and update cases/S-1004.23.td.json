@@ -1,0 +1,66 @@
+{
+  "title": "Successfully updates a case with wrong data type for Date fields in a collection",
+  "_guid_": "S-1004.23",
+  "_extends_": "F-1004_UpdateCaseEventV2",
+  "specs": [
+    "an active profile in CCD",
+    "contains a Text value for the Date fields in a collection",
+    "contains a SearchCriteria with SearchParty excluding the Dates"
+  ],
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][F-1004_CreateCasePreRequisiteCaseworker_InvalidDataFieldsCollection][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "ListOfPeople" : [ {
+          "value" : {
+            "IndividualOtherName" : "other-name",
+            "IndividualDateOfBirthText" : "date-of-birth-text",
+            "IndividualDateOfDeathText" : "date-of-death-text"
+          },
+          "id" : "4b8f17d9-5e27-4989-8ba5-ca9ce1bbb710"
+        } ]
+      },
+      "event_token": "${[scenarioContext][childContexts][F-1004_GetCaseworkerUpdateToken_InvalidFieldsCaseCollection][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 201,
+    "responseMessage": "Created",
+    "headers": {
+      "_extends_": "Common_Response_Headers"
+    },
+    "body": {
+      "jurisdiction": "BEFTA_MASTER",
+      "state": "CaseUpdated",
+      "case_type": "FT_GlobalSearch",
+      "data": {
+        "ListOfPeople" : [ {
+          "value" : {
+            "IndividualOtherName" : "other-name",
+            "IndividualDateOfBirthText" : "date-of-birth-text",
+            "IndividualDateOfDeathText" : "date-of-death-text"
+          },
+          "id" : "4b8f17d9-5e27-4989-8ba5-ca9ce1bbb710"
+        } ],
+        "SearchCriteria": {
+          "SearchParties": [
+            {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },
+            {
+              "id": "[[ANYTHING_PRESENT]]",
+              "value": {
+                "Name": "other-name"
+              }
+            }
+          ]
+        }
+      },
+      "data_classification": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}
+
