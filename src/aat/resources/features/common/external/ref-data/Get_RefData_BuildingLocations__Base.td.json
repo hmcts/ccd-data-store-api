@@ -1,8 +1,6 @@
 {
   "_guid_": "Get_RefData_BuildingLocations__Base",
 
-  "title": "Retrieve users in invoker's organisation (+ organisationIdentifier)",
-
   "productName": "Location Reference Data API",
   "operationName": "Retrieves the the Building Location details",
 
@@ -13,7 +11,12 @@
 
   "request": {
     "_extends_": "Common_Request",
-		"queryParams": {}
+		"queryParams": {
+      "building_location_name2": null,
+      "cluster_id": null,
+      "epimms_id": null,
+      "region_id": null
+    }
   },
 
   "expectedResponse": {
