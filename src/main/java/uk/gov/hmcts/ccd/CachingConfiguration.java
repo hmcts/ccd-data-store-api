@@ -51,6 +51,8 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithMaxIdle("userInfoCache", applicationParams.getUserCacheTTLSecs()));
         config.addMapConfig(newMapConfigWithMaxIdle("idamUserRoleCache",
             applicationParams.getUserCacheTTLSecs()));
+        config.addMapConfig(newMapConfigWithMaxIdle("systemUserTokenCache",
+            applicationParams.getSystemUserTokenCacheTTLSecs()));
         config.addMapConfig(newMapConfigWithMaxIdle("bannersCache", latestVersionTTL));
         config.addMapConfig(newMapConfigWithMaxIdle("jurisdictionUiConfigsCache", latestVersionTTL));
         config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", latestVersionTTL));
