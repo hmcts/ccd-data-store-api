@@ -81,6 +81,8 @@ class CaseAccessOperationTest {
     private static final String CASE_ROLE = "[DEFENDANT]";
     private static final String CASE_ROLE_OTHER = "[OTHER]";
     private static final String CASE_ROLE_CREATOR = "[CREATOR]";
+    private static final String CASE_ROLE_SOLICITOR = "[SOLICITORA]";
+
     private static final String CASE_ROLE_GRANTED = "[ALREADY_GRANTED]";
     private static final String ORGANISATION = "ORGANISATION";
     private static final String ORGANISATION_OTHER = "ORGANISATION_OTHER";
@@ -2159,20 +2161,18 @@ class CaseAccessOperationTest {
             when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
 
             List<CaseAssignedUserRoleWithOrganisation> caseUserRoles = Lists.newArrayList(
-                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE, ORGANISATION)
+                new CaseAssignedUserRoleWithOrganisation(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_SOLICITOR,
+                    ORGANISATION)
             );
 
             // for an existing relation and then after removal
             mockExistingCaseUserRolesForRA(
                 // before
                 List.of(
-                    new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE),
-                    new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR)
+                    new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_SOLICITOR)
                 ),
                 // after
-                List.of(
-                    new CaseAssignedUserRole(CASE_REFERENCE.toString(), USER_ID, CASE_ROLE_CREATOR)
-                )
+                new ArrayList<>()
             );
 
             // ACT

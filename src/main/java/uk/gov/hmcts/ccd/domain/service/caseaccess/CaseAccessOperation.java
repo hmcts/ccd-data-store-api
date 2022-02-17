@@ -3,6 +3,8 @@ package uk.gov.hmcts.ccd.domain.service.caseaccess;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.util.set.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +40,8 @@ import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
 @Service
 public class CaseAccessOperation {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CaseAccessOperation.class);
 
     public static final String ORGS_ASSIGNED_USERS_PATH = "orgs_assigned_users.";
 
@@ -204,6 +208,9 @@ public class CaseAccessOperation {
     @Transactional
     public void removeCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
 
+        LOG.info("Entered into removeCaseUserRoles {}", caseUserRoles.size());
+        caseUserRoles.stream().forEach(System.out::println);
+
         Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseDetails =
             getMapOfCaseAssignedUserRolesByCaseDetails(caseUserRoles);
 
@@ -256,7 +263,7 @@ public class CaseAccessOperation {
         // (i.e user still has an association to a case).
         Map<String, Map<String, Long>> removeUserCounts
             = getNewUserCountByCaseAndOrganisation(filteredCauRolesByCaseDetails, null);
-
+        LOG.info("Before updating Supplementary data {}", removeUserCounts.size());
         removeUserCounts.forEach((caseReference, orgNewUserCountMap) ->
             orgNewUserCountMap.forEach((organisationId, removeUserCount) ->
                 supplementaryDataRepository.incrementSupplementaryData(caseReference,
