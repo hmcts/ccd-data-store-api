@@ -213,11 +213,13 @@ public class CaseAccessOperation {
 
         Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseDetails =
             getMapOfCaseAssignedUserRolesByCaseDetails(caseUserRoles);
+        LOG.info("cauRolesByCaseDetails {}", cauRolesByCaseDetails.size());
 
         // Ignore case user role mappings that DO NOT exist
         // NB: also required so they don't effect revoked user counts.
         Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> filteredCauRolesByCaseDetails =
             findAndFilterOnExistingCauRoles(cauRolesByCaseDetails);
+        LOG.info("filteredCauRolesByCaseDetails {}", filteredCauRolesByCaseDetails.size());
 
         if (applicationParams.getEnableAttributeBasedAccessControl()) {
             List<RoleAssignmentsDeleteRequest> deleteRequests = new ArrayList<>();
@@ -234,6 +236,7 @@ public class CaseAccessOperation {
                                 .map(CaseAssignedUserRoleWithOrganisation::getCaseRole)
                                 .collect(Collectors.toList())
                         )));
+                LOG.info("caseRolesByUserAndCase {}", caseRolesByUserAndCase.size());
 
                 // for each user in current case: add list of all case-roles to revoke to the delete requests
                 caseRolesByUserAndCase.forEach((userId, roleNames) ->
@@ -244,6 +247,8 @@ public class CaseAccessOperation {
                         .build()
                 ));
             });
+
+            LOG.info("deleteRequests {}", deleteRequests.size());
 
             // submit list of all delete requests from all cases
             roleAssignmentService.deleteRoleAssignments(deleteRequests);
