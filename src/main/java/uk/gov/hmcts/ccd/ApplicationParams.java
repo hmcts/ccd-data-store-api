@@ -108,11 +108,11 @@ public class ApplicationParams {
     @Value("${user.cache.ttl.secs}")
     private Integer userCacheTTLSecs;
 
-    @Value("${definition.cache.max.size}")
-    private Integer definitionCacheMaxSize;
+    @Value("${default.cache.max.size}")
+    private Integer defaultCacheMaxSize;
 
-    @Value("${definition.cache.eviction.policy}")
-    private EvictionPolicy definitionCacheEvictionPolicy;
+    @Value("${default.cache.eviction.policy}")
+    private EvictionPolicy defaultCacheEvictionPolicy;
 
     @Value("#{'${search.elastic.hosts}'.split(',')}")
     private List<String> elasticSearchHosts;
@@ -401,12 +401,12 @@ public class ApplicationParams {
         return userCacheTTLSecs;
     }
 
-    public int getDefinitionCacheMaxSize() {
-        return definitionCacheMaxSize;
+    public int getDefaultCacheMaxSize() {
+        return defaultCacheMaxSize;
     }
 
-    public EvictionPolicy getDefinitionCacheEvictionPolicy() {
-        return definitionCacheEvictionPolicy;
+    public EvictionPolicy getDefaultCacheEvictionPolicy() {
+        return defaultCacheEvictionPolicy;
     }
 
     public List<String> getSearchBlackList() {
