@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -110,7 +109,6 @@ public class CaseDetailsEndpoint {
         this.appInsights = appinsights;
     }
 
-    @Transactional
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}")
     @ApiOperation(value = "Get case", notes = "Retrieve an existing case with its state and data")
     @ApiResponses(value = {
@@ -138,7 +136,6 @@ public class CaseDetailsEndpoint {
         return caseDetails;
     }
 
-    @Transactional
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}")
     @ApiOperation(value = "Get case", notes = "Retrieve an existing case with its state and data")
     @ApiResponses(value = {
@@ -162,7 +159,6 @@ public class CaseDetailsEndpoint {
             .orElseThrow(() -> new CaseNotFoundException(caseId));
     }
 
-    @Transactional
     @GetMapping(
         value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token")
     @ApiOperation(value = "Start event creation as Case worker",
@@ -189,7 +185,6 @@ public class CaseDetailsEndpoint {
         return startEventOperation.triggerStartForCase(caseId, eventId, ignoreWarning);
     }
 
-    @Transactional
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token")
     @ApiOperation(value = "Start event creation as Citizen", notes = "Start the event creation process for an existing "
         + "case. Triggers `AboutToStart` callback.")
@@ -215,7 +210,6 @@ public class CaseDetailsEndpoint {
         return startEventOperation.triggerStartForCase(caseId, eventId, ignoreWarning);
     }
 
-    @Transactional
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token")
     @ApiOperation(value = "Start case creation as Case worker", notes = "Start the case creation process for a new "
         + "case. Triggers `AboutToStart` callback.")
@@ -238,7 +232,6 @@ public class CaseDetailsEndpoint {
         return startEventOperation.triggerStartForCaseType(caseTypeId, eventId, ignoreWarning);
     }
 
-    @Transactional
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/event-triggers/{etid}/token")
     @ApiOperation(value = "Start case creation as Citizen", notes = "Start the case creation process for a new case. "
         + "Triggers `AboutToStart` callback.")
@@ -261,7 +254,6 @@ public class CaseDetailsEndpoint {
         return startEventOperation.triggerStartForCaseType(caseTypeId, eventId, ignoreWarning);
     }
 
-    @Transactional
     @PostMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(
@@ -290,7 +282,6 @@ public class CaseDetailsEndpoint {
         return createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
     }
 
-    @Transactional
     @PostMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(
@@ -319,7 +310,6 @@ public class CaseDetailsEndpoint {
         return createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
     }
 
-    @Transactional
     @PostMapping(value = {"/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate",
         "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/validate"})
     @ResponseStatus(HttpStatus.OK)
@@ -351,7 +341,6 @@ public class CaseDetailsEndpoint {
                                        pageId);
     }
 
-    @Transactional
     @PostMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(
@@ -380,7 +369,6 @@ public class CaseDetailsEndpoint {
                                                     content);
     }
 
-    @Transactional
     @PostMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(
@@ -409,7 +397,6 @@ public class CaseDetailsEndpoint {
                                                     content);
     }
 
-    @Transactional
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/documents")
     @ApiOperation(value = "Get a list of printable documents for the given case id ")
     @ApiResponses(value = {
@@ -428,7 +415,6 @@ public class CaseDetailsEndpoint {
         }
     }
 
-    @Transactional
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")
     @ApiOperation(value = "Get case data for a given case type")
     @ApiResponses(value = {
@@ -442,7 +428,6 @@ public class CaseDetailsEndpoint {
         return searchCases(jurisdictionId, caseTypeId, queryParameters);
     }
 
-    @Transactional
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases")
     @ApiOperation(value = "Get case data for a given case type")
     @ApiResponses(value = {
@@ -467,7 +452,6 @@ public class CaseDetailsEndpoint {
         return searchOperation.execute(metadata, sanitizedParams);
     }
 
-    @Transactional
     @GetMapping(value = "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata")
     @ApiOperation(value = "Get the pagination metadata for a case data search")
     @ApiResponses(value = {
@@ -480,7 +464,6 @@ public class CaseDetailsEndpoint {
         return searchMetadata(jurisdictionId, caseTypeId, queryParameters);
     }
 
-    @Transactional
     @GetMapping(value = "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/pagination_metadata")
     @ApiOperation(value = "Get the pagination metadata for a case data search")
     @ApiResponses(value = {
