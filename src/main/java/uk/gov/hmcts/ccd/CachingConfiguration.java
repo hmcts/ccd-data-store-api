@@ -37,6 +37,7 @@ public class CachingConfiguration {
     private void configCaches(Config config) {
         final int defaultCacheMaxIdle = applicationParams.getDefaultCacheMaxIdleSecs();
         final int defaultCacheTtl = applicationParams.getDefaultCacheTtlSecs();
+
         config.addMapConfig(newMapConfigWithMaxIdle("caseTypeDefinitionsCache", defaultCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("workBasketResultCache", defaultCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("searchResultCache", defaultCacheMaxIdle));
@@ -47,14 +48,16 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithMaxIdle("wizardPageCollectionCache", defaultCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("allJurisdictionsCache", defaultCacheMaxIdle));
         config.addMapConfig(newMapConfigWithMaxIdle("userRolesCache", defaultCacheMaxIdle));
-        config.addMapConfig(newMapConfigWithMaxIdle("caseTypePseudoRoleToAccessProfileCache", defaultCacheMaxIdle));
-        config.addMapConfig(newMapConfigWithMaxIdle("userInfoCache", applicationParams.getUserCacheTTLSecs()));
-        config.addMapConfig(newMapConfigWithMaxIdle("idamUserRoleCache",
+        config.addMapConfig(newMapConfigWithMaxIdle("caseTypePseudoRoleToAccessProfileCache",
+            defaultCacheMaxIdle));
+
+        config.addMapConfig(newMapConfigWithTtl("userInfoCache", applicationParams.getUserCacheTTLSecs()));
+        config.addMapConfig(newMapConfigWithTtl("idamUserRoleCache",
             applicationParams.getUserCacheTTLSecs()));
         config.addMapConfig(newMapConfigWithTtl("systemUserTokenCache",
             applicationParams.getSystemUserTokenCacheTTLSecs()));
-        config.addMapConfig(newMapConfigWithMaxIdle("bannersCache", defaultCacheTtl));
-        config.addMapConfig(newMapConfigWithMaxIdle("jurisdictionUiConfigsCache", defaultCacheTtl));
+        config.addMapConfig(newMapConfigWithTtl("bannersCache", defaultCacheTtl));
+        config.addMapConfig(newMapConfigWithTtl("jurisdictionUiConfigsCache", defaultCacheTtl));
         config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", defaultCacheTtl));
         config.addMapConfig(newMapConfigWithTtl("jurisdictionCache", applicationParams.getJurisdictionTTLSecs()));
         config.addMapConfig(newMapConfigWithTtl(BUILDING_LOCATIONS_CACHE, applicationParams.getRefDataCacheTtlInSec()));
