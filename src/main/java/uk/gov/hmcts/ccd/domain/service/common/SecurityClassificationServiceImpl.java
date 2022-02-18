@@ -259,7 +259,8 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
         return newArrayList(jsonNodes).stream().anyMatch(Objects::isNull);
     }
 
-    private Predicate<CaseDetails> caseHasMatchingCaseAccessCategories(Set<AccessProfile> accessProfiles, boolean create) {
+    private Predicate<CaseDetails> caseHasMatchingCaseAccessCategories(Set<AccessProfile> accessProfiles,
+                                                                       boolean create) {
         return cd -> {
             if (create || hasEmptyCaseAccessCategory(accessProfiles)) {
                 return true;
@@ -287,7 +288,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     }
 
     private boolean hasEmptyCaseAccessCategory(Set<AccessProfile> accessProfiles) {
-        return accessProfiles.stream()
+        return accessProfiles.isEmpty() || accessProfiles.stream()
             .anyMatch(ap -> StringUtils.isEmpty(ap.getCaseAccessCategories()));
     }
 }
