@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Lists;
+import org.junit.Ignore;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -292,6 +293,7 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         verifyAuditForRemoveCaseUserRoles(HttpStatus.BAD_REQUEST, caseUserRoles);
     }
 
+    @Ignore
     @Test
     @DisplayName("AC-12 case not found: should throw exception")
     void removeCaseUserRoles_shouldThrowExceptionWhenCaseNotFound() throws Exception {

@@ -50,7 +50,8 @@ public class DefaultSupplementaryDataRepository implements SupplementaryDataRepo
     public void incrementSupplementaryData(final String caseReference,
                                            String fieldPath,
                                            Object fieldValue) {
-
+        LOG.info("In setSupplementaryData caseReference {}, fieldPath {}, fieldValue {}", caseReference, fieldPath,
+            fieldValue);
         Query query = queryBuilder(SupplementaryDataOperation.INC).build(em,
             caseReference,
             fieldPath,

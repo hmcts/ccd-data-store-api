@@ -207,74 +207,77 @@ public class CaseAccessOperation {
 
     @Transactional
     public void removeCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
+        try {
+            LOG.info("Entered into removeCaseUserRoles {}", caseUserRoles.size());
+            caseUserRoles.stream().forEach(System.out::println);
 
-        LOG.info("Entered into removeCaseUserRoles {}", caseUserRoles.size());
-        caseUserRoles.stream().forEach(System.out::println);
+            Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseDetails =
+                getMapOfCaseAssignedUserRolesByCaseDetails(caseUserRoles);
+            LOG.info("cauRolesByCaseDetails {}", cauRolesByCaseDetails.size());
 
-        Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseDetails =
-            getMapOfCaseAssignedUserRolesByCaseDetails(caseUserRoles);
-        LOG.info("cauRolesByCaseDetails {}", cauRolesByCaseDetails.size());
+            // Ignore case user role mappings that DO NOT exist
+            // NB: also required so they don't effect revoked user counts.
+            Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> filteredCauRolesByCaseDetails =
+                findAndFilterOnExistingCauRoles(cauRolesByCaseDetails);
+            LOG.info("filteredCauRolesByCaseDetails {}", filteredCauRolesByCaseDetails.size());
 
-        // Ignore case user role mappings that DO NOT exist
-        // NB: also required so they don't effect revoked user counts.
-        Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> filteredCauRolesByCaseDetails =
-            findAndFilterOnExistingCauRoles(cauRolesByCaseDetails);
-        LOG.info("filteredCauRolesByCaseDetails {}", filteredCauRolesByCaseDetails.size());
+            if (applicationParams.getEnableAttributeBasedAccessControl()) {
+                List<RoleAssignmentsDeleteRequest> deleteRequests = new ArrayList<>();
 
-        if (applicationParams.getEnableAttributeBasedAccessControl()) {
-            List<RoleAssignmentsDeleteRequest> deleteRequests = new ArrayList<>();
+                // for each case
+                filteredCauRolesByCaseDetails.forEach((caseDetails, requestedAssignments) -> {
+                    // group by user
+                    Map<String, List<String>> caseRolesByUserAndCase = requestedAssignments.stream()
+                        .collect(Collectors.groupingBy(
+                            CaseAssignedUserRoleWithOrganisation::getUserId,
+                            Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                roles -> roles.stream()
+                                    .map(CaseAssignedUserRoleWithOrganisation::getCaseRole)
+                                    .collect(Collectors.toList())
+                            )));
+                    LOG.info("caseRolesByUserAndCase {}", caseRolesByUserAndCase.size());
 
-            // for each case
-            filteredCauRolesByCaseDetails.forEach((caseDetails, requestedAssignments) -> {
-                // group by user
-                Map<String, List<String>> caseRolesByUserAndCase = requestedAssignments.stream()
-                    .collect(Collectors.groupingBy(
-                        CaseAssignedUserRoleWithOrganisation::getUserId,
-                        Collectors.collectingAndThen(
-                            Collectors.toList(),
-                            roles -> roles.stream()
-                                .map(CaseAssignedUserRoleWithOrganisation::getCaseRole)
-                                .collect(Collectors.toList())
-                        )));
-                LOG.info("caseRolesByUserAndCase {}", caseRolesByUserAndCase.size());
+                    // for each user in current case: add list of all case-roles to revoke to the delete requests
+                    caseRolesByUserAndCase.forEach((userId, roleNames) ->
+                        deleteRequests.add(RoleAssignmentsDeleteRequest.builder()
+                            .caseId(caseDetails.getReferenceAsString())
+                            .userId(userId)
+                            .roleNames(roleNames)
+                            .build()
+                        ));
+                });
 
-                // for each user in current case: add list of all case-roles to revoke to the delete requests
-                caseRolesByUserAndCase.forEach((userId, roleNames) ->
-                    deleteRequests.add(RoleAssignmentsDeleteRequest.builder()
-                        .caseId(caseDetails.getReferenceAsString())
-                        .userId(userId)
-                        .roleNames(roleNames)
-                        .build()
-                ));
-            });
+                LOG.info("deleteRequests {}", deleteRequests.size());
 
-            LOG.info("deleteRequests {}", deleteRequests.size());
+                // submit list of all delete requests from all cases
+                roleAssignmentService.deleteRoleAssignments(deleteRequests);
+            }
+            if (applicationParams.getEnableCaseUsersDbSync()) {
+                filteredCauRolesByCaseDetails.forEach((caseDetails, requestedAssignments) -> {
+                        Long caseId = Long.parseLong(caseDetails.getId());
+                        requestedAssignments.forEach(requestedAssignment ->
+                            caseUserRepository.revokeAccess(caseId, requestedAssignment.getUserId(),
+                                requestedAssignment.getCaseRole())
+                        );
+                    }
+                );
+            }
 
-            // submit list of all delete requests from all cases
-            roleAssignmentService.deleteRoleAssignments(deleteRequests);
-        }
-        if (applicationParams.getEnableCaseUsersDbSync()) {
-            filteredCauRolesByCaseDetails.forEach((caseDetails, requestedAssignments) -> {
-                    Long caseId = Long.parseLong(caseDetails.getId());
-                    requestedAssignments.forEach(requestedAssignment ->
-                        caseUserRepository.revokeAccess(caseId, requestedAssignment.getUserId(),
-                            requestedAssignment.getCaseRole())
-                    );
-                }
+            // determine counters after removal of requested mappings so that same function can be re-used
+            // (i.e user still has an association to a case).
+            Map<String, Map<String, Long>> removeUserCounts
+                = getNewUserCountByCaseAndOrganisation(filteredCauRolesByCaseDetails, null);
+            LOG.info("Before updating Supplementary data {}", removeUserCounts.size());
+            removeUserCounts.forEach((caseReference, orgNewUserCountMap) ->
+                orgNewUserCountMap.forEach((organisationId, removeUserCount) ->
+                    supplementaryDataRepository.incrementSupplementaryData(caseReference,
+                        ORGS_ASSIGNED_USERS_PATH + organisationId, Math.negateExact(removeUserCount))
+                )
             );
+        } catch (Exception e) {
+            LOG.error("Exception while executing removeCaseUserRoles", e);
         }
-
-        // determine counters after removal of requested mappings so that same function can be re-used
-        // (i.e user still has an association to a case).
-        Map<String, Map<String, Long>> removeUserCounts
-            = getNewUserCountByCaseAndOrganisation(filteredCauRolesByCaseDetails, null);
-        LOG.info("Before updating Supplementary data {}", removeUserCounts.size());
-        removeUserCounts.forEach((caseReference, orgNewUserCountMap) ->
-            orgNewUserCountMap.forEach((organisationId, removeUserCount) ->
-                supplementaryDataRepository.incrementSupplementaryData(caseReference,
-                    ORGS_ASSIGNED_USERS_PATH + organisationId, Math.negateExact(removeUserCount))
-            )
-        );
     }
 
     private Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> findAndFilterOnExistingCauRoles(

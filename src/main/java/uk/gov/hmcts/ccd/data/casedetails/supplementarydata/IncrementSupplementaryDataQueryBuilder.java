@@ -39,8 +39,8 @@ public class IncrementSupplementaryDataQueryBuilder implements SupplementaryData
         LOG.info("jsonValue {}", jsonValue);
         query.setParameter("json_value", jsonValue);
         query.setParameter("node_path", Arrays.asList(fieldPath.split(Pattern.quote("."))));
-        LOG.info("leaf_node_key {}, node_path {}", query.getParameter("leaf_node_key"),
-            query.getParameter("node_path"));
+        LOG.info("leaf_node_key {}, node_path {}", fieldPath.replaceAll(Pattern.quote("."), ","),
+            Arrays.asList(fieldPath.split(Pattern.quote("."))));
         return query;
     }
 
