@@ -28,10 +28,10 @@
           "BEFTA_MASTER"
         ],
         "caseManagementBaseLocationIds": [
-          "${[scenarioContext][childContexts][F-1005_CreateCaseWithCallback][testData][actualResponse][body][case_data][caseManagementLocation][baseLocation]}"
+          "1"
         ],
         "caseManagementRegionIds": [
-          "${[scenarioContext][childContexts][F-1005_CreateCaseWithCallback][testData][actualResponse][body][case_data][caseManagementLocation][region]}"
+          "3"
         ],
         "parties": [
           {
@@ -86,11 +86,11 @@
             "FirstNameValue"
           ],
           "caseNameHmctsInternal": "Name Internal",
-          "baseLocationId": "${[scenarioContext][testData][request][body][searchCriteria][caseManagementBaseLocationIds][0]}",
+          "baseLocationId": "1",
           "baseLocationName": "[[ANY_NULLABLE]]",
           "caseManagementCategoryId": "987",
           "caseManagementCategoryName": "Category label",
-          "regionId": "${[scenarioContext][testData][request][body][searchCriteria][caseManagementRegionIds][0]}",
+          "regionId": "3",
           "regionName": "[[ANY_NULLABLE]]",
           "CCDJurisdictionId": "BEFTA_MASTER",
           "CCDJurisdictionName": "BEFTA Master",
