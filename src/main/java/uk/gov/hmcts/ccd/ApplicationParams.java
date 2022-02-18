@@ -93,11 +93,11 @@ public class ApplicationParams {
     @Value("${pagination.page.size}")
     private Integer paginationPageSize;
 
-    @Value("${definition.cache.max-idle.secs}")
-    private Integer definitionCacheMaxIdleSecs;
+    @Value("${default.cache.max-idle}")
+    private Integer defaultCacheMaxIdleSecs;
 
-    @Value("${definition.cache.latest-version-ttl}")
-    private Integer latestVersionTTLSecs;
+    @Value("${default.cache.ttl}")
+    private Integer defaultCacheTtlSecs;
 
     @Value("${definition.cache.jurisdiction-ttl}")
     private Integer jurisdictionTTL;
@@ -399,12 +399,12 @@ public class ApplicationParams {
         return paginationPageSize;
     }
 
-    public int getDefinitionCacheMaxIdleSecs() {
-        return definitionCacheMaxIdleSecs;
+    public int getDefaultCacheMaxIdleSecs() {
+        return defaultCacheMaxIdleSecs;
     }
 
-    public int getLatestVersionTTLSecs() {
-        return latestVersionTTLSecs;
+    public int getDefaultCacheTtlSecs() {
+        return defaultCacheTtlSecs;
     }
 
     public int getJurisdictionTTLSecs() {
