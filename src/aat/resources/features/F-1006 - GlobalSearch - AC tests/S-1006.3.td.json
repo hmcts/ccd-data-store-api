@@ -11,7 +11,7 @@
       "searchCriteria": {
         "parties": [
           {
-            "addressLine1": "${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][case_data][Address][AddressLine1]}"
+            "emailAddress": "${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][case_data][Email]}"
           }
         ]
       }
@@ -32,6 +32,9 @@
       },
       "results": [
         {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "value"
+        },{
           "_extends_": "S-1006.3_ExpectedCaseSearchResult"
         }, {
           "_extends_": "S-1006.3_ExpectedCaseSearchResult"

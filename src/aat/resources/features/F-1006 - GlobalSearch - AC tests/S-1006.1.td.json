@@ -32,12 +32,15 @@
       },
       "results": [
         {
-          "_extends_": "F-1006_ExpectedCaseSearchResult"
-        }, {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "value"
+        },{
           "_extends_": "F-1006_ExpectedCaseSearchResult"
         },{
           "_extends_": "F-1006_ExpectedCaseSearchResult"
-        }, {
+        },{
+          "_extends_": "F-1006_ExpectedCaseSearchResult"
+        },{
           "_extends_": "F-1006_ExpectedCaseSearchResult"
         },{
           "_extends_": "F-1006_ExpectedCaseSearchResult"

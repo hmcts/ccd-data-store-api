@@ -46,7 +46,7 @@
         "dateOfDeath": "2020-04-21",
         "Email": "${[scenarioContext][parentContext][siblingContexts][F-1006_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][case_data][Email]}",
         "Address": {
-          "AddressLine1": "${[scenarioContext][parentContext][siblingContexts][F-1006_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][case_data][Address][AddressLine1]}"
+          "AddressLine1": "Address Value"
         },
         "FirstName": "FirstNameValue",
         "LastName": "LastNameValue",
@@ -81,7 +81,7 @@
         },
         "Email" : "[[ANYTHING_PRESENT]]",
         "Address" : {
-          "AddressLine1" : "[[ANYTHING_PRESENT]]"
+          "AddressLine1" : "Address Value"
         },
         "caseManagementLocation" : {
           "baseLocation" : "1",
@@ -97,11 +97,15 @@
             "value" : "FirstNameValue",
             "id" : "[[ANYTHING_PRESENT]]"
           } ],
-          "SearchParties" : [ {
+          "SearchParties" : [
+            {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },{
             "value" : {
               "Name" : "FirstNameValue LastNameValue",
-              "EmailAddress" : "[[ANYTHING_PRESENT]]",
-              "AddressLine1" : "[[ANYTHING_PRESENT]]",
+              "EmailAddress" : "${[scenarioContext][testData][request][body][data][Email]}",
+              "AddressLine1" : "Address Value",
               "PostCode": "BH1 7BP",
               "DateOfBirth" : "2012-04-21",
               "DateOfDeath" : "2020-04-21"
