@@ -65,7 +65,7 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create) {
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, create);
         Optional<CaseDetails> result = Optional.of(caseDetails).filter(caseHasMatchingCaseAccessCategories(
-            caseDataAccessControl.generateAccessProfilesByCaseDetails(caseDetails)));
+            caseDataAccessControl.generateAccessProfilesByCaseDetails(caseDetails), create));
 
         return userClassificationOpt
             .flatMap(securityClassification ->
@@ -259,13 +259,15 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
         return newArrayList(jsonNodes).stream().anyMatch(Objects::isNull);
     }
 
-    private Predicate<CaseDetails> caseHasMatchingCaseAccessCategories(Set<AccessProfile> accessProfiles) {
-        Set<String> caseAccessCategories = getCaseAccessCategories(accessProfiles);
+    private Predicate<CaseDetails> caseHasMatchingCaseAccessCategories(Set<AccessProfile> accessProfiles, boolean create) {
         return cd -> {
+            if (create || hasEmptyCaseAccessCategory(accessProfiles)) {
+                return true;
+            }
             String value = getCaseAccessCategory(cd);
-            return caseAccessCategories.isEmpty()
-                || caseAccessCategories.stream()
-                .anyMatch(cac -> StringUtils.isEmpty(value) || value.startsWith(cac));
+            Set<String> caseAccessCategories = getCaseAccessCategories(accessProfiles);
+            return !StringUtils.isEmpty(value) && caseAccessCategories.stream()
+                .anyMatch(cac ->  value.startsWith(cac));
         };
     }
 
@@ -282,5 +284,10 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
             .filter(ap -> ap.getCaseAccessCategories() != null)
             .flatMap(ap -> Arrays.stream(ap.getCaseAccessCategories().split(",")))
             .collect(Collectors.toSet());
+    }
+
+    private boolean hasEmptyCaseAccessCategory(Set<AccessProfile> accessProfiles) {
+        return accessProfiles.stream()
+            .anyMatch(ap -> StringUtils.isEmpty(ap.getCaseAccessCategories()));
     }
 }
