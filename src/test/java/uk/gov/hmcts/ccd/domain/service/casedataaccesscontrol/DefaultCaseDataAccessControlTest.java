@@ -1,6 +1,16 @@
 package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,17 +40,6 @@ import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.AuthorisationMapper;
 import uk.gov.hmcts.ccd.domain.service.common.CaseTypeService;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.junit.Assert.assertTrue;
@@ -105,9 +104,6 @@ class DefaultCaseDataAccessControlTest {
     private PseudoRoleAssignmentsGenerator pseudoRoleAssignmentsGenerator;
 
     @Mock
-    private PseudoRoleToAccessProfileGenerator pseudoRoleToAccessProfileGenerator;
-
-    @Mock
     private ApplicationParams applicationParams;
 
     @Mock
@@ -152,7 +148,6 @@ class DefaultCaseDataAccessControlTest {
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
 
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
-        doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
 
         var accessProfiles = createAccessProfiles(userRoles);
         var result = defaultCaseDataAccessControl
@@ -179,7 +174,6 @@ class DefaultCaseDataAccessControlTest {
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
 
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
-        doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
 
         var accessProfiles = createAccessProfiles(userRoles);
         var result = defaultCaseDataAccessControl
@@ -213,7 +207,6 @@ class DefaultCaseDataAccessControlTest {
         doReturn(roleAssignments1).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
 
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
-        doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
 
         Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
             .generateAccessProfilesByCaseDetails(caseDetails);
@@ -226,7 +219,6 @@ class DefaultCaseDataAccessControlTest {
         verify(roleAssignmentsFilteringService)
             .filter(any(RoleAssignments.class), any(CaseDetails.class));
         verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
-        verify(applicationParams).getEnablePseudoAccessProfilesGeneration();
         verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
     }
 
@@ -256,7 +248,6 @@ class DefaultCaseDataAccessControlTest {
         doReturn(roleAssignments1).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
 
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
-        doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
 
         Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl.generateAccessProfilesByCaseReference(CASE_ID);
 
@@ -269,7 +260,6 @@ class DefaultCaseDataAccessControlTest {
         verify(roleAssignmentsFilteringService)
             .filter(any(RoleAssignments.class), any(CaseDetails.class));
         verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
-        verify(applicationParams).getEnablePseudoAccessProfilesGeneration();
         verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
     }
 
@@ -306,7 +296,6 @@ class DefaultCaseDataAccessControlTest {
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
 
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
-        doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
 
         var accessProfiles = createAccessProfiles(userRoles);
         var result = defaultCaseDataAccessControl
@@ -328,7 +317,6 @@ class DefaultCaseDataAccessControlTest {
         verify(roleAssignmentService).getRoleAssignmentsForCreate(anyString());
         verify(roleAssignmentsFilteringService).filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
         verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
-        verify(applicationParams).getEnablePseudoAccessProfilesGeneration();
         verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
     }
 
@@ -360,7 +348,6 @@ class DefaultCaseDataAccessControlTest {
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
 
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
-        doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
 
         Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
             .generateAccessProfilesByCaseTypeId(CASE_TYPE_1);
@@ -373,7 +360,6 @@ class DefaultCaseDataAccessControlTest {
         verify(roleAssignmentsFilteringService)
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
         verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
-        verify(applicationParams).getEnablePseudoAccessProfilesGeneration();
         verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
     }
 
@@ -401,7 +387,6 @@ class DefaultCaseDataAccessControlTest {
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
 
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
-        doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
 
         Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
             .generateAccessProfilesByCaseTypeId(CASE_TYPE_1);
@@ -414,7 +399,6 @@ class DefaultCaseDataAccessControlTest {
         verify(roleAssignmentsFilteringService)
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
         verify(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
-        verify(applicationParams).getEnablePseudoAccessProfilesGeneration();
         verify(accessProfileService).generateAccessProfiles(anyList(), anyList());
     }
 
@@ -438,14 +422,12 @@ class DefaultCaseDataAccessControlTest {
             .filter(any(RoleAssignments.class), any(CaseTypeDefinition.class));
 
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
-        doReturn(true).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
         List<RoleToAccessProfileDefinition> generatedPseudoAP = List.of(
             RoleToAccessProfileDefinition.builder()
                 .accessProfiles(CREATOR.name())
                 .roleName(CREATOR.name())
                 .build()
         );
-        doReturn(generatedPseudoAP).when(pseudoRoleToAccessProfileGenerator).generate(any());
 
         Set<AccessProfile> accessProfiles = defaultCaseDataAccessControl
             .generateAccessProfilesByCaseTypeId(CASE_TYPE_1);
@@ -581,7 +563,6 @@ class DefaultCaseDataAccessControlTest {
         when(filteredRoleAssignments.getFilteredMatchingRoleAssignments()).thenReturn(roleAssignments1);
 
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
-        doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
 
         boolean anyRoleEquals = defaultCaseDataAccessControl.anyAccessProfileEqualsTo(CASE_TYPE_1, "test");
         assertEquals(false, anyRoleEquals);
@@ -603,7 +584,6 @@ class DefaultCaseDataAccessControlTest {
         when(filteredRoleAssignments.getFilteredMatchingRoleAssignments()).thenReturn(roleAssignments1);
 
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
-        doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
 
         boolean anyRoleEquals = defaultCaseDataAccessControl.anyAccessProfileEqualsTo(CASE_TYPE_1, ROLE_NAME_1);
         assertEquals(true, anyRoleEquals);
