@@ -245,14 +245,14 @@ public class CreateCaseEventService {
                                  CaseDetails caseDetailsAfterCallback,
                                  List<CaseFieldDefinition> caseFieldDefinitions) {
 
-        List<String> preCallbackCaseLinks =
-            caseLinkExtractor.getCaseLinks(caseDetailsBeforeCallback.getData(), caseFieldDefinitions);
-        List<String> postCallbackCaseLinks =
+        List<String> finalCaseLinkReferences =
             caseLinkExtractor.getCaseLinks(caseDetailsAfterCallback.getData(), caseFieldDefinitions);
 
+        // TODO: CaseTypeId needs to be 'case type id of the case to which the case links' so will need to possibly
+        //  be updated to take in the linked case - this will need to be confirmed
         caseLinkService.updateCaseLinks(caseDetailsBeforeCallback.getReference(),
                                         caseDetailsBeforeCallback.getCaseTypeId(),
-                                        preCallbackCaseLinks, postCallbackCaseLinks);
+                                        finalCaseLinkReferences);
     }
 
     private CaseEventDefinition findAndValidateCaseEvent(final CaseTypeDefinition caseTypeDefinition,

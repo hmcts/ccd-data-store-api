@@ -163,7 +163,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
 
     private void insertCaseLinks(CaseDetails caseDetails, List<CaseFieldDefinition> caseFieldDefinitions) {
         final List<String> caseLinks = caseLinkExtractor.getCaseLinks(caseDetails.getData(), caseFieldDefinitions);
-        caseLinkService.createCaseLinks(caseDetails.getReference(), caseDetails.getCaseTypeId(), caseLinks);
+        caseLinkService.updateCaseLinks(caseDetails.getReference(), caseDetails.getCaseTypeId(), caseLinks);
     }
 
     private void updateCaseState(CaseEventDefinition caseEventDefinition, CaseDetails newCaseDetails) {

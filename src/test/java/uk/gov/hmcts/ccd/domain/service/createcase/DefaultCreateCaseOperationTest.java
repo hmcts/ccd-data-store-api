@@ -540,7 +540,7 @@ class DefaultCreateCaseOperationTest {
             () -> order.verify(callbackInvoker).invokeSubmittedCallback(eq(eventTrigger), isNull(CaseDetails.class),
                 same(savedCaseType)),
             () -> order.verify(savedCaseType).setAfterSubmitCallbackResponseEntity(response),
-            () -> order.verify(caseLinkService).createCaseLinks(caseReference, CASE_TYPE_ID, caseLinks),
+            () -> order.verify(caseLinkService).updateCaseLinks(caseReference, CASE_TYPE_ID, caseLinks),
             () -> order.verify(draftGateway).delete(DRAFT_ID)
         );
     }
