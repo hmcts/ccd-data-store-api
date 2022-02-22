@@ -36,8 +36,8 @@
 		},
 		"body": {
       "CaseLinks" : [ {
-        "CaseId" : "[[ANYTHING_PRESENT]]",
-        "LinkedCaseId" : "[[ANYTHING_PRESENT]]",
+        "CaseReference" : "[[ANYTHING_PRESENT]]",
+        "LinkedCaseReference" : "[[ANYTHING_PRESENT]]",
         "CaseTypeId" : "FT_MasterCaseType"
       }]
 		}
