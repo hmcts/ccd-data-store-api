@@ -115,7 +115,7 @@ public class CaseLinkService {
     private List<String> getStringCaseReferencesFromCaseLinks(List<CaseLink> caseLinks) {
         return caseLinks
             .stream()
-            .map(caseLink -> caseLink.getLinkedCaseReference().toString()) // should this be getCaseReference or getLinkedCaseReference ?
+            .map(caseLink -> caseLink.getLinkedCaseReference().toString()) //getCaseReference or getLinkedCaseReference
             .collect(Collectors.toList());
     }
 }
