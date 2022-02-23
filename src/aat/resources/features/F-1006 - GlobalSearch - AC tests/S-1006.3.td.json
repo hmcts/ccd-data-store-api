@@ -19,7 +19,7 @@
   },
   "users": {
     "invokingUser": {
-      "_extends_": "BeftaCaseworkerCaa"
+      "_extends_": "BeftaCaseworker1"
     }
   },
   "expectedResponse": {
