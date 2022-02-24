@@ -20,4 +20,5 @@ public class SearchParty implements Serializable {
     private Date liveFrom;
     private Date liveTo;
     private String searchPartyName;
+    private String searchPartyCollectionFieldName;
 }
