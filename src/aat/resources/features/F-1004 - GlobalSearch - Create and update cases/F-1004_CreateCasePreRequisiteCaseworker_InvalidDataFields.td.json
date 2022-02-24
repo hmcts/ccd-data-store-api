@@ -1,39 +1,35 @@
 {
-	"_guid_": "F-1005_CreateCaseMasterCaseType",
+	"_guid_": "F-1004_CreateCasePreRequisiteCaseworker_InvalidDataFields",
 	"_extends_": "Case_Creation_Base",
 
   "specs": [
     "to create a case"
   ],
+
   "prerequisites" : [ {
-    "Token_Creation": "F-1005_GetCreateCaseMasterCaseTypeToken"
+    "Token_Creation": "F-1004_Case_Data_Create_Token_Creation"
     }
    ],
+
   "users": {
 		"invokingUser": {
       "_extends_": "BeftaMasterCaseworker"
 		}
 	},
+
   "request": {
 		"pathVariables": {
 			"jid": "BEFTA_MASTER",
-			"ctid": "FT_MasterCaseType"
+			"ctid": "FT_GlobalSearch"
 		},
 		"body": {
       "data": {
-        "caseManagementLocation": {
-          "baseLocation": "1",
-          "region": "3"
-        }
-      },
-      "event": {
-        "id": "createCase",
-        "summary": "",
-        "description": ""
+        "dateOfBirthText": "2012-04-21",
+        "dateOfDeathText": "2020-04-21"
       },
 			"event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
     }
-  },
+	},
 
 	"expectedResponse": {
 		"body": {
@@ -41,30 +37,36 @@
 			"jurisdiction": "BEFTA_MASTER",
 			"state": "CaseCreated",
 			"version": 0,
-			"case_type_id": "FT_MasterCaseType",
+			"case_type_id": "FT_GlobalSearch",
 			"created_date": "[[ANYTHING_PRESENT]]",
 			"last_modified": "[[ANYTHING_PRESENT]]",
 			"last_state_modified_date": "[[ANYTHING_PRESENT]]",
 			"security_classification": "PUBLIC",
 			"case_data": {
-        "caseManagementLocation": {
-          "baseLocation": "1",
-          "region": "3"
-        },
-        "SearchCriteria" : {}
+        "dateOfBirthText" : "2012-04-21",
+        "dateOfDeathText" : "2020-04-21",
+        "SearchCriteria" : {
+          "SearchParties" : [ 
+            {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },{
+            "value" : {
+              "DateOfBirth" : "2012-04-21",
+              "DateOfDeath" : "2020-04-21"
+            },
+            "id" : "[[ANYTHING_PRESENT]]"
+          } ]
+        }
       },
-
 			"data_classification": {
-        "caseManagementLocation" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "baseLocation" : "PUBLIC",
-            "region" : "PUBLIC"
-          }
-        },
+        "dateOfBirthText" : "PUBLIC",
+        "dateOfDeathText" : "PUBLIC",
         "SearchCriteria" : {
           "classification" : "PUBLIC",
-          "value" : { }
+          "value" : {
+            "SearchParties" : "[[ANYTHING_PRESENT]]"
+          }
         }
       },
 			"supplementary_data": null,
@@ -74,16 +76,13 @@
 			"delete_draft_response_status_code": null,
 			"delete_draft_response_status": null,
 			"security_classifications": {
-        "caseManagementLocation" : {
-          "classification" : "PUBLIC",
-          "value" : {
-            "baseLocation" : "PUBLIC",
-            "region" : "PUBLIC"
-          }
-        },
+        "dateOfBirthText" : "PUBLIC",
+        "dateOfDeathText" : "PUBLIC",
         "SearchCriteria" : {
-          "classification" : "PUBLIC",
-          "value" : { }
+          "classification": "PUBLIC",
+          "value": {
+            "SearchParties": "[[ANYTHING_PRESENT]]"
+          }
         }
       }
 		}
