@@ -1,0 +1,52 @@
+{
+  "title": "Returning all results from Global Search matching the users jurisdictions/case types",
+  "_guid_": "S-1006.1",
+  "_extends_": "F-1006_SearchCaseBase",
+  "specs": [
+    "no field level RESTRICTED of security classification",
+    "contains only PUBLIC cases"
+  ],
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "parties": [
+          {
+            "emailAddress": "${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][case_data][Email]}"
+          }
+        ]
+      }
+    }
+  },
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "resultInfo": {
+        "casesReturned": 5,
+        "caseStartRecord": 1,
+        "moreResultsToGo": false
+      },
+      "results": [
+        {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "value"
+        },{
+          "_extends_": "F-1006_ExpectedCaseSearchResult"
+        },{
+          "_extends_": "F-1006_ExpectedCaseSearchResult"
+        },{
+          "_extends_": "F-1006_ExpectedCaseSearchResult"
+        },{
+          "_extends_": "F-1006_ExpectedCaseSearchResult"
+        },{
+          "_extends_": "F-1006_ExpectedCaseSearchResult"
+        }
+      ]
+    }
+  }
+}
+
