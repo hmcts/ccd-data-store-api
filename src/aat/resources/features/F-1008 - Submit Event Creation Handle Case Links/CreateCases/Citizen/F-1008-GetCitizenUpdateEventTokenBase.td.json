@@ -1,16 +1,7 @@
 {
 	"title": "should create an event token for correct inputs",
 	"_guid_": "F-1008-GetCitizenUpdateEventTokenBase",
-
-	"productName": "CCD Data Store",
-	"operationName": "Retrieve update token for an existing case",
-
-	"method": "GET",
-	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
-
-	"specs": [
-		"to get an event token for the case just created"
-	],
+  "_extends_": "Token_Creation_Data_For_Citizen_Case_Creation",
 
   "users": {
     "invokingUser": {
@@ -23,9 +14,6 @@
 			"_extends_": "Common_Request_Headers"
 		},
 		"pathVariables": {
-			"uid": "[[DEFAULT_AUTO_VALUE]]",
-			"jid": "BEFTA_MASTER",
-			"ctid": "FT_MasterCaseType",
 			"cid": "${[scenarioContext][parentContext][childContexts][F-1008_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
 			"etid": "updateCaseCitizen"
 		}

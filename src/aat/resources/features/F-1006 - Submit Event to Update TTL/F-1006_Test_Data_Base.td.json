@@ -1,11 +1,6 @@
 {
 	"_guid_": "F-1006_Test_Data_Base",
-
-	"productName": "CCD Data Store",
-	"operationName": "submit event creation as case worker",
-
-	"method": "POST",
-	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events",
+  "_extends_": "Event_Creation_Caseworker_Base",
 
   "users": {
     "invokingUser": {
@@ -15,9 +10,6 @@
 
 	"request": {
 		"pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_MASTER",
-      "ctid": "FT_MasterCaseType",
       "cid": "${[scenarioContext][childContexts][F-1006_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
 		}
 	}

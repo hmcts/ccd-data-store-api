@@ -123,9 +123,21 @@ class CaseLinkServiceTest {
             new CaseLinkEntity(caseId, linkedCaseIds.get(2), caseTypeId));
 
         final List<CaseLink> caseLinksModels = List.of(
-            new CaseLink(caseId, linkedCaseIds.get(0), caseTypeId),
-            new CaseLink(caseId, linkedCaseIds.get(1), caseTypeId),
-            new CaseLink(caseId, linkedCaseIds.get(2), caseTypeId)
+            CaseLink.builder()
+                .caseId(caseId)
+                .linkedCaseId(linkedCaseIds.get(0))
+                .caseTypeId(caseTypeId)
+                .build(),
+            CaseLink.builder()
+                .caseId(caseId)
+                .linkedCaseId(linkedCaseIds.get(1))
+                .caseTypeId(caseTypeId)
+                .build(),
+            CaseLink.builder()
+                .caseId(caseId)
+                .linkedCaseId(linkedCaseIds.get(2))
+                .caseTypeId(caseTypeId)
+                .build()
         );
 
         when(caseLinkRepository.findAllByCaseReference(caseReferenceToFindLong)).thenReturn(caseLinkEntities);
@@ -136,7 +148,7 @@ class CaseLinkServiceTest {
         assertFalse(caseLinks.isEmpty());
 
         final List<Long> foundLinkedCaseReferences = caseLinks.stream()
-            .map(CaseLink::getLinkedCaseId)
+            .map(CaseLink::getLinkedCaseReference)
             .collect(Collectors.toList());
 
         assertTrue(foundLinkedCaseReferences.containsAll(linkedCaseReferences));

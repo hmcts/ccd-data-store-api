@@ -17,9 +17,6 @@
       "_extends_": "Common_Request_Headers"
     },
     "pathVariables": {
-      "uid": "[[DEFAULT_AUTO_VALUE]]",
-      "jid": "BEFTA_MASTER",
-      "ctid": "FT_MasterCaseType",
       "cid": "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}",
       "etid": "updateModifiedSystemTTL"
     }

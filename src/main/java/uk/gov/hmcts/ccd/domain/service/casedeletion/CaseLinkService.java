@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ccd.domain.service.casedeletion;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity;
@@ -12,6 +11,7 @@ import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
 
 @Slf4j
 @Service
@@ -21,38 +21,38 @@ public class CaseLinkService {
     private final CaseLinkRepository caseLinkRepository;
     private final CaseLinkMapper caseLinkMapper;
 
-    @Autowired
+    @Inject
     public CaseLinkService(CaseLinkRepository caseLinkRepository,
                            CaseLinkMapper caseLinkMapper,
                            @Qualifier(DefaultCaseDetailsRepository.QUALIFIER)
-                                   CaseDetailsRepository caseDetailsRepository) {
+                               CaseDetailsRepository caseDetailsRepository) {
         this.caseLinkRepository = caseLinkRepository;
         this.caseLinkMapper = caseLinkMapper;
         this.caseDetailsRepository = caseDetailsRepository;
     }
 
-    public void updateCaseLinks(Long caseId,
+    public void updateCaseLinks(Long caseReference,
                                 String caseTypeId,
                                 List<String> preCallbackCaseLinks,
                                 List<String> postCallbackCaseLinks) {
-        deleteRemovedCaseLinks(caseId, preCallbackCaseLinks, postCallbackCaseLinks);
-        insertNewCaseLinks(caseId, caseTypeId, preCallbackCaseLinks, postCallbackCaseLinks);
+        deleteRemovedCaseLinks(caseReference, preCallbackCaseLinks, postCallbackCaseLinks);
+        insertNewCaseLinks(caseReference, caseTypeId, preCallbackCaseLinks, postCallbackCaseLinks);
     }
 
     public void createCaseLinks(Long caseReference, String caseTypeId, List<String> caseLinks) {
         caseLinks.stream()
             .filter(caseLinkString -> caseLinkString != null && !caseLinkString.isEmpty())
-            .forEach(caseLink -> {
+            .forEach(caseLinkReference -> {
                 caseLinkRepository.insertUsingCaseReferenceLinkedCaseReferenceAndCaseTypeId(caseReference,
-                    Long.parseLong(caseLink),
+                    Long.parseLong(caseLinkReference),
                     caseTypeId);
                 log.debug("inserted case link with id {}, linkedCaseId {} and caseType {}",
-                    caseReference, caseLink, caseTypeId);
+                    caseReference, caseLinkReference, caseTypeId);
             });
 
     }
 
-    private void deleteRemovedCaseLinks(Long caseId,
+    private void deleteRemovedCaseLinks(Long caseReference,
                                         List<String> preCallbackData,
                                         List<String> postCallbackData) {
 
@@ -63,12 +63,12 @@ public class CaseLinkService {
             .collect(Collectors.toList());
 
         caseLinksToDelete.forEach(caseLink -> {
-            caseLinkRepository.deleteByCaseReferenceAndLinkedCaseReference(caseId, Long.parseLong(caseLink));
-            log.debug("deleted case link with id {} and linkedCaseId {}", caseId, caseLink);
+            caseLinkRepository.deleteByCaseReferenceAndLinkedCaseReference(caseReference, Long.parseLong(caseLink));
+            log.debug("deleted case link with id {} and linkedCaseId {}", caseReference, caseLink);
         });
     }
 
-    private void insertNewCaseLinks(Long caseId,
+    private void insertNewCaseLinks(Long caseReference,
                                     String caseTypeId,
                                     List<String> preCallbackData,
                                     List<String> postCallbackData) {
@@ -77,7 +77,7 @@ public class CaseLinkService {
             .filter(caseLink -> !preCallbackData.contains(caseLink))
             .collect(Collectors.toList());
 
-        createCaseLinks(caseId, caseTypeId, caseLinksToInsert);
+        createCaseLinks(caseReference, caseTypeId, caseLinksToInsert);
     }
 
     public List<CaseLink> findCaseLinks(String caseReference) {
@@ -88,7 +88,7 @@ public class CaseLinkService {
         List<Long> linkedCaseReferences =
             caseDetailsRepository.findCaseReferencesByIds(getAllLinkedCaseIds(allByCaseReference));
 
-        updateCaseLinkObjectIdsToReferences(allLinkedCases, linkedCaseReferences, Long.valueOf(caseReference));
+        setCaseLinkReferences(allLinkedCases, linkedCaseReferences, Long.valueOf(caseReference));
 
         return allLinkedCases;
     }
@@ -100,12 +100,12 @@ public class CaseLinkService {
             .collect(Collectors.toList());
     }
 
-    private void updateCaseLinkObjectIdsToReferences(List<CaseLink> allLinkedCases,
-                                                     List<Long> linkedCaseReferences,
-                                                     Long caseReference) {
+    private void setCaseLinkReferences(List<CaseLink> allLinkedCases,
+                                       List<Long> linkedCaseReferences,
+                                       Long caseReference) {
         for (int i = 0; i < allLinkedCases.size(); i++) {
-            allLinkedCases.get(i).setCaseId(caseReference);
-            allLinkedCases.get(i).setLinkedCaseId(linkedCaseReferences.get(i));
+            allLinkedCases.get(i).setCaseReference(caseReference);
+            allLinkedCases.get(i).setLinkedCaseReference(linkedCaseReferences.get(i));
         }
     }
 }
