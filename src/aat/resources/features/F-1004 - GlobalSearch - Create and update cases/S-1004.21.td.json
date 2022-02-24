@@ -1,0 +1,112 @@
+{
+  "title": "Create and update a case using a collection field within a complex type in the CollectionFieldName column",
+  "_guid_": "S-1004.21",
+  "_extends_": "F-1004_UpdateCaseEventV2",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains additional data fields that will be used to populate SearchCriteria",
+    "contains updated data including the search party fields in the collection fields as specified by the CollectionFieldName"
+  ],
+
+  "request": {
+
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][F-1004_CreateCasePreRequisiteCaseworker_ComplexCollection][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "GroupOfPeople": {
+          "Members": [
+            {
+              "value": {
+                "IndividualFirstName": "FirstNameValue",
+                "IndividualLastName": "LastNameValue",
+                "IndividualEmail": "e@mail.com",
+                "IndividualAddress": {
+                  "AddressLine1": "updated Address",
+                  "PostCode": "SE1 4EE"
+                },
+                "IndividualDateOfBirth": "2012-04-21",
+                "IndividualDateOfDeath": "2020-04-21"
+              }
+            }
+          ]
+        }
+      },
+      "event_token": "${[scenarioContext][childContexts][F-1004_GetCaseworkerUpdateToken_ComplexCollection][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 201,
+    "responseMessage": "OK",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Vary": "Accept-Encoding"
+    },
+    "body": {
+      "jurisdiction": "BEFTA_MASTER",
+      "state": "CaseUpdated",
+      "case_type": "FT_GlobalSearch",
+      "data": {
+        "caseManagementCategory" : {
+          "value" : {
+            "code" : "987",
+            "label" : "Category label"
+          },
+          "list_items" : [ {
+            "code" : "987",
+            "label" : "Category label"
+          } ]
+        },
+        "caseManagementLocation" : {
+          "baseLocation" : "123",
+          "region" : "1"
+        },
+        "GroupOfPeople" : {
+          "Members" : [
+            {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },
+            {
+              "value": {
+                "IndividualFirstName": "FirstNameValue",
+                "IndividualLastName": "LastNameValue",
+                "IndividualEmail": "e@mail.com",
+                "IndividualAddress": {
+                  "AddressLine1": "updated Address",
+                  "PostCode": "SE1 4EE"
+                },
+                "IndividualDateOfBirth": "2012-04-21",
+                "IndividualDateOfDeath": "2020-04-21"
+              },
+              "id": "[[ANYTHING_PRESENT]]"
+            }
+          ]
+        },
+        "caseNameHmctsInternal" : "Name Internal",
+        "SearchCriteria" : {
+          "SearchParties" : [
+            {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },
+            {
+              "value": {
+                "Name": "LastNameValue FirstNameValue",
+                "EmailAddress": "e@mail.com",
+                "AddressLine1": "updated Address",
+                "PostCode": "SE1 4EE",
+                "DateOfBirth": "2012-04-21",
+                "DateOfDeath": "2020-04-21"
+              },
+              "id": "[[ANYTHING_PRESENT]]"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

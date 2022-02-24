@@ -50,7 +50,7 @@ public class SecurityUtils {
     public HttpHeaders authorizationHeadersForDataStoreSystemUser() {
         final HttpHeaders headers = new HttpHeaders();
         headers.add(SERVICE_AUTHORIZATION, getServiceAuthorization());
-        headers.add(HttpHeaders.AUTHORIZATION, BEARER + idamRepository.getDataStoreSystemUserAccessToken());
+        headers.add(HttpHeaders.AUTHORIZATION, idamRepository.getDataStoreSystemUserAccessToken());
         return headers;
     }
 
