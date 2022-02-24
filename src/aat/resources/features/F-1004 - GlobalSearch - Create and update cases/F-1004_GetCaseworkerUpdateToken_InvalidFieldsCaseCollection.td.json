@@ -1,0 +1,10 @@
+{
+  "_guid_": "F-1004_GetCaseworkerUpdateToken_InvalidFieldsCaseCollection",
+  "_extends_": "F-1004_GetCaseworkerUpdateToken",
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1004_CreateCasePreRequisiteCaseworker_InvalidDataFieldsCollection][testData][actualResponse][body][id]}"
+    }
+  }
+}
