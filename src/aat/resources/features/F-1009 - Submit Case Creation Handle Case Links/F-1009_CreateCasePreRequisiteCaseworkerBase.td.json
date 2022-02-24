@@ -1,0 +1,56 @@
+{
+  "_guid_": "F-1009_CreateCasePreRequisiteCaseworkerBase",
+  "_extends_": "Case_Creation_Base",
+
+  "specs": [
+    "to create a case"
+  ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "S-1009_GetCreateToken"
+  }
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_MasterCaseType"
+    },
+    "body": {
+      "data": {
+        "TextField": "This is the case that will be linked to the case being updated"
+      },
+      "event": {
+        "id": "createCaseCaseLinks",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "jurisdiction" : "BEFTA_MASTER",
+      "state" : "CaseCreated",
+      "case_type_id" : "FT_MasterCaseType",
+      "case_data" : {
+        "TextField": "This is the case that will be linked to the case being updated"
+      },
+      "data_classification" : {
+        "TextField": "PUBLIC"
+      },
+      "supplementary_data" : null,
+      "security_classifications" : {
+        "TextField": "PUBLIC"
+      }
+    }
+  }
+}
+

@@ -32,8 +32,8 @@
     "_extends_": "Common_200_Response",
 		"body": {
       "CaseLinks" : [ {
-        "CaseId" : "[[ANYTHING_PRESENT]]",
-        "LinkedCaseId" : "${[scenarioContext][parentContext][childContexts][F-1009_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+        "CaseReference" : "[[ANYTHING_PRESENT]]",
+        "LinkedCaseReference" : "${[scenarioContext][parentContext][childContexts][F-1009_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
         "CaseTypeId" : "FT_MasterCaseType"
       }]
 		}

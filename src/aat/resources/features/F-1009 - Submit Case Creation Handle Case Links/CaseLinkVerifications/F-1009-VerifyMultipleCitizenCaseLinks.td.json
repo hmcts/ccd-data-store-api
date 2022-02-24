@@ -39,13 +39,13 @@
         "__elementId__": "LinkedCaseId"
       },
       {
-        "CaseId" : "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
-        "LinkedCaseId" : "${[scenarioContext][parentContext][childContexts][F-1009_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
+        "CaseReference" : "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
+        "LinkedCaseReference" : "${[scenarioContext][parentContext][childContexts][F-1009_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
         "CaseTypeId" : "FT_MasterCaseType"
       },
       {
-        "CaseId" : "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
-        "LinkedCaseId" : "${[scenarioContext][parentContext][childContexts][F-1009_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
+        "CaseReference" : "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
+        "LinkedCaseReference" : "${[scenarioContext][parentContext][childContexts][F-1009_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
         "CaseTypeId" : "FT_MasterCaseType"
       }]
 		}
