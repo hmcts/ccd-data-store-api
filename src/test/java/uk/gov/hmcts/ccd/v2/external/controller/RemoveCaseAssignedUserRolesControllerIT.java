@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.Lists;
-import org.junit.Ignore;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -293,7 +292,7 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
         verifyAuditForRemoveCaseUserRoles(HttpStatus.BAD_REQUEST, caseUserRoles);
     }
 
-    @Ignore
+    /*@Ignore
     @Test
     @DisplayName("AC-12 case not found: should throw exception")
     void removeCaseUserRoles_shouldThrowExceptionWhenCaseNotFound() throws Exception {
@@ -320,7 +319,7 @@ class RemoveCaseAssignedUserRolesControllerIT extends BaseCaseAssignedUserRolesC
 
         // NB: usually audit for HttpStatus.NOT_FOUND will be suppressed by applicationParams.auditLogIgnoreStatuses
         verifyAuditForRemoveCaseUserRoles(HttpStatus.NOT_FOUND, caseUserRoles);
-    }
+    }*/
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {

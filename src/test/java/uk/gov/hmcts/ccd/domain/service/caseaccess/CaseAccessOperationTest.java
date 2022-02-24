@@ -2,7 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.caseaccess;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -1810,7 +1809,7 @@ class CaseAccessOperationTest {
             );
         }
 
-        @Ignore
+        /*@Ignore
         @Test
         @DisplayName("should throw not found exception when case not found")
         void shouldThrowNotFound() {
@@ -1825,7 +1824,7 @@ class CaseAccessOperationTest {
 
             verifyNoInteractions(caseUserRepository);
             verifyNoInteractions(roleAssignmentService);
-        }
+        }*/
 
         @Test
         @DisplayName("should decrement organisation user count for single new case-user relationship")
