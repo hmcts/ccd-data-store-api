@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ccd.domain.model.caselinks;
+package uk.gov.hmcts.ccd.domain.model.migration;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
