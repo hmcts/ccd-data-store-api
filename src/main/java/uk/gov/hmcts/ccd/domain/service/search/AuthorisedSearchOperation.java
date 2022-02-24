@@ -13,6 +13,7 @@ import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.caselinks.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
@@ -56,9 +57,17 @@ public class AuthorisedSearchOperation implements SearchOperation {
 
     @Override
     public List<CaseDetails> execute(MetaData metaData, Map<String, String> criteria) {
-
         final List<CaseDetails> results = searchOperation.execute(metaData, criteria);
-        CaseTypeDefinition caseTypeDefinition = getCaseType(metaData.getCaseTypeId());
+        return filterResults(results, getCaseType(metaData.getCaseTypeId()));
+    }
+
+    @Override
+    public List<CaseDetails> execute(MigrationParameters migrationParameters) {
+        final List<CaseDetails> results = searchOperation.execute(migrationParameters);
+        return filterResults(results, getCaseType(migrationParameters.getCaseTypeId()));
+    }
+
+    private List<CaseDetails> filterResults(List<CaseDetails> results, CaseTypeDefinition caseTypeDefinition) {
         Set<String> userRoles = getUserRoles();
 
         return (null == results || !accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles,

@@ -91,6 +91,8 @@ env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
 env.DEFAULT_COLLECTION_ASSERTION_MODE="UNORDERED"
 env.MAX_NUM_PARALLEL_THREADS=6
 env.BEFTA_S2S_CLIENT_ID = "ccd_gw"
+env.TESTING_SUPPORT_ENABLED = "true"
+env.CASE_LINK_MIGRATION_ENABLED = "true"
 
 withPipeline(type, product, component) {
     onMaster {

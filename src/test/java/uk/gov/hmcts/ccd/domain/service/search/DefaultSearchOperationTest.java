@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
+import uk.gov.hmcts.ccd.domain.model.caselinks.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import java.util.ArrayList;
@@ -34,6 +35,8 @@ class DefaultSearchOperationTest {
     private MetaData metaData;
     private HashMap<String, String> criteria;
 
+    private MigrationParameters migrationParameters;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -42,6 +45,8 @@ class DefaultSearchOperationTest {
 
         metaData = new MetaData(CASE_TYPE_ID, JURISDICTION_ID);
         criteria = new HashMap<>();
+
+        migrationParameters = new MigrationParameters(CASE_TYPE_ID, JURISDICTION_ID, 1L, 10);
     }
 
     @Test
@@ -54,6 +59,20 @@ class DefaultSearchOperationTest {
 
         assertAll(
             () -> verify(caseDetailsRepository).findByMetaDataAndFieldData(metaData, criteria),
+            () -> assertThat(output, sameInstance(results))
+        );
+    }
+
+    @Test
+    @DisplayName("should search against repository for migration")
+    void shouldSearchAgainstRepositoryForMigration() {
+        final ArrayList<CaseDetails> results = new ArrayList<>();
+        doReturn(results).when(caseDetailsRepository).findByParamsWithLimit(migrationParameters);
+
+        final List<CaseDetails> output = searchOperation.execute(migrationParameters);
+
+        assertAll(
+            () -> verify(caseDetailsRepository).findByParamsWithLimit(migrationParameters),
             () -> assertThat(output, sameInstance(results))
         );
     }

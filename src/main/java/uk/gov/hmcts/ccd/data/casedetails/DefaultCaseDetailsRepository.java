@@ -11,6 +11,7 @@ import uk.gov.hmcts.ccd.data.casedetails.query.CaseDetailsQueryBuilderFactory;
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
 import uk.gov.hmcts.ccd.data.casedetails.search.SearchQueryFactoryOperation;
+import uk.gov.hmcts.ccd.domain.model.caselinks.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CaseConcurrencyException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.CasePersistenceException;
@@ -160,6 +161,17 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
     }
 
     @Override
+    public List<CaseDetails> findByParamsWithLimit(final MigrationParameters migrationParameters) {
+        final Query query = em.createNamedQuery("CaseDataEntity_FIND_CASE_WITH_LIMITS");
+        query.setParameter("jurisdictionId", migrationParameters.getJurisdictionId());
+        query.setParameter("caseTypeId", migrationParameters.getCaseTypeId());
+        query.setParameter("caseDataId", migrationParameters.getCaseDataId());
+
+        paginateSetLimit(query, migrationParameters.getNumRecords());
+        return caseDetailsMapper.entityToModel(query.getResultList());
+    }
+
+    @Override
     public PaginatedSearchMetadata getPaginatedSearchMetadata(MetaData metaData,
                                                               Map<String, String> dataSearchParams) {
         final Query query = getQuery(metaData, dataSearchParams, true);
@@ -229,6 +241,10 @@ public class DefaultCaseDetailsRepository implements CaseDetailsRepository {
         int firstResult = (page - 1) * pageSize;
         query.setFirstResult(firstResult);
         query.setMaxResults(pageSize);
+    }
+
+    private void paginateSetLimit(Query query, int limit) {
+        query.setMaxResults(limit);
     }
 
     private boolean isDuplicateReference(PersistenceException e) {

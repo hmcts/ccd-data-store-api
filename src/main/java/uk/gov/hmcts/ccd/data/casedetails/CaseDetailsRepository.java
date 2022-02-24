@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.data.casedetails;
 
 import uk.gov.hmcts.ccd.data.casedetails.search.MetaData;
 import uk.gov.hmcts.ccd.data.casedetails.search.PaginatedSearchMetadata;
+import uk.gov.hmcts.ccd.domain.model.caselinks.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 
 import java.util.List;
@@ -58,6 +59,8 @@ public interface CaseDetailsRepository {
                                String caseReference);
 
     List<CaseDetails> findByMetaDataAndFieldData(MetaData metadata, Map<String, String> dataSearchParams);
+
+    List<CaseDetails> findByParamsWithLimit(MigrationParameters migrationParameters);
 
     PaginatedSearchMetadata getPaginatedSearchMetadata(MetaData metaData, Map<String, String> dataSearchParams);
 }

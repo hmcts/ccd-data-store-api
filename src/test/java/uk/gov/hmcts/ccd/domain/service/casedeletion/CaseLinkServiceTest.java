@@ -198,7 +198,6 @@ class CaseLinkServiceTest {
 
         final List<String> caseLinks = createPostCallbackCaseLinks();
 
-        //caseLinkService.createCaseLinks(CASE_ID, CASE_TYPE_ID, caseLinks);
         caseLinkService.updateCaseLinks(CASE_ID, CASE_TYPE_ID, caseLinks);
 
         caseLinks.forEach(caseLink ->
@@ -216,7 +215,6 @@ class CaseLinkServiceTest {
         allCaseLinks.add(null);
         allCaseLinks.add("");
 
-        //caseLinkService.createCaseLinks(CASE_ID, CASE_TYPE_ID, allCaseLinks);
         caseLinkService.updateCaseLinks(CASE_ID, CASE_TYPE_ID, allCaseLinks);
 
         validCaseLinks.forEach(caseLink ->
@@ -234,7 +232,6 @@ class CaseLinkServiceTest {
         caseLinks.add("");
         caseLinks.add(null);
 
-        //caseLinkService.createCaseLinks(CASE_ID, CASE_TYPE_ID, caseLinks);
         caseLinkService.updateCaseLinks(CASE_ID, CASE_TYPE_ID, caseLinks);
 
         caseLinks.forEach(caseLink ->

@@ -4,8 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.user.DefaultUserRepository;
+import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.search.elasticsearch.ElasticsearchRequest;
 import uk.gov.hmcts.ccd.domain.service.common.ObjectMapperService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -26,12 +31,32 @@ public class ElasticsearchQueryHelper {
 
     private final ApplicationParams applicationParams;
     private final ObjectMapperService objectMapperService;
+    private final UserRepository userRepository;
+    private final CaseDefinitionRepository caseDefinitionRepository;
 
     @Autowired
     public ElasticsearchQueryHelper(ApplicationParams applicationParams,
-                                    ObjectMapperService objectMapperService) {
+                                    ObjectMapperService objectMapperService,
+                                    @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
+                                            CaseDefinitionRepository caseDefinitionRepository,
+                                    @Qualifier(DefaultUserRepository.QUALIFIER) UserRepository userRepository) {
         this.applicationParams = applicationParams;
         this.objectMapperService = objectMapperService;
+        this.userRepository = userRepository;
+        this.caseDefinitionRepository = caseDefinitionRepository;
+    }
+
+    public List<String> getCaseTypesAvailableToUser() {
+        if (userRepository.anyRoleEqualsAnyOf(applicationParams.getCcdAccessControlCrossJurisdictionRoles())) {
+            return caseDefinitionRepository.getAllCaseTypesIDs();
+        } else {
+            return getCaseTypesFromIdamRoles();
+        }
+    }
+
+    private List<String> getCaseTypesFromIdamRoles() {
+        List<String> jurisdictions = userRepository.getCaseworkerUserRolesJurisdictions();
+        return caseDefinitionRepository.getCaseTypesIDsByJurisdictions(jurisdictions);
     }
 
     public ElasticsearchRequest validateAndConvertRequest(String jsonSearchRequest) {

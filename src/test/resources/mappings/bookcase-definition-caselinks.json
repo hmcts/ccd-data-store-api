@@ -447,6 +447,78 @@
           "show_condition": null,
           "display_context_parameter": null,
           "retain_hidden_value": null
+        },
+        {
+          "metadata": false,
+          "id": "CaseLinkCollection",
+          "case_type_id": "TestAddressBookCase",
+          "label": "Case Link Field",
+          "hint_text": null,
+          "field_type": {
+            "id": "CaseLinkCollection",
+            "type": "Collection",
+            "min": null,
+            "max": null,
+            "regular_expression": null,
+            "fixed_list_items": [],
+            "complex_fields": [],
+            "collection_field_type": {
+              "id": "CaseLink",
+              "type": "Complex",
+              "min": null,
+              "max": null,
+              "regular_expression": null,
+              "fixed_list_items": [],
+              "complex_fields": [
+                {
+                  "metadata": false,
+                  "id": "CaseReference",
+                  "case_type_id": null,
+                  "label": "Case Reference",
+                  "hint_text": null,
+                  "field_type": {
+                    "id": "TextCaseReference",
+                    "type": "Text",
+                    "min": null,
+                    "max": null,
+                    "regular_expression": "(?:^[0-9]{16}$|^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)",
+                    "fixed_list_items": [],
+                    "complex_fields": [],
+                    "collection_field_type": null
+                  },
+                  "hidden": null,
+                  "security_classification": "PUBLIC",
+                  "live_from": null,
+                  "live_until": null,
+                  "acls": null,
+                  "complexACLs": [],
+                  "order": null,
+                  "show_condition": null,
+                  "display_context_parameter": null,
+                  "retain_hidden_value": null
+                }
+              ],
+              "collection_field_type": null
+            }
+          },
+          "hidden": false,
+          "security_classification": "PUBLIC",
+          "live_from": "2017-01-01",
+          "live_until": null,
+          "acls": [
+            {
+              "role": "caseworker-probate-public",
+              "create": true,
+              "read": true,
+              "update": true,
+              "delete": true
+            }
+          ],
+          "complexACLs": [],
+          "order": null,
+          "show_condition": null,
+          "display_context_parameter": null,
+          "retain_hidden_value": null
         }
       ]
     },

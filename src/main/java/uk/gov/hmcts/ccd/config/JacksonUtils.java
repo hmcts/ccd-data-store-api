@@ -130,7 +130,25 @@ public final class JacksonUtils {
                 String truncatedKey = path.substring(path.indexOf(".") + 1);
 
                 if (entry.getKey().equals(key)) {
-                    jsonValue[0] = findValueFromTruncatedKey(entry, truncatedKey);
+                    if (entry.getValue().isArray()) {
+                        ArrayNode arrayNode = ((ArrayNode)entry.getValue());
+                        final var arrayIndex = truncatedKey.substring(0, truncatedKey.indexOf("."));
+                        final var keyToArrayContent = truncatedKey.substring(truncatedKey.indexOf(".") + 1);
+                        if (StringUtils.isNumeric(arrayIndex)) {
+                            JsonNode jsonNodeFromArray = arrayNode.get(Integer.parseInt(arrayIndex));
+                            JsonNode nestedCaseFieldByPath =
+                                getNestedCaseFieldByPath(jsonNodeFromArray, keyToArrayContent);
+                            if (nestedCaseFieldByPath == null) {
+                                nestedCaseFieldByPath = jsonNodeFromArray.get("value");
+                            }
+                            jsonValue[0] = getValue(nestedCaseFieldByPath);
+                        }
+                    } else {
+                        JsonNode foundJsonNode = getNestedCaseFieldByPath(entry.getValue(), truncatedKey);
+                        if (foundJsonNode != null) {
+                            jsonValue[0] = foundJsonNode.textValue();
+                        }
+                    }
                 }
             } else if (entry.getKey().equals(path)) {
                 jsonValue[0] = getValue(entry.getValue());
@@ -138,34 +156,6 @@ public final class JacksonUtils {
         });
 
         return jsonValue[0];
-    }
-
-    private static String findValueFromTruncatedKey(Map.Entry<String, JsonNode> entry, String truncatedKey) {
-        if (entry.getValue().isArray()) {
-            return getValueFromArray(entry, truncatedKey);
-        } else {
-            JsonNode foundJsonNode = getNestedCaseFieldByPath(entry.getValue(), truncatedKey);
-            if (foundJsonNode != null) {
-                return foundJsonNode.textValue();
-            }
-        }
-        return null;
-    }
-
-    private static String getValueFromArray(Map.Entry<String, JsonNode> entry, String truncatedKey) {
-        ArrayNode arrayNode = ((ArrayNode)entry.getValue());
-        final var arrayIndex = truncatedKey.substring(0, truncatedKey.indexOf("."));
-        final var keyToArrayContent = truncatedKey.substring(truncatedKey.indexOf(".") + 1);
-        if (StringUtils.isNumeric(arrayIndex)) {
-            JsonNode jsonNodeFromArray = arrayNode.get(Integer.parseInt(arrayIndex));
-            JsonNode nestedCaseFieldByPath =
-                getNestedCaseFieldByPath(jsonNodeFromArray, keyToArrayContent);
-            if (nestedCaseFieldByPath == null) {
-                nestedCaseFieldByPath = jsonNodeFromArray.get("value");
-            }
-            return getValue(nestedCaseFieldByPath);
-        }
-        return null;
     }
 
     private static String getValue(JsonNode jsonNode) {
