@@ -1,0 +1,36 @@
+{
+  "_guid_": "S-13010.9.2",
+
+  "specs" : [
+    "Role Assignments that don't apply for the scenario of creating a case have been filtered out",
+    "contains CaseAccessCategory with pattern - Civil/Standard, Criminal/Serious",
+    "C1 contains an CaseAccessCategory field value as FamilyLaw/Standard",
+    "attempts to get the previously created case"
+  ],
+
+  "productName": "CCD Data Store",
+  "operationName": "external get case",
+
+  "method": "GET",
+  "uri": "/internal/cases/{cid}",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "Common_User_For_Request"
+    }
+  },
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers",
+      "experimental": true
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-13010.2_CreateCase][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_404_Response"
+  }
+}
