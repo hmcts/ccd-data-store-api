@@ -177,9 +177,6 @@ public class ApplicationParams {
     @Value("${enable-pseudo-role-assignments-generation}")
     private boolean enablePseudoRoleAssignmentsGeneration;
 
-    @Value("${enable-pseudo-access-profiles-generation}")
-    private boolean enablePseudoAccessProfilesGeneration;
-
     @Value("${enable-case-users-db-sync}")
     private boolean enableCaseUsersDbSync;
 
@@ -513,10 +510,6 @@ public class ApplicationParams {
 
     public boolean getEnablePseudoRoleAssignmentsGeneration() {
         return enablePseudoRoleAssignmentsGeneration;
-    }
-
-    public boolean getEnablePseudoAccessProfilesGeneration() {
-        return enablePseudoAccessProfilesGeneration;
     }
 
     public boolean getEnableCaseUsersDbSync() {
