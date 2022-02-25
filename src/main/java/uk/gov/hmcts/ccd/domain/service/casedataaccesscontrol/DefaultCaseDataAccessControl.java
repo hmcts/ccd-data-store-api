@@ -2,13 +2,6 @@ package uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -36,7 +29,16 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.RoleToAccessProfileDefinition;
 import uk.gov.hmcts.ccd.domain.service.AccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.endpoint.exceptions.DownstreamIssueException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
 
@@ -307,7 +309,10 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
 
     private Set<SecurityClassification> getSecurityClassifications(Set<AccessProfile> accessProfiles) {
         return accessProfiles.stream()
-            .map(accessProfile -> SecurityClassification.valueOf(accessProfile.getSecurityClassification()))
+            .map(accessProfile -> SecurityClassification.valueOf(Optional.ofNullable(accessProfile
+                .getSecurityClassification()).orElseThrow(()
+                    -> new DownstreamIssueException("null SecurityClassification for role: "
+                        + accessProfile.getAccessProfile()))))
             .collect(Collectors.toSet());
     }
 
