@@ -5,7 +5,7 @@ Feature: F-13010: Case Access Category Tests
     Given an appropriate test context as detailed in the test data source
 
 
-  @S-13010.1 @Ignore
+  @S-13010.1
   Scenario: RoleToAccessProfiles mapping for user’s derived AccessProfile contains category, case contains category value starting with defined pattern, Access is granted.
     Given a case that has just been created as in [F-13010.1_CreateCase],
     And the RoleToAccessProfiles tab [contains CaseAccessCategory with pattern - Civil/Standard, Criminal/Serious]

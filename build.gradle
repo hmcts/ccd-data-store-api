@@ -264,7 +264,7 @@ dependencies {
     compile 'org.jooq:jool-java-8:0.9.14'
     compile 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
-    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.10.20-prerelease'
+    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.10.21-prerelease'
     testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.1'
 
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
@@ -822,7 +822,7 @@ task functional() {
             args = [
                     '--threads', '1',
                     '--plugin', "json:${rootDir}/target/cucumber.json",
-                    '--tags', 'not @Ignore',
+                    '--tags', '@currentrun and not @Ignore',
                     '--glue', 'uk.gov.hmcts.befta.player',
                     '--glue', 'uk.gov.hmcts.ccd.datastore.befta', 'src/aat/resources/features'
             ]
