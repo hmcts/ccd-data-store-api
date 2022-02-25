@@ -2,7 +2,7 @@
   "_guid_": "S-1008.1",
   "_extends_": "F-1008_Test_Data_Base",
 
-  "title": "TTL.Suspended changed after returning from Mid Event Callback and Validate Event is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST",
+  "title": "Case Link does not exist at present and CaseLink field in the Request contains CaseReference value and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST",
 
   "specs": [
     "an active profile in CCD",

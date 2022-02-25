@@ -24,7 +24,7 @@
     },
     "body": {
       "data": {
-        "TextField": "This is the case that will be linked to the case being updated"
+        "TextField": "This is the case being updated"
       },
       "event": {
         "id": "createCaseCaseLinks",
@@ -41,7 +41,7 @@
       "state" : "CaseCreated",
       "case_type_id" : "FT_MasterCaseType",
       "case_data" : {
-        "TextField": "This is the case that will be linked to the case being updated"
+        "TextField": "This is the case being updated"
       },
       "data_classification" : {
         "TextField": "PUBLIC"

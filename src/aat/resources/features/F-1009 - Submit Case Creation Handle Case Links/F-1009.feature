@@ -74,7 +74,7 @@ Feature: F-1009: Submit Case Creation Handle Case Links
       And   it is submitted to call the [Submit case creation as Citizen] operation of [CCD Data Store]
       Then  a positive response is received
       And   the response has all other details as expected
-      And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1009-VerifyCaseLinks]
+      And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1009-VerifyCitizenCaseLinks]
 
     @S-1009.7 @AC-7
     Scenario: CaseLink field contains blank value and Submit Case Creation Event is invoked on
@@ -122,7 +122,7 @@ Feature: F-1009: Submit Case Creation Handle Case Links
       And     it is submitted to call the [Submit case creation as Citizen] operation of [CCD Data Store]
       Then    a positive response is received
       And     the response has all other details as expected
-      And     a successful call [to verify that the Case Links have been created in the CASE_LINK table with correct values] as in [F-1009-VerifyMultipleCaseLinks]
+      And     a successful call [to verify that the Case Links have been created in the CASE_LINK table with correct values] as in [F-1009-VerifyMultipleCitizenCaseLinks]
 
     @S-1009.11 @AC-11
     Scenario: CaseLink field contains CaseReference value and Submit Case Creation Event is invoked
@@ -134,7 +134,7 @@ Feature: F-1009: Submit Case Creation Handle Case Links
       And   it is submitted to call the [Submit case creation as Case worker] operation of [CCD Data Store]
       Then  a positive response is received
       And   the response has all other details as expected
-      And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1009-VerifyCaseLinks]
+      And   a successful call [to verify that the Case Link has been created in the CASE_LINK table with correct value] as in [F-1009-VerifyCaseLinks_V2]
 
     @S-1009.12 @AC-12
     Scenario: CaseLink field contains blank value and Submit Case Creation Event is invoked on

@@ -17,6 +17,7 @@ import javax.inject.Inject;
 @Slf4j
 @Service
 public class CaseLinkService {
+
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseLinkRepository caseLinkRepository;
     private final CaseLinkMapper caseLinkMapper;

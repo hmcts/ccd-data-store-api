@@ -14,7 +14,7 @@ Feature: F-1006: Submit Event to Update TTL
       And the request [has TTL.Suspension value changed to No from Yes]
       And the request [has TTL.OverrideTTL set to less than today + TTL Guard]
       And the request [has TTL.SystemTTL set to less than today + TTL Guard]
-      And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
+      And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
      Then a negative response is received
       And the response has all other details as expected
       And another call [to verify that the TTL.Suspended value has not changed in the database] will get the expected response as in [F-1006_GetCaseDetails_Caseworker]
@@ -29,7 +29,7 @@ Feature: F-1006: Submit Event to Update TTL
       And the request [has TTL.Suspension value changed to No from Yes]
       And the request [has TTL.OverrideTTL set to null]
       And the request [has TTL.SystemTTL set to null]
-      And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
+      And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
      Then a positive response is received
       And the response has all other details as expected
 
@@ -43,7 +43,7 @@ Feature: F-1006: Submit Event to Update TTL
       And the request [has TTL.Suspension value changed to No from Yes]
       And the request [has TTL.OverrideTTL set to null]
       And the request [has TTL.SystemTTL set to greater than today + guard value]
-      And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
+      And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
      Then a positive response is received
       And the response has all other details as expected
 
@@ -57,7 +57,7 @@ Feature: F-1006: Submit Event to Update TTL
     And the request [has TTL.Suspension value changed to No from Yes]
     And the request [has TTL.OverrideTTL set to greater than today + guard value]
     And the request [has TTL.SystemTTL set to null]
-    And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
 
@@ -71,7 +71,7 @@ Feature: F-1006: Submit Event to Update TTL
     And the request [has TTL.Suspension value changed to No from Yes]
     And the request [has TTL.SystemTTL set to less than today + TTL Guard]
     And the request [has TTL.OverrideTTL set to greater than today + guard value]
-    And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
 
@@ -83,7 +83,7 @@ Feature: F-1006: Submit Event to Update TTL
     And the request [contains a case Id that has just been created as in F-1006_CreateCasePreRequisiteCaseworker]
     And the request [contains an event token for the case just created above]
     And the request [has TTL.Suspension value changed to Yes from No]
-    And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
 
@@ -98,7 +98,7 @@ Feature: F-1006: Submit Event to Update TTL
       And the request [has TTL.OverrideTTL set to greater than today + guard value]
       And the request [has TTL.SystemTTL set to greater than today + guard value]
       And the request [callback About to submit changes TTL.Suspended value]
-      And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
+      And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
      Then a negative response is received
       And the response has all other details as expected
 
@@ -112,7 +112,7 @@ Feature: F-1006: Submit Event to Update TTL
     And the request [has TTL.Suspension value changed to No from Yes]
     And the request [has TTL.OverrideTTL set to less than today + TTL Guard]
     And the request [has TTL.SystemTTL set to less than today + TTL Guard]
-    And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response has all other details as expected
     And another call [to verify that the TTL.Suspended value has not changed in the database] will get the expected response as in [F-1006_GetCaseDetails_Caseworker]
@@ -127,7 +127,7 @@ Feature: F-1006: Submit Event to Update TTL
     And the request [has TTL.Suspension value changed to No from Yes]
     And the request [has TTL.OverrideTTL set to null]
     And the request [has TTL.SystemTTL set to null]
-    And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
 
@@ -141,7 +141,7 @@ Feature: F-1006: Submit Event to Update TTL
     And the request [has TTL.Suspension value changed to No from Yes]
     And the request [has TTL.OverrideTTL set to null]
     And the request [has TTL.SystemTTL set to greater than today + guard value]
-    And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
 
@@ -155,7 +155,7 @@ Feature: F-1006: Submit Event to Update TTL
     And the request [has TTL.Suspension value changed to No from Yes]
     And the request [has TTL.OverrideTTL set to greater than today + guard value]
     And the request [has TTL.SystemTTL set to null]
-    And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
 
@@ -169,7 +169,7 @@ Feature: F-1006: Submit Event to Update TTL
     And the request [has TTL.Suspension value changed to No from Yes]
     And the request [has TTL.SystemTTL set to less than today + TTL Guard]
     And the request [has TTL.OverrideTTL set to greater than today + guard value]
-    And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
 
@@ -181,7 +181,7 @@ Feature: F-1006: Submit Event to Update TTL
     And the request [contains a case Id that has just been created as in F-1006_CreateCasePreRequisiteCaseworker]
     And the request [contains an event token for the case just created above]
     And the request [has TTL.Suspension value changed to Yes from No]
-    And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a positive response is received
     And the response has all other details as expected
 
@@ -196,7 +196,7 @@ Feature: F-1006: Submit Event to Update TTL
     And the request [has TTL.OverrideTTL set to greater than today + guard value]
     And the request [has TTL.SystemTTL set to greater than today + guard value]
     And the request [callback About to submit changes TTL.Suspended value]
-    And it is submitted to call the [submit event creation as case worker] operation of [CCD Data Store]
+    And it is submitted to call the [Submit event creation as Case worker] operation of [CCD Data Store]
     Then a negative response is received
     And the response has all other details as expected
 

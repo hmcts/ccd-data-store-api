@@ -1,0 +1,40 @@
+{
+	"_guid_": "F-1008_Test_Data_Base_Citizen",
+  "_extends_": "Event_Creation_Citizen_Base",
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCitizen2"
+    }
+  },
+
+	"request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    }
+	},
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "_extends_": "Common_Response_Headers"
+    },
+    "body" : {
+      "id" : "OVERRIDE",
+      "jurisdiction" : "OVERRIDE",
+      "state" : "CaseUpdated",
+      "version" : 1,
+      "case_type_id" : "OVERRIDE",
+      "created_date" : "[[ANY_STRING_NOT_NULLABLE]]",
+      "last_modified" : "[[ANY_STRING_NOT_NULLABLE]]",
+      "last_state_modified_date" : "[[ANY_STRING_NOT_NULLABLE]]",
+      "security_classification" : "PUBLIC",
+      "supplementary_data" : null,
+      "after_submit_callback_response" : null,
+      "callback_response_status_code" : null,
+      "callback_response_status" : null,
+      "delete_draft_response_status_code" : null,
+      "delete_draft_response_status" : null
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "_guid_": "F-1008_CreateLinkedCasePreRequisiteCaseworkerBase",
+  "_extends_": "F-1008_CreateCasePreRequisiteCaseworkerBase",
+
+  "request": {
+    "body": {
+      "data": {
+        "TextField": "This is the case that is currently linked to the case being updated",
+        "CaseLinkField": {
+          "CaseReference": "${}${[scenarioContext][siblingContexts][F-1008_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+        }
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "case_data" : {
+        "TextField": "This is the case that is currently linked to the case being updated",
+        "CaseLinkField": {
+          "CaseReference": "${}${[scenarioContext][siblingContexts][F-1008_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+        }
+      },
+      "data_classification" : {
+        "TextField": "PUBLIC",
+        "CaseLinkField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "CaseReference" : "PUBLIC"
+          }
+        }
+      },
+      "security_classifications" : {
+        "TextField": "PUBLIC",
+        "CaseLinkField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "CaseReference" : "PUBLIC"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,22 +1,7 @@
 {
   "_guid_": "F-1005_CitizenCreateUpdateEvent",
   "title": "should create an event token for correct inputs",
-
-  "productName": "CCD Data Store",
-  "operationName": "Start event creation process to update a case as Citizen",
-
-  "method": "GET",
-  "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
-
-  "specs": [
-    "to get an update event token for the case just created"
-  ],
-
-  "users": {
-    "invokingUser": {
-      "_extends_": "BeftaCitizen2"
-    }
-  },
+  "_extends_": "Token_Creation_Data_For_Citizen_Case_Creation",
 
   "request": {
     "headers": {
@@ -26,8 +11,7 @@
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "OVERRIDE",
       "ctid": "OVERRIDE",
-      "cid": "OVERRIDE",
-      "etid": "OVERRIDE"
+      "cid": "OVERRIDE"
     }
   },
 

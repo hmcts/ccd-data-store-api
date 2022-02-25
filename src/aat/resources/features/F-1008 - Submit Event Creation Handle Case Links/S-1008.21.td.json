@@ -1,0 +1,66 @@
+{
+  "_guid_": "S-1008.21",
+  "_extends_": "F-1008_Test_Data_Base_Citizen",
+
+  "title": "Case Link does not exist at present and CaseLink field in the Request contains CaseReference value and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured CaseLink field with Case Reference created in F-1008_CreateCasePreRequisiteCaseworkerBase",
+    "specifying the case to be updated, as created in F-1008_CreateAnotherCasePreRequisiteCaseworkerBase, does not contain a CaseLink field"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1008_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "CaseLinkField": {
+          "CaseReference": "${}${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
+        },
+        "TextField" : "S-1008.21"
+      },
+      "event": {
+        "id": "updateCaseCitizen",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][F-1008-GetCitizenUpdateEventToken][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "id": "${[scenarioContext][childContexts][F-1008_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
+      "jurisdiction" : "BEFTA_MASTER",
+      "case_type_id" : "FT_MasterCaseType",
+      "case_data" : {
+        "TextField" : "S-1008.21",
+        "CaseLinkField" : {
+          "CaseReference" : "${}${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
+        }
+      },
+      "data_classification" : {
+        "TextField" : "PUBLIC",
+        "CaseLinkField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "CaseReference" : "PUBLIC"
+          }
+        }
+      },
+      "security_classifications" : {
+        "TextField" : "PUBLIC",
+        "CaseLinkField" : {
+          "classification" : "PUBLIC",
+          "value" : {
+            "CaseReference" : "PUBLIC"
+          }
+        }
+      }
+    }
+  }
+}

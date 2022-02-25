@@ -2,7 +2,7 @@
 	"_guid_": "F-1006_Test_Data_Base_V2",
 
 	"productName": "CCD Data Store",
-	"operationName": "submit event creation as case worker",
+	"operationName": "Submit event creation as Case worker",
 
 	"method": "POST",
   "uri": "/cases/{cid}/events",

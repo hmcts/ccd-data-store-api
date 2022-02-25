@@ -1,6 +1,6 @@
 {
 	"title": "should retrieve case links for a specified case reference",
-	"_guid_": "F-1009-VerifyMultipleCaseLinks",
+	"_guid_": "F-1009-VerifyCitizenCaseLinks",
 
 	"productName": "CCD Data Store",
 	"operationName": "Retrieve case links for an existing case reference",
@@ -9,7 +9,7 @@
 	"uri": "/testing-support/case-link/{cid}",
 
 	"specs": [
-		"to verify that the Case Links have been created in the CASE_LINK table with correct values"
+		"to verify that the Case Link has been created in the CASE_LINK table with correct value"
 	],
 
   "users": {
@@ -36,13 +36,8 @@
 		},
 		"body": {
       "CaseLinks" : [ {
-        "CaseReference" : "[[ANYTHING_PRESENT]]",
-        "LinkedCaseReference" : "[[ANYTHING_PRESENT]]",
-        "CaseTypeId" : "FT_MasterCaseType"
-      },
-      {
-        "CaseReference" : "[[ANYTHING_PRESENT]]",
-        "LinkedCaseReference" : "[[ANYTHING_PRESENT]]",
+        "CaseReference" : "${[scenarioContext][parentContext][testData][actualResponse][body][id]}",
+        "LinkedCaseReference" : "${[scenarioContext][parentContext][childContexts][F-1009_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}",
         "CaseTypeId" : "FT_MasterCaseType"
       }]
 		}

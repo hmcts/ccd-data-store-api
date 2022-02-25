@@ -1,0 +1,51 @@
+{
+  "_guid_": "S-1008.36",
+  "_extends_": "F-1008_Test_Data_Base_Negative_V2",
+
+  "title": "Case Link does not exist at present and CaseLink field in the Request contains INVALID CaseReference value and Submit Event Creation is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains correctly configured CaseLink field with Case Reference created in F-1008_CreateCasePreRequisiteCaseworkerBase",
+    "CaseLink field has an invalid reference"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "CaseLinkField": {
+          "CaseReference": "INVALID_CASE_REF"
+        },
+        "TextField" : "S-1008.36"
+      },
+      "event": {
+        "id": "updateCase",
+        "summary": "",
+        "description": ""
+      },
+      "security_classification": "PUBLIC",
+      "event_token" : "${[scenarioContext][childContexts][F-1008-GetUpdateEventToken][testData][actualResponse][body][token]}",
+      "ignore_warning": true
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "exception" : "uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException",
+      "timestamp" : "[[ANYTHING_PRESENT]]",
+      "message" : "Case data validation failed",
+      "path" : "[[ANYTHING_PRESENT]]",
+      "details" : {
+        "field_errors" : [ {
+          "id" : "CaseLinkField.CaseReference",
+          "message" : "The data entered is not valid for this type of field, please delete and re-enter using only valid data"
+        } ]
+      },
+      "callbackErrors" : null,
+      "callbackWarnings" : null
+    }
+  }
+}

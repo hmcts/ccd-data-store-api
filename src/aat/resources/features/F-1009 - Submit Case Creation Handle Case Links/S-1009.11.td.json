@@ -5,8 +5,8 @@
   "title": "CaseLink field contains CaseReference value and Submit Case Creation Event is invoked on v2_external#/case-controller/createCaseUsingPOST",
 
   "prerequisites" : [ {
-    "Token_Creation": "S-1009_GetCreateToken"
-  }
+      "Token_Creation": "S-1009_GetCreateToken"
+    }
   ],
 
   "specs": [
