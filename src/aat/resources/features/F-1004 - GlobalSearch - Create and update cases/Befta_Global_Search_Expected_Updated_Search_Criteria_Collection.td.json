@@ -1,0 +1,85 @@
+{
+  "_guid_": "Befta_Global_Search_Updated_Expected_Search_Criteria_Collection",
+
+  "caseManagementCategory": {
+    "value": {
+      "code": "987",
+      "label": "Category label"
+    },
+    "list_items": [
+      {
+        "code": "987",
+        "label": "Category label"
+      }
+    ]
+  },
+  "caseManagementLocation": {
+    "region": "1",
+    "baseLocation": "123"
+  },
+  "caseNameHmctsInternal": "Name Internal",
+  "ListOfPeople": [
+    {
+      "__ordering__": "UNORDERED",
+      "__elementId__": "value"
+    },
+    {
+      "value": {
+        "IndividualFirstName": "FirstNameValue",
+        "IndividualLastName": "LastNameValue",
+        "IndividualEmail": "e@mail.com",
+        "IndividualAddress": {
+          "AddressLine1": "updated Address",
+          "PostCode": "SE1 4EE"
+        },
+        "IndividualDateOfBirth": "2012-04-21",
+        "IndividualDateOfDeath": "2020-04-21"
+      },
+      "id": "[[ANYTHING_PRESENT]]"
+    },
+    {
+      "value": {
+        "IndividualFirstName": "FirstNameValue2",
+        "IndividualLastName": "LastNameValue2",
+        "IndividualEmail": "e2@mail.com",
+        "IndividualAddress": {
+          "AddressLine1": "updated Address",
+          "PostCode": "SE2 4EE"
+        },
+        "IndividualDateOfBirth": "1979-04-21",
+        "IndividualDateOfDeath": "1980-04-21"
+      },
+      "id": "[[ANYTHING_PRESENT]]"
+    }
+  ],
+  "SearchCriteria": {
+    "SearchParties": [
+      {
+        "__ordering__": "UNORDERED",
+        "__elementId__": "value"
+      },
+      {
+        "id": "[[ANYTHING_PRESENT]]",
+        "value": {
+          "Name" : "FirstNameValue LastNameValue",
+          "EmailAddress" : "e@mail.com",
+          "AddressLine1": "updated Address",
+          "PostCode" : "SE1 4EE",
+          "DateOfBirth" : "2012-04-21",
+          "DateOfDeath" : "2020-04-21"
+        }
+      },
+      {
+        "id": "[[ANYTHING_PRESENT]]",
+        "value": {
+          "Name" : "FirstNameValue2 LastNameValue2",
+          "EmailAddress" : "e2@mail.com",
+          "AddressLine1": "updated Address",
+          "PostCode" : "SE2 4EE",
+          "DateOfBirth" : "1979-04-21",
+          "DateOfDeath" : "1980-04-21"
+        }
+      }
+    ]
+  }
+}

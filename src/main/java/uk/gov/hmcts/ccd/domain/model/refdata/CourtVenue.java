@@ -15,24 +15,24 @@ import java.time.LocalDate;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class CourtVenue implements Serializable {
     String courtVenueId;
+    String epimmsId;
     String siteName;
-    String courtName;
-    String epimsId;
-    String openForPublic;
-    String courtTypeId;
-    String courtType;
     String regionId;
     String region;
+    String courtType;
+    String courtTypeId;
     String clusterId;
     String clusterName;
-    String courtStatus;
-    LocalDate courtOpenDate;
-    LocalDate closedDate;
-    String postcode;
+    String openForPublic;
     String courtAddress;
+    String postcode;
     String phoneNumber;
+    LocalDate closedDate;
     String courtLocationCode;
     String dxAddress;
     String welshSiteName;
     String welshCourtAddress;
+    String courtStatus;
+    LocalDate courtOpenDate;
+    String courtName;
 }
