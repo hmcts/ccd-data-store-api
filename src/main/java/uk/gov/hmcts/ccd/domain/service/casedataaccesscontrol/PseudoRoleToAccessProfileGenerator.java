@@ -108,7 +108,8 @@ public class PseudoRoleToAccessProfileGenerator {
     private RoleToAccessProfileDefinition createRoleToAccessProfile(String ctId, String role, boolean addIdamPrefix) {
         return new RoleToAccessProfileDefinition(
             ctId, false, false, null,
-            role, null, null, addIdamPrefix ? IDAM_PREFIX + role : role
+            role, null, null, addIdamPrefix ? IDAM_PREFIX + role : role,
+            null
         );
     }
 }
