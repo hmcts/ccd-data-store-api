@@ -738,7 +738,6 @@ class DefaultCaseDataAccessControlTest {
         doReturn(roleAssignments1).when(filteredRoleAssignments).getFilteredMatchingRoleAssignments();
 
         doReturn(false).when(applicationParams).getEnablePseudoRoleAssignmentsGeneration();
-        doReturn(false).when(applicationParams).getEnablePseudoAccessProfilesGeneration();
 
         assertThatExceptionOfType(DownstreamIssueException.class)
             .isThrownBy(() -> defaultCaseDataAccessControl.getUserClassifications(caseDetails))
