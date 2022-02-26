@@ -1,12 +1,6 @@
 {
-  "title": "should retrieve empty list of case links for a specified case reference",
   "_guid_": "F-1009-VerifyCaseLinksNotInserted",
-
-  "productName": "CCD Data Store",
-  "operationName": "Retrieve case links for an existing case reference",
-
-  "method": "GET",
-  "uri": "/testing-support/case-link/{cid}",
+  "_extends_": "Verify_Case_Links_Base",
 
   "specs": [
     "to verify that no Case Links have been created in the CASE_LINK table"
@@ -19,10 +13,6 @@
   },
 
   "request": {
-    "headers": {
-      "_extends_": "Common_Request_Headers",
-      "experimental": "true"
-    },
     "pathVariables": {
       "cid": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
     }

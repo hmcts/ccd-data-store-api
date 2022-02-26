@@ -33,7 +33,7 @@ public class CaseDataExtractor {
             data,
             caseFieldDefinitions,
             CaseDataExtractor.EMPTY_STRING,
-            new ArrayList<>(),
+            Collections.emptyList(),
             fieldType);
     }
 
@@ -82,31 +82,14 @@ public class CaseDataExtractor {
                 fieldIdPrefix + dataFieldId + FIELD_SEPARATOR, paths, fieldType
             );
         } else if (BaseType.get(COLLECTION) == baseFieldType) {
-            final List<String> extractionResults =
-                extractSimpleField(
-                    dataFieldId,
-                    caseFieldDefinition,
-                    fieldIdPrefix,
-                    fieldType,
-                    paths
-                );
-            final Iterator<JsonNode> collectionIterator = dataValue.iterator();
-
-            int index = 0;
-            while (collectionIterator.hasNext()) {
-                final JsonNode itemValue = collectionIterator.next();
-                extractionResults.addAll(
-                    extractCollectionItem(
-                        caseFieldDefinition.getFieldTypeDefinition().getCollectionFieldTypeDefinition(),
-                        itemValue,
-                        fieldIdPrefix + dataFieldId + FIELD_SEPARATOR, Integer.toString(index),
-                        paths,
-                        fieldType
-                    )
-                );
-                index++;
-            }
-            return extractionResults;
+            return extractCollectionField(
+                                            dataFieldId,
+                                            dataValue,
+                                            caseFieldDefinition,
+                                            fieldIdPrefix,
+                                            fieldType,
+                                            paths
+            );
         } else {
             return extractSimpleField(
                                         dataFieldId,
@@ -132,6 +115,39 @@ public class CaseDataExtractor {
         }
 
         return returnValue;
+    }
+
+    private List<String> extractCollectionField(final String dataFieldId,
+                                                final JsonNode dataValue,
+                                                final CaseFieldDefinition caseFieldDefinition,
+                                                final String fieldIdPrefix,
+                                                final String fieldType,
+                                                List<String> paths) {
+        final List<String> extractionResults =
+            extractSimpleField(
+                dataFieldId,
+                caseFieldDefinition,
+                fieldIdPrefix,
+                fieldType,
+                paths
+            );
+        final Iterator<JsonNode> collectionIterator = dataValue.iterator();
+
+        int index = 0;
+        while (collectionIterator.hasNext()) {
+            final JsonNode itemValue = collectionIterator.next();
+            extractionResults.addAll(
+                extractCollectionItem(
+                    caseFieldDefinition.getFieldTypeDefinition().getCollectionFieldTypeDefinition(),
+                    itemValue,
+                    fieldIdPrefix + dataFieldId + FIELD_SEPARATOR, Integer.toString(index),
+                    paths,
+                    fieldType
+                )
+            );
+            index++;
+        }
+        return extractionResults;
     }
 
     private List<String> extractCollectionItem(FieldTypeDefinition fieldTypeDefinition,

@@ -45,11 +45,6 @@ class CaseLinkMapperTest {
     }
 
     @Test
-    void testNullModelToEntity() {
-        assertNull(caseLinkMapper.modelToEntity(null));
-    }
-
-    @Test
     void testEntityToModel() {
         CaseLink mappedCaseLinkModel = caseLinkMapper.entityToModel(caseLinkEntity);
         assertAll(() -> {
@@ -85,11 +80,5 @@ class CaseLinkMapperTest {
         final List<CaseLink> caseLinks = caseLinkMapper.entitiesToModels(caseLinkEntities);
         assertEquals(caseLinkEntities.size(), caseLinks.size());
         assertTrue(expectedCaseLinkModels.containsAll(caseLinks));
-    }
-
-    @Test
-    void testNullEntityToModel() {
-        CaseLinkEntity caseLinkEntity = null;
-        assertNull(caseLinkMapper.entityToModel(caseLinkEntity));
     }
 }

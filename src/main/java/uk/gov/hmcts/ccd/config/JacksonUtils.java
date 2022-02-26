@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.NonNull;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Arrays;
@@ -130,25 +131,7 @@ public final class JacksonUtils {
                 String truncatedKey = path.substring(path.indexOf(".") + 1);
 
                 if (entry.getKey().equals(key)) {
-                    if (entry.getValue().isArray()) {
-                        ArrayNode arrayNode = ((ArrayNode)entry.getValue());
-                        final var arrayIndex = truncatedKey.substring(0, truncatedKey.indexOf("."));
-                        final var keyToArrayContent = truncatedKey.substring(truncatedKey.indexOf(".") + 1);
-                        if (StringUtils.isNumeric(arrayIndex)) {
-                            JsonNode jsonNodeFromArray = arrayNode.get(Integer.parseInt(arrayIndex));
-                            JsonNode nestedCaseFieldByPath =
-                                getNestedCaseFieldByPath(jsonNodeFromArray, keyToArrayContent);
-                            if (nestedCaseFieldByPath == null) {
-                                nestedCaseFieldByPath = jsonNodeFromArray.get("value");
-                            }
-                            jsonValue[0] = getValue(nestedCaseFieldByPath);
-                        }
-                    } else {
-                        JsonNode foundJsonNode = getNestedCaseFieldByPath(entry.getValue(), truncatedKey);
-                        if (foundJsonNode != null) {
-                            jsonValue[0] = foundJsonNode.textValue();
-                        }
-                    }
+                    jsonValue[0] = findValueFromTruncatedKey(entry, truncatedKey);
                 }
             } else if (entry.getKey().equals(path)) {
                 jsonValue[0] = getValue(entry.getValue());
@@ -158,19 +141,41 @@ public final class JacksonUtils {
         return jsonValue[0];
     }
 
-    private static String getValue(JsonNode jsonNode) {
-        String returnValue = null;
-        if (jsonNode != null) {
-            if (jsonNode instanceof IntNode) {
-                returnValue = jsonNode.toString();
-            } else {
-                if (jsonNode.iterator().hasNext()) {
-                    returnValue = jsonNode.iterator().next().textValue();
-                }
-                if (returnValue == null) {
-                    returnValue = jsonNode.textValue();
-                }
+    private static String findValueFromTruncatedKey(Map.Entry<String, JsonNode> entry, String truncatedKey) {
+        if (entry.getValue().isArray()) {
+            return getValueFromArray(entry, truncatedKey);
+        } else {
+            JsonNode foundJsonNode = getNestedCaseFieldByPath(entry.getValue(), truncatedKey);
+            if (foundJsonNode != null) {
+                return foundJsonNode.textValue();
             }
+        }
+        return null;
+    }
+
+    private static String getValueFromArray(Map.Entry<String, JsonNode> entry, String truncatedKey) {
+        ArrayNode arrayNode = ((ArrayNode)entry.getValue());
+        final var arrayIndex = truncatedKey.substring(0, truncatedKey.indexOf("."));
+        final var keyToArrayContent = truncatedKey.substring(truncatedKey.indexOf(".") + 1);
+        if (StringUtils.isNumeric(arrayIndex)) {
+            JsonNode jsonNodeFromArray = arrayNode.get(Integer.parseInt(arrayIndex));
+            JsonNode nestedCaseFieldByPath =
+                getNestedCaseFieldByPath(jsonNodeFromArray, keyToArrayContent);
+            if (nestedCaseFieldByPath == null) {
+                nestedCaseFieldByPath = jsonNodeFromArray.get("value");
+            }
+            return getValue(nestedCaseFieldByPath);
+        }
+        return null;
+    }
+
+    private static String getValue(@NonNull JsonNode jsonNode) {
+        String returnValue = null;
+
+        if (jsonNode instanceof IntNode) {
+            returnValue = jsonNode.toString();
+        } else {
+            return jsonNode.iterator().hasNext() ? jsonNode.iterator().next().textValue() : jsonNode.textValue();
         }
         return returnValue;
     }

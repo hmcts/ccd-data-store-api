@@ -1,16 +1,10 @@
 {
-	"title": "should retrieve case links for a specified case reference",
 	"_guid_": "F-1009-VerifyMultipleCitizenCaseLinks",
+  "_extends_": "Verify_Case_Links_Base",
 
-	"productName": "CCD Data Store",
-	"operationName": "Retrieve case links for an existing case reference",
-
-	"method": "GET",
-	"uri": "/testing-support/case-link/{cid}",
-
-	"specs": [
-		"to verify that the Case Links have been created in the CASE_LINK table with correct values"
-	],
+  "specs": [
+    "to verify that the Case Links have been created in the CASE_LINK table with correct values"
+  ],
 
   "users": {
     "invokingUser": {
@@ -19,10 +13,6 @@
   },
 
 	"request": {
-		"headers": {
-			"_extends_": "Common_Request_Headers",
-      "experimental": "true"
-		},
 		"pathVariables": {
 			"cid": "${[scenarioContext][parentContext][testData][actualResponse][body][id]}"
 		}

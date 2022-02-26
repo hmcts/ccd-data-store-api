@@ -1,15 +1,6 @@
 {
 	"_guid_": "Citizen_Full_Case_Creation_Data",
-
-	"productName": "CCD Data Store",
-	"operationName": "Submit case creation as Citizen",
-
-	"method": "POST",
-	"uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases",
-
-	"specs": [
-		"to create a full case as a citizen"
-	],
+  "_extends_": "Citizen_Case_Creation_Data_Base",
 
 	"users": {
 		"invokingUser": {
@@ -18,11 +9,7 @@
 	},
 
 	"request": {
-		"headers": {
-			"_extends_": "Common_Request_Headers"
-		},
 		"pathVariables": {
-			"uid": "[[DEFAULT_AUTO_VALUE]]",
 			"jid": "BEFTA_JURISDICTION_3",
 			"ctid": "BEFTA_CASETYPE_3_2"
 		},

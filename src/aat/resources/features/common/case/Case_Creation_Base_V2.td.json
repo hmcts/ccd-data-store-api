@@ -1,0 +1,28 @@
+{
+  "_guid_": "Case_Creation_Base_V2",
+
+  "productName": "CCD Data Store",
+  "operationName": "Submit case creation as Case worker",
+
+  "method": "POST",
+  "uri": "/case-types/{caseTypeId}/cases",
+
+  "specs": [
+    "to create a full case"
+  ],
+
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "vary": "accept-encoding",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

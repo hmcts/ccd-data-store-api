@@ -40,7 +40,18 @@
   },
 
   "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "headers": {
+      "Content-Encoding": "gzip",
+      "vary": "accept-encoding",
+      "Content-Length": "[[ANYTHING_PRESENT]]"
+    },
     "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "version": 0,
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
       "jurisdiction": "BEFTA_MASTER",
       "state": "CaseCreated",
       "case_type_id": "FT_MasterCaseType",
@@ -57,7 +68,13 @@
       "supplementary_data": null,
       "security_classifications": {
         "_extends_" : "TTL_Classifications"
-      }
+      },
+      "security_classification": "PUBLIC",
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null
     }
   }
 }
