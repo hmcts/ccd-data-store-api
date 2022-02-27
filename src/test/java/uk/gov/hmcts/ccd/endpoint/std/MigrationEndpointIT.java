@@ -26,7 +26,6 @@ import uk.gov.hmcts.ccd.auditlog.AuditRepository;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationParameters;
 import uk.gov.hmcts.ccd.domain.model.migration.MigrationResult;
-import uk.gov.hmcts.ccd.v2.external.resource.CaseResource;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +35,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
@@ -48,9 +46,9 @@ import static uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink.builder;
 public class MigrationEndpointIT extends WireMockBaseTest {
     private static final String URL = "/migration/populateCaseLinks";
 
-    private final String CASE_TYPE_ID = "TestAddressBookCaseCaseLinks";
-    private final String PROBATE_JURISDICTION_ID = "PROBATE";
-    private final String SSCS_JURISDICTION_ID = "SSCS";
+    private static final String CASE_TYPE_ID = "TestAddressBookCaseCaseLinks";
+    private static final String PROBATE_JURISDICTION_ID = "PROBATE";
+    private static final String SSCS_JURISDICTION_ID = "SSCS";
 
     @Inject
     private WebApplicationContext wac;
@@ -83,9 +81,11 @@ public class MigrationEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
     public void shouldPopulateCaseLinksWhereCaseHasSingleMissingCaseLink() throws Exception {
-        MigrationParameters migrationParameters = new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 1L, 5);
+        MigrationParameters migrationParameters =
+            new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 1L, 5);
 
         stubIdamRequest();
 
@@ -107,9 +107,11 @@ public class MigrationEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_multiple_missing_case_link.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_multiple_missing_case_link.sql"})
     public void shouldPopulateCaseLinksWhereCaseHasMultipleMissingCaseLinks() throws Exception {
-        MigrationParameters migrationParameters = new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 1L, 5);
+        MigrationParameters migrationParameters =
+            new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 1L, 5);
 
         stubIdamRequest();
 
@@ -137,9 +139,11 @@ public class MigrationEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_multiple_missing_case_link.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_multiple_missing_case_link.sql"})
     public void shouldPopulateCaseLinksWhereMultipleCasesHaveMultipleMissingCaseLinks() throws Exception {
-        MigrationParameters migrationParameters = new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 1L, 5);
+        MigrationParameters migrationParameters =
+            new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 1L, 5);
 
         stubIdamRequest();
 
@@ -182,9 +186,14 @@ public class MigrationEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
     public void shouldPopulateCaseLinksWhereCaseHasExistingCaseLink() throws Exception {
-        MigrationParameters migrationParameters = new MigrationParameters("TestAddressBookCaseCaseLinks", PROBATE_JURISDICTION_ID, 1L, 5);
+        MigrationParameters migrationParameters = new MigrationParameters(
+                                                                "TestAddressBookCaseCaseLinks",
+            PROBATE_JURISDICTION_ID,
+                                                                 1L,
+                                                                5);
 
         stubIdamRequest();
 
@@ -207,9 +216,11 @@ public class MigrationEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
     public void shouldNotPopulateMissingCaseLinksDueToStartingID() throws Exception {
-        MigrationParameters migrationParameters = new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 2L, 5);
+        MigrationParameters migrationParameters =
+            new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 2L, 5);
 
         stubIdamRequest();
 
@@ -223,9 +234,11 @@ public class MigrationEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
     public void shouldNotPopulateCaseLinksWithIncorrectJurisdiction() throws Exception {
-        MigrationParameters migrationParameters = new MigrationParameters(CASE_TYPE_ID, SSCS_JURISDICTION_ID, 1L, 5);
+        MigrationParameters migrationParameters =
+            new MigrationParameters(CASE_TYPE_ID, SSCS_JURISDICTION_ID, 1L, 5);
 
         stubIdamRequest();
 
@@ -242,7 +255,8 @@ public class MigrationEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
     public void shouldVerifyLogs() throws Exception {
 
         Long caseDataId = 1L;
@@ -268,9 +282,11 @@ public class MigrationEndpointIT extends WireMockBaseTest {
     }
 
     @Test
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        scripts = {"classpath:sql/insert_cases_missing_case_link.sql"})
     public void shouldVerifyMigrationResultAfterCaseLinkPopulation() throws Exception {
-        MigrationParameters migrationParameters = new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 1L, 5);
+        MigrationParameters migrationParameters =
+            new MigrationParameters(CASE_TYPE_ID, PROBATE_JURISDICTION_ID, 1L, 5);
 
         stubIdamRequest();
 
@@ -296,7 +312,7 @@ public class MigrationEndpointIT extends WireMockBaseTest {
         assertTrue(expectedCaseLinks.equals(caseLinks));
     }
 
-    private void stubIdamRequest(){
+    private void stubIdamRequest() {
         String userJson = "{\n"
             + "          \"sub\": \"Cloud.Strife@test.com\",\n"
             + "          \"uid\": \"89000\",\n"

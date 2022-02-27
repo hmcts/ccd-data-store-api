@@ -71,7 +71,8 @@ class CaseLinkMigrationServiceTest {
 
         caseLinkMigrationService.backPopulateCaseLinkTable(cases);
 
-        verify(caseLinkService, times(0)).updateCaseLinks(any(), any(), anyList());
+        verify(caseLinkService,
+            times(0)).updateCaseLinks(any(), any(), anyList());
     }
 
     @Test
@@ -83,7 +84,8 @@ class CaseLinkMigrationServiceTest {
 
         caseLinkMigrationService.backPopulateCaseLinkTable(cases);
 
-        verify(caseLinkService, times(1)).updateCaseLinks(CASE_REFERENCE, CASE_TYPE_ID, caseLinks);
+        verify(caseLinkService,
+            times(1)).updateCaseLinks(CASE_REFERENCE, CASE_TYPE_ID, caseLinks);
     }
 
 
@@ -98,7 +100,8 @@ class CaseLinkMigrationServiceTest {
 
         caseLinkMigrationService.backPopulateCaseLinkTable(cases);
 
-        verify(caseLinkService, times(1)).updateCaseLinks(CASE_REFERENCE, CASE_TYPE_ID, caseLinks);
+        verify(caseLinkService,
+            times(1)).updateCaseLinks(CASE_REFERENCE, CASE_TYPE_ID, caseLinks);
     }
 
     @Test
@@ -113,7 +116,8 @@ class CaseLinkMigrationServiceTest {
 
         caseLinkMigrationService.backPopulateCaseLinkTable(cases);
 
-        verify(caseLinkService, times(2)).updateCaseLinks(CASE_REFERENCE, CASE_TYPE_ID, caseLinks);
+        verify(caseLinkService,
+            times(2)).updateCaseLinks(CASE_REFERENCE, CASE_TYPE_ID, caseLinks);
     }
 
     private CaseDetails createNewCaseDetails(String caseTypeId, String jurisdictionId, Map<String, JsonNode> data) {
@@ -125,7 +129,7 @@ class CaseLinkMigrationServiceTest {
         return caseDetails;
     }
 
-    private List<String> createCaseLinks(String ... caseLinkReferences) {
+    private List<String> createCaseLinks(String... caseLinkReferences) {
         return new ArrayList<>(Arrays.asList(caseLinkReferences));
     }
 }

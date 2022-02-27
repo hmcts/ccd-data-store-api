@@ -4,7 +4,6 @@ import lombok.NonNull;
 import uk.gov.hmcts.ccd.data.caseaccess.CaseLinkEntity;
 import uk.gov.hmcts.ccd.domain.model.casedeletion.CaseLink;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.inject.Named;

@@ -60,9 +60,9 @@ public class MigrationEndpoint {
     @RequestMapping(
         value = "/populateCaseLinks",
         method = RequestMethod.POST
-        //consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    @ApiOperation(value = "Update case with case links", notes = "Update cases with case link values if they dont exist")
+    @ApiOperation(value = "Update case with case links",
+        notes = "Update cases with case link values if they dont exist")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Events found for the given ID"),
         @ApiResponse(code = 400, message = "Invalid case ID"),
@@ -87,8 +87,7 @@ public class MigrationEndpoint {
                 migrationResult.setRecordCount(caseDetails.size());
                 migrationResult.setFinalRecordId(Integer.parseInt(Iterables.getLast(caseDetails).getId()));
             }
-
-        }else {
+        } else {
             log.error("User does not have access to CaseType: '{}'", migrationParameters.getCaseDataId());
             throw new ForbiddenException();
         }
