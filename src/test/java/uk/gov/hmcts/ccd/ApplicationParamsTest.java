@@ -23,18 +23,14 @@ class ApplicationParamsTest {
     @Test
     public void shouldPrepareRoleAssignments() {
         final var enablePseudoRoleAssignmentsGeneration = true;
-        final var enablePseudoAccessProfilesGeneration = false;
         final var enableAttributeBasedAccessControl = true;
         ReflectionTestUtils.setField(applicationParams, "enablePseudoRoleAssignmentsGeneration",
             enablePseudoRoleAssignmentsGeneration);
-        ReflectionTestUtils.setField(applicationParams, "enablePseudoAccessProfilesGeneration",
-            enablePseudoAccessProfilesGeneration);
         ReflectionTestUtils.setField(applicationParams, "enableAttributeBasedAccessControl",
             enableAttributeBasedAccessControl);
 
         assertEquals(applicationParams.getEnablePseudoRoleAssignmentsGeneration(),
             enablePseudoRoleAssignmentsGeneration);
-        assertEquals(applicationParams.getEnablePseudoAccessProfilesGeneration(),enablePseudoAccessProfilesGeneration);
         assertEquals(applicationParams.getEnableAttributeBasedAccessControl(),enableAttributeBasedAccessControl);
     }
 }
