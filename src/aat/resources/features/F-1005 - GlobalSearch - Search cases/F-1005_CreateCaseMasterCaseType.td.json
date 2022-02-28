@@ -22,8 +22,8 @@
 		"body": {
       "data": {
         "caseManagementLocation": {
-          "baseLocation": "123",
-          "region": "1"
+          "baseLocation": "1",
+          "region": "3"
         }
       },
       "event": {
@@ -48,8 +48,8 @@
 			"security_classification": "PUBLIC",
 			"case_data": {
         "caseManagementLocation": {
-          "baseLocation": "123",
-          "region": "1"
+          "baseLocation": "1",
+          "region": "3"
         },
         "SearchCriteria" : {}
       },

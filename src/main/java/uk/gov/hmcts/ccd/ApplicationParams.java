@@ -51,6 +51,12 @@ public class ApplicationParams {
     @Value("${role.assignment.api.host}")
     private String roleAssignmentServiceHost;
 
+    @Value("${role.assignment.pagination.enabled}")
+    private boolean roleAssignmentPaginationEnabled;
+
+    @Value("${role.assignment.page.size}")
+    private String roleAssignmentPageSize;
+
     @Value("${ccd.draft.host}")
     private String draftHost;
 
@@ -170,9 +176,6 @@ public class ApplicationParams {
 
     @Value("${enable-pseudo-role-assignments-generation}")
     private boolean enablePseudoRoleAssignmentsGeneration;
-
-    @Value("${enable-pseudo-access-profiles-generation}")
-    private boolean enablePseudoAccessProfilesGeneration;
 
     @Value("${enable-case-users-db-sync}")
     private boolean enableCaseUsersDbSync;
@@ -337,6 +340,14 @@ public class ApplicationParams {
         return roleAssignmentServiceHost + "/am/role-assignments";
     }
 
+    public boolean isRoleAssignmentPaginationEnabled() {
+        return roleAssignmentPaginationEnabled;
+    }
+
+    public String getRoleAssignmentPageSize() {
+        return roleAssignmentPageSize;
+    }
+
     public String amDeleteByQueryRoleAssignmentsURL() {
         return roleAssignmentBaseURL() + "/query/delete";
     }
@@ -499,10 +510,6 @@ public class ApplicationParams {
 
     public boolean getEnablePseudoRoleAssignmentsGeneration() {
         return enablePseudoRoleAssignmentsGeneration;
-    }
-
-    public boolean getEnablePseudoAccessProfilesGeneration() {
-        return enablePseudoAccessProfilesGeneration;
     }
 
     public boolean getEnableCaseUsersDbSync() {
