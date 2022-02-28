@@ -1,4 +1,4 @@
-@F-13010
+@F-13010 @currentrun
 Feature: F-13010: Case Access Category Tests
 
   Background: Load test data for the scenario
@@ -8,10 +8,11 @@ Feature: F-13010: Case Access Category Tests
   @S-13010.1
   Scenario: RoleToAccessProfiles mapping for user’s derived AccessProfile contains category, case contains category value starting with defined pattern, Access is granted.
     Given a case that has just been created as in [F-13010.1_CreateCase],
-    And the RoleToAccessProfiles tab [contains CaseAccessCategory with pattern - Civil/Standard, Criminal/Serious]
-    And the case [C1 contains an CaseAccessCategory field value as Civil/Standard/Legal]
-    When a request is prepared with appropriate values
-    And the request [attempts to get the previously created case]
+    And a user with [an active profile in CCD],
+    When a request is prepared with appropriate values,
+    And the RoleToAccessProfiles tab [contains CaseAccessCategory with pattern Civil Standard, Criminal Serious],
+    And the case [C1 contains an CaseAccessCategory field value as Civil Standard Legal],
+    And it is submitted to call the [external get case] operation of [CCD Data Store],
     Then a positive response is received,
     And the response has all the details as expected
 
