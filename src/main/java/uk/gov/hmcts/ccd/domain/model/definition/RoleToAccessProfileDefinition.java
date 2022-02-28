@@ -34,8 +34,6 @@ public class RoleToAccessProfileDefinition implements Serializable {
     private String liveTo;
     @JsonProperty("role_name")
     private String roleName;
-    @JsonProperty("case_access_categories")
-    private String caseAccessCategories;
 
     public List<String> getAuthorisationList() {
         if (getAuthorisations() != null) {
