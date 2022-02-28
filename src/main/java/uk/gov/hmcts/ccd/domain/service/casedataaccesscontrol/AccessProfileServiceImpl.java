@@ -28,27 +28,22 @@ public class AccessProfileServiceImpl implements AccessProfileService, AccessCon
 
         // TODO: Think about improving this, as most of this logic is already done in AuthorisationsMatcher
         List<AccessProfile> accessProfiles = new ArrayList<>();
-        Map<String, List<RoleToAccessProfileDefinition>> roleToAccessProfileDefinitionMap =
+        Map<String, RoleToAccessProfileDefinition> roleToAccessProfileDefinitionMap =
             authorisationMapper.toRoleNameAsKeyMap(roleToAccessProfilesMappings);
 
         for (RoleAssignment roleAssignment : filteredRoleAssignments) {
 
-            List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions =
+            RoleToAccessProfileDefinition roleToAccessProfileDefinition =
                 roleToAccessProfileDefinitionMap.get(roleAssignment.getRoleName());
 
-            if (roleToAccessProfileDefinitions != null) {
-                for (RoleToAccessProfileDefinition roleToAccessProfileDefinition : roleToAccessProfileDefinitions) {
+            if (roleToAccessProfileDefinition != null && !roleToAccessProfileDefinition.getDisabled()) {
+                List<String> definitionAuthorisations = roleToAccessProfileDefinition.getAuthorisationList();
+                List<String> roleAssignmentAuthorisations = roleAssignment.getAuthorisations();
 
-                    if (roleToAccessProfileDefinition != null && !roleToAccessProfileDefinition.getDisabled()) {
-                        List<String> definitionAuthorisations = roleToAccessProfileDefinition.getAuthorisationList();
-                        List<String> roleAssignmentAuthorisations = roleAssignment.getAuthorisations();
-
-                        if (authorisationMapper.authorisationsAllowMappingToAccessProfiles(definitionAuthorisations,
-                            roleAssignmentAuthorisations)) {
-                            accessProfiles.addAll(authorisationMapper
-                                .createAccessProfiles(roleAssignment, roleToAccessProfileDefinition));
-                        }
-                    }
+                if (authorisationMapper.authorisationsAllowMappingToAccessProfiles(definitionAuthorisations,
+                    roleAssignmentAuthorisations)) {
+                    accessProfiles.addAll(authorisationMapper
+                        .createAccessProfiles(roleAssignment, roleToAccessProfileDefinition));
                 }
             }
         }

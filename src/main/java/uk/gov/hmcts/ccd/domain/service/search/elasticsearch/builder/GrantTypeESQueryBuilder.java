@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.search.elasticsearch.builder;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -15,7 +16,6 @@ import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessContr
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.SearchRoleAssignment;
 
-import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.CASE_ACCESS_CATEGORY;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.JURISDICTION_FIELD_COL;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.LOCATION;
 import static uk.gov.hmcts.ccd.data.casedetails.CaseDetailsEntity.REFERENCE_FIELD_COL;
@@ -53,7 +53,6 @@ public abstract class GrantTypeESQueryBuilder extends GrantTypeQueryBuilder {
                 addTermsQueryForReference(groupedSearchRoleAssignments, innerQuery);
                 addTermsQueryForState(readableCaseStates, caseStates, innerQuery);
                 addTermsQueryForClassification(representative, innerQuery);
-                addPrefixQueryForCaseAccessCategory(caseType, representative, innerQuery);
 
                 query.should(innerQuery);
             });
@@ -93,21 +92,5 @@ public abstract class GrantTypeESQueryBuilder extends GrantTypeQueryBuilder {
         if (!classifications.isEmpty()) {
             parentQuery.must(QueryBuilders.termsQuery(SECURITY_CLASSIFICATION_FIELD_COL, classifications));
         }
-    }
-
-    private void addPrefixQueryForCaseAccessCategory(CaseTypeDefinition caseType,
-                                                     SearchRoleAssignment representative,
-                                                     BoolQueryBuilder parentQuery) {
-
-        List<String> caseAccessCategories = getCaseAccessCategories(representative.getRoleAssignment(), caseType);
-        if (caseAccessCategories.isEmpty()) {
-            return;
-        }
-
-        BoolQueryBuilder caseAccessQuery = QueryBuilders.boolQuery();
-
-        caseAccessCategories
-            .forEach(cac -> caseAccessQuery.should(QueryBuilders.matchPhrasePrefixQuery(CASE_ACCESS_CATEGORY, cac)));
-        parentQuery.must(caseAccessQuery);
     }
 }
