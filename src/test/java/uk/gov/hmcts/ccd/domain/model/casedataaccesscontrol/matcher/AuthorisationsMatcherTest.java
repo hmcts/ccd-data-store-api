@@ -82,94 +82,6 @@ class AuthorisationsMatcherTest extends BaseFilter {
     }
 
     @Test
-    void shouldMatchWhenRoleAssignmentHasMatchingDefinitionAuthorisationsForRoleWithMultipleAccessProfiles() {
-        RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
-            Instant.now().minus(1, ChronoUnit.DAYS),
-            Instant.now().plus(2, ChronoUnit.DAYS),
-            "PRIVATE", null, null);
-        roleAssignment.setAuthorisations(Lists.newArrayList(AUTHORISATION_1));
-
-        CaseTypeDefinition caseTypeDefinition = mockCaseTypeDefinition();
-
-        List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions = mockRoleToMultipleAccessProfileDefinitions(
-            ROLE_NAME_1,
-            CASE_TYPE_ID_1,
-            false,
-            Lists.newArrayList(AUTHORISATION_2),
-            Lists.newArrayList(AUTHORISATION_1)
-            );
-        when(caseTypeDefinition.getRoleToAccessProfiles()).thenReturn(roleToAccessProfileDefinitions);
-        assertTrue(classUnderTest.matchAttribute(roleAssignment, caseTypeDefinition));
-    }
-
-    @Test
-    void shouldMatchWhenRoleAssignmentHasMatchingCaseWithDefinitionAuthorisationsForRoleWithMultipleAccessProfiles() {
-        RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
-            Instant.now().minus(1, ChronoUnit.DAYS),
-            Instant.now().plus(2, ChronoUnit.DAYS),
-            "PRIVATE", null, null);
-        roleAssignment.setAuthorisations(Lists.newArrayList(AUTHORISATION_1));
-
-        CaseTypeDefinition caseTypeDefinition = mockCaseTypeDefinition();
-
-        List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions = mockRoleToMultipleAccessProfileDefinitions(
-            ROLE_NAME_1,
-            CASE_TYPE_ID_1,
-            false,
-            Lists.newArrayList(AUTHORISATION_2),
-            Lists.newArrayList(AUTHORISATION_1));
-        when(caseTypeDefinition.getRoleToAccessProfiles()).thenReturn(roleToAccessProfileDefinitions);
-
-        CaseDetails caseDetails = mockCaseDetails();
-        when(caseTypeService.getCaseType(anyString())).thenReturn(caseTypeDefinition);
-        assertTrue(classUnderTest.matchAttribute(roleAssignment, caseDetails));
-    }
-
-    @Test
-    void shouldNotMatchWhenRoleAssignmentHasMatchingDefinitionAuthorisationsForRoleWithMultipleAccessProfiles() {
-        RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
-            Instant.now().minus(1, ChronoUnit.DAYS),
-            Instant.now().plus(2, ChronoUnit.DAYS),
-            "PRIVATE", null, null);
-        roleAssignment.setAuthorisations(Lists.newArrayList(AUTHORISATION_1));
-
-        CaseTypeDefinition caseTypeDefinition = mockCaseTypeDefinition();
-
-        List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions = mockRoleToMultipleAccessProfileDefinitions(
-            ROLE_NAME_1,
-            CASE_TYPE_ID_1,
-            false,
-            Lists.newArrayList(AUTHORISATION_2),
-            Lists.newArrayList(AUTHORISATION_3)
-        );
-        when(caseTypeDefinition.getRoleToAccessProfiles()).thenReturn(roleToAccessProfileDefinitions);
-        assertFalse(classUnderTest.matchAttribute(roleAssignment, caseTypeDefinition));
-    }
-
-    @Test
-    void shouldNotMatchWhenRoleAssignmentHasMatchingCaseWithDefinitionAuthorisationsWithMultipleAccessProfilesToRole() {
-        RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
-            Instant.now().minus(1, ChronoUnit.DAYS),
-            Instant.now().plus(2, ChronoUnit.DAYS),
-            "PRIVATE", null, null);
-        roleAssignment.setAuthorisations(Lists.newArrayList(AUTHORISATION_1));
-
-        CaseTypeDefinition caseTypeDefinition = mockCaseTypeDefinition();
-
-        List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions = mockRoleToMultipleAccessProfileDefinitions(
-            ROLE_NAME_1,
-            CASE_TYPE_ID_1,
-            false,
-            Lists.newArrayList(AUTHORISATION_2),
-            Lists.newArrayList(AUTHORISATION_3));
-        when(caseTypeDefinition.getRoleToAccessProfiles()).thenReturn(roleToAccessProfileDefinitions);
-
-        CaseDetails caseDetails = mockCaseDetails();
-        when(caseTypeService.getCaseType(anyString())).thenReturn(caseTypeDefinition);
-        assertFalse(classUnderTest.matchAttribute(roleAssignment, caseDetails));
-    }
-
-    @Test
     void shouldNotMatchWhenRoleAssignmentHasEmptyAuthorisations() {
         RoleAssignment roleAssignment = createRoleAssignment(CASE_ID_1, JURISDICTION_1,
             Instant.now().minus(1, ChronoUnit.DAYS),
@@ -263,34 +175,6 @@ class AuthorisationsMatcherTest extends BaseFilter {
             when(roleToAccessProfileDefinition.getAuthorisationList()).thenReturn(authorisations);
             roleToAccessProfileDefinitions.add(roleToAccessProfileDefinition);
         }
-        return roleToAccessProfileDefinitions;
-    }
-
-    private List<RoleToAccessProfileDefinition> mockRoleToMultipleAccessProfileDefinitions(String roleName,
-                                                                                           String caseTypeId,
-                                                                                           boolean disabled,
-                                                                                           List<String> authorisations1,
-                                                                                           List<String>
-                                                                                               authorisations2) {
-        RoleToAccessProfileDefinition roleToAccessProfileDefinition1 = mock(RoleToAccessProfileDefinition.class);
-        when(roleToAccessProfileDefinition1.getDisabled()).thenReturn(disabled);
-        when(roleToAccessProfileDefinition1.getReadOnly()).thenReturn(false);
-        when(roleToAccessProfileDefinition1.getCaseTypeId()).thenReturn(caseTypeId);
-        when(roleToAccessProfileDefinition1.getRoleName()).thenReturn(roleName);
-        when(roleToAccessProfileDefinition1.getAccessProfileList()).thenReturn(Lists.newArrayList());
-        when(roleToAccessProfileDefinition1.getAuthorisationList()).thenReturn(authorisations1);
-        List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions = new ArrayList<>();
-        roleToAccessProfileDefinitions.add(roleToAccessProfileDefinition1);
-
-        RoleToAccessProfileDefinition roleToAccessProfileDefinition2 = mock(RoleToAccessProfileDefinition.class);
-        when(roleToAccessProfileDefinition2.getDisabled()).thenReturn(disabled);
-        when(roleToAccessProfileDefinition2.getReadOnly()).thenReturn(false);
-        when(roleToAccessProfileDefinition2.getCaseTypeId()).thenReturn(caseTypeId);
-        when(roleToAccessProfileDefinition2.getRoleName()).thenReturn(roleName);
-        when(roleToAccessProfileDefinition2.getAccessProfileList()).thenReturn(Lists.newArrayList());
-        when(roleToAccessProfileDefinition2.getAuthorisationList()).thenReturn(authorisations2);
-        roleToAccessProfileDefinitions.add(roleToAccessProfileDefinition2);
-
         return roleToAccessProfileDefinitions;
     }
 }

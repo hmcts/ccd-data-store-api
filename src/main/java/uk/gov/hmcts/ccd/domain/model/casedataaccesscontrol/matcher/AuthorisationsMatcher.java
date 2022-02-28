@@ -33,7 +33,7 @@ public class AuthorisationsMatcher implements RoleAttributeMatcher {
 
     @Override
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseDetails caseDetails) {
-        Map<String, List<RoleToAccessProfileDefinition>> roleToAccessProfileDefinitionMap =
+        Map<String, RoleToAccessProfileDefinition> roleToAccessProfileDefinitionMap =
             authorisationMapper.toRoleNameAsKeyMap(caseDetails.getCaseTypeId());
 
         return matchAuthorisations(roleAssignment, roleToAccessProfileDefinitionMap);
@@ -41,37 +41,30 @@ public class AuthorisationsMatcher implements RoleAttributeMatcher {
 
     @Override
     public boolean matchAttribute(RoleAssignment roleAssignment, CaseTypeDefinition caseTypeDefinition) {
-        Map<String, List<RoleToAccessProfileDefinition>> roleToAccessProfileDefinitionMap =
+        Map<String, RoleToAccessProfileDefinition> roleToAccessProfileDefinitionMap =
             authorisationMapper.toRoleNameAsKeyMap(caseTypeDefinition);
         return matchAuthorisations(roleAssignment, roleToAccessProfileDefinitionMap);
     }
 
     private boolean matchAuthorisations(RoleAssignment roleAssignment,
-                                        Map<String, List<RoleToAccessProfileDefinition>>
-                                            roleToAccessProfileDefinitionMap) {
-
-        List<RoleToAccessProfileDefinition> roleToAccessProfileDefinitions = roleToAccessProfileDefinitionMap
+                                        Map<String, RoleToAccessProfileDefinition> roleToAccessProfileDefinitionMap) {
+        RoleToAccessProfileDefinition roleToAccessProfileDefinition = roleToAccessProfileDefinitionMap
             .get(roleAssignment.getRoleName());
         List<String> roleAssignmentAuthorisations = roleAssignment.getAuthorisations();
 
         boolean emptyRoleAssignmentAuthorisations = CollectionUtils.isEmpty(roleAssignmentAuthorisations);
-        if (!emptyRoleAssignmentAuthorisations && roleToAccessProfileDefinitions != null
-            && !roleToAccessProfileDefinitions.isEmpty()) {
-
-            return roleToAccessProfileDefinitions.stream().anyMatch(definition -> {
-                    List<String> definitionAuthorisations = definition.getAuthorisationList();
-                    Boolean match = authorisationMapper
-                        .authorisationsAllowMappingToAccessProfiles(definitionAuthorisations,
-                            roleAssignmentAuthorisations);
-                    log.debug("Role Assignment id: {}, roleName: {} - Matching Authorisations to {} from "
-                            + "Access Profiles: {} with role assignment Authorisations: {}",
-                        roleAssignment.getId(),
-                        roleAssignment.getRoleName(),
-                        match,
-                        join(",", (definitionAuthorisations)), join(",", roleAssignmentAuthorisations));
-                    return match;
-                }
-            );
+        if (!emptyRoleAssignmentAuthorisations && roleToAccessProfileDefinition != null) {
+            List<String> definitionAuthorisations = roleToAccessProfileDefinition.getAuthorisationList();
+            boolean match = authorisationMapper.authorisationsAllowMappingToAccessProfiles(definitionAuthorisations,
+                roleAssignmentAuthorisations);
+            log.debug("Role Assignment id: {}, roleName: {} - Matching Authorisations to {} from Access Profiles: {}"
+                    + " with role assignment Authorisations: {}",
+                roleAssignment.getId(),
+                roleAssignment.getRoleName(),
+                match,
+                join(",", definitionAuthorisations),
+                join(",", roleAssignmentAuthorisations));
+            return match;
         }
         log.debug("Role Assignment id: {}, roleName: {} - Matching Authorisations to {}"
                 + " with role assignment Authorisations: {}",

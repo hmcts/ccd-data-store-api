@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ccd.data.casedetails.search.builder;
 
 import com.google.common.collect.Lists;
-import java.util.Arrays;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,6 +9,7 @@ import java.util.TreeSet;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
@@ -89,25 +90,8 @@ public abstract class GrantTypeQueryBuilder {
             .collect(Collectors.toCollection(TreeSet::new));
     }
 
-    protected Set<AccessProfile> getAccessProfiles(RoleAssignment roleAssignment,
+    private Set<AccessProfile> getAccessProfiles(RoleAssignment roleAssignment,
                                                  CaseTypeDefinition caseTypeDefinition) {
         return caseDataAccessControl.filteredAccessProfiles(List.of(roleAssignment), caseTypeDefinition, false);
-    }
-
-    protected List<String> getCaseAccessCategories(RoleAssignment roleAssignment, CaseTypeDefinition caseType) {
-        Set<AccessProfile> accessProfiles = getAccessProfiles(roleAssignment, caseType);
-
-        if (ignoreCaseAccessCategoryQuery(accessProfiles)) {
-            return Lists.newArrayList();
-        }
-        return accessProfiles.stream()
-            .filter(ap -> ap.getCaseAccessCategories() != null)
-            .flatMap(ap -> Arrays.stream(ap.getCaseAccessCategories().split(",")))
-            .collect(Collectors.toList());
-    }
-
-    private boolean ignoreCaseAccessCategoryQuery(Set<AccessProfile> accessProfiles) {
-        return accessProfiles.stream()
-            .anyMatch(ap -> ap.getCaseAccessCategories() == null);
     }
 }
