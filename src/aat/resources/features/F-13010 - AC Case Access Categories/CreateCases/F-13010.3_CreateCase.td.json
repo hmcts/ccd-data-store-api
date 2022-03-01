@@ -9,7 +9,7 @@
     "body": {
       "event_token": "${[scenarioContext][parentContext][childContexts][F-13010.3_CreateCase_Token_Creation][testData][actualResponse][body][token]}",
       "data": {
-        "CaseAccessCategoryId": "FamilyLaw/Standard"
+        "CaseAccessCategory": "FamilyLaw/Standard"
       }
     }
   },
@@ -17,7 +17,7 @@
   "expectedResponse": {
     "body" : {
       "data": {
-        "CaseAccessCategoryId": "FamilyLaw/Standard"
+        "CaseAccessCategory": "FamilyLaw/Standard"
       }
     }
   }
