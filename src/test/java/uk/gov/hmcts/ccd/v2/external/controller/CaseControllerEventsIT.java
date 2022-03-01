@@ -2,8 +2,6 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import java.util.Arrays;
-import javax.inject.Inject;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +17,9 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.v2.V2;
 import uk.gov.hmcts.ccd.v2.external.resource.CaseEventsResource;
+
+import javax.inject.Inject;
+import java.util.Arrays;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
@@ -68,7 +69,8 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         template = new JdbcTemplate(db);
 
-        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+        if (applicationParams.getEnableAttributeBasedAccessControl()
+            && !applicationParams.getEnablePseudoAccessProfilesGeneration()) {
             CaseTypeDefinition caseTypeDefinition = enhanceGetCaseTypeStubWithAccessProfiles(
                 "bookcase-no-event-access-to-caserole-definition.json",
                 roleToAccessProfileDefinition(CASE_ROLE_1),
@@ -126,8 +128,9 @@ public class CaseControllerEventsIT extends WireMockBaseTest {
         scripts = {"classpath:sql/insert_cases_event_access_case_roles.sql"})
     public void shouldReturnEventHistoryDataForCitizenWhoHasCaseRoleAccess() throws Exception {
         // we need to add AccessProfiles to the caseType and include prefix when pseudo generation enabled
-        String caseRole1 = CASE_ROLE_1;
-        String caseRole2 = CASE_ROLE_2;
+        boolean pseudoAPGeneration = applicationParams.getEnablePseudoAccessProfilesGeneration();
+        String caseRole1 = pseudoAPGeneration ? "idam:" + CASE_ROLE_1 : CASE_ROLE_1;
+        String caseRole2 = pseudoAPGeneration ? "idam:" + CASE_ROLE_2 : CASE_ROLE_2;
 
         stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + UID_WITH_EVENT_ACCESS))
             .willReturn(okJson(defaultObjectMapper.writeValueAsString(

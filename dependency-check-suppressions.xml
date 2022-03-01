@@ -49,17 +49,4 @@
     		<vulnerabilityName>CWE-862: Missing Authorization</vulnerabilityName>
   	</suppress>
 
-	<!-- Temporary suppression before fix -->
-	<suppress>
-		<cve>CVE-2021-44832</cve>
-		<cve>CVE-2021-42550</cve>
-		<cve>CVE-2021-22060</cve>
-		<cve>CVE-2022-23181</cve>
-	</suppress>
-
-	<suppress>
-		<packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-core@.*$</packageUrl>
-		<vulnerabilityName>CWE-862: Missing Authorization</vulnerabilityName>
-	</suppress>
-
 </suppressions>
