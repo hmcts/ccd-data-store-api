@@ -1,4 +1,4 @@
-@F-13010 @currentrun
+@F-13010
 Feature: F-13010: Case Access Category Tests
 
   Background: Load test data for the scenario
