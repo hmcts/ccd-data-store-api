@@ -2,12 +2,12 @@
   "_guid_": "S-13010.9.5",
 
   "specs" : [
+    "an active profile in CCD",
     "Role Assignments that don't apply for the scenario of creating a case have been filtered out",
-    "contains CaseAccessCategory with NULL value",
-    "contains CaseAccessCategory with Civil/Standard, Criminal/Standard value",
-    "C1 contains an CaseAccessCategory field value as FamilyLaw/Standard",
-    "attempts to get the previously created case"
-  ],
+    "the RoleToAccessProfiles tab contains CaseAccessCategory with NULL value",
+    "the RoleToAccessProfiles tab contains CaseAccessCategory with Civil/Standard, Criminal/Standard value",
+    "the case C1 contains an CaseAccessCategory field value as FamilyLaw/Standard"
+    ],
 
   "productName": "CCD Data Store",
   "operationName": "external get case",

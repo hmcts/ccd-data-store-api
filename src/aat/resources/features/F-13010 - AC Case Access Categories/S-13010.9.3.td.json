@@ -2,10 +2,10 @@
   "_guid_": "S-13010.9.3",
 
   "specs" : [
+    "an active profile in CCD",
     "Role Assignments that don't apply for the scenario of creating a case have been filtered out",
-    "contains CaseAccessCategory with pattern - Civil/Standard, Criminal/Serious",
-    "C1 contains an CaseAccessCategory field value as NULL",
-    "attempts to get the previously created case"
+    "the RoleToAccessProfiles tab contains CaseAccessCategory with pattern - Civil/Standard, Criminal/Serious",
+    "the case C1 contains an CaseAccessCategory field value as NULL"
   ],
 
   "productName": "CCD Data Store",

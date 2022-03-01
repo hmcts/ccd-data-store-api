@@ -2,8 +2,9 @@
   "_guid_": "S-13010.9.1",
 
   "specs" : [
-    "contains CaseAccessCategory with pattern - Civil/Standard, Criminal/Serious",
-    "C1 contains an CaseAccessCategory field value as Civil/Standard/Legal"
+    "an active profile in CCD",
+    "the RoleToAccessProfiles tab contains CaseAccessCategory with pattern - Civil/Standard, Criminal/Serious",
+    "the case C1 contains an CaseAccessCategory field value as Civil/Standard/Legal"
   ],
 
   "productName": "CCD Data Store",
