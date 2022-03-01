@@ -1,0 +1,111 @@
+{
+  "title": "Successfully creates a case with correct data type for Date fields using V1: /caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases endpoint",
+  "_guid_": "S-1004.13",
+  "_extends_": "Case_Creation_Base",
+  "specs": [
+    "an active profile in CCD",
+    "contains a Text value for the Date fields",
+    "contains a SearchCriteria with SearchParty including the Dates",
+    "to create a full case"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_GlobalSearch"
+    },
+    "body": {
+      "data": {
+        "dateOfBirthText": "2012-01-01",
+        "dateOfDeathText": "2022-01-01",
+        "OtherName": "other-name"
+      },
+      "event_token": "${[scenarioContext][childContexts][F-1004_Case_Data_Create_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "jurisdiction": "BEFTA_MASTER",
+      "state": "CaseCreated",
+      "case_type_id": "FT_GlobalSearch",
+      "supplementary_data": null,
+      "case_data": {
+        "dateOfBirthText": "2012-01-01",
+        "dateOfDeathText": "2022-01-01",
+        "OtherName": "other-name",
+        "SearchCriteria": {
+          "SearchParties": [
+            {
+              "__ordering__": "UNORDERED",
+              "__elementId__": "value"
+            },
+            {
+              "value": {
+                "Name": "other-name",
+                "DateOfBirth": "2012-01-01",
+                "DateOfDeath": "2022-01-01"
+              },
+              "id": "[[ANYTHING_PRESENT]]"
+            }
+          ]
+        }
+      },
+      "data_classification": {
+        "dateOfBirthText": "PUBLIC",
+        "dateOfDeathText": "PUBLIC",
+        "OtherName": "PUBLIC",
+        "SearchCriteria": {
+          "classification": "PUBLIC",
+          "value": {
+            "SearchParties": {
+              "classification": "PUBLIC",
+              "value": [
+                {
+                  "__ordering__": "UNORDERED",
+                  "__elementId__": "value"
+                },
+                {
+                  "value": {
+                    "Name": "PUBLIC",
+                    "DateOfBirth": "PUBLIC",
+                    "DateOfDeath": "PUBLIC"
+                  },
+                  "id": "[[ANYTHING_PRESENT]]"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "security_classifications": {
+        "dateOfBirthText": "PUBLIC",
+        "dateOfDeathText": "PUBLIC",
+        "OtherName": "PUBLIC",
+        "SearchCriteria": {
+          "classification": "PUBLIC",
+          "value": {
+            "SearchParties": {
+              "classification": "PUBLIC",
+              "value": [
+                {
+                  "__ordering__": "UNORDERED",
+                  "__elementId__": "value"
+                },
+                {
+                  "value": {
+                    "Name": "PUBLIC",
+                    "DateOfBirth": "PUBLIC",
+                    "DateOfDeath": "PUBLIC"
+                  },
+                  "id": "[[ANYTHING_PRESENT]]"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

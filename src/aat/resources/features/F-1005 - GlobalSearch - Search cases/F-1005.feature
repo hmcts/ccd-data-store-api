@@ -1,9 +1,9 @@
-@F-1005 @elasticsearch @Ignore # Exclude all tests until issues with them are resolved
+@F-1005 @elasticsearch
 Feature: F-1005: Global Search - Search cases
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source
-    And a successful call [to create the global search index] as in [F-1005_GlobalSearchIndexCreation]
+    And a successful call [to create the global search index] as in [GlobalSearchIndexCreation]
     And a case that has just been created as in [F-1005_CreateCasePreRequisiteCaseworker]
     And a wait time of [5] seconds [to allow for Logstash to index the case just created]
 
