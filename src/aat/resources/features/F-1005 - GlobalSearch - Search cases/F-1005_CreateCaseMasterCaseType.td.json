@@ -27,6 +27,11 @@
           "_extends_": "CaseManagementLocation_FromRefData_SiblingContext"
         }
       },
+      "supplementary_data_request": {
+        "$set": {
+          "HMCTSServiceId": "${[scenarioContext][siblingContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_code]}"
+        }
+      },
       "event": {
         "id": "createCase",
         "summary": "",
@@ -67,7 +72,9 @@
           "value" : { }
         }
       },
-			"supplementary_data": null,
+      "supplementary_data": {
+        "HMCTSServiceId": "${[scenarioContext][siblingContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_code]}"
+      },
 			"after_submit_callback_response": null,
 			"callback_response_status_code": null,
 			"callback_response_status": null,

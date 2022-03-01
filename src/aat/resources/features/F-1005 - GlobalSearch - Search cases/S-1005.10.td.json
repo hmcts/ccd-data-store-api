@@ -94,6 +94,8 @@
           "regionName": "[[ANY_NULLABLE]]",
           "CCDJurisdictionId": "BEFTA_MASTER",
           "CCDJurisdictionName": "BEFTA Master",
+          "HMCTSServiceId" : "${[scenarioContext][childContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_code]}",
+          "HMCTSServiceShortDescription" : "${[scenarioContext][childContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_short_description]}",
           "CCDCaseTypeId": "FT_GlobalSearch",
           "CCDCaseTypeName": "FT_GlobalSearch"
         }

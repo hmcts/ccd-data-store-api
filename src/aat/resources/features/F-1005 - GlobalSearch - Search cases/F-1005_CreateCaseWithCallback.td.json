@@ -23,6 +23,11 @@
     },
     "body": {
       "data": {},
+      "supplementary_data_request": {
+        "$set": {
+          "HMCTSServiceId": "${[scenarioContext][siblingContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_code]}"
+        }
+      },
       "event": {
         "id": "createCaseCallback",
         "summary": "",
@@ -52,7 +57,9 @@
       "data_classification": {
         "_extends_": "Befta_Global_Search_Data_Classifications"
       },
-      "supplementary_data": null,
+      "supplementary_data": {
+        "HMCTSServiceId": "${[scenarioContext][siblingContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_code]}"
+      },
       "after_submit_callback_response": null,
       "callback_response_status_code": null,
       "callback_response_status": null,
