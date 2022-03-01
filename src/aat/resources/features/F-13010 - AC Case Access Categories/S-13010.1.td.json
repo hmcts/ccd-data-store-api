@@ -30,8 +30,18 @@
     }
   },
   "expectedResponse": {
+    "_extends_": "Common_200_Response",
     "headers": {
-      "_extends_": "Common_200_Response"
+      "Cache-Control" : "[[ANYTHING_PRESENT]]",
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
+      "Content-Type" : "[[ANYTHING_PRESENT]]",
+      "Date" :"[[ANYTHING_PRESENT]]",
+      "Expires" : "[[ANYTHING_PRESENT]]",
+      "Pragma" :"[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security" : "[[ANYTHING_PRESENT]]",
+      "X-Content-Type-Options" : "[[ANYTHING_PRESENT]]",
+      "X-Frame-Options" : "[[ANYTHING_PRESENT]]",
+      "X-Xss-Protection" : "[[ANYTHING_PRESENT]]"
     },
     "body" : {
       "_links" : {
