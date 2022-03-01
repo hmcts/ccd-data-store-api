@@ -4,8 +4,8 @@
 
   "specs" : [
     "an active profile in CCD",
-    "contains CaseAccessCategory with pattern Civil Standard, Criminal Serious",
-    "C1 contains an CaseAccessCategory field value as Civil Standard Legal"
+    "the RoleToAccessProfiles tab contains CaseAccessCategory with pattern Civil Standard, Criminal Serious",
+    "the case C1 contains an CaseAccessCategory field value as Civil Standard Legal"
   ],
 
   "productName": "CCD Data Store",

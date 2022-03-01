@@ -10,8 +10,8 @@ Feature: F-13010: Case Access Category Tests
     Given a case that has just been created as in [F-13010.1_CreateCase],
     And a user with [an active profile in CCD],
     When a request is prepared with appropriate values,
-    And the RoleToAccessProfiles tab [contains CaseAccessCategory with pattern Civil Standard, Criminal Serious],
-    And the case [C1 contains an CaseAccessCategory field value as Civil Standard Legal],
+    And [the RoleToAccessProfiles tab contains CaseAccessCategory with pattern Civil Standard, Criminal Serious] in the context,
+    And [the case C1 contains an CaseAccessCategory field value as Civil Standard Legal] in the context,
     And it is submitted to call the [external get case] operation of [CCD Data Store],
     Then a positive response is received,
     And the response has all the details as expected
