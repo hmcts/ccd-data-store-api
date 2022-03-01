@@ -42,33 +42,34 @@
         }
       },
       "case_details" : {
-        "id" : null,
-        "jurisdiction" : "BEFTA_MASTER",
-        "state" : null,
-        "version" : null,
-        "case_type_id" : "FT_CaseAccessCategories",
-        "created_date" : null,
-        "last_modified" : null,
-        "last_state_modified_date" : null,
-        "security_classification" : null,
-        "case_data" : {
-          "CaseAccessCategory" : "DefaultValue test",
-          "TextField" : "DefaultValue test"
+        "id": null,
+        "jurisdiction": "BEFTA_MASTER",
+        "state": null,
+        "version": null,
+        "case_type_id": "FT_CaseAccessCategories",
+        "created_date": null,
+        "last_modified": null,
+        "last_state_modified_date": null,
+        "security_classification": null,
+        "case_data": {
+          "CaseAccessCategory": "DefaultValue test",
+          "TextField": "DefaultValue test"
         },
-        "data_classification" : {
-          "CaseAccessCategory" : "PUBLIC",
-          "TextField" : "PUBLIC"
+        "data_classification": {
+          "CaseAccessCategory": "PUBLIC",
+          "TextField": "PUBLIC"
         },
-        "supplementary_data" : null,
-        "after_submit_callback_response" : null,
-        "callback_response_status_code" : null,
-        "callback_response_status" : null,
-        "delete_draft_response_status_code" : null,
-        "delete_draft_response_status" : null,
-        "security_classifications" : {
-          "CaseAccessCategory" : "PUBLIC",
-          "TextField" : "PUBLIC"
-        },
+        "supplementary_data": null,
+        "after_submit_callback_response": null,
+        "callback_response_status_code": null,
+        "callback_response_status": null,
+        "delete_draft_response_status_code": null,
+        "delete_draft_response_status": null,
+        "security_classifications": {
+          "CaseAccessCategory": "PUBLIC",
+          "TextField": "PUBLIC"
+        }
+      },
       "event_id" : "CREATE"
     }
   }
