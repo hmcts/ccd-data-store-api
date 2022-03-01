@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-1005_GlobalSearchIndexCreation",
+  "_guid_": "GlobalSearchIndexCreation",
   "productName": "CCD Definition Store",
   "operationName": "to create the global search index",
   "method": "POST",
