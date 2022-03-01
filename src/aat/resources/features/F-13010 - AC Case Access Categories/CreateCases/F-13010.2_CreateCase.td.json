@@ -7,9 +7,6 @@
       "event_token": "${[scenarioContext][parentContext][childContexts][F-13010.2_CreateCase_Token_Creation][testData][actualResponse][body][token]}",
       "data": {
         "CaseAccessCategory": "FamilyLaw/Standard"
-      },
-      "event_data": {
-        "CaseAccessCategory": "FamilyLaw/Standard"
       }
     }
   },
