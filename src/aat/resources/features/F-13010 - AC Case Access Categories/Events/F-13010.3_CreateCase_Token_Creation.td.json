@@ -6,5 +6,11 @@
     "pathVariables": {
       "caseTypeId": "FT_CaseAccessCategories_1"
     }
+  },
+
+  "expectedResponse": {
+      "case_details" : {
+        "case_type_id" : "FT_CaseAccessCategories_1"
+      }
   }
 }

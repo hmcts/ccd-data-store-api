@@ -36,7 +36,7 @@ Feature: F-13010: Case Access Category Tests
     When a request is prepared with appropriate values,
     And [Role Assignments that don't apply for the scenario of creating a case have been filtered out] in the context,
     And [the RoleToAccessProfiles tab contains CaseAccessCategory with pattern - Civil/Standard, Criminal/Serious] in the context,
-    And [the case C1 contains an CaseAccessCategory field value as NULL]
+    And [the case C1 contains an CaseAccessCategory field value as NULL] in the context,
     And it is submitted to call the [external get case] operation of [CCD Data Store],
     Then a negative response is received
     And the response has all other details as expected.
