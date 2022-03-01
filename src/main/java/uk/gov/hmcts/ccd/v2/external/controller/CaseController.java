@@ -107,12 +107,9 @@ public class CaseController {
     @LogAudit(operationType = CASE_ACCESSED, caseId = "#caseId",
         jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")
     public ResponseEntity<CaseResource> getCase(@PathVariable("caseId") String caseId) {
-        if (!caseReferenceService.validateUID(caseId)) {
-            throw new BadRequestException(V2.Error.CASE_ID_INVALID);
-        }
+        validateCaseReference(caseId);
 
-        final CaseDetails caseDetails = this.getCaseOperation.execute(caseId)
-                                                             .orElseThrow(() -> new CaseNotFoundException(caseId));
+        final CaseDetails caseDetails = getCaseDetails(caseId);
 
         return ResponseEntity.ok(new CaseResource(caseDetails));
     }
@@ -348,9 +345,7 @@ public class CaseController {
         )
     })
     public ResponseEntity<CaseEventsResource> getCaseEvents(@PathVariable("caseId") String caseId) {
-        if (!caseReferenceService.validateUID(caseId)) {
-            throw new BadRequestException(V2.Error.ERROR_CASE_ID_INVALID);
-        }
+        validateCaseReference(caseId);
 
         final List<AuditEvent> auditEvents = getEventsOperation.getEvents(caseId);
 
@@ -413,21 +408,46 @@ public class CaseController {
                                            @RequestBody SupplementaryDataUpdateRequest supplementaryDataUpdateRequest) {
 
         this.requestValidator.validate(supplementaryDataUpdateRequest);
-        if (!caseReferenceService.validateUID(caseId)) {
-            throw new BadRequestException(V2.Error.CASE_ID_INVALID);
-        }
+        validateCaseReference(caseId);
         SupplementaryData supplementaryDataUpdated = supplementaryDataUpdateOperation.updateSupplementaryData(caseId,
             supplementaryDataUpdateRequest);
         return status(HttpStatus.OK).body(new SupplementaryDataResource(supplementaryDataUpdated));
     }
 
     private ResponseEntity<CaseResource> createCaseEvent(String caseId, CaseDataContent content) {
-        if (!caseReferenceService.validateUID(caseId)) {
-            throw new BadRequestException(V2.Error.CASE_ID_INVALID);
-        }
+        validateCaseReference(caseId);
 
         final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseId, content);
         return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content));
+    }
+
+    @GetMapping(
+        path = "/categoriesAndDocuments/{caseRef}",
+        produces = {
+            V2.MediaType.CASE
+        }
+    )
+    @ApiResponses({
+        @ApiResponse(
+            code = 204,
+            message = "Success"
+        ),
+        @ApiResponse(
+            code = 400,
+            message = V2.Error.CASE_ID_INVALID
+        ),
+        @ApiResponse(
+            code = 404,
+            message = V2.Error.CASE_NOT_FOUND
+        )
+    })
+    /*TODO @LogAudit(operationType = CASE_ACCESSED, caseId = "#caseId",
+        jurisdiction = "#result.body.jurisdiction", caseType = "#result.body.caseType")*/
+    public ResponseEntity<Void> getCategoriesAndDocuments(@PathVariable("caseRef") final String caseRef) {
+        validateCaseReference(caseRef);
+        final CaseDetails caseDetails = getCaseDetails(caseRef);
+
+        return ResponseEntity.noContent().build();  // TODO: for now
     }
 
     private ResponseEntity<CaseResource> getCaseResourceResponseEntity(String caseTypeId,
@@ -436,5 +456,16 @@ public class CaseController {
 
         final CaseDetails caseDetails = createCaseOperation.createCaseDetails(caseTypeId, content, ignoreWarning);
         return status(HttpStatus.CREATED).body(new CaseResource(caseDetails, content, ignoreWarning));
+    }
+
+    private void validateCaseReference(final String caseReference) {
+        if (!caseReferenceService.validateUID(caseReference)) {
+            throw new BadRequestException(V2.Error.CASE_ID_INVALID);
+        }
+    }
+
+    private CaseDetails getCaseDetails(final String caseReference) {
+        return getCaseOperation.execute(caseReference)
+            .orElseThrow(() -> new CaseNotFoundException(caseReference));
     }
 }

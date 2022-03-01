@@ -3,11 +3,14 @@ package uk.gov.hmcts.ccd.v2.external.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -37,17 +40,21 @@ import uk.gov.hmcts.ccd.v2.external.resource.SupplementaryDataResource;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
@@ -188,8 +195,8 @@ class CaseControllerTest {
             when(caseDetails.getLastStateModifiedDate()).thenReturn(stateModified);
 
             final ResponseEntity<CaseResource> response = caseController.createCase(CASE_TYPE_ID,
-                                                                                    CASE_DATA_CONTENT,
-                                                                                    IGNORE_WARNING);
+                CASE_DATA_CONTENT,
+                IGNORE_WARNING);
 
             assertAll(
                 () -> assertThat(response.getStatusCode(), is(HttpStatus.CREATED)),
@@ -366,7 +373,7 @@ class CaseControllerTest {
         }
 
         private void validateResponseData(Map<String, Object> response, String expectedKey, Object expectedValue) {
-            Map<String, Object> childMap = (Map<String, Object> ) response.get("orgs_assigned_users");
+            Map<String, Object> childMap = (Map<String, Object>) response.get("orgs_assigned_users");
             assertTrue(childMap.containsKey(expectedKey));
             assertEquals(expectedValue, childMap.get(expectedKey));
         }
@@ -411,6 +418,66 @@ class CaseControllerTest {
             auditEvent.setUserFirstName("First_Name");
             auditEvent.setUserLastName("Last_Name");
             return auditEvent;
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /categoriesAndDocuments/{caseReference}")
+    class GetCategoriesAndDocuments {
+
+        @Test
+        @DisplayName("should return 200 when case found")
+        void caseFound() {
+            // WHEN
+            final ResponseEntity<Void> response = caseController.getCategoriesAndDocuments(CASE_REFERENCE);
+
+            // THEN
+            assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT));
+            assertNull(response.getBody());
+        }
+
+        @Test
+        @DisplayName("should propagate CaseNotFoundException when case NOT found")
+        void caseNotFound() {
+            // GIVEN
+            doReturn(Optional.empty()).when(getCaseOperation).execute(CASE_REFERENCE);
+
+            // WHEN
+            final Throwable thrown = catchThrowable(() -> caseController.getCategoriesAndDocuments(CASE_REFERENCE));
+
+            // THEN
+            Assertions.assertThat(thrown)
+                .isInstanceOf(CaseNotFoundException.class)
+                .hasMessage(String.format("No case found for reference: %s", CASE_REFERENCE));
+        }
+
+        @Test
+        @DisplayName("should propagate BadRequestException when case reference not valid")
+        void caseReferenceNotValid() {
+            // GIVEN
+            doReturn(FALSE).when(caseReferenceService).validateUID(CASE_REFERENCE);
+
+            // WHEN
+            final Throwable thrown = catchThrowable(() -> caseController.getCategoriesAndDocuments(CASE_REFERENCE));
+
+            // THEN
+            Assertions.assertThat(thrown)
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("Case ID is not valid");
+        }
+
+        @Test
+        @DisplayName("should propagate exception")
+        void shouldPropagateExceptionWhenThrown() {
+            // GIVEN
+            doThrow(RuntimeException.class).when(getCaseOperation).execute(CASE_REFERENCE);
+
+            // WHEN
+            final Throwable thrown = catchThrowable(() -> caseController.getCategoriesAndDocuments(CASE_REFERENCE));
+
+            // THEN
+            Assertions.assertThat(thrown)
+                .isInstanceOf(Exception.class);
         }
     }
 }
