@@ -118,7 +118,7 @@ public class DefinitionsCachingIT {
 
     @Test
     public void testTtlBasedEvictionOfJurisdictionLists() throws InterruptedException {
-        Assert.assertEquals(3, applicationParams.getJurisdictionTTLSecs());
+        Assert.assertEquals(3, applicationParams.getJurisdictionTtl());
 
         verify(caseDefinitionRepository, times(0)).getJurisdictionFromDefinitionStore("J2");
         caseDefinitionRepository.getJurisdiction("J2");

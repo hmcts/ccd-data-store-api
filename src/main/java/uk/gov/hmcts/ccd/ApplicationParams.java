@@ -393,7 +393,7 @@ public class ApplicationParams {
         return defaultCacheTtlSecs;
     }
 
-    public int getJurisdictionTTLSecs() {
+    public int getJurisdictionTtl() {
         return jurisdictionTTL;
     }
 
@@ -585,7 +585,7 @@ public class ApplicationParams {
         return requestScopeCachedCaseTypesTillHour;
     }
 
-    public Integer getSystemUserTokenCacheTTLSecs() {
+    public Integer getSystemUserTokenCacheTtl() {
         return systemUserTokenCacheTTLSecs;
     }
 }
