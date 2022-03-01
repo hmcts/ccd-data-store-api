@@ -1,0 +1,35 @@
+{
+  "_guid_": "Befta_Global_Search_Expected_Search_Criteria_Collection",
+  "_extends_": "Befta_Global_Search_Case_Data_Collection",
+
+  "SearchCriteria" : {
+    "SearchParties" : [
+      {
+        "__ordering__": "UNORDERED",
+        "__elementId__": "value"
+      },
+      {
+        "value" : {
+          "Name" : "FirstNameValue LastNameValue",
+          "EmailAddress" : "e@mail.com",
+          "AddressLine1" : "Address Value",
+          "PostCode" : "SE1 4EE",
+          "DateOfBirth" : "2012-04-21",
+          "DateOfDeath" : "2020-04-21"
+        },
+        "id" : "[[ANYTHING_PRESENT]]"
+      },
+      {
+        "value" : {
+          "Name" : "FirstNameValue2 LastNameValue2",
+          "EmailAddress" : "e2@mail.com",
+          "AddressLine1" : "Address Value2",
+          "PostCode" : "SE2 4EE",
+          "DateOfBirth" : "1979-04-21",
+          "DateOfDeath" : "1980-04-21"
+        },
+        "id" : "[[ANYTHING_PRESENT]]"
+      }
+    ]
+  }
+}
