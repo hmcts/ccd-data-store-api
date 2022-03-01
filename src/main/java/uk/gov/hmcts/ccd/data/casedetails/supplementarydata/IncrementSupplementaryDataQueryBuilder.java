@@ -4,12 +4,18 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
 @Qualifier("increment")
 public class IncrementSupplementaryDataQueryBuilder implements SupplementaryDataQueryBuilder {
+
+    private static final Logger LOG = LoggerFactory.getLogger(IncrementSupplementaryDataQueryBuilder.class);
+
     @SuppressWarnings("checkstyle:LineLength") //don't want to break long SQL statement
     private static final String INC_UPDATE_QUERY = "UPDATE case_data SET "
             + "supplementary_data= (CASE"
@@ -31,8 +37,19 @@ public class IncrementSupplementaryDataQueryBuilder implements SupplementaryData
         Query query = entityManager.createNativeQuery(INC_UPDATE_QUERY);
         setCommonProperties(query, caseReference, fieldPath, fieldValue);
         String jsonValue = requestedDataToJson(fieldPath, fieldValue);
+        LOG.info("Before json_value {}, node_path {}, value {}, reference {}",
+            jsonValue,
+            Arrays.asList(fieldPath.split(Pattern.quote("."))),
+            query.getParameter("value"),
+            query.getParameter("reference"));
+        query.setParameter("value", fieldValue);
         query.setParameter("json_value", jsonValue);
         query.setParameter("node_path", Arrays.asList(fieldPath.split(Pattern.quote("."))));
+        LOG.info("After json_value {}, node_path {}, value {}, reference {}",
+            query.getParameter("json_value"),
+            query.getParameter("node_path"),
+            query.getParameter("value"),
+            query.getParameter("reference"));
         return query;
     }
 
