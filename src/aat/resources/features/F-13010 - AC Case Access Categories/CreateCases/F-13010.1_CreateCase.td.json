@@ -15,6 +15,9 @@
     "body" : {
       "data": {
         "CaseAccessCategory": "Civil/Standard/Legal"
+      },
+      "event_data": {
+        "CaseAccessCategory": "Civil/Standard/Legal"
       }
     }
   }
