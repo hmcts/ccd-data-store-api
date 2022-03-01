@@ -9,8 +9,10 @@
   },
 
   "expectedResponse": {
-    "case_details" : {
-      "case_type_id" : "FT_CaseAccessCategories_2"
+    "body" : {
+      "case_details" : {
+        "case_type_id" : "FT_CaseAccessCategories_2"
+      }
     }
   }
 }

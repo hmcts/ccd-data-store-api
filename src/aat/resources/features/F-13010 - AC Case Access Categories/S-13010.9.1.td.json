@@ -42,33 +42,29 @@
       "X-Frame-Options" : "[[ANYTHING_PRESENT]]",
       "X-Xss-Protection" : "[[ANYTHING_PRESENT]]"
     },
-    "body" : {
-      "_links" : {
-        "self" : {
-          "href" : "[[ANYTHING_PRESENT]]"
+    "body": {
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
         }
       },
-      "id" : "[[ANYTHING_PRESENT]]",
-      "jurisdiction" :  "[[ANYTHING_PRESENT]]",
-      "case_type" :  "[[ANYTHING_PRESENT]]",
-      "created_on" : "[[ANYTHING_PRESENT]]",
-      "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-      "last_modified_on" : "[[ANYTHING_PRESENT]]",
-      "state" : "CaseCreated",
-      "security_classification" : "PUBLIC",
-      "data" : {
-        "CaseAccessCategory" : "Civil/Standard/Legal",
-        "TextField" : "value1"
+      "case_id": "[[ANYTHING_PRESENT]]",
+      "case_type" : {
+        "id" : "FT_CaseAccessCategories",
+        "name" : "FT_CaseAccessCategories",
+        "description" : "[[ANYTHING_PRESENT]]",
+        "jurisdiction" : {
+          "id" : "[[ANYTHING_PRESENT]]",
+          "name" : "[[ANYTHING_PRESENT]]",
+          "description" : "[[ANYTHING_PRESENT]]"
+        },
+        "printEnabled" : false
       },
-      "data_classification" : {
-        "CaseAccessCategory" : "PUBLIC",
-        "TextField" : "PUBLIC"
-      },
-      "after_submit_callback_response" : null,
-      "callback_response_status_code" : null,
-      "callback_response_status" : null,
-      "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null
+      "tabs": "[[ANYTHING_PRESENT]]",
+      "metadataFields": "[[ANYTHING_PRESENT]]",
+      "state": "[[ANYTHING_PRESENT]]",
+      "triggers": "[[ANYTHING_PRESENT]]",
+      "events": "[[ANYTHING_PRESENT]]"
     }
   }
 }
