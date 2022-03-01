@@ -1,0 +1,39 @@
+{
+  "title": "Returning all results from Global Search matching the users jurisdictions/case types, excluding any case where the user doesn't have Read access for a search field that they supplied",
+  "_guid_": "S-1006.4",
+  "_extends_": "F-1006_SearchCaseBase",
+  "specs": [
+    "no READ access to a field",
+    "contains the search field with no R access",
+    "doesn't contain any cases"
+  ],
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "caseManagementBaseLocationIds": [
+          "1"
+        ],
+        "caseManagementRegionIds": [
+          "3"
+        ]
+      }
+    }
+  },
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworker1"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body" : {
+      "resultInfo" : {
+        "casesReturned" : 0,
+        "caseStartRecord" : 1,
+        "moreResultsToGo" : false
+      },
+      "results" : [ ]
+    }
+  }
+}
+

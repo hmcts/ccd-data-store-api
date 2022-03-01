@@ -25,10 +25,10 @@
           "BEFTA_MASTER"
         ],
         "caseManagementBaseLocationIds": [
-          "123"
+          "1"
         ],
         "caseManagementRegionIds": [
-          "1"
+          "3"
         ],
         "parties": [
           {
@@ -78,11 +78,11 @@
             "FirstNameValue"
           ],
           "caseNameHmctsInternal": "Name Internal",
-          "baseLocationId": "123",
+          "baseLocationId": "1",
           "baseLocationName": "[[ANY_NULLABLE]]",
           "caseManagementCategoryId": "987",
           "caseManagementCategoryName": "Category label",
-          "regionId": "1",
+          "regionId": "3",
           "regionName": "[[ANY_NULLABLE]]",
           "CCDJurisdictionId": "BEFTA_MASTER",
           "CCDJurisdictionName": "BEFTA Master",

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ccd.domain.service.search.global;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.NonNull;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -74,11 +75,19 @@ public class GlobalSearchResponseTransformer {
                                                               final LocationLookup locationLookup) {
         final String jurisdictionId = caseDetails.getJurisdiction();
         final String caseTypeId = caseDetails.getCaseTypeId();
-        final Optional<JurisdictionDefinition> optionalJurisdiction =
-            Optional.ofNullable(caseDefinitionRepository.getJurisdiction(jurisdictionId));
-        final String caseTypeName = Optional.ofNullable(caseDefinitionRepository.getCaseType(caseTypeId))
+
+        final Optional<CaseTypeDefinition> optionalCaseType =
+            Optional.ofNullable(caseDefinitionRepository.getCaseType(caseTypeId));
+        Optional<JurisdictionDefinition> optionalJurisdiction =
+            optionalCaseType.map(CaseTypeDefinition::getJurisdictionDefinition);
+        // clear jurisdiction loaded from case type if ID doesn't match value from case details
+        if (!StringUtils.equals(optionalJurisdiction.map(JurisdictionDefinition::getId).orElse(null), jurisdictionId)) {
+            optionalJurisdiction = Optional.empty();
+        }
+        final String caseTypeName = optionalCaseType
             .map(CaseTypeDefinition::getName)
             .orElse(null);
+
         // NB: if no relevant case data has been index for record then use empty map rather than null
         final Map<String, JsonNode> caseData = Optional.ofNullable(caseDetails.getData()).orElse(new HashMap<>());
 

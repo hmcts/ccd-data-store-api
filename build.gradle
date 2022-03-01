@@ -48,7 +48,7 @@ def versions = [
         pact_version: '4.1.7'
 ]
 ext['spring-security.version'] = '5.4.7'
-ext['spring-framework.version'] = '5.3.12'
+ext['spring-framework.version'] = '5.3.15'
 
 
 dependencyUpdates.resolutionStrategy = {
@@ -167,7 +167,7 @@ dependencies {
 
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.1'
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
 
@@ -251,7 +251,8 @@ dependencies {
     // for sonar analysis
     testCompile group: 'org.openid4java', name: 'openid4java', version: '1.0.0'
     // remove me once insights is in
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
+    compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
 
     //excluding log4j-core which causes a vulnerability issue
     compile(group: 'io.searchbox', name: 'jest', version: '6.3.1') {
@@ -263,7 +264,7 @@ dependencies {
     compile 'org.jooq:jool-java-8:0.9.14'
     compile 'com.github.hmcts:ccd-case-document-am-client:1.7.1'
 
-    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.9.1'
+    testCompile group: 'com.github.hmcts', name: 'ccd-test-definitions', version: '7.10.19'
     testCompile group: 'com.github.hmcts', name: 'befta-fw', version: '8.7.1'
 
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
@@ -290,7 +291,7 @@ dependencyManagement {
 
         // CVE-2019-0232 - Java and Command Line injections in Windows (updated to version 9.0.19)
         // CVE-2021-42340 - Memory leak (updated to version 9.0.54)
-        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.54') {
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.58') {
             entry 'tomcat-embed-core'
             entry 'tomcat-embed-el'
             entry 'tomcat-embed-websocket'
@@ -747,8 +748,6 @@ task fortifyScan(type: JavaExec)  {
     main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
     classpath += sourceSets.test.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
-    // The line below prevents the build from failing if the Fortify scan detects issues
-    ignoreExitValue = true
 }
 
 idea {
