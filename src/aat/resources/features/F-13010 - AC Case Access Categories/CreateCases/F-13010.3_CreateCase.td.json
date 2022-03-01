@@ -16,9 +16,7 @@
 
   "expectedResponse": {
     "body" : {
-      "case_details" : {
-        "case_type_id" : "FT_CaseAccessCategories_1"
-      },
+      "case_type" : "FT_CaseAccessCategories_1",
       "data": {
         "CaseAccessCategory": "FamilyLaw/Standard"
       }
