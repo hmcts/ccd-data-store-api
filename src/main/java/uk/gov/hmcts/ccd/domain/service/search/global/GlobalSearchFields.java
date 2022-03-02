@@ -27,6 +27,7 @@ public final class GlobalSearchFields {
      */
     public static final class CaseDataFields {
 
+        public static final String CASE_ACCESS_CATEGORY = "CaseAccessCategory";
         public static final String CASE_MANAGEMENT_CATEGORY = "caseManagementCategory";
         public static final String CASE_MANAGEMENT_LOCATION = "caseManagementLocation";
         public static final String CASE_NAME_HMCTS_INTERNAL = "caseNameHmctsInternal";
@@ -109,6 +110,8 @@ public final class GlobalSearchFields {
     public static final class CaseDataPaths {
 
         // root fields
+        public static final String CASE_ACCESS_CATEGORY
+            = CASE_DATA_PREFIX + CaseDataFields.CASE_ACCESS_CATEGORY;
         public static final String CASE_MANAGEMENT_CATEGORY
             = CASE_DATA_PREFIX + CaseDataFields.CASE_MANAGEMENT_CATEGORY;
         public static final String CASE_MANAGEMENT_LOCATION
