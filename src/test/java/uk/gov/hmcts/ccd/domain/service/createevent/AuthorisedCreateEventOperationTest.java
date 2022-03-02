@@ -24,6 +24,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessCategoriesService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -105,6 +106,9 @@ class AuthorisedCreateEventOperationTest {
     @Mock
     private CaseAccessService caseAccessService;
 
+    @Mock
+    private CaseAccessCategoriesService caseAccessCategoriesService;
+
     private AuthorisedCreateEventOperation authorisedCreateEventOperation;
     private CaseDetails classifiedCase;
     private JsonNode authorisedCaseNode;
@@ -121,7 +125,8 @@ class AuthorisedCreateEventOperationTest {
             getCaseOperation,
             caseDefinitionRepository,
             accessControlService,
-            caseAccessService);
+            caseAccessService,
+            caseAccessCategoriesService);
 
         CaseDetails existingCase = new CaseDetails();
         Map<String, JsonNode> existingData = Maps.newHashMap();

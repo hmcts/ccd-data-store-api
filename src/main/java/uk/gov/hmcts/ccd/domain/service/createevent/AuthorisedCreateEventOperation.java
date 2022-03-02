@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessCategoriesService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -39,19 +41,22 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
     private final GetCaseOperation getCaseOperation;
     private final AccessControlService accessControlService;
     private final CaseAccessService caseAccessService;
+    private final CaseAccessCategoriesService caseAccessCategoriesService;
 
     public AuthorisedCreateEventOperation(@Qualifier("classified") final CreateEventOperation createEventOperation,
                                           @Qualifier("default") final GetCaseOperation getCaseOperation,
                                           @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                           final CaseDefinitionRepository caseDefinitionRepository,
                                           final AccessControlService accessControlService,
-                                          CaseAccessService caseAccessService) {
+                                          CaseAccessService caseAccessService,
+                                          CaseAccessCategoriesService caseAccessCategoriesService) {
 
         this.createEventOperation = createEventOperation;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.getCaseOperation = getCaseOperation;
         this.accessControlService = accessControlService;
         this.caseAccessService = caseAccessService;
+        this.caseAccessCategoriesService = caseAccessCategoriesService;
     }
 
     @Override
@@ -72,12 +77,21 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
         }
 
+        verifyCaseAccessCategories(accessProfiles, existingCaseDetails);
         verifyUpsertAccess(content.getEvent(), content.getData(), existingCaseDetails,
             caseTypeDefinition, accessProfiles);
 
         final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseReference,
                                                                              content);
         return verifyReadAccess(caseTypeDefinition, accessProfiles, caseDetails);
+    }
+
+    private void verifyCaseAccessCategories(Set<AccessProfile> accessProfiles, CaseDetails existingCaseDetails) {
+        Optional<CaseDetails> filteredCaseDetails = Optional.of(existingCaseDetails)
+            .filter(caseAccessCategoriesService.caseHasMatchingCaseAccessCategories(accessProfiles, false));
+        if (filteredCaseDetails.isEmpty()) {
+            throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
+        }
     }
 
     private CaseDetails verifyReadAccess(CaseTypeDefinition caseTypeDefinition,
