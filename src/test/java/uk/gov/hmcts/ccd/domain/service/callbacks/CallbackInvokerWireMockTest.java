@@ -3,7 +3,6 @@ package uk.gov.hmcts.ccd.domain.service.callbacks;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.ccd.WireMockBaseTest;
@@ -87,7 +86,6 @@ public class CallbackInvokerWireMockTest extends WireMockBaseTest {
     }
 
     @Test
-    @Ignore
     public void shouldNotRetryWhenCallbackRetriesDisabled() throws Exception {
 
         stubFor(post(urlMatching("/test-callbackGrrrr.*"))
