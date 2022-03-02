@@ -54,6 +54,22 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
         return caseEventResult.getSavedCaseDetails();
     }
 
+    @Transactional
+    @Override
+    public CaseDetails createCaseSystemEvent(final String caseReference, final CaseDataContent content,
+                                             final Integer version, final String attributePath,
+                                             final String categoryId) {
+        eventValidator.validate(content.getEvent());
+
+        final CreateCaseEventResult caseEventResult = createEventService.createCaseSystemEvent(caseReference, content,
+            version, attributePath, categoryId);
+
+        if (!isBlank(caseEventResult.getEventTrigger().getCallBackURLSubmittedEvent())) {
+            return invokeSubmitedToCallback(caseEventResult);
+        }
+        return caseEventResult.getSavedCaseDetails();
+    }
+
     private CaseDetails invokeSubmitedToCallback(CreateCaseEventResult caseEventResult) {
         CaseDetails caseDetails = caseEventResult.getSavedCaseDetails();
         try { // make a call back
