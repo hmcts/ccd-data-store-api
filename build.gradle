@@ -225,6 +225,12 @@ dependencies {
     runtime group: 'com.zaxxer', name: 'HikariCP', version: '4.0.2'
 
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    configurations.all {
+        exclude group: 'com.vaadin.external.google', module: 'android-json'
+    }
+    testImplementation group: 'org.json', name: 'json', version: '20211205'
+
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.cloud:spring-cloud-starter-contract-stub-runner')
     testCompile ('com.opentable.components:otj-pg-embedded:0.12.0')
