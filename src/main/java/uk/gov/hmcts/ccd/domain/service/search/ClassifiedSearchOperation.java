@@ -15,13 +15,15 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@Qualifier("classified")
+@Qualifier(ClassifiedSearchOperation.QUALIFIER)
 public class ClassifiedSearchOperation implements SearchOperation {
+    public static final String QUALIFIER = "classified";
+
     private final SearchOperation searchOperation;
     private final SecurityClassificationService classificationService;
 
     @Autowired
-    public ClassifiedSearchOperation(@Qualifier("default") SearchOperation searchOperation,
+    public ClassifiedSearchOperation(@Qualifier(DefaultSearchOperation.QUALIFIER) SearchOperation searchOperation,
                                      SecurityClassificationService classificationService) {
 
         this.searchOperation = searchOperation;
