@@ -93,11 +93,11 @@ public class ApplicationParams {
     @Value("${pagination.page.size}")
     private Integer paginationPageSize;
 
-    @Value("${definition.cache.max-idle.secs}")
-    private Integer definitionCacheMaxIdleSecs;
+    @Value("${default.cache.max-idle}")
+    private Integer defaultCacheMaxIdleSecs;
 
-    @Value("${definition.cache.latest-version-ttl}")
-    private Integer latestVersionTTLSecs;
+    @Value("${default.cache.ttl}")
+    private Integer defaultCacheTtlSecs;
 
     @Value("${definition.cache.jurisdiction-ttl}")
     private Integer jurisdictionTTL;
@@ -114,11 +114,11 @@ public class ApplicationParams {
     @Value("${user.cache.ttl.secs}")
     private Integer userCacheTTLSecs;
 
-    @Value("${definition.cache.max.size}")
-    private Integer definitionCacheMaxSize;
+    @Value("${default.cache.max.size}")
+    private Integer defaultCacheMaxSize;
 
-    @Value("${definition.cache.eviction.policy}")
-    private EvictionPolicy definitionCacheEvictionPolicy;
+    @Value("${default.cache.eviction.policy}")
+    private EvictionPolicy defaultCacheEvictionPolicy;
 
     @Value("#{'${search.elastic.hosts}'.split(',')}")
     private List<String> elasticSearchHosts;
@@ -399,12 +399,12 @@ public class ApplicationParams {
         return paginationPageSize;
     }
 
-    public int getDefinitionCacheMaxIdleSecs() {
-        return definitionCacheMaxIdleSecs;
+    public int getDefaultCacheMaxIdleSecs() {
+        return defaultCacheMaxIdleSecs;
     }
 
-    public int getLatestVersionTTLSecs() {
-        return latestVersionTTLSecs;
+    public int getDefaultCacheTtlSecs() {
+        return defaultCacheTtlSecs;
     }
 
     public int getJurisdictionTTLSecs() {
@@ -415,12 +415,12 @@ public class ApplicationParams {
         return userCacheTTLSecs;
     }
 
-    public int getDefinitionCacheMaxSize() {
-        return definitionCacheMaxSize;
+    public int getDefaultCacheMaxSize() {
+        return defaultCacheMaxSize;
     }
 
-    public EvictionPolicy getDefinitionCacheEvictionPolicy() {
-        return definitionCacheEvictionPolicy;
+    public EvictionPolicy getDefaultCacheEvictionPolicy() {
+        return defaultCacheEvictionPolicy;
     }
 
     public List<String> getSearchBlackList() {
