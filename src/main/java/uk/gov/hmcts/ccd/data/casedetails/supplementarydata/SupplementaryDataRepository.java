@@ -18,4 +18,6 @@ public interface SupplementaryDataRepository {
      * @return SupplementaryData
      */
     SupplementaryData findSupplementaryData(String caseReference, Set<String> requestedProperties);
+
+    String findSupplementaryData(String caseReference);
 }

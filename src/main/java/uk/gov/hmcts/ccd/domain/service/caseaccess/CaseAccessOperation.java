@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.data.caseaccess.GlobalCaseRole.CREATOR;
@@ -209,7 +210,7 @@ public class CaseAccessOperation {
     public void removeCaseUserRoles(List<CaseAssignedUserRoleWithOrganisation> caseUserRoles) {
         try {
             LOG.info("Entered into removeCaseUserRoles {}", caseUserRoles.size());
-            caseUserRoles.stream().forEach(System.out::println);
+            caseUserRoles.forEach(System.out::println);
 
             Map<CaseDetails, List<CaseAssignedUserRoleWithOrganisation>> cauRolesByCaseDetails =
                 getMapOfCaseAssignedUserRolesByCaseDetails(caseUserRoles);
@@ -253,28 +254,51 @@ public class CaseAccessOperation {
                 // submit list of all delete requests from all cases
                 roleAssignmentService.deleteRoleAssignments(deleteRequests);
             }
+
+            LOG.info("getEnableCaseUsersDbSync {}", applicationParams.getEnableCaseUsersDbSync());
             if (applicationParams.getEnableCaseUsersDbSync()) {
                 filteredCauRolesByCaseDetails.forEach((caseDetails, requestedAssignments) -> {
-                        Long caseId = Long.parseLong(caseDetails.getId());
-                        requestedAssignments.forEach(requestedAssignment ->
+                    Long caseId = Long.parseLong(caseDetails.getId());
+                    requestedAssignments.forEach(requestedAssignment -> {
+                        LOG.info("Before revokeAccess try-catch block");
+                        try {
+                            LOG.info("Before calling revokeAccess");
                             caseUserRepository.revokeAccess(caseId, requestedAssignment.getUserId(),
-                                requestedAssignment.getCaseRole())
-                        );
-                    }
-                );
+                                requestedAssignment.getCaseRole());
+                            LOG.info("After calling revokeAccess");
+                        } catch (Exception ex) {
+                            LOG.error("Exception while executing revokeAccess", ex);
+                        }
+                        LOG.info("After revokeAccess try-catch block");
+                    });
+                });
             }
 
             // determine counters after removal of requested mappings so that same function can be re-used
             // (i.e user still has an association to a case).
             Map<String, Map<String, Long>> removeUserCounts
                 = getNewUserCountByCaseAndOrganisation(filteredCauRolesByCaseDetails, null);
+            AtomicReference<String> caseRef = new AtomicReference<>();
+
             LOG.info("Before updating Supplementary data {}", removeUserCounts.size());
             removeUserCounts.forEach((caseReference, orgNewUserCountMap) ->
-                orgNewUserCountMap.forEach((organisationId, removeUserCount) ->
-                    supplementaryDataRepository.incrementSupplementaryData(caseReference,
-                        ORGS_ASSIGNED_USERS_PATH + organisationId, Math.negateExact(removeUserCount))
-                )
+                    orgNewUserCountMap.forEach((organisationId, removeUserCount) -> {
+                        caseRef.set(caseReference);
+                        LOG.info("Before Supplementary try-catch block");
+                        try {
+                            LOG.info("Before calling incrementSupplementaryData");
+                            supplementaryDataRepository.incrementSupplementaryData(caseReference,
+                                ORGS_ASSIGNED_USERS_PATH + organisationId, Math.negateExact(removeUserCount));
+                            LOG.info("After calling incrementSupplementaryData");
+                        } catch (Exception ex) {
+                            LOG.error("Exception while executing incrementSupplementaryData", ex);
+                        }
+                        LOG.info("Supplementary data after try-catch block {}",
+                            supplementaryDataRepository.findSupplementaryData(caseReference));
+                    })
             );
+            LOG.info("After updating Supplementary data {}",
+                supplementaryDataRepository.findSupplementaryData(caseRef.get()));
         } catch (Exception e) {
             LOG.error("Exception while executing removeCaseUserRoles", e);
         }

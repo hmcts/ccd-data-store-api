@@ -2,6 +2,8 @@ package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -59,6 +61,8 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
 @Service
 public class CreateCaseEventService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CreateCaseEventService.class);
 
     private final UserRepository userRepository;
     private final CaseDetailsRepository caseDetailsRepository;
@@ -136,6 +140,7 @@ public class CreateCaseEventService {
     public CreateCaseEventResult createCaseEvent(final String caseReference, final CaseDataContent content) {
 
         final CaseDetails caseDetails = getCaseDetails(caseReference);
+        LOG.info("case supplementary data => {} ", caseDetails.getSupplementaryData());
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
         final CaseEventDefinition caseEventDefinition = findAndValidateCaseEvent(
             caseTypeDefinition,
@@ -270,6 +275,9 @@ public class CreateCaseEventService {
         }
 
         caseDataIssueLogger.logAnyDataIssuesIn(caseDetailsBefore, caseDetails);
+        CaseDetails caseDetailsWithLatestSuppData = getCaseDetails(caseDetails.getReferenceAsString());
+        LOG.info("Latest supplementary data => {}", caseDetailsWithLatestSuppData.getSupplementaryData());
+        caseDetails.setSupplementaryData(caseDetailsWithLatestSuppData.getSupplementaryData());
         return caseDetailsRepository.set(caseDetails);
     }
 

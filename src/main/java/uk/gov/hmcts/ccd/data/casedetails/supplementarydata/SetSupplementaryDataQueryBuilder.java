@@ -1,15 +1,20 @@
 package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
 @Qualifier("set")
 public class SetSupplementaryDataQueryBuilder implements SupplementaryDataQueryBuilder {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SetSupplementaryDataQueryBuilder.class);
 
     private static final String SET_UPDATE_QUERY = "UPDATE case_data SET "
         + "supplementary_data= (CASE"
@@ -43,10 +48,18 @@ public class SetSupplementaryDataQueryBuilder implements SupplementaryDataQueryB
         String parentKey = fieldPath.split(Pattern.quote("."))[0];
         String jsonValue = requestedDataToJson(fieldPath, fieldValue);
         query.setParameter("json_value", jsonValue);
+        LOG.info("set json_value {}", jsonValue);
         String parentKeyJsonValue = requestedDataJsonForPath(fieldPath, fieldValue, parentKey);
         query.setParameter("json_value_insert", parentKeyJsonValue);
-        query.setParameter("parent_path", Arrays.asList(parentKey));
+        query.setParameter("parent_path", List.of(parentKey));
         query.setParameter("parent_key", "{" + parentKey + "}");
+        LOG.info("set leaf_node_key {}, json_value_insert {}, parent_path {}, parent_key {}, value {}, reference {}",
+            fieldPath.replaceAll(Pattern.quote("."), ","),
+            parentKeyJsonValue,
+            List.of(parentKey),
+            "{" + parentKey + "}",
+            fieldValue.toString(),
+            caseReference);
         return query;
     }
 
