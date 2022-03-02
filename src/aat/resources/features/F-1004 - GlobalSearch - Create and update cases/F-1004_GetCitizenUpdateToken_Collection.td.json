@@ -1,0 +1,10 @@
+{
+  "_guid_": "F-1004_GetCitizenUpdateToken_Collection",
+  "_extends_": "F-1004_GetCitizenUpdateToken",
+
+ "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1004_CreateCasePreRequisiteCitizen_Collection][testData][actualResponse][body][id]}"
+    }
+  }
+}

@@ -3,8 +3,8 @@
 
   "caseNameHmctsInternal": "Name Internal",
   "caseManagementLocation": {
-    "baseLocation": "123",
-    "region": "1"
+    "baseLocation": "1",
+    "region": "3"
   },
   "caseManagementCategory": {
     "value": {
@@ -18,8 +18,8 @@
       }
     ]
   },
-  "DateOfBirth": "2012-04-21",
-  "DateOfDeath": "2020-04-21",
+  "dateOfBirth": "2012-04-21",
+  "dateOfDeath": "2020-04-21",
   "Email": "e@mail.com",
   "Address": {
     "AddressLine1": "Address Value"

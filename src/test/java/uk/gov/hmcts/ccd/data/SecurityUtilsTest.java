@@ -40,7 +40,7 @@ class SecurityUtilsTest {
     private static final String SERVICE_JWT = "7gf364fg367f67";
     private static final String USER_ID = "123";
     private static final String USER_JWT = "Bearer 8gf364fg367f67";
-    private static final String SYSTEM_USER_TOKEN = "eyAidGVzdCI6InRlc3QiIH0";
+    private static final String SYSTEM_USER_JWT = "Bearer eyAidGVzdCI6InRlc3QiIH0";
 
     @Mock
     private Authentication authentication;
@@ -88,7 +88,7 @@ class SecurityUtilsTest {
     }
 
     @Test
-    @DisplayName("authorizationHeaders")
+    @DisplayName("Get authorization headers")
     void authorizationHeaders() {
         final HttpHeaders headers = securityUtils.authorizationHeaders();
 
@@ -100,11 +100,11 @@ class SecurityUtilsTest {
     }
 
     @Test
-    @DisplayName("authorizationHeadersForDataStoreSystemUser")
+    @DisplayName("Get authorization headers for data-store's system user")
     void authorizationHeadersForDataStoreSystemUser() {
 
         // GIVEN
-        doReturn(SYSTEM_USER_TOKEN).when(idamRepository).getDataStoreSystemUserAccessToken();
+        doReturn(SYSTEM_USER_JWT).when(idamRepository).getDataStoreSystemUserAccessToken();
 
         // WHEN
         final HttpHeaders headers = securityUtils.authorizationHeadersForDataStoreSystemUser();
@@ -112,7 +112,7 @@ class SecurityUtilsTest {
         // THEN
         assertAll(
             () -> assertHeader(headers, SecurityUtils.SERVICE_AUTHORIZATION, SERVICE_JWT),
-            () -> assertHeader(headers, HttpHeaders.AUTHORIZATION, "Bearer " + SYSTEM_USER_TOKEN)
+            () -> assertHeader(headers, HttpHeaders.AUTHORIZATION, SYSTEM_USER_JWT)
         );
     }
 
