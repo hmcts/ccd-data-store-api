@@ -64,11 +64,13 @@ public class CachingConfiguration {
     }
 
     private MapConfig newMapConfigWithMaxIdle(final String name, final Integer maxIdle) {
-        return newMapConfig(name).setMaxIdleSeconds(maxIdle);
+        final int defaultCacheTtl = appParams.getDefaultCacheTtlSecs();
+        return newMapConfig(name).setMaxIdleSeconds(maxIdle).setTimeToLiveSeconds(defaultCacheTtl);
     }
 
     private MapConfig newMapConfigWithTtl(final String name, final Integer ttl) {
-        return newMapConfig(name).setTimeToLiveSeconds(ttl);
+        final int defaultCacheMaxIdle = appParams.getDefaultCacheMaxIdleSecs();
+        return newMapConfig(name).setTimeToLiveSeconds(ttl).setMaxIdleSeconds(defaultCacheMaxIdle);
     }
 
     private MapConfig newMapConfig(final String name) {
