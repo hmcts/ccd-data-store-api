@@ -1,0 +1,47 @@
+{
+  "title": "Returning all results from Global Search matching the users jurisdictions/case types and including restricted cases",
+  "_guid_": "S-1006.5",
+  "_extends_": "F-1006_SearchCaseBase",
+  "specs": [
+    "field level RESTRICTED of security classification",
+    "contains the restricted case"
+  ],
+  "users": {
+    "invokingUser": {
+      "_extends_": "RestrictedCaseworker"
+    }
+  },
+  "request": {
+    "body": {
+      "searchCriteria": {
+        "parties": [
+          {
+            "emailAddress": "${[scenarioContext][childContexts][F-1006_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][case_data][Email]}"
+          }
+        ]
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "resultInfo": {
+        "casesReturned": 1,
+        "caseStartRecord": 1,
+        "moreResultsToGo": false
+      },
+      "results": [
+        {
+          "stateId": "CaseCreated",
+          "processForAccess": "NONE",
+          "caseReference": "[[ANYTHING_PRESENT]]",
+          "otherReferences": [],
+          "CCDJurisdictionId": "AUTOTEST1",
+          "CCDJurisdictionName": "Auto Test 1",
+          "CCDCaseTypeId": "SC_Restricted",
+          "CCDCaseTypeName": "SC_Restricted"
+        }
+      ]
+    }
+  }
+}

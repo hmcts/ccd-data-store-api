@@ -13,10 +13,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
 import uk.gov.hmcts.ccd.domain.model.search.global.SearchCriteria;
+import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchParser;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
@@ -49,6 +51,9 @@ class GlobalSearchEndpointTest {
     @Mock
     private GlobalSearchService globalSearchService;
 
+    @Mock
+    private GlobalSearchParser globalSearchParser;
+
     @InjectMocks
     private GlobalSearchEndpoint classUnderTest;
 
@@ -71,7 +76,7 @@ class GlobalSearchEndpointTest {
 
             doReturn(assembledSearchRequest).when(globalSearchService).assembleSearchQuery(any());
             doReturn(searchResults).when(caseSearchOperation).execute(any(), anyBoolean());
-            doReturn(transformedResult).when(globalSearchService).transformResponse(any(), any());
+            doReturn(transformedResult).when(globalSearchService).transformResponse(any(), any(), any());
         }
 
         @DisplayName("should set defaults, assemble query, execute search and transform response")
@@ -84,6 +89,9 @@ class GlobalSearchEndpointTest {
             SearchCriteria searchCriteria = new SearchCriteria();
             searchCriteria.setCcdCaseTypeIds(List.of(CASE_TYPE_1));
             doReturn(searchCriteria).when(globalSearchRequestPayload).getSearchCriteria();
+
+            final List<CaseDetails> filteredCaseList = globalSearchParser.filterCases(searchResults.getCases(),
+                                                                        globalSearchRequestPayload.getSearchCriteria());
 
             // ACT
             GlobalSearchResponsePayload output = classUnderTest.searchForCases(globalSearchRequestPayload);
@@ -98,7 +106,8 @@ class GlobalSearchEndpointTest {
             // :: execute search
             verify(caseSearchOperation).execute(eq(assembledSearchRequest), anyBoolean());
             // :: TransformResponse
-            verify(globalSearchService).transformResponse(globalSearchRequestPayload, searchResults);
+            verify(globalSearchService).transformResponse(globalSearchRequestPayload,
+                searchResults.getTotal(), filteredCaseList);
 
         }
 

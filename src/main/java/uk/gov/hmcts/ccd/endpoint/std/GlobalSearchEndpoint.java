@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.LogAudit;
+import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.search.CaseSearchResult;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchRequestPayload;
 import uk.gov.hmcts.ccd.domain.model.search.global.GlobalSearchResponsePayload;
 import uk.gov.hmcts.ccd.domain.model.std.validator.ValidationError;
+import uk.gov.hmcts.ccd.domain.service.globalsearch.GlobalSearchParser;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CaseSearchOperation;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.CrossCaseTypeSearchRequest;
 import uk.gov.hmcts.ccd.domain.service.search.elasticsearch.ElasticsearchQueryHelper;
@@ -29,6 +31,7 @@ import javax.validation.Valid;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,18 +48,20 @@ public class GlobalSearchEndpoint {
     private final CaseSearchOperation caseSearchOperation;
     private final ElasticsearchQueryHelper elasticsearchQueryHelper;
     private final GlobalSearchService globalSearchService;
+    private final GlobalSearchParser globalSearchParser;
 
     @SuppressWarnings({"squid:S1075"})
     public static final String GLOBAL_SEARCH_PATH = "/globalSearch";
 
     @Autowired
     public GlobalSearchEndpoint(@Qualifier(AuthorisedCaseSearchOperation.QUALIFIER)
-                                CaseSearchOperation caseSearchOperation,
+                                    CaseSearchOperation caseSearchOperation,
                                 ElasticsearchQueryHelper elasticsearchQueryHelper,
-                                GlobalSearchService globalSearchService) {
+                                GlobalSearchService globalSearchService, GlobalSearchParser globalSearchParser) {
         this.caseSearchOperation = caseSearchOperation;
         this.elasticsearchQueryHelper = elasticsearchQueryHelper;
         this.globalSearchService = globalSearchService;
+        this.globalSearchParser = globalSearchParser;
     }
 
     @PostMapping(path = GLOBAL_SEARCH_PATH, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
@@ -116,7 +121,11 @@ public class GlobalSearchEndpoint {
 
         CaseSearchResult caseSearchResult = caseSearchOperation.execute(searchRequest, true);
 
-        GlobalSearchResponsePayload result = globalSearchService.transformResponse(requestPayload, caseSearchResult);
+        List<CaseDetails> filteredCaseList = globalSearchParser.filterCases(caseSearchResult.getCases(),
+                                                                            requestPayload.getSearchCriteria());
+
+        GlobalSearchResponsePayload result = globalSearchService.transformResponse(requestPayload,
+            caseSearchResult.getTotal(), filteredCaseList);
 
         Duration between = Duration.between(start, Instant.now());
         log.debug("GlobalSearchEndpoint.searchForCases execution completed in {} milliseconds...", between.toMillis());
