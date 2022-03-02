@@ -21,7 +21,7 @@ public class IncrementSupplementaryDataQueryBuilder implements SupplementaryData
             + "        WHEN COALESCE(supplementary_data, '{}') = '{}' "
             + "        THEN COALESCE(supplementary_data, '{}') || :json_value\\:\\:jsonb"
             + "        WHEN jsonb_extract_path_text(COALESCE(supplementary_data, '{}'), :node_path) IS NULL "
-            + "        THEN jsonb_set(COALESCE(supplementary_data, '{}'), :leaf_node_key, (:value)\\:\\:TEXT\\:\\:jsonb)"
+            + "        THEN jsonb_set(COALESCE(supplementary_data, '{}'), :leaf_node_key, :value\\:\\:TEXT\\:\\:jsonb)"
             + "        WHEN jsonb_extract_path_text(COALESCE(supplementary_data, '{}'), :node_path) IS NOT NULL"
             + "        THEN jsonb_set(COALESCE(supplementary_data, '{}'), :leaf_node_key,"
             + "             (jsonb_extract_path_text(supplementary_data, :node_path)\\:\\:INT + :value) \\:\\:TEXT\\:\\:jsonb, false)"
