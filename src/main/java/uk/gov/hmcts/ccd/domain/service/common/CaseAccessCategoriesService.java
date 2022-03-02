@@ -23,7 +23,7 @@ public class CaseAccessCategoriesService {
             String value = getCaseAccessCategory(cd);
             Set<String> caseAccessCategories = getCaseAccessCategories(accessProfiles);
             return !StringUtils.isEmpty(value) && caseAccessCategories.stream()
-                .anyMatch(cac ->  value.startsWith(cac));
+                .anyMatch(value::startsWith);
         };
     }
 
