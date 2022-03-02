@@ -40,18 +40,15 @@ public class MigrationEndpoint {
     private final CaseLinkMigrationService caseLinkMigrationService;
 
     private final SearchOperation searchOperation;
-    private final FieldMapSanitizeOperation fieldMapSanitizeOperation;
 
     private final ElasticsearchQueryHelper elasticsearchQueryHelper;
 
     @Autowired
     public MigrationEndpoint(final CaseLinkMigrationService caseLinkMigrationService,
                              @Qualifier(AuthorisedSearchOperation.QUALIFIER) final SearchOperation searchOperation,
-                             final FieldMapSanitizeOperation fieldMapSanitizeOperation,
                              final ElasticsearchQueryHelper elasticsearchQueryHelper) {
         this.caseLinkMigrationService = caseLinkMigrationService;
         this.searchOperation = searchOperation;
-        this.fieldMapSanitizeOperation = fieldMapSanitizeOperation;
 
         this.elasticsearchQueryHelper = elasticsearchQueryHelper;
     }
@@ -88,7 +85,7 @@ public class MigrationEndpoint {
                 migrationResult.setFinalRecordId(Integer.parseInt(Iterables.getLast(caseDetails).getId()));
             }
         } else {
-            log.error("User does not have access to CaseType: '{}'", migrationParameters.getCaseDataId());
+            log.error("User does not have access to CaseType: '{}'", migrationParameters.getCaseTypeId());
             throw new ForbiddenException();
         }
         return migrationResult;
