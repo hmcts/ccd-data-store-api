@@ -14,8 +14,10 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Qualifier("default")
+@Qualifier(DefaultSearchOperation.QUALIFIER)
 public class DefaultSearchOperation implements SearchOperation {
+    public static final String QUALIFIER = "default";
+
     private final CaseDetailsRepository caseDetailsRepository;
 
     @Autowired

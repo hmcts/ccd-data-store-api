@@ -1528,13 +1528,24 @@ public class QueryEndpointIT extends WireMockBaseTest {
         final JurisdictionDisplayProperties[] jurisdictions = mapper.readValue(
             result.getResponse().getContentAsString(), JurisdictionDisplayProperties[].class);
 
+        // match against wiremock:`/src/test/resources/mappings/jurisdictions.json`
         assertAll(
             () -> assertThat(jurisdictions.length, is(equalTo(4))),
-            () -> assertThat(jurisdictions[1].getCaseTypeDefinitions().size(), is(equalTo(1))),
+            () -> assertThat(jurisdictions[1].getCaseTypeDefinitions().size(), is(equalTo(2))),
+
+            () -> assertThat(jurisdictions[1].getCaseTypeDefinitions().get(0),
+                hasProperty("id", equalTo("GrantOfRepresentation"))),
             () -> assertThat(jurisdictions[1].getCaseTypeDefinitions().get(0).getStates().size(),
                 is(equalTo(2))),
             () -> assertThat(jurisdictions[1].getCaseTypeDefinitions().get(0).getEvents().size(),
-                is(equalTo(2)))
+                is(equalTo(2))),
+
+            () -> assertThat(jurisdictions[1].getCaseTypeDefinitions().get(1),
+                hasProperty("id", equalTo("TestAddressBookCaseCaseLinks"))),
+            () -> assertThat(jurisdictions[1].getCaseTypeDefinitions().get(1).getStates().size(),
+                is(equalTo(2))),
+            () -> assertThat(jurisdictions[1].getCaseTypeDefinitions().get(1).getEvents().size(),
+                is(equalTo(3)))
         );
     }
 

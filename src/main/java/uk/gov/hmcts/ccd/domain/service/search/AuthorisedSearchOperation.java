@@ -40,7 +40,8 @@ public class AuthorisedSearchOperation implements SearchOperation {
     private final CaseUserRepository caseUserRepository;
 
     @Autowired
-    public AuthorisedSearchOperation(@Qualifier("classified") final SearchOperation searchOperation,
+    public AuthorisedSearchOperation(@Qualifier(ClassifiedSearchOperation.QUALIFIER)
+                                         final SearchOperation searchOperation,
                                      @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                          final CaseDefinitionRepository caseDefinitionRepository,
                                      final AccessControlService accessControlService,

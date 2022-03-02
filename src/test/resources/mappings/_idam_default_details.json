@@ -18,6 +18,7 @@
       }
     },
     {
+      "id": "13b731bd-e240-468b-96d1-84bb55079220",
       "request": {
         "method": "GET",
         "url": "/o/userinfo"

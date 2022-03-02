@@ -1,0 +1,28 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/o/userinfo",
+    "headers": {
+      "Authorization": {
+        "equalTo": "Bearer CaseworkerSSCS"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "sub": "CaseworkerSSCS@test.com",
+      "uid": "CaseworkerSSCS",
+      "roles": [
+        "caseworker",
+        "caseworker-sscs"
+      ],
+      "name": "Caseworker SSCS",
+      "given_name": "Caseworker",
+      "family_name": "SSCS"
+    }
+  }
+}
