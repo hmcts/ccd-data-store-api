@@ -2,10 +2,10 @@
   "_guid_": "S-13010.2",
 
   "specs" : [
+    "an active profile in CCD",
     "Role Assignments that don't apply for the scenario of creating a case have been filtered out",
-    "contains CaseAccessCategory with pattern - Civil/Standard, Criminal/Serious",
-    "C1 contains an CaseAccessCategory field value as FamilyLaw/Standard",
-    "attempts to get the previously created case"
+    "the RoleToAccessProfiles tab contains CaseAccessCategory with pattern - Civil/Standard, Criminal/Serious",
+    "the case C1 contains an CaseAccessCategory field value as FamilyLaw/Standard"
   ],
 
   "productName": "CCD Data Store",
@@ -16,7 +16,7 @@
 
   "users": {
     "invokingUser": {
-      "_extends_": "Common_User_For_Request"
+      "_extends_": "BeftaMasterCaseworker"
     }
   },
 
@@ -31,6 +31,13 @@
   },
 
   "expectedResponse": {
-    "_extends_": "Common_404_Response"
+    "_extends_": "Common_404_Response",
+    "body": {
+      "exception": "uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException",
+      "message": "[[ANYTHING_PRESENT]]",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
   }
 }
