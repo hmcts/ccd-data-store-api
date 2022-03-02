@@ -26,7 +26,8 @@ import static java.util.Collections.emptyList;
 
 class MigrationEndpointTest {
 
-    private MigrationEndpoint endpoint;
+    private static final String CASE_TYPE_ID = "CaseTypeId";
+    private static final String JURISDICTION_ID = "Jurisdiction";
 
     @Mock
     private CaseLinkMigrationService service;
@@ -34,6 +35,8 @@ class MigrationEndpointTest {
     private SearchOperation operation;
     @Mock
     private ElasticsearchQueryHelper elasticsearchQueryHelper;
+
+    private MigrationEndpoint endpoint;
 
     @BeforeEach
     void setup() {
@@ -44,8 +47,6 @@ class MigrationEndpointTest {
 
     @Test
     void shouldRunNoCasesFound() {
-        String caseTypeId = "CaseTypeId";
-        String jurisdiction = "Jurisdiction";
         Long caseDataId = 1L;
         Integer numRecords = 5;
 
@@ -53,7 +54,7 @@ class MigrationEndpointTest {
         caseTypesAvailableToUser.add("CaseTypeId");
 
         MigrationParameters migrationParameters =
-            new MigrationParameters(caseTypeId, jurisdiction, caseDataId, numRecords);
+            new MigrationParameters(CASE_TYPE_ID, JURISDICTION_ID, caseDataId, numRecords);
 
         doReturn(caseTypesAvailableToUser).when(elasticsearchQueryHelper).getCaseTypesAvailableToUser();
         doReturn(emptyList()).when(operation).execute(migrationParameters);
@@ -69,19 +70,18 @@ class MigrationEndpointTest {
 
     @Test
     void shouldNotAuthoriseCaseTypeId() {
-        String caseTypeId = "CaseTypeId1";
-        String jurisdiction = "Jurisdiction";
-        Long caseDataId = 1L;
-        Integer numRecords = 5;
-
         // GIVEN
         List<String> caseTypesAvailableToUser = new ArrayList<>();
         caseTypesAvailableToUser.add("CaseTypeId2");
 
         doReturn(caseTypesAvailableToUser).when(elasticsearchQueryHelper).getCaseTypesAvailableToUser();
 
+        String caseTypeId = "CaseTypeId1";
+        Long caseDataId = 1L;
+        Integer numRecords = 5;
+
         MigrationParameters migrationParameters =
-            new MigrationParameters(caseTypeId, jurisdiction, caseDataId, numRecords);
+            new MigrationParameters(caseTypeId, JURISDICTION_ID, caseDataId, numRecords);
 
         // WHEN
         Exception exception = assertThrows(ForbiddenException.class, () -> {
@@ -98,11 +98,6 @@ class MigrationEndpointTest {
 
     @Test
     void shouldRunSingleCaseFound() {
-        String caseTypeId = "CaseTypeId";
-        String jurisdiction = "Jurisdiction";
-        Long caseDataId = 1L;
-        Integer numRecords = 5;
-
         List<String> caseTypesAvailableToUser = new ArrayList<>();
         caseTypesAvailableToUser.add("CaseTypeId");
 
@@ -112,8 +107,11 @@ class MigrationEndpointTest {
         List<CaseDetails> cases = new ArrayList<>();
         cases.add(caseDetails);
 
+        Long caseDataId = 1L;
+        Integer numRecords = 5;
+
         MigrationParameters migrationParameters =
-            new MigrationParameters(caseTypeId, jurisdiction, caseDataId, numRecords);
+            new MigrationParameters(CASE_TYPE_ID, JURISDICTION_ID, caseDataId, numRecords);
 
         doReturn(caseTypesAvailableToUser).when(elasticsearchQueryHelper).getCaseTypesAvailableToUser();
         doReturn(cases).when(operation).execute(migrationParameters);
@@ -128,11 +126,6 @@ class MigrationEndpointTest {
 
     @Test
     void shouldRunMultipleCasesFound() {
-        String caseTypeId = "CaseTypeId";
-        String jurisdiction = "Jurisdiction";
-        Long caseDataId = 1L;
-        Integer numRecords = 5;
-
         List<String> caseTypesAvailableToUser = new ArrayList<>();
         caseTypesAvailableToUser.add("CaseTypeId");
 
@@ -145,8 +138,11 @@ class MigrationEndpointTest {
         cases.add(caseDetails1);
         cases.add(caseDetails2);
 
+        Long caseDataId = 1L;
+        Integer numRecords = 5;
+
         MigrationParameters migrationParameters =
-            new MigrationParameters(caseTypeId, jurisdiction, caseDataId, numRecords);
+            new MigrationParameters(CASE_TYPE_ID, JURISDICTION_ID, caseDataId, numRecords);
 
         doReturn(caseTypesAvailableToUser).when(elasticsearchQueryHelper).getCaseTypesAvailableToUser();
         doReturn(cases).when(operation).execute(migrationParameters);
