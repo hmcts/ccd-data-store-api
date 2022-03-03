@@ -234,8 +234,7 @@ public class CreateCaseEventService {
     }
 
     public CreateCaseEventResult createCaseSystemEvent(final String caseReference, final CaseDataContent content,
-                                                       final Integer version, final String attributePath,
-                                                       final String categoryId) {
+                                                       final String attributePath, final String categoryId) {
         final CaseDetails caseDetails = getCaseDetails(caseReference);
         final CaseEventDefinition caseEventDefinition = new CaseEventDefinition();
         caseEventDefinition.setId("DocumentUpdated");

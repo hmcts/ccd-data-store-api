@@ -6,7 +6,11 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.stream.Collectors;
+
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +20,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.documentdata.CollectionData;
+import uk.gov.hmcts.ccd.data.documentdata.DocumentData;
 import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
@@ -26,6 +32,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
+import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -41,6 +48,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
@@ -107,10 +115,13 @@ class AuthorisedCreateEventOperationTest {
 
     private AuthorisedCreateEventOperation authorisedCreateEventOperation;
     private CaseDetails classifiedCase;
+    private CaseDetails documentFieldsCase;
     private JsonNode authorisedCaseNode;
     private final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
     private final List<CaseFieldDefinition> caseFieldDefinitions = Lists.newArrayList();
     private final List<CaseEventDefinition> events = Lists.newArrayList();
+    private final String categoryId = "categoryId";
+    private final Map<String, JsonNode> documentData = new HashMap<>();
 
     @BeforeEach
     void setUp() {
@@ -344,4 +355,209 @@ class AuthorisedCreateEventOperationTest {
             CASE_DATA_CONTENT);
         assertThat(caseDetails, is(nullValue()));
     }
+
+    @Test
+    void shouldSuccessfullyReturnCaseDetailsWhenTopLevelDocumentFieldIdentifiedByAttributePathWithAllCorrectDetails() {
+        Event event = new Event();
+        event.setEventId("DocumentUpdated");
+        CaseDataContent caseDataContent = new CaseDataContent();
+        caseDataContent.setEvent(event);
+        caseDataContent.setData(NEW_DATA);
+        CaseDetails existingCase = new CaseDetails();
+        existingCase.setVersion(1);
+        existingCase.setCaseTypeId(CASE_TYPE_ID);
+        existingCase.setState(STATE_ID);
+        DocumentData document = new DocumentData();
+        document.setFilename("filename");
+        String attributeField = "DocumentField1";
+        documentData.put(attributeField, MAPPER.convertValue(document, JsonNode.class));
+        existingCase.setData(documentData);
+        String caseReference = "1122334455";
+        when(getCaseOperation.execute(caseReference)).thenReturn(Optional.of(existingCase));
+        documentFieldsCase = new CaseDetails();
+        documentFieldsCase.setVersion(2);
+        doReturn(documentFieldsCase).when(createEventOperation).createCaseSystemEvent(caseReference,
+            caseDataContent, 1, attributeField, categoryId);
+
+        CaseDetails updatedCaseDetails = authorisedCreateEventOperation.createCaseSystemEvent(caseReference,
+            caseDataContent, 1, attributeField, categoryId);
+
+        assertEquals(documentFieldsCase, updatedCaseDetails);
+    }
+
+    @Test
+    void shouldSuccessfullyReturnCaseDetailsWhenComplexDocumentFieldHasMatchingDetails() {
+        Event event = new Event();
+        event.setEventId("DocumentUpdated");
+        CaseDataContent caseDataContent = new CaseDataContent();
+        caseDataContent.setEvent(event);
+        caseDataContent.setData(NEW_DATA);
+        CaseDetails existingCase = new CaseDetails();
+        existingCase.setVersion(1);
+        existingCase.setCaseTypeId(CASE_TYPE_ID);
+        existingCase.setState(STATE_ID);
+        DocumentData document = new DocumentData();
+        document.setFilename("filename");
+        documentData.put("AnotherField", MAPPER.convertValue(document, JsonNode.class));
+        Map<String, JsonNode> map = new HashMap<>();
+        map.put("DocumentField1", MAPPER.convertValue(documentData, JsonNode.class));
+        existingCase.setData(map);
+        String caseReference = "1122334455";
+        when(getCaseOperation.execute(caseReference)).thenReturn(Optional.of(existingCase));
+        documentFieldsCase = new CaseDetails();
+        documentFieldsCase.setVersion(2);
+        String attributeField = "DocumentField1.AnotherField";
+        doReturn(documentFieldsCase).when(createEventOperation).createCaseSystemEvent(caseReference,
+            caseDataContent, 1, attributeField, categoryId);
+
+        CaseDetails updatedCaseDetails = authorisedCreateEventOperation.createCaseSystemEvent(caseReference,
+            caseDataContent, 1, attributeField, categoryId);
+
+        assertEquals(documentFieldsCase, updatedCaseDetails);
+    }
+
+    @Test
+    void shouldSuccessfullyReturnCaseDetailsWhenCollectionDocumentFieldHasMatchingDetails() {
+        Event event = new Event();
+        event.setEventId("DocumentUpdated");
+        CaseDataContent caseDataContent = new CaseDataContent();
+        caseDataContent.setEvent(event);
+        caseDataContent.setData(NEW_DATA);
+        CaseDetails existingCase = new CaseDetails();
+        existingCase.setVersion(1);
+        existingCase.setCaseTypeId(CASE_TYPE_ID);
+        existingCase.setState(STATE_ID);
+        Map<String, String> collectionMap = new HashMap<>();
+        CollectionData collectionData = new CollectionData();
+        collectionData.setId("12345");
+        collectionMap.put("document_url", "someUrl");
+        collectionData.setValue(collectionMap);
+        List<CollectionData> collectionDataList = new ArrayList<>();
+        collectionDataList.add(collectionData);
+        Map<String, JsonNode> dataMap = new HashMap<>();
+        dataMap.put("DocumentField1", MAPPER.convertValue(collectionDataList, JsonNode.class));
+        existingCase.setData(dataMap);
+        String caseReference = "1122334455";
+        when(getCaseOperation.execute(caseReference)).thenReturn(Optional.of(existingCase));
+        documentFieldsCase = new CaseDetails();
+        documentFieldsCase.setVersion(2);
+        String attributeField = "DocumentField1[12345]";
+        doReturn(documentFieldsCase).when(createEventOperation).createCaseSystemEvent(caseReference,
+            caseDataContent, 1, attributeField, categoryId);
+
+        CaseDetails updatedCaseDetails = authorisedCreateEventOperation.createCaseSystemEvent(caseReference,
+            caseDataContent, 1, attributeField, categoryId);
+
+        assertEquals(documentFieldsCase, updatedCaseDetails);
+    }
+
+    @Test
+    void shouldSuccessfullyReturnCaseDetailsWhenComplexCollectionDocumentFieldHasMatchingDetails() {
+        Event event = new Event();
+        event.setEventId("DocumentUpdated");
+        CaseDataContent caseDataContent = new CaseDataContent();
+        caseDataContent.setEvent(event);
+        caseDataContent.setData(NEW_DATA);
+        CaseDetails existingCase = new CaseDetails();
+        existingCase.setVersion(1);
+        existingCase.setCaseTypeId(CASE_TYPE_ID);
+        existingCase.setState(STATE_ID);
+        Map<String, JsonNode> map1 = new HashMap<>();
+        DocumentData documentData = new DocumentData();
+        documentData.setUrl("someurl");
+        map1.put("Document", MAPPER.convertValue(documentData, JsonNode.class));
+        Map<String, JsonNode> map2 = new HashMap<>();
+        map2.put("id", MAPPER.convertValue("12345", JsonNode.class));
+        map2.put("value", MAPPER.convertValue(map1, JsonNode.class));
+        List<Map<String, JsonNode>> collectionDataList = new ArrayList<>();
+        collectionDataList.add(map2);
+        Map<String, JsonNode> map3 = new HashMap<>();
+        map3.put("DocumentField1", MAPPER.convertValue(collectionDataList, JsonNode.class));
+        Map<String, JsonNode> map4 = new HashMap<>();
+        map4.put("Complex", MAPPER.convertValue(map3, JsonNode.class));
+        existingCase.setData(map4);
+        String caseReference = "1122334455";
+        when(getCaseOperation.execute(caseReference)).thenReturn(Optional.of(existingCase));
+        documentFieldsCase = new CaseDetails();
+        documentFieldsCase.setVersion(2);
+        String attributeField = "Complex.DocumentField1[12345].Document";
+        doReturn(documentFieldsCase).when(createEventOperation).createCaseSystemEvent(caseReference,
+            caseDataContent, 1, attributeField, categoryId);
+
+        CaseDetails updatedCaseDetails = authorisedCreateEventOperation.createCaseSystemEvent(caseReference,
+            caseDataContent, 1, attributeField, categoryId);
+
+        assertEquals(documentFieldsCase, updatedCaseDetails);
+    }
+
+    @Test
+    void shouldSuccessfullyReturnCaseDetailsWhenCollectionComplexDocumentFieldHasMatchingDetails() {
+        Event event = new Event();
+        event.setEventId("DocumentUpdated");
+        CaseDataContent caseDataContent = new CaseDataContent();
+        caseDataContent.setEvent(event);
+        caseDataContent.setData(NEW_DATA);
+        CaseDetails existingCase = new CaseDetails();
+        existingCase.setVersion(1);
+        existingCase.setCaseTypeId(CASE_TYPE_ID);
+        existingCase.setState(STATE_ID);
+        Map<String, JsonNode> map1 = new HashMap<>();
+        DocumentData documentData = new DocumentData();
+        documentData.setUrl("someurl");
+        map1.put("Document", MAPPER.convertValue(documentData, JsonNode.class));
+        Map<String, JsonNode> map2 = new HashMap<>();
+        map2.put("id", MAPPER.convertValue("12345", JsonNode.class));
+        map2.put("value", MAPPER.convertValue(map1, JsonNode.class));
+        List<Map<String, JsonNode>> collectionDataList = new ArrayList<>();
+        collectionDataList.add(map2);
+        Map<String, JsonNode> map3 = new HashMap<>();
+        map3.put("DocumentField1", MAPPER.convertValue(collectionDataList, JsonNode.class));
+        existingCase.setData(map3);
+        String caseReference = "1122334455";
+        when(getCaseOperation.execute(caseReference)).thenReturn(Optional.of(existingCase));
+        documentFieldsCase = new CaseDetails();
+        documentFieldsCase.setVersion(2);
+        String attributeField = "DocumentField1[12345].Document";
+        doReturn(documentFieldsCase).when(createEventOperation).createCaseSystemEvent(caseReference,
+            caseDataContent, 1, attributeField, categoryId);
+
+        CaseDetails updatedCaseDetails = authorisedCreateEventOperation.createCaseSystemEvent(caseReference,
+            caseDataContent, 1, attributeField, categoryId);
+
+        assertEquals(documentFieldsCase, updatedCaseDetails);
+    }
+
+    @Test
+    void shouldThrowBadRequestExceptionWhenCollectionFieldDoesNotMatchAttributePath() {
+        Event event = new Event();
+        event.setEventId("DocumentUpdated");
+        CaseDataContent caseDataContent = new CaseDataContent();
+        caseDataContent.setEvent(event);
+        caseDataContent.setData(NEW_DATA);
+        CaseDetails existingCase = new CaseDetails();
+        existingCase.setVersion(1);
+        existingCase.setCaseTypeId(CASE_TYPE_ID);
+        existingCase.setState(STATE_ID);
+        Map<String, String> collectionMap = new HashMap<>();
+        CollectionData collectionData = new CollectionData();
+        collectionData.setId("12345");
+        collectionMap.put("document_url", "someUrl");
+        collectionData.setValue(collectionMap);
+        List<CollectionData> collectionDataList = new ArrayList<>();
+        collectionDataList.add(collectionData);
+        Map<String, JsonNode> dataMap = new HashMap<>();
+        dataMap.put("DocumentField2", MAPPER.convertValue(collectionDataList, JsonNode.class));
+        existingCase.setData(dataMap);
+        String caseReference = "1122334455";
+        when(getCaseOperation.execute(caseReference)).thenReturn(Optional.of(existingCase));
+        documentFieldsCase = new CaseDetails();
+        documentFieldsCase.setVersion(2);
+        String attributeField = "DocumentField1[12345]";
+        doReturn(documentFieldsCase).when(createEventOperation).createCaseSystemEvent(caseReference,
+            caseDataContent, 1, attributeField, categoryId);
+
+        assertThrows(BadRequestException.class, () -> authorisedCreateEventOperation
+            .createCaseSystemEvent(caseReference, caseDataContent, 1, attributeField, categoryId));
+    }
+
 }
