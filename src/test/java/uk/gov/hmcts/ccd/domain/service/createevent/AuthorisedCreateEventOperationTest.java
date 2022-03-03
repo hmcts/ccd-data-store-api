@@ -46,7 +46,6 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -410,11 +409,14 @@ class AuthorisedCreateEventOperationTest {
         when(caseAccessService.getAccessProfiles(anyString())).thenReturn(accessProfiles);
         when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(accessProfiles);
 
-        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(accessProfiles), eq(CAN_UPDATE))).
-            thenReturn(true);
-        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(accessProfiles),
+        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
+            eq(accessProfiles), eq(CAN_UPDATE)))
+            .thenReturn(true);
+        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
+            eq(accessProfiles),
             eq(CAN_UPDATE))).thenReturn(true);
-        when(accessControlService.canAccessCaseStateWithCriteria(eq(STATE_ID), eq(caseTypeDefinition), eq(accessProfiles),
+        when(accessControlService.canAccessCaseStateWithCriteria(eq(STATE_ID),
+            eq(caseTypeDefinition), eq(accessProfiles),
             eq(CAN_UPDATE))).thenReturn(true);
 
         when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_ID),
