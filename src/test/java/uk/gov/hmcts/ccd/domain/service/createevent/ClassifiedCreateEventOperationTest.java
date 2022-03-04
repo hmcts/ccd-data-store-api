@@ -1,6 +1,16 @@
 package uk.gov.hmcts.ccd.domain.service.createevent;
 
 import java.util.Optional;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,15 +19,6 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
-import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ccd.domain.service.common.TestBuildersUtil.CaseDataContentBuilder.newCaseDataContent;
 
 class ClassifiedCreateEventOperationTest {
 
@@ -67,8 +68,11 @@ class ClassifiedCreateEventOperationTest {
     void shouldReturnNullWhenOperationReturnsNull() {
         doReturn(null).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
                                                                   CASE_DATA_CONTENT);
-        assertThrows(CaseNotFoundException.class, () ->
-            classifiedCreateEventOperation.createCaseEvent(CASE_REFERENCE, CASE_DATA_CONTENT));
+
+        final CaseDetails output = classifiedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
+                                                                                  CASE_DATA_CONTENT);
+
+        assertThat(output, is(nullValue()));
     }
 
     @Test
@@ -90,8 +94,10 @@ class ClassifiedCreateEventOperationTest {
 
         doReturn(Optional.empty()).when(classificationService).applyClassification(caseDetails);
 
-        assertThrows(CaseNotFoundException.class, () ->
-            classifiedCreateEventOperation.createCaseEvent(CASE_REFERENCE, CASE_DATA_CONTENT));
+        final CaseDetails output = classifiedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
+                                                                                  CASE_DATA_CONTENT);
+
+        assertThat(output, is(nullValue()));
     }
 
 }

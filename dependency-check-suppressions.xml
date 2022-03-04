@@ -40,7 +40,7 @@
 		<cve>CVE-2007-1651</cve>
 		<cve>CVE-2007-1652</cve>
 	</suppress>
-	
+
 	<suppress until="2022-03-25">
     		<notes><![CDATA[
    			file name: spring-security-core-5.4.7.jar
