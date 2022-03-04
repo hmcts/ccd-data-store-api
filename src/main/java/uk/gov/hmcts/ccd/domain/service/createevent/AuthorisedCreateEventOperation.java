@@ -18,6 +18,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessCategoriesService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
@@ -90,7 +91,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         Optional<CaseDetails> filteredCaseDetails = Optional.of(existingCaseDetails)
             .filter(caseAccessCategoriesService.caseHasMatchingCaseAccessCategories(accessProfiles, false));
         if (filteredCaseDetails.isEmpty()) {
-            throw new ResourceNotFoundException(NO_CASE_TYPE_FOUND);
+            throw new CaseNotFoundException(existingCaseDetails.getReferenceAsString());
         }
     }
 

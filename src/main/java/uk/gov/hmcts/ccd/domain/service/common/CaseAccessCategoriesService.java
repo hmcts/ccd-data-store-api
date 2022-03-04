@@ -43,7 +43,7 @@ public class CaseAccessCategoriesService {
     }
 
     private boolean hasEmptyCaseAccessCategory(Set<AccessProfile> accessProfiles) {
-        return accessProfiles.isEmpty() || accessProfiles.stream()
+        return accessProfiles.stream()
             .anyMatch(ap -> StringUtils.isEmpty(ap.getCaseAccessCategories()));
     }
 }

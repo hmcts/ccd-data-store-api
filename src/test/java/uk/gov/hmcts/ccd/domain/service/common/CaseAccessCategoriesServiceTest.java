@@ -40,7 +40,7 @@ class CaseAccessCategoriesServiceTest {
         Predicate<CaseDetails> caseDetailsPredicate = caseAccessCategoriesService
             .caseHasMatchingCaseAccessCategories(Sets.newHashSet(), false);
         CaseDetails caseDetails = new CaseDetails();
-        assertTrue(caseDetailsPredicate.test(caseDetails));
+        assertFalse(caseDetailsPredicate.test(caseDetails));
     }
 
     @Test

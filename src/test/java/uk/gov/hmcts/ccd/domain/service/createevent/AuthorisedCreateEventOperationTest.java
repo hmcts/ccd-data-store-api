@@ -26,6 +26,7 @@ import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessCategoriesService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
@@ -379,13 +380,13 @@ class AuthorisedCreateEventOperationTest {
         doReturn(classifiedCase).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
             newCaseDataContent);
 
-        assertThrows(ResourceNotFoundException.class, () ->
+        assertThrows(CaseNotFoundException.class, () ->
             authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE, newCaseDataContent));
     }
 
     @Test
-    @DisplayName("should return true if case data match with case access categories")
-    void shouldReturnTrueIfCaseAccessCategoriesMatchCaseData() {
+    @DisplayName("should return case details if case data match with case access categories")
+    void shouldReturnCaseDetailsIfCaseAccessCategoriesMatchCaseData() {
         Set<AccessProfile> accessProfiles =
             createAccessProfilesWithCaseAccessCategories(Sets.newHashSet("Civil/Standard"));
         mockAccess(accessProfiles);
