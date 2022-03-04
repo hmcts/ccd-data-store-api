@@ -2,8 +2,9 @@
   "_guid_": "S-13010.9.1",
 
   "specs" : [
-    "contains CaseAccessCategory with pattern - Civil/Standard, Criminal/Serious",
-    "C1 contains an CaseAccessCategory field value as Civil/Standard/Legal"
+    "an active profile in CCD",
+    "the RoleToAccessProfiles tab contains CaseAccessCategory with pattern - Civil/Standard, Criminal/Serious",
+    "the case C1 contains an CaseAccessCategory field value as Civil/Standard/Legal"
   ],
 
   "productName": "CCD Data Store",
@@ -14,7 +15,7 @@
 
   "users": {
     "invokingUser": {
-      "_extends_": "Common_User_For_Request"
+      "_extends_": "BeftaMasterCaseworker"
     }
   },
 
@@ -28,31 +29,42 @@
     }
   },
   "expectedResponse": {
+    "_extends_": "Common_200_Response",
     "headers": {
-      "_extends_": "Common_Response_Headers",
-      "Content-Type" : "application/vnd.uk.gov.hmcts.ccd-data-store-api.case.v2+json;charset=UTF-8",
-      "Content-Length": "[[ANYTHING_PRESENT]]"
+      "Cache-Control" : "[[ANYTHING_PRESENT]]",
+      "Content-Length" : "[[ANYTHING_PRESENT]]",
+      "Content-Type" : "[[ANYTHING_PRESENT]]",
+      "Date" :"[[ANYTHING_PRESENT]]",
+      "Expires" : "[[ANYTHING_PRESENT]]",
+      "Pragma" :"[[ANYTHING_PRESENT]]",
+      "Strict-Transport-Security" : "[[ANYTHING_PRESENT]]",
+      "X-Content-Type-Options" : "[[ANYTHING_PRESENT]]",
+      "X-Frame-Options" : "[[ANYTHING_PRESENT]]",
+      "X-Xss-Protection" : "[[ANYTHING_PRESENT]]"
     },
-    "body" : {
-      "_links" : {
-        "self" : {
-          "href" : "[[ANYTHING_PRESENT]]"
+    "body": {
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
         }
       },
-      "id" : "[[ANYTHING_PRESENT]]",
-      "jurisdiction" :  "[[ANYTHING_PRESENT]]",
-      "case_type" :  "[[ANYTHING_PRESENT]]",
-      "created_on" : "[[ANYTHING_PRESENT]]",
-      "last_state_modified_on" : "[[ANY_TIMESTAMP_NOT_NULLABLE]]",
-      "last_modified_on" : "[[ANYTHING_PRESENT]]",
-      "state" : "CaseCreated",
-      "security_classification" : "PUBLIC",
-
-      "after_submit_callback_response" : null,
-      "callback_response_status_code" : null,
-      "callback_response_status" : null,
-      "delete_draft_response_status_code" : null,
-      "delete_draft_response_status" : null
+      "case_id": "[[ANYTHING_PRESENT]]",
+      "case_type" : {
+        "id" : "FT_CaseAccessCategories",
+        "name" : "FT_CaseAccessCategories",
+        "description" : "[[ANYTHING_PRESENT]]",
+        "jurisdiction" : {
+          "id" : "[[ANYTHING_PRESENT]]",
+          "name" : "[[ANYTHING_PRESENT]]",
+          "description" : "[[ANYTHING_PRESENT]]"
+        },
+        "printEnabled" : false
+      },
+      "tabs": "[[ANYTHING_PRESENT]]",
+      "metadataFields": "[[ANYTHING_PRESENT]]",
+      "state": "[[ANYTHING_PRESENT]]",
+      "triggers": "[[ANYTHING_PRESENT]]",
+      "events": "[[ANYTHING_PRESENT]]"
     }
   }
 }
