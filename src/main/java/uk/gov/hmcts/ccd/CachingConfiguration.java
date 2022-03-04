@@ -40,14 +40,15 @@ public class CachingConfiguration {
         final int userCacheTtl = appParams.getUserCacheTTLSecs();
         final int jurisdictionCacheTtl = appParams.getJurisdictionTTLSecs();
 
-        config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionsCache", defaultCacheTtl));
-        config.addMapConfig(newMapConfigWithTtl("workBasketResultCache", defaultCacheTtl));
-        config.addMapConfig(newMapConfigWithTtl("searchResultCache", defaultCacheTtl));
-        config.addMapConfig(newMapConfigWithTtl("searchCasesResultCache", defaultCacheTtl));
-        config.addMapConfig(newMapConfigWithTtl("searchInputDefinitionCache", defaultCacheTtl));
-        config.addMapConfig(newMapConfigWithTtl("workbasketInputDefinitionCache", defaultCacheTtl));
-        config.addMapConfig(newMapConfigWithTtl("caseTabCollectionCache", defaultCacheTtl));
-        config.addMapConfig(newMapConfigWithTtl("wizardPageCollectionCache", defaultCacheTtl));
+        config.addMapConfig(newMapConfigWithMaxIdle("caseTypeDefinitionsCache", defaultCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("workBasketResultCache", defaultCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("searchResultCache", defaultCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("searchCasesResultCache", defaultCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("searchInputDefinitionCache", defaultCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("workbasketInputDefinitionCache", defaultCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("caseTabCollectionCache", defaultCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("wizardPageCollectionCache", defaultCacheMaxIdle));
+
         config.addMapConfig(newMapConfigWithTtl("allJurisdictionsCache", jurisdictionCacheTtl));
         config.addMapConfig(newMapConfigWithTtl("userRolesCache", userCacheTtl));
         config.addMapConfig(newMapConfigWithTtl("caseTypePseudoRoleToAccessProfileCache", userCacheTtl));
