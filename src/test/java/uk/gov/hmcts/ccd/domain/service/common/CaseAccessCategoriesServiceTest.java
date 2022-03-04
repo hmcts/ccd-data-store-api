@@ -36,7 +36,7 @@ class CaseAccessCategoriesServiceTest {
     }
 
     @Test
-    void shouldReturnTrueWhenAccessProfilesAreEmpty() {
+    void shouldReturnFalseWhenAccessProfilesAreEmpty() {
         Predicate<CaseDetails> caseDetailsPredicate = caseAccessCategoriesService
             .caseHasMatchingCaseAccessCategories(Sets.newHashSet(), false);
         CaseDetails caseDetails = new CaseDetails();
