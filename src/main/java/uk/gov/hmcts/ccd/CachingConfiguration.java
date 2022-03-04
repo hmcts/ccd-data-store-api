@@ -35,29 +35,29 @@ public class CachingConfiguration {
     }
 
     private void configCaches(Config config) {
-        final int defaultCacheMaxIdle = appParams.getDefaultCacheMaxIdleSecs();
+        final int defaultMaxIdle = appParams.getDefaultCacheMaxIdleSecs();
         final int defaultCacheTtl = appParams.getDefaultCacheTtlSecs();
         final int userCacheTtl = appParams.getUserCacheTTLSecs();
         final int jurisdictionCacheTtl = appParams.getJurisdictionTTLSecs();
+        final int systemUserTokenCacheTTLSecs = appParams.getSystemUserTokenCacheTTLSecs();
 
-        config.addMapConfig(newMapConfigWithMaxIdle("caseTypeDefinitionsCache", defaultCacheMaxIdle));
-        config.addMapConfig(newMapConfigWithMaxIdle("workBasketResultCache", defaultCacheMaxIdle));
-        config.addMapConfig(newMapConfigWithMaxIdle("searchResultCache", defaultCacheMaxIdle));
-        config.addMapConfig(newMapConfigWithMaxIdle("searchCasesResultCache", defaultCacheMaxIdle));
-        config.addMapConfig(newMapConfigWithMaxIdle("searchInputDefinitionCache", defaultCacheMaxIdle));
-        config.addMapConfig(newMapConfigWithMaxIdle("workbasketInputDefinitionCache", defaultCacheMaxIdle));
-        config.addMapConfig(newMapConfigWithMaxIdle("caseTabCollectionCache", defaultCacheMaxIdle));
-        config.addMapConfig(newMapConfigWithMaxIdle("wizardPageCollectionCache", defaultCacheMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("caseTypeDefinitionsCache", defaultMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("workBasketResultCache", defaultMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("searchResultCache", defaultMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("searchCasesResultCache", defaultMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("searchInputDefinitionCache", defaultMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("workbasketInputDefinitionCache", defaultMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("caseTabCollectionCache", defaultMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("wizardPageCollectionCache", defaultMaxIdle));
+        config.addMapConfig(newMapConfigWithMaxIdle("caseTypePseudoRoleToAccessProfileCache", defaultMaxIdle));
 
-        config.addMapConfig(newMapConfigWithTtl("allJurisdictionsCache", jurisdictionCacheTtl));
-        config.addMapConfig(newMapConfigWithTtl("userRolesCache", userCacheTtl));
-        config.addMapConfig(newMapConfigWithTtl("caseTypePseudoRoleToAccessProfileCache", userCacheTtl));
-
-        config.addMapConfig(newMapConfigWithTtl("userInfoCache", userCacheTtl));
-        config.addMapConfig(newMapConfigWithTtl("idamUserRoleCache", userCacheTtl));
-        config.addMapConfig(newMapConfigWithTtl("systemUserTokenCache", appParams.getSystemUserTokenCacheTTLSecs()));
-        config.addMapConfig(newMapConfigWithTtl("bannersCache", defaultCacheTtl));
-        config.addMapConfig(newMapConfigWithTtl("jurisdictionUiConfigsCache", defaultCacheTtl));
+        config.addMapConfig(newMapConfigWithTtl("allJurisdictionsCache", jurisdictionCacheTtl)); // Fixed.
+        config.addMapConfig(newMapConfigWithTtl("userRolesCache", userCacheTtl)); // Fixed.
+        config.addMapConfig(newMapConfigWithTtl("userInfoCache", userCacheTtl)); // Fixed.
+        config.addMapConfig(newMapConfigWithTtl("idamUserRoleCache", userCacheTtl)); // Fixed.
+        config.addMapConfig(newMapConfigWithTtl("systemUserTokenCache", systemUserTokenCacheTTLSecs));
+        config.addMapConfig(newMapConfigWithTtl("bannersCache", defaultCacheTtl)); // Fixed.
+        config.addMapConfig(newMapConfigWithTtl("jurisdictionUiConfigsCache", defaultCacheTtl)); // Fixed.
         config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", defaultCacheTtl));
         config.addMapConfig(newMapConfigWithTtl("jurisdictionCache", jurisdictionCacheTtl));
         config.addMapConfig(newMapConfigWithTtl(BUILDING_LOCATIONS_CACHE, appParams.getRefDataCacheTtlInSec()));
