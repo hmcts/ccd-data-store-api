@@ -47,7 +47,7 @@ apply plugin: 'se.patrikerdes.use-latest-versions'
 def versions = [
         pact_version: '4.1.7'
 ]
-ext['spring-security.version'] = '5.4.7'
+ext['spring-security.version'] = '5.6.1'
 ext['spring-framework.version'] = '5.3.15'
 
 

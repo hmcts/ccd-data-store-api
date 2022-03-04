@@ -42,14 +42,6 @@
 	</suppress>
 
 	<suppress until="2022-04-25">
-    		<notes><![CDATA[
-   			file name: spring-security-core-5.4.7.jar
-   		]]></notes>
-    		<packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-core@.*$</packageUrl>
-    		<vulnerabilityName>CWE-862: Missing Authorization</vulnerabilityName>
-  	</suppress>
-
-	<suppress until="2022-04-25">
 		<notes>
 			CVE affecting hazelcast-spring-4.0.3.jar and hazelcast-4.0.3.jar
 		</notes>
