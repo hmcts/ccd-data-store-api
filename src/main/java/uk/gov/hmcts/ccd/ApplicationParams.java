@@ -51,6 +51,12 @@ public class ApplicationParams {
     @Value("${role.assignment.api.host}")
     private String roleAssignmentServiceHost;
 
+    @Value("${role.assignment.pagination.enabled}")
+    private boolean roleAssignmentPaginationEnabled;
+
+    @Value("${role.assignment.page.size}")
+    private String roleAssignmentPageSize;
+
     @Value("${ccd.draft.host}")
     private String draftHost;
 
@@ -213,6 +219,9 @@ public class ApplicationParams {
     @Value("${reference.data.cache.ttl.in.days}")
     private String referenceDataCacheTtlInDays;
 
+    @Value("${system.user.token.cache.ttl.secs}")
+    private Integer systemUserTokenCacheTTLSecs;
+
     public static String encode(final String stringToEncode) {
         try {
             return URLEncoder.encode(stringToEncode, "UTF-8");
@@ -332,6 +341,14 @@ public class ApplicationParams {
 
     public String roleAssignmentBaseURL() {
         return roleAssignmentServiceHost + "/am/role-assignments";
+    }
+
+    public boolean isRoleAssignmentPaginationEnabled() {
+        return roleAssignmentPaginationEnabled;
+    }
+
+    public String getRoleAssignmentPageSize() {
+        return roleAssignmentPageSize;
     }
 
     public String amDeleteByQueryRoleAssignmentsURL() {
@@ -580,5 +597,9 @@ public class ApplicationParams {
 
     public Integer getRequestScopeCachedCaseTypesTillHour() {
         return requestScopeCachedCaseTypesTillHour;
+    }
+
+    public Integer getSystemUserTokenCacheTTLSecs() {
+        return systemUserTokenCacheTTLSecs;
     }
 }
