@@ -1,0 +1,6 @@
+{
+  "_guid_": "CaseManagementLocation_FromRefData_SiblingContext",
+
+  "baseLocation": "${[scenarioContext][siblingContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][building_location_id]}",
+  "region": "${[scenarioContext][siblingContexts][Get_RefData_BuildingLocations_Load_All][testData][actualResponse][body][arrayInMap][0][region_id]}"
+}
