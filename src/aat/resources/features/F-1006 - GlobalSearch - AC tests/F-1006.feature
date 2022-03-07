@@ -1,4 +1,4 @@
-@F-1006 @elasticsearch
+@F-1006 @elasticsearch @Ignore
 Feature: F-1006: Global Search - Access Control Tests
 
   Background: Load test data for the scenario

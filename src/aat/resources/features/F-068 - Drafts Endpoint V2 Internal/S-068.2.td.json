@@ -1,0 +1,48 @@
+{
+  "_guid_": "S-068.2",
+  "operationName": "Update draft as a caseworker",
+  "_extends_": "F-068_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "Update draft as a caseworker",
+    "contains HTTP 200"
+  ],
+  "method": "PUT",
+  "uri": "/internal/case-types/{ctid}/drafts/{did}",
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "ctid": "FT_CRUD",
+      "did": "${[scenarioContext][childContexts][F-068_Create_Draft][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "TextField": "updated field1",
+        "TextField2": "updated field2"
+      },
+      "event": {
+        "id": "createCase",
+        "summary": "",
+        "description": ""
+      },
+      "event_token": "${[scenarioContext][childContexts][F-068_Get_Event_Token][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "document": null,
+      "type": null,
+      "created": null,
+      "updated": null,
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      }
+    }
+  }
+}
