@@ -3,6 +3,7 @@ package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ServiceException;
 
@@ -67,22 +69,28 @@ public class DefaultSupplementaryDataRepository implements SupplementaryDataRepo
 
     @Override
     public SupplementaryData findSupplementaryData(final String caseReference, Set<String> requestedProperties) {
-        Query query = queryBuilder(SupplementaryDataOperation.FIND).build(em,
-            caseReference,
-            null,
-            null);
-        JsonNode responseNode = (JsonNode) query.getSingleResult();
+        JsonNode responseNode = findSupplementaryDataNode(caseReference);
         return new SupplementaryData(responseNode, requestedProperties);
     }
 
     @Override
     public String findSupplementaryData(final String caseReference) {
+        JsonNode responseNode = findSupplementaryDataNode(caseReference);
+        return jsonNodeToString(responseNode);
+    }
+
+    @Override
+    public Map<String, JsonNode> findSupplementaryDataMap(final String caseReference) {
+        JsonNode responseNode = findSupplementaryDataNode(caseReference);
+        return JacksonUtils.convertValue(responseNode);
+    }
+
+    public JsonNode findSupplementaryDataNode(final String caseReference) {
         Query query = queryBuilder(SupplementaryDataOperation.FIND).build(em,
             caseReference,
             null,
             null);
-        JsonNode responseNode = (JsonNode) query.getSingleResult();
-        return jsonNodeToString(responseNode);
+        return (JsonNode) query.getSingleResult();
     }
 
     private SupplementaryDataQueryBuilder queryBuilder(final SupplementaryDataOperation supplementaryDataOperation) {

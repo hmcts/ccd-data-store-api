@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
@@ -68,6 +69,7 @@ public class CreateCaseEventService {
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
+    private final SupplementaryDataRepository supplementaryDataRepository;
     private final EventTriggerService eventTriggerService;
     private final EventTokenService eventTokenService;
     private final CaseService caseService;
@@ -94,6 +96,7 @@ public class CreateCaseEventService {
                                   @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                   final CaseDefinitionRepository caseDefinitionRepository,
                                   final CaseAuditEventRepository caseAuditEventRepository,
+                                  final SupplementaryDataRepository supplementaryDataRepository,
                                   final EventTriggerService eventTriggerService,
                                   final EventTokenService eventTokenService,
                                   final CaseService caseService,
@@ -116,6 +119,7 @@ public class CreateCaseEventService {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
+        this.supplementaryDataRepository = supplementaryDataRepository;
         this.eventTriggerService = eventTriggerService;
         this.caseService = caseService;
         this.caseDataService = caseDataService;
@@ -277,7 +281,11 @@ public class CreateCaseEventService {
         caseDataIssueLogger.logAnyDataIssuesIn(caseDetailsBefore, caseDetails);
         CaseDetails caseDetailsWithLatestSuppData = getCaseDetails(caseDetails.getReferenceAsString());
         LOG.info("Latest supplementary data => {}", caseDetailsWithLatestSuppData.getSupplementaryData());
-        caseDetails.setSupplementaryData(caseDetailsWithLatestSuppData.getSupplementaryData());
+
+        LOG.info("supplementary data through repo {}",
+            supplementaryDataRepository.findSupplementaryData(caseDetails.getReferenceAsString()));
+        caseDetails.setSupplementaryData(
+            supplementaryDataRepository.findSupplementaryDataMap(caseDetails.getReferenceAsString()));
         return caseDetailsRepository.set(caseDetails);
     }
 

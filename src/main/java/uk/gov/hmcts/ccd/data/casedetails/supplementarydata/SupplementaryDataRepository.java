@@ -1,6 +1,9 @@
 package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
+import java.util.Map;
 import java.util.Set;
+
+import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 
 public interface SupplementaryDataRepository {
@@ -20,4 +23,7 @@ public interface SupplementaryDataRepository {
     SupplementaryData findSupplementaryData(String caseReference, Set<String> requestedProperties);
 
     String findSupplementaryData(String caseReference);
+
+    Map<String, JsonNode> findSupplementaryDataMap(String caseReference);
+
 }
