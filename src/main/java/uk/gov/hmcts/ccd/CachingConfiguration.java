@@ -60,13 +60,14 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithTtl("jurisdictionUiConfigsCache", defaultCacheTtl)); // Fixed.
         config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", defaultCacheTtl));
         config.addMapConfig(newMapConfigWithTtl("jurisdictionCache", jurisdictionCacheTtl));
-        config.addMapConfig(newMapConfigWithTtl(BUILDING_LOCATIONS_CACHE, appParams.getRefDataCacheTtlInSec()));
-        config.addMapConfig(newMapConfigWithTtl(SERVICES_CACHE, appParams.getRefDataCacheTtlInSec()));
+        config.addMapConfig(newMapConfigWithTtl(BUILDING_LOCATIONS_CACHE, appParams.getRefDataCacheTtlInSec())
+            .setMaxIdleSeconds(0));
+        config.addMapConfig(newMapConfigWithTtl(SERVICES_CACHE, appParams.getRefDataCacheTtlInSec())
+            .setMaxIdleSeconds(0));
     }
 
     private MapConfig newMapConfigWithMaxIdle(final String name, final Integer maxIdle) {
-        final int defaultCacheTtl = appParams.getDefaultCacheTtlSecs();
-        return newMapConfig(name).setMaxIdleSeconds(maxIdle).setTimeToLiveSeconds(defaultCacheTtl);
+        return newMapConfig(name).setMaxIdleSeconds(maxIdle);
     }
 
     private MapConfig newMapConfigWithTtl(final String name, final Integer ttl) {
