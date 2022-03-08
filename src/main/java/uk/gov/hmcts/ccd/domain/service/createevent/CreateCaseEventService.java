@@ -187,6 +187,8 @@ public class CreateCaseEventService {
         @SuppressWarnings("UnnecessaryLocalVariable")
         final CaseDetails caseDetailsAfterCallback = updatedCaseDetailsWithoutHashes;
 
+        LOG.info("case supplementary data after callback => {} ", caseDetailsAfterCallback.getSupplementaryData());
+
         validateCaseFieldsOperation.validateData(caseDetailsAfterCallback.getData(), caseTypeDefinition, content);
         final LocalDateTime timeNow = now();
 
@@ -207,6 +209,9 @@ public class CreateCaseEventService {
             newState,
             timeNow
         );
+
+        LOG.info("case supplementary data saved Details => {} ", savedCaseDetails.getSupplementaryData());
+
         saveAuditEventForCaseDetails(
             aboutToSubmitCallbackResponse,
             content.getEvent(),
