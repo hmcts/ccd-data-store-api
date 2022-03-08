@@ -7,16 +7,19 @@
   "specs": [
     "to search a full case"
   ],
+
   "users": {
     "invokingUser": {
       "_extends_": "BeftaMasterCaseworker"
     }
   },
+
   "request": {
     "headers": {
       "_extends_": "Common_Request_Headers"
     }
   },
+
   "expectedResponse": {
     "headers": {
       "Content-Encoding": "gzip",
