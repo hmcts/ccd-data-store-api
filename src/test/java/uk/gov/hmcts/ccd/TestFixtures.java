@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -216,6 +217,13 @@ public abstract class TestFixtures {
         caseTypeDefinition.setVersion(version);
 
         return caseTypeDefinition;
+    }
+
+    protected Map<String, JsonNode> buildSupplementaryData() {
+        Map<String, JsonNode> supplementaryData = new HashMap<>();
+        supplementaryData.put("test", null);
+
+        return supplementaryData;
     }
 
     private List<EventPostStateDefinition> getEventPostStates(String... postStateReferences) {

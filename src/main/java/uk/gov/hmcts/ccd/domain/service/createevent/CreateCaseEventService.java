@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.data.casedetails.CachedCaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.DefaultSupplementaryDataRepository;
+import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
@@ -64,6 +66,7 @@ public class CreateCaseEventService {
     private final CaseDetailsRepository caseDetailsRepository;
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final CaseAuditEventRepository caseAuditEventRepository;
+    private final SupplementaryDataRepository supplementaryDataRepository;
     private final EventTriggerService eventTriggerService;
     private final EventTokenService eventTokenService;
     private final CaseService caseService;
@@ -90,6 +93,8 @@ public class CreateCaseEventService {
                                   @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
                                   final CaseDefinitionRepository caseDefinitionRepository,
                                   final CaseAuditEventRepository caseAuditEventRepository,
+                                  @Qualifier(DefaultSupplementaryDataRepository.QUALIFIER)
+                                  final SupplementaryDataRepository supplementaryDataRepository,
                                   final EventTriggerService eventTriggerService,
                                   final EventTokenService eventTokenService,
                                   final CaseService caseService,
@@ -112,6 +117,7 @@ public class CreateCaseEventService {
         this.caseDetailsRepository = caseDetailsRepository;
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.caseAuditEventRepository = caseAuditEventRepository;
+        this.supplementaryDataRepository = supplementaryDataRepository;
         this.eventTriggerService = eventTriggerService;
         this.caseService = caseService;
         this.caseDataService = caseDataService;
@@ -192,6 +198,7 @@ public class CreateCaseEventService {
         );
 
         final CaseDetails savedCaseDetails = saveCaseDetails(
+            caseReference,
             caseDetailsInDatabase,
             caseDetailsAfterCallbackWithoutHashes,
             caseEventDefinition,
@@ -256,7 +263,8 @@ public class CreateCaseEventService {
                 new ResourceNotFoundException(format("Case with reference %s could not be found", caseReference)));
     }
 
-    private CaseDetails saveCaseDetails(final CaseDetails caseDetailsBefore,
+    private CaseDetails saveCaseDetails(final String caseReference,
+                                        final CaseDetails caseDetailsBefore,
                                         final CaseDetails caseDetails,
                                         final CaseEventDefinition caseEventDefinition,
                                         final Optional<String> state,
@@ -268,6 +276,7 @@ public class CreateCaseEventService {
         if (!caseDetails.getState().equalsIgnoreCase(caseDetailsBefore.getState())) {
             caseDetails.setLastStateModifiedDate(timeNow);
         }
+        updateLatestSupplementaryData(caseReference, caseDetails);
 
         caseDataIssueLogger.logAnyDataIssuesIn(caseDetailsBefore, caseDetails);
         return caseDetailsRepository.set(caseDetails);
@@ -278,6 +287,11 @@ public class CreateCaseEventService {
         if (shouldChangeState(postState)) {
             caseDetails.setState(postState);
         }
+    }
+
+    private void updateLatestSupplementaryData(final String caseReference, final CaseDetails caseDetails) {
+        caseDetails.setSupplementaryData(
+            supplementaryDataRepository.findSupplementaryData(caseReference));
     }
 
     private LocalDateTime now() {

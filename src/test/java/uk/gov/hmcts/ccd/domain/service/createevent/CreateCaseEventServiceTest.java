@@ -10,6 +10,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.TestFixtures;
 import uk.gov.hmcts.ccd.data.casedetails.CaseAuditEventRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
+import uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.IdamUser;
@@ -77,6 +78,8 @@ class CreateCaseEventServiceTest extends TestFixtures {
     private CaseDefinitionRepository caseDefinitionRepository;
     @Mock
     private CaseAuditEventRepository caseAuditEventRepository;
+    @Mock
+    private SupplementaryDataRepository supplementaryDataRepository;
     @Mock
     private EventTriggerService eventTriggerService;
     @Mock
@@ -146,7 +149,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
     @BeforeEach
     void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         event = buildEvent();
         data = buildJsonNodeData();
@@ -180,7 +183,6 @@ class CreateCaseEventServiceTest extends TestFixtures {
         doReturn(fixedClock.instant()).when(clock).instant();
         doReturn(fixedClock.getZone()).when(clock).getZone();
 
-        doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(caseTypeDefinition).when(caseDefinitionRepository).getCaseType(CASE_TYPE_ID);
         doReturn(true).when(caseTypeService).isJurisdictionValid(JURISDICTION_ID, caseTypeDefinition);
         doReturn(caseEventDefinition).when(eventTriggerService).findCaseEvent(caseTypeDefinition, EVENT_ID);
@@ -269,6 +271,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
         assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
         assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate())
             .isEqualTo(LAST_MODIFIED);
+        assertThat(caseEventResult.getSavedCaseDetails().getSupplementaryData()).isEqualTo(new HashMap<>());
     }
 
     @Test
@@ -291,6 +294,7 @@ class CreateCaseEventServiceTest extends TestFixtures {
 
         assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(PRE_STATE_ID);
         assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate()).isEqualTo(LAST_MODIFIED);
+        assertThat(caseEventResult.getSavedCaseDetails().getSupplementaryData()).isEqualTo(new HashMap<>());
     }
 
     @Test
@@ -327,6 +331,24 @@ class CreateCaseEventServiceTest extends TestFixtures {
         assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
         assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate())
             .isEqualTo(LAST_MODIFIED);
+        assertThat(caseEventResult.getSavedCaseDetails().getSupplementaryData()).isEqualTo(new HashMap<>());
+    }
+
+    @Test
+    @DisplayName("should fetch latest supplementary data")
+    void shouldFetchLatestSupplementaryData() {
+        caseDetailsBefore.setLastStateModifiedDate(LAST_MODIFIED);
+        caseDetailsBefore.setState(PRE_STATE_ID);
+
+        Map<String, JsonNode> supplementaryData = buildSupplementaryData();
+        doReturn(supplementaryData).when(supplementaryDataRepository).findSupplementaryData(CASE_REFERENCE);
+
+        final CreateCaseEventResult caseEventResult = underTest.createCaseEvent(CASE_REFERENCE, caseDataContent);
+
+        assertThat(caseEventResult.getSavedCaseDetails().getState()).isEqualTo(POST_STATE);
+        assertThat(caseEventResult.getSavedCaseDetails().getLastStateModifiedDate())
+            .isEqualTo(LAST_MODIFIED);
+        assertThat(caseEventResult.getSavedCaseDetails().getSupplementaryData()).isEqualTo(supplementaryData);
     }
 
     private void createCaseEvent() {

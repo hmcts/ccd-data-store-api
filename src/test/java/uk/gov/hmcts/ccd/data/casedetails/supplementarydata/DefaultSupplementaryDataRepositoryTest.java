@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ccd.data.casedetails.supplementarydata;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Map;
@@ -13,9 +14,9 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.std.SupplementaryData;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
 
@@ -23,8 +24,8 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
     private JdbcTemplate template;
 
     @Inject
-    @Qualifier("default")
-    private uk.gov.hmcts.ccd.data.casedetails.supplementarydata.SupplementaryDataRepository supplementaryDataRepository;
+    @Qualifier(DefaultSupplementaryDataRepository.QUALIFIER)
+    private SupplementaryDataRepository supplementaryDataRepository;
 
     @BeforeEach
     void setUp() {
@@ -43,7 +44,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
             Sets.newHashSet("orgs_assigned_users.organisationA"));
         assertNotNull(supplementaryData);
         Map<String, Object> response = supplementaryData.getResponse();
-        assertTrue(response.keySet().contains("orgs_assigned_users.organisationA"));
+        assertTrue(response.containsKey("orgs_assigned_users.organisationA"));
         assertEquals(32, response.get("orgs_assigned_users.organisationA"));
     }
 
@@ -61,7 +62,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
             Sets.newHashSet("orgs_assigned_users.organisationB"));
         assertNotNull(supplementaryData);
         Map<String, Object> response = supplementaryData.getResponse();
-        assertTrue(response.keySet().contains("orgs_assigned_users.organisationB"));
+        assertTrue(response.containsKey("orgs_assigned_users.organisationB"));
         assertEquals(3, response.get("orgs_assigned_users.organisationB"));
     }
 
@@ -79,7 +80,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
             Sets.newHashSet("orgs_assigned_users.organisationB"));
         assertNotNull(supplementaryData);
         Map<String, Object> response = supplementaryData.getResponse();
-        assertTrue(response.keySet().contains("orgs_assigned_users.organisationB"));
+        assertTrue(response.containsKey("orgs_assigned_users.organisationB"));
         assertEquals(3, response.get("orgs_assigned_users.organisationB"));
     }
 
@@ -97,7 +98,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
             Sets.newHashSet("orgs_assigned_users.organisationC"));
         assertNotNull(supplementaryData);
         Map<String, Object> response = supplementaryData.getResponse();
-        assertTrue(response.keySet().contains("orgs_assigned_users.organisationC"));
+        assertTrue(response.containsKey("orgs_assigned_users.organisationC"));
         assertEquals(23, response.get("orgs_assigned_users.organisationC"));
     }
 
@@ -115,7 +116,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
             Sets.newHashSet("orgs_assigned_users.organisationA"));
         assertNotNull(response);
         Map<String, Object> responseMap = response.getResponse();
-        assertTrue(responseMap.keySet().contains("orgs_assigned_users.organisationA"));
+        assertTrue(responseMap.containsKey("orgs_assigned_users.organisationA"));
         assertEquals(13, responseMap.get("orgs_assigned_users.organisationA"));
     }
 
@@ -133,7 +134,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
             Sets.newHashSet("orgs_assigned_users.organisationA"));
         assertNotNull(response);
         Map<String, Object> responseMap = response.getResponse();
-        assertTrue(responseMap.keySet().contains("orgs_assigned_users.organisationA"));
+        assertTrue(responseMap.containsKey("orgs_assigned_users.organisationA"));
         assertEquals(-1, responseMap.get("orgs_assigned_users.organisationA"));
     }
 
@@ -152,7 +153,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
             Sets.newHashSet("orgs_assigned_users.organisationB"));
         assertNotNull(response);
         Map<String, Object> responseMap = response.getResponse();
-        assertTrue(responseMap.keySet().contains("orgs_assigned_users.organisationB"));
+        assertTrue(responseMap.containsKey("orgs_assigned_users.organisationB"));
         assertEquals(3, responseMap.get("orgs_assigned_users.organisationB"));
     }
 
@@ -169,7 +170,7 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
             Sets.newHashSet("orgs_assigned_users.organisationB"));
         assertNotNull(response);
         Map<String, Object> responseMap = response.getResponse();
-        assertTrue(responseMap.keySet().contains("orgs_assigned_users.organisationB"));
+        assertTrue(responseMap.containsKey("orgs_assigned_users.organisationB"));
         assertEquals(3, responseMap.get("orgs_assigned_users.organisationB"));
     }
 
@@ -182,11 +183,22 @@ class DefaultSupplementaryDataRepositoryTest extends WireMockBaseTest {
             supplementaryDataRepository.findSupplementaryData("1504259907353529", null);
         assertNotNull(supplementaryData);
         Map<String, Object> responseMap = supplementaryData.getResponse();
-        assertTrue(responseMap.keySet().contains("orgs_assigned_users"));
+        assertTrue(responseMap.containsKey("orgs_assigned_users"));
+    }
+
+    @Test
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts =
+        {"classpath:sql/insert_cases_supplementary_data.sql"})
+    public void findSupplementaryDataWithReference() {
+        assumeDataInitialised();
+        final Map<String, JsonNode> supplementaryData =
+            supplementaryDataRepository.findSupplementaryData("1504259907353529");
+        assertNotNull(supplementaryData);
+        assertTrue(supplementaryData.containsKey("orgs_assigned_users"));
     }
 
     private void assumeDataInitialised() {
         final List<CaseDetails> resultList = template.query("SELECT * FROM case_data", this::mapCaseData);
-        assertEquals("Incorrect data initiation", NUMBER_OF_CASES, resultList.size());
+        assertEquals(NUMBER_OF_CASES, resultList.size(), "Incorrect data initiation");
     }
 }
