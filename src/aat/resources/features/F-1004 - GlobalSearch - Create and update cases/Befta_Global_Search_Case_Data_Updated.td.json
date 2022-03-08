@@ -1,0 +1,28 @@
+{
+  "_guid_": "Befta_Global_Search_Case_Data_Updated",
+
+  "dateOfBirth": "2012-04-21",
+  "dateOfDeath": "2020-04-21",
+  "Email": "e@mail.com",
+  "Address": {
+    "AddressLine1": "updated Address"
+  },
+  "FirstName": "FirstNameValue",
+  "LastName": "LastNameValue",
+  "PostCode": "SE1 4EE",
+  "caseManagementCategory" : {
+    "value" : {
+      "code" : "987",
+      "label" : "Category label"
+    },
+    "list_items" : [ {
+      "code" : "987",
+      "label" : "Category label"
+    } ]
+  },
+  "caseManagementLocation" : {
+    "baseLocation" : "1",
+    "region" : "3"
+  },
+  "caseNameHmctsInternal" : "Name Internal"
+}
