@@ -1,0 +1,96 @@
+{
+  "_guid_": "S-068.3",
+  "operationName": "Fetch a draft for display",
+  "_extends_": "F-068_Test_Data_Base",
+  "specs": [
+    "an active profile in CCD",
+    "Fetch a draft for display",
+    "contains HTTP 200"
+  ],
+  "method": "GET",
+  "uri": "/internal/drafts/{did}",
+  "request": {
+    "headers": {
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "did": "${[scenarioContext][childContexts][F-068_Create_Draft][testData][actualResponse][body][id]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_200_Response",
+    "body" : {
+      "_links" : {
+        "self" : {
+          "href" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "case_id" : "DRAFT${[scenarioContext][childContexts][F-068_Create_Draft][testData][actualResponse][body][id]}",
+      "case_type" : {
+        "id" : "FT_CRUD",
+        "name" : "FT- CRUD",
+        "description" : "Case Type for testing CRUD",
+        "jurisdiction" : {
+          "id" : "BEFTA_MASTER",
+          "name" : "BEFTA Master",
+          "description" : "Content for the BEFTA Master Jurisdiction."
+        },
+        "printEnabled" : false
+      },
+      "tabs" : [ {
+        "id" : "Data",
+        "label" : "Data",
+        "order" : 1,
+        "fields" : [ {
+          "id" : "TextField",
+          "label" : "TextField",
+          "hidden" : false,
+          "value" : "field1",
+          "metadata" : false,
+          "hint_text" : null,
+          "field_type" : "[[ANYTHING_PRESENT]]",
+          "validation_expr" : null,
+          "security_label" : "PUBLIC",
+          "order" : 1,
+          "formatted_value" : "field1",
+          "display_context" : null,
+          "display_context_parameter" : null,
+          "show_condition" : null,
+          "show_summary_change_option" : null,
+          "show_summary_content_option" : null,
+          "retain_hidden_value" : null,
+          "publish" : null,
+          "publish_as" : null,
+          "acls" : "[[ANYTHING_PRESENT]]"
+        }, {
+          "id" : "TextField2",
+          "label" : "TextField2",
+          "hidden" : false,
+          "value" : "field2",
+          "metadata" : false,
+          "hint_text" : null,
+          "field_type" : "[[ANYTHING_PRESENT]]",
+          "validation_expr" : null,
+          "security_label" : "PUBLIC",
+          "order" : 1,
+          "formatted_value" : "field2",
+          "display_context" : null,
+          "display_context_parameter" : null,
+          "show_condition" : null,
+          "show_summary_change_option" : null,
+          "show_summary_content_option" : null,
+          "retain_hidden_value" : null,
+          "publish" : null,
+          "publish_as" : null,
+          "acls" : "[[ANYTHING_PRESENT]]"
+        } ],
+        "role" : null,
+        "show_condition" : null
+      } ],
+      "metadataFields" : "[[ANYTHING_PRESENT]]",
+      "state" : null,
+      "triggers" : "[[ANYTHING_PRESENT]]",
+      "events" : "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

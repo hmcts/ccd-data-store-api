@@ -1,0 +1,23 @@
+{
+	"_guid_": "F-1006_CreateCases",
+  "specs": [
+    "to create another four cases"
+  ],
+  "prerequisites" : [ {
+    "Case_2": "F-1006_CreateAnotherCasePreRequisiteCaseworker",
+    "Case_3": "F-1006_CreateAnotherCasePreRequisiteCaseworker",
+    "Case_4": "F-1006_CreateAnotherCasePreRequisiteCaseworker"
+    }
+  ],
+  "_extends_": "F-1006_CreateAnotherCasePreRequisiteCaseworker",
+  "request": {
+    "body": {
+      "data": {
+        "Email": "${[scenarioContext][parentContext][childContexts][F-1006_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][case_data][Email]}",
+        "Address": {
+          "AddressLine1": "${[scenarioContext][parentContext][childContexts][F-1006_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][case_data][Address][AddressLine1]}"
+        }
+      }
+    }
+  }
+}
