@@ -29,6 +29,8 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(JexlEnablingConditionParser.class);
 
+    private static final String EVENT_ENABLE_CONDITION_NON_EXISTING_SUB_FIELD = "[__FNA__]";
+
     private final JexlEngine engine;
 
     private final ObjectMapper objectMapper;
@@ -72,7 +74,10 @@ public class JexlEnablingConditionParser implements EnablingConditionParser {
             Optional<Object> value = getValueFromContext(context, variable);
             if (value.isPresent()) {
                 contextData.put(variable, value.get());
+            } else {
+                contextData.put(variable, EVENT_ENABLE_CONDITION_NON_EXISTING_SUB_FIELD);
             }
+
         }
         return contextData;
     }

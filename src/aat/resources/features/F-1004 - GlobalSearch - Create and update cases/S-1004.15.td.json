@@ -1,0 +1,42 @@
+{
+  "title": "Update the Data Store for \"case create\" when valid data has been entered correctly in the CollectionFieldName using  V1: /caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases endpoint",
+  "_guid_": "S-1004.15",
+  "_extends_": "Case_Creation_Base",
+
+  "specs": [
+    "an active profile in CCD",
+    "contains the collection field that will be used to populate SearchCriteria",
+    "to create a full case"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "jid": "BEFTA_MASTER",
+      "ctid": "FT_GlobalSearch"
+    },
+    "body": {
+      "data": {
+        "_extends_": "Befta_Global_Search_Case_Data_Collection"
+      },
+      "event_token": "${[scenarioContext][childContexts][F-1004_Case_Data_Create_Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "jurisdiction": "BEFTA_MASTER",
+      "state": "CaseCreated",
+      "case_type_id": "FT_GlobalSearch",
+      "supplementary_data": null,
+      "case_data": {
+        "_extends_": "Befta_Global_Search_Expected_Search_Criteria_Collection"
+      },
+      "data_classification": {
+        "_extends_": "Befta_Global_Search_Data_Classifications_Collection"
+      },
+      "security_classifications": {
+        "_extends_": "Befta_Global_Search_Data_Classifications_Collection"
+      }
+    }
+  }
+}
