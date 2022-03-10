@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-1007_GetUpdateSuspendedCaseToken",
+  "_guid_": "S-1017_GetUpdateSuspendedCaseToken",
 
   "productName": "CCD Data Store",
   "operationName": "Retrieve a create token",
@@ -26,7 +26,7 @@
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType",
-      "cid": "${[scenarioContext][parentContext][childContexts][F-1007_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1017_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "etid": "updateCase"
     }
   },

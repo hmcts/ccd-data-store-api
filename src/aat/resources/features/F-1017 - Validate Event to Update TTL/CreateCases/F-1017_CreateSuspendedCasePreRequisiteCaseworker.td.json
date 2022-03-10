@@ -1,6 +1,6 @@
 {
-  "_guid_": "F-1007_CreateSuspendedCasePreRequisiteCaseworker",
-  "_extends_": "F-1007_CreateCasePreRequisiteCaseworkerBase",
+  "_guid_": "F-1017_CreateSuspendedCasePreRequisiteCaseworker",
+  "_extends_": "F-1017_CreateCasePreRequisiteCaseworkerBase",
 
   "request": {
     "body": {

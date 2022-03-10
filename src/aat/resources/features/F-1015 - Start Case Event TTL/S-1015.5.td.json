@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-1005.5",
-  "_extends_": "F-1005_RetrieveTriggerInternal",
+  "_guid_": "S-1015.5",
+  "_extends_": "F-1015_RetrieveTriggerInternal",
   "title": "must successfully update a cases TTL.SystemTTL value using V2 /cases/{caseId}/event-triggers/{eventId}",
 
   "specs": [
@@ -13,7 +13,7 @@
 
   "request": {
     "pathVariables": {
-      "caseId": "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "caseId": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "triggerId": "updateCaseTTLInc"
     }
   },
@@ -23,7 +23,7 @@
       "id" : "updateCaseTTLInc",
       "name" : "Update with TTL Increment",
       "description" : "Update a case with a TTL increment value present",
-      "case_id": "${}${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "case_id": "${}${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "case_fields" : [ {
         "id" : "TTL",
         "label" : "TTL Fields",

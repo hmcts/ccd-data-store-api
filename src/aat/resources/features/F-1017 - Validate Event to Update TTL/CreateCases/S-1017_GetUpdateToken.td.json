@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-1007_GetUpdateToken",
+  "_guid_": "S-1017_GetUpdateToken",
 
   "productName": "CCD Data Store",
   "operationName": "Retrieve a create token",
@@ -26,7 +26,7 @@
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType",
-      "cid": "${[scenarioContext][parentContext][childContexts][F-1007_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1017_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "etid": "updateCase"
     }
   },

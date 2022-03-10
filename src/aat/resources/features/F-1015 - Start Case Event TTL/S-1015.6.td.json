@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-1005.6",
+  "_guid_": "S-1015.6",
   "_extends_": "Befta_Jurisdiction2_Token_For_Update_Case",
   "title": "must successfully update a case without modifying the TTL.SystemTTL value when no TTLIncrement is specified",
 
@@ -22,7 +22,7 @@
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType",
-      "cid": "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "cid": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "etid": "updateCaseNoTTLInc"
     }
   },
@@ -36,7 +36,7 @@
     },
     "body": {
       "case_details": {
-        "id": "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+        "id": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
         "jurisdiction": "BEFTA_MASTER",
         "state": "CaseCreated",
         "version": 0,
@@ -46,10 +46,12 @@
         "last_state_modified_date": "[[ANYTHING_PRESENT]]",
         "security_classification": "PUBLIC",
         "case_data": {
-          "_extends_": "TTL_Case_Data"
+          "_extends_": "TTL_Case_Data",
+          "SearchCriteria" : { }
         },
         "data_classification": {
-          "_extends_": "TTL_Case_Data_Classifications"
+          "_extends_": "TTL_Case_Data_Classifications",
+          "SearchCriteria" : "[[ANYTHING_PRESENT]]"
         },
         "supplementary_data": null,
         "after_submit_callback_response": null,
@@ -58,7 +60,8 @@
         "delete_draft_response_status_code": null,
         "delete_draft_response_status": null,
         "security_classifications": {
-          "_extends_": "TTL_Case_Data_Classifications"
+          "_extends_": "TTL_Case_Data_Classifications",
+          "SearchCriteria" : "[[ANYTHING_PRESENT]]"
         }
       },
       "event_id": "updateCaseNoTTLInc"

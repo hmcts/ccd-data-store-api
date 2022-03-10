@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-1005.4",
-  "_extends_": "F-1005_AggregatedRetrieveTrigger",
+  "_guid_": "S-1015.4",
+  "_extends_": "F-1015_AggregatedRetrieveTrigger",
   "title": "must successfully update a cases TTL.SystemTTL value using v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET",
 
   "specs": [
@@ -21,7 +21,7 @@
     "pathVariables": {
       "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType",
-      "cid": "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "cid": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "etid": "updateCaseTTLInc"
     }
   },
@@ -31,7 +31,7 @@
       "id": "updateCaseTTLInc",
       "name": "Update with TTL Increment",
       "description": "Update a case with a TTL increment value present",
-      "case_id": "${}${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "case_id": "${}${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "case_fields": [{
         "id": "TTL",
         "label": "TTL Fields",

@@ -1,6 +1,6 @@
 {
-  "_guid_": "F-1006_GetCaseDetails_Caseworker",
-  "_extends_": "F-1006_GetCaseDetails_Base",
+  "_guid_": "F-1016_GetCaseDetails_Caseworker",
+  "_extends_": "F-1016_GetCaseDetails_Base",
 
   "specs": [
     "to verify that the TTL.Suspended value has not changed in the database"
@@ -14,7 +14,18 @@
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][siblingContexts][F-1006_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][siblingContexts][F-1016_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "data": {
+        "SearchCriteria" : { }
+      },
+      "data_classification": {
+        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+      }
     }
   }
 }

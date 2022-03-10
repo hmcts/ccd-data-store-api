@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-1005_AggregatedRetrieveTrigger",
+  "_guid_": "F-1015_AggregatedRetrieveTrigger",
 
   "productName": "CCD Data Store",
   "operationName": "Fetch an update event trigger in the context of a case",
@@ -34,7 +34,10 @@
         "show_event_notes" : null,
         "end_button_label" : null,
         "can_save_draft" : false,
-        "title_display" : null
+        "title_display" : null,
+        "access_granted" : "[[ANY_STRING_NOT_NULLABLE]]",
+        "access_process" : "[[ANY_STRING_NOT_NULLABLE]]",
+        "supplementary_data" : null
     }
   }
 }

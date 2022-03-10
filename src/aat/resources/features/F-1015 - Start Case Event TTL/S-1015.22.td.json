@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-1005.22",
-  "_extends_": "F-1005-CreateEventTokenErrorResponseCitizen",
+  "_guid_": "S-1015.22",
+  "_extends_": "F-1015-CreateEventTokenErrorResponseCitizen",
   "title": "must error when updating a case where about to start callback has modified TTL.Suspended",
 
   "specs": [
@@ -20,7 +20,7 @@
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType",
-      "cid": "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}",
+      "cid": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}",
       "etid": "updateModifiedSuspendedTTL"
     }
   }
