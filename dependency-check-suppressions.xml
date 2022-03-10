@@ -49,11 +49,4 @@
     		<vulnerabilityName>CWE-862: Missing Authorization</vulnerabilityName>
   	</suppress>
 
-	<suppress until="2022-03-25">
-		<notes>
-			CVE affecting hazelcast-spring-4.0.3.jar and hazelcast-4.0.3.jar
-		</notes>
-		<cve>CVE-2022-0265</cve>
-	</suppress>
-
 </suppressions>
