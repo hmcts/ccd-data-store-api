@@ -52,6 +52,6 @@ Feature: F-130: Create Case External API CRUD Tests
     And a successful call [to create a token for case creation] as in [S-130.1_Get_Event_Trigger]
     When a request is prepared with appropriate values,
     And it is submitted to call the [external create case] operation of [CCD Data Store],
-    Then a negative response is received
+    Then a positive response is received
     And the response has all other details as expected
-    And the response [contains an error stating that the case details is marked as non-null but is null]
+    And the response [contains an null values for case details]
