@@ -1,0 +1,67 @@
+{
+  "title": "Update the Data Store for \"case update\" when valid data has been entered correctly in the CollectionFieldName using V1: /citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events endpoint",
+  "_guid_": "S-1004.18",
+  "_extends_": "F-1004_CaseworkerUpdateCaseEvent",
+
+   "specs": [
+      "an active profile in CCD",
+      "contains additional data fields that will be used to populate SearchCriteria",
+     "contains updated data including the search party fields in the collection fields as specified by the CollectionFieldName"
+    ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1004_CreateCasePreRequisiteCaseworker_Collection][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "ListOfPeople": [
+          {
+            "value": {
+              "IndividualFirstName": "FirstNameValue",
+              "IndividualLastName": "LastNameValue",
+              "IndividualEmail": "e@mail.com",
+              "IndividualAddress": {
+                "AddressLine1": "updated Address",
+                "PostCode": "SE1 4EE"
+              },
+              "IndividualDateOfBirth": "2012-04-21",
+              "IndividualDateOfDeath": "2020-04-21"
+            }
+          },
+          {
+            "value": {
+              "IndividualFirstName": "FirstNameValue2",
+              "IndividualLastName": "LastNameValue2",
+              "IndividualEmail": "e2@mail.com",
+              "IndividualAddress": {
+                "AddressLine1": "updated Address",
+                "PostCode": "SE2 4EE"
+              },
+              "IndividualDateOfBirth": "1979-04-21",
+              "IndividualDateOfDeath": "1980-04-21"
+            }
+          }
+        ]
+      },
+      "event_token": "${[scenarioContext][childContexts][F-1004_GetCaseworkerUpdateToken_Collection][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 201,
+    "responseMessage": "OK",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Vary": "Accept-Encoding"
+    },
+    "body": {
+      "jurisdiction": "BEFTA_MASTER",
+      "state": "CaseUpdated",
+      "case_type_id": "FT_GlobalSearch",
+      "case_data": {
+        "_extends_": "Befta_Global_Search_Updated_Expected_Search_Criteria_Collection"
+      }
+    }
+  }
+}

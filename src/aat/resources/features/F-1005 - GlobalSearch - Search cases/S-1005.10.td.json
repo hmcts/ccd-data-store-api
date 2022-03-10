@@ -2,6 +2,7 @@
   "title": "Successfully searches for a case that was modified by a callback",
   "_guid_": "S-1005.10",
   "_extends_": "F-1005_SearchCaseBase",
+
   "specs": [
     "an active profile in CCD",
     "contains the fields modified by the callback",
@@ -9,6 +10,7 @@
     "has 200 return code",
     "contains the case modified by the callback"
   ],
+
   "request": {
     "body": {
       "searchCriteria": {
@@ -26,10 +28,10 @@
           "BEFTA_MASTER"
         ],
         "caseManagementBaseLocationIds": [
-          "123"
+          "1"
         ],
         "caseManagementRegionIds": [
-          "1"
+          "3"
         ],
         "parties": [
           {
@@ -62,6 +64,7 @@
       "startRecordNumber": 1
     }
   },
+
   "expectedResponse": {
     "_extends_": "Common_200_Response",
     "body": {
@@ -72,6 +75,10 @@
       },
       "results": [
         {
+          "__ordering__": "UNORDERED",
+          "__elementId__": "caseReference"
+        },
+        {
           "stateId": "CaseCreated",
           "processForAccess" : "NONE",
           "caseReference": "${}${[scenarioContext][childContexts][F-1005_CreateCaseWithCallback][testData][actualResponse][body][id]}",
@@ -79,14 +86,16 @@
             "FirstNameValue"
           ],
           "caseNameHmctsInternal": "Name Internal",
-          "baseLocationId": "123",
+          "baseLocationId": "1",
           "baseLocationName": "[[ANY_NULLABLE]]",
           "caseManagementCategoryId": "987",
           "caseManagementCategoryName": "Category label",
-          "regionId": "1",
+          "regionId": "3",
           "regionName": "[[ANY_NULLABLE]]",
           "CCDJurisdictionId": "BEFTA_MASTER",
           "CCDJurisdictionName": "BEFTA Master",
+          "HMCTSServiceId" : "${[scenarioContext][childContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_code]}",
+          "HMCTSServiceShortDescription" : "${[scenarioContext][childContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_short_description]}",
           "CCDCaseTypeId": "FT_GlobalSearch",
           "CCDCaseTypeName": "FT_GlobalSearch"
         }

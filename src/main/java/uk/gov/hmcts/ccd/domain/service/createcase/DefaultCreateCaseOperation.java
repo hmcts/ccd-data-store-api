@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
@@ -102,6 +103,7 @@ public class DefaultCreateCaseOperation implements CreateCaseOperation {
         this.supplementaryDataValidator = supplementaryDataValidator;
     }
 
+    @Transactional
     @Override
     public CaseDetails createCaseDetails(final String caseTypeId,
                                          final CaseDataContent caseDataContent,
