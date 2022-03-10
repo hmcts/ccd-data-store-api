@@ -44,13 +44,16 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
 
     private final CaseDataAccessControl caseDataAccessControl;
     private final CaseDefinitionRepository caseDefinitionRepository;
+    private final CaseAccessCategoriesService caseAccessCategoriesService;
 
     @Autowired
     public SecurityClassificationServiceImpl(CaseDataAccessControl caseDataAccessControl,
                                              @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                             final CaseDefinitionRepository caseDefinitionRepository) {
+                                             final CaseDefinitionRepository caseDefinitionRepository,
+                                             CaseAccessCategoriesService caseAccessCategoriesService) {
         this.caseDataAccessControl = caseDataAccessControl;
         this.caseDefinitionRepository = caseDefinitionRepository;
+        this.caseAccessCategoriesService = caseAccessCategoriesService;
     }
 
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails) {
@@ -59,7 +62,9 @@ public class SecurityClassificationServiceImpl implements SecurityClassification
 
     public Optional<CaseDetails> applyClassification(CaseDetails caseDetails, boolean create) {
         Optional<SecurityClassification> userClassificationOpt = getUserClassification(caseDetails, create);
-        Optional<CaseDetails> result = Optional.of(caseDetails);
+        Optional<CaseDetails> result = Optional.of(caseDetails).filter(
+            caseAccessCategoriesService.caseHasMatchingCaseAccessCategories(caseDataAccessControl
+                .generateAccessProfilesByCaseDetails(caseDetails), create));
 
         return userClassificationOpt
             .flatMap(securityClassification ->
