@@ -30,7 +30,8 @@
     "body" : {
       "_links" : {
         "self": {
-          "href": "[[ANYTHING_PRESENT]]"
+          "href": "[[ANYTHING_PRESENT]]",
+          "templated" : "[[ANYTHING_PRESENT]]"
         }
       },
       "id" : null,
