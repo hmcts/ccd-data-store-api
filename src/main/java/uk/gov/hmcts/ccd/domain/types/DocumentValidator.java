@@ -16,7 +16,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-
+//todo Cognitive... refactor this class or add file to to sonar exclusions
+@SuppressWarnings({"squid:S3776","squid:S1135"})
 @Named("DocumentValidator")
 @Singleton
 public class DocumentValidator implements BaseTypeValidator {
@@ -25,23 +26,22 @@ public class DocumentValidator implements BaseTypeValidator {
     private static final String DOCUMENT_BINARY_URL = "document_binary_url";
     private static final String CATEGORY_ID = "category_id";
     private static final String UPLOAD_TIMESTAMP = "upload_timestamp";
+    private static final String LOG_MESSAGE = "Validation failure for: "; //todo remove
+    private static final String NOT_A_VALID_INPUT = " is not a text value or is null";
 
     private static final Logger LOG = LoggerFactory.getLogger(DocumentValidator.class);
 
     private final ApplicationParams applicationParams;
     private final TextValidator textValidator;
     private final DateTimeValidator dateTimeValidator;
-    private final CachedCaseDefinitionRepository caseDefinitionRepository;
 
-    public DocumentValidator(ApplicationParams applicationParams,
-                             @Qualifier("TextValidator") TextValidator textValidator,
+    public DocumentValidator(@Qualifier("TextValidator") TextValidator textValidator,
                              @Qualifier("DateTimeValidator") DateTimeValidator dateTimeValidator,
                              @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                 CachedCaseDefinitionRepository caseDefinitionRepository) {
+                                 ApplicationParams applicationParams) {
         this.applicationParams = applicationParams;
         this.textValidator = textValidator;
         this.dateTimeValidator = dateTimeValidator;
-        this.caseDefinitionRepository = caseDefinitionRepository;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class DocumentValidator implements BaseTypeValidator {
                                            final CaseFieldDefinition caseFieldDefinition) {
 
         // Empty text should still check against MIN - MIN may or may not be 0
-        if (isNullOrEmpty(dataValue)) {
+        if (Boolean.TRUE.equals(BaseTypeValidator.super.isNullOrEmpty(dataValue))) {
             return Collections.emptyList();
         }
 
@@ -67,9 +67,9 @@ public class DocumentValidator implements BaseTypeValidator {
 
         final JsonNode documentUrl = dataValue.get(DOCUMENT_URL);
 
-        if (!documentUrl.isTextual() || documentUrl.isNull()) {
+        if (Boolean.TRUE.equals(isNullOrEmpty(documentUrl))) {
             return Collections.singletonList(new ValidationResult(
-                "document_url is not a text value or is null", dataFieldId));
+                DOCUMENT_URL + NOT_A_VALID_INPUT, dataFieldId));
         }
 
         final String documentUrlValue = documentUrl.textValue();
@@ -87,9 +87,9 @@ public class DocumentValidator implements BaseTypeValidator {
         if (dataValue.has(DOCUMENT_BINARY_URL)) {
             final JsonNode documentBinaryUrl = dataValue.get(DOCUMENT_BINARY_URL);
 
-            if (!documentBinaryUrl.isTextual() || documentBinaryUrl.isNull()) {
+            if (Boolean.TRUE.equals(isNullOrEmpty(documentBinaryUrl))) {
                 return Collections.singletonList(new ValidationResult(
-                    "document_binary_url is not a text value or is null", dataFieldId));
+                    DOCUMENT_BINARY_URL + NOT_A_VALID_INPUT, dataFieldId));
             }
 
             final String documentBinaryUrlValue = documentBinaryUrl.textValue();
@@ -104,54 +104,61 @@ public class DocumentValidator implements BaseTypeValidator {
         }
 
         if (dataValue.has(CATEGORY_ID)) {
+
             final JsonNode categoryId = dataValue.get(CATEGORY_ID);
 
-            if (checkIfNullOrEmpty(categoryId)) {
-                LOG.info("{} is empty or null", CATEGORY_ID);
+            if (Boolean.TRUE.equals(isNullOrEmpty(categoryId))) {
+                LOG.info("{} is not a text value or is null", CATEGORY_ID);
                 return Collections.singletonList(new ValidationResult(
-                    CATEGORY_ID + " is empty or null", dataFieldId));
+                    CATEGORY_ID + NOT_A_VALID_INPUT, dataFieldId));
             }
 
             final List<ValidationResult> validationResults =
                 textValidator.validate(dataFieldId, categoryId, caseFieldDefinition);
 
-            if (!validationResults.isEmpty()) {
-                LOG.info("{} validation failure", CATEGORY_ID);
-                return validationResults.stream()
-                    .map(validationResult ->
-                        new ValidationResult(
-                            CATEGORY_ID + " " + validationResult.getErrorMessage(),validationResult.getFieldId()))
-                    .collect(Collectors.toList());
+            if (!checkValidationResults(validationResults,CATEGORY_ID).isEmpty()) {
+                return validationResults;
             }
+
         }
 
         if (dataValue.has(UPLOAD_TIMESTAMP)) {
             final JsonNode uploadTimeStamp = dataValue.get(UPLOAD_TIMESTAMP);
 
-            if (checkIfNullOrEmpty(uploadTimeStamp)) {
-                LOG.info("{} is empty or null", UPLOAD_TIMESTAMP);
+            if (Boolean.TRUE.equals(isNullOrEmpty(uploadTimeStamp))) {
+                LOG.info("{} is not a text value or is null", UPLOAD_TIMESTAMP);
                 return Collections.singletonList(new ValidationResult(
-                    UPLOAD_TIMESTAMP + " is empty or null", dataFieldId));
+                    UPLOAD_TIMESTAMP + NOT_A_VALID_INPUT, dataFieldId));
             }
 
             final List<ValidationResult> validationResults =
                 dateTimeValidator.validate(dataFieldId, uploadTimeStamp, caseFieldDefinition);
 
-            if (!validationResults.isEmpty()) {
-                LOG.info("{} validation failure", UPLOAD_TIMESTAMP);
-                return validationResults.stream()
-                    .map(validationResult ->
-                        new ValidationResult(
-                            UPLOAD_TIMESTAMP + " " + validationResult.getErrorMessage(),validationResult.getFieldId()))
-                    .collect(Collectors.toList());
+            if (!checkValidationResults(validationResults,UPLOAD_TIMESTAMP).isEmpty()) {
+                return validationResults;
             }
         }
 
         return Collections.emptyList();
     }
 
-    public Boolean checkIfNullOrEmpty(JsonNode dataValue) {
-        return !dataValue.isTextual() || isNullOrEmpty(dataValue);
+    @Override
+    public Boolean isNullOrEmpty(JsonNode dataValue) {
+        // todo TextValidator does this check as well. Remove?
+        return !dataValue.isTextual() || BaseTypeValidator.super.isNullOrEmpty(dataValue);
+    }
+
+    private List<ValidationResult> checkValidationResults(final List<ValidationResult> validationResults,
+                                                       final String key) {
+        if (!validationResults.isEmpty()) {
+            LOG.info("{} {}",LOG_MESSAGE,key);
+            return validationResults.stream()
+                .map(validationResult ->
+                    new ValidationResult(
+                        key + " " + validationResult.getErrorMessage(),validationResult.getFieldId()))
+                .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 
 }
