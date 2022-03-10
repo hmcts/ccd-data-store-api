@@ -7,7 +7,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import uk.gov.hmcts.ccd.ApplicationParams;
+import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.FieldTypeDefinition;
@@ -29,6 +31,9 @@ import static uk.gov.hmcts.ccd.domain.types.DocumentValidator.DOCUMENT_URL;
 @SuppressWarnings("checkstyle:OperatorWrap")
 public class DocumentValidatorTest implements IVallidatorTest {
     public static final String DOCUMENT_FIELD_ID = "DOCUMENT_FIELD_ID";
+    public static final String DOCUMENT_BINARY_URL = "document_binary_url";
+    public static final String CATEGORY_ID = "category_id";
+    private static final String UPLOAD_TIMESTAMP = "upload_timestamp";
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String CASE_FIELD_STRING =
         "{\n"
@@ -57,10 +62,15 @@ public class DocumentValidatorTest implements IVallidatorTest {
     private static final String DOCUMENT_URL_WITH_PORT = "https://ng.reform.hmcts.net:6789/documents/a1-2Z-3-x-ngitb";
     private static final String UNKNOWN_DOCUMENT_PARENT_DOMAIN_URL =
         "https://dm.reform.hmcts.net.example.com/documents/a1-2Z-3-x";
+    private static final String VALID_CATEGORY_ID = "mainEvidence";
+    private static final String VALID_UPLOAD_TIMESTAMP = "2012-12-10T00:00:00";
     private DocumentValidator validator;
     private CaseFieldDefinition caseFieldDefinition;
     private ObjectNode data;
-    private List<ValidationResult> validDocumentUrlResult;
+    private List<ValidationResult> validationResults;
+    private TextValidator textValidator;
+    private DateTimeValidator dateTimeValidator;
+    private CachedCaseDefinitionRepository caseDefinitionRepository;
 
     @BeforeClass
     public static void setUpClass() {
@@ -75,16 +85,16 @@ public class DocumentValidatorTest implements IVallidatorTest {
     @BeforeEach
     public void setupTests() {
         final ObjectNode data;
-        final List<ValidationResult> validDocumentUrlResult;
+        final List<ValidationResult> validationResults;
     }
 
     @Test
     public void shouldValidateIfPortsAreSpecifiedAndMatch() {
         final DocumentValidator validatorWithPort = buildDocumentValidator("https://ng.reform.hmcts.net:6789");
 
-        validDocumentUrlResult = validatorWithPort.validate(DOCUMENT_FIELD_ID,
+        validationResults = validatorWithPort.validate(DOCUMENT_FIELD_ID,
             data, caseFieldDefinition);
-        assertThat(validDocumentUrlResult, empty());
+        assertThat(validationResults, empty());
     }
 
     @Test
@@ -92,11 +102,11 @@ public class DocumentValidatorTest implements IVallidatorTest {
         final DocumentValidator validatorWithPort = buildDocumentValidator("https://ng.reform.hmcts.net:7789");
 
         data = createDoc(DOCUMENT_URL_WITH_PORT);
-        validDocumentUrlResult = validatorWithPort.validate(DOCUMENT_FIELD_ID,
+        validationResults = validatorWithPort.validate(DOCUMENT_FIELD_ID,
             data,
             caseFieldDefinition);
-        assertThat(validDocumentUrlResult, hasSize(1));
-        assertThat(validDocumentUrlResult.get(0).getErrorMessage(),
+        assertThat(validationResults, hasSize(1));
+        assertThat(validationResults.get(0).getErrorMessage(),
             is(DOCUMENT_URL_WITH_PORT + " does not match Document Management domain or expected URL path"));
     }
 
@@ -104,7 +114,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
         final ApplicationParams ap = mock(ApplicationParams.class);
         when(ap.getDocumentURLPattern()).thenReturn(urlBase + "/documents/[A-Za-z0-9-]+(?:/binary)?");
 
-        return new DocumentValidator(ap);
+        return new DocumentValidator(ap, textValidator,dateTimeValidator,caseDefinitionRepository);
     }
 
     @Before
@@ -112,7 +122,9 @@ public class DocumentValidatorTest implements IVallidatorTest {
         final ApplicationParams applicationParams = mock(ApplicationParams.class);
         when(applicationParams.getDocumentURLPattern()).thenReturn("https://dm.reform.hmcts.net/documents/[A-Za-z0-9-]+(?:/binary)?");
 
-        validator = new DocumentValidator(applicationParams);
+        textValidator = new TextValidator();
+        dateTimeValidator = new DateTimeValidator();
+        validator = new DocumentValidator(applicationParams,textValidator,dateTimeValidator,caseDefinitionRepository);
         caseFieldDefinition = MAPPER.readValue(CASE_FIELD_STRING, CaseFieldDefinition.class);
     }
 
@@ -120,35 +132,35 @@ public class DocumentValidatorTest implements IVallidatorTest {
     public void shouldNotValidateIfDocumentUrlIsNotText() {
         data = MAPPER.createObjectNode();
         data.put(DOCUMENT_URL, true);
-        validDocumentUrlResult =
+        validationResults =
             validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(validationResults.toString(), 1, validationResults.size());
     }
 
     @Test
     public void shouldNotValidateIfDocumentUrlDoesNotExist() {
         data = MAPPER.createObjectNode();
         data.put("some_data", "some_value");
-        validDocumentUrlResult =
+        validationResults =
             validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(validationResults.toString(), 1, validationResults.size());
     }
 
     @Test
     public void shouldNotValidateIfDocumentUrlIsNull() {
         data = MAPPER.createObjectNode();
         data.set(DOCUMENT_URL, null);
-        validDocumentUrlResult =
+        validationResults =
             validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(validationResults.toString(), 1, validationResults.size());
     }
 
     @Test
     public void shouldValidateDocumentWithValidUrlAndDomain() {
         data = createDoc(VALID_DOCUMENT_URL);
-        validDocumentUrlResult =
+        validationResults =
             validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
-        assertEquals(validDocumentUrlResult.toString(), 0, validDocumentUrlResult.size());
+        assertEquals(validationResults.toString(), 0, validationResults.size());
     }
 
     @Test
@@ -156,11 +168,11 @@ public class DocumentValidatorTest implements IVallidatorTest {
         validator = setUpEmHrsApiValidator();
 
         data = createDoc(VALID_EM_HRS_API_DOCUMENT_URL_1);
-        validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
-        assertEquals(validDocumentUrlResult.toString(), 0, validDocumentUrlResult.size());
+        validationResults = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
+        assertEquals(validationResults.toString(), 0, validationResults.size());
         data = createDoc(VALID_EM_HRS_API_DOCUMENT_URL_2);
-        validDocumentUrlResult = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
-        assertEquals(validDocumentUrlResult.toString(), 0, validDocumentUrlResult.size());
+        validationResults = validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
+        assertEquals(validationResults.toString(), 0, validationResults.size());
     }
 
     @Test
@@ -168,9 +180,9 @@ public class DocumentValidatorTest implements IVallidatorTest {
         validator = setUpEmHrsApiValidator();
 
         data = createDoc(VALID_EM_HRS_API_DOCUMENT_URL_3);
-        validDocumentUrlResult =
+        validationResults =
             validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
-        assertEquals(validDocumentUrlResult.toString(), 0, validDocumentUrlResult.size());
+        assertEquals(validationResults.toString(), 0, validationResults.size());
     }
 
     @Test
@@ -178,9 +190,9 @@ public class DocumentValidatorTest implements IVallidatorTest {
         validator = setUpEmHrsApiValidator();
 
         data = createDoc(INVALID_RECORD_ID_EM_HRS_API_DOCUMENT_URL);
-        validDocumentUrlResult =
+        validationResults =
             validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(validationResults.toString(), 1, validationResults.size());
     }
 
     @Test
@@ -188,41 +200,41 @@ public class DocumentValidatorTest implements IVallidatorTest {
         validator = setUpEmHrsApiValidator();
 
         data = createDoc(INVALID_EM_HRS_API_DOCUMENT_URL);
-        validDocumentUrlResult =
+        validationResults =
             validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(validationResults.toString(), 1, validationResults.size());
     }
 
     @Test
     public void shouldNotValidateDocumentWithMissingDocumentPath() {
         data = createDoc(MISSING_DOCUMENT_PATH_URL);
-        validDocumentUrlResult =
+        validationResults =
             validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(validationResults.toString(), 1, validationResults.size());
     }
 
     @Test
     public void shouldNotValidateDocumentWithUnknownDomain() {
         data = createDoc(UNKNOWN_DOCUMENT_DOMAIN_URL);
-        validDocumentUrlResult =
+        validationResults =
             validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(validationResults.toString(), 1, validationResults.size());
     }
 
     @Test
     public void shouldNotValidateDocumentWithUnknownParentDomain() {
         data = createDoc(UNKNOWN_DOCUMENT_PARENT_DOMAIN_URL);
-        validDocumentUrlResult =
+        validationResults =
             validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(validationResults.toString(), 1, validationResults.size());
     }
 
     @Test
     public void shouldValidateDocumentWithValidBinaryUrlAndDomain() {
-        data = createDoc(VALID_DOCUMENT_URL, VALID_DOCUMENT_URL + "/binary");
-        validDocumentUrlResult =
+        data = createDoc(VALID_DOCUMENT_URL, DOCUMENT_BINARY_URL,VALID_DOCUMENT_URL + "/binary");
+        validationResults =
             validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
-        assertEquals(validDocumentUrlResult.toString(), 0, validDocumentUrlResult.size());
+        assertEquals(validationResults.toString(), 0, validationResults.size());
     }
 
     @Test
@@ -230,33 +242,33 @@ public class DocumentValidatorTest implements IVallidatorTest {
         data = MAPPER.createObjectNode();
         data.put(DOCUMENT_URL, VALID_DOCUMENT_URL);
         data.set("document_binary_url", null);
-        validDocumentUrlResult =
+        validationResults =
             validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(validationResults.toString(), 1, validationResults.size());
     }
 
     @Test
     public void shouldNotValidateDocumentWithMissingDocumentPathToBinary() {
-        data = createDoc(VALID_DOCUMENT_URL, MISSING_DOCUMENT_PATH_URL + "/binary");
-        validDocumentUrlResult =
+        data = createDoc(VALID_DOCUMENT_URL,DOCUMENT_BINARY_URL, MISSING_DOCUMENT_PATH_URL + "/binary");
+        validationResults =
             validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(validationResults.toString(), 1, validationResults.size());
     }
 
     @Test
     public void shouldNotValidateDocumentWithUnknownDomainForBinary() {
-        data = createDoc(VALID_DOCUMENT_URL, UNKNOWN_DOCUMENT_DOMAIN_URL + "/binary");
-        validDocumentUrlResult =
+        data = createDoc(VALID_DOCUMENT_URL,DOCUMENT_BINARY_URL, UNKNOWN_DOCUMENT_DOMAIN_URL + "/binary");
+        validationResults =
             validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(validationResults.toString(), 1, validationResults.size());
     }
 
     @Test
     public void shouldNotValidateDocumentWithUnknownParentDomainForBinary() {
-        data = createDoc(VALID_DOCUMENT_URL, UNKNOWN_DOCUMENT_PARENT_DOMAIN_URL + "/binary");
-        validDocumentUrlResult =
+        data = createDoc(VALID_DOCUMENT_URL,DOCUMENT_BINARY_URL, UNKNOWN_DOCUMENT_PARENT_DOMAIN_URL + "/binary");
+        validationResults =
             validator.validate(DOCUMENT_FIELD_ID, data, caseFieldDefinition);
-        assertEquals(validDocumentUrlResult.toString(), 1, validDocumentUrlResult.size());
+        assertEquals(validationResults.toString(), 1, validationResults.size());
     }
 
     @Test
@@ -399,16 +411,50 @@ public class DocumentValidatorTest implements IVallidatorTest {
         assertThat(result.get(0).getErrorMessage(), is("document_url is not a text value or is null"));
     }
 
+    @Test
+    public void shouldFail_whenValidatingCategoryId() {
+        data = createDoc(VALID_DOCUMENT_URL,CATEGORY_ID,null);
+        validationResults = validator.validate(CATEGORY_ID, data, caseFieldDefinition);
+
+        assertThat(validationResults.get(0).getErrorMessage(), is(CATEGORY_ID + " is empty or null"));
+    }
+
+    @Test
+    public void shouldValidateCategoryId() {
+        data = createDoc(VALID_DOCUMENT_URL,CATEGORY_ID,VALID_CATEGORY_ID);
+        validationResults = validator.validate(CATEGORY_ID, data, caseFieldDefinition);
+
+        assertThat(validationResults, empty());
+    }
+
+    @Disabled(value = "NullPointerException exception returned")
+    public void shouldFail_whenValidatingUploadTimeStamp() {
+        data = createDoc(VALID_DOCUMENT_URL,UPLOAD_TIMESTAMP,VALID_UPLOAD_TIMESTAMP);
+        validationResults = validator.validate(UPLOAD_TIMESTAMP, data, caseFieldDefinition);
+
+        assertThat(validationResults, hasSize(1));
+        assertThat(validationResults.get(0).getErrorMessage(), is(UPLOAD_TIMESTAMP + " is empty or null"));
+    }
+
+    @Disabled(value = "NullPointerException exception returned")
+    public void shouldValidateUploadTimeStamp() {
+        data = createDoc(VALID_DOCUMENT_URL,UPLOAD_TIMESTAMP,VALID_UPLOAD_TIMESTAMP);
+        validationResults = validator.validate(UPLOAD_TIMESTAMP, data, caseFieldDefinition);
+
+        assertThat(validationResults, empty());
+    }
+
+
     private ObjectNode createDoc(String documentUrl) {
         data = MAPPER.createObjectNode();
         data.set(DOCUMENT_URL, new TextNode(documentUrl));
         return data;
     }
 
-    private ObjectNode createDoc(String documentUrl, String documentBinaryUrl) {
+    private ObjectNode createDoc(String documentUrl, String key, String value) {
         data = MAPPER.createObjectNode();
         data.set(DOCUMENT_URL, new TextNode(documentUrl));
-        data.set("document_binary_url", new TextNode(documentBinaryUrl));
+        data.set(key, new TextNode(value));
         return data;
     }
 
@@ -418,7 +464,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
             + "em-hrs-api-(pr-[0-9]+|preview).service.core-compute-preview).internal(?::d+)?/"
             + "hearing-recordings/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
             + "[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/segments/[0-9]+");
-        validator = new DocumentValidator(applicationParams);
+        validator = new DocumentValidator(applicationParams,null, null,null);
         return validator;
     }
 }

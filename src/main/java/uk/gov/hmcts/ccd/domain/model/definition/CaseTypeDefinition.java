@@ -45,6 +45,7 @@ public class CaseTypeDefinition implements Serializable {
     private final List<SearchAliasField> searchAliasFields = new ArrayList<>();
     private final List<SearchParty> searchParties = new ArrayList<>();
     private final List<SearchCriteria> searchCriterias = new ArrayList<>();
+    private final List<Category> categories = new ArrayList<>();
     @JsonProperty("roleToAccessProfiles")
     private List<RoleToAccessProfileDefinition> roleToAccessProfiles = new ArrayList<>();
 
@@ -244,5 +245,15 @@ public class CaseTypeDefinition implements Serializable {
         if (searchCriterias != null) {
             this.searchCriterias.addAll(searchCriterias);
         }
+    }
+
+    public void setCategories(List<Category> categories) {
+        if (categories != null) {
+            this.categories.addAll(categories);
+        }
+    }
+
+    public List<Category> getCategories() {
+        return categories;
     }
 }
