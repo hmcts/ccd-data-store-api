@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,8 +20,8 @@ import uk.gov.hmcts.ccd.domain.service.aggregated.GetCaseViewOperation;
 import uk.gov.hmcts.ccd.domain.service.common.UIDService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.v2.V2;
-import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
 import uk.gov.hmcts.ccd.v2.internal.resource.CaseHistoryViewResource;
+import uk.gov.hmcts.ccd.v2.internal.resource.CaseViewResource;
 
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.CASE_ACCESSED;
 import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.VIEW_CASE_HISTORY;
@@ -47,7 +46,6 @@ public class UICaseController {
         this.caseReferenceService = caseReferenceService;
     }
 
-    @Transactional
     @GetMapping(
         path = "/{caseId}",
         headers = {
@@ -88,7 +86,6 @@ public class UICaseController {
         return ResponseEntity.ok(new CaseViewResource(caseView));
     }
 
-    @Transactional
     @GetMapping(
         path = "/{caseId}/events/{eventId}",
         headers = {

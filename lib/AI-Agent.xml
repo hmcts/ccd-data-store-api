@@ -19,13 +19,11 @@
             <Method name="getCaseTypesForJurisdiction"/>
             <Method name="getBaseTypes"/>
             <Method name="getClassificationsForUserRoleList"/>
-            <Method name="getLatestVersion"/>
             <Method name="getJurisdictions"/>
         </Class>
         <Class name="uk.gov.hmcts.ccd.data.casedetails.DefaultCaseDetailsRepository">
             <Method name="set"/>
             <Method name="findById"/>
-            <Method name="findByReference"/>
             <Method name="lockCase"/>
             <Method name="findUniqueCase"/>
             <Method name="findByMetaDataAndFieldData"/>
