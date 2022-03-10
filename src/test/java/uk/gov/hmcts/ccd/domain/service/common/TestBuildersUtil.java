@@ -705,7 +705,7 @@ public class TestBuildersUtil {
         }
 
         public AccessControlListBuilder withRole(String role) {
-            this.accessControlList.setRole(role);
+            this.accessControlList.setAccessProfile(role);
             return this;
         }
 
@@ -751,7 +751,7 @@ public class TestBuildersUtil {
         }
 
         public ComplexACLBuilder withRole(String role) {
-            this.complexACL.setRole(role);
+            this.complexACL.setAccessProfile(role);
             return this;
         }
 
@@ -874,6 +874,11 @@ public class TestBuildersUtil {
 
         public CaseEventFieldDefinitionBuilder withPublishAs(String publishAs) {
             caseField.setPublishAs(publishAs);
+            return this;
+        }
+
+        public CaseEventFieldDefinitionBuilder withDefaultValue(String defaultValue) {
+            caseField.setDefaultValue(defaultValue);
             return this;
         }
 

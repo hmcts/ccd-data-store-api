@@ -92,7 +92,8 @@ class OrgPolicyCaseAssignedRoleValidatorTest {
         caseFieldDefinition.setCaseTypeId("TEST");
         final JsonNode validValue = NODE_FACTORY.textNode("ROLE_1");
         ValidationContext validationContext1 = createValidationContext(caseFieldDefinition, validValue);
-        when(caseRoleRepository.getCaseRoles(anyString())).thenReturn(roles);
+
+        when(caseRoleRepository.getRoles(anyString())).thenReturn(roles);
         final List<ValidationResult> validResult = validator.validate(validationContext1);
 
         assertAll(

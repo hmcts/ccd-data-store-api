@@ -1,0 +1,15 @@
+{
+  "_guid_": "S-1006.3_ExpectedCaseSearchResult",
+
+  "stateId" : "CaseCreated",
+  "processForAccess" : "NONE",
+  "caseReference" : "[[ANYTHING_PRESENT]]",
+  "otherReferences" : [ "FirstNameValue" ],
+  "caseNameHmctsInternal" : "Name Internal",
+  "caseManagementCategoryId" : "987",
+  "caseManagementCategoryName" : "Category label",
+  "CCDJurisdictionId" : "BEFTA_MASTER",
+  "CCDJurisdictionName" : "BEFTA Master",
+  "CCDCaseTypeId" : "FT_GlobalSearch",
+  "CCDCaseTypeName" : "FT_GlobalSearch"
+}

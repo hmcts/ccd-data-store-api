@@ -39,7 +39,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class CaseDocumentServiceTest extends TestFixtures {
@@ -86,18 +85,20 @@ class CaseDocumentServiceTest extends TestFixtures {
     }
 
     @Test
-    void testShouldReturnOriginalCaseDetailsWhenNoDocumentsPresent() throws Exception {
+    void testShouldReturnCloneOfOriginalCaseDetailsWhenNoDocumentsPresent() throws Exception {
         // Given
         final Map<String, JsonNode> data = fromFileAsMap("text-type-case-field.json");
         final CaseDetails caseDetails = buildCaseDetails(data);
 
+        doReturn(true).when(applicationParams).isDocumentHashCloneEnabled();
+        doReturn(caseDetails).when(caseService).clone(caseDetails);
         doCallRealMethod().when(documentUtils).findDocumentNodes(anyMap());
 
         // When
         final CaseDetails actualClonedCaseDetails = underTest.stripDocumentHashes(caseDetails);
 
         // Then
-        verifyZeroInteractions(caseService);
+        verify(caseService).clone(caseDetails);
         verify(documentUtils).findDocumentNodes(anyMap());
 
         assertThat(actualClonedCaseDetails)
@@ -247,7 +248,7 @@ class CaseDocumentServiceTest extends TestFixtures {
         underTest.attachCaseDocuments(CASE_REFERENCE, CASE_TYPE_ID, JURISDICTION_ID, emptyList());
 
         // Then
-        verifyZeroInteractions(caseDocumentAmApiClient);
+        verifyNoMoreInteractions(caseDocumentAmApiClient);
     }
 
     @ParameterizedTest
@@ -279,6 +280,6 @@ class CaseDocumentServiceTest extends TestFixtures {
         assertThatCode(() -> underTest.validate(emptyList()))
             .doesNotThrowAnyException();
 
-        verifyZeroInteractions(documentUtils);
+        verifyNoMoreInteractions(documentUtils);
     }
 }

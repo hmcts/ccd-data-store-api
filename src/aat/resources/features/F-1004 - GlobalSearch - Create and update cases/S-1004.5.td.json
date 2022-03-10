@@ -1,0 +1,41 @@
+{
+  "title": "must successfully create a case as a caseworker using  /case-types/{caseTypeId}/cases endpoint",
+  "_guid_": "S-1004.5",
+  "_extends_": "F-1004_CitizenUpdateCaseEvent",
+
+   "specs": [
+    "an active profile in CCD",
+    "contains additional data fields that will be used to populate SearchCriteria"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "cid": "${[scenarioContext][childContexts][F-1004_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "Address": {
+          "AddressLine1": "updated Address"
+        }
+      },
+      "event_token": "${[scenarioContext][childContexts][F-1004_GetCitizenUpdateToken][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 201,
+    "responseMessage": "OK",
+    "headers": {
+      "_extends_": "Common_Response_Headers",
+      "Vary": "Accept-Encoding"
+    },
+    "body": {
+      "jurisdiction": "BEFTA_MASTER",
+      "state": "CaseUpdated",
+      "case_type_id": "FT_GlobalSearch",
+      "case_data": {
+        "_extends_": "Befta_Global_Search_Updated_Expected_Search_Criteria"
+      }
+    }
+  }
+}

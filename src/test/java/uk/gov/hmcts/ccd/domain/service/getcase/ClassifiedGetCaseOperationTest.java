@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
-import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationService;
 
 import java.util.Optional;
+import uk.gov.hmcts.ccd.domain.service.common.SecurityClassificationServiceImpl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -30,7 +30,7 @@ class ClassifiedGetCaseOperationTest {
     private GetCaseOperation getCaseOperation;
 
     @Mock
-    private SecurityClassificationService classificationService;
+    private SecurityClassificationServiceImpl classificationService;
 
     private ClassifiedGetCaseOperation classifiedGetCaseOperation;
     private Optional<CaseDetails> caseDetails;

@@ -3,6 +3,12 @@ package uk.gov.hmcts.ccd.domain.service.common;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,18 +20,13 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.AuditEvent;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.hamcrest.CoreMatchers.is;
@@ -40,10 +41,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PRIVATE;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.PUBLIC;
 import static uk.gov.hmcts.ccd.data.casedetails.SecurityClassification.RESTRICTED;
@@ -58,7 +62,7 @@ public class SecurityClassificationServiceTest {
     private static final String JURISDICTION_ID = "PROBATE";
     private static final ObjectMapper MAPPER = JacksonUtils.MAPPER;
 
-    private SecurityClassificationService securityClassificationService;
+    private SecurityClassificationServiceImpl securityClassificationService;
 
     @Mock
     private Authentication authentication;
@@ -67,16 +71,24 @@ public class SecurityClassificationServiceTest {
     private SecurityContext securityContext;
 
     @Mock
-    private UserRepository userRepository;
+    private CaseDataAccessControl caseDataAccessControl;
+
+    @Mock
+    private CaseDefinitionRepository caseDefinitionRepository;
+
+    private CaseDetails caseDetails;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+        caseDetails = new CaseDetails();
+        caseDetails.setJurisdiction(JURISDICTION_ID);
 
         doReturn(authentication).when(securityContext).getAuthentication();
         SecurityContextHolder.setContext(securityContext);
 
-        securityClassificationService = spy(new SecurityClassificationService(userRepository));
+        securityClassificationService = spy(new SecurityClassificationServiceImpl(caseDataAccessControl,
+            caseDefinitionRepository));
     }
 
     @Nested
@@ -100,7 +112,9 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should return TRUE when user has enough SC rank")
         void userHasEnoughSecurityClassificationForField() {
-            doReturn(newHashSet(PUBLIC, PRIVATE)).when(userRepository).getUserClassifications(JURISDICTION_ID);
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(newHashSet(PUBLIC, PRIVATE));
+
             assertTrue(securityClassificationService.userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
                 testCaseTypeDefinition,
                 CASE_FIELD_ID_1_1));
@@ -109,7 +123,9 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should return FALSE when user doesn't have enough SC rank")
         void userDoesNotHaveEnoughSecurityClassificationForField() {
-            doReturn(newHashSet(PUBLIC, PRIVATE)).when(userRepository).getUserClassifications(JURISDICTION_ID);
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(newHashSet(PUBLIC, PRIVATE));
+
             assertFalse(securityClassificationService.userHasEnoughSecurityClassificationForField(JURISDICTION_ID,
                 testCaseTypeDefinition,
                 CASE_FIELD_ID_1_2));
@@ -123,20 +139,22 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should retrieve user classifications from user repository")
         public void shouldRetrieveClassificationsFromRepository() {
-            doReturn(newHashSet(PUBLIC, PRIVATE)).when(userRepository).getUserClassifications(JURISDICTION_ID);
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(newHashSet(PUBLIC, PRIVATE));
+            securityClassificationService.getUserClassification(new CaseTypeDefinition(), true);
 
-            securityClassificationService.getUserClassification(JURISDICTION_ID);
-
-            verify(userRepository, times(1)).getUserClassifications(JURISDICTION_ID);
+            verify(caseDataAccessControl, times(1))
+                .getUserClassifications(any(CaseTypeDefinition.class), anyBoolean());
         }
 
         @Test
         @DisplayName("should keep highest ranked classification")
         public void shouldRetrieveHigherRankedRole() {
-            doReturn(newHashSet(PUBLIC, PRIVATE)).when(userRepository).getUserClassifications(JURISDICTION_ID);
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(newHashSet(PUBLIC, PRIVATE));
 
-            Optional<SecurityClassification> userClassification = securityClassificationService.getUserClassification(
-                JURISDICTION_ID);
+            Optional<SecurityClassification> userClassification = securityClassificationService
+                .getUserClassification(new CaseTypeDefinition(), true);
 
             assertEquals(PRIVATE,
                 userClassification.get(),
@@ -147,10 +165,13 @@ public class SecurityClassificationServiceTest {
         @DisplayName("should retrieve no security classification if empty list of classifications returned by user "
             + "repository")
         public void shouldRetrieveNoSecurityClassificationIfEmptyListOfClassifications() {
-            doReturn(newHashSet()).when(userRepository).getUserClassifications(JURISDICTION_ID);
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(newHashSet());
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(newHashSet());
 
             Optional<SecurityClassification> userClassification = securityClassificationService.getUserClassification(
-                JURISDICTION_ID);
+                new CaseTypeDefinition(), true);
 
             assertFalse(userClassification.isPresent(), "Should not have classification");
         }
@@ -170,8 +191,11 @@ public class SecurityClassificationServiceTest {
 
         Optional<CaseDetails> applyClassification(SecurityClassification userClassification,
                                                   SecurityClassification caseClassification) {
-            doReturn(Optional.ofNullable(userClassification)).when(securityClassificationService)
-                .getUserClassification(JURISDICTION_ID);
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(newHashSet(userClassification));
+
+            when(caseDataAccessControl.getUserClassifications(any(CaseDetails.class)))
+                .thenReturn(newHashSet(userClassification));
 
             caseDetails.setSecurityClassification(caseClassification);
 
@@ -223,14 +247,15 @@ public class SecurityClassificationServiceTest {
             restrictedEvent = new AuditEvent();
             restrictedEvent.setSecurityClassification(RESTRICTED);
 
-            doReturn(Optional.empty()).when(securityClassificationService).getUserClassification(JURISDICTION_ID);
+            doReturn(Optional.empty()).when(securityClassificationService)
+                .getUserClassification(any(CaseTypeDefinition.class), anyBoolean());
         }
 
         @Test
         @DisplayName("should return empty list when given null")
         void shouldReturnEmptyListInsteadOfNull() {
             final List<AuditEvent> classifiedEvents =
-                securityClassificationService.applyClassification(JURISDICTION_ID, null);
+                securityClassificationService.applyClassification(caseDetails, null);
 
             assertAll(
                 () -> assertThat(classifiedEvents, is(notNullValue())),
@@ -241,11 +266,11 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should return all events when user has higher classification")
         void shouldReturnAllEventsWhenUserHigherClassification() {
-            doReturn(Optional.of(RESTRICTED)).when(securityClassificationService).getUserClassification(
-                JURISDICTION_ID);
+            when(caseDataAccessControl.getUserClassifications(any(CaseDetails.class)))
+                .thenReturn(newHashSet(RESTRICTED));
 
             final List<AuditEvent> classifiedEvents =
-                securityClassificationService.applyClassification(JURISDICTION_ID,
+                securityClassificationService.applyClassification(caseDetails,
                                                                 Arrays.asList(publicEvent,
                                                                     privateEvent,
                                                                     restrictedEvent));
@@ -259,10 +284,11 @@ public class SecurityClassificationServiceTest {
         @Test
         @DisplayName("should filter out events with higher classification")
         void shouldFilterOutEventsHigherClassification() {
-            doReturn(Optional.of(PUBLIC)).when(securityClassificationService).getUserClassification(JURISDICTION_ID);
+            when(caseDataAccessControl.getUserClassifications(any(CaseDetails.class)))
+                .thenReturn(newHashSet(PUBLIC));
 
             final List<AuditEvent> classifiedEvents =
-                securityClassificationService.applyClassification(JURISDICTION_ID,
+                securityClassificationService.applyClassification(caseDetails,
                                                                     Arrays.asList(publicEvent,
                                                                         privateEvent,
                                                                         restrictedEvent));
@@ -278,7 +304,7 @@ public class SecurityClassificationServiceTest {
         void shouldReturnEmptyListWhenNoUserClassification() {
 
             final List<AuditEvent> classifiedEvents =
-                securityClassificationService.applyClassification(JURISDICTION_ID,
+                securityClassificationService.applyClassification(caseDetails,
                                                                     Arrays.asList(publicEvent,
                                                                         privateEvent,
                                                                         restrictedEvent));
@@ -347,7 +373,12 @@ public class SecurityClassificationServiceTest {
 
         CaseDetails applyClassification(SecurityClassification userClassification) {
             doReturn(Optional.ofNullable(userClassification)).when(securityClassificationService)
-                .getUserClassification(JURISDICTION_ID);
+                .getUserClassification(any(CaseTypeDefinition.class), anyBoolean());
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean())).thenReturn(
+                Sets.newHashSet(userClassification));
+
+            when(caseDataAccessControl.getUserClassifications(any(CaseDetails.class))).thenReturn(
+                Sets.newHashSet(userClassification));
 
             caseDetails.setSecurityClassification(PRIVATE);
 
@@ -894,7 +925,7 @@ public class SecurityClassificationServiceTest {
                     "         \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
                     "       },\n" +
                     "       {\n" +
-                    "         \"classification\": \"PRIVATE\",\n" +
+                    "         \"classification\": \"RESTRICTED\",\n" +
                     "         \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
                     "       },\n" +
                     "       {\n" +
@@ -913,16 +944,14 @@ public class SecurityClassificationServiceTest {
             assertAll(
                 () -> assertThat(resultNode.has("Aliases"), is(true)),
                 () -> assertThat(resultNode.get("Aliases").isArray(), is(true)),
-                () -> assertThat(resultNode.get("Aliases").size(), is(3))
+                () -> assertThat(resultNode.get("Aliases").size(), is(2))
             );
             final JsonNode aliases = resultNode.get("Aliases");
             final String alias1 = aliases.get(0).get("value").textValue();
-            final String alias2 = aliases.get(1).get("value").textValue();
-            final String alias3 = aliases.get(2).get("value").textValue();
+            final String alias3 = aliases.get(1).get("value").textValue();
 
             assertAll("Restricted Alias #2 should have been removed",
                 () -> assertThat(alias1, is("Alias #1")),
-                () -> assertThat(alias2, is("Alias #2")),
                 () -> assertThat(alias3, is("Alias #3"))
             );
         }
@@ -950,13 +979,13 @@ public class SecurityClassificationServiceTest {
 
             assertAll(
                 () -> assertThat(item1Collection1.isArray(), is(true)),
-                () -> assertThat(item1Collection1.size(), is(2)),
+                () -> assertThat(item1Collection1.size(), is(1)),
                 () -> assertThat(item2Collection1.isArray(), is(true)),
-                () -> assertThat(item2Collection1.size(), is(2))
+                () -> assertThat(item2Collection1.size(), is(1))
             );
 
             final String item1_1 = item1Collection1.get(0).get("value").textValue();
-            final String item2_2 = item2Collection1.get(1).get("value").textValue();
+            final String item2_2 = item2Collection1.get(0).get("value").textValue();
 
             assertAll(
                 () -> assertThat(item1_1, equalTo("ITEM_1_1")),
@@ -982,7 +1011,7 @@ public class SecurityClassificationServiceTest {
                     "                }," +
                     "                {" +
                     "                  \"id\": \"ITEM_1_2\"," +
-                    "                  \"classification\": \"PRIVATE\"" +
+                    "                  \"classification\": \"RESTRICTED\"" +
                     "                }" +
                     "              ]" +
                     "            }" +
@@ -997,7 +1026,7 @@ public class SecurityClassificationServiceTest {
                     "              \"value\": [" +
                     "                {" +
                     "                  \"id\": \"ITEM_2_1\"," +
-                    "                  \"classification\": \"PRIVATE\"" +
+                    "                  \"classification\": \"RESTRICTED\"" +
                     "                }," +
                     "                {" +
                     "                  \"id\": \"ITEM_2_2\"," +
@@ -1129,12 +1158,12 @@ public class SecurityClassificationServiceTest {
                     "       \"value\": [\n" +
                     "         {  \n" +
                     "            \"value\":{  \n" +
-                    "               \"Address\":\"PRIVATE\",\n" +
+                    "               \"Address\":\"RESTRICTED\",\n" +
                     "               \"Notes\": {\n" +
                     "                   \"classification\": \"PRIVATE\",\n" +
                     "                   \"value\": {\n" +
                     "                     \"Note1\": \"PRIVATE\",\n" +
-                    "                     \"Note2\": \"PRIVATE\"\n" +
+                    "                     \"Note2\": \"RESTRICTED\"\n" +
                     "                   }\n" +
                     "                }" +
                     "            },\n" +
@@ -1146,7 +1175,7 @@ public class SecurityClassificationServiceTest {
                     "               \"Notes\": {\n" +
                     "                   \"classification\": \"PRIVATE\",\n" +
                     "                   \"value\": {\n" +
-                    "                     \"Note1\": \"PRIVATE\",\n" +
+                    "                     \"Note1\": \"RESTRICTED\",\n" +
                     "                     \"Note2\": \"PRIVATE\"\n" +
                     "                   }" +
                     "               }" +
@@ -1165,16 +1194,16 @@ public class SecurityClassificationServiceTest {
             JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
                 () -> assertThat(resultNode.get("Addresses").get(0).get(ID), is(equalTo(getTextNode(FIRST_CHILD_ID)))),
-                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).has("Address"), is(true)),
+                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).has("Address"), is(false)),
                 () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).get("Notes").get("Note1"),
                     is(equalTo(getTextNode("someNote11")))),
-                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).get("Notes").has("Note2"), is(true)),
+                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).get("Notes").has("Note2"), is(false)),
 
                 () -> assertThat(resultNode.get("Addresses").get(1).get(ID),
                     is(equalTo(getTextNode(SECOND_CHILD_ID)))),
                 () -> assertThat(resultNode.get("Addresses").get(1).get(VALUE).get("Address"),
                     is(equalTo(getTextNode("address2")))),
-                () -> assertThat(resultNode.get("Addresses").get(1).get(VALUE).get("Notes").has("Note1"), is(true)),
+                () -> assertThat(resultNode.get("Addresses").get(1).get(VALUE).get("Notes").has("Note1"), is(false)),
                 () -> assertThat(resultNode.get("Addresses").get(1).get(VALUE).get("Notes").get("Note2"),
                     is(equalTo(getTextNode("someNote22"))))
             );
@@ -1216,12 +1245,12 @@ public class SecurityClassificationServiceTest {
                     "       \"value\": [\n" +
                     "         {  \n" +
                     "            \"value\":{  \n" +
-                    "               \"Address\":\"PRIVATE\",\n" +
+                    "               \"Address\":\"RESTRICTED\",\n" +
                     "               \"Notes\": {\n" +
                     "                   \"classification\": \"PRIVATE\",\n" +
                     "                   \"value\": {\n" +
                     "                     \"Note1\": \"PRIVATE\",\n" +
-                    "                     \"Note2\": \"PRIVATE\"\n" +
+                    "                     \"Note2\": \"RESTRICTED\"\n" +
                     "                   }\n" +
                     "                }" +
                     "            },\n" +
@@ -1238,12 +1267,12 @@ public class SecurityClassificationServiceTest {
 
             JsonNode resultNode = JacksonUtils.convertValueJsonNode(caseDetails.getData());
             assertAll(
-                () -> assertThat(resultNode.get("Addresses").size(), is(equalTo(2))),
+                () -> assertThat(resultNode.get("Addresses").size(), is(equalTo(1))),
                 () -> assertThat(resultNode.get("Addresses").get(0).get(ID), is(equalTo(getTextNode(FIRST_CHILD_ID)))),
-                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).has("Address"), is(true)),
+                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).has("Address"), is(false)),
                 () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).get("Notes").get("Note1"),
                     is(equalTo(getTextNode("someNote11")))),
-                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).get("Notes").has("Note2"), is(true))
+                () -> assertThat(resultNode.get("Addresses").get(0).get(VALUE).get("Notes").has("Note2"), is(false))
             );
         }
 
@@ -1289,7 +1318,7 @@ public class SecurityClassificationServiceTest {
             final JsonNode addresses = resultNode.get("Addresses");
             assertThat(addresses, is(notNullValue()));
             assertAll(
-                () -> assertThat(addresses.size(), equalTo(2)),
+                () -> assertThat(addresses.size(), equalTo(1)),
                 () -> assertThat(addresses.get(0).get(ID),
                     is(equalTo(jsonNodeFactory.textNode(FIRST_CHILD_ID)))),
                 () -> assertThat(addresses.get(0).get(VALUE),
@@ -1426,19 +1455,19 @@ public class SecurityClassificationServiceTest {
                     "        \"value\": [  \n" +
                     "          { \"value\":{  \n" +
                     "               \"Name\":\"PRIVATE\",\n" +
-                    "               \"BirthDate\":\"PRIVATE\",\n" +
-                    "               \"Gender\":\"PRIVATE\",\n" +
-                    "               \"ApplicantRelation\":\"PRIVATE\",\n" +
-                    "               \"RespondentRelation\":\"PRIVATE\"\n" +
+                    "               \"BirthDate\":\"RESTRICTED\",\n" +
+                    "               \"Gender\":\"PUBLIC\",\n" +
+                    "               \"ApplicantRelation\":\"RESTRICTED\",\n" +
+                    "               \"RespondentRelation\":\"RESTRICTED\"\n" +
                     "            },\n" +
                     "            \"id\":\"" + FIRST_CHILD_ID + "\"\n" +
                     "          },\n" +
                     "          { \"value\":{  \n" +
-                    "               \"Name\":\"PRIVATE\",\n" +
+                    "               \"Name\":\"PUBLIC\",\n" +
                     "               \"BirthDate\":\"PRIVATE\",\n" +
-                    "               \"Gender\":\"PRIVATE\",\n" +
-                    "               \"ApplicantRelation\":\"PRIVATE\",\n" +
-                    "               \"RespondentRelation\":\"PRIVATE\"\n" +
+                    "               \"Gender\":\"PUBLIC\",\n" +
+                    "               \"ApplicantRelation\":\"PUBLIC\",\n" +
+                    "               \"RespondentRelation\":\"PUBLIC\"\n" +
                     "            },\n" +
                     "            \"id\":\"" + SECOND_CHILD_ID + "\"\n" +
                     "          }\n" +
@@ -1472,10 +1501,10 @@ public class SecurityClassificationServiceTest {
                     is(equalTo(getTextNode(FIRST_CHILD_ID)))),
                 () -> assertThat(resultNode.get("ChildrenDet").get(0).get(VALUE).get("Name"),
                     is(equalTo(getTextNode("First Childs Name")))),
-                () -> assertThat(resultNode.get("ChildrenDet").get(0).get(VALUE).has("BirthDate"), is(true)),
+                () -> assertThat(resultNode.get("ChildrenDet").get(0).get(VALUE).has("BirthDate"), is(false)),
                 () -> assertThat(resultNode.get("ChildrenDet").get(0).get(VALUE).get("Gender"),
                     is(equalTo(getTextNode("Male")))),
-                () -> assertThat(resultNode.get("ChildrenDet").get(0).get(VALUE).has("ApplicantRelation"), is(true)),
+                () -> assertThat(resultNode.get("ChildrenDet").get(0).get(VALUE).has("ApplicantRelation"), is(false)),
                 () -> assertThat(resultNode.get("ChildrenDet").get(1).get(ID),
                     is(equalTo(getTextNode(SECOND_CHILD_ID)))),
                 () -> assertThat(resultNode.get("ChildrenDet").get(1).get(VALUE).get("Name"),

@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/o/token",
+    "bodyPatterns" : [{
+      "contains" : "data.store.idam.system.user%40gmail.com"
+    }]
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "access_token": "eyAidGVzdCI6InRlc3QiIH0"
+    }
+  }
+}

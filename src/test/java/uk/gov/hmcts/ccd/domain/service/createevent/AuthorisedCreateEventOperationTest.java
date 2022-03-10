@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import java.util.stream.Collectors;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -40,6 +42,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.doReturn;
@@ -60,9 +63,9 @@ class AuthorisedCreateEventOperationTest {
     private static final String CASEWORKER_PROBATE_LOA1 = "caseworker-probate-loa1";
     private static final String CASEWORKER_PROBATE_LOA3 = "caseworker-probate-loa3";
     private static final String CASEWORKER_DIVORCE = "caseworker-divorce-loa3";
-    private static final Set<String> USER_ROLES = Sets.newHashSet(CASEWORKER_DIVORCE,
+    private static final Set<AccessProfile> USER_ROLES = createAccessProfiles(Sets.newHashSet(CASEWORKER_DIVORCE,
         CASEWORKER_PROBATE_LOA1,
-        CASEWORKER_PROBATE_LOA3);
+        CASEWORKER_PROBATE_LOA3));
 
     private static final String CASE_TYPE_ID = "Grant";
     private static final String CASE_ID = "26";
@@ -136,7 +139,8 @@ class AuthorisedCreateEventOperationTest {
         caseTypeDefinition.setEvents(events);
         caseTypeDefinition.setCaseFieldDefinitions(caseFieldDefinitions);
         when(caseDefinitionRepository.getCaseType(CASE_TYPE_ID)).thenReturn(caseTypeDefinition);
-        when(caseAccessService.getUserRoles()).thenReturn(USER_ROLES);
+        when(caseAccessService.getAccessProfiles(anyString())).thenReturn(USER_ROLES);
+        when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(USER_ROLES);
         when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition), eq(USER_ROLES),
             eq(CAN_UPDATE))).thenReturn(true);
         when(accessControlService.canAccessCaseStateWithCriteria(eq(STATE_ID), eq(caseTypeDefinition), eq(USER_ROLES),
@@ -159,6 +163,14 @@ class AuthorisedCreateEventOperationTest {
             eq(USER_ROLES),
             eq(CAN_READ),
             anyBoolean())).thenReturn(authorisedCaseNode);
+    }
+
+    private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
+        return userRoles.stream()
+            .map(userRole -> AccessProfile.builder().readOnly(false)
+                .accessProfile(userRole)
+                .build())
+            .collect(Collectors.toSet());
     }
 
     @Test
@@ -204,7 +216,7 @@ class AuthorisedCreateEventOperationTest {
             () -> assertThat(output, sameInstance(classifiedCase)),
             () -> assertThat(output.getData(), is(equalTo(JacksonUtils.convertValue(authorisedCaseNode)))),
             () -> inOrder.verify(getCaseOperation).execute(CASE_REFERENCE),
-            () -> inOrder.verify(caseAccessService).getUserRoles(),
+            () -> inOrder.verify(caseAccessService).getAccessProfilesByCaseReference(CASE_REFERENCE),
             () -> inOrder.verify(caseDefinitionRepository).getCaseType(CASE_TYPE_ID),
             () -> inOrder.verify(accessControlService).canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
                 eq(USER_ROLES),
@@ -258,7 +270,7 @@ class AuthorisedCreateEventOperationTest {
     @DisplayName("should fail if user roles not found")
     void shouldFailIfNoUserRolesFound() {
 
-        doReturn(Collections.EMPTY_SET).when(caseAccessService).getUserRoles();
+        doReturn(Collections.EMPTY_SET).when(caseAccessService).getAccessProfilesByCaseReference(anyString());
 
         assertThrows(ValidationException.class, () -> authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
             CASE_DATA_CONTENT));

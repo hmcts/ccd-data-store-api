@@ -1,0 +1,32 @@
+{
+	"_guid_": "F-1005_CreateCasePreRequisiteCaseworker",
+	"_extends_": "F-1004_CreateCasePreRequisiteCaseworker",
+
+	"request": {
+		"body": {
+			"data": {
+				"caseManagementLocation": {
+					"_extends_": "CaseManagementLocation_FromRefData_SiblingContext"
+				}
+			},
+			"supplementary_data_request": {
+				"$set": {
+					"HMCTSServiceId": "${[scenarioContext][siblingContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_code]}"
+				}
+			}
+		}
+	},
+
+	"expectedResponse": {
+		"body": {
+			"case_data": {
+				"caseManagementLocation": {
+					"_extends_": "CaseManagementLocation_FromRequest"
+				}
+			},
+			"supplementary_data": {
+				"HMCTSServiceId": "${[scenarioContext][siblingContexts][Get_RefData_OrgServices_Load_All][testData][actualResponse][body][arrayInMap][0][service_code]}"
+			}
+		}
+	}
+}

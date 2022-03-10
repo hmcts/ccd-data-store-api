@@ -10,6 +10,9 @@
 	"users": {
 		"invokingUser": {
 			"_extends_": "Common_User_For_Request"
+		},
+		"testUser": {
+			"_extends_": "PrivateCaseworker"
 		}
 	},
 
@@ -20,7 +23,7 @@
 			"jid": "AUTOTEST1",
 			"ctid": "AAT",
 			"cid": "[[DEFAULT_AUTO_VALUE]]",
-			"idToDelete": "${[scenarioContext][theInvokingUser][id]}"
+			"idToDelete": "${[scenarioContext][testData][users][testUser][id]}"
 		}
 	}
 }

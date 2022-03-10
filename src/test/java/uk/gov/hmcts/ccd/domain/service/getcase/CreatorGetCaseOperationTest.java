@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
 
@@ -25,6 +26,9 @@ class CreatorGetCaseOperationTest {
 
     @Mock
     private CaseAccessService caseAccessService;
+
+    @Mock
+    private ApplicationParams applicationParams;
 
     private CreatorGetCaseOperation classUnderTest;
 
@@ -38,7 +42,7 @@ class CreatorGetCaseOperationTest {
     public void setupMocks() {
         MockitoAnnotations.initMocks(this);
 
-        classUnderTest = new CreatorGetCaseOperation(getCaseOperation, caseAccessService);
+        classUnderTest = new CreatorGetCaseOperation(getCaseOperation, caseAccessService, applicationParams);
 
         when(getCaseOperation.execute(any(), any(), any())).thenReturn(Optional.of(caseDetails));
         when(getCaseOperation.execute(any())).thenReturn(Optional.of(caseDetails));
@@ -105,6 +109,30 @@ class CreatorGetCaseOperationTest {
             assertCaseDetailsPresent(false,false, JURISDICTION_ID);
         }
 
+    }
+
+    @Nested
+    @DisplayName("Test role assignment enable and disable behaviour")
+    class RoleAssignmentStatus {
+
+        @Test
+        @DisplayName("Should not check granted users when role assignment is enabled")
+        @SuppressWarnings("checkstyle:LineLength") // don't want to break long method names
+        void searchOperationReturnsCaseDetails_WhenRoleAssignmentEnabled() {
+            when(caseAccessService.canUserAccess(any())).thenReturn(true);
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(true);
+            assertCaseDetailsPresent(true, false, JURISDICTION_ID);
+        }
+
+
+        @Test
+        @DisplayName("Should check granted users when role assignment is not enabled")
+        @SuppressWarnings("checkstyle:LineLength") // don't want to break long method names
+        void searchOperationReturnsCaseDetails_WhenRoleAssignmentNotEnabled_SholdCheckGrantedUsers() {
+            when(caseAccessService.canUserAccess(any())).thenReturn(true);
+            when(applicationParams.getEnableAttributeBasedAccessControl()).thenReturn(false);
+            assertCaseDetailsPresent(true, true, JURISDICTION_ID, CASE_TYPE_ID, CASE_REFERENCE);
+        }
     }
 
     private void assertCaseDetailsPresent(boolean isPresent,

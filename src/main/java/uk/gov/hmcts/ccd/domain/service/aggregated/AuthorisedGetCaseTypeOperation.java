@@ -3,15 +3,14 @@ package uk.gov.hmcts.ccd.domain.service.aggregated;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.AccessControlList;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
@@ -20,57 +19,56 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 public class AuthorisedGetCaseTypeOperation implements GetCaseTypeOperation {
     public static final String QUALIFIER = "authorised";
     private final AccessControlService accessControlService;
-    private final UserRepository userRepository;
     private final GetCaseTypeOperation getCaseTypeOperation;
+    private final CaseDataAccessControl caseDataAccessControl;
 
     @Autowired
     public AuthorisedGetCaseTypeOperation(final AccessControlService accessControlService,
-                                          @Qualifier(CachedUserRepository.QUALIFIER)
-                                              final UserRepository userRepository,
                                           @Qualifier(DefaultGetCaseTypeOperation.QUALIFIER)
-                                              final GetCaseTypeOperation getCaseTypeOperation) {
+                                              final GetCaseTypeOperation getCaseTypeOperation,
+                                          CaseDataAccessControl caseDataAccessControl) {
         this.accessControlService = accessControlService;
-        this.userRepository = userRepository;
         this.getCaseTypeOperation = getCaseTypeOperation;
+        this.caseDataAccessControl = caseDataAccessControl;
     }
 
     @Override
     public Optional<CaseTypeDefinition> execute(String caseTypeId, Predicate<AccessControlList> access) {
-        final Set<String> userRoles = getUserRoles();
+        final Set<AccessProfile> userRoles = getAccessProfiles(caseTypeId);
         return getCaseTypeOperation.execute(caseTypeId, access)
             .flatMap(caseType -> verifyAccess(caseType, userRoles, access));
     }
 
-    private Set<String> getUserRoles() {
-        Set<String> userRoles = userRepository.getUserRoles();
-        if (userRoles == null) {
-            throw new ValidationException("Cannot find user roles for the user");
+    private Set<AccessProfile> getAccessProfiles(String caseTypeId) {
+        Set<AccessProfile> accessProfiles = caseDataAccessControl.generateAccessProfilesByCaseTypeId(caseTypeId);
+        if (accessProfiles == null) {
+            throw new ValidationException("Cannot find access profiles for the user");
         }
-        return userRoles;
+
+        return accessProfiles;
     }
 
     private Optional<CaseTypeDefinition> verifyAccess(CaseTypeDefinition caseTypeDefinition,
-                                                      Set<String> userRoles,
+                                                      Set<AccessProfile> accessProfiles,
                                                       Predicate<AccessControlList> access) {
 
-        if (CollectionUtils.isEmpty(userRoles)) {
+        if (CollectionUtils.isEmpty(accessProfiles)) {
             return Optional.empty();
         }
 
-        if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, access)) {
+        if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, access)) {
             return Optional.empty();
         }
 
-        caseTypeDefinition.setStates(accessControlService.filterCaseStatesByAccess(caseTypeDefinition.getStates(),
-                                                                         userRoles,
+        caseTypeDefinition.setStates(accessControlService.filterCaseStatesByAccess(caseTypeDefinition,
+                                                                         accessProfiles,
                                                                          access));
-        caseTypeDefinition.setEvents(accessControlService.filterCaseEventsByAccess(caseTypeDefinition.getEvents(),
-                                                                         userRoles,
-                                                                         access));
+        caseTypeDefinition.setEvents(accessControlService.filterCaseEventsByAccess(caseTypeDefinition,
+            accessProfiles, access));
 
         caseTypeDefinition.setCaseFieldDefinitions(accessControlService.filterCaseFieldsByAccess(
                                                     caseTypeDefinition.getCaseFieldDefinitions(),
-                                                    userRoles,
+                                                    accessProfiles,
                                                     access));
 
 

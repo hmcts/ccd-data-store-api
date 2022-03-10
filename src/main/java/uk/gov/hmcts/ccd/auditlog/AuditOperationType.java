@@ -11,7 +11,8 @@ public enum AuditOperationType {
     REMOVE_CASE_ASSIGNED_USER_ROLES("Remove Case-Assigned Users and Roles"),
     GET_CASE_ASSIGNED_USER_ROLES("Get Case-Assigned Users and Roles"),
     REVOKE_CASE_ACCESS("Revoke case access permissions"),
-    VIEW_CASE_HISTORY("View case history");
+    VIEW_CASE_HISTORY("View case history"),
+    GLOBAL_SEARCH("Global search");
 
     private final String label;
 

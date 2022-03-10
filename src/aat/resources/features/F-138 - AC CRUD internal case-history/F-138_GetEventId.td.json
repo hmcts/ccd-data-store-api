@@ -1,0 +1,64 @@
+{
+  "_guid_": "F-138_GetEventId",
+  "title": "to get the details about case event for the case just created",
+
+  "productName": "CCD Data Store",
+  "operationName": "Retrieve a CaseView Event by case and event id for dynamic display",
+
+  "method": "GET",
+  "uri": "/internal/cases/{cid}",
+
+  "specs": [
+    "to get the details about case event for the case just created above"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_": "BeftaCaseworkerCaa"
+    }
+  },
+
+  "request": {
+    "_extends_": "Common_Request",
+    "headers": {
+      "experimental": true,
+      "_extends_": "Common_Request_Headers"
+    },
+    "pathVariables": {
+      "cid": "${[scenarioContext][parentContext][childContexts][F-138_CreateCase][testData][actualResponse][body][id]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_Response_Headers",
+    "responseCode": 200,
+    "responseMessage": "OK",
+    "headers": {
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Keep-Alive": "[[ANYTHING_PRESENT]]",
+      "Transfer-Encoding": "[[ANYTHING_PRESENT]]",
+      "Cache-Control": "[[ANYTHING_PRESENT]]",
+      "Date" : "[[ANYTHING_PRESENT]]",
+      "Expires" : "[[ANYTHING_PRESENT]]",
+      "Pragma" : "[[ANYTHING_PRESENT]]",
+      "X-Content-Type-Options" : "[[ANYTHING_PRESENT]]",
+      "X-XSS-Protection" : "[[ANY_STRING_NOT_NULLABLE]]",
+      "X-Frame-Options" : "[[ANY_STRING_NOT_NULLABLE]]"
+    },
+    "body": {
+      "_links": {
+        "self": {
+          "href": "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "case_id": "[[ANYTHING_PRESENT]]",
+      "case_type": "[[ANYTHING_PRESENT]]",
+      "tabs": "[[ANYTHING_PRESENT]]",
+      "metadataFields": "[[ANYTHING_PRESENT]]",
+      "state": "[[ANYTHING_PRESENT]]",
+      "triggers": "[[ANYTHING_PRESENT]]",
+      "events": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

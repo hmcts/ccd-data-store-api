@@ -1,0 +1,24 @@
+{
+  "_guid_": "S-1042",
+  "_extends_": "F-1003-SubmitCaseCreation",
+  "title": "must successfully create a case with new document uploaded where binary_url is not specified",
+  "specs": [
+    "an active caseworker profile in CCD with full permissions on a document field",
+    "is to attach the document uploaded above to a new case without specifying binary_url",
+    "contains necessary details about the document attached to the case"
+  ],
+  "request": {
+    "body": {
+      "data": {
+        "DocumentField1": {
+          "document_url": "{{DM_STORE_BASE_URL}}/documents/${[scenarioContext][childContexts][Default_Document_Upload_Data][customValues][documentIdInTheResponse]}",
+          "document_filename": "${[scenarioContext][childContexts][Default_Document_Upload_Data][testData][actualResponse][body][documents][0][originalDocumentName]}",
+          "document_hash": null
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "_extends_": "F-1003-SubmitCaseCreationResponse"
+  }
+}

@@ -3,13 +3,18 @@ package uk.gov.hmcts.ccd.auditlog;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ccd.AuditCaseRemoteConfiguration;
 import uk.gov.hmcts.ccd.auditlog.aop.AuditContext;
 import uk.gov.hmcts.ccd.data.SecurityUtils;
 import uk.gov.hmcts.ccd.data.user.CachedUserRepository;
 import uk.gov.hmcts.ccd.data.user.UserRepository;
+import uk.gov.hmcts.ccd.domain.service.lau.AuditCaseRemoteOperation;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.Objects;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
@@ -20,20 +25,27 @@ public class AuditService {
     private final SecurityUtils securityUtils;
     private final UserRepository userRepository;
     private final AuditRepository auditRepository;
+    private final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration;
+    private final AuditCaseRemoteOperation auditCaseRemoteOperation;
 
     public AuditService(@Qualifier("utcClock") final Clock clock,
                         @Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
-                        @Lazy final SecurityUtils securityUtils, final AuditRepository auditRepository) {
+                        @Lazy final SecurityUtils securityUtils, final AuditRepository auditRepository,
+                        final AuditCaseRemoteConfiguration auditCaseRemoteConfiguration,
+                        final AuditCaseRemoteOperation auditCaseRemoteOperation) {
         this.clock = clock;
         this.userRepository = userRepository;
         this.securityUtils = securityUtils;
         this.auditRepository = auditRepository;
+        this.auditCaseRemoteConfiguration = auditCaseRemoteConfiguration;
+        this.auditCaseRemoteOperation = auditCaseRemoteOperation;
     }
 
     public void audit(AuditContext auditContext) {
         AuditEntry entry = new AuditEntry();
 
-        String formattedDate = LocalDateTime.now(clock).format(ISO_LOCAL_DATE_TIME);
+        ZonedDateTime currentZonedDateTime = ZonedDateTime.of(LocalDateTime.now(clock), ZoneOffset.UTC);
+        String formattedDate = currentZonedDateTime.format(ISO_LOCAL_DATE_TIME);
         entry.setDateTime(formattedDate);
 
         entry.setHttpStatus(auditContext.getHttpStatus());
@@ -54,6 +66,20 @@ public class AuditService {
         entry.setTargetCaseRoles(auditContext.getTargetCaseRoles());
 
         auditRepository.save(entry);
+
+        // Log and Audit Call...
+        if (auditCaseRemoteConfiguration.isEnabled() && Objects.nonNull(auditContext.getAuditOperationType())) {
+            switch (auditContext.getAuditOperationType()) {
+                case CASE_ACCESSED:
+                case CREATE_CASE:
+                case UPDATE_CASE:
+                    auditCaseRemoteOperation.postCaseAction(entry, currentZonedDateTime);
+                    break;
+                case SEARCH_CASE:
+                    auditCaseRemoteOperation.postCaseSearch(entry, currentZonedDateTime);
+                    break;
+            }
+        }
     }
 
 }

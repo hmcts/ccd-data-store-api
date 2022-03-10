@@ -5,6 +5,7 @@
 
 	"specs": [
 		"an active profile in CCD",
+		"testUser - with an active profile in CCD",
 		"does not provide authorised access to the operation",
 		"has the 403 return code"
 	],

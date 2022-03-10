@@ -7,8 +7,14 @@
 	"method": "POST",
 	"uri": "/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/users",
 
-	"user": {
-		"_extends_": "Common_User_For_Request"
+	"users": {
+		"invokingUser": {
+			"_extends_": "Common_User_For_Request"
+		},
+		"testUser": {
+			"_extends_": "PrivateCaseworker"
+		}
+
 	},
 
 	"request": {
@@ -19,7 +25,7 @@
 			"ctid": "AAT"
 		},
 		"body": {
-			"id": "${[scenarioContext][theInvokingUser][id]}"
+			"id": "${[scenarioContext][testData][users][testUser][id]}"
 		}
 	}
 }

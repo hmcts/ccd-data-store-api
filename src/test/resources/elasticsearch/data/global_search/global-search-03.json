@@ -1,0 +1,59 @@
+{
+    "reference": 3333444411112222,
+    "data": {
+        "caseManagementCategory": {
+            "value": {
+                "code": "987",
+                "label": "Category label Order-01"
+            }
+        },
+        "caseManagementLocation": {
+            "baseLocation": "123",
+            "region": "1"
+        },
+        "caseNameHmctsInternal": "Name Internal 03",
+        "SearchCriteria": {
+            "OtherCaseReferences": [
+                {
+                    "id": "72b5ab79-004c-46a6-b935-f1c657bd693a",
+                    "value": "123456789"
+                }
+            ]
+        }
+    },
+    "data_classification": {
+        "caseManagementCategory": "PUBLIC",
+        "caseManagementLocation": {
+            "classification": "PUBLIC",
+            "value": {
+                "baseLocation": "PUBLIC",
+                "region": "PUBLIC"
+            }
+        },
+        "caseNameHmctsInternal": "PUBLIC",
+        "SearchCriteria": {
+            "classification": "PUBLIC",
+            "value": {
+                "OtherCaseReferences": {
+                    "classification": "PUBLIC",
+                    "value": [
+                        {
+                            "id": "72b5ab79-004c-46a6-b935-f1c657bd693a",
+                            "classification": "PUBLIC"
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "supplementary_data": {
+        "HMCTSServiceId": "AAA1"
+    },
+    "jurisdiction": "AUTOTEST1",
+    "last_state_modified_date": "2021-09-27T13:34:23.092Z",
+    "security_classification": "PUBLIC",
+    "state": "CaseCreated",
+    "created_date": "2021-09-02T13:34:23.092Z",
+    "last_modified": "2021-09-27T13:34:23.094Z",
+    "case_type_id": "GlobalSearch"
+}

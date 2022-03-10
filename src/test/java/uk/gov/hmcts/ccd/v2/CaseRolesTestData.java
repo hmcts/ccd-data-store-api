@@ -14,13 +14,13 @@ public class CaseRolesTestData {
 
         return
             "{\n" +
-                "  \"id\": \"CallbackCase\",\n" +
+                "  \"id\": \"CaseRolesCase\",\n" +
                 "  \"version\": {\n" +
                 "    \"number\": 1,\n" +
                 "    \"live_from\": \"2017-01-01\"\n" +
                 "  },\n" +
-                "  \"name\": \"Callback Case\",\n" +
-                "  \"description\": \"Test Callback Case\",\n" +
+                "  \"name\": \"CaseRoles Case\",\n" +
+                "  \"description\": \"Test CaseRoles Case\",\n" +
                 "  \"jurisdiction\": {\n" +
                 "    \"id\": \"TEST\",\n" +
                 "    \"name\": \"Test\",\n" +

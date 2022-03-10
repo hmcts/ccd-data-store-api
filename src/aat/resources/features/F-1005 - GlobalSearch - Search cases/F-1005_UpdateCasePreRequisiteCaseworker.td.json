@@ -1,0 +1,37 @@
+{
+  "_guid_": "F-1005_UpdateCasePreRequisiteCaseworker",
+  "_extends_": "F-1004_UpdateCaseEventV2",
+
+  "specs": [
+    "to update a case"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "caseId": "${[scenarioContext][parentContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+    },
+    "body": {
+      "data": {
+        "Address": {
+          "AddressLine1": "updated Address"
+        }
+      },
+      "event_token": "${[scenarioContext][siblingContexts][F-1005_GetCaseworkerUpdateToken][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "_extends_": "Common_201_Response",
+    "body": {
+      "jurisdiction": "BEFTA_MASTER",
+      "state": "CaseUpdated",
+      "case_type": "FT_GlobalSearch",
+      "data": {
+        "_extends_": "Befta_Global_Search_Updated_Expected_Search_Criteria",
+        "caseManagementLocation": {
+          "_extends_": "CaseManagementLocation_FromRefData_SiblingContext"
+        }
+      }
+    }
+  }
+}
