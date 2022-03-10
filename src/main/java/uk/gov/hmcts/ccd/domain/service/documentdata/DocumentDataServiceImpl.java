@@ -31,9 +31,12 @@ public class DocumentDataServiceImpl implements DocumentDataService {
     }
 
     @Override
-    public void updateDocumentCategoryId(String caseReference, Integer caseVersion, String attributePath,
+    public void updateDocumentCategoryId(String caseReference,
+                                         Integer caseVersion,
+                                         String attributePath,
                                          String categoryId) {
-        createEventOperation.createCaseSystemEvent(caseReference, createCaseDataContent(categoryId, attributePath),
+        createEventOperation.createCaseSystemEvent(caseReference,
+            createCaseDataContent(categoryId, attributePath),
             caseVersion, attributePath, categoryId);
     }
 

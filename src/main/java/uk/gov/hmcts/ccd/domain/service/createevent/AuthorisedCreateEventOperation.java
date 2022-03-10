@@ -79,11 +79,32 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
     }
 
     @Override
-    public CaseDetails createCaseSystemEvent(String caseReference, CaseDataContent content, Integer version,
-                                             String attributePath, String categoryId) {
+    public CaseDetails createCaseSystemEvent(String caseReference,
+                                             CaseDataContent content,
+                                             Integer version,
+                                             String attributePath,
+                                             String categoryId) {
         CreateCaseEventDetails createCaseEventDetails = getCreateCaseEventDetails(caseReference);
 
         //checks field denoted by attributePath exists and is of type document
+        extractCaseDocumentData(attributePath, createCaseEventDetails);
+
+        verifyUpsertAccessForCaseSystemEvent(content.getData(), createCaseEventDetails.getCaseDetails(),
+            createCaseEventDetails.getCaseTypeDefinition(), createCaseEventDetails.getAccessProfiles());
+
+        //categoryId check needed here
+
+        if (!version.equals(createCaseEventDetails.getCaseDetails().getVersion())) {
+            throw new BadRequestException("003 Wrong CaseVersion");
+        }
+
+        final CaseDetails caseDetails = createEventOperation.createCaseSystemEvent(caseReference,
+            content, version, attributePath, categoryId);
+        return verifyReadAccess(createCaseEventDetails.getCaseTypeDefinition(), createCaseEventDetails
+            .getAccessProfiles(), caseDetails);
+    }
+
+    private void extractCaseDocumentData(String attributePath, CreateCaseEventDetails createCaseEventDetails) {
         JsonNode data;
         if (attributePath.contains(".")) {
             List<String> paths = Arrays.asList(attributePath.split("\\."));
@@ -159,20 +180,6 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
             throw new BadRequestException("Field denoted by path: '" + attributePath
                 + "' is not a document field type");
         }
-
-        verifyUpsertAccessForCaseSystemEvent(content.getData(), createCaseEventDetails.getCaseDetails(),
-            createCaseEventDetails.getCaseTypeDefinition(), createCaseEventDetails.getAccessProfiles());
-
-        //categoryId check needed here
-
-        if (!version.equals(createCaseEventDetails.getCaseDetails().getVersion())) {
-            throw new BadRequestException("003 Wrong CaseVersion");
-        }
-
-        final CaseDetails caseDetails = createEventOperation.createCaseSystemEvent(caseReference,
-            content, version, attributePath, categoryId);
-        return verifyReadAccess(createCaseEventDetails.getCaseTypeDefinition(), createCaseEventDetails
-            .getAccessProfiles(), caseDetails);
     }
 
     private CreateCaseEventDetails getCreateCaseEventDetails(String caseReference) {
