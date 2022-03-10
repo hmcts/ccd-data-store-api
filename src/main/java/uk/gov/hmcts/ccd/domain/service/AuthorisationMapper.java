@@ -24,7 +24,7 @@ public class AuthorisationMapper {
 
     private final CaseTypeService caseTypeService;
 
-    private final Map<String, Map<String, RoleToAccessProfileDefinition>> caseTypeRoleToAccessProfileDefinition
+    private final Map<String, Map<String, List<RoleToAccessProfileDefinition>>> caseTypeRoleToAccessProfileDefinition
         = newConcurrentMap();
 
     @Autowired
@@ -32,23 +32,23 @@ public class AuthorisationMapper {
         this.caseTypeService = caseTypeService;
     }
 
-    public Map<String, RoleToAccessProfileDefinition> toRoleNameAsKeyMap(CaseTypeDefinition caseTypeDefinition) {
+    public Map<String, List<RoleToAccessProfileDefinition>> toRoleNameAsKeyMap(CaseTypeDefinition caseTypeDefinition) {
         return caseTypeRoleToAccessProfileDefinition.computeIfAbsent(caseTypeDefinition.getId(),
             id -> toRoleNameAsKeyMap(caseTypeDefinition.getRoleToAccessProfiles()));
     }
 
-    public Map<String, RoleToAccessProfileDefinition> toRoleNameAsKeyMap(String caseTypeId) {
+    public Map<String, List<RoleToAccessProfileDefinition>> toRoleNameAsKeyMap(String caseTypeId) {
         return caseTypeRoleToAccessProfileDefinition.computeIfAbsent(caseTypeId,
             id -> toRoleNameAsKeyMap(caseTypeService.getCaseType(caseTypeId).getRoleToAccessProfiles()));
     }
 
-    public Map<String, RoleToAccessProfileDefinition> toRoleNameAsKeyMap(
+    public Map<String, List<RoleToAccessProfileDefinition>> toRoleNameAsKeyMap(
         List<RoleToAccessProfileDefinition> roleToAccessProfiles) {
         return roleToAccessProfiles
             .stream()
             .filter(e -> e.getRoleName() != null)
-            .collect(Collectors.toMap(RoleToAccessProfileDefinition::getRoleName,
-                Function.identity()));
+            .collect(Collectors.groupingBy(RoleToAccessProfileDefinition::getRoleName, Collectors.mapping(Function
+                .identity(), Collectors.toList())));
     }
 
     public boolean authorisationsAllowMappingToAccessProfiles(List<String> authorisations,
@@ -70,6 +70,7 @@ public class AuthorisationMapper {
             .stream()
             .map(accessProfileValue -> AccessProfile.builder()
                 .accessProfile(accessProfileValue)
+                .caseAccessCategories(roleToAccessProfileDefinition.getCaseAccessCategories())
                 .securityClassification(roleAssignment.getClassification())
                 .readOnly(readOnly(roleAssignment, roleToAccessProfileDefinition))
                 .build()).collect(Collectors.toList());
