@@ -93,8 +93,7 @@ public abstract class WireMockBaseTest extends BaseTest {
     public void stubSuccess(final String path, final String payload, final UUID mappingId) {
         stubFor(get(urlPathEqualTo(path))
             .withId(mappingId)
-            .withHeader(
-              , equalTo(SERVICE_AUTHORISATION_VALUE))
+            .withHeader(SERVICE_AUTHORIZATION, equalTo(SERVICE_AUTHORISATION_VALUE))
             .willReturn(aResponse()
                 .withHeader(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .withStatus(HttpStatus.OK.value())
