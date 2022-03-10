@@ -480,11 +480,11 @@ public class CaseAccessOperation {
 
     private void validateCaseRoles(Set<String> validCaseRoles, Set<String> targetCaseRoles) {
         targetCaseRoles.stream()
-            .filter(role -> !validCaseRoles.contains(role))
-            .findFirst()
-            .ifPresent(role -> {
-                throw new InvalidCaseRoleException(role);
-            });
+                .filter(role -> !validCaseRoles.contains(role))
+                .findFirst()
+                .ifPresent(role -> {
+                    throw new InvalidCaseRoleException(role);
+                });
     }
 
     private void grantAddedCaseRoles(String userId,

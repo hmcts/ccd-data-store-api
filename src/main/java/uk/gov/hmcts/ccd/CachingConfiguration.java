@@ -56,6 +56,7 @@ public class CachingConfiguration {
         config.addMapConfig(newMapConfigWithMaxIdle("bannersCache", defaultCacheTtl));
         config.addMapConfig(newMapConfigWithMaxIdle("jurisdictionUiConfigsCache", defaultCacheTtl));
         config.addMapConfig(newMapConfigWithTtl("caseTypeDefinitionLatestVersionCache", defaultCacheTtl));
+        config.addMapConfig(newMapConfigWithTtl("caseRolesCache", defaultCacheTtl));
         config.addMapConfig(newMapConfigWithTtl("jurisdictionCache", applicationParams.getJurisdictionTTLSecs()));
         config.addMapConfig(newMapConfigWithTtl(BUILDING_LOCATIONS_CACHE, applicationParams.getRefDataCacheTtlInSec()));
         config.addMapConfig(newMapConfigWithTtl(SERVICES_CACHE, applicationParams.getRefDataCacheTtlInSec()));
