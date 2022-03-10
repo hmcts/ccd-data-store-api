@@ -207,7 +207,7 @@ public class DefaultCaseDataAccessControl implements NoCacheCaseDataAccessContro
                                                        CaseTypeDefinition caseTypeDefinition) {
         List<RoleToAccessProfileDefinition> pseudoAccessProfilesMappings = new ArrayList<>();
         pseudoAccessProfilesMappings.addAll(caseTypeDefinition.getRoleToAccessProfiles());
-        if (applicationParams.getEnablePseudoAccessProfilesGeneration()) {
+        if (pseudoAccessProfilesMappings.isEmpty()) {
             List<RoleToAccessProfileDefinition> generated =
                 pseudoRoleToAccessProfileGenerator.generate(caseTypeDefinition);
             pseudoAccessProfilesMappings.addAll(generated.stream()
