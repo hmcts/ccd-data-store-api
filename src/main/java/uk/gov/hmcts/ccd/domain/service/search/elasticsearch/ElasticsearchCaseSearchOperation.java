@@ -134,7 +134,7 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
             if (response.searchResult != null) {
                 buildCaseTypesResults(response, caseTypeResults, crossCaseTypeSearchRequest);
                 caseDetails.addAll(searchResultToCaseList(response.searchResult));
-                totalHits += response.searchResult.getTotal();
+                totalHits += new JestSearchResult(response.searchResult).getTotal();
             }
         }
 
@@ -154,7 +154,8 @@ public class ElasticsearchCaseSearchOperation implements CaseSearchOperation {
                 caseTypeId = getCaseTypeIDFromIndex(indexName, crossCaseTypeSearchRequest.getCaseTypeIds());
             }
 
-            caseTypeResults.add(new CaseTypeResults(caseTypeId, response.searchResult.getTotal()));
+            caseTypeResults.add(new CaseTypeResults(caseTypeId,
+                new JestSearchResult(response.searchResult).getTotal()));
         }
     }
 
