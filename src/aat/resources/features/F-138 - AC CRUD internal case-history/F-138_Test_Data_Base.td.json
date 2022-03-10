@@ -1,0 +1,28 @@
+{
+	"_guid_": "F-138_Test_Data_Base",
+	"productName": "CCD Data Store",
+	"operationName": "retrieve case history for the event",
+	"method": "GET",
+  "uri": "/aggregated/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events/{eventId}/case-history",
+
+  "specs" : [
+    "an active profile in CCD"
+  ],
+
+  "users": {
+    "invokingUser": {
+      "username": "master.caseworker@gmail.com",
+      "password": "[[$CCD_CASEWORKER_AUTOTEST_PASSWORD]]"
+    }
+  },
+
+	"request": {
+    "headers":{
+      "_extends_": "Common_Request_Headers",
+      "Content-Type": "application/json"
+    }
+  },
+
+  "expectedResponse": {
+  }
+}

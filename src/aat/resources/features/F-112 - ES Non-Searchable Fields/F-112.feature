@@ -1,5 +1,5 @@
 @F-112 @elasticsearch
-Feature: Allow ignoring fields in ES by declaring them non searchable
+Feature: F-112: Allow ignoring fields in ES by declaring them non searchable
 
   Background: Load test data for the scenario
     Given an appropriate test context as detailed in the test data source

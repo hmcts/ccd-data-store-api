@@ -19,6 +19,7 @@ import uk.gov.hmcts.ccd.WireMockBaseTest;
 import uk.gov.hmcts.ccd.auditlog.AuditEntry;
 import uk.gov.hmcts.ccd.auditlog.AuditOperationType;
 import uk.gov.hmcts.ccd.auditlog.AuditRepository;
+import uk.gov.hmcts.ccd.data.casedataaccesscontrol.RoleAssignmentResponse;
 import uk.gov.hmcts.ccd.domain.model.std.UserId;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -28,6 +29,7 @@ import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.times;
@@ -36,6 +38,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.createRoleAssignmentRecord;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.createRoleAssignmentResponse;
+import static uk.gov.hmcts.ccd.test.RoleAssignmentsHelper.emptyRoleAssignmentResponseJson;
 
 public class CaseAccessEndpointIT extends WireMockBaseTest {
 
@@ -43,6 +48,8 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
     private static final String CASE_TYPE = "TestAddressBookCase";
     private static final String USER_ID = "123";
     private static final String CASE_ID = "1504259907353529";
+    private static final String ASSIGNMENT = "assignment1";
+    protected static final String CASE_ROLE = "[CREATOR]";
 
     @Inject
     private WebApplicationContext wac;
@@ -71,6 +78,34 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn200WhenFindIdsCalled() throws Exception {
 
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            // no existing roleAssignments
+            stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
+                .inScenario("MultiRoleAssignmentQueryCalls")
+                .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200))
+                .willSetStateTo("FirstAttempt")
+            );
+
+            // one role assignment
+            RoleAssignmentResponse roleAssignmentResponse = createRoleAssignmentResponse(
+                singletonList(createRoleAssignmentRecord(ASSIGNMENT, CASE_ID, CASE_ROLE, USER_ID)));
+
+            stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
+                .inScenario("MultiRoleAssignmentQueryCalls")
+                .whenScenarioStateIs("FirstAttempt")
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(roleAssignmentResponse)).withStatus(200))
+                .willSetStateTo("SecondAttempt")
+            );
+
+            // stored role assignment with case access
+            stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + USER_ID))
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(
+                    createRoleAssignmentResponse(
+                        singletonList(createRoleAssignmentRecord(ASSIGNMENT, CASE_ID, CASE_TYPE, JURISDICTION,
+                            CASE_ROLE, USER_ID, false)))))
+                    .withStatus(200)));
+        }
+
         final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
             + "/cases/ids?userId=" + USER_ID;
 
@@ -90,8 +125,7 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
             .andReturn();
 
         List<String> response = mapper.readValue(mvcResult.getResponse().getContentAsString(),
-            new TypeReference<List<String>>() {
-            });
+            new TypeReference<>() {});
 
         assertThat(response)
             .contains(CASE_ID);
@@ -99,17 +133,23 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
 
     @Test
     public void shouldReturnEmptyListWhenFindIdsCalledAndNoGrantsExist() throws Exception {
+        String userId = "12312312312321";
+
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            // no existing roleAssignments
+            stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + userId))
+                .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200)));
+        }
+
         final String url = "/caseworkers/0/jurisdictions/" + JURISDICTION + "/case-types/" + CASE_TYPE
-            + "/cases/ids?userId=12312312312321";
+            + "/cases/ids?userId=" + userId;
 
         final MvcResult mvcResult = mockMvc.perform(get(url))
             .andExpect(status().isOk())
             .andReturn();
 
         List<String> response = mapper.readValue(mvcResult.getResponse().getContentAsString(),
-            new TypeReference<List<String>>() {
-            }
-        );
+            new TypeReference<>() {});
 
         assertThat(response)
             .size()
@@ -119,12 +159,23 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WhenGrantCalled() throws Exception {
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            // no existing roleAssignments
+            stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
+                .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200)));
+        }
+
         grantAccess();
     }
 
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldLogAndAuditGrantAccessToCase() throws Exception {
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            // no existing roleAssignments
+            stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
+                .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200)));
+        }
         grantAccess();
 
         ArgumentCaptor<AuditEntry> captor = ArgumentCaptor.forClass(AuditEntry.class);
@@ -140,10 +191,28 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
         MatcherAssert.assertThat(captor.getValue().getTargetIdamId(), is(USER_ID));
     }
 
-
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn201WhenGrantIsCalledMultipleTimesWithSameContent() throws Exception {
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            // no existing roleAssignments
+            stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
+                .inScenario("MultiRoleAssignmentQueryCalls")
+                .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200))
+                .willSetStateTo("FirstAttempt")
+            );
+
+            // one role assignment
+            RoleAssignmentResponse roleAssignmentResponse = createRoleAssignmentResponse(
+                singletonList(createRoleAssignmentRecord(ASSIGNMENT, CASE_ID, CASE_ROLE, USER_ID)));
+
+            stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
+                .inScenario("MultiRoleAssignmentQueryCalls")
+                .whenScenarioStateIs("FirstAttempt")
+                .willReturn(okJson(defaultObjectMapper.writeValueAsString(roleAssignmentResponse)).withStatus(200))
+                .willSetStateTo("SecondAttempt")
+            );
+        }
         grantAccess();
         grantAccess();
     }
@@ -151,6 +220,11 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn204WhenRevokeCalled() throws Exception {
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            // no existing roleAssignments
+            stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
+                .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200)));
+        }
         grantAccess();
         revokeAccess();
     }
@@ -158,6 +232,11 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldLogAndAuditRevokeAccessToCase() throws Exception {
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            // no existing roleAssignments
+            stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
+                .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200)));
+        }
         grantAccess();
         revokeAccess();
 
@@ -178,6 +257,11 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
     @Test
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn204WhenRevokeCalledTwice() throws Exception {
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            // no existing roleAssignments
+            stubFor(WireMock.post(urlMatching("/am/role-assignments/query"))
+                .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200)));
+        }
         grantAccess();
         revokeAccess();
         revokeAccess();
@@ -187,6 +271,28 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
     @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/insert_cases.sql"})
     public void shouldReturn204WhenGrantDoesnotExistAndRevokeCalled() throws Exception {
         revokeAccess();
+    }
+
+    @Test
+    public void findCaseIdsGivenUserIdHasAccessToWithUuid() throws Exception {
+        String userId = "0000-zzzz-9999-yyyy";
+
+        if (applicationParams.getEnableAttributeBasedAccessControl()) {
+            // no existing roleAssignments
+            stubFor(WireMock.get(urlMatching("/am/role-assignments/actors/" + userId))
+                .willReturn(okJson(emptyRoleAssignmentResponseJson()).withStatus(200)));
+        }
+
+        final String url = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions/"
+            + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/ids?userId="
+            + userId;
+
+        final MvcResult mvcResult = mockMvc.perform(get(url))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        assertThat(mvcResult.getResponse().getStatus())
+            .isEqualTo(200);
     }
 
     private void revokeAccess() throws Exception {
@@ -209,22 +315,4 @@ public class CaseAccessEndpointIT extends WireMockBaseTest {
             .andExpect(status().isCreated())
             .andReturn();
     }
-
-
-    @Test
-    public void findCaseIdsGivenUserIdHasAccessToWithUuid() throws Exception {
-        final String url = "/caseworkers/0000-aaaa-2222-bbbb/jurisdictions/"
-            + JURISDICTION + "/case-types/" + CASE_TYPE + "/cases/ids?userId="
-            + "0000-zzzz-9999-yyyy";
-
-        final MvcResult mvcResult = mockMvc.perform(get(url))
-            .andExpect(status().isOk())
-            .andReturn();
-
-        assertThat(mvcResult.getResponse().getStatus())
-            .isEqualTo(200);
-
-    }
-
-
 }

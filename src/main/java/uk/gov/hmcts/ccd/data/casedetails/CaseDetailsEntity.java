@@ -69,6 +69,7 @@ public class CaseDetailsEntity {
     public static final String ID_FIELD_COL = "id";
     public static final String STATE_FIELD_COL = "state";
     public static final String JURISDICTION_FIELD_COL = "jurisdiction";
+    public static final String JURISDICTION_FIELD_KEYWORD_COL = "jurisdiction.keyword";
     public static final String CASE_TYPE_ID_FIELD_COL = "case_type_id";
     public static final String REFERENCE_FIELD_COL = "reference";
     public static final String CREATED_DATE_FIELD_COL = "created_date";
@@ -81,6 +82,8 @@ public class CaseDetailsEntity {
     public static final String RESOLVED_TTL_COL = "resolved_ttl";
 
 
+    public static final String LOCATION = "data.caseManagementLocation.baseLocation";
+    public static final String REGION = "data.caseManagementLocation.region";
 
     @Id
     @Column(name = ID_FIELD_COL)

@@ -1,19 +1,17 @@
 package uk.gov.hmcts.ccd.domain.service.aggregated;
 
-import com.google.common.collect.Sets;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
-import uk.gov.hmcts.ccd.data.caseaccess.CaseUserRepository;
 import uk.gov.hmcts.ccd.data.casedetails.CaseDetailsRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
-import uk.gov.hmcts.ccd.data.user.UserRepository;
 import uk.gov.hmcts.ccd.domain.model.aggregated.AbstractCaseView;
 import uk.gov.hmcts.ccd.domain.model.aggregated.CaseViewTab;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
+import uk.gov.hmcts.ccd.domain.service.casedataaccesscontrol.CaseDataAccessControl;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
 import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
@@ -26,24 +24,21 @@ public abstract class AbstractAuthorisedCaseViewOperation {
 
     private final CaseDefinitionRepository caseDefinitionRepository;
     private final AccessControlService accessControlService;
-    private final UserRepository userRepository;
-    private final CaseUserRepository caseUserRepository;
     private final CaseDetailsRepository caseDetailsRepository;
+    private final CaseDataAccessControl caseDataAccessControl;
 
     AbstractAuthorisedCaseViewOperation(CaseDefinitionRepository caseDefinitionRepository,
                                         AccessControlService accessControlService,
-                                        UserRepository userRepository,
-                                        CaseUserRepository caseUserRepository,
-                                        CaseDetailsRepository caseDetailsRepository) {
+                                        CaseDetailsRepository caseDetailsRepository,
+                                        CaseDataAccessControl caseDataAccessControl) {
         this.caseDefinitionRepository = caseDefinitionRepository;
         this.accessControlService = accessControlService;
-        this.userRepository = userRepository;
-        this.caseUserRepository = caseUserRepository;
         this.caseDetailsRepository = caseDetailsRepository;
+        this.caseDataAccessControl = caseDataAccessControl;
     }
 
-    void verifyCaseTypeReadAccess(CaseTypeDefinition caseTypeDefinition, Set<String> userRoles) {
-        if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, userRoles, CAN_READ)) {
+    void verifyCaseTypeReadAccess(CaseTypeDefinition caseTypeDefinition, Set<AccessProfile> accessProfiles) {
+        if (!accessControlService.canAccessCaseTypeWithCriteria(caseTypeDefinition, accessProfiles, CAN_READ)) {
             ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException(AccessControlService
                 .NO_CASE_TYPE_FOUND);
             resourceNotFoundException.withDetails(NO_CASE_TYPE_FOUND_DETAILS);
@@ -69,22 +64,20 @@ public abstract class AbstractAuthorisedCaseViewOperation {
             .orElseThrow(() -> new CaseNotFoundException(caseReference));
     }
 
-    protected Set<String> getUserRoles(String caseId) {
-        return Sets.union(userRepository.getUserRoles(),
-            caseUserRepository
-                .findCaseRoles(Long.valueOf(caseId), userRepository.getUserId())
-                .stream()
-                .collect(Collectors.toSet()));
+    protected Set<AccessProfile> getAccessProfiles(String caseReference) {
+        return caseDataAccessControl
+            .generateAccessProfilesByCaseReference(caseReference);
     }
 
-    protected void filterAllowedTabsWithFields(AbstractCaseView abstractCaseView, Set<String> userRoles) {
+    protected void filterAllowedTabsWithFields(AbstractCaseView abstractCaseView, Set<AccessProfile> accessProfiles) {
         abstractCaseView.setTabs(Arrays.stream(abstractCaseView.getTabs())
-            .filter(caseViewTab -> caseViewTab.getFields().length > 0 && tabAllowed(caseViewTab, userRoles))
+            .filter(caseViewTab -> caseViewTab.getFields().length > 0 && tabAllowed(caseViewTab, accessProfiles))
             .toArray(CaseViewTab[]::new));
     }
 
-    private boolean tabAllowed(final CaseViewTab caseViewTab, final Set<String> userRoles) {
-        return StringUtils.isEmpty(caseViewTab.getRole()) || userRoles.contains(caseViewTab.getRole());
+    private boolean tabAllowed(final CaseViewTab caseViewTab, final Set<AccessProfile> accessProfiles) {
+        Set<String> accessProfileNames = AccessControlService.extractAccessProfileNames(accessProfiles);
+        return StringUtils.isEmpty(caseViewTab.getRole()) || accessProfileNames.contains(caseViewTab.getRole());
     }
 
     AccessControlService getAccessControlService() {

@@ -1,6 +1,6 @@
 #===========================================
 @F-129 @access-control
-Feature: F-129 Access Control tests covering Security Classification feature
+Feature: F-129: Access Control tests covering Security Classification feature
 #===========================================
 
   Background: Load test data for the scenario

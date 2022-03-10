@@ -1,0 +1,42 @@
+{
+  "_guid_": "S-130.7",
+  "_extends_" : "F-130_Test_Data_Base",
+
+  "specs" : [
+    "contains an error stating that the case details is marked as non-null but is null"
+  ],
+
+  "request": {
+    "pathVariables": {
+      "ctid": "FT_CRUD_2"
+    },
+    "body": {
+      "data":
+      {
+        "TextField": "value1"
+      },
+      "event": {
+        "id": "createCase"
+      },
+      "event_token": "${[scenarioContext][childContexts][S-130.1_Get_Event_Trigger][testData][actualResponse][body][token]}",
+      "event_data": {
+        "TextField": "value1"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "responseCode": 500,
+    "body" : {
+      "exception": "java.lang.NullPointerException",
+      "timestamp": "[[ANYTHING_PRESENT]]",
+      "status": 500,
+      "error": "Unexpected Error",
+      "message": "caseDetails is marked non-null but is null",
+      "path": "/case-types/FT_CRUD_2/cases",
+      "details": null,
+      "callbackErrors": null,
+      "callbackWarnings": null
+    }
+  }
+}

@@ -1,0 +1,61 @@
+{
+	"_guid_": "F-1004_CreateCasePreRequisiteCaseworker",
+	"_extends_": "Case_Creation_Base",
+
+  "specs": [
+    "to create a case"
+  ],
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1004_Case_Data_Create_Token_Creation"
+    }
+   ],
+
+  "users": {
+		"invokingUser": {
+      "_extends_": "BeftaMasterCaseworker"
+		}
+	},
+
+  "request": {
+		"pathVariables": {
+			"jid": "BEFTA_MASTER",
+			"ctid": "FT_GlobalSearch"
+		},
+		"body": {
+      "data": {
+        "_extends_": "Befta_Global_Search_Case_Data"
+      },
+			"event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+	},
+
+	"expectedResponse": {
+		"body": {
+			"id": "[[ANYTHING_PRESENT]]",
+			"jurisdiction": "BEFTA_MASTER",
+			"state": "CaseCreated",
+			"version": 0,
+			"case_type_id": "FT_GlobalSearch",
+			"created_date": "[[ANYTHING_PRESENT]]",
+			"last_modified": "[[ANYTHING_PRESENT]]",
+			"last_state_modified_date": "[[ANYTHING_PRESENT]]",
+			"security_classification": "PUBLIC",
+			"case_data": {
+        "_extends_": "Befta_Global_Search_Expected_Search_Criteria"
+      },
+			"data_classification": {
+        "_extends_": "Befta_Global_Search_Data_Classifications"
+      },
+			"supplementary_data": null,
+			"after_submit_callback_response": null,
+			"callback_response_status_code": null,
+			"callback_response_status": null,
+			"delete_draft_response_status_code": null,
+			"delete_draft_response_status": null,
+			"security_classifications": {
+        "_extends_": "Befta_Global_Search_Data_Classifications"
+      }
+		}
+	}
+}

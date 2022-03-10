@@ -1,0 +1,69 @@
+{
+	"_guid_": "F-1006_CreateRestrictedCase",
+  "_extends_": "Case_Creation_Data_Base",
+
+  "prerequisites" : [ {
+    "Token_Creation": "F-1006_Restricted_Case_Create_Token_Creation"
+  }
+  ],
+
+  "users": {
+    "invokingUser": {
+      "_extends_" : "RestrictedCaseworker"
+    }
+  },
+
+  "request": {
+    "pathVariables": {
+      "uid": "[[DEFAULT_AUTO_VALUE]]",
+      "jid": "AUTOTEST1",
+      "ctid": "SC_Restricted"
+    },
+    "body": {
+      "data": {
+        "RestrictedTextField": "${[scenarioContext][parentContext][childContexts][F-1006_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][case_data][Email]}"
+      },
+      "event": {
+        "id": "createCase"
+      },
+      "event_token": "${[scenarioContext][childContexts][Token_Creation][testData][actualResponse][body][token]}"
+    }
+  },
+
+  "expectedResponse": {
+    "body": {
+      "id": "[[ANYTHING_PRESENT]]",
+      "jurisdiction": "AUTOTEST1",
+      "state": "CaseCreated",
+      "version": 0,
+      "case_type_id": "SC_Restricted",
+      "created_date": "[[ANYTHING_PRESENT]]",
+      "last_modified": "[[ANYTHING_PRESENT]]",
+      "last_state_modified_date": "[[ANYTHING_PRESENT]]",
+      "security_classification": "RESTRICTED",
+      "case_data" : {
+        "RestrictedTextField" : "[[ANYTHING_PRESENT]]",
+        "SearchCriteria" : {
+          "SearchParties" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "data_classification": {
+        "RestrictedTextField": "RESTRICTED",
+        "SearchCriteria" : {
+          "classification" : "RESTRICTED",
+          "value" : "[[ANYTHING_PRESENT]]"
+        }
+      },
+      "supplementary_data": null,
+      "after_submit_callback_response": null,
+      "callback_response_status_code": null,
+      "callback_response_status": null,
+      "delete_draft_response_status_code": null,
+      "delete_draft_response_status": null,
+      "security_classifications": {
+        "RestrictedTextField" : "RESTRICTED",
+        "SearchCriteria" : "[[ANYTHING_PRESENT]]"
+      }
+    }
+  }
+}
