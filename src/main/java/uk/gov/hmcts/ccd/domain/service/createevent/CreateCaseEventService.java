@@ -82,8 +82,8 @@ public class CreateCaseEventService {
     private final MessageService messageService;
     private final CaseDocumentService caseDocumentService;
     private final CaseDataIssueLogger caseDataIssueLogger;
-    private final TimeToLiveService timeToLiveService;
     private final GlobalSearchProcessorService globalSearchProcessorService;
+    private final TimeToLiveService timeToLiveService;
 
     @Inject
     public CreateCaseEventService(@Qualifier(CachedUserRepository.QUALIFIER) final UserRepository userRepository,
@@ -132,8 +132,8 @@ public class CreateCaseEventService {
         this.messageService = messageService;
         this.caseDocumentService = caseDocumentService;
         this.caseDataIssueLogger = caseDataIssueLogger;
-        this.timeToLiveService = timeToLiveService;
         this.globalSearchProcessorService = globalSearchProcessorService;
+        this.timeToLiveService = timeToLiveService;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

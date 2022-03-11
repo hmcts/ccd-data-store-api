@@ -43,9 +43,9 @@ public class CallbackInvoker {
     private final CaseTypeService caseTypeService;
     private final CaseDataService caseDataService;
     private final CaseSanitiser caseSanitiser;
-    private final TimeToLiveService timeToLiveService;
     private final SecurityValidationService securityValidationService;
     private final GlobalSearchProcessorService globalSearchProcessorService;
+    private final TimeToLiveService timeToLiveService;
 
     @Autowired
     public CallbackInvoker(final CallbackService callbackService,
@@ -59,9 +59,9 @@ public class CallbackInvoker {
         this.caseTypeService = caseTypeService;
         this.caseDataService = caseDataService;
         this.caseSanitiser = caseSanitiser;
-        this.timeToLiveService = timeToLiveService;
         this.securityValidationService = securityValidationService;
         this.globalSearchProcessorService = globalSearchProcessorService;
+        this.timeToLiveService = timeToLiveService;
     }
 
     public void invokeAboutToStartCallback(final CaseEventDefinition caseEventDefinition,

@@ -186,6 +186,9 @@ public class ApplicationParams {
     @Value("${document.hash.check.enabled}")
     private boolean enableDocumentHashCheck;
 
+    @Value("${ttl.guard}")
+    private Integer ttlGuard;
+
     @Value("${ccd.multiparty.fix.enabled}")
     private boolean multipartyFixEnabled;
 
@@ -194,9 +197,6 @@ public class ApplicationParams {
 
     @Value("#{'${ccd.multiparty.case-types}'.split(',')}")
     private List<String> multipartyCaseTypes;
-
-    @Value("${ttl.guard}")
-    private Integer ttlGuard;
 
     @Value("${ccd.case-document-am-api.attachDocumentEnabled:true}")
     private boolean attachDocumentEnabled;

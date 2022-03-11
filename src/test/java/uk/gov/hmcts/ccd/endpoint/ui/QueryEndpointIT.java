@@ -152,11 +152,11 @@ public class QueryEndpointIT extends WireMockBaseTest {
         + "/0/jurisdictions/PROBATE/case-types/"
         + "TestAddressBookCaseEventEnablingCondition/cases/1504259907353529";
 
-        private static final String GET_CASE_EVENT_ENABLING_CONDITION_NO_DATA = "/aggregated/caseworkers"
+    private static final String GET_CASE_EVENT_ENABLING_CONDITION_NO_DATA = "/aggregated/caseworkers"
         + "/0/jurisdictions/PROBATE/case-types/"
         + "TestAddressBookCaseEventEnablingCondition/cases/3479829222340505";
 
-        private static final int NUMBER_OF_CASES_EVENT_ENABLING = 19;
+    private static final int NUMBER_OF_CASES_EVENT_ENABLING = 19;
 
     @Inject
     private WebApplicationContext wac;
