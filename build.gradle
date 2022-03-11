@@ -271,11 +271,11 @@ dependencies {
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
     contractTestRuntime group: 'io.springfox', name: 'springfox-boot-starter', version: swagger2Version
-    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-client'
-    contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
-    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server'
-    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-core'
-    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
+    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.6.1'
+    contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '5.6.1'
+    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server', version: '5.6.1'
+    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: '5.6.1'
+    contractTestCompile group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: '5.6.1'
 
 }
 // end::dependencies[]
