@@ -180,7 +180,7 @@ dependencies {
 
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.6.1'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.4.5'
-    implementation group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server'
+    implementation group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server' , version: '5.6.1'
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: '5.6.1'
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: '5.6.1'
 
