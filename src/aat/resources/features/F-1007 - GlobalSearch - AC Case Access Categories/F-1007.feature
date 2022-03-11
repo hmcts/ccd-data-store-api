@@ -80,3 +80,4 @@ Feature: F-1007: GlobalSearch - AC Case Access Categories
     And the response [has 200 return code],
     And the response [contains case C1],
     And the response has all other details as expected.
+
