@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 
 import javax.inject.Named;
@@ -35,10 +34,9 @@ public class DocumentValidator implements BaseTypeValidator {
     private final TextValidator textValidator;
     private final DateTimeValidator dateTimeValidator;
 
-    public DocumentValidator(@Qualifier("TextValidator") TextValidator textValidator,
-                             @Qualifier("DateTimeValidator") DateTimeValidator dateTimeValidator,
-                             @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                 ApplicationParams applicationParams) {
+    public DocumentValidator(ApplicationParams applicationParams,
+                             @Qualifier("TextValidator") TextValidator textValidator,
+                             @Qualifier("DateTimeValidator") DateTimeValidator dateTimeValidator) {
         this.applicationParams = applicationParams;
         this.textValidator = textValidator;
         this.dateTimeValidator = dateTimeValidator;

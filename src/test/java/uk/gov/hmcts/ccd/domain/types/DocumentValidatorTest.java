@@ -120,7 +120,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
         final ApplicationParams ap = mock(ApplicationParams.class);
         when(ap.getDocumentURLPattern()).thenReturn(urlBase + "/documents/[A-Za-z0-9-]+(?:/binary)?");
 
-        return new DocumentValidator(textValidator,dateTimeValidator,ap);
+        return new DocumentValidator(ap,textValidator,dateTimeValidator);
     }
 
     @Before
@@ -130,7 +130,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
 
         textValidator = new TextValidator();
         dateTimeValidator = new DateTimeValidator();
-        validator = new DocumentValidator(textValidator,dateTimeValidator,applicationParams);
+        validator = new DocumentValidator(applicationParams,textValidator,dateTimeValidator);
         caseFieldDefinition = MAPPER.readValue(CASE_FIELD_STRING, CaseFieldDefinition.class);
     }
 
@@ -475,7 +475,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
             + "em-hrs-api-(pr-[0-9]+|preview).service.core-compute-preview).internal(?::d+)?/"
             + "hearing-recordings/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
             + "[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/segments/[0-9]+");
-        validator = new DocumentValidator(null, null,applicationParams);
+        validator = new DocumentValidator(applicationParams,null, null);
         return validator;
     }
 }
