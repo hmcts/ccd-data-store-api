@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -77,7 +76,6 @@ public class CaseAssignedUserRolesController {
         this.securityUtils = securityUtils;
     }
 
-    @Transactional
     @PostMapping(
         path = "/case-users"
     )
@@ -135,7 +133,6 @@ public class CaseAssignedUserRolesController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new CaseAssignedUserRolesResponse(ADD_SUCCESS_MESSAGE));
     }
 
-    @Transactional
     @DeleteMapping(
         path = "/case-users"
     )
@@ -195,7 +192,6 @@ public class CaseAssignedUserRolesController {
         return ResponseEntity.status(HttpStatus.OK).body(new CaseAssignedUserRolesResponse(REMOVE_SUCCESS_MESSAGE));
     }
 
-    @Transactional
     @GetMapping(
         path = "/case-users"
     )

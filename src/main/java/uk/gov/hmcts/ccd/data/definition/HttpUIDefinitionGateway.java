@@ -74,7 +74,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             throw new ServiceException(String.format(
                     "Problem getting SearchResultDefinition definition for case type: %s because of %s",
                     caseTypeId,
-                    e.getMessage()));
+                    e.getMessage()), e);
         }
     }
 
@@ -99,7 +99,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             throw new ServiceException(String.format(
                     "Problem getting SearchInputs definition for case type: %s because of %s",
                     caseTypeId,
-                    e.getMessage()));
+                    e.getMessage()), e);
         }
     }
 
@@ -124,7 +124,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             throw new ServiceException(String.format(
                     "Problem getting WorkbasketInputs definition for case type: %s because of %s",
                     caseTypeId,
-                    e.getMessage()));
+                    e.getMessage()), e);
         }
     }
 
@@ -185,7 +185,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             throw new ServiceException(String.format(
                     "Problem getting WorkBasketResult definition for case type: %s because of %s",
                     caseTypeId,
-                    e.getMessage()));
+                    e.getMessage()), e);
         }
     }
 
@@ -211,7 +211,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             throw new ServiceException(String.format(
                 "Problem getting SearchCasesResult definition for case type: %s because of %s",
                 caseTypeId,
-                e.getMessage()));
+                e.getMessage()), e);
         }
     }
 
@@ -245,7 +245,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             throw new ServiceException(String.format(
                 "Problem getting banners for jurisdiction references: %s because of %s",
                 jurisdictionIds,
-                e.getMessage()));
+                e.getMessage()), e);
         }
     }
 
@@ -269,7 +269,7 @@ public class HttpUIDefinitionGateway implements UIDefinitionGateway {
             throw new ServiceException(String.format(
                 "Problem getting jurisdiction UI configs for jurisdiction references: %s because of %s",
                 jurisdictionIds,
-                e.getMessage()));
+                e.getMessage()), e);
         }
     }
 }
