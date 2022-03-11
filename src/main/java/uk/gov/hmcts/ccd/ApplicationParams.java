@@ -177,9 +177,6 @@ public class ApplicationParams {
     @Value("${enable-pseudo-role-assignments-generation}")
     private boolean enablePseudoRoleAssignmentsGeneration;
 
-    @Value("${enable-pseudo-access-profiles-generation}")
-    private boolean enablePseudoAccessProfilesGeneration;
-
     @Value("${enable-case-users-db-sync}")
     private boolean enableCaseUsersDbSync;
 
@@ -328,8 +325,9 @@ public class ApplicationParams {
         return caseDefinitionHost + "/api/base-types";
     }
 
-    public String caseRolesURL() {
-        return caseDefinitionHost + "/api/data/caseworkers/uid/jurisdictions/jid/case-types";
+    public String caseRolesURL(final String userId, final String jurisdictionId, final String caseTypeId) {
+        return caseDefinitionHost + "/api/data/caseworkers/" + encode(userId)
+            + "/jurisdictions/" + encode(jurisdictionId) + "/case-types/" + encode(caseTypeId) + "/roles";
     }
 
     public String accessProfileRolesURL(String caseTypeId) {
@@ -513,10 +511,6 @@ public class ApplicationParams {
 
     public boolean getEnablePseudoRoleAssignmentsGeneration() {
         return enablePseudoRoleAssignmentsGeneration;
-    }
-
-    public boolean getEnablePseudoAccessProfilesGeneration() {
-        return enablePseudoAccessProfilesGeneration;
     }
 
     public boolean getEnableCaseUsersDbSync() {
