@@ -1,5 +1,5 @@
 {
-	"_guid_": "S-1006_GetCreateToken",
+	"_guid_": "S-1016_GetCreateToken",
 	"_extends_": "Standard_Token_Creation_Data_For_Case_Creation",
 
 	"specs": [

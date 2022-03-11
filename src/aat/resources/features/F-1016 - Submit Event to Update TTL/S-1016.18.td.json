@@ -1,16 +1,16 @@
 {
-  "_guid_": "S-1006.18",
-  "_extends_": "F-1006_Test_Data_Base_Citizen",
+  "_guid_": "S-1016.18",
+  "_extends_": "F-1016_Test_Data_Base_Citizen",
 
   "title": "TTL.Suspended changed to \"No\", SystemTTL is NULL, OverRide TTL is greater than TTLGuard",
 
   "prerequisites" : [{
-    "Token_Creation": "S-1006_GetUpdateSuspendedCaseTokenCitizen"
+    "Token_Creation": "S-1016_GetUpdateSuspendedCaseTokenCitizen"
   }],
 
   "specs": [
     "an active profile in CCD",
-    "contains a case Id that has just been created as in F-1006_CreateSuspendedCasePreRequisiteCitizen",
+    "contains a case Id that has just been created as in F-1016_CreateSuspendedCasePreRequisiteCitizen",
     "contains an event token for the case just created above",
     "has TTL.Suspension value changed to No from Yes",
     "has TTL.OverrideTTL set to greater than today + guard value",
@@ -19,7 +19,7 @@
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1006_CreateSuspendedCasePreRequisiteCitizen][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][F-1016_CreateSuspendedCasePreRequisiteCitizen][testData][actualResponse][body][id]}"
     },
     "headers": {
       "_extends_": "Common_Request_Headers"

@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-1008.10",
-  "_extends_": "F-1008_RetrieveTriggerInternal",
+  "_guid_": "S-1015.10",
+  "_extends_": "F-1015_RetrieveTriggerInternal",
   "title": "must successfully update a case without modifying the TTL.SystemTTL value when no TTLIncrement is specified",
 
   "specs": [
@@ -13,7 +13,7 @@
 
   "request": {
     "pathVariables": {
-      "caseId": "${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "caseId": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "triggerId": "updateCaseNoTTLInc"
     }
   },
@@ -29,7 +29,7 @@
       "id" : "updateCaseNoTTLInc",
       "name" : "Update with no TTL Increment",
       "description" : "Update a case with no TTL increment value present",
-      "case_id": "${}${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "case_id": "${}${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "case_fields" : [ {
         "id" : "TTL",
         "label" : "TTL Fields",

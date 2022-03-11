@@ -1,5 +1,5 @@
 {
-	"_guid_": "F-1006_Test_Data_Base_Citizen",
+	"_guid_": "F-1016_Test_Data_Base_Citizen",
 
 	"productName": "CCD Data Store",
 	"operationName": "submit event creation as citizen",
@@ -18,7 +18,7 @@
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType",
-      "cid": "${[scenarioContext][childContexts][F-1006_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][F-1016_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
 		}
 	}
 }

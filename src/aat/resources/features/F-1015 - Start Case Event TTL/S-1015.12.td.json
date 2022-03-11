@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-1008.12",
-  "_extends_": "F-1008-CreateEventTokenErrorResponse",
+  "_guid_": "S-1015.12",
+  "_extends_": "F-1015-CreateEventTokenErrorResponse",
   "title": "must error when updating a case where about to start callback has modified TTL.SystemTTL",
 
   "specs": [
@@ -26,7 +26,7 @@
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType",
-      "cid": "${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "cid": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "etid": "updateModifiedSystemTTL"
     }
   }

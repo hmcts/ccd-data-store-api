@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-1008.1",
+  "_guid_": "S-1015.1",
   "_extends_": "Befta_Jurisdiction2_Token_For_Update_Case",
   "title": "must successfully update a cases TTL.SystemTTL value",
 
@@ -22,7 +22,7 @@
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType",
-      "cid": "${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "cid": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "etid": "updateCaseTTLInc"
     }
   },
@@ -37,7 +37,7 @@
     "body": {
       "token": "[[ANYTHING_PRESENT]]",
       "case_details": {
-        "id": "${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+        "id": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
         "jurisdiction": "BEFTA_MASTER",
         "state": "CaseCreated",
         "version": 0,
@@ -51,10 +51,12 @@
             "SystemTTL" : "${[scenarioContext][customValues][dateTwentyDaysFromToday]}",
             "OverrideTTL" : "2021-03-05",
             "Suspended" : "No"
-          }
+          },
+          "SearchCriteria" : { }
         },
         "data_classification": {
-          "_extends_": "TTL_Case_Data_Classifications"
+          "_extends_": "TTL_Case_Data_Classifications",
+          "SearchCriteria" : "[[ANYTHING_PRESENT]]"
         },
         "supplementary_data": null,
         "after_submit_callback_response": null,
@@ -63,7 +65,8 @@
         "delete_draft_response_status_code": null,
         "delete_draft_response_status": null,
         "security_classifications": {
-          "_extends_": "TTL_Case_Data_Classifications"
+          "_extends_": "TTL_Case_Data_Classifications",
+          "SearchCriteria" : "[[ANYTHING_PRESENT]]"
         }
       },
       "event_id": "updateCaseTTLInc"

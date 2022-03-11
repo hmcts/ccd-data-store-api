@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-1008.20",
-  "_extends_": "F-1008-CreateEventTokenErrorResponseCitizen",
+  "_guid_": "S-1015.20",
+  "_extends_": "F-1015-CreateEventTokenErrorResponseCitizen",
   "title": "must error when updating a case where about to start callback has modified TTL.OverrideTTL",
 
   "specs": [
@@ -19,7 +19,7 @@
       "uid": "[[DEFAULT_AUTO_VALUE]]",
       "jid": "BEFTA_MASTER",
       "ctid": "FT_MasterCaseType",
-      "cid": "${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}",
+      "cid": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCitizen][testData][actualResponse][body][id]}",
       "etid": "updateModifiedOverrideTTL"
     }
   }

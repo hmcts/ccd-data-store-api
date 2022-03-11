@@ -1,6 +1,6 @@
 {
-  "_guid_": "F-1007_CreateCasePreRequisiteCaseworker",
-  "_extends_": "F-1007_CreateCasePreRequisiteCaseworkerBase",
+  "_guid_": "F-1017_CreateCasePreRequisiteCaseworker",
+  "_extends_": "F-1017_CreateCasePreRequisiteCaseworkerBase",
 
   "request": {
     "body": {

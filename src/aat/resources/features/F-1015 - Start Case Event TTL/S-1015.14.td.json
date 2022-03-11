@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-1008.14",
-  "_extends_": "F-1008_RetrieveTriggerInternalErrorResponse",
+  "_guid_": "S-1015.14",
+  "_extends_": "F-1015_RetrieveTriggerInternalErrorResponse",
   "title": "must error when updating a case where about to start callback has modified TTL.OverrideTTL",
 
   "specs": [
@@ -19,7 +19,7 @@
 
   "request": {
     "pathVariables": {
-      "caseId": "${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "caseId": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "triggerId": "updateModifiedOverrideTTL"
     }
   }
