@@ -322,20 +322,5 @@ class CachedCaseDefinitionRepositoryTest {
             );
         }
 
-        @Test
-        @DisplayName("shouldGetCategories")
-        void shouldGetCategories() {
-            final CaseTypeDefinition caseTypeDefinition = new CaseTypeDefinition();
-            Category category = new Category();
-            category.setCategoryId("Cat1,Cat2");
-            category.setCategoryLabel("CategoryLabel");
-            category.setParentCategoryId("ParentCat1");
-            category.setLiveFrom(LocalDate.parse("2017-02-02"));
-            category.setLiveTo(LocalDate.parse("2018-03-03"));
-            category.setDisplayOrder(1);
-
-            caseTypeDefinition.setCategories(List.of(category));
-            assertThat(caseTypeDefinition.getCategories(),isNotNull());
-        }
     }
 }
