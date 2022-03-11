@@ -56,7 +56,7 @@ public class CaseRoleDefinitionCachingIT {
     @DisplayName("return case roles from cache and repository after cache eviction")
     public void returnCaseRolesForCaseTypeFromCacheAndRepositoryAfterCacheEviction() throws InterruptedException {
 
-        Assert.assertEquals(3, applicationParams.getLatestVersionTTLSecs());
+        Assert.assertEquals(3, applicationParams.getDefaultCacheTtlSecs());
         verify(caseRoleRepository, times(0)).getCaseRoles(caseTypeId1);
 
         caseRoleRepository.getCaseRoles(caseTypeId1);
@@ -81,7 +81,7 @@ public class CaseRoleDefinitionCachingIT {
     @DisplayName("return empty case roles but do not cache the result")
     public void returnEmptyCaseRolesForCaseTypeButDoNotCache() throws InterruptedException {
 
-        Assert.assertEquals(3, applicationParams.getLatestVersionTTLSecs());
+        Assert.assertEquals(3, applicationParams.getDefaultCacheTtlSecs());
         verify(caseRoleRepository, times(0)).getCaseRoles(caseTypeId2);
 
         caseRoleRepository.getCaseRoles(caseTypeId2);
