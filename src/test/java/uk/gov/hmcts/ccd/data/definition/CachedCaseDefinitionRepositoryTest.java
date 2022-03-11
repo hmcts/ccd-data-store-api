@@ -318,6 +318,5 @@ class CachedCaseDefinitionRepositoryTest {
                 () -> verifyNoMoreInteractions(caseDefinitionRepository)
             );
         }
-
     }
 }
