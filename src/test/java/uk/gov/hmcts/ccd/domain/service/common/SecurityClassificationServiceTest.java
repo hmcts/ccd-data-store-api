@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import uk.gov.hmcts.ccd.config.JacksonUtils;
 import uk.gov.hmcts.ccd.data.casedetails.SecurityClassification;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
+import uk.gov.hmcts.ccd.domain.model.casedataaccesscontrol.AccessProfile;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseDetails;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseEventDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
@@ -43,6 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -76,6 +80,9 @@ public class SecurityClassificationServiceTest {
     @Mock
     private CaseDefinitionRepository caseDefinitionRepository;
 
+    @Mock
+    private CaseAccessCategoriesService caseAccessCategoriesService;
+
     private CaseDetails caseDetails;
 
     @BeforeEach
@@ -88,7 +95,11 @@ public class SecurityClassificationServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         securityClassificationService = spy(new SecurityClassificationServiceImpl(caseDataAccessControl,
-            caseDefinitionRepository));
+            caseDefinitionRepository,
+            caseAccessCategoriesService));
+        Predicate<CaseDetails> predicate = cd -> true;
+        when(caseAccessCategoriesService
+            .caseHasMatchingCaseAccessCategories(anySet(), anyBoolean())).thenReturn(predicate);
     }
 
     @Nested
@@ -224,6 +235,58 @@ public class SecurityClassificationServiceTest {
         @DisplayName("should return case when user has higher classification")
         void shouldReturnCaseWhenUserHigherClassification() {
             assertThat(applyClassification(RESTRICTED, PUBLIC).get(), sameInstance(caseDetails));
+        }
+
+    }
+
+    @Nested
+    @DisplayName("CaseDetails case access categories")
+    class ApplyCaseAccessCategoriesToCaseDetails {
+
+        private CaseDetails caseDetails;
+
+        @BeforeEach
+        void setUp() throws IOException {
+            caseDetails = new CaseDetails();
+
+            final Map<String, JsonNode> data = JacksonUtils.convertValue(MAPPER.readTree(
+                "{  \"CaseAccessCategory\": \"Civil/Standard\"\n," +
+                    "       \"Note2\": \"note2\"\n" +
+                    "    }\n"
+            ));
+            caseDetails.setData(data);
+            caseDetails.setJurisdiction(JURISDICTION_ID);
+        }
+
+        Optional<CaseDetails> applyClassification(SecurityClassification userClassification,
+                                                  SecurityClassification caseClassification,
+                                                  String caseAccessCategories) {
+            when(caseDataAccessControl.getUserClassifications(any(CaseTypeDefinition.class), anyBoolean()))
+                .thenReturn(newHashSet(userClassification));
+
+            when(caseDataAccessControl.getUserClassifications(any(CaseDetails.class)))
+                .thenReturn(newHashSet(userClassification));
+
+            AccessProfile accessProfile = new AccessProfile("Test");
+            accessProfile.setCaseAccessCategories(caseAccessCategories);
+            when(caseDataAccessControl.generateAccessProfilesByCaseDetails(any(CaseDetails.class)))
+                .thenReturn(newHashSet(accessProfile));
+
+            caseDetails.setSecurityClassification(caseClassification);
+
+            return securityClassificationService.applyClassification(caseDetails);
+        }
+
+        @Test
+        @DisplayName("should return null when case has no matching case access categories")
+        void shouldReturnNullWhenCaseHasNoCaseAccessCategories() {
+            assertThat(applyClassification(PUBLIC, RESTRICTED, "Civil/Test").isPresent(), is(false));
+        }
+
+        @Test
+        @DisplayName("should return case details when case and access profiles has matching case access categories")
+        void shouldReturnCaseDetailsWhenCaseAndAccessProfileHasSameCategories() {
+            assertThat(applyClassification(PUBLIC, RESTRICTED, "Civil/Standard,Crime/Standard").isPresent(), is(false));
         }
 
     }

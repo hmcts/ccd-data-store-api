@@ -1,0 +1,21 @@
+{
+  "_guid_": "F-13010.1_CreateCase",
+  "_extends_" : "F-13010_CreateCaseBase",
+
+  "request": {
+    "body": {
+      "event_token": "${[scenarioContext][parentContext][childContexts][F-13010.1_CreateCase_Token_Creation][testData][actualResponse][body][token]}",
+      "data": {
+        "CaseAccessCategory": "Civil/Standard/Legal"
+      }
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "data": {
+        "CaseAccessCategory": "Civil/Standard/Legal"
+      }
+    }
+  }
+}

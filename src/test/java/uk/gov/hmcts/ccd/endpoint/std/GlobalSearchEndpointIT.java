@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -314,14 +313,15 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
         return "{\n"
             + "   \"took\":177,\n"
             + "   \"hits\":{\n"
+            + "      \"total\": 30,"
             + "      \"hits\":[\n"
             + "         {\n"
             + "            \"_index\":\"TestAddressBookCase_cases-000001\",\n"
-            + "            \"_source\":" + caseDetails1
+            + "            \"_source\":" + createCaseDetails(caseDetails1)
             + "         },\n"
             + "         {\n"
             + "            \"_index\":\"TestAddressBookCase_cases-000001\",\n"
-            + "            \"_source\":" + caseDetails2
+            + "            \"_source\":" + createCaseDetails(caseDetails2)
             + "         }\n"
             + "      ]\n"
             + "   }\n"
@@ -347,21 +347,21 @@ public class GlobalSearchEndpointIT extends WireMockBaseTest {
     }
 
     private void stubElasticSearchSearchRequestWillReturn() throws java.io.IOException {
-        String caseDetails1 = createCaseDetails(REFERENCE_1);
-        String caseDetails2 = createCaseDetails(REFERENCE_2);
         String caseDetailElastic = create2CaseDetailsElastic(REFERENCE_1, REFERENCE_2);
 
-        JsonObject convertedObject = new Gson().fromJson(caseDetailElastic, JsonObject.class);
+        Gson gson = new Gson();
+        JsonObject convertedObject = gson.fromJson(caseDetailElastic, JsonObject.class);
         MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
         when(multiSearchResult.isSucceeded()).thenReturn(true);
 
-        SearchResult searchResult = mock(SearchResult.class);
-        when(searchResult.getTotal()).thenReturn(30L);
-        when(searchResult.getSourceAsStringList()).thenReturn(newArrayList(caseDetails1, caseDetails2));
+        SearchResult searchResult = new SearchResult(gson);
+        searchResult.setSucceeded(true);
+        searchResult.setJsonObject(convertedObject);
+        searchResult.setJsonString(convertedObject.toString());
+        searchResult.setPathToResult("hits/hits/_source");
 
         MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
         when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
-        when(searchResult.getJsonObject()).thenReturn(convertedObject);
         Whitebox.setInternalState(response, "searchResult", searchResult);
 
         given(jestClient.execute(any())).willReturn(multiSearchResult);
