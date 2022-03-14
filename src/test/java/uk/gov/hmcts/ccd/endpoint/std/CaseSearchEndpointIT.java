@@ -29,7 +29,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -71,7 +70,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
 
         String caseDetailElastic = create1CaseDetailsElastic("1535450291607660");
 
-        stubElasticSearchSearchRequestWillReturn(caseDetailElastic, createCaseDetails("1535450291607660"));
+        stubElasticSearchSearchRequestWillReturn(caseDetailElastic);
 
         String searchRequest = "{\"query\": {\"match_all\": {}}}";
         MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
@@ -106,11 +105,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
         String reference2 = "1535450291607670";
         String caseDetailElastic1 = create2CaseDetailsElastic(reference1, reference2);
 
-        stubElasticSearchSearchRequestWillReturn(
-                                                 caseDetailElastic1,
-                                                 createCaseDetails("1535450291607660"),
-                                                 createCaseDetails("1535450291607670")
-                                                 );
+        stubElasticSearchSearchRequestWillReturn(caseDetailElastic1);
 
         String searchRequest = "{\"query\": {\"match_all\": {}}}";
         MvcResult result = mockMvc.perform(post(POST_SEARCH_CASES)
@@ -144,6 +139,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
         return "{\n" +
             "   \"took\":177,\n" +
             "   \"hits\":{\n" +
+            "      \"total\": 2," +
             "      \"hits\":[\n" +
             "         {\n" +
             "            \"_index\":\"TestAddressBookCase_cases-000001\",\n" +
@@ -158,6 +154,7 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
         return "{\n" +
             "   \"took\":177,\n" +
             "   \"hits\":{\n" +
+            "      \"total\": 2," +
             "      \"hits\":[\n" +
             "         {\n" +
             "            \"_index\":\"TestAddressBookCase_cases-000001\",\n" +
@@ -190,20 +187,19 @@ public class CaseSearchEndpointIT extends WireMockBaseTest {
             + "}";
     }
 
-    private void stubElasticSearchSearchRequestWillReturn(String caseDetailElastic,
-                                                          String... caseDetails) throws java.io.IOException {
-
-        JsonObject convertedObject = new Gson().fromJson(caseDetailElastic, JsonObject.class);
+    private void stubElasticSearchSearchRequestWillReturn(String caseDetailElastic) throws java.io.IOException {
+        Gson gson = new Gson();
+        JsonObject convertedObject = gson.fromJson(caseDetailElastic, JsonObject.class);
         MultiSearchResult multiSearchResult = mock(MultiSearchResult.class);
         when(multiSearchResult.isSucceeded()).thenReturn(true);
-
-        SearchResult searchResult = mock(SearchResult.class);
-        when(searchResult.getTotal()).thenReturn(30L);
-        when(searchResult.getSourceAsStringList()).thenReturn(newArrayList(caseDetails));
+        SearchResult searchResult = new SearchResult(gson);
+        searchResult.setSucceeded(true);
+        searchResult.setJsonObject(convertedObject);
+        searchResult.setJsonString(convertedObject.toString());
+        searchResult.setPathToResult("hits/hits/_source");
 
         MultiSearchResult.MultiSearchResponse response = mock(MultiSearchResult.MultiSearchResponse.class);
         when(multiSearchResult.getResponses()).thenReturn(Collections.singletonList(response));
-        when(searchResult.getJsonObject()).thenReturn(convertedObject);
         Whitebox.setInternalState(response, "searchResult", searchResult);
 
         given(jestClient.execute(any())).willReturn(multiSearchResult);

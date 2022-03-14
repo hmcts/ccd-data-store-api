@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CASE_TYPE;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.BASE_LOCATION;
+import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.CASE_ACCESS_CATEGORY;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.CASE_MANAGEMENT_CATEGORY_ID;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.CASE_MANAGEMENT_CATEGORY_NAME;
 import static uk.gov.hmcts.ccd.domain.service.search.global.GlobalSearchFields.CaseDataPaths.CASE_MANAGEMENT_LOCATION;
@@ -105,6 +106,7 @@ public class GlobalSearchQueryBuilder {
     public ArrayNode globalSearchSourceFields() {
         return JacksonUtils.MAPPER.createArrayNode()
             // root level case data fields
+            .add(CASE_ACCESS_CATEGORY)
             .add(CASE_MANAGEMENT_CATEGORY_ID)
             .add(CASE_MANAGEMENT_CATEGORY_NAME)
             .add(CASE_MANAGEMENT_LOCATION)
