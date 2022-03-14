@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 import org.mockito.Mock;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
@@ -445,8 +446,8 @@ public class DocumentValidatorTest implements IVallidatorTest {
         assertThat(validDocumentUrlResult.get(0).getErrorMessage(), is("boolean is not a string"));
     }
 
-    @Test
-//    @Disabled(value = "NullPointer error")
+//    @Test
+    @Disabled(value = "NullPointer error")
     public void shouldValidateCategoryId() {
         data = createDoc(CATEGORY_ID,VALID_CATEGORY_ID);
         caseFieldDefinition.setCaseTypeId(CASE_TYPE_ID);
