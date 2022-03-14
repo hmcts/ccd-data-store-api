@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.ccd.ApplicationParams;
 import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
+import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.Category;
 
@@ -17,8 +18,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-//todo remove todo squid
-@SuppressWarnings({"squid:S1135"})
+//todo remove todo squid. S3776 is cognitive... New ticket to move doc binary to another method
+@SuppressWarnings({"squid:S3776","squid:S1135"})
 @Named("DocumentValidator")
 @Singleton
 public class DocumentValidator implements BaseTypeValidator {
@@ -35,17 +36,17 @@ public class DocumentValidator implements BaseTypeValidator {
     private final ApplicationParams applicationParams;
     private final TextValidator textValidator;
     private final DateTimeValidator dateTimeValidator;
-    private final CachedCaseDefinitionRepository cachedCaseDefinitionRepository;
+    private final CaseDefinitionRepository caseDefinitionRepository;
 
     public DocumentValidator(ApplicationParams applicationParams,
                              @Qualifier("TextValidator") TextValidator textValidator,
                              @Qualifier("DateTimeValidator") DateTimeValidator dateTimeValidator,
                              @Qualifier(CachedCaseDefinitionRepository.QUALIFIER)
-                                 CachedCaseDefinitionRepository cachedCaseDefinitionRepository) {
+                                 CaseDefinitionRepository caseDefinitionRepository) {
         this.applicationParams = applicationParams;
         this.textValidator = textValidator;
         this.dateTimeValidator = dateTimeValidator;
-        this.cachedCaseDefinitionRepository = cachedCaseDefinitionRepository;
+        this.caseDefinitionRepository = caseDefinitionRepository;
     }
 
     @Override
@@ -114,12 +115,18 @@ public class DocumentValidator implements BaseTypeValidator {
 
         if (dataValue.has(CATEGORY_ID)) {
             // TODO Should the parent_category_id be expected/checked?
-            return validateCategoryId(dataFieldId,dataValue,caseFieldDefinition);
+            List<ValidationResult> validationResults = validateCategoryId(dataFieldId,dataValue,caseFieldDefinition);
+            if (!validationResults.isEmpty()) {
+                return validationResults;
+            }
         }
 
         if (dataValue.has(UPLOAD_TIMESTAMP)) {
-            return validateUploadTimeStamp(dataFieldId,dataValue,caseFieldDefinition);
-
+            List<ValidationResult> validationResults =
+                validateUploadTimeStamp(dataFieldId,dataValue,caseFieldDefinition);
+            if (!validationResults.isEmpty()) {
+                return validationResults;
+            }
         }
 
         return Collections.emptyList();
@@ -137,6 +144,7 @@ public class DocumentValidator implements BaseTypeValidator {
         }
 
         if (!dataValue.has("parent_category_id")) {
+            // TODO Should the parent_category_id be expected/checked?
             LOG.info("Object does not have parent_category_id key specified");
         }
 
@@ -148,16 +156,16 @@ public class DocumentValidator implements BaseTypeValidator {
         }
 
         final List<Category> categoryList =
-            cachedCaseDefinitionRepository.getCaseType(caseFieldDefinition.getCaseTypeId()).getCategories();
+            caseDefinitionRepository.getCaseType(caseFieldDefinition.getCaseTypeId()).getCategories();
 
         final boolean categoryCheck = categoryList.stream()
             .anyMatch(category ->
                 category.getCategoryId().contains(categoryId.textValue()));
 
         if (!categoryCheck) {
-            LOG.error("{} value not recognised as a valid category", CATEGORY_ID);
+            LOG.error("{} value not recognised as a valid Case Category", CATEGORY_ID);
             return Collections.singletonList(new ValidationResult(
-                CATEGORY_ID + " not found", dataFieldId));
+                CATEGORY_ID + " value not found", dataFieldId));
         }
         return Collections.emptyList();
     }
