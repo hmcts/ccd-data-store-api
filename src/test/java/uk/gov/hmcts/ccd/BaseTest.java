@@ -5,13 +5,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
+import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.ReadContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.platform.commons.util.StringUtils;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -394,14 +398,18 @@ public abstract class BaseTest {
     public static CaseTypeDefinition loadCaseTypeDefinition(String caseTypeJsonLocation) {
         String resourceAsString = BaseTest.getResourceAsString(caseTypeJsonLocation);
         String jsonPathExpression = "$.response.jsonBody";
-        return JsonPath.parse(resourceAsString)
-            .read(jsonPathExpression, CaseTypeDefinition.class);
-    }
 
-    public static CaseTypeDefinition loadCaseTypeDefinitionFromJsonBodyFile(String caseTypeJsonLocation) {
-        String resourceAsString = BaseTest.getResourceAsString(caseTypeJsonLocation);
-        String jsonPathExpression = "$";
-        return JsonPath.parse(resourceAsString)
-            .read(jsonPathExpression, CaseTypeDefinition.class);
+        ReadContext jsonData = JsonPath.using(Configuration.defaultConfiguration()
+            .addOptions(Option.SUPPRESS_EXCEPTIONS)).parse(resourceAsString);
+
+        // check if using separate body file
+        String bodyFileName = jsonData.read("$.response.bodyFileName");
+        if (StringUtils.isNotBlank(bodyFileName)) {
+            resourceAsString = BaseTest.getResourceAsString("/__files/" + bodyFileName);
+            jsonData = JsonPath.parse(resourceAsString);
+            jsonPathExpression = "$";
+        }
+
+        return jsonData.read(jsonPathExpression, CaseTypeDefinition.class);
     }
 }

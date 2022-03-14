@@ -29,6 +29,9 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation;
 import uk.gov.hmcts.ccd.infrastructure.user.UserAuthorisation.AccessLevel;
 
+import javax.inject.Inject;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRequestEvent;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,9 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
-import javax.inject.Inject;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRequestEvent;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
@@ -463,8 +463,7 @@ public class DefaultCaseDetailsRepositoryTest extends WireMockBaseTest {
     })
     public void searchWithParams_withAccessLevelGranted() throws Exception {
         String userId = "123";
-        CaseTypeDefinition caseTypeDefinition =
-            loadCaseTypeDefinitionFromJsonBodyFile("/__files/test-addressbook-case.json");
+        CaseTypeDefinition caseTypeDefinition = loadCaseTypeDefinition("/mappings/bookcase-definition.json");
         caseTypeDefinition.setRoleToAccessProfiles(asList(roleToAccessProfileDefinition("[CREATOR]")));
 
         stubFor(WireMock.get(urlMatching("/api/data/case-type/TestAddressBookCase"))

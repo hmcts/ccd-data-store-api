@@ -84,40 +84,40 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
 
   @S-1015.7 #AC-7
   Scenario: TTLIncrement is blank (Null) for the Case Event and Start Event is invoked on v1_external#/case-details-endpoint/startEventForCitizenUsingGET
-    Given a user with [an active profile in CCD]
+    Given a user with [an active profile in CCD]
     And   a successful call [to create a case] as in [F-1015_CreateCasePreRequisiteCitizen]
     When  a request is prepared with appropriate values
-    And   the request [contains correctly configured event details] 
+    And   the request [contains correctly configured event details]
     And   the request [has a null TTLIncrement configured]
     And   the request [is configured to trigger an About to Start callback]
     And   it is submitted to call the [Start event creation process to update a case as Citizen] operation of [CCD Data Store]
-    Then  a positive response is received 
+    Then  a positive response is received
     And   the response has all other details as expected
     And   the response [contains the TTL.SystemTTL for the case, that has not been modified]
 
   @S-1015.8 #AC-8
-  Scenario: TTLIncrement is blank (Null) for the Case Event and Start Event is invoked on v2_external#/start-event-controller/getStartEventTriggerUsingGET
-    Given a user with [an active profile in CCD]
+  Scenario: TTLIncrement is blank (Null) for the Case Event and Start Event is invoked on v2_external#/start-event-controller/getStartEventTriggerUsingGET
+    Given a user with [an active profile in CCD]
     And   a successful call [to create a case] as in [F-1015_CreateCasePreRequisiteCaseworker]
     When  a request is prepared with appropriate values
-    And   the request [contains correctly configured event details] 
+    And   the request [contains correctly configured event details]
     And   the request [has a null TTLIncrement configured]
     And   the request [is configured to trigger an About to Start callback]
     And   it is submitted to call the [Retrieve an update event trigger for case] operation of [CCD Data Store]
-    Then  a positive response is received 
+    Then  a positive response is received
     And   the response has all other details as expected
     And   the response [contains the TTL.SystemTTL for the case, that has not been modified]
 
   @S-1015.9 #AC-9
-  Scenario: TTLIncrement is blank (Null) for the Case Event and Start Event is invoked on v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET
-    Given a user with [an active profile in CCD]
+  Scenario: TTLIncrement is blank (Null) for the Case Event and Start Event is invoked on v1_internal#/query-endpoint/getEventTriggerForCaseUsingGET
+    Given a user with [an active profile in CCD]
     And   a successful call [to create a case] as in [F-1015_CreateCasePreRequisiteCaseworker]
     When  a request is prepared with appropriate values
-    And   the request [contains correctly configured event details] 
+    And   the request [contains correctly configured event details]
     And   the request [has a null TTLIncrement configured]
     And   the request [is configured to trigger an About to Start callback]
     And   it is submitted to call the [Fetch an update event trigger in the context of a case] operation of [CCD Data Store]
-    Then  a positive response is received 
+    Then  a positive response is received
     And   the response has all other details as expected
     And   the response [contains the TTL.SystemTTL for the case, that has not been modified]
 
@@ -162,7 +162,6 @@ Feature: F-1015: Update Case - Start Case Event - Update Code for TTL
 
   @S-1015.13 #AC-13
   Scenario: TTLIncrement is set to "20" for the Case Event, TTL.suspended has changed after About to Start Callback. Start Event is invoked on v1_external#/case-details-endpoint/startEventForCaseworkerUsingGET
-
     Given a user with [an active profile in CCD],
     And   a successful call [to create a case] as in [F-1015_CreateCasePreRequisiteCaseworker]
     When  a request is prepared with appropriate values,
