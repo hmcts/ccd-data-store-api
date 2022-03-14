@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @Data
@@ -14,8 +14,9 @@ public class Category implements Serializable {
     private String categoryId;
     private String categoryLabel;
     private String parentCategoryId;
-    private Date liveFrom;
-    private Date liveTo;
-    private String displayOrder;
+    private LocalDate liveFrom;
+    private LocalDate liveTo;
+    private Integer displayOrder;
     private String caseTypeId;
+
 }
