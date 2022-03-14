@@ -1,0 +1,18 @@
+{
+  "_guid_": "F-13010.4_CreateCase_Token_Creation",
+  "_extends_" : "F-13010_Get_Event_Token_Base",
+
+  "request": {
+    "pathVariables": {
+      "caseTypeId": "FT_CaseAccessCategories_2"
+    }
+  },
+
+  "expectedResponse": {
+    "body" : {
+      "case_details" : {
+        "case_type_id" : "FT_CaseAccessCategories_2"
+      }
+    }
+  }
+}
