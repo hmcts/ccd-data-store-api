@@ -8,6 +8,9 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ExampleProperty;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -49,6 +52,9 @@ import static uk.gov.hmcts.ccd.auditlog.AuditOperationType.UPDATE_CASE;
 @RestController
 @RequestMapping(path = "/")
 public class CaseController {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CaseController.class);
+
     private final GetCaseOperation getCaseOperation;
     private final CreateEventOperation createEventOperation;
     private final CreateCaseOperation createCaseOperation;
@@ -226,6 +232,10 @@ public class CaseController {
                                                         + "}"
                                                         + "\n```", required = true)
                                                     @RequestBody final CaseDataContent content) {
+        if (content != null && content.getEvent() != null) {
+            String eventId = content.getEvent().getEventId().replaceAll(",", "");
+            LOG.info("/cases/{caseId}/events - started for {}", eventId);
+        }
         return createCaseEvent(caseId, content);
     }
 

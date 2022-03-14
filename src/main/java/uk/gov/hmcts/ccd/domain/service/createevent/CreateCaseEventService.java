@@ -144,7 +144,11 @@ public class CreateCaseEventService {
     public CreateCaseEventResult createCaseEvent(final String caseReference, final CaseDataContent content) {
 
         final CaseDetails caseDetails = getCaseDetails(caseReference);
-        LOG.info("case supplementary data => {} ", caseDetails.getSupplementaryData());
+        String eventId = "<NA>";
+        if (content != null && content.getEvent() != null) {
+            eventId = content.getEvent().getEventId();
+        }
+        LOG.info("case supplementary data => {}, event {}", caseDetails.getSupplementaryData(), eventId);
         final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseDetails.getCaseTypeId());
         final CaseEventDefinition caseEventDefinition = findAndValidateCaseEvent(
             caseTypeDefinition,
@@ -187,7 +191,8 @@ public class CreateCaseEventService {
         @SuppressWarnings("UnnecessaryLocalVariable")
         final CaseDetails caseDetailsAfterCallback = updatedCaseDetailsWithoutHashes;
 
-        LOG.info("case supplementary data after callback => {} ", caseDetailsAfterCallback.getSupplementaryData());
+        LOG.info("case supplementary data after callback => {}, event {}",
+            caseDetailsAfterCallback.getSupplementaryData(), eventId);
 
         validateCaseFieldsOperation.validateData(caseDetailsAfterCallback.getData(), caseTypeDefinition, content);
         final LocalDateTime timeNow = now();
@@ -207,10 +212,12 @@ public class CreateCaseEventService {
             caseDetailsAfterCallbackWithoutHashes,
             caseEventDefinition,
             newState,
-            timeNow
+            timeNow,
+            eventId
         );
 
-        LOG.info("case supplementary data saved Details => {} ", savedCaseDetails.getSupplementaryData());
+        LOG.info("case supplementary data saved Details => {}, event {}",
+            savedCaseDetails.getSupplementaryData(), eventId);
 
         saveAuditEventForCaseDetails(
             aboutToSubmitCallbackResponse,
@@ -274,7 +281,8 @@ public class CreateCaseEventService {
                                         final CaseDetails caseDetails,
                                         final CaseEventDefinition caseEventDefinition,
                                         final Optional<String> state,
-                                        final LocalDateTime timeNow) {
+                                        final LocalDateTime timeNow,
+                                        final String eventId) {
 
         if (state.isEmpty()) {
             updateCaseState(caseDetails, caseEventDefinition);
@@ -285,10 +293,12 @@ public class CreateCaseEventService {
 
         caseDataIssueLogger.logAnyDataIssuesIn(caseDetailsBefore, caseDetails);
         CaseDetails caseDetailsWithLatestSuppData = getCaseDetails(caseDetails.getReferenceAsString());
-        LOG.info("Latest supplementary data => {}", caseDetailsWithLatestSuppData.getSupplementaryData());
+        LOG.info("Latest supplementary data => {}, event {}",
+            caseDetailsWithLatestSuppData.getSupplementaryData(), eventId);
 
-        LOG.info("supplementary data through repo {}",
-            supplementaryDataRepository.findSupplementaryData(caseDetails.getReferenceAsString()));
+        LOG.info("supplementary data through repo {}, event {}",
+            supplementaryDataRepository.findSupplementaryData(caseDetails.getReferenceAsString()),
+            eventId);
         caseDetails.setSupplementaryData(
             supplementaryDataRepository.findSupplementaryDataMap(caseDetails.getReferenceAsString()));
         return caseDetailsRepository.set(caseDetails);

@@ -44,13 +44,17 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
     @Override
     public CaseDetails createCaseEvent(final String caseReference,
                                        final CaseDataContent content) {
+        String eventId = content.getEvent().getEventId();
+        LOG.info("createCaseEvent started for {}", eventId);
         eventValidator.validate(content.getEvent());
 
         final CreateCaseEventResult caseEventResult = createEventService.createCaseEvent(caseReference, content);
-
+        LOG.info("Before calling submitted callback for {}", eventId);
         if (!isBlank(caseEventResult.getEventTrigger().getCallBackURLSubmittedEvent())) {
+            LOG.info("Calling submitted callback for {}", eventId);
             return invokeSubmitedToCallback(caseEventResult);
         }
+        LOG.info("After calling submitted callback and createCaseEvent completed for {}", eventId);
         return caseEventResult.getSavedCaseDetails();
     }
 

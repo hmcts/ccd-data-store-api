@@ -7,6 +7,8 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.EnumUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -71,6 +73,8 @@ import static uk.gov.hmcts.ccd.data.casedetails.search.MetaData.SORT_PARAM;
     produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(value = "/", description = "Standard case API")
 public class CaseDetailsEndpoint {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CaseDetailsEndpoint.class);
 
     private final GetCaseOperation getCaseOperation;
     private final CreateCaseOperation createCaseOperation;
@@ -365,6 +369,11 @@ public class CaseDetailsEndpoint {
         @ApiParam(value = "Case ID", required = true)
         @PathVariable("cid") final String caseId,
         @RequestBody final CaseDataContent content) {
+        if (content != null && content.getEvent() != null) {
+            String eventId = content.getEvent().getEventId().replaceAll(",", "");
+            LOG.info("/caseworkers/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/events - started for {}",
+                eventId);
+        }
         return createEventOperation.createCaseEvent(caseId,
                                                     content);
     }
