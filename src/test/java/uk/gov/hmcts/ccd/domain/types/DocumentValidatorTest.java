@@ -6,10 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
-import org.mockito.Mock;
 import uk.gov.hmcts.ccd.ApplicationParams;
-import uk.gov.hmcts.ccd.data.definition.CachedCaseDefinitionRepository;
 import uk.gov.hmcts.ccd.data.definition.CaseDefinitionRepository;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseFieldDefinition;
 import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
@@ -32,9 +29,6 @@ import static uk.gov.hmcts.ccd.domain.types.DocumentValidator.DOCUMENT_URL;
 // too many legacy OperatorWrap occurrences on JSON strings so suppress until move to Java12+
 @SuppressWarnings("checkstyle:OperatorWrap")
 public class DocumentValidatorTest implements IVallidatorTest {
-
-    @Mock
-    private FieldTypeDefinition dateTimeFieldTypeDefinition;
 
     private static final String DOCUMENT_FIELD_ID = "DOCUMENT_FIELD_ID";
     private static final String DOCUMENT_BINARY_URL = "document_binary_url";
@@ -77,9 +71,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     private List<ValidationResult> validDocumentUrlResult;
     private TextValidator textValidator;
     private DateTimeValidator dateTimeValidator;
-    private CachedCaseDefinitionRepository cachedCaseDefinitionRepository;
     private CaseDefinitionRepository caseDefinitionRepository;
-
 
     @Test
     public void shouldValidateIfPortsAreSpecifiedAndMatch() {
@@ -107,7 +99,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
         final ApplicationParams ap = mock(ApplicationParams.class);
         when(ap.getDocumentURLPattern()).thenReturn(urlBase + "/documents/[A-Za-z0-9-]+(?:/binary)?");
 
-        return new DocumentValidator(ap,textValidator,dateTimeValidator, cachedCaseDefinitionRepository);
+        return new DocumentValidator(ap,textValidator,dateTimeValidator, caseDefinitionRepository);
     }
 
     @Before
@@ -117,16 +109,18 @@ public class DocumentValidatorTest implements IVallidatorTest {
         when(documentFieldTypeDefinition.getType()).thenReturn("Document");
         when(dateTimeFieldTypeDefinition.getType()).thenReturn("DateTime");
         final CaseTypeDefinition caseTypeDefinition = mock(CaseTypeDefinition.class);
-        final CaseDefinitionRepository definitionRepository = mock(CaseDefinitionRepository.class);
+        caseDefinitionRepository = mock(CaseDefinitionRepository.class);
 
-        List<Category> categories = List.of();
+        Category category = new Category();
+        category.setCategoryId(VALID_CATEGORY_ID);
+        List<Category> categories = List.of(category);
         doReturn(categories)
             .when(caseTypeDefinition).getCategories();
         doReturn(List.of(documentFieldTypeDefinition, dateTimeFieldTypeDefinition))
-            .when(definitionRepository).getBaseTypes();
+            .when(caseDefinitionRepository).getBaseTypes();
         doReturn(caseTypeDefinition)
-            .when(definitionRepository).getCaseType(anyString());
-        BaseType.setCaseDefinitionRepository(definitionRepository);
+            .when(caseDefinitionRepository).getCaseType(anyString());
+        BaseType.setCaseDefinitionRepository(caseDefinitionRepository);
 
         final ObjectNode data;
         final List<ValidationResult> validDocumentUrlResult;
@@ -136,12 +130,9 @@ public class DocumentValidatorTest implements IVallidatorTest {
 
         textValidator = new TextValidator();
         dateTimeValidator = new DateTimeValidator();
-        cachedCaseDefinitionRepository = new CachedCaseDefinitionRepository(
-            mock(CachedCaseDefinitionRepository.class),applicationParams);
 
-        caseDefinitionRepository = mock(CaseDefinitionRepository.class);
         validator = new DocumentValidator(
-            applicationParams,textValidator,dateTimeValidator,cachedCaseDefinitionRepository);
+            applicationParams,textValidator,dateTimeValidator, caseDefinitionRepository);
         caseFieldDefinition = MAPPER.readValue(CASE_FIELD_STRING, CaseFieldDefinition.class);
     }
 
@@ -446,10 +437,9 @@ public class DocumentValidatorTest implements IVallidatorTest {
         assertThat(validDocumentUrlResult.get(0).getErrorMessage(), is("boolean is not a string"));
     }
 
-//    @Test
-    @Disabled(value = "NullPointer error")
+    @Test
     public void shouldValidateCategoryId() {
-        data = createDoc(CATEGORY_ID,VALID_CATEGORY_ID);
+        data = createDoc(CATEGORY_ID, VALID_CATEGORY_ID);
         caseFieldDefinition.setCaseTypeId(CASE_TYPE_ID);
 
         validDocumentUrlResult = validator.validate(CATEGORY_ID, data, caseFieldDefinition);
