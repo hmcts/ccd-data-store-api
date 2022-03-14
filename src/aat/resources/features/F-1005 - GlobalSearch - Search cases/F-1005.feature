@@ -7,7 +7,7 @@
     And a case that has just been created as in [F-1005_CreateCasePreRequisiteCaseworker]
     And a wait time of [5] seconds [to allow for Logstash to index the case just created]
 
-  @S-1005.1 #AC1
+  @S-1005.1 @AC1
   Scenario: Successfully search for case with one of the new global search parameters
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
@@ -18,7 +18,7 @@
     And the response [has 200 return code],
     And the response has all other details as expected.
 
-  @S-1005.2  #AC2
+  @S-1005.2  @AC2
   Scenario: Successfully search for case with all of the new global search parameters
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
@@ -29,7 +29,7 @@
     And the response [has 200 return code],
     And the response has all other details as expected.
 
-  @S-1005.3  #AC3
+  @S-1005.3  @AC3
   Scenario:  Unsuccessful search for case with none of the new global search parameters
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
@@ -41,7 +41,7 @@
     And the response [contains the error message 'Must have at least one search criteria'],
     And the response has all other details as expected.
 
-  @S-1005.4  #AC4
+  @S-1005.4  @AC4
   Scenario:  Unsuccessful search for case with invalid schema
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
@@ -54,7 +54,7 @@
     And the response [contains the error message 'Input not valid'],
     And the response has all other details as expected.
 
-  @S-1005.5  #AC5
+  @S-1005.5  @AC5
   Scenario:  Unsuccessful search for case with invalid global search parameters with an invalid user
     Given a user with [an active profile in CCD]
     When a request is prepared with appropriate values
