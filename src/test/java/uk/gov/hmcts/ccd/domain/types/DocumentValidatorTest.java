@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ccd.domain.types;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -422,7 +421,7 @@ public class DocumentValidatorTest implements IVallidatorTest {
     }
 
     @Test
-    public void shouldFail_whenValidatingBooleanCategoryId() throws JsonProcessingException {
+    public void shouldFail_whenValidatingBooleanCategoryId() {
         data = createDoc(VALID_DOCUMENT_URL);
         data.put(CATEGORY_ID, true);
 
