@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-1005.8",
-  "_extends_": "F-1005_RetrieveTrigger",
+  "_guid_": "S-1015.8",
+  "_extends_": "F-1015_RetrieveTrigger",
   "title": "must successfully update a case without modifying the TTL.SystemTTL value when no TTLIncrement is specified",
 
   "specs": [
@@ -19,7 +19,7 @@
 
   "request": {
     "pathVariables": {
-      "caseId": "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "caseId": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "triggerId": "updateCaseNoTTLInc"
     }
   },
@@ -33,7 +33,7 @@
     },
     "body": {
       "case_details": {
-        "id": "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+        "id": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
         "jurisdiction": "BEFTA_MASTER",
         "state": "CaseCreated",
         "version": 0,

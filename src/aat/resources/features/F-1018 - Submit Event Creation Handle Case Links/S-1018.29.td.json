@@ -1,24 +1,24 @@
 {
-  "_guid_": "S-1008.29",
-  "_extends_": "F-1008_Test_Data_Base_Negative_Citizen",
+  "_guid_": "S-1018.29",
+  "_extends_": "F-1018_Test_Data_Base_Negative_Citizen",
 
   "title": "Case Link does not exist at present and CaseLink field in the Request contains CaseReference value but Invalid Case data and Submit Event Creation is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST",
 
   "specs": [
     "an active profile in CCD",
-    "contains correctly configured CaseLink field with Case Reference created in F-1008_CreateAnotherCasePreRequisiteCaseworkerBase",
+    "contains correctly configured CaseLink field with Case Reference created in F-1018_CreateAnotherCasePreRequisiteCaseworkerBase",
     "CaseLink field has a valid reference",
     "Case data is invalid"
   ],
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][F-1018_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
     },
     "body": {
       "data": {
         "CaseLinkField": {
-          "CaseReference": "${}${[scenarioContext][childContexts][F-1008_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
+          "CaseReference": "${}${[scenarioContext][childContexts][F-1018_CreateAnotherCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
         },
         "TextField" : 1
       },
@@ -28,7 +28,7 @@
         "description": ""
       },
       "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][F-1008-GetCitizenUpdateEventToken][testData][actualResponse][body][token]}",
+      "event_token" : "${[scenarioContext][childContexts][F-1018-GetCitizenUpdateEventToken][testData][actualResponse][body][token]}",
       "ignore_warning": true
     }
   },

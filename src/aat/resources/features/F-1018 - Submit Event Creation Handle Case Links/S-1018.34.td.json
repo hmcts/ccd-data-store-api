@@ -1,25 +1,25 @@
 {
-  "_guid_": "S-1008.34",
-  "_extends_": "F-1008_Test_Data_Base_V2",
+  "_guid_": "S-1018.34",
+  "_extends_": "F-1018_Test_Data_Base_V2",
 
   "title": "CaseLink in database exists and CaseLink field in the Request is unchanged and and Submit Event Creation is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST",
 
   "specs": [
     "an active profile in CCD",
-    "contains correctly configured CaseLink field with Case Reference created in F-1008_CreateCasePreRequisiteCaseworkerBase",
-    "specifying the case to be updated, as created in F-1008_CreateLinkedCasePreRequisiteCaseworkerBase, CaseLink field not changed"
+    "contains correctly configured CaseLink field with Case Reference created in F-1018_CreateCasePreRequisiteCaseworkerBase",
+    "specifying the case to be updated, as created in F-1018_CreateLinkedCasePreRequisiteCaseworkerBase, CaseLink field not changed"
   ],
 
   "request": {
     "pathVariables": {
-      "caseId": "${[scenarioContext][childContexts][F-1008_CreateLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+      "caseId": "${[scenarioContext][childContexts][F-1018_CreateLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
     },
     "body": {
       "data": {
         "CaseLinkField": {
-          "CaseReference": "${}${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+          "CaseReference": "${}${[scenarioContext][childContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
         },
-        "TextField" : "S-1008.34"
+        "TextField" : "S-1018.34"
       },
       "event": {
         "id": "updateCase",
@@ -27,19 +27,19 @@
         "description": ""
       },
       "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][F-1008-GetLinkedCaseUpdateEventToken][testData][actualResponse][body][token]}",
+      "event_token" : "${[scenarioContext][childContexts][F-1018-GetLinkedCaseUpdateEventToken][testData][actualResponse][body][token]}",
       "ignore_warning": true
     }
   },
 
   "expectedResponse": {
     "body" : {
-      "id": "${}${[scenarioContext][childContexts][F-1008_CreateLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+      "id": "${}${[scenarioContext][childContexts][F-1018_CreateLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
       "data" : {
         "CaseLinkField": {
-          "CaseReference": "${}${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+          "CaseReference": "${}${[scenarioContext][childContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
         },
-        "TextField" : "S-1008.34"
+        "TextField" : "S-1018.34"
       },
       "data_classification" : {
         "TextField" : "PUBLIC",

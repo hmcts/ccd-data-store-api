@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-1007_CreateCasePreRequisiteCaseworkerBase",
+  "_guid_": "F-1017_CreateCasePreRequisiteCaseworkerBase",
   "_extends_": "Case_Creation_Base",
 
   "specs": [
@@ -7,7 +7,7 @@
   ],
 
   "prerequisites" : [ {
-    "Token_Creation": "S-1007_GetCreateToken"
+    "Token_Creation": "S-1017_GetCreateToken"
   }
   ],
 
