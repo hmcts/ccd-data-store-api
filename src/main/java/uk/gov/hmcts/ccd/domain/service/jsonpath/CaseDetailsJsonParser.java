@@ -19,7 +19,7 @@ public class CaseDetailsJsonParser {
 
     private static final String COLLECTION_PATH = "[";
     private static final String ID_EXPRESSION_START = "[?(@.id == \"";
-    private static final String ID_EXPRESSION_END= "\")].value";
+    private static final String ID_EXPRESSION_END = "\")].value";
     Configuration configuration = Configuration.defaultConfiguration()
         .addOptions(Option.DEFAULT_PATH_LEAF_TO_NULL)
         .addOptions(Option.SUPPRESS_EXCEPTIONS);

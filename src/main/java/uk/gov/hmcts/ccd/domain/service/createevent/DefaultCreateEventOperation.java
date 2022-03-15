@@ -76,7 +76,7 @@ public class DefaultCreateEventOperation implements CreateEventOperation {
     private Event createDocumentUpdatedEvent() {
         Event event = new Event();
         event.setEventId("DocumentUpdated");
-       return event;
+        return event;
     }
 
     private CaseDetails invokeSubmitedToCallback(CreateCaseEventResult caseEventResult) {
