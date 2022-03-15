@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.assertj.core.util.Lists;
@@ -25,7 +26,9 @@ import uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessCategoriesService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -40,6 +43,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -48,7 +53,9 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.anyBoolean;
@@ -114,6 +121,9 @@ class AuthorisedCreateEventOperationTest {
     private CaseAccessService caseAccessService;
 
     @Mock
+    private CaseAccessCategoriesService caseAccessCategoriesService;
+
+    @Mock
     private CaseDetailsJsonParser caseDetailsJsonParser;
 
     private AuthorisedCreateEventOperation authorisedCreateEventOperation;
@@ -136,15 +146,10 @@ class AuthorisedCreateEventOperationTest {
             caseDefinitionRepository,
             accessControlService,
             caseAccessService,
+            caseAccessCategoriesService,
             caseDetailsJsonParser);
 
-        CaseDetails existingCase = new CaseDetails();
-        Map<String, JsonNode> existingData = Maps.newHashMap();
-        existingCase.setState(STATE_ID);
-        existingCase.setData(existingData);
-        existingCase.setId(CASE_ID);
-        existingCase.setCaseTypeId(CASE_TYPE_ID);
-        when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.of(existingCase));
+        mockExistingCaseDetails(Maps.newHashMap());
 
         classifiedCase = new CaseDetails();
         Map<String, JsonNode> classifiedData = Maps.newHashMap();
@@ -178,12 +183,26 @@ class AuthorisedCreateEventOperationTest {
             eq(USER_ROLES),
             eq(CAN_READ),
             anyBoolean())).thenReturn(authorisedCaseNode);
+
+        Predicate<CaseDetails> predicate = cd -> true;
+        when(caseAccessCategoriesService
+            .caseHasMatchingCaseAccessCategories(anySet(), anyBoolean())).thenReturn(predicate);
+
         when(caseDetailsJsonParser.read(any(CaseDetails.class), anyString())).thenCallRealMethod();
         when(caseDetailsJsonParser.containsDocumentUrl(any(CaseDetails.class), anyString())).thenCallRealMethod();
         doCallRealMethod().when(caseDetailsJsonParser)
             .updateCaseDocumentData(anyString(), anyString(), any(CaseDetails.class));
         doCallRealMethod().when(caseDetailsJsonParser).compiledPath(anyString());
         doCallRealMethod().when(caseDetailsJsonParser).compiledPath(anyString(), anyBoolean());
+    }
+
+    private void mockExistingCaseDetails(Map<String, JsonNode> existingData) {
+        CaseDetails existingCase = new CaseDetails();
+        existingCase.setState(STATE_ID);
+        existingCase.setData(existingData);
+        existingCase.setId(CASE_ID);
+        existingCase.setCaseTypeId(CASE_TYPE_ID);
+        when(getCaseOperation.execute(CASE_REFERENCE)).thenReturn(Optional.of(existingCase));
     }
 
     private static Set<AccessProfile> createAccessProfiles(Set<String> userRoles) {
@@ -572,4 +591,112 @@ class AuthorisedCreateEventOperationTest {
             .createCaseSystemEvent(caseReference, 1, attributeField, categoryId));
     }
 
+
+    @Test
+    @DisplayName("should fail if case data not match with case access categories")
+    void shouldFailIfCaseAccessCategoriesNotMatchWithCaseData() {
+        Set<AccessProfile> accessProfiles =
+            createAccessProfilesWithCaseAccessCategories(Sets.newHashSet("Civil/Standard"));
+        mockAccess(accessProfiles);
+
+        Map<String, JsonNode> data = getCaseAccessCategoriesData("Civil/Test");
+        mockExistingCaseDetails(data);
+
+        CaseDataContent newCaseDataContent = createNewCaseDataContent("Civil/Test1");
+        CaseDetails classifiedCase = new CaseDetails();
+        Map<String, JsonNode> classifiedData = Maps.newHashMap();
+        classifiedCase.setData(classifiedData);
+        doReturn(classifiedCase).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
+            newCaseDataContent);
+
+        assertThrows(CaseNotFoundException.class, () ->
+            authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE, newCaseDataContent));
+    }
+
+    @Test
+    @DisplayName("should return case details if case data match with case access categories")
+    void shouldReturnCaseDetailsIfCaseAccessCategoriesMatchCaseData() {
+        Set<AccessProfile> accessProfiles =
+            createAccessProfilesWithCaseAccessCategories(Sets.newHashSet("Civil/Standard"));
+        mockAccess(accessProfiles);
+
+        Map<String, JsonNode> data = getCaseAccessCategoriesData("Civil/Standard/Test");
+        mockExistingCaseDetails(data);
+
+        CaseDataContent newCaseDataContent = createNewCaseDataContent("Civil/Standard/Test");
+        CaseDetails classifiedCase = new CaseDetails();
+        Map<String, JsonNode> classifiedData = Maps.newHashMap();
+        classifiedCase.setData(classifiedData);
+        doReturn(classifiedCase).when(createEventOperation).createCaseEvent(CASE_REFERENCE,
+            newCaseDataContent);
+
+        final CaseDetails caseDetails = authorisedCreateEventOperation.createCaseEvent(CASE_REFERENCE,
+            newCaseDataContent);
+        assertNotNull(caseDetails);
+    }
+
+    private void mockAccess(Set<AccessProfile> accessProfiles) {
+        when(caseAccessService.getAccessProfiles(anyString())).thenReturn(accessProfiles);
+        when(caseAccessService.getAccessProfilesByCaseReference(anyString())).thenReturn(accessProfiles);
+
+        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
+            eq(accessProfiles), eq(CAN_UPDATE)))
+            .thenReturn(true);
+        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
+            eq(accessProfiles),
+            eq(CAN_UPDATE))).thenReturn(true);
+        when(accessControlService.canAccessCaseStateWithCriteria(eq(STATE_ID),
+            eq(caseTypeDefinition), eq(accessProfiles),
+            eq(CAN_UPDATE))).thenReturn(true);
+
+        when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_ID),
+            eq(events),
+            eq(accessProfiles),
+            eq(CAN_CREATE))).thenReturn(true);
+
+        when(accessControlService.canAccessCaseEventWithCriteria(eq(EVENT_ID),
+            eq(events),
+            eq(accessProfiles),
+            eq(CAN_CREATE))).thenReturn(true);
+
+        when(accessControlService.canAccessCaseFieldsForUpsert(any(JsonNode.class),
+            any(JsonNode.class),
+            eq(caseFieldDefinitions),
+            eq(accessProfiles))).thenReturn(true);
+        when(accessControlService.canAccessCaseTypeWithCriteria(eq(caseTypeDefinition),
+            eq(accessProfiles),
+            eq(CAN_READ))).thenReturn(true);
+
+        when(caseAccessCategoriesService
+            .caseHasMatchingCaseAccessCategories(eq(accessProfiles), eq(false))).thenCallRealMethod();
+    }
+
+    private static Set<AccessProfile> createAccessProfilesWithCaseAccessCategories(Set<String> caseAccessCategories) {
+        return caseAccessCategories.stream()
+            .map(caseAccessCategory -> AccessProfile.builder().readOnly(false)
+                .caseAccessCategories(caseAccessCategory)
+                .build())
+            .collect(Collectors.toSet());
+    }
+
+    private Map<String, JsonNode> getCaseAccessCategoriesData(String caseAccessCategoryValue) {
+        JsonNode caseAccessCategory = new TextNode(caseAccessCategoryValue);
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("CaseAccessCategory", caseAccessCategory);
+        return data;
+    }
+
+    private CaseDataContent createNewCaseDataContent(String caseAccessCategoryValue) {
+        JsonNode caseAccessCategory = new TextNode(caseAccessCategoryValue);
+        Map<String, JsonNode> data = new HashMap<>();
+        data.put("CaseAccessCategory", caseAccessCategory);
+
+        CaseDataContent caseDataContent = newCaseDataContent()
+            .withEvent(EVENT)
+            .withData(data)
+            .withToken(TOKEN)
+            .withIgnoreWarning(IGNORE)
+            .build();
+        return caseDataContent;
+    }
 }

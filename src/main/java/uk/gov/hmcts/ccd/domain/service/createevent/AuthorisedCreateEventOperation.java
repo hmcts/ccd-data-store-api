@@ -15,7 +15,9 @@ import uk.gov.hmcts.ccd.domain.model.definition.CreateCaseEventDetails;
 import uk.gov.hmcts.ccd.domain.model.std.CaseDataContent;
 import uk.gov.hmcts.ccd.domain.model.std.Event;
 import uk.gov.hmcts.ccd.domain.service.common.AccessControlService;
+import uk.gov.hmcts.ccd.domain.service.common.CaseAccessCategoriesService;
 import uk.gov.hmcts.ccd.domain.service.common.CaseAccessService;
+import uk.gov.hmcts.ccd.domain.service.getcase.CaseNotFoundException;
 import uk.gov.hmcts.ccd.domain.service.getcase.GetCaseOperation;
 import uk.gov.hmcts.ccd.domain.service.jsonpath.CaseDetailsJsonParser;
 import uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException;
@@ -23,6 +25,7 @@ import uk.gov.hmcts.ccd.endpoint.exceptions.ResourceNotFoundException;
 import uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static uk.gov.hmcts.ccd.domain.service.common.AccessControlService.CAN_CREATE;
@@ -44,6 +47,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
     private final GetCaseOperation getCaseOperation;
     private final AccessControlService accessControlService;
     private final CaseAccessService caseAccessService;
+    private final CaseAccessCategoriesService caseAccessCategoriesService;
     private final CaseDetailsJsonParser caseDetailsJsonParser;
 
     public AuthorisedCreateEventOperation(@Qualifier("classified") final CreateEventOperation createEventOperation,
@@ -52,6 +56,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
                                           final CaseDefinitionRepository caseDefinitionRepository,
                                           final AccessControlService accessControlService,
                                           CaseAccessService caseAccessService,
+                                          CaseAccessCategoriesService caseAccessCategoriesService,
                                           CaseDetailsJsonParser caseDetailsJsonParser) {
 
         this.createEventOperation = createEventOperation;
@@ -59,6 +64,7 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         this.getCaseOperation = getCaseOperation;
         this.accessControlService = accessControlService;
         this.caseAccessService = caseAccessService;
+        this.caseAccessCategoriesService = caseAccessCategoriesService;
         this.caseDetailsJsonParser = caseDetailsJsonParser;
     }
 
@@ -66,17 +72,27 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
     public CaseDetails createCaseEvent(String caseReference,
                                        CaseDataContent content) {
 
-        CreateCaseEventDetails createCaseEventDetails = getCreateCaseEventDetails(caseReference);
+        CaseDetails existingCaseDetails = getCaseOperation.execute(caseReference)
+            .orElseThrow(() -> new ResourceNotFoundException("Case not found"));
 
-        verifyUpsertAccess(content.getEvent(), content.getData(), createCaseEventDetails.getCaseDetails(),
-            createCaseEventDetails.getCaseTypeDefinition(), createCaseEventDetails.getAccessProfiles());
+        Set<AccessProfile> accessProfiles = caseAccessService.getAccessProfilesByCaseReference(caseReference);
+        if (accessProfiles == null || accessProfiles.isEmpty()) {
+            throw new ValidationException("Cannot find user roles for the user");
+        }
 
+        String caseTypeId = existingCaseDetails.getCaseTypeId();
+        final CaseTypeDefinition caseTypeDefinition = caseDefinitionRepository.getCaseType(caseTypeId);
+        if (caseTypeDefinition == null) {
+            throw new ValidationException("Cannot find case type definition for  " + caseTypeId);
+        }
 
+        verifyCaseAccessCategories(accessProfiles, existingCaseDetails);
+        verifyUpsertAccess(content.getEvent(), content.getData(), existingCaseDetails,
+            caseTypeDefinition, accessProfiles);
 
         final CaseDetails caseDetails = createEventOperation.createCaseEvent(caseReference,
                                                                              content);
-        return verifyReadAccess(createCaseEventDetails.getCaseTypeDefinition(), createCaseEventDetails
-            .getAccessProfiles(), caseDetails);
+        return verifyReadAccess(caseTypeDefinition, accessProfiles, caseDetails);
     }
 
     @Override
@@ -136,6 +152,14 @@ public class AuthorisedCreateEventOperation implements CreateEventOperation {
         }
         createCaseEventDetails.setCaseTypeDefinition(caseTypeDefinition);
         return createCaseEventDetails;
+    }
+
+    private void verifyCaseAccessCategories(Set<AccessProfile> accessProfiles, CaseDetails existingCaseDetails) {
+        Optional<CaseDetails> filteredCaseDetails = Optional.of(existingCaseDetails)
+            .filter(caseAccessCategoriesService.caseHasMatchingCaseAccessCategories(accessProfiles, false));
+        if (filteredCaseDetails.isEmpty()) {
+            throw new CaseNotFoundException(existingCaseDetails.getReferenceAsString());
+        }
     }
 
     private CaseDetails verifyReadAccess(CaseTypeDefinition caseTypeDefinition,
