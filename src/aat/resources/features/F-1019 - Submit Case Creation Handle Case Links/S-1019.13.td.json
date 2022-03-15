@@ -1,11 +1,11 @@
 {
-  "_guid_": "S-1009.13",
-  "_extends_": "F-1009_Test_Data_Base_Error_Response_V2",
+  "_guid_": "S-1019.13",
+  "_extends_": "F-1019_Test_Data_Base_Error_Response_V2",
 
   "title": "CaseLink field contains Invalid CaseReference value and Submit Case Creation Event is invoked on v2_external#/case-controller/createCaseUsingPOST",
 
   "prerequisites" : [ {
-    "Token_Creation": "S-1009_GetCreateToken"
+    "Token_Creation": "S-1019_GetCreateToken"
   }
   ],
 
@@ -21,7 +21,7 @@
         "CaseLinkField": {
           "CaseReference": "7247798054644494"
         },
-        "TextField" : "S-1009.13"
+        "TextField" : "S-1019.13"
       },
       "event": {
         "id": "createCaseCaseLinks",

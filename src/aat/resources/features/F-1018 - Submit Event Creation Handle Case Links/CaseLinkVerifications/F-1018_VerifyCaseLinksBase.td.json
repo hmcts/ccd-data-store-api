@@ -1,6 +1,6 @@
 {
 	"title": "should retrieve case links for a specified case reference",
-	"_guid_": "F-1008_VerifyCaseLinksBase",
+	"_guid_": "F-1018_VerifyCaseLinksBase",
 
 	"productName": "CCD Data Store",
 	"operationName": "Retrieve case links for an existing case reference",
@@ -24,7 +24,7 @@
       "experimental": "true"
 		},
 		"pathVariables": {
-			"cid": "${[scenarioContext][parentContext][childContexts][F-1008_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+			"cid": "${[scenarioContext][parentContext][childContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
 		}
 	},
 

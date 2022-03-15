@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-1007_GetUpdateSuspendedCaseTokenCitizen",
-  "_extends_": "F-1006_GetEventTokenBase",
+  "_guid_": "S-1017_GetUpdateSuspendedCaseTokenCitizen",
+  "_extends_": "F-1016_GetEventTokenBase",
 
   "uri": "/citizens/{uid}/jurisdictions/{jid}/case-types/{ctid}/cases/{cid}/event-triggers/{etid}/token",
 
@@ -12,7 +12,7 @@
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][parentContext][childContexts][F-1007_CreateSuspendedCasePreRequisiteCitizen][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1017_CreateSuspendedCasePreRequisiteCitizen][testData][actualResponse][body][id]}"
     }
   }
 }

@@ -1,25 +1,25 @@
 {
-  "_guid_": "S-1008.6",
-  "_extends_": "F-1008_Test_Data_Base_Negative",
+  "_guid_": "S-1018.6",
+  "_extends_": "F-1018_Test_Data_Base_Negative",
 
   "title": "Case Link does not exist at present and CaseLink field in the Request contains INVALID CaseReference value and Submit Event Creation is invoked on v1_external#/caseworker/case-details-endpoint/validateCaseDetailsUsingPOST",
 
   "specs": [
     "an active profile in CCD",
-    "contains correctly configured CaseLink field with Case Reference created in F-1008_CreateCasePreRequisiteCaseworkerBase",
+    "contains correctly configured CaseLink field with Case Reference created in F-1018_CreateCasePreRequisiteCaseworkerBase",
     "CaseLink field has an invalid reference"
   ],
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1008_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
     },
     "body": {
       "data": {
         "CaseLinkField": {
           "CaseReference": "INVALID_CASE_REF"
         },
-        "TextField" : "S-1008.6"
+        "TextField" : "S-1018.6"
       },
       "event": {
         "id": "updateCase",
@@ -27,7 +27,7 @@
         "description": ""
       },
       "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][F-1008-GetUpdateEventToken][testData][actualResponse][body][token]}",
+      "event_token" : "${[scenarioContext][childContexts][F-1018-GetUpdateEventToken][testData][actualResponse][body][token]}",
       "ignore_warning": true
     }
   },

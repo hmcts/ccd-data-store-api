@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-1006_GetCaseDetails_Base",
+  "_guid_": "F-1016_GetCaseDetails_Base",
 
   "productName": "CCD Data Store",
   "operationName": "retrieve a case by id",

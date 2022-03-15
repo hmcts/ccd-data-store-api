@@ -1,6 +1,6 @@
 {
-  "_guid_": "S-1005.15",
-  "_extends_": "F-1005_RetrieveTriggerInternalErrorResponse",
+  "_guid_": "S-1015.15",
+  "_extends_": "F-1015_RetrieveTriggerInternalErrorResponse",
   "title": "must error when updating a case where about to start callback has modified TTL.SystemTTL",
 
   "specs": [
@@ -20,7 +20,7 @@
 
   "request": {
     "pathVariables": {
-      "caseId": "${[scenarioContext][childContexts][F-1005_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
+      "caseId": "${[scenarioContext][childContexts][F-1015_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}",
       "triggerId": "updateModifiedOverrideTTL"
     }
   }

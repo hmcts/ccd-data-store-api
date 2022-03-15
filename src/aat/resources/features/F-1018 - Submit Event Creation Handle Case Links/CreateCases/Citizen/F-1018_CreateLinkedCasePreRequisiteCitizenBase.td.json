@@ -1,13 +1,13 @@
 {
-  "_guid_": "F-1008_CreateLinkedCasePreRequisiteCitizenBase",
-  "_extends_": "F-1008_CreateCasePreRequisiteCitizenBase",
+  "_guid_": "F-1018_CreateLinkedCasePreRequisiteCitizenBase",
+  "_extends_": "F-1018_CreateCasePreRequisiteCitizenBase",
 
   "request": {
     "body": {
       "data": {
         "TextField": "This is the case that is currently linked to the case being updated",
         "CaseLinkField": {
-          "CaseReference": "${}${[scenarioContext][siblingContexts][F-1008_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
+          "CaseReference": "${}${[scenarioContext][siblingContexts][F-1018_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
         }
       }
     }
@@ -18,7 +18,7 @@
       "case_data" : {
         "TextField": "This is the case that is currently linked to the case being updated",
         "CaseLinkField": {
-          "CaseReference": "${}${[scenarioContext][siblingContexts][F-1008_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
+          "CaseReference": "${}${[scenarioContext][siblingContexts][F-1018_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
         }
       },
       "data_classification" : {
