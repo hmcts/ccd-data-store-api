@@ -108,18 +108,11 @@ public class DocumentValidatorTest implements IVallidatorTest {
         final FieldTypeDefinition dateTimeFieldTypeDefinition = mock(FieldTypeDefinition.class);
         when(documentFieldTypeDefinition.getType()).thenReturn("Document");
         when(dateTimeFieldTypeDefinition.getType()).thenReturn("DateTime");
-        final CaseTypeDefinition caseTypeDefinition = mock(CaseTypeDefinition.class);
-        caseDefinitionRepository = mock(CaseDefinitionRepository.class);
 
-        Category category = new Category();
-        category.setCategoryId(VALID_CATEGORY_ID);
-        List<Category> categories = List.of(category);
-        doReturn(categories)
-            .when(caseTypeDefinition).getCategories();
+        caseDefinitionRepository = mock(CaseDefinitionRepository.class);
         doReturn(List.of(documentFieldTypeDefinition, dateTimeFieldTypeDefinition))
             .when(caseDefinitionRepository).getBaseTypes();
-        doReturn(caseTypeDefinition)
-            .when(caseDefinitionRepository).getCaseType(anyString());
+
         BaseType.setCaseDefinitionRepository(caseDefinitionRepository);
 
         final ObjectNode data;
@@ -424,7 +417,8 @@ public class DocumentValidatorTest implements IVallidatorTest {
         data = createDoc(CATEGORY_ID,null);
         validDocumentUrlResult = validator.validate(CATEGORY_ID, data, caseFieldDefinition);
         assertThat(validDocumentUrlResult, hasSize(1));
-        assertThat(validDocumentUrlResult.get(0).getErrorMessage(), is(CATEGORY_ID + " is not a text value or is empty"));
+        assertThat(validDocumentUrlResult.get(0).getErrorMessage(),
+            is(CATEGORY_ID + " is not a text value or is empty"));
     }
 
     @Test
@@ -439,6 +433,8 @@ public class DocumentValidatorTest implements IVallidatorTest {
 
     @Test
     public void shouldValidateCategoryId() {
+
+        setupWithCategories();
         data = createDoc(CATEGORY_ID, VALID_CATEGORY_ID);
         caseFieldDefinition.setCaseTypeId(CASE_TYPE_ID);
 
@@ -492,5 +488,16 @@ public class DocumentValidatorTest implements IVallidatorTest {
             + "[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/segments/[0-9]+");
         validator = new DocumentValidator(applicationParams,null, null, null);
         return validator;
+    }
+
+    private void setupWithCategories() {
+        final CaseTypeDefinition caseTypeDefinition = mock(CaseTypeDefinition.class);
+        Category category = new Category();
+        category.setCategoryId(VALID_CATEGORY_ID);
+        List<Category> categories = List.of(category);
+        doReturn(caseTypeDefinition)
+            .when(caseDefinitionRepository).getCaseType(anyString());
+        doReturn(categories)
+            .when(caseTypeDefinition).getCategories();
     }
 }

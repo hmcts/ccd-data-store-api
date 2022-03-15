@@ -18,8 +18,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-//todo remove todo squid. S3776 is cognitive... New ticket to move doc binary to another method
-@SuppressWarnings({"squid:S3776","squid:S1135"})
 @Named("DocumentValidator")
 @Singleton
 public class DocumentValidator implements BaseTypeValidator {
@@ -28,8 +26,7 @@ public class DocumentValidator implements BaseTypeValidator {
     private static final String DOCUMENT_BINARY_URL = "document_binary_url";
     private static final String CATEGORY_ID = "category_id";
     private static final String UPLOAD_TIMESTAMP = "upload_timestamp";
-    private static final String LOG_MESSAGE = "Validation failure for: "; //todo remove
-    private static final String NOT_VALID = " is not a text value or is empty";
+    private static final String NOT_TEXT_OR_EMPTY = " is not a text value or is empty";
 
     private static final Logger LOG = LoggerFactory.getLogger(DocumentValidator.class);
 
@@ -37,6 +34,8 @@ public class DocumentValidator implements BaseTypeValidator {
     private final TextValidator textValidator;
     private final DateTimeValidator dateTimeValidator;
     private final CaseDefinitionRepository caseDefinitionRepository;
+    private List<ValidationResult> validationResults;
+    private List<ValidationResult> isNullOrEmptyResult;
 
     public DocumentValidator(ApplicationParams applicationParams,
                              @Qualifier("TextValidator") TextValidator textValidator,
@@ -47,6 +46,8 @@ public class DocumentValidator implements BaseTypeValidator {
         this.textValidator = textValidator;
         this.dateTimeValidator = dateTimeValidator;
         this.caseDefinitionRepository = caseDefinitionRepository;
+        validationResults = List.of();
+        isNullOrEmptyResult = List.of();
     }
 
     @Override
@@ -71,16 +72,15 @@ public class DocumentValidator implements BaseTypeValidator {
         }
 
         final JsonNode documentUrl = dataValue.get(DOCUMENT_URL);
-
-        if (Boolean.TRUE.equals(isNullOrEmpty(documentUrl))) {
-            return Collections.singletonList(new ValidationResult(
-                DOCUMENT_URL + NOT_VALID, dataFieldId));
+        isNullOrEmptyResult = isNullOrEmpty(documentUrl,DOCUMENT_URL,dataFieldId);
+        if (!isNullOrEmptyResult.isEmpty()) {
+            return isNullOrEmptyResult;
         }
 
         final String documentUrlValue = documentUrl.textValue();
         if (documentUrlValue == null) {
             return Collections.singletonList(new ValidationResult(
-                DOCUMENT_URL + NOT_VALID, dataFieldId));
+                DOCUMENT_URL + NOT_TEXT_OR_EMPTY, dataFieldId));
         }
 
         final String urlPatternString = applicationParams.getDocumentURLPattern();
@@ -96,34 +96,23 @@ public class DocumentValidator implements BaseTypeValidator {
 
         if (dataValue.has(DOCUMENT_BINARY_URL)) {
             final JsonNode documentBinaryUrl = dataValue.get(DOCUMENT_BINARY_URL);
-
-            if (Boolean.TRUE.equals(isNullOrEmpty(documentBinaryUrl))) {
-                return Collections.singletonList(new ValidationResult(
-                    DOCUMENT_BINARY_URL + NOT_VALID, dataFieldId));
-            }
-
-            final String documentBinaryUrlValue = documentBinaryUrl.textValue();
-            final Matcher documentBinaryUrlMatcher = urlPattern.matcher(documentBinaryUrlValue);
-
-            if (!documentBinaryUrlMatcher.matches()) {
-                LOG.error("{} does not match Document Management domain or expected URL path {} {}",
-                          documentUrlValue, urlPatternString, dataFieldId);
-                return Collections.singletonList(new ValidationResult(documentBinaryUrlValue
-                    + " does not match Document Management domain or expected URL path", dataFieldId));
+            validationResults = validateDocumentBinaryURL(
+                dataFieldId,documentBinaryUrl,urlPattern,documentUrlValue, urlPatternString);
+            if (!validationResults.isEmpty()) {
+                return validationResults;
             }
         }
 
         if (dataValue.has(CATEGORY_ID)) {
-            // TODO Should the parent_category_id be expected/checked?
-            List<ValidationResult> validationResults = validateCategoryId(dataFieldId,dataValue,caseFieldDefinition);
+            validationResults = validateCategoryId(dataFieldId,dataValue,caseFieldDefinition);
             if (!validationResults.isEmpty()) {
                 return validationResults;
             }
         }
 
         if (dataValue.has(UPLOAD_TIMESTAMP)) {
-            List<ValidationResult> validationResults =
-                validateUploadTimeStamp(dataFieldId,dataValue,caseFieldDefinition);
+            final JsonNode uploadTimeStamp = dataValue.get(UPLOAD_TIMESTAMP);
+            validationResults = validateUploadTimeStamp(dataFieldId,uploadTimeStamp,caseFieldDefinition);
             if (!validationResults.isEmpty()) {
                 return validationResults;
             }
@@ -132,32 +121,49 @@ public class DocumentValidator implements BaseTypeValidator {
         return Collections.emptyList();
     }
 
+    private List<ValidationResult> validateDocumentBinaryURL(final String dataFieldId,
+                                                             final JsonNode documentBinaryUrl,
+                                                             Pattern urlPattern,
+                                                             String documentUrlValue,
+                                                             String urlPatternString) {
+        isNullOrEmptyResult = isNullOrEmpty(documentBinaryUrl,DOCUMENT_BINARY_URL,dataFieldId);
+        if (!isNullOrEmptyResult.isEmpty()) {
+            return isNullOrEmptyResult;
+        }
+
+        final String documentBinaryUrlValue = documentBinaryUrl.textValue();
+        final Matcher documentBinaryUrlMatcher = urlPattern.matcher(documentBinaryUrlValue);
+
+        if (!documentBinaryUrlMatcher.matches()) {
+            LOG.error("{} does not match Document Management domain or expected URL path {} {}",
+                documentUrlValue, urlPatternString, dataFieldId);
+            return Collections.singletonList(new ValidationResult(documentBinaryUrlValue
+                + " does not match Document Management domain or expected URL path", dataFieldId));
+        }
+        return Collections.emptyList();
+    }
+
     private List<ValidationResult> validateCategoryId(final String dataFieldId,
                                                       final JsonNode dataValue,
                                                       final CaseFieldDefinition caseFieldDefinition) {
         final JsonNode categoryId = dataValue.get(CATEGORY_ID);
-
-        if (Boolean.TRUE.equals(isNullOrEmpty(categoryId))) {
-            LOG.debug("{} is not a text value or is empty", CATEGORY_ID);
-            return Collections.singletonList(new ValidationResult(
-                CATEGORY_ID + NOT_VALID, dataFieldId));
+        isNullOrEmptyResult = (isNullOrEmpty(categoryId,CATEGORY_ID,dataFieldId));
+        if (!isNullOrEmptyResult.isEmpty()) {
+            return isNullOrEmptyResult;
         }
 
         if (!dataValue.has("parent_category_id")) {
-            // TODO Should the parent_category_id be expected/checked?
-            LOG.info("Object does not have parent_category_id key specified");
+            LOG.warn("Object does not have parent_category_id key specified");
         }
 
-        final List<ValidationResult> validationResults =
+        validationResults =
             textValidator.validate(dataFieldId, categoryId, caseFieldDefinition);
-
         if (!checkValidationResults(validationResults,CATEGORY_ID).isEmpty()) {
             return validationResults;
         }
 
         final List<Category> categoryList =
             caseDefinitionRepository.getCaseType(caseFieldDefinition.getCaseTypeId()).getCategories();
-
         final boolean categoryCheck = categoryList.stream()
             .anyMatch(category ->
                 category.getCategoryId().contains(categoryId.textValue()));
@@ -171,29 +177,40 @@ public class DocumentValidator implements BaseTypeValidator {
     }
 
     private List<ValidationResult> validateUploadTimeStamp(final String dataFieldId,
-                                                           final JsonNode dataValue,
+                                                           final JsonNode uploadTimeStamp,
                                                            final CaseFieldDefinition caseFieldDefinition) {
-        final JsonNode uploadTimeStamp = dataValue.get(UPLOAD_TIMESTAMP);
 
-        if (Boolean.TRUE.equals(isNullOrEmpty(uploadTimeStamp))) {
-            LOG.debug("{} is not a text value or is null", UPLOAD_TIMESTAMP);
-            return Collections.singletonList(new ValidationResult(
-                UPLOAD_TIMESTAMP + NOT_VALID, dataFieldId));
+        isNullOrEmptyResult = (isNullOrEmpty(uploadTimeStamp,UPLOAD_TIMESTAMP,dataFieldId));
+        if (!isNullOrEmptyResult.isEmpty()) {
+            return isNullOrEmptyResult;
         }
 
-        final List<ValidationResult> validationResults =
-            dateTimeValidator.validate(dataFieldId, uploadTimeStamp, caseFieldDefinition);
-
+        validationResults = dateTimeValidator.validate(dataFieldId, uploadTimeStamp, caseFieldDefinition);
         if (!checkValidationResults(validationResults,UPLOAD_TIMESTAMP).isEmpty()) {
             return validationResults;
         }
         return Collections.emptyList();
     }
 
+
+
+    private List<ValidationResult> isNullOrEmpty(final JsonNode dataValue,
+                                                 final String key,
+                                                 final String dataFieldId) {
+
+        if (Boolean.TRUE.equals(isNullOrEmpty(dataValue))) {
+            LOG.debug("{} is not a text value or is null", key);
+            return Collections.singletonList(new ValidationResult(
+                key + NOT_TEXT_OR_EMPTY, dataFieldId));
+        }
+
+        return Collections.emptyList();
+    }
+
     private List<ValidationResult> checkValidationResults(final List<ValidationResult> validationResults,
                                                           final String key) {
         if (!validationResults.isEmpty()) {
-            LOG.debug("{} {}",LOG_MESSAGE,key);
+            LOG.error("Validating {} failure",key);
             return validationResults.stream()
                 .map(validationResult ->
                     new ValidationResult(
