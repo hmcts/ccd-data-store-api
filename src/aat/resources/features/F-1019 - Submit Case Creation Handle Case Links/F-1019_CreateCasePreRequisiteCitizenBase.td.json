@@ -1,5 +1,5 @@
 {
-  "_guid_": "F-1009_CreateCasePreRequisiteCitizenBase",
+  "_guid_": "F-1019_CreateCasePreRequisiteCitizenBase",
   "_extends_": "Befta_Jurisdiction2_Citizen_Case_Creation_Base_Data",
 
   "specs": [
@@ -7,7 +7,7 @@
   ],
 
   "prerequisites" : [ {
-    "Token_Creation": "S-1009_GetCitizenCreateToken"
+    "Token_Creation": "S-1019_GetCitizenCreateToken"
   }
   ],
 

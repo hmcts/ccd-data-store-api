@@ -1,11 +1,11 @@
 {
-  "_guid_": "S-1009.9",
-  "_extends_": "F-1009_Test_Data_Citizen_Base_Error_Response",
+  "_guid_": "S-1019.9",
+  "_extends_": "F-1019_Test_Data_Citizen_Base_Error_Response",
 
   "title": "CaseLink field contains valid CaseReference value but case data invalid and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCitizenUsingPOST",
 
   "prerequisites" : [ {
-      "Token_Creation": "S-1009_GetCitizenCreateToken"
+      "Token_Creation": "S-1019_GetCitizenCreateToken"
     }
   ],
 
@@ -20,7 +20,7 @@
     "body": {
       "data": {
         "CaseLinkField": {
-          "CaseReference": "${}${[scenarioContext][childContexts][F-1009_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
+          "CaseReference": "${}${[scenarioContext][childContexts][F-1019_CreateCasePreRequisiteCitizenBase][testData][actualResponse][body][id]}"
         },
         "TextField" : 3
       },

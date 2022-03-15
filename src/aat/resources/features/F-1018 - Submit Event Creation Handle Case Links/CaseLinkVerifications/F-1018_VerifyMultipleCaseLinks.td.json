@@ -1,11 +1,11 @@
 {
 	"title": "should retrieve case links for a specified case reference",
-	"_guid_": "F-1008_VerifyMultipleCaseLinks",
-  "_extends_": "F-1008_VerifyCaseLinksBase",
+	"_guid_": "F-1018_VerifyMultipleCaseLinks",
+  "_extends_": "F-1018_VerifyCaseLinksBase",
 
 	"request": {
 		"pathVariables": {
-			"cid": "${[scenarioContext][parentContext][childContexts][F-1008_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+			"cid": "${[scenarioContext][parentContext][childContexts][F-1018_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
 		}
 	},
 
@@ -17,13 +17,13 @@
         "__elementId__": "LinkedCaseReference"
       },
       {
-        "CaseReference" : "${[scenarioContext][parentContext][childContexts][F-1008_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
-        "LinkedCaseReference" : "${[scenarioContext][parentContext][childContexts][F-1008_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+        "CaseReference" : "${[scenarioContext][parentContext][childContexts][F-1018_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+        "LinkedCaseReference" : "${[scenarioContext][parentContext][childContexts][F-1018_CreateCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
         "CaseTypeId" : "FT_MasterCaseType"
       },
       {
-        "CaseReference" : "${[scenarioContext][parentContext][childContexts][F-1008_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
-        "LinkedCaseReference" : "${[scenarioContext][parentContext][childContexts][F-1008_CreateThirdCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+        "CaseReference" : "${[scenarioContext][parentContext][childContexts][F-1018_CreateAnotherCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
+        "LinkedCaseReference" : "${[scenarioContext][parentContext][childContexts][F-1018_CreateThirdCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}",
         "CaseTypeId" : "FT_MasterCaseType"
       }]
 		}

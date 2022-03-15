@@ -1,11 +1,11 @@
 {
-  "_guid_": "S-1009.7",
-  "_extends_": "F-1009_Test_Data_Citizen_Base",
+  "_guid_": "S-1019.7",
+  "_extends_": "F-1019_Test_Data_Citizen_Base",
 
   "title": "CaseLink field contains blank value and Submit Case Creation Event is invoked on v1_external#/case-details-endpoint/saveCaseDetailsForCitizenUsingPOST",
 
   "prerequisites" : [ {
-      "Token_Creation": "S-1009_GetCitizenCreateToken"
+      "Token_Creation": "S-1019_GetCitizenCreateToken"
     }
   ],
 
@@ -20,7 +20,7 @@
         "CaseLinkField": {
           "CaseReference": ""
         },
-        "TextField" : "S-1009.7"
+        "TextField" : "S-1019.7"
       },
       "event": {
         "id": "createCaseCaseLinks",
@@ -36,7 +36,7 @@
   "expectedResponse": {
     "body" : {
       "case_data" : {
-        "TextField" : "S-1009.7",
+        "TextField" : "S-1019.7",
         "CaseLinkField" : {
           "CaseReference" : ""
         }

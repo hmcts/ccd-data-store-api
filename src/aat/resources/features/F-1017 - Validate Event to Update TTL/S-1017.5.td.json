@@ -1,17 +1,17 @@
 {
-  "_guid_": "S-1007.5",
-  "_extends_": "F-1007_Test_Data_Base_Citizen",
+  "_guid_": "S-1017.5",
+  "_extends_": "F-1017_Test_Data_Base_Citizen",
 
   "title": "TTL.SystemTTL changed after returning from Mid Event Callback and Validate Event is invoked on v1_external#/citizen/case-details-endpoint/validateCaseDetailsUsingPOST",
 
   "prerequisites" : [ {
-    "Token_Creation": "S-1007_GetUpdateSuspendedCaseTokenCitizen"
+    "Token_Creation": "S-1017_GetUpdateSuspendedCaseTokenCitizen"
   }
   ],
 
   "specs": [
     "an active profile in CCD",
-    "contains a case Id that has just been created as in F-1007_CreateSuspendedCasePreRequisiteCitizen",
+    "contains a case Id that has just been created as in F-1017_CreateSuspendedCasePreRequisiteCitizen",
     "contains an event token for the case just created above",
     "has the mid event callback change the TTL.SystemTTL value changed"
   ],

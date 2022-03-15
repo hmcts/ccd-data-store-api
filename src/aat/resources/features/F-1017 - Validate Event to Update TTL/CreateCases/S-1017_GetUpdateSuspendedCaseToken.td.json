@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-1007_GetUpdateSuspendedCaseToken",
+  "_guid_": "S-1017_GetUpdateSuspendedCaseToken",
   "_extends_": "Token_Creation_Data_For_Master_Caseworker_Case_Creation",
 
   "specs": [
@@ -15,7 +15,7 @@
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][parentContext][childContexts][F-1007_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1017_CreateSuspendedCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
     }
   },
 

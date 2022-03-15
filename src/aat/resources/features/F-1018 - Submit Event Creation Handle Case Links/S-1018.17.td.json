@@ -1,18 +1,18 @@
 {
-  "_guid_": "S-1008.17",
-  "_extends_": "F-1008_Test_Data_Base_Negative",
+  "_guid_": "S-1018.17",
+  "_extends_": "F-1018_Test_Data_Base_Negative",
 
   "title": "Case Link does not exist at present and CaseLink field in the Request contains INVALID CaseReference value and Submit Event Creation is invoked on v1_external#/case-details-endpoint/createCaseEventForCaseWorkerUsingPOST",
 
   "specs": [
     "an active profile in CCD",
     "contains correctly configured CaseLink field as a collection",
-    "specifying the case to be updated, as created in F-1008_CreateAnotherCasePreRequisiteCaseworkerBase, has a different CaseLink field in CaseCollection"
+    "specifying the case to be updated, as created in F-1018_CreateAnotherCasePreRequisiteCaseworkerBase, has a different CaseLink field in CaseCollection"
   ],
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][childContexts][F-1008_CreateMultipleLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][childContexts][F-1018_CreateMultipleLinkedCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
     },
     "body": {
       "data": {
@@ -26,10 +26,10 @@
           {
             "id": "84e22baf-5bec-4eec-a31f-7a3954efc9c3",
             "value": {
-              "CaseReference": "${}${[scenarioContext][childContexts][F-1008_CreateThirdCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
+              "CaseReference": "${}${[scenarioContext][childContexts][F-1018_CreateThirdCasePreRequisiteCaseworkerBase][testData][actualResponse][body][id]}"
             }
           }],
-        "TextField" : "S-1008.16"
+        "TextField" : "S-1018.16"
       },
       "event": {
         "id": "updateCase",
@@ -37,7 +37,7 @@
         "description": ""
       },
       "security_classification": "PUBLIC",
-      "event_token" : "${[scenarioContext][childContexts][F-1008-GetMultipleLinkedCaseUpdateEventToken][testData][actualResponse][body][token]}",
+      "event_token" : "${[scenarioContext][childContexts][F-1018-GetMultipleLinkedCaseUpdateEventToken][testData][actualResponse][body][token]}",
       "ignore_warning": true
     }
   },

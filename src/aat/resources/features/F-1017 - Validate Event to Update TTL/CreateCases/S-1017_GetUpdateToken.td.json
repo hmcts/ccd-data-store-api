@@ -1,5 +1,5 @@
 {
-  "_guid_": "S-1007_GetUpdateToken",
+  "_guid_": "S-1017_GetUpdateToken",
   "_extends_": "Token_Creation_Data_For_Master_Caseworker_Case_Creation",
 
   "specs": [
@@ -15,7 +15,7 @@
 
   "request": {
     "pathVariables": {
-      "cid": "${[scenarioContext][parentContext][childContexts][F-1007_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
+      "cid": "${[scenarioContext][parentContext][childContexts][F-1017_CreateCasePreRequisiteCaseworker][testData][actualResponse][body][id]}"
     }
   },
   "expectedResponse": {
